@@ -1,0 +1,11 @@
+'use client';
+
+import { useState } from 'react';
+import { Icon } from '../Home/icons';
+import type { MealName } from './types';
+
+export default function ReviewEstimate({ imageUrl, onRetake, onAddManual, onSave }: { imageUrl: string; onRetake: () => void; onAddManual: (meal: MealName) => void; onSave: (meal: MealName, portion: number) => void }) {
+  const [meal, setMeal] = useState<MealName>('Dinner');
+  const [portion, setPortion] = useState(1);
+  return <><header className="scan-header"><div><h2>Review estimate</h2></div><button onClick={onRetake}><Icon name="scan" size={13}/> Retake</button></header><div className="detected-foods"><div className="meal-photo">{imageUrl && <img src={imageUrl} alt="Selected meal for review"/>}<span><Icon name="meal" size={20}/></span></div><div className="detected-list"><b>Detected items <small>demo</small></b>{[['Grilled chicken breast','150 g','92'],['Steamed rice','1 cup','85'],['Mixed vegetables','80 g','61']].map(([name,amount,score])=><div key={name}><b>{name}</b><small>{amount}</small><em>{score}</em></div>)}</div></div><div className="scan-warning"><b>⚠</b><p><strong>Low confidence on 1 item</strong><br/>Check “Mixed vegetables” before saving, or edit the values manually.</p></div><section className="scan-choice"><h3>Meal</h3><div className="scan-chips">{(['Breakfast','Lunch','Snack','Dinner'] as MealName[]).map(option=><button key={option} className={meal===option?'active':''} onClick={()=>setMeal(option)}>{option}</button>)}</div></section><section className="scan-choice"><h3>Portion size</h3><div className="scan-chips portions">{[0.5,1,1.5,2].map(option=><button key={option} className={portion===option?'active':''} onClick={()=>setPortion(option)}>{option}×</button>)}</div></section><section className="estimated-macros"><h3>Estimated macros · sample values</h3>{[['Calories',`${Math.round(620*portion)} kcal`],['Protein',`${Math.round(48*portion)} g`],['Carbs',`${Math.round(72*portion)} g`],['Fat',`${Math.round(14*portion)} g`]].map(([name,value])=><div key={name}><span>{name}</span><b>{value}</b></div>)}</section><footer className="scan-footer split-footer"><button className="secondary" onClick={()=>onAddManual(meal)}>Edit manually</button><button className="primary" onClick={()=>onSave(meal,portion)}>Save entry</button></footer></>;
+}

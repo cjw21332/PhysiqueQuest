@@ -1,0 +1,10 @@
+{
+  "name": "physique-quest",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --workspace frontend",
+    "build": "npm run build --workspace frontend",
+    "start": "npm run start --workspace frontend"
+  },
+  "workspaces": ["frontend"]
+}
