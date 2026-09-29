@@ -23,6 +23,7 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
     health: <><path d="M20.4 8.8c0 4-8.4 10-8.4 10s-8.4-6-8.4-10a4.6 4.6 0 018.4-2.1 4.6 4.6 0 018.4 2.1z"/><path d="M6.7 11.5h3l1.5-2.7 2.2 5 1.4-2.6h2.7"/></>,
     crown: <><path d="m3 7 5 4 4-7 4 7 5-4-2 12H5L3 7z"/><path d="M6 22h12"/></>,
     sun: <><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></>,
+    moon: <><path d="M20 14.5A8.5 8.5 0 019.5 4a7 7 0 108.9 9.6 8.6 8.6 0 011.6.9z"/></>,
     lock: <><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3m-4 5v2"/></>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name] ?? paths.target}</svg>;

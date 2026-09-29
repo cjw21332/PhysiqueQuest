@@ -8,5 +8,10 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, maximumScale: 1, themeColor: '#f3f6f2' };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return <html lang="en" suppressHydrationWarning>
+    <head>
+      <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('physiquequest-theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){}" }}/>
+    </head>
+    <body>{children}</body>
+  </html>;
 }

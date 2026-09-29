@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import AuthForm from '../sections/Auth/AuthForm';
 import HomeSection from '../sections/Home/HomeSection';
+import ThemeToggle, { type Theme } from '../sections/Home/ThemeToggle';
 
 type Profile = { name: string; email: string; age: string; height: string; heightUnit: 'cm' | 'ftin'; weight: string; weightUnit: 'kg' | 'lbs'; gender: string; chest: string; waist: string; arms: string; activity: string; goal: string; targetWeight: string; targetDate: string; commitment: string; equipment: string[]; days: string[]; duration: string; conditions: string[]; notes: string; contactName: string; contactPhone: string };
 const emptyProfile: Profile = { name: '', email: '', age: '', height: '', heightUnit: 'cm', weight: '', weightUnit: 'kg', gender: 'Male', chest: '', waist: '', arms: '', activity: 'Moderate', goal: 'Build muscle', targetWeight: '', targetDate: '', commitment: 'Consistent', equipment: ['Dumbbells'], days: ['M-0', 'W-2', 'F-4', 'S-5'], duration: '45 min', conditions: [], notes: '', contactName: '', contactPhone: '' };
@@ -37,9 +38,22 @@ export default function Home() {
   const [consent, setConsent] = useState(false);
   const [authError, setAuthError] = useState('');
   const [notice, setNotice] = useState('');
+  const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => { try { const saved = localStorage.getItem('physiquequest-profile'); if (saved) setProfile({ ...emptyProfile, ...JSON.parse(saved) }); } catch { /* A fresh profile is used if saved browser data is unavailable. */ } setReady(true); }, []);
   useEffect(() => { if (ready) localStorage.setItem('physiquequest-profile', JSON.stringify(profile)); }, [profile, ready]);
+  useEffect(() => {
+    let saved: string | null = null;
+    try { saved = localStorage.getItem('physiquequest-theme'); } catch { /* Fall back to the system preference below. */ }
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(saved === 'light' || saved === 'dark' ? saved : prefersDark ? 'dark' : 'light');
+  }, []);
+  useEffect(() => {
+    if (!theme) return;
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem('physiquequest-theme', theme); } catch { /* The theme still applies for this session. */ }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#070a0e' : '#f3f6f2');
+  }, [theme]);
   const bmi = useMemo(() => {
     const heightCm = Number(profile.height);
     const enteredWeight = Number(profile.weight);
@@ -85,6 +99,7 @@ export default function Home() {
   const weightControl = (target = false) => { const key = target ? 'targetWeight' : 'weight'; return <label className="field"><span>{target ? 'Target weight' : 'Weight'}</span><div className="input-wrap"><input aria-label={`${target ? 'Target weight' : 'Weight'} in ${profile.weightUnit}`} type="number" min="0" placeholder={target ? '' : profile.weightUnit === 'kg' ? 'e.g. 70' : 'e.g. 154'} value={displayWeight(profile[key])} onChange={e => update(key, e.target.value)} inputMode="decimal"/><select aria-label="Weight unit" value={profile.weightUnit} onChange={e => switchWeightUnit(e.target.value as Profile['weightUnit'])}><option value="kg">kg</option><option value="lbs">lbs</option></select></div></label>; };
 
   return <main className="scene"><div className="app-shell">
+    {theme && <ThemeToggle theme={theme} onToggle={() => setTheme(current => current === 'dark' ? 'light' : 'dark')}/>}
     {screen === 'launch' && <section className="launch screen-enter"><div className="brand-mark">PQ</div><h1>PhysiqueQuest</h1><p className="subtitle">AI-assisted, gamified fitness<br className="desktop-break"/> coaching that watches your form.</p><div className="readiness"><div className="readiness-head"><b>Device readiness</b><span>2 of 3 ready</span></div><div className="ready-row"><b className="ready-icon">✓</b><p>Android 12 or higher<small>Android 14 detected</small></p></div><div className="ready-row"><b className="ready-icon">✓</b><p>High-speed Wi-Fi<small>Connected · 84 Mbps</small></p></div><div className="ready-row"><b className="camera-icon">◎</b><p>Camera permission<small>Needed for form tracking</small></p><button className="allow" onClick={() => setNotice('Camera access can be enabled when you start a camera-guided workout.')}>Allow</button></div></div><div className="launch-actions"><button className="primary" onClick={begin}>Get started</button><button className="secondary" onClick={() => { setAuthMode('login'); setAuthError(''); setScreen('auth'); }}>I already have an account</button></div></section>}
 
     {screen === 'auth' && <AuthForm mode={authMode} onModeChange={setAuthMode} name={profile.name} email={profile.email} onNameChange={value => update('name', value)} onEmailChange={value => update('email', value)} onContinue={continueAuth} error={authError} onErrorChange={setAuthError} consent={consent} onConsentChange={setConsent}/>}
