@@ -13,6 +13,8 @@ Install dependencies with `npm install`, then start the app with `npm run dev`. 
 - `frontend/sections/Home/` — dashboard, bottom navigation, goals, progress, notifications, and shared Home icons.
 - `frontend/sections/Coach/` — coach plan, exercise library, camera check, live session, and workout report.
 - `frontend/sections/Scan/` — nutrition overview, meal review, manual food entry, daily log, and history.
+- `frontend/sections/Quests Section/` — level and streak progress, daily missions, penalty rules, and badges.
+- `frontend/sections/Me Section/` — profile summary, safety preferences, privacy controls, and account settings.
 - `backend/` — handoff notes and reserved location for a future API.
 
 ## Current prototype
@@ -21,4 +23,4 @@ Welcome and device readiness, register/login entry, four onboarding steps (perso
 
 ## Progress report
 
-See [PROGRESS.md](./PROGRESS.md) for the initial onboarding handoff, [PROGRESS-2.md](./PROGRESS-2.md) for Home, [PROGRESS-3.md](./PROGRESS-3.md) for Coach, and [PROGRESS-4.md](./PROGRESS-4.md) for Scan.
+See [PROGRESS.md](./PROGRESS.md) for the initial onboarding handoff, [PROGRESS-2.md](./PROGRESS-2.md) for Home, [PROGRESS-3.md](./PROGRESS-3.md) for Coach, [PROGRESS-4.md](./PROGRESS-4.md) for Scan, [PROGRESS-5.md](./PROGRESS-5.md) for Quests, and [PROGRESS-6.md](./PROGRESS-6.md) for Me.

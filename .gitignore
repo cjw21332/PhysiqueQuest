@@ -1,5 +1,6 @@
 node_modules/
 frontend/.next/
+frontend/.next-dev/
 frontend/out/
 *.log
 .env
