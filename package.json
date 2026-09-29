@@ -3,8 +3,9 @@
   "private": true,
   "scripts": {
     "dev": "npm run dev --workspace frontend",
+    "expo": "npm run start --workspace mobile",
     "build": "npm run build --workspace frontend",
     "start": "npm run start --workspace frontend"
   },
-  "workspaces": ["frontend"]
+  "workspaces": ["frontend", "mobile"]
 }

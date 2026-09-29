@@ -6,6 +6,15 @@ A responsive, mobile-first fitness onboarding prototype based on the supplied de
 
 Install dependencies with `npm install`, then start the app with `npm run dev`. Open the local address shown in the terminal. The same responsive app works in phone, tablet, and desktop browsers.
 
+## Run on a phone with Expo Go
+
+1. Install dependencies with `npm install` from the project root.
+2. Start the live web app with `npm run dev` in one terminal.
+3. Start the Expo Go bridge with `npm run expo` in a second terminal.
+4. Connect your phone and computer to the same Wi-Fi, install or update Expo Go, and scan the Expo terminal QR code.
+
+The Expo app opens the live Next.js app in a native WebView. Changes to the web app appear on the phone as you work. The WebView can infer the computer address from the Expo connection; if your phone cannot connect, make sure both devices are on the same network and enter the computer's LAN address with `:3000` on the connection screen. Expo's tunnel can carry the Expo bundle, but your phone still needs network access to the web app on port 3000.
+
 ## Folders
 
 - `frontend/app/` — Next.js app entry point and responsive styling.
@@ -15,6 +24,7 @@ Install dependencies with `npm install`, then start the app with `npm run dev`. 
 - `frontend/sections/Scan/` — nutrition overview, meal review, manual food entry, daily log, and history.
 - `frontend/sections/Quests Section/` — level and streak progress, daily missions, penalty rules, and badges.
 - `frontend/sections/Me Section/` — profile summary, safety preferences, privacy controls, and account settings.
+- `mobile/` — Expo Go companion that opens the live Next.js app in a native WebView.
 - `backend/` — handoff notes and reserved location for a future API.
 
 ## Current prototype

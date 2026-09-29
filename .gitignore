@@ -2,6 +2,8 @@ node_modules/
 frontend/.next/
 frontend/.next-dev/
 frontend/out/
+mobile/.expo/
+mobile/dist/
 *.log
 .env
 .env.*

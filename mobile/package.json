@@ -1,0 +1,20 @@
+{
+  "name": "physique-quest-expo",
+  "private": true,
+  "version": "1.0.0",
+  "main": "expo/AppEntry",
+  "scripts": {
+    "start": "expo start --lan"
+  },
+  "dependencies": {
+    "expo": "~57.0.1",
+    "expo-constants": "~57.0.19",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-webview": "13.16.1"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  }
+}
