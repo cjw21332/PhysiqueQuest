@@ -24,6 +24,8 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
     crown: <><path d="m3 7 5 4 4-7 4 7 5-4-2 12H5L3 7z"/><path d="M6 22h12"/></>,
     sun: <><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></>,
     lock: <><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3m-4 5v2"/></>,
+    play: <><path d="M5 3l14 9-14 9V3z" fill="currentColor" stroke="none"/></>,
+    logout: <><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name] ?? paths.target}</svg>;
 }

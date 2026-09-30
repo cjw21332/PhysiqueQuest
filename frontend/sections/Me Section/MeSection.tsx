@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
+import BottomNav from '../Home/BottomNav';
 import type { Profile } from '../Home/types';
 
 type Settings = { inactivity: boolean; alarmVolume: boolean; showLeaderboard: boolean; threshold: 30 | 45 | 60 };
@@ -23,12 +24,13 @@ function SettingRow({ icon, title, detail, onClick, danger = false }: { icon: st
   </button>;
 }
 
-export default function MeSection({ profile }: { profile: Profile }) {
+export default function MeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const [settings, setSettings] = useState<Settings>(initialSettings);
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
 
   useEffect(() => {
+    setReady(true);
     try {
       const saved = localStorage.getItem('physiquequest-me-settings');
       if (saved) {
@@ -41,7 +43,6 @@ export default function MeSection({ profile }: { profile: Profile }) {
         });
       }
     } catch { /* Keep the default settings if stored browser data is unavailable. */ }
-    setReady(true);
   }, []);
 
   useEffect(() => { if (ready) localStorage.setItem('physiquequest-me-settings', JSON.stringify(settings)); }, [settings, ready]);
@@ -99,8 +100,9 @@ export default function MeSection({ profile }: { profile: Profile }) {
         <SettingRow icon="trend" title="Engagement analytics" detail="Users, sessions, safety events" onClick={() => setNotice('Engagement analytics are coming soon.')}/>
       </div>
 
-      <button className="me-logout" onClick={() => setNotice('Log out is not connected in this prototype.')}><span>⇥</span>Log out</button>
+      <button className="me-logout" onClick={() => onLogoutRequest?.()}><span>⇥</span>Log out</button>
     </div>
+    <BottomNav />
     {notice && <div className="home-toast me-toast" role="status">{notice}</div>}
   </section>;
 }

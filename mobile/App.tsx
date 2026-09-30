@@ -1,5 +1,5 @@
 import Constants from 'expo-constants';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
@@ -9,24 +9,59 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
+
+declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string } };
 
 function getInitialAddress() {
   const configured = process.env.EXPO_PUBLIC_WEB_APP_URL?.trim();
   if (configured) return configured.replace(/\/$/, '');
   const hostUri = Constants.expoConfig?.hostUri;
   const host = hostUri?.split(':')[0];
-  return host ? `http://${host}:3000` : 'http://localhost:3000';
+  return host ? `http://${host}:3000` : 'http://192.168.100.5:3000';
 }
 
-export default function App() {
+/**
+ * Publishes the native safe-area insets (status bar, Android gesture/nav bar,
+ * display cutouts) to the web document as CSS custom properties so the web app
+ * can pad its content clear of the system UI.
+ */
+function buildInsetsScript(insets: { top: number; bottom: number; left: number; right: number }) {
+  const { top, bottom, left, right } = insets;
+  return `(function(){try{
+    var r=document.documentElement.style;
+    r.setProperty('--safe-top','${top}px');
+    r.setProperty('--safe-bottom','${bottom}px');
+    r.setProperty('--safe-left','${left}px');
+    r.setProperty('--safe-right','${right}px');
+    var m=document.createElement('meta');
+    m.name='viewport';
+    m.content='width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover';
+    document.head.appendChild(m);
+  }catch(e){}})();true;`;
+}
+
+function AppContent() {
+  const insets = useSafeAreaInsets();
+  const webRef = useRef<WebView>(null);
+  const { width } = useWindowDimensions();
   const inferredAddress = useMemo(getInitialAddress, []);
   const [address, setAddress] = useState(inferredAddress);
   const [loadedAddress, setLoadedAddress] = useState(inferredAddress);
   const [error, setError] = useState(false);
   const [key, setKey] = useState(0);
+
+  const insetScript = useMemo(
+    () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }),
+    [insets.top, insets.bottom, insets.left, insets.right],
+  );
+
+  const pushInsets = useCallback(() => {
+    webRef.current?.injectJavaScript(insetScript);
+  }, [insetScript]);
 
   const connect = () => {
     const normalized = address.trim().replace(/\/$/, '');
@@ -34,68 +69,151 @@ export default function App() {
     setAddress(withProtocol);
     setLoadedAddress(withProtocol);
     setError(false);
-    setKey(current => current + 1);
+    setKey(c => c + 1);
     Keyboard.dismiss();
   };
 
+  const pad = Math.max(16, Math.min(40, Math.round(width * 0.05)));
+  const cardMax = Math.min(width - pad * 2, 560);
+  const cardPad = Math.max(22, Math.min(38, Math.round(width * 0.07)));
+  const bodySize = Math.max(15, Math.min(18, Math.round(width / 24)));
+
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="dark-content" backgroundColor="#f4f6f3" />
-        <WebView
-          key={key}
-          source={{ uri: loadedAddress }}
-          style={styles.webView}
-          javaScriptEnabled
-          domStorageEnabled
-          allowsBackForwardNavigationGestures
-          startInLoadingState
-          renderLoading={() => <View style={styles.loading}><ActivityIndicator size="large" color="#26743a"/><Text style={styles.loadingText}>Opening PhysiqueQuest…</Text></View>}
-          onError={() => setError(true)}
-          onHttpError={event => { if (event.nativeEvent.statusCode >= 500) setError(true); }}
-        />
-        {error && (
-          <View style={styles.errorOverlay}>
-            <View style={styles.errorCard}>
-              <Text style={styles.title}>Can’t reach PhysiqueQuest</Text>
-              <Text style={styles.body}>Start the web app on your computer with <Text style={styles.code}>npm run dev</Text>. Keep your phone and computer on the same Wi-Fi network.</Text>
-              <Text style={styles.label}>Computer address</Text>
-              <TextInput
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="url"
-                onChangeText={setAddress}
-                onSubmitEditing={connect}
-                placeholder="http://192.168.1.10:3000"
-                returnKeyType="go"
-                style={styles.input}
-                value={address}
-              />
-              <Pressable accessibilityRole="button" onPress={connect} style={styles.button}>
-                <Text style={styles.buttonText}>Connect</Text>
-              </Pressable>
-              <Text style={styles.hint}>The computer address is usually printed beside “Network” when Next.js starts.</Text>
-            </View>
+    <View style={styles.root}>
+      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
+      <WebView
+        ref={webRef}
+        key={key}
+        source={{ uri: loadedAddress }}
+        style={StyleSheet.absoluteFill}
+        containerStyle={styles.webContainer}
+        originWhitelist={['*']}
+        injectedJavaScriptBeforeContentLoaded={insetScript}
+        onLoadEnd={pushInsets}
+        javaScriptEnabled
+        domStorageEnabled
+        allowsBackForwardNavigationGestures
+        allowsInlineMediaPlayback
+        mediaPlaybackRequiresUserAction={false}
+        startInLoadingState
+        bounces={false}
+        overScrollMode="never"
+        scrollEnabled
+        setBuiltInZoomControls={false}
+        setDisplayZoomControls={false}
+        scalesPageToFit={false}
+        textZoom={100}
+        renderLoading={() => (
+          <View style={[styles.loading, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
+            <ActivityIndicator size="large" color="#26743a" />
+            <Text style={[styles.loadingText, { fontSize: bodySize }]}>Opening PhysiqueQuest…</Text>
           </View>
         )}
-      </SafeAreaView>
+        onError={() => setError(true)}
+        onHttpError={e => {
+          if (e.nativeEvent.statusCode >= 500) setError(true);
+        }}
+      />
+      {error && (
+        <View
+          style={[
+            styles.errorOverlay,
+            {
+              paddingTop: insets.top + 16,
+              paddingBottom: insets.bottom + 16,
+              paddingLeft: insets.left + 16,
+              paddingRight: insets.right + 16,
+            },
+          ]}
+        >
+          <View style={[styles.errorCard, { maxWidth: cardMax, padding: cardPad }]}>
+            <Text style={[styles.title, { fontSize: Math.round(bodySize * 1.45) }]}>
+              Can't reach PhysiqueQuest
+            </Text>
+            <Text style={[styles.body, { fontSize: bodySize, lineHeight: bodySize * 1.6 }]}>
+              Start the web app on your computer with <Text style={styles.code}>npm run dev</Text>. Keep
+              your phone and computer on the same Wi-Fi network.
+            </Text>
+            <Text style={[styles.label, { fontSize: bodySize - 1 }]}>Computer address</Text>
+            <TextInput
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+              onChangeText={setAddress}
+              onSubmitEditing={connect}
+              placeholder="http://192.168.1.10:3000"
+              returnKeyType="go"
+              style={[styles.input, { minHeight: bodySize * 3.1, fontSize: bodySize, paddingHorizontal: 14 }]}
+              value={address}
+            />
+            <Pressable
+              accessibilityRole="button"
+              onPress={connect}
+              style={[styles.button, { minHeight: bodySize * 3.3 }]}
+            >
+              <Text style={[styles.buttonText, { fontSize: bodySize }]}>Connect</Text>
+            </Pressable>
+            <Text style={[styles.hint, { fontSize: bodySize - 2, lineHeight: (bodySize - 2) * 1.55 }]}>
+              The computer address is usually printed beside "Network" when Next.js starts.
+            </Text>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <AppContent />
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f4f6f3' },
-  webView: { flex: 1, backgroundColor: '#f4f6f3' },
-  loading: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', gap: 12, backgroundColor: '#f4f6f3' },
-  loadingText: { color: '#536176', fontSize: 14 },
-  errorOverlay: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: '#f4f6f3' },
-  errorCard: { width: '100%', maxWidth: 420, padding: 22, borderRadius: 18, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e9e3' },
-  title: { marginBottom: 9, color: '#192233', fontSize: 21, fontWeight: '700' },
-  body: { color: '#536176', fontSize: 14, lineHeight: 21 },
+  root: { flex: 1, backgroundColor: '#f4f6f3' },
+  webContainer: { flex: 1, backgroundColor: '#f4f6f3' },
+  loading: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    backgroundColor: '#f4f6f3',
+  },
+  loadingText: { color: '#536176', textAlign: 'center' },
+  errorOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f4f6f3',
+  },
+  errorCard: { width: '100%', backgroundColor: '#fff' },
+  title: { marginBottom: 10, color: '#192233', fontWeight: '700' },
+  body: { color: '#536176' },
   code: { color: '#192233', fontWeight: '700' },
-  label: { marginTop: 19, marginBottom: 6, color: '#192233', fontSize: 13, fontWeight: '600' },
-  input: { minHeight: 44, paddingHorizontal: 12, borderRadius: 10, borderWidth: 1, borderColor: '#dce4dc', color: '#192233', fontSize: 14 },
-  button: { minHeight: 46, marginTop: 12, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: '#7ee582' },
-  buttonText: { color: '#173c1f', fontSize: 14, fontWeight: '700' },
-  hint: { marginTop: 11, color: '#718096', fontSize: 12, lineHeight: 18 },
+  label: { marginTop: 20, marginBottom: 6, color: '#192233', fontWeight: '600' },
+  input: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#dce4dc',
+    color: '#192233',
+  },
+  button: {
+    marginTop: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    backgroundColor: '#7ee582',
+  },
+  buttonText: { color: '#173c1f', fontWeight: '700' },
+  hint: { marginTop: 12, color: '#718096' },
 });

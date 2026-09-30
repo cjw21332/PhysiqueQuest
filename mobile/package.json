@@ -2,19 +2,21 @@
   "name": "physique-quest-expo",
   "private": true,
   "version": "1.0.0",
-  "main": "expo/AppEntry",
+  "main": "index.ts",
   "scripts": {
-    "start": "expo start --lan"
+    "start": "npx expo start --lan"
   },
   "dependencies": {
-    "expo": "~57.0.1",
-    "expo-constants": "~57.0.19",
+    "expo": "^57.0.26",
+    "expo-constants": "57.0.20",
+    "next": "15.5.26",
     "react": "19.2.3",
     "react-native": "0.86.3",
-    "react-native-safe-area-context": "~5.7.0",
+    "react-native-safe-area-context": "5.7.0",
     "react-native-webview": "13.16.1"
   },
   "devDependencies": {
-    "typescript": "~6.0.3"
+    "cross-env": "^10.1.0",
+    "typescript": "6.0.3"
   }
 }

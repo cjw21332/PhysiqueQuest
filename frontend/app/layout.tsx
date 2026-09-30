@@ -6,7 +6,16 @@ export const metadata: Metadata = {
   description: 'Your personal, AI-assisted fitness journey starts here.',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'PhysiqueQuest' },
 };
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, maximumScale: 1, themeColor: '#f3f6f2' };
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  // Allow pinch-zoom for accessibility, but let the layout cover the display
+  // cutout/notch so env(safe-area-inset-*) resolves to real values.
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
+  themeColor: '#f3f6f2',
+};
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="en"><body>{children}</body></html>;
 }

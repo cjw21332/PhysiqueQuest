@@ -4,13 +4,38 @@
     "slug": "physiquequest",
     "scheme": "physiquequest",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "sdkVersion": "57.0.0",
+    "platforms": ["android", "ios"],
+    "orientation": "default",
     "userInterfaceStyle": "light",
-    "ios": {
-      "supportsTablet": true
-    },
+    "backgroundColor": "#f4f6f3",
     "android": {
-      "usesCleartextTraffic": true
+      "package": "com.physiquequest.app",
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "androidStatusBar": {
+      "translucent": true,
+      "backgroundColor": "#00000000",
+      "barStyle": "dark-content"
+    },
+    "androidNavigationBar": {
+      "backgroundColor": "#00000000",
+      "barStyle": "dark-content",
+      "visible": "leanback"
+    },
+    "ios": {
+      "bundleIdentifier": "com.physiquequest.app",
+      "supportsTablet": true,
+      "requireFullScreen": false
+    },
+    "iosStatusBar": {
+      "translucent": true,
+      "backgroundColor": "#00000000",
+      "barStyle": "dark-content"
+    },
+    "web": {
+      "favicon": null
     }
   }
 }
