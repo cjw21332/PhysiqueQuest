@@ -1,1 +1,24 @@
-export type Profile = { name: string; email: string; goal: string; duration: string; targetWeight: string; weightUnit: string; weight: string; height: string; equipment?: string[]; days?: string[]; conditions?: string[]; contactName?: string };
+export type Profile = {
+  name: string;
+  email: string;
+  goal: string;
+  duration: string;
+  targetWeight: string;
+  weightUnit: string;
+  weight: string;
+  height: string;
+  age?: string;
+  gender?: string;
+  chest?: string;
+  waist?: string;
+  arms?: string;
+  activity?: string;
+  targetDate?: string;
+  seriousness?: string;
+  equipment?: string[];
+  days?: string[];
+  conditions?: string[];
+  healthNotes?: string;
+  contactName?: string;
+  contactPhone?: string;
+};
