@@ -3,6 +3,7 @@
     "name": "PhysiqueQuest",
     "slug": "physiquequest",
     "scheme": "physiquequest",
+    "icon": "./assets/physiquequest-icon.png",
     "version": "1.0.0",
     "sdkVersion": "57.0.0",
     "platforms": ["android", "ios"],
@@ -11,6 +12,10 @@
     "backgroundColor": "#f4f6f3",
     "android": {
       "package": "com.physiquequest.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/physiquequest-icon.png",
+        "backgroundColor": "#ffffff"
+      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -35,7 +40,7 @@
       "barStyle": "dark-content"
     },
     "web": {
-      "favicon": null
+      "favicon": "./assets/physiquequest-icon.png"
     }
   }
 }

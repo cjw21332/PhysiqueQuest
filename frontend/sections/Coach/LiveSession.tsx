@@ -65,7 +65,7 @@ export default function LiveSession({ exercise, onEnd }: { exercise: Exercise; o
 
       <div className="session-controls">
         <button className="pause-button" onClick={togglePause}>
-          <Icon name={paused ? 'play' : 'scan'} size={16}/>
+          {paused ? <Icon name="play" size={16}/> : <span className="pause-glyph" aria-hidden="true">Ⅱ</span>}
           {paused ? 'Resume' : 'Pause'}
         </button>
         <button className="end-button" onClick={() => onEnd(seconds)}>

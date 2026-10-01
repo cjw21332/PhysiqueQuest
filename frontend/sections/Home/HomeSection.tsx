@@ -21,11 +21,11 @@ export default function HomeSection({ profile, onLogoutRequest }: { profile: Pro
     <section className="home-section screen-enter">
       <div className="home-content">
         {view === 'dashboard' && <HomeDashboard profile={profile} onOpen={next => open(next)} onNotify={() => open('notifications')} onAction={feedback}/>}
-        {view === 'goals' && <GoalsMilestones profile={profile} onBack={goHome}/>}
-        {view === 'progress' && <Progress onBack={goHome}/>}
-        {view === 'notifications' && <Notifications onBack={goHome}/>}
+        {view === 'goals' && <div className="home-subview"><GoalsMilestones profile={profile} onBack={goHome}/></div>}
+        {view === 'progress' && <div className="home-subview"><Progress onBack={goHome}/></div>}
+        {view === 'notifications' && <div className="home-subview"><Notifications onBack={goHome}/></div>}
       </div>
-      <BottomNav />
+      {view === 'dashboard' && <BottomNav />}
       {message && <div className="home-toast" role="status">{message}</div>}
     </section>
   );

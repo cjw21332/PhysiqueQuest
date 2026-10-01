@@ -27,6 +27,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
   return (
     <>
       <header className="coach-header">
+        <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
         <h2>Camera check</h2>
       </header>
 
@@ -89,18 +90,19 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
                 </span>
                 <b>Upload a recorded set</b>
                 <p>MP4 or MOV, up to 2 minutes. Film from the side with your full body visible.</p>
-                <label className="choose-video">
-                  Choose a video
-                  <input type="file" accept="video/mp4,video/quicktime,video/*" onChange={e => chooseFile(e.target.files?.[0])}/>
-                </label>
               </>
             )}
           </div>
 
           <footer className="coach-footer">
-            <button className="primary" disabled={!fileUrl} onClick={onStart}>
-              {!fileUrl ? 'Choose a video to continue' : 'Start session'}
-            </button>
+            {fileUrl ? (
+              <button className="primary" onClick={onStart}>Start session</button>
+            ) : (
+              <label className="primary choose-video">
+                Choose a video
+                <input type="file" accept="video/mp4,video/quicktime,video/*" onChange={e => chooseFile(e.target.files?.[0])}/>
+              </label>
+            )}
           </footer>
         </>
       )}

@@ -30,7 +30,7 @@ export default function CoachSection({ profile, onLogoutRequest }: { profile: Pr
         {view === 'session' && <LiveSession exercise={exercises[1]} onEnd={seconds => { setElapsed(seconds); setView('report'); }}/>}
         {view === 'report' && <WorkoutReport duration={elapsed} onHome={goHome} onShare={() => say('Workout summary is ready to share when sharing is connected.')}/>}
       </div>
-      <BottomNav />
+      {view === 'plan' && <BottomNav />}
       {toast && <div className="home-toast coach-toast" role="status">{toast}</div>}
     </section>
   );
