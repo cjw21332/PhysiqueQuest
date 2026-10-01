@@ -37,6 +37,52 @@ Rules:
 - Derive the authenticated user ID from the validated server-side identity, not from a client-supplied `userId` field.
 - Return only fields the caller is allowed to see. Do not expose MongoDB documents or internal errors as API responses.
 
+### Registration and calibration data flow
+
+The flow below records the current prototype behavior. It is deliberately separate from the target backend flow: the current UI does not call an API or MongoDB Atlas.
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant Form as Register form (AuthForm)
+  participant Page as Register page
+  participant Wizard as CalibrationFlow (React state)
+  participant Storage as Browser localStorage
+  participant Auth as Simulated login utility
+  participant Home as Home route
+  User->>Form: Enter name, email, password, confirmation, consent
+  Form->>Form: Check password length >= 8 and confirmation matches
+  Form->>Page: Create account callback
+  Page->>Page: Require name, email, consent
+  Page->>Wizard: Open step 1; pass name and email
+  User->>Wizard: Complete steps 1–4
+  Wizard->>Wizard: Validate each step; keep fields in React state
+  Wizard->>Page: Submit complete Profile
+  Page->>Storage: Save physiquequest-profile JSON
+  Page->>Auth: login(email, prototype-registration)
+  Auth->>Storage: Read profile; write physiquequest-auth JSON
+  Page->>Home: Navigate to /home
+```
+
+Current registration rules and observed behavior:
+
+- Step 0 is the register form: it collects name and email, requires the consent checkbox, and checks that the password has at least eight characters and matches its confirmation. The register page does not receive either password value; no credential is created, stored, hashed, or sent to a server in this prototype.
+- Steps 1–4 collect personal data (age, height, weight/unit, gender, optional measurements, activity), goal (including optional target weight/date and seriousness), training preferences (equipment, days, duration, phone-placement confirmation), then safety details (conditions, optional health notes, required emergency contact name and phone).
+- Step values live only in the wizard's React state until step 4 succeeds. Navigating between steps preserves them; refresh, tab closure, or browser failure before completion loses them. There is no saved draft or resume flow.
+- Completion builds one `Profile` object, then the register page writes it to `physiquequest-profile`. The simulated `login()` reads that profile and writes a user-shaped object to `physiquequest-auth`; the user is then routed to `/home`. These are browser-local prototype writes, not a server transaction and not Atlas persistence.
+- The profile currently contains name, email, calibration and plan fields, health conditions/notes, and emergency contact details. The consent choice is required to proceed but is not included in the profile or recorded elsewhere. Camera-based analysis and emergency-alert services are not connected by this flow.
+- Browser localStorage is readable by same-origin JavaScript and is not a suitable production store for passwords, session secrets, or unprotected health/emergency-contact data. Treat current values as prototype data; do not load real sensitive data into this implementation.
+
+Target backend flow when remote registration is implemented:
+
+1. The client submits registration data over HTTPS to an identity endpoint (or approved identity provider). Validate and normalize inputs server-side, enforce rate limits, and create a pending identity using the provider's credential handling. Never send a plaintext password to profile/calibration services or persist it in application collections/logs.
+2. Return a short-lived, limited onboarding session/token. The user can complete calibration without granting access to unrelated account data. If draft recovery is a product requirement, save only validated draft updates to a dedicated onboarding draft with owner, expiry, and version; otherwise keep steps client-side until final submission.
+3. On step 4, submit the complete onboarding payload once to an authenticated API. The server derives the user ID from the session, validates every field and allowed choice, normalizes units and dates, records the applicable consent evidence/version, and applies health-data access rules.
+4. Persist the profile and training preferences through their domain repositories. Keep health restrictions/notes and emergency contacts separately protected when their distinct access, retention, or deletion rules warrant it. Use an idempotency key so retries cannot create duplicate onboarding records.
+5. Only mark onboarding complete and activate the pending account after profile persistence succeeds. Return a minimal profile summary and route the client to the home screen. If persistence fails, retain/recover the safe client draft and allow retry; do not pretend setup completed or silently write a second local source of truth.
+
+Do not implement this future flow until the backend, identity provider, consent language/version, data retention, and access controls are explicitly configured and reviewed. Atlas remains unconnected today.
+
 ## 3. What Needs Persistence
 
 Use this as the initial migration map. Persist only when the feature needs accounts, durable history, multiple devices, collaboration, or server-side processing. Keep prototype fixtures clearly identified and out of production user collections.
@@ -44,7 +90,7 @@ Use this as the initial migration map. Persist only when the feature needs accou
 | Domain | Current prototype source | Future persistence boundary | Guidance |
 |:--|:--|:--|:--|
 | Identity and sessions | Simulated `physiquequest-auth` localStorage | Authentication provider/service and user identity records | Prefer a proven identity provider. If credentials are owned by PhysiqueQuest, store only strong password hashes in a restricted auth domain; never store or log plaintext passwords. Use revocable, expiring sessions/tokens. |
-| Profile and onboarding | `physiquequest-profile` localStorage | User profile and versioned profile changes | Store only required personal data. Keep health restrictions, measurements, and emergency contacts separately protected or access-controlled when that materially reduces exposure. |
+| Profile and onboarding | Register wizard state until completion; then `physiquequest-profile` localStorage; simulated user in `physiquequest-auth` | Identity provider plus profile/onboarding domain APIs and repositories | Current profile includes personal, body measurement, training, health-condition/note, and emergency-contact fields. Current consent is only a required UI gate and is not recorded. For remote storage, minimize fields, record consent evidence/version, and isolate or tightly restrict health and emergency-contact data. Never store passwords in profile/auth application documents. |
 | Nutrition and hydration | `physiquequest-food-log` localStorage; sample catalog and meals | User-owned meal entries and daily water records; optional managed food catalog | Preserve entry time, meal type, nutrition snapshot, quantity/unit, and source. Snapshot values used at log time so later catalog edits do not rewrite history. |
 | Workout plan and sessions | Exercise fixtures, coach state, demo form scores | Workout plans and completed sessions | Store planned prescription separately from actual sets/reps/load and session outcomes. Mark demo or estimated metrics as such. |
 | Progress and personal records | Sample charts and local/profile state | User measurements and verified record events | Store source and measurement time. Prefer deriving charts/rollups from authoritative events; cache aggregates only when measured performance requires it. |
