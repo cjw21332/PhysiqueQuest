@@ -22,5 +22,7 @@ export const viewport: Viewport = {
   themeColor: '#f3f6f2',
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  // The Expo WebView injects native safe-area CSS variables on <html> before
+  // hydration, so its initial style attribute intentionally differs from SSR.
+  return <html lang="en" suppressHydrationWarning><body>{children}</body></html>;
 }

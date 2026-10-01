@@ -42,7 +42,6 @@ export default function RegisterPage() {
             name={name}
             email={email}
             onComplete={finishCalibration}
-            onBackToRegister={() => setCalibrating(false)}
           />
         </div>
       </main>
