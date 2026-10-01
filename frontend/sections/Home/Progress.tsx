@@ -16,7 +16,10 @@ export default function Progress({ onBack }: { onBack: () => void }) {
   return (
     <>
       <header className="section-page-head">
-        <h2>Progress</h2>
+        <div className="section-back-title">
+          <button className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="arrow" size={24}/></button>
+          <h2>Progress</h2>
+        </div>
       </header>
 
       <div className="metric-tabs">

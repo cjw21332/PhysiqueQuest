@@ -18,7 +18,10 @@ export default function Notifications({ onBack }: { onBack: () => void }) {
   return (
     <>
       <header className="section-page-head">
-        <h2>Notifications</h2>
+        <div className="section-back-title">
+          <button className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="arrow" size={24}/></button>
+          <h2>Notifications</h2>
+        </div>
         <button
           className="mark-all-btn"
           onClick={() => setItems(current => current.map(item => ({ ...item, unread: false })))}

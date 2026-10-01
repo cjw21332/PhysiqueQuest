@@ -19,8 +19,10 @@ export default function GoalsMilestones({ profile, onBack }: { profile: Profile;
   return (
     <>
       <header className="section-page-head">
-        <h2>Goals</h2>
-        <button className="edit-link" onClick={onBack}>✎ Edit</button>
+        <div className="section-back-title">
+          <button className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="arrow" size={24}/></button>
+          <h2>Goals</h2>
+        </div>
       </header>
 
       <section className="goal-hero">

@@ -4,6 +4,11 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'PhysiqueQuest — Training that fits you',
   description: 'Your personal, AI-assisted fitness journey starts here.',
+  icons: {
+    icon: '/physiquequest-icon.png',
+    shortcut: '/physiquequest-icon.png',
+    apple: '/physiquequest-icon.png',
+  },
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'PhysiqueQuest' },
 };
 export const viewport: Viewport = {

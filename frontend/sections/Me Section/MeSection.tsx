@@ -4,8 +4,11 @@ import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import type { Profile } from '../Home/types';
+import AdminExerciseLibrary from './AdminExerciseLibrary';
+import EngagementAnalytics from './EngagementAnalytics';
 
 type Settings = { inactivity: boolean; alarmVolume: boolean; showLeaderboard: boolean; threshold: 30 | 45 | 60 };
+type AdminView = 'settings' | 'exercises' | 'engagement';
 const initialSettings: Settings = { inactivity: true, alarmVolume: true, showLeaderboard: true, threshold: 45 };
 
 function Switch({ label, checked, onChange, tone = 'green' }: { label: string; checked: boolean; onChange: () => void; tone?: 'green' | 'red' }) {
@@ -26,6 +29,7 @@ function SettingRow({ icon, title, detail, onClick, danger = false }: { icon: st
 
 export default function MeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const [settings, setSettings] = useState<Settings>(initialSettings);
+  const [adminView, setAdminView] = useState<AdminView>('settings');
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
 
@@ -57,6 +61,13 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const daysPerWeek = profile.days?.length || 4;
   const conditionCount = profile.conditions?.includes('None of these') ? 0 : profile.conditions?.length || 1;
   const goalWeight = profile.targetWeight ? `${profile.targetWeight} kg` : '74 kg';
+
+  if (adminView === 'exercises') {
+    return <AdminExerciseLibrary onBack={() => setAdminView('settings')} />;
+  }
+  if (adminView === 'engagement') {
+    return <EngagementAnalytics onBack={() => setAdminView('settings')} />;
+  }
 
   return <section className="me-section" aria-label="Account and settings">
     <header className="me-header"><h2>Account &amp; settings</h2></header>
@@ -96,8 +107,8 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
 
       <h3 className="me-group-title me-admin-title">Admin tools</h3>
       <div className="me-list">
-        <SettingRow icon="meal" title="Exercise library" detail="Publish exercises and pose templates" onClick={() => setNotice('Exercise library admin tools are coming soon.')}/>
-        <SettingRow icon="trend" title="Engagement analytics" detail="Users, sessions, safety events" onClick={() => setNotice('Engagement analytics are coming soon.')}/>
+        <SettingRow icon="dumbbell" title="Exercise library" detail="Publish exercises and pose templates" onClick={() => setAdminView('exercises')}/>
+        <SettingRow icon="trend" title="Engagement Analytics" detail="Users, sessions, safety events" onClick={() => setAdminView('engagement')}/>
       </div>
 
       <button className="me-logout" onClick={() => onLogoutRequest?.()}><span>⇥</span>Log out</button>

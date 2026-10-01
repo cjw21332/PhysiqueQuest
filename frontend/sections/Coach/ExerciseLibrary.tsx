@@ -15,6 +15,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment }: { onBack:
   return (
     <>
       <header className="coach-header">
+        <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
         <h2>Exercise library</h2>
       </header>
 

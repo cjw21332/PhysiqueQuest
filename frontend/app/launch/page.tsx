@@ -20,7 +20,7 @@ export default function LaunchPage() {
       <div className="app-shell">
         <section className="launch screen-enter">
           <div className="launch-brand">
-            <div className="brand-mark">PQ</div>
+            <img src="/physiquequest-icon.png" alt="PhysiqueQuest logo" className="brand-logo" />
             <h1>PhysiqueQuest</h1>
             <p className="subtitle">AI-assisted, gamified fitness coaching that watches your form.</p>
           </div>

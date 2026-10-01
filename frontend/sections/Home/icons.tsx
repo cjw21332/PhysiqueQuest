@@ -17,6 +17,8 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
     trend: <><path d="m4 16 6-6 4 4 6-7"/><path d="M14 7h6v6"/></>,
     check: <><path d="m5 12 4 4L19 6"/></>,
     arrow: <><path d="m9 18 6-6-6-6"/></>,
+    search: <><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.5 4.5"/></>,
+    download: <><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 002 2h10a2 2 0 002-2v-4"/></>,
     medal: <><circle cx="12" cy="8" r="5"/><path d="m8 12-2 9 6-3 6 3-2-9"/></>,
     shield: <><path d="M12 3 20 6v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></>,
     phone: <><path d="M7 3h3l2 5-2.2 1.8a14 14 0 004.4 4.4L16 12l5 2v3c0 1.1-.9 2-2 2C10.2 19 5 13.8 5 5c0-1.1.9-2 2-2z"/></>,
