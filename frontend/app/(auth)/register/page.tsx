@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthForm from '../../../sections/Auth/AuthForm';
+import CalibrationFlow from '../../../sections/Auth/CalibrationFlow';
 import { login } from '../../../lib/auth';
+import type { Profile } from '../../../sections/Home/types';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -11,22 +13,41 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
+  const [calibrating, setCalibrating] = useState(false);
 
-  const handleContinue = async () => {
+  const handleContinue = () => {
     if (!name.trim() || !email.trim() || !consent) {
       setError('Add your name and email, then agree to continue.');
       return;
     }
+    setError('');
+    setCalibrating(true);
+  };
 
+  const finishCalibration = async (profile: Profile) => {
     try {
-      await login(email, 'password'); // In production, use real password
-      // Save profile data
-      localStorage.setItem('physiquequest-profile', JSON.stringify({ name, email }));
+      localStorage.setItem('physiquequest-profile', JSON.stringify(profile));
+      await login(email, 'prototype-registration');
       router.push('/home');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+    } catch {
+      setError('We could not finish your local setup. Please try again.');
     }
   };
+
+  if (calibrating) {
+    return (
+      <main className="scene">
+        <div className="app-shell">
+          <CalibrationFlow
+            name={name}
+            email={email}
+            onComplete={finishCalibration}
+            onBackToRegister={() => setCalibrating(false)}
+          />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="scene">

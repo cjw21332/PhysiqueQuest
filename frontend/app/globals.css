@@ -3957,6 +3957,71 @@ body{min-height:100dvh}
 }
 .coach-back:hover { background: #e9f8eb; }
 
+/* Four-step account calibration uses the existing onboarding design primitives. */
+.calibration-wizard {
+  padding-top: max(clamp(14px, 3vh, 28px), var(--sat));
+}
+.calibration-form {
+  flex: 1 0 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.calibration-form .step-content { flex: 1 0 auto; }
+.calibration-wizard .progress { margin-bottom: clamp(18px, 3vh, 26px); }
+.calibration-wizard .wizard-heading h2 { font-size: clamp(19px, 5vw, 24px); }
+.calibration-wizard .wizard-heading p { max-width: 36ch; }
+.calibration-wizard .choice-group { margin-top: clamp(15px, 2.3vh, 21px); }
+.calibration-wizard .bmi { margin-bottom: clamp(14px, 2.4vh, 21px); }
+.calibration-wizard .target-grid .input-wrap input { min-width: 0; }
+.calibration-wizard .training-equipment { margin-top: 0; }
+.calibration-wizard .calibration-footer {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: calc(-1 * clamp(20px, 4vw, 40px));
+  margin-right: calc(-1 * clamp(20px, 4vw, 40px));
+  padding-left: clamp(20px, 4vw, 40px);
+  padding-right: clamp(20px, 4vw, 40px);
+  padding-bottom: max(16px, var(--sab));
+}
+.calibration-back-link {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.calibration-footer .primary {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.calibration-footer .primary svg { flex: 0 0 auto; }
+.calibration-wizard .safety-note { align-items: flex-start; }
+.calibration-wizard .emergency .field { margin-bottom: 10px; }
+.calibration-wizard .error { margin-top: 10px; }
+@media (max-width: 380px) {
+  .calibration-wizard { padding-left: 16px; padding-right: 16px; }
+  .calibration-wizard .calibration-footer {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .calibration-back-link { padding: 0 4px; font-size: 10px; }
+  .calibration-wizard .chip { padding-left: 10px; padding-right: 10px; }
+}
+
 /* Focused Coach subviews no longer reserve space for the main tab bar. */
 .coach-view-library .coach-scroll { padding-bottom: max(clamp(20px, 4vh, 32px), var(--sab)); }
 
