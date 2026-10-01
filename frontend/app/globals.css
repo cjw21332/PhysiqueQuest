@@ -3960,14 +3960,23 @@ body{min-height:100dvh}
 /* Four-step account calibration uses the existing onboarding design primitives. */
 .calibration-wizard {
   padding-top: max(clamp(14px, 3vh, 28px), var(--sat));
+  min-height: 0;
+  overflow: hidden;
 }
 .calibration-form {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
-.calibration-form .step-content { flex: 1 0 auto; }
+.calibration-form .step-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 12px;
+}
 .calibration-wizard .progress { margin-bottom: clamp(18px, 3vh, 26px); }
 .calibration-wizard .wizard-heading h2 { font-size: clamp(19px, 5vw, 24px); }
 .calibration-wizard .wizard-heading p { max-width: 36ch; }
@@ -3976,30 +3985,24 @@ body{min-height:100dvh}
 .calibration-wizard .target-grid .input-wrap input { min-width: 0; }
 .calibration-wizard .training-equipment { margin-top: 0; }
 .calibration-wizard .calibration-footer {
+  position: relative;
+  bottom: auto;
   flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  width: auto;
+  align-self: stretch;
+  display: block;
   margin-left: calc(-1 * clamp(20px, 4vw, 40px));
   margin-right: calc(-1 * clamp(20px, 4vw, 40px));
   padding-left: clamp(20px, 4vw, 40px);
   padding-right: clamp(20px, 4vw, 40px);
-  padding-bottom: max(16px, var(--sab));
-}
-.calibration-back-link {
-  flex: 0 0 auto;
-  min-height: 44px;
-  padding: 0 8px;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 11px;
-  white-space: nowrap;
+  margin-top: 0;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
 }
 .calibration-footer .primary {
-  flex: 1 1 auto;
-  min-width: 0;
+  width: 100%;
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -4018,7 +4021,6 @@ body{min-height:100dvh}
     padding-left: 16px;
     padding-right: 16px;
   }
-  .calibration-back-link { padding: 0 4px; font-size: 10px; }
   .calibration-wizard .chip { padding-left: 10px; padding-right: 10px; }
 }
 

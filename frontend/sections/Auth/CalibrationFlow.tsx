@@ -46,11 +46,10 @@ const dayOptions = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const activityOptions = ['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete'];
 const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'None of these'];
 
-export default function CalibrationFlow({ name, email, onComplete, onBackToRegister }: {
+export default function CalibrationFlow({ name, email, onComplete }: {
   name: string;
   email: string;
   onComplete: (profile: Profile) => void;
-  onBackToRegister: () => void;
 }) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<CalibrationData>(initialData);
@@ -231,9 +230,6 @@ export default function CalibrationFlow({ name, email, onComplete, onBackToRegis
         </div>
 
         <footer className="wizard-footer calibration-footer">
-          {step === 1
-            ? <button type="button" className="calibration-back-link" onClick={onBackToRegister}>Back to account</button>
-            : <button type="button" className="calibration-back-link" onClick={() => { setError(''); setStep((current) => current - 1); }}>Back</button>}
           <button className="primary" type="submit">{continueLabels[step - 1]} <Icon name={step === 4 ? 'check' : 'arrow'} size={16} /></button>
         </footer>
       </form>
