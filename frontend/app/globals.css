@@ -620,6 +620,23 @@ body{min-height:100dvh}
 @media(min-width:1200px){
   .wizard{max-width:900px}
 }
+.wizard-heading .step-header{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:8px;
+}
+.wizard-heading .step-header small{
+  flex:1 1 auto;
+}
+.wizard-heading .back-link{
+  flex:0 0 auto;
+  font-size:13px;color:var(--muted);
+  display:flex;align-items:center;gap:6px;
+  padding:6px 12px;
+  transition:color 0.2s;
+}
+.wizard-heading .back-link:hover{
+  color:var(--ink);
+}
 .wizard-heading h2{font-size:clamp(22px,4vw,32px)}
 .wizard-heading p{font-size:clamp(13px,2.5vw,16px)}
 .wizard-body{flex:1 1 auto;min-height:0;overflow-y:auto;width:100%}
@@ -628,8 +645,10 @@ body{min-height:100dvh}
   margin:clamp(20px,3vh,32px) 0 0;
   padding:0 0 max(20px,var(--sab));
   border-top:0;background:transparent;
+  display:flex;justify-content:center;
 }
-.wizard-footer .primary{
+.wizard-footer .continue-btn{
+  width:100%;max-width:600px;
   font-size:clamp(14px,2.5vw,17px);
   height:clamp(50px,8vh,62px);
 }
@@ -3978,8 +3997,181 @@ body{min-height:100dvh}
   padding-bottom: 12px;
 }
 .calibration-wizard .progress { margin-bottom: clamp(18px, 3vh, 26px); }
-.calibration-wizard .wizard-heading h2 { font-size: clamp(19px, 5vw, 24px); }
-.calibration-wizard .wizard-heading p { max-width: 36ch; }
+.calibration-wizard > .progress { width: calc(100% - 32px); max-width: 800px; margin-left: auto; margin-right: auto; }
+
+/* Typography - Step indicator */
+.calibration-wizard .wizard-heading small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--green-dark);
+}
+
+/* Typography - Section heading */
+.calibration-wizard .wizard-heading h2 {
+  font-size: clamp(19px, 5vw, 24px);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Typography - Description text */
+.calibration-wizard .wizard-heading p {
+  max-width: 36ch;
+  font-size: clamp(13px, 2.5vw, 16px);
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Typography - Section labels */
+.calibration-wizard .section-header .group-title b,
+.calibration-wizard .group-title b {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Typography - Optional/Required badges */
+.calibration-wizard .group-title small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.calibration-wizard .group-title .required {
+  color: #e53935;
+}
+
+/* Typography - Field labels */
+.calibration-wizard .field > span,
+.calibration-wizard label > span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Typography - Input text */
+.calibration-wizard input,
+.calibration-wizard textarea {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+/* Typography - Unit suffixes */
+.calibration-wizard .input-wrap small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Typography - BMI display */
+.calibration-wizard .bmi {
+  margin-bottom: clamp(14px, 2.4vh, 21px);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Typography - Button labels */
+.calibration-wizard .chip,
+.calibration-wizard .equipment,
+.calibration-wizard .day {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.calibration-wizard .chip.chosen,
+.calibration-wizard .chip.active,
+.calibration-wizard .equipment.on,
+.calibration-wizard .day.active {
+  font-weight: 600;
+  color: var(--green-dark);
+}
+
+/* Typography - Goal card titles */
+.calibration-wizard .goal-card b {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Typography - Goal card details */
+.calibration-wizard .goal-card small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Typography - Microcopy/helper text */
+.calibration-wizard .microcopy {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Typography - Primary button */
+.calibration-footer .primary {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: clamp(14px, 2.5vw, 17px);
+  font-weight: 600;
+  color: var(--green-dark);
+}
+
+/* Typography - Back button */
+.wizard-heading .back-link {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Typography - Clear button */
+.calibration-wizard .clear-section-btn {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+  padding: 6px 12px;
+  transition: color 0.2s;
+}
+
+/* Typography - Checkbox labels */
+.calibration-wizard .condition-list label,
+.calibration-wizard .placement-check {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+/* Typography - Safety note */
+.calibration-wizard .safety-note p {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.calibration-wizard .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.calibration-wizard .section-header .group-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.calibration-wizard .clear-section-btn {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 6px 12px;
+  transition: color 0.2s;
+}
+.calibration-wizard .clear-section-btn:hover {
+  color: var(--ink);
+}
 .calibration-wizard .choice-group { margin-top: clamp(15px, 2.3vh, 21px); }
 .calibration-wizard .bmi { margin-bottom: clamp(14px, 2.4vh, 21px); }
 .calibration-wizard .target-grid .input-wrap input { min-width: 0; }
@@ -3988,13 +4180,16 @@ body{min-height:100dvh}
   position: relative;
   bottom: auto;
   flex: 0 0 auto;
-  width: auto;
-  align-self: stretch;
-  display: block;
-  margin-left: calc(-1 * clamp(20px, 4vw, 40px));
-  margin-right: calc(-1 * clamp(20px, 4vw, 40px));
-  padding-left: clamp(20px, 4vw, 40px);
-  padding-right: clamp(20px, 4vw, 40px);
+  width: calc(100% - 32px);
+  max-width: 800px;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0;
+  padding-right: 0;
   margin-top: 0;
   padding-top: 12px;
   padding-bottom: 12px;
@@ -4003,6 +4198,8 @@ body{min-height:100dvh}
 }
 .calibration-footer .primary {
   width: 100%;
+  max-width: none;
+  margin-inline: auto;
   min-height: 50px;
   display: flex;
   align-items: center;
@@ -4015,12 +4212,6 @@ body{min-height:100dvh}
 .calibration-wizard .error { margin-top: 10px; }
 @media (max-width: 380px) {
   .calibration-wizard { padding-left: 16px; padding-right: 16px; }
-  .calibration-wizard .calibration-footer {
-    margin-left: -16px;
-    margin-right: -16px;
-    padding-left: 16px;
-    padding-right: 16px;
-  }
   .calibration-wizard .chip { padding-left: 10px; padding-right: 10px; }
 }
 
@@ -4337,4 +4528,90 @@ body{min-height:100dvh}
   .daily-log-summary { margin-bottom: 14px; }
   .daily-log-meal-list .log-meal { min-height: 52px; }
   .daily-log-water { margin-top: 12px; }
+}
+.calibration-wizard .height-field { min-width: 0; }
+.calibration-wizard .height-input-wrap { gap: 8px; }
+.calibration-wizard .unit-suffix-select { min-width: 48px; max-width: 88px; height: 36px; flex: none; border: 0; border-radius: 7px; padding: 0 3px; background: transparent; color: var(--muted); font: inherit; font-size: 11px; text-align: right; }
+.calibration-wizard .unit-suffix-select:focus-visible { outline: 2px solid #7ee58265; color: var(--ink); }
+.calibration-wizard .height-imperial-inputs { display: flex; align-items: center; flex: 1; min-width: 0; gap: 4px; }
+.calibration-wizard .height-imperial-inputs input { flex: 1 1 0; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; }
+.calibration-wizard .height-imperial-inputs small { flex: none; font-size: 11px; color: var(--muted); margin-right: 2px; }
+.calibration-wizard .measure-grid .input-wrap small { font-size: 10px; }
+@media (max-width: 360px) {
+  .calibration-wizard .measure-grid { gap: 5px; }
+  .calibration-wizard .measure-grid .input-wrap { padding: 0 5px; }
+  .calibration-wizard .unit-suffix-select { max-width: 64px; font-size: 10px; }
+}
+
+/* Hide browser notification badge and development indicators */
+[data-notification-badge],
+[data-nextjs-toast-notification],
+.__next-dev-indicator,
+#__next-dev-indicator,
+[id*="notification-badge"],
+[class*="notification-badge"],
+iframe[src*="notification"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Password Requirements Checklist */
+.password-requirements {
+  margin-top: 12px;
+  margin-bottom: 6px;
+  padding: 0;
+}
+
+.requirements-title {
+  font-size: 12px;
+  font-weight: 400;
+  color: #627087;
+  margin: 0 0 10px 0;
+}
+
+.requirements-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.requirements-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  transition: color 0.15s ease;
+}
+
+.requirements-list li.unmet {
+  color: #627087;
+}
+
+.requirements-list li.met {
+  color: #167336;
+}
+
+.requirements-list .check-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  transition: stroke 0.15s ease;
+}
+
+.requirements-list li.unmet .check-icon {
+  stroke: #c6ced9;
+}
+
+.requirements-list li.met .check-icon {
+  stroke: #167336;
+}
+
+.requirement-label {
+  flex: 1;
 }

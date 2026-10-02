@@ -7,11 +7,16 @@ export type Profile = {
   weightUnit: string;
   weight: string;
   height: string;
+  heightUnit: 'cm' | 'ft & in.';
+  heightInches?: string;
   age?: string;
   gender?: string;
   chest?: string;
+  chestUnit?: 'cm' | 'inch';
   waist?: string;
+  waistUnit?: 'cm' | 'inch';
   arms?: string;
+  armsUnit?: 'cm' | 'inch';
   activity?: string;
   targetDate?: string;
   seriousness?: string;

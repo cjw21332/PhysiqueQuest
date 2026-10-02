@@ -1,30 +1,51 @@
+import { api } from './api';
+
 // Authentication utilities
 export interface User {
+  id: string;
   name: string;
   email: string;
-  profile: any; // Full profile data
+  token: string;
+  profile?: any; // Full profile data
 }
 
 export const AUTH_STORAGE_KEY = 'physiquequest-auth';
 export const PROFILE_STORAGE_KEY = 'physiquequest-profile';
 
-export function login(email: string, password: string): Promise<User> {
-  // Simulate login - in production, this would call your backend API
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const savedProfile = localStorage.getItem(PROFILE_STORAGE_KEY);
-      const profile = savedProfile ? JSON.parse(savedProfile) : {};
+export async function register(name: string, email: string, password: string): Promise<User> {
+  try {
+    const response = await api.register({ name, email, password });
 
-      const user: User = {
-        name: profile.name || 'User',
-        email: email,
-        profile: profile
-      };
+    const user: User = {
+      id: response.user.id,
+      name: response.user.name,
+      email: response.user.email,
+      token: response.access_token, // Backend returns access_token
+    };
 
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      resolve(user);
-    }, 500);
-  });
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    return user;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : 'Registration failed');
+  }
+}
+
+export async function login(email: string, password: string): Promise<User> {
+  try {
+    const response = await api.login({ email, password });
+
+    const user: User = {
+      id: response.user.id,
+      name: response.user.name,
+      email: response.user.email,
+      token: response.access_token, // Backend returns access_token
+    };
+
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    return user;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : 'Login failed');
+  }
 }
 
 export function logout() {
