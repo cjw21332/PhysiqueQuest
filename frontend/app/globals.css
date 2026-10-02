@@ -3692,7 +3692,7 @@ body{min-height:100dvh}
   min-height: 100svh;
   padding: var(--sat) var(--sar) var(--sab) var(--sal);
   overflow: hidden;
-  animation: splash-exit 0.68s ease-in 3.78s both;
+  /* Keep the server-rendered fallback visible until the WebView navigates. */
 }
 .splash-composition {
   position: relative;
@@ -4537,6 +4537,11 @@ body{min-height:100dvh}
 .calibration-wizard .height-imperial-inputs input { flex: 1 1 0; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; }
 .calibration-wizard .height-imperial-inputs small { flex: none; font-size: 11px; color: var(--muted); margin-right: 2px; }
 .calibration-wizard .measure-grid .input-wrap small { font-size: 10px; }
+.calibration-wizard .back-link-icon svg { transform: rotate(180deg); }
+.profile-load-state { width: min(100%, 520px); margin: auto; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); text-align: center; }
+.profile-load-state h2 { font-size: 20px; }
+.profile-load-state p { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.profile-load-state .primary { max-width: 240px; margin: 18px auto 0; }
 @media (max-width: 360px) {
   .calibration-wizard .measure-grid { gap: 5px; }
   .calibration-wizard .measure-grid .input-wrap { padding: 0 5px; }

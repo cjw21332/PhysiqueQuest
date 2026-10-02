@@ -12,10 +12,11 @@ export type Profile = {
   age?: string;
   gender?: string;
   chest?: string;
-  chestUnit?: 'cm' | 'inch';
   waist?: string;
-  waistUnit?: 'cm' | 'inch';
   arms?: string;
+  measurementUnit?: 'cm' | 'inch';
+  chestUnit?: 'cm' | 'inch';
+  waistUnit?: 'cm' | 'inch';
   armsUnit?: 'cm' | 'inch';
   activity?: string;
   targetDate?: string;

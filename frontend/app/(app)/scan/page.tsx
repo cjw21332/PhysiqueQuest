@@ -1,39 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ScanSection from '../../../sections/Scan/ScanSection';
 import LogoutModal from '../../../components/LogoutModal';
 import { getCurrentUser, logout } from '../../../lib/auth';
+import { useCurrentProfile } from '../../../hooks/useCurrentProfile';
+import ProfileLoadState from '../../../components/ProfileLoadState';
 
 export default function ScanPage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const { profile, loading, error, retry } = useCurrentProfile();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/');
-      return;
-    }
-
-    try {
-      const savedProfile = localStorage.getItem('physiquequest-profile');
-      if (savedProfile) {
-        setProfile(JSON.parse(savedProfile));
-      }
-    } catch {
-      setProfile({});
-    }
-  }, [router]);
 
   const handleLogout = () => {
     logout();
     router.push('/');
   };
 
-  if (!profile) return null;
+  if (loading || error || !profile) return <ProfileLoadState loading={loading} error={error} onRetry={retry} />;
 
   return (
     <main className="scene">

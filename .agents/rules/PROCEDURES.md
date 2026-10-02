@@ -9,12 +9,12 @@ description: >-
 
 ## 1. Project State and Architecture
 
-PhysiqueQuest is a two-workspace npm project:
+PhysiqueQuest has two root npm workspaces plus a separately managed backend service:
 
-- frontend/ is the Next.js 15 App Router web app. React and TypeScript are used for UI and behavior; all active global styles are in frontend/app/globals.css.
+- frontend/ is the Next.js 16 App Router web app. React and TypeScript are used for UI and behavior; all active global styles are in frontend/app/globals.css.
 - mobile/ is an Expo 57 app that hosts the web app in a React Native WebView and passes native safe-area insets into CSS.
-- backend/ is a reserved folder with a README only. It is not an npm workspace and there is no API server yet.
-- MongoDB Atlas is the selected database for future backend persistence, but no Atlas environment or database connection has been implemented.
+- backend/ is an operational NestJS API service with JWT authentication, protected profile endpoints, and a MongoDB/Mongoose connection. It is not a root npm workspace; install and run its package from `backend/`.
+- MongoDB Atlas stores user identities and profiles. Nutrition, workout, and quest state remain local/demo features unless their API implementation is explicitly added.
 
 The web app is the source of product UI. Do not create parallel native screens in mobile/ for features that already belong to the web app.
 
@@ -22,7 +22,7 @@ The web app is the source of product UI. Do not create parallel native screens i
 
 | Route | Purpose |
 |:--|:--|
-| / | Logo opener; continues to /home for an authenticated user or /launch otherwise |
+| / | Server-side redirect to /launch so the Expo WebView does not depend on client hydration to leave a splash page |
 | /launch | Welcome and device-readiness introduction |
 | /login | Prototype sign-in and forgot-password flow |
 | /register | Profile and training onboarding |
@@ -36,11 +36,12 @@ The five main signed-in tabs are Home, Coach, Scan, Quests, and Me. Most seconda
 
 ### Current prototype boundaries
 
-- Authentication is simulated in frontend/lib/auth.ts. The login function uses a short delay and stores a local user record; it does not validate a password with a server.
-- Onboarding profile and food log data are saved in localStorage on the current browser/device.
+- Registration and login call the backend auth endpoints and store a JWT in localStorage. Authenticated profile pages retrieve profile data from the backend and cache the response locally.
+- Forgot-password UI is currently a prototype flow; no password-reset API or email challenge is implemented.
+- Food log data is saved locally; exercise, progress, quest, notification, and nutrition examples include sample/demo data.
 - Exercise, progress, quest, notification, and nutrition examples include sample/demo data.
 - Camera permission and local video selection can use device inputs, but readiness checks, form tracking, calorie estimates, exercise scoring, and workout reports are prototype/demo behavior. Do not describe these results as connected AI or verified tracking. Uploaded video is currently handled locally in the WebView flow.
-- No API, remote account service, database connection, or cross-device sync is implemented. MongoDB Atlas is the planned database; see `DATABASE.md` before designing backend persistence.
+- The client calls the NestJS API; the API connects to MongoDB Atlas. Expo Go loads the frontend from the development computer and derives the API host from that page's LAN hostname. The phone and computer must share a reachable network; clients never connect directly to Atlas.
 
 ## 2. Run and Build
 
@@ -61,7 +62,7 @@ The frontend uses .next-dev/ for development and .next/ for production build out
 ### Routes and shells
 
 - frontend/app/layout.tsx owns document metadata, viewport configuration, app icons, and the global stylesheet import.
-- frontend/app/page.tsx owns the logo opener and authenticated/unauthenticated handoff.
+- frontend/app/page.tsx sends the initial request to the server-rendered /launch route so the mobile WebView does not depend on client hydration to leave a splash page.
 - frontend/app/(app)/layout.tsx guards signed-in routes.
 - frontend/app/(app)/<section>/page.tsx files are thin route wrappers that load the current profile and render a section.
 - frontend/app/(auth)/login/page.tsx and register/page.tsx own auth and onboarding flow composition.
@@ -137,8 +138,8 @@ Current localStorage keys:
 
 | Key | Stored data | Owner |
 |:--|:--|:--|
-| physiquequest-auth | Simulated current user record | frontend/lib/auth.ts |
-| physiquequest-profile | Onboarding/profile object | Onboarding and signed-in route wrappers |
+| physiquequest-auth | Backend user identity and JWT access token; never the password | frontend/lib/auth.ts |
+| physiquequest-profile | Cached backend profile; it is not the authoritative copy | frontend/lib/auth.ts and signed-in route wrappers |
 | physiquequest-food-log | Meals array and water count | frontend/sections/Scan/ScanSection.tsx |
 
 Rules:
@@ -146,8 +147,8 @@ Rules:
 - Guard browser-only storage access from server rendering and catch malformed JSON where practical.
 - Never store passwords or secrets in localStorage.
 - Route auth checks use the shared functions in frontend/lib/auth.ts.
-- Logout currently removes the auth key and leaves the profile key intact.
-- Do not imply that localStorage data is secure, server-backed, or synchronized across devices.
+- Logout removes the auth key and leaves the profile cache intact. Protected pages must still obtain profile data from the API using the bearer token.
+- Do not store passwords in localStorage or describe the profile cache as authoritative or an offline mode. Nutrition, workout, and quest data remain local/demo until their API flows are implemented.
 
 ## 10. Procedure: Change the Native WebView
 
@@ -174,4 +175,4 @@ After a UI, route, or behavior change:
 - Keep PROCEDURES.md focused on current architecture and how to make changes safely.
 - Keep DATABASE.md focused on current persistence state and language-independent database/backend data rules.
 - Update both when app structure, navigation, palette, safe-area handling, persistence, or supported workflows change.
-- Keep README.md’s quick-start and folder overview aligned with the actual npm workspaces. The backend folder remains reserved until it contains an implemented service.
+- Keep README.md’s quick-start and folder overview aligned with the actual npm workspaces and separately managed backend service.

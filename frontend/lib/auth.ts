@@ -65,5 +65,5 @@ export function getCurrentUser(): User | null {
 }
 
 export function isAuthenticated(): boolean {
-  return getCurrentUser() !== null;
+  return Boolean(getCurrentUser()?.token);
 }

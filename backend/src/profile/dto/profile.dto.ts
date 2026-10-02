@@ -56,9 +56,10 @@ export class CreateProfileDto {
   @IsNumberString()
   arms?: string;
 
-  @IsOptional()
-  @IsIn(['cm', 'inch'])
-  measurementUnit?: string;
+  @IsOptional() @IsIn(['cm', 'inch']) chestUnit?: string;
+  @IsOptional() @IsIn(['cm', 'inch']) waistUnit?: string;
+  @IsOptional() @IsIn(['cm', 'inch']) armsUnit?: string;
+  @IsOptional() @IsIn(['cm', 'inch']) measurementUnit?: string;
 
   @IsIn(['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete'])
   activity: string;
@@ -129,6 +130,9 @@ export class UpdateProfileDto {
   @IsOptional() @Transform(({ value }) => value === '' ? undefined : value) @IsNumberString() chest?: string;
   @IsOptional() @Transform(({ value }) => value === '' ? undefined : value) @IsNumberString() waist?: string;
   @IsOptional() @Transform(({ value }) => value === '' ? undefined : value) @IsNumberString() arms?: string;
+  @IsOptional() @IsIn(['cm', 'inch']) chestUnit?: string;
+  @IsOptional() @IsIn(['cm', 'inch']) waistUnit?: string;
+  @IsOptional() @IsIn(['cm', 'inch']) armsUnit?: string;
   @IsOptional() @IsIn(['cm', 'inch']) measurementUnit?: string;
   @IsOptional() @IsIn(['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete']) activity?: string;
   @IsOptional() @IsString() @MaxLength(80) goal?: string;

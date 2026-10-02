@@ -49,8 +49,9 @@ export default function RegisterPage() {
         chest: profile.chest || undefined,
         waist: profile.waist || undefined,
         arms: profile.arms || undefined,
-        // Backend uses single measurementUnit instead of separate units
-        measurementUnit: profile.chestUnit || profile.waistUnit || profile.armsUnit || 'cm',
+        chestUnit: profile.chestUnit || 'cm',
+        waistUnit: profile.waistUnit || 'cm',
+        armsUnit: profile.armsUnit || 'cm',
         activity: profile.activity,
         goal: profile.goal,
         targetWeight: profile.targetWeight || undefined,

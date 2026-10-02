@@ -184,7 +184,7 @@ export default function CalibrationFlow({ name, email, onComplete }: {
           <small>Step {step} of 4 · Calibration</small>
           {step > 1 && (
             <button type="button" className="ghost back-link" onClick={() => { setError(''); setStep(step - 1); }}>
-              <Icon name="arrow" size={14} style={{ transform: 'rotate(180deg)' }} />
+              <span className="back-link-icon"><Icon name="arrow" size={14} /></span>
               Back
             </button>
           )}
