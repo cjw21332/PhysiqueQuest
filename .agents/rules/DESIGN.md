@@ -21,6 +21,8 @@ This document describes the current PhysiqueQuest product, light-theme interface
 
 ## 2. Color and Type
 
+### Colors
+
 Core colors are CSS custom properties in frontend/app/globals.css. Reuse them for new UI.
 
 | Token | Value | Use |
@@ -34,11 +36,52 @@ Core colors are CSS custom properties in frontend/app/globals.css. Reuse them fo
 | --green | #7ee582 | Primary action and progress |
 | --green-dark | #167336 | Green-surface text and secondary brand accents |
 
-Use the native system font stack: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif. Do not add web fonts.
-
-Scale headings, body text, spacing, and control sizes with clamp() where the layout needs to adapt. Keep headings compact, body text readable, and secondary text legible on small phones. Typical targets are 18–24px for page headings, 13–16px for body copy, and 11–13px for supporting text; do not shrink controls or labels to fit.
-
 Use semantic status colors already present in the stylesheet for error, warning, success, and information states. Avoid adding new palette variables or decorative color systems without approval.
+
+### Typography
+
+**Font Family:**
+System font stack: `-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif`
+
+Do not add web fonts. Use the native system font stack for all text.
+
+**Calibration Flow Typography Specifications:**
+
+| Element | Font Size | Weight | Color | Usage |
+|:--|:--|:--|:--|:--|
+| Step indicator | 12px | 400 (regular) | --green-dark (#167336) | "Step 1 of 4 · Calibration" |
+| Section heading (h2) | clamp(19px, 5vw, 24px) | 600 (semibold) | --ink (#192233) | "Personal data", "What are you training for?" |
+| Description text | clamp(13px, 2.5vw, 16px) | 400 (regular) | --muted (#627087) | Subtitle under section heading |
+| Section labels | 14-15px | 600 (semibold) | --ink (#192233) | "Basic information", "Equipment available", "Training days" |
+| Field labels | 13-14px | 600 (semibold) | --ink (#192233) | "Age", "Height", "Weight", "Gender" |
+| Input text | 14-16px | 400 (regular) | --ink (#192233) | User-entered values |
+| Unit suffixes | 11-13px | 400 (regular) | --muted (#627087) | "yrs", "cm", "kg" within inputs |
+| Optional labels | 11-12px | 400 (regular) | --muted (#627087) | "Optional" badges |
+| Required labels | 11-12px | 400 (regular) | #e53935 (red) | "Required" badges |
+| BMI display | 13-14px | 400 (regular) | --muted (#627087) | "BMI 23.2" |
+| Button labels (selected) | 14-15px | 600 (semibold) | --green-dark (#167336) | Selected choice buttons |
+| Button labels (unselected) | 14-15px | 400 (regular) | --ink (#192233) | Unselected choice buttons |
+| Goal card titles | 14-15px | 600 (semibold) | --ink (#192233) | "Weight loss", "Build muscle" |
+| Goal card details | 12-13px | 400 (regular) | --muted (#627087) | "Calorie deficit + conditioning" |
+| Microcopy/helper text | 12-13px | 400 (regular) | --muted (#627087) | Activity descriptions |
+| Primary button text | clamp(14px, 2.5vw, 17px) | 600 (semibold) | --green-dark (#167336) | "Next: Goals →", "Finish & build my plan →" |
+| Back button | 13px | 400 (regular) | --muted (#627087) | "Back" in step header |
+| Clear button | 12px | 400 (regular) | --muted (#627087) | "Clear" inline section buttons |
+| Day buttons | 14-16px | 600 (semibold) when selected | --green-dark or --ink | "M", "T", "W" training day buttons |
+| Checkbox labels | 14px | 400 (regular) | --ink (#192233) | Condition checkboxes, equipment options |
+| Placeholder text | 13-14px | 400 (regular) | --muted (#627087) | Textarea placeholders |
+| Safety note | 12-13px | 400 (regular) | --ink (#192233) | Emergency contact info boxes |
+| Password requirements title | 12px | 400 (regular) | --muted (#627087) | "Password must contain:" |
+| Password requirements list | 13px | 400 (regular) | --muted (unmet) / --green-dark (met) | Individual password requirements with checkmarks |
+
+**Typography Rules:**
+- Use clamp() for responsive text sizing where layouts need to adapt
+- Keep headings compact, body text readable, and secondary text legible on small phones
+- Typical targets: 18–24px for page headings, 13–16px for body copy, 11–13px for supporting text
+- Do not shrink controls or labels below readable sizes to force fit
+- Semibold (600) is used for emphasis on labels, headings, and selected states
+- Regular (400) is the default weight for body text and unselected states
+- Muted color (#627087) distinguishes secondary information from primary content
 
 ## 3. Shared Layout and Safe Areas
 
@@ -94,3 +137,9 @@ Use semantic status colors already present in the stylesheet for error, warning,
 - [ ] Are touch targets at least 44px and focus states visible?
 - [ ] Are sample/demo data and camera capabilities clearly described?
 - [ ] Does the page respect reduced motion and use the shared icon system?
+
+### Personal data measurement controls
+
+- Step 1 of calibration provides unit dropdowns for height (`cm` or `ft & in.`), body weight (`kg` or `lbs`), and body measurements (`cm` or `inch`). Keep these controls visually aligned with the existing bordered input fields, with a visible keyboard focus state and a usable touch target.
+- Imperial height uses separate feet and inches number fields. When a unit changes, convert any entered value and keep the value paired with the selected unit; do not leave a number to be silently reinterpreted.
+- BMI uses normalized metric values internally while the displayed inputs and saved profile retain the selected units.

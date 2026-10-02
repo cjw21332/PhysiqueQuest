@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import PasswordStrengthChecker, { validatePassword } from '../../components/PasswordStrengthChecker';
 
 type Props = {
   mode: 'register' | 'login';
@@ -9,7 +10,7 @@ type Props = {
   email: string;
   onNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
-  onContinue: () => void;
+  onContinue: (password: string) => void;
   error: string;
   onErrorChange: (value: string) => void;
   consent: boolean;
@@ -28,16 +29,100 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
   const [confirmPassword, setConfirmPassword] = useState('');
   const register = mode === 'register';
 
-  const passwordField = (label: string, value: string, onChange: (value: string) => void, visible: boolean, toggle: () => void, confirm = false) => <label className="field"><span>{label}</span><div className="input-wrap"><input type={visible ? 'text' : 'password'} placeholder={confirm ? 'Re-enter password' : 'At least 8 characters'} value={value} onChange={e => onChange(e.target.value)} autoComplete={confirm ? 'new-password' : register ? 'new-password' : 'current-password'}/><button type="button" className="eye" onClick={toggle} aria-label={visible ? `Hide ${confirm ? 'confirm password' : 'password'}` : `Show ${confirm ? 'confirm password' : 'password'}`} aria-pressed={visible}><EyeIcon visible={visible}/></button></div></label>;
+  const passwordField = (label: string, value: string, onChange: (value: string) => void, visible: boolean, toggle: () => void, confirm = false) => (
+    <>
+      <label className="field">
+        <span>{label}</span>
+        <div className="input-wrap">
+          <input
+            type={visible ? 'text' : 'password'}
+            placeholder={confirm ? 'Re-enter password' : 'At least 8 characters'}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            autoComplete={confirm ? 'new-password' : register ? 'new-password' : 'current-password'}
+          />
+          <button
+            type="button"
+            className="eye"
+            onClick={toggle}
+            aria-label={visible ? `Hide ${confirm ? 'confirm password' : 'password'}` : `Show ${confirm ? 'confirm password' : 'password'}`}
+            aria-pressed={visible}
+          >
+            <EyeIcon visible={visible}/>
+          </button>
+        </div>
+      </label>
+      {register && !confirm && <PasswordStrengthChecker password={value} />}
+    </>
+  );
 
-  return <section className="auth-screen screen-enter"><div className="auth-body"><div className="auth-heading"><h2>{register ? 'Create your account' : 'Welcome back'}</h2><p>{register ? 'It takes about two minutes to set up your plan.' : 'Log in to continue your fitness journey.'}</p></div><div className="segmented"><button className={register ? 'selected' : ''} onClick={() => { onModeChange('register'); onErrorChange(''); }}>Register</button><button className={!register ? 'selected' : ''} onClick={() => { onModeChange('login'); onErrorChange(''); }}>Log in</button></div>
-    {register && <label className="field"><span>Full name</span><div className="input-wrap"><input placeholder="Juan Dela Cruz" value={name} onChange={e => onNameChange(e.target.value)}/></div></label>}
-    <label className="field"><span>Email address</span><div className="input-wrap"><input type="email" placeholder="you@email.com" value={email} onChange={e => onEmailChange(e.target.value)}/></div></label>
-    {register && <small className="hint">Tip: try juan@email.com to see the error state</small>}
-    {passwordField('Password', password, setPassword, showPassword, () => setShowPassword(v => !v))}
-    {!register && <a className="forgot-password-link" onClick={onForgotPassword}>Forgot Password?</a>}
-    {register && <>{passwordField('Confirm password', confirmPassword, setConfirmPassword, showConfirmPassword, () => setShowConfirmPassword(v => !v), true)}<label className="consent"><input type="checkbox" checked={consent} onChange={e => onConsentChange(e.target.checked)}/><span>I agree to the terms, privacy policy, and camera-based health data processing.</span></label></>}
-    {error && <p className="error" role="alert">{error}</p>}</div>
-    <div className="auth-footer"><button className="primary" onClick={() => { if (register && (password.length < 8 || password !== confirmPassword)) { onErrorChange(password.length < 8 ? 'Use a password with at least 8 characters.' : 'Your passwords do not match.'); return; } onContinue(); }}>{register ? 'Create account' : 'Log in'}</button></div>
-  </section>;
+  const handleContinue = () => {
+    if (register) {
+      if (!validatePassword(password)) {
+        onErrorChange('Please meet all password requirements.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        onErrorChange('Your passwords do not match.');
+        return;
+      }
+    } else {
+      if (!password) {
+        onErrorChange('Please enter your password.');
+        return;
+      }
+    }
+    onContinue(password);
+  };
+
+  return (
+    <section className="auth-screen screen-enter">
+      <div className="auth-body">
+        <div className="auth-heading">
+          <h2>{register ? 'Create your account' : 'Welcome back'}</h2>
+          <p>{register ? 'It takes about two minutes to set up your plan.' : 'Log in to continue your fitness journey.'}</p>
+        </div>
+        <div className="segmented">
+          <button className={register ? 'selected' : ''} onClick={() => { onModeChange('register'); onErrorChange(''); }}>
+            Register
+          </button>
+          <button className={!register ? 'selected' : ''} onClick={() => { onModeChange('login'); onErrorChange(''); }}>
+            Log in
+          </button>
+        </div>
+        {register && (
+          <label className="field">
+            <span>Full name</span>
+            <div className="input-wrap">
+              <input placeholder="Juan Dela Cruz" value={name} onChange={e => onNameChange(e.target.value)}/>
+            </div>
+          </label>
+        )}
+        <label className="field">
+          <span>Email address</span>
+          <div className="input-wrap">
+            <input type="email" placeholder="you@email.com" value={email} onChange={e => onEmailChange(e.target.value)}/>
+          </div>
+        </label>
+        {register && <small className="hint">Tip: try juan@email.com to see the error state</small>}
+        {passwordField('Password', password, setPassword, showPassword, () => setShowPassword(v => !v))}
+        {!register && <a className="forgot-password-link" onClick={onForgotPassword}>Forgot Password?</a>}
+        {register && (
+          <>
+            {passwordField('Confirm password', confirmPassword, setConfirmPassword, showConfirmPassword, () => setShowConfirmPassword(v => !v), true)}
+            <label className="consent">
+              <input type="checkbox" checked={consent} onChange={e => onConsentChange(e.target.checked)}/>
+              <span>I agree to the terms, privacy policy, and camera-based health data processing.</span>
+            </label>
+          </>
+        )}
+        {error && <p className="error" role="alert">{error}</p>}
+      </div>
+      <div className="auth-footer">
+        <button className="primary" onClick={handleContinue}>
+          {register ? 'Create account' : 'Log in'}
+        </button>
+      </div>
+    </section>
+  );
 }

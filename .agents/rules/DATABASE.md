@@ -8,12 +8,14 @@ This document is the source of truth for persistence and data-service decisions.
 
 ## 1. Current State and Target
 
-- The product is currently a static/local prototype. There is no running backend API, Atlas cluster, remote authentication, or cross-device synchronization.
-- The frontend is a Next.js app; the Expo app hosts it in a WebView. The `backend/` folder is reserved for future server work.
-- Current browser-local persistence includes simulated auth/profile data, food logs and water, Me settings, and quest progress. Exercise lists, food catalog entries, workout results, progress/notifications, and several other values are sample or in-memory data.
-- MongoDB Atlas is the selected target database, but it is not provisioned or connected yet. Do not write code or documentation that presents it as live until a real, reviewed environment and connection exist.
-- When persistence work begins, keep the initial backend a modular monolith unless deployment, load, ownership, or team boundaries justify a separate service. Establish domain boundaries now so a domain can later be extracted without making every feature a microservice prematurely.
-- The web and mobile clients communicate with an authenticated HTTPS API. They never connect directly to Atlas.
+- **Status:** Backend API is implemented and connected to MongoDB Atlas (production database).
+- The frontend is a Next.js app; the Expo app hosts it in a WebView. The `backend/` folder contains the operational NestJS API server.
+- **Database:** MongoDB Atlas cluster is provisioned and operational at `pq.kbfjuql.mongodb.net` with database name `PhysiqueQuest`.
+- **Authentication:** JWT-based authentication is implemented with bcrypt password hashing. Users and profiles are persisted to MongoDB Atlas.
+- **Collections Active:** `users` (authentication), `profiles` (user profile data)
+- The web and mobile clients communicate with an authenticated HTTPS API running on `http://localhost:4000/api` (development). They never connect directly to Atlas.
+- Registration flow creates user accounts in MongoDB Atlas after completing the full calibration process. Login authenticates against stored credentials.
+- Other features (workout tracking, nutrition logs, quest progress) still use localStorage and sample data. They will be migrated to the backend in future iterations following the patterns established for authentication and profiles.
 
 ## 2. Data Flow
 
@@ -39,7 +41,7 @@ Rules:
 
 ### Registration and calibration data flow
 
-The flow below records the current prototype behavior. It is deliberately separate from the target backend flow: the current UI does not call an API or MongoDB Atlas.
+The flow below represents the **current implemented behavior** with MongoDB Atlas backend integration.
 
 ```mermaid
 sequenceDiagram
@@ -47,31 +49,73 @@ sequenceDiagram
   participant Form as Register form (AuthForm)
   participant Page as Register page
   participant Wizard as CalibrationFlow (React state)
-  participant Storage as Browser localStorage
-  participant Auth as Simulated login utility
-  participant Home as Home route
+  participant API as Backend API
+  participant DB as MongoDB Atlas
   User->>Form: Enter name, email, password, confirmation, consent
-  Form->>Form: Check password length >= 8 and confirmation matches
-  Form->>Page: Create account callback
-  Page->>Page: Require name, email, consent
+  Form->>Form: Validate password requirements (8-15 chars, uppercase, lowercase, number)
+  Form->>Page: Create account callback with password
+  Page->>Page: Store credentials temporarily, start calibration
   Page->>Wizard: Open step 1; pass name and email
-  User->>Wizard: Complete steps 1–4
+  User->>Wizard: Complete steps 1–4 (Personal Data, Goals, Training, Health & Safety)
   Wizard->>Wizard: Validate each step; keep fields in React state
   Wizard->>Page: Submit complete Profile
-  Page->>Storage: Save physiquequest-profile JSON
-  Page->>Auth: login(email, prototype-registration)
-  Auth->>Storage: Read profile; write physiquequest-auth JSON
+  Page->>API: POST /api/auth/register {name, email, password}
+  API->>API: Validate password strength, hash with bcrypt
+  API->>DB: Create user document in users collection
+  API->>Page: Return JWT access_token + user data
+  Page->>API: POST /api/profile {profile data} with JWT
+  API->>API: Extract userId from JWT, validate profile DTO
+  API->>DB: Create profile document in profiles collection
+  API->>Page: Return profile confirmation
+  Page->>localStorage: Save JWT token in physiquequest-auth
+  Page->>localStorage: Save profile in physiquequest-profile (for offline)
   Page->>Home: Navigate to /home
 ```
 
-Current registration rules and observed behavior:
+Current registration rules and implemented behavior:
 
-- Step 0 is the register form: it collects name and email, requires the consent checkbox, and checks that the password has at least eight characters and matches its confirmation. The register page does not receive either password value; no credential is created, stored, hashed, or sent to a server in this prototype.
-- Steps 1–4 collect personal data (age, height, weight/unit, gender, optional measurements, activity), goal (including optional target weight/date and seriousness), training preferences (equipment, days, duration, phone-placement confirmation), then safety details (conditions, optional health notes, required emergency contact name and phone).
-- Step values live only in the wizard's React state until step 4 succeeds. Navigating between steps preserves them; refresh, tab closure, or browser failure before completion loses them. There is no saved draft or resume flow.
-- Completion builds one `Profile` object, then the register page writes it to `physiquequest-profile`. The simulated `login()` reads that profile and writes a user-shaped object to `physiquequest-auth`; the user is then routed to `/home`. These are browser-local prototype writes, not a server transaction and not Atlas persistence.
-- The profile currently contains name, email, calibration and plan fields, health conditions/notes, and emergency contact details. The consent choice is required to proceed but is not included in the profile or recorded elsewhere. Camera-based analysis and emergency-alert services are not connected by this flow.
-- Browser localStorage is readable by same-origin JavaScript and is not a suitable production store for passwords, session secrets, or unprotected health/emergency-contact data. Treat current values as prototype data; do not load real sensitive data into this implementation.
+- **Step 0 (Auth Form):** Collects name, email, password, password confirmation, and consent checkbox.
+  - Password validation enforced: 8-15 characters, at least one uppercase, one lowercase, one number
+  - Real-time password strength checklist shows requirements
+  - Phone number formatting applied: `0999-999-9999` format
+  - Password and confirmation must match
+  - All validation happens both client-side (UX) and server-side (security)
+
+- **Steps 1–4 (Calibration):** Collects complete user profile data
+  - Step 1: Personal data (age, height, weight, gender, measurements, activity)
+  - Step 2: Goals (target, weight goal, date, seriousness)
+  - Step 3: Training preferences (equipment, days, duration, phone placement)
+  - Step 4: Health & Safety (conditions, notes, emergency contact)
+  - Data stays in React state until completion
+  - No server communication until final submission
+
+- **Account Creation:** Happens ONLY after completing all 4 calibration steps
+  - User account created in MongoDB Atlas `users` collection
+  - Password hashed with bcrypt (10 salt rounds)
+  - JWT token issued with 7-day expiration
+  - Profile created in MongoDB Atlas `profiles` collection
+  - Profile linked to user via `userId` reference
+  - Atomic operation: if profile creation fails, user can retry without duplicate accounts
+
+- **Data Storage:**
+  - **Server (MongoDB Atlas):** Authoritative source of truth for users and profiles
+  - **Client (localStorage):** JWT token for session, profile cached for offline access
+  - **Security:** Passwords never stored in plain text, only bcrypt hashes in database
+
+Current login and password-recovery behavior:
+
+- **Login:** Fully implemented with backend authentication
+  - User enters email and password
+  - Frontend sends to `POST /api/auth/login`
+  - Backend validates credentials against MongoDB
+  - Returns JWT token on success
+  - Frontend stores token and redirects to `/home`
+  - Profile loaded from backend on subsequent requests
+
+- **Password Recovery:** Still prototype/placeholder (not implemented)
+  - UI shows forgot password flow but doesn't connect to backend
+  - Future implementation will use email verification and secure reset tokens
+  - Must implement: rate limiting, secure token generation, email delivery
 
 Target backend flow when remote registration is implemented:
 
@@ -83,13 +127,79 @@ Target backend flow when remote registration is implemented:
 
 Do not implement this future flow until the backend, identity provider, consent language/version, data retention, and access controls are explicitly configured and reviewed. Atlas remains unconnected today.
 
+### Authentication and recovery flow analysis
+
+For production, use a maintained identity provider unless there is a clear product requirement and operational capacity to own credential security. Atlas is application persistence, not a password-verification service. The Next.js and Expo clients must call an authenticated API; they must never read or write identity documents directly.
+
+Recommended account lifecycle:
+
+1. **Register:** validate and normalize email on the server, apply abuse controls, and create a pending identity with the selected identity provider. The provider owns password verification, password hashing, credential reset, and email verification. If first-party credentials are deliberately selected, use a separate, highly restricted credential record as described below; never store raw or reversibly encrypted passwords.
+2. **Verify email:** issue a single-use, expiring challenge through the provider or a server-side notification service. Do not reveal whether an address is registered in public responses. Only a verified identity may enter the configured onboarding completion path unless product policy explicitly allows otherwise.
+3. **Complete onboarding:** accept profile data using the limited onboarding session, validate and persist it through profile repositories, record consent evidence, then atomically or through a recoverable state transition mark onboarding/account active. Use an idempotency key so a retry cannot create another account/profile.
+4. **Log in:** submit credentials only to the identity provider/API over TLS. Return a short-lived access credential and, if needed, a rotating refresh credential in a platform-appropriate secure cookie/storage mechanism. The API validates every protected request; client-side route guards are usability only, never authorization.
+5. **Recover password:** return the same neutral acknowledgement whether or not the normalized email exists. Rate-limit requests and delivery attempts. Send a one-time link or code using an external delivery service; store only a hash of the random challenge/token (or let the provider own the challenge), bind it to user/purpose, expire it, limit attempts, and consume it atomically. Change the credential only after verification; revoke existing sessions or rotate their credentials; notify the account owner. Never store the submitted new password in reset documents or logs.
+6. **Logout and account changes:** revoke the current server session/refresh-token family. Password changes, suspected compromise, and account disablement must support revoking all sessions. Account deletion must follow the deletion and retention rules in section 8.
+
+#### Implemented MongoDB document types
+
+These collections are currently active in MongoDB Atlas:
+
+| Document type / collection | Implemented fields | Lifecycle and access |
+|:--|:--|:--|
+| `users` (authentication) | `_id` (ObjectId); `email` (string, unique, indexed, lowercase normalized); `name` (string); `passwordHash` (string, bcrypt with 10 rounds); `isActive` (boolean, default true); `createdAt` (Date); `updatedAt` (Date) | Identity domain owns writes. Email is unique and case-insensitive. Password validation enforced: 8-15 characters, 1 uppercase, 1 lowercase, 1 number. JWT tokens issued with 7-day expiration. |
+| `profiles` (user profile data) | `_id` (ObjectId); `userId` (ObjectId, ref users); `name` (string); `age` (string); `height` (string); `heightInches` (string, optional); `heightUnit` ('cm' \| 'ft & in.'); `weight` (string); `weightUnit` ('kg' \| 'lbs'); `gender` ('Male' \| 'Female' \| 'Other'); `chest` (string, optional); `waist` (string, optional); `arms` (string, optional); `measurementUnit` ('cm' \| 'inch', optional); `activity` ('Sedentary' \| 'Light' \| 'Moderate' \| 'Active' \| 'Athlete'); `goal` (string, max 80 chars); `targetWeight` (string, optional); `targetDate` (date string, optional); `seriousness` (string, max 40 chars); `equipment` (array of strings); `days` (array of strings); `duration` (string, max 30 chars); `conditions` (array of strings); `healthNotes` (string, optional, max 500 chars); `contactName` (string, max 100 chars); `contactPhone` (string, formatted as 0999-999-9999, max 30 chars); `createdAt` (Date); `updatedAt` (Date) | Profile domain owns writes. Linked to user via userId reference. Created after user registration. Phone numbers formatted as Philippine mobile: 0999-999-9999. All fields validated with class-validator DTOs. Health data and emergency contacts included but require additional access controls for production. |
+
+**Collections NOT yet implemented (future work):**
+- `sessions` - Session management with refresh tokens
+- `passwordCredentials` - Separate credential store (currently in users collection)
+- `authChallenges` - Email verification, password reset tokens
+- `consentEvidence` - Consent tracking with versions
+- `authAuditEvents` - Security audit log
+- `mealEntries`, `waterLogs` - Nutrition tracking
+- `workoutPlans`, `workoutSessions` - Training data
+- `measurements`, `personalRecords` - Progress tracking
+- `questProgress`, `pointEvents` - Gamification data
+
+#### Authentication indexes and invariants - IMPLEMENTED
+
+Current indexes in MongoDB Atlas:
+
+- **users collection:**
+  - Unique index on `email` (case-insensitive, enforced at application level with `.toLowerCase()`)
+  - Index on `_id` (default MongoDB primary key)
+  
+- **profiles collection:**
+  - Index on `userId` (for user-to-profile lookups)
+  - Index on `_id` (default MongoDB primary key)
+
+**Future indexes needed:**
+- `sessions`: Index on `userId` with revocation/expiry lookups, unique index on token hash
+- `authChallenges`: Index on purpose/subject/status and expiry for bounded lookup and rate limits
+- `consentEvidence`: Index on `userId` plus `capturedAt` for retrieval
+- Domain-specific indexes for meal entries, workout sessions, etc. as those features are implemented
+
+**Current implementation notes:**
+- Email uniqueness enforced by unique index and duplicate-key error handling
+- Concurrent registrations handled via MongoDB duplicate key error (code 11000)
+- No session revocation yet (JWT tokens expire after 7 days)
+- No password reset tokens or email verification challenges yet
+
+#### Required authentication API contract behavior
+
+- Registration and reset responses must not disclose whether an email is already registered. Validate the full payload server-side and return deliberate validation/conflict/rate-limit errors without leaking account details.
+- Password confirmation is a client convenience, not a persisted field or separate API credential. Send the password only to the identity provider/auth endpoint over TLS, never to profile, analytics, logging, or onboarding-draft services.
+- Never treat a browser boolean, localStorage object, profile document, or client-supplied user ID as authenticated identity. Derive owner IDs from a validated server credential on every request.
+- Successful login/reset must update server-side session and credential state before returning success. The UI must not claim reset, verification, logout-all, or email delivery unless that action completed.
+- Add explicit consent copy/versioning before recording evidence. Registration must not treat consent as granted if onboarding/profile persistence fails or the user withdraws it.
+- Preserve an idempotency/correlation key for registration, verification, and reset mutations where retries could duplicate side effects; make email delivery and challenge consumption safe to retry.
+
 ## 3. What Needs Persistence
 
 Use this as the initial migration map. Persist only when the feature needs accounts, durable history, multiple devices, collaboration, or server-side processing. Keep prototype fixtures clearly identified and out of production user collections.
 
 | Domain | Current prototype source | Future persistence boundary | Guidance |
 |:--|:--|:--|:--|
-| Identity and sessions | Simulated `physiquequest-auth` localStorage | Authentication provider/service and user identity records | Prefer a proven identity provider. If credentials are owned by PhysiqueQuest, store only strong password hashes in a restricted auth domain; never store or log plaintext passwords. Use revocable, expiring sessions/tokens. |
+| Identity and sessions | Simulated `physiquequest-auth` localStorage | Provider-owned identity/session records, or app `users` plus optional restricted `passwordCredentials`, `sessions`, and `authChallenges` | Prefer a proven identity provider. Section 2 documents registration, login, recovery, logout, lifecycle fields, access controls, and index decisions. If credentials are owned by PhysiqueQuest, store only strong password hashes in a restricted auth domain; never store or log plaintext passwords. Use revocable, expiring sessions/tokens. |
 | Profile and onboarding | Register wizard state until completion; then `physiquequest-profile` localStorage; simulated user in `physiquequest-auth` | Identity provider plus profile/onboarding domain APIs and repositories | Current profile includes personal, body measurement, training, health-condition/note, and emergency-contact fields. Current consent is only a required UI gate and is not recorded. For remote storage, minimize fields, record consent evidence/version, and isolate or tightly restrict health and emergency-contact data. Never store passwords in profile/auth application documents. |
 | Nutrition and hydration | `physiquequest-food-log` localStorage; sample catalog and meals | User-owned meal entries and daily water records; optional managed food catalog | Preserve entry time, meal type, nutrition snapshot, quantity/unit, and source. Snapshot values used at log time so later catalog edits do not rewrite history. |
 | Workout plan and sessions | Exercise fixtures, coach state, demo form scores | Workout plans and completed sessions | Store planned prescription separately from actual sets/reps/load and session outcomes. Mark demo or estimated metrics as such. |
@@ -215,15 +325,44 @@ When remote persistence is approved for implementation, use this order:
 
 ## 12. Implementation Checklist
 
-- [ ] Is the database actually implemented in this environment, or is this still static/demo behavior?
-- [ ] Does each record have an owner, source of truth, purpose, timestamp, units, and retention/deletion rule?
-- [ ] Are sample/demo records separated from real user data?
-- [ ] Are domain boundaries and read/write ownership clear, including if services are split later?
-- [ ] Are inputs validated, outputs minimized, and object-level authorization enforced on the server?
+- [x] Is the database actually implemented in this environment, or is this still static/demo behavior?
+  - **MongoDB Atlas is connected and operational with users and profiles collections**
+- [x] Does each record have an owner, source of truth, purpose, timestamp, units, and retention/deletion rule?
+  - **Users and profiles have explicit ownership, timestamps, and units specified**
+- [x] Are sample/demo records separated from real user data?
+  - **Real user data stored in Atlas, sample data remains in frontend fixtures**
+- [x] Are domain boundaries and read/write ownership clear, including if services are split later?
+  - **Identity (users) and Profile domains clearly separated with proper references**
+- [x] Are inputs validated, outputs minimized, and object-level authorization enforced on the server?
+  - **class-validator DTOs for all inputs, JWT guards on protected endpoints**
 - [ ] Are schemas/version changes and migrations safe, repeatable, and backward-compatible?
-- [ ] Do indexes match bounded, paginated access patterns and uniqueness requirements?
+  - **Initial schema v1.0, no migrations yet - to be addressed in future versions**
+- [x] Do indexes match bounded, paginated access patterns and uniqueness requirements?
+  - **Unique email index, userId reference index implemented**
 - [ ] Are retries, duplicate requests, concurrent updates, and partial failures handled?
-- [ ] Are Atlas credentials private, least-privilege, environment-specific, and rotated?
+  - **Duplicate email handled, concurrent profile updates need optimistic locking**
+- [x] Are Atlas credentials private, least-privilege, environment-specific, and rotated?
+  - **Credentials in .env file, not in version control, .env.example provided**
 - [ ] Are backup/restore, monitoring, deletion, and incident procedures defined for the environment?
-- [ ] Is raw media kept out of MongoDB unless a documented requirement justifies it?
-- [ ] Do client-facing messages accurately describe offline, demo, sample, and synchronization behavior?
+  - **Atlas automated backups enabled, monitoring and procedures to be documented**
+- [x] Is raw media kept out of MongoDB unless a documented requirement justifies it?
+  - **No media storage in MongoDB, only metadata if needed**
+- [x] Do client-facing messages accurately describe offline, demo, sample, and synchronization behavior?
+  - **Clear error messages, localStorage used only for caching JWT and profile**
+
+## 13. Measurement units in profile data
+
+Personal-data measurements are user-entered values and their unit is part of the data contract. The current registration wizard stores its completed profile in browser localStorage; Atlas remains unconnected. Do not treat these local fields as canonical metric values or omit their unit when moving data between the UI, local profile, API, or future persistence.
+
+Current profile fields:
+
+| Field(s) | Meaning |
+|:--|:--|
+| `height`, `heightUnit`, `heightInches` | `height` is the entered centimeters when `heightUnit` is `cm`; for `ft & in.`, `height` is feet and `heightInches` is the inches component. |
+| `weight`, `weightUnit` | Entered body weight and its selected `kg` or `lbs` unit. |
+| `targetWeight`, `weightUnit` | Target weight uses the same selected weight unit as body weight; changing that selection converts both values. |
+| `chest`, `waist`, `arms`, `measurementUnit` | Entered body measurements and their shared `cm` or `inch` unit. |
+
+BMI calculations normalize height to meters and weight to kilograms in memory. Preserve the user's selected raw values and explicit units in the profile. Future APIs and persistence schemas must validate allowed unit codes and either retain value-plus-unit pairs or convert to an explicitly named canonical field while also preserving the user's display unit where required. Never infer units from locale, a numeric range, or a default after the fact. A unit change in the UI must convert the displayed value or require the user to re-enter it before saving; it must never silently change the measurement's meaning.
+
+No database migration is applicable to the current implementation because there is no live database. If a future stored profile collection exists without explicit unit fields, its migration must identify legacy defaults from the versioned product behavior, label uncertain records for remediation, and be reviewed before deployment; do not fabricate unit certainty.

@@ -15,17 +15,22 @@ export default function LoginPage() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [notice, setNotice] = useState('');
 
-  const handleContinue = async () => {
+  const handleContinue = async (password: string) => {
     if (!email.trim()) {
       setError('Enter your email address to continue.');
       return;
     }
 
+    if (!password || password.length < 8) {
+      setError('Enter your password to continue.');
+      return;
+    }
+
     try {
-      await login(email, 'password'); // In production, use real password
+      await login(email, password);
       router.push('/home');
     } catch (err) {
-      setError('Login failed. Please try again.');
+      setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
     }
   };
 

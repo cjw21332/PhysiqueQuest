@@ -60,7 +60,8 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const equipment = profile.equipment?.length ? profile.equipment.join(', ') : 'Dumbbells';
   const daysPerWeek = profile.days?.length || 4;
   const conditionCount = profile.conditions?.includes('None of these') ? 0 : profile.conditions?.length || 1;
-  const goalWeight = profile.targetWeight ? `${profile.targetWeight} kg` : '74 kg';
+  const weightUnit = profile.weightUnit || 'kg';
+  const goalWeight = profile.targetWeight ? `${profile.targetWeight} ${weightUnit}` : `74 ${weightUnit}`;
 
   if (adminView === 'exercises') {
     return <AdminExerciseLibrary onBack={() => setAdminView('settings')} />;
