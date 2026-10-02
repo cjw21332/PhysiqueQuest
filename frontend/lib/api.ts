@@ -1,5 +1,16 @@
 // API client configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+function getApiBaseUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (configuredUrl) return configuredUrl.replace(/\/$/, '');
+
+  // Expo Go loads this site from the computer's LAN address. In that context,
+  // localhost would point back to the phone, so use the WebView's site host.
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.hostname}:4000/api`;
+  }
+
+  return 'http://localhost:4000/api';
+}
 
 export interface ApiError {
   message: string;
@@ -8,17 +19,11 @@ export interface ApiError {
 }
 
 class ApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    const url = `${getApiBaseUrl()}${endpoint}`;
 
     const config: RequestInit = {
       ...options,
@@ -41,8 +46,11 @@ class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        const error: ApiError = await response.json();
-        throw new Error(error.message || 'An error occurred');
+        const error: ApiError = await response.json().catch(() => ({
+          message: `Request failed (${response.status})`,
+          statusCode: response.status,
+        }));
+        throw new Error(Array.isArray(error.message) ? error.message.join(', ') : error.message || 'An error occurred');
       }
 
       return await response.json();
@@ -92,25 +100,25 @@ class ApiClient {
   }
 
   // Profile endpoints
-  async createProfile(data: any) {
-    return this.request<{ profile: any }>('/profile', {
+  async createProfile(data: unknown) {
+    return this.request<any>('/profile', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
   async getProfile() {
-    return this.request<{ profile: any }>('/profile', {
+    return this.request<any>('/profile', {
       method: 'GET',
     });
   }
 
-  async updateProfile(data: any) {
-    return this.request<{ profile: any }>('/profile', {
-      method: 'PATCH',
+  async updateProfile(data: unknown) {
+    return this.request<any>('/profile', {
+      method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 }
 
-export const api = new ApiClient(API_BASE_URL);
+export const api = new ApiClient();

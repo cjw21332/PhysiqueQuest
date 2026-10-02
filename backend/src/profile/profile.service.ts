@@ -90,19 +90,17 @@ function validateProfileMeasurements(profile: Partial<Profile>): void {
     throw new BadRequestException('Height must be between 80 and 250 cm (or the equivalent in ft & in.).');
   }
 
-  const factor = profile.measurementUnit === 'inch' ? 2.54 : 1;
-  for (const [field, max] of [['chest', 250], ['waist', 250], ['arms', 150]] as const) {
+  for (const [field, unitField, max] of [['chest', 'chestUnit', 250], ['waist', 'waistUnit', 250], ['arms', 'armsUnit', 150]] as const) {
     const value = profile[field];
     if (value === undefined || value === null || value === '') continue;
+    const unit = profile[unitField] || profile.measurementUnit;
+    if (!unit) throw new BadRequestException(`A unit is required for ${field}.`);
+    const factor = unit === 'inch' ? 2.54 : 1;
     const cm = Number(value) * factor;
     if (!Number.isFinite(cm) || cm <= 0 || cm > max) {
       throw new BadRequestException(`${field} must be greater than 0 and no more than ${max} cm (or the equivalent in inches).`);
     }
   }
-  if ((!profile.measurementUnit) && [profile.chest, profile.waist, profile.arms].some((value) => value !== undefined && value !== '')) {
-    throw new BadRequestException('A measurement unit is required when body measurements are provided.');
-  }
-
   if (profile.targetWeight !== undefined && profile.targetWeight !== null && profile.targetWeight !== '') {
     const targetWeight = Number(profile.targetWeight);
     const targetWeightKg = profile.weightUnit === 'lbs' ? targetWeight / 2.2046226218 : targetWeight;

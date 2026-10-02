@@ -51,7 +51,7 @@ function AppContent() {
   const inferredAddress = useMemo(getInitialAddress, []);
   const [address, setAddress] = useState(inferredAddress);
   const [loadedAddress, setLoadedAddress] = useState(inferredAddress);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(!inferredAddress);
   const [key, setKey] = useState(0);
 
   const insetScript = useMemo(
@@ -65,6 +65,10 @@ function AppContent() {
 
   const connect = () => {
     const normalized = address.trim().replace(/\/$/, '');
+    if (!normalized) {
+      setError(true);
+      return;
+    }
     const withProtocol = /^https?:\/\//i.test(normalized) ? normalized : `http://${normalized}`;
     setAddress(withProtocol);
     setLoadedAddress(withProtocol);
@@ -81,7 +85,7 @@ function AppContent() {
   return (
     <View style={styles.root}>
       <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
-      <WebView
+      {loadedAddress ? <WebView
         ref={webRef}
         key={key}
         source={{ uri: loadedAddress }}
@@ -89,7 +93,6 @@ function AppContent() {
         containerStyle={styles.webContainer}
         originWhitelist={['*']}
         injectedJavaScriptBeforeContentLoaded={insetScript}
-        onLoadEnd={pushInsets}
         javaScriptEnabled
         domStorageEnabled
         allowsBackForwardNavigationGestures
@@ -99,6 +102,8 @@ function AppContent() {
         bounces={false}
         overScrollMode="never"
         scrollEnabled
+        cacheEnabled={false}
+        incognito={false}
         setBuiltInZoomControls={false}
         setDisplayZoomControls={false}
         scalesPageToFit={false}
@@ -109,11 +114,29 @@ function AppContent() {
             <Text style={[styles.loadingText, { fontSize: bodySize }]}>Opening PhysiqueQuest…</Text>
           </View>
         )}
-        onError={() => setError(true)}
+        onError={(e) => {
+          console.error('WebView error:', e.nativeEvent);
+          setError(true);
+        }}
         onHttpError={e => {
+          console.error('HTTP error:', e.nativeEvent);
           if (e.nativeEvent.statusCode >= 500) setError(true);
         }}
-      />
+        onMessage={(e) => {
+          console.log('WebView message:', e.nativeEvent.data);
+        }}
+        onLoadStart={() => {
+          console.log('WebView load started:', loadedAddress);
+        }}
+        onLoadEnd={(e) => {
+          console.log('WebView load ended:', e.nativeEvent.url);
+          pushInsets();
+        }}
+        onContentProcessDidTerminate={() => {
+          console.error('WebView process terminated');
+          setError(true);
+        }}
+      /> : null}
       {error && (
         <View
           style={[
@@ -131,8 +154,8 @@ function AppContent() {
               Can't reach PhysiqueQuest
             </Text>
             <Text style={[styles.body, { fontSize: bodySize, lineHeight: bodySize * 1.6 }]}>
-              Start the web app on your computer with <Text style={styles.code}>npm run dev</Text>. Keep
-              your phone and computer on the same Wi-Fi network.
+              Start the web app, backend, and database connection on your computer. Keep your phone and
+              computer on the same Wi-Fi network, then enter the computer's LAN address on port 3000.
             </Text>
             <Text style={[styles.label, { fontSize: bodySize - 1 }]}>Computer address</Text>
             <TextInput

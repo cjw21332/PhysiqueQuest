@@ -43,6 +43,16 @@ export class Profile {
   arms?: string;
 
   @Prop({ enum: ['cm', 'inch'] })
+  chestUnit?: string;
+
+  @Prop({ enum: ['cm', 'inch'] })
+  waistUnit?: string;
+
+  @Prop({ enum: ['cm', 'inch'] })
+  armsUnit?: string;
+
+  // Legacy shared unit retained for profiles created before per-measurement units.
+  @Prop({ enum: ['cm', 'inch'] })
   measurementUnit?: string;
 
   @Prop({ required: true })

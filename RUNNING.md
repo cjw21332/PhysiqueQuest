@@ -94,7 +94,7 @@ npm install
 
 ## Running the Application
 
-You need to run all three components simultaneously in separate terminal windows.
+You need to run all three components simultaneously in separate terminal windows. For Expo Go, all devices must be on the same Wi-Fi network. The Next.js and NestJS servers listen on the computer's network interfaces; the app uses the computer's LAN address for both the page (port 3000) and API (port 4000). MongoDB Atlas remains a cloud database and is reached by the backend, not by the phone.
 
 ### Terminal 1: Backend Server
 
@@ -136,7 +136,7 @@ npm run dev
 
 ```bash
 cd mobile
-npx expo start
+npx expo start --lan
 ```
 
 **Expected Output:**
@@ -170,13 +170,13 @@ http://localhost:3000
 
 3. Scan the QR code displayed in Terminal 3
 
-4. The app will automatically connect to your frontend at `http://[your-computer-ip]:3000`
+4. Expo Go opens the mobile wrapper. It automatically loads the frontend at `http://[your-computer-ip]:3000`; API requests then use that same host on port 4000.
 
-**If Connection Fails:**
+**If the app shows a connection screen:**
 - Verify both devices are on the same Wi-Fi network
-- Check that the frontend server is running
-- The app will display an error screen with an input to manually enter the computer address
-- Enter your computer's IP address and port: `http://192.168.1.10:3000` (replace with your actual IP)
+- Check that the frontend, backend, and MongoDB Atlas connection are running
+- Enter your computer's LAN address and port 3000 in the app, for example `http://192.168.1.10:3000` (replace with your actual IP)
+- Allow Node.js through Windows Defender Firewall for private networks so the phone can reach ports 3000 and 4000
 
 ### Finding Your Computer's IP Address
 

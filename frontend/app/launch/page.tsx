@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 export default function LaunchPage() {
   const router = useRouter();
   const [notice, setNotice] = useState('');
-
   const handleGetStarted = () => {
     router.push('/register');
   };

@@ -13,7 +13,7 @@ This document is the source of truth for persistence and data-service decisions.
 - **Database:** MongoDB Atlas cluster is provisioned and operational at `pq.kbfjuql.mongodb.net` with database name `PhysiqueQuest`.
 - **Authentication:** JWT-based authentication is implemented with bcrypt password hashing. Users and profiles are persisted to MongoDB Atlas.
 - **Collections Active:** `users` (authentication), `profiles` (user profile data)
-- The web and mobile clients communicate with an authenticated HTTPS API running on `http://localhost:4000/api` (development). They never connect directly to Atlas.
+- The web client and Expo WebView communicate with the NestJS API at `/api`. On a computer, development uses `http://localhost:4000/api`; on a phone, the API host must be the same reachable LAN hostname as the Next.js page, on port 4000. Production must use HTTPS. Clients never connect directly to Atlas.
 - Registration flow creates user accounts in MongoDB Atlas after completing the full calibration process. Login authenticates against stored credentials.
 - Other features (workout tracking, nutrition logs, quest progress) still use localStorage and sample data. They will be migrated to the backend in future iterations following the patterns established for authentication and profiles.
 
@@ -95,11 +95,11 @@ Current registration rules and implemented behavior:
   - JWT token issued with 7-day expiration
   - Profile created in MongoDB Atlas `profiles` collection
   - Profile linked to user via `userId` reference
-  - Atomic operation: if profile creation fails, user can retry without duplicate accounts
+  - User and profile writes are currently two sequential API operations, not one database transaction. If profile creation fails after account creation, the account remains and recovery should use login plus a profile-retry path; do not describe registration as atomic.
 
 - **Data Storage:**
   - **Server (MongoDB Atlas):** Authoritative source of truth for users and profiles
-  - **Client (localStorage):** JWT token for session, profile cached for offline access
+  - **Client (localStorage):** JWT token and a cached profile copy; profile routes currently fetch the backend and are not an offline mode
   - **Security:** Passwords never stored in plain text, only bcrypt hashes in database
 
 Current login and password-recovery behavior:
@@ -125,7 +125,7 @@ Target backend flow when remote registration is implemented:
 4. Persist the profile and training preferences through their domain repositories. Keep health restrictions/notes and emergency contacts separately protected when their distinct access, retention, or deletion rules warrant it. Use an idempotency key so retries cannot create duplicate onboarding records.
 5. Only mark onboarding complete and activate the pending account after profile persistence succeeds. Return a minimal profile summary and route the client to the home screen. If persistence fails, retain/recover the safe client draft and allow retry; do not pretend setup completed or silently write a second local source of truth.
 
-Do not implement this future flow until the backend, identity provider, consent language/version, data retention, and access controls are explicitly configured and reviewed. Atlas remains unconnected today.
+The backend and Atlas connection are implemented. The preceding sequence describes recommended production hardening beyond the current first-party JWT implementation; add an external identity provider, email verification, onboarding idempotency, consent evidence, and recovery controls only as product and operational requirements are approved.
 
 ### Authentication and recovery flow analysis
 
@@ -147,7 +147,7 @@ These collections are currently active in MongoDB Atlas:
 | Document type / collection | Implemented fields | Lifecycle and access |
 |:--|:--|:--|
 | `users` (authentication) | `_id` (ObjectId); `email` (string, unique, indexed, lowercase normalized); `name` (string); `passwordHash` (string, bcrypt with 10 rounds); `isActive` (boolean, default true); `createdAt` (Date); `updatedAt` (Date) | Identity domain owns writes. Email is unique and case-insensitive. Password validation enforced: 8-15 characters, 1 uppercase, 1 lowercase, 1 number. JWT tokens issued with 7-day expiration. |
-| `profiles` (user profile data) | `_id` (ObjectId); `userId` (ObjectId, ref users); `name` (string); `age` (string); `height` (string); `heightInches` (string, optional); `heightUnit` ('cm' \| 'ft & in.'); `weight` (string); `weightUnit` ('kg' \| 'lbs'); `gender` ('Male' \| 'Female' \| 'Other'); `chest` (string, optional); `waist` (string, optional); `arms` (string, optional); `measurementUnit` ('cm' \| 'inch', optional); `activity` ('Sedentary' \| 'Light' \| 'Moderate' \| 'Active' \| 'Athlete'); `goal` (string, max 80 chars); `targetWeight` (string, optional); `targetDate` (date string, optional); `seriousness` (string, max 40 chars); `equipment` (array of strings); `days` (array of strings); `duration` (string, max 30 chars); `conditions` (array of strings); `healthNotes` (string, optional, max 500 chars); `contactName` (string, max 100 chars); `contactPhone` (string, formatted as 0999-999-9999, max 30 chars); `createdAt` (Date); `updatedAt` (Date) | Profile domain owns writes. Linked to user via userId reference. Created after user registration. Phone numbers formatted as Philippine mobile: 0999-999-9999. All fields validated with class-validator DTOs. Health data and emergency contacts included but require additional access controls for production. |
+| `profiles` (user profile data) | `_id` (ObjectId); `userId` (ObjectId, ref users); `name` (string); `age` (string); `height` (string); `heightInches` (string, optional); `heightUnit` ('cm' \| 'ft & in.'); `weight` (string); `weightUnit` ('kg' \| 'lbs'); `gender` ('Male' \| 'Female' \| 'Other'); `chest` (string, optional); `chestUnit` ('cm' \| 'inch', optional); `waist` (string, optional); `waistUnit` ('cm' \| 'inch', optional); `arms` (string, optional); `armsUnit` ('cm' \| 'inch', optional); `measurementUnit` ('cm' \| 'inch', optional legacy shared unit); `activity` ('Sedentary' \| 'Light' \| 'Moderate' \| 'Active' \| 'Athlete'); `goal` (string, max 80 chars); `targetWeight` (string, optional); `targetDate` (date string, optional); `seriousness` (string, max 40 chars); `equipment` (array of strings); `days` (array of strings); `duration` (string, max 30 chars); `conditions` (array of strings); `healthNotes` (string, optional, max 500 chars); `contactName` (string, max 100 chars); `contactPhone` (string, formatted as 0999-999-9999, max 30 chars); `createdAt` (Date); `updatedAt` (Date) | Profile domain owns writes. Linked to user via userId reference. Created after user registration. Phone numbers formatted as Philippine mobile: 0999-999-9999. All fields validated with class-validator DTOs. Health data and emergency contacts included but require additional access controls for production. |
 
 **Collections NOT yet implemented (future work):**
 - `sessions` - Session management with refresh tokens
@@ -352,7 +352,7 @@ When remote persistence is approved for implementation, use this order:
 
 ## 13. Measurement units in profile data
 
-Personal-data measurements are user-entered values and their unit is part of the data contract. The current registration wizard stores its completed profile in browser localStorage; Atlas remains unconnected. Do not treat these local fields as canonical metric values or omit their unit when moving data between the UI, local profile, API, or future persistence.
+Personal-data measurements are user-entered values and their unit is part of the data contract. The registration wizard sends the selected values and units through the authenticated profile API, and the profile document persists the values in MongoDB Atlas. The browser also caches the returned profile in localStorage. Do not treat entered values as canonical metric values or omit their unit when moving data between the UI, API, cache, and database.
 
 Current profile fields:
 
@@ -361,8 +361,10 @@ Current profile fields:
 | `height`, `heightUnit`, `heightInches` | `height` is the entered centimeters when `heightUnit` is `cm`; for `ft & in.`, `height` is feet and `heightInches` is the inches component. |
 | `weight`, `weightUnit` | Entered body weight and its selected `kg` or `lbs` unit. |
 | `targetWeight`, `weightUnit` | Target weight uses the same selected weight unit as body weight; changing that selection converts both values. |
-| `chest`, `waist`, `arms`, `measurementUnit` | Entered body measurements and their shared `cm` or `inch` unit. |
+| `chest`, `chestUnit` | Chest measurement and its selected `cm` or `inch` unit. |
+| `waist`, `waistUnit` | Waist measurement and its selected `cm` or `inch` unit. |
+| `arms`, `armsUnit` | Arm measurement and its selected `cm` or `inch` unit. |
 
-BMI calculations normalize height to meters and weight to kilograms in memory. Preserve the user's selected raw values and explicit units in the profile. Future APIs and persistence schemas must validate allowed unit codes and either retain value-plus-unit pairs or convert to an explicitly named canonical field while also preserving the user's display unit where required. Never infer units from locale, a numeric range, or a default after the fact. A unit change in the UI must convert the displayed value or require the user to re-enter it before saving; it must never silently change the measurement's meaning.
+BMI calculations normalize height to meters and weight to kilograms in memory. Backend profile validation normalizes values transiently to enforce physical bounds, then stores the entered raw values with their selected units. The UI converts the displayed height, weight, and target weight when their units change. Body measurements have independent unit dropdowns and are converted for validation according to their own selected units. `measurementUnit` is retained as an optional legacy field; when a per-measurement unit is absent, validation may use that legacy shared unit. New clients should always send the explicit `chestUnit`, `waistUnit`, and `armsUnit` fields when corresponding values are present. Never infer units from locale or numeric range.
 
-No database migration is applicable to the current implementation because there is no live database. If a future stored profile collection exists without explicit unit fields, its migration must identify legacy defaults from the versioned product behavior, label uncertain records for remediation, and be reviewed before deployment; do not fabricate unit certainty.
+Profiles created before per-measurement units can continue to use `measurementUnit` as the shared-unit fallback. Do not rewrite existing raw measurement values during migration unless their original unit is known. If any stored record lacks both explicit units and a legacy unit, flag it for remediation rather than inventing unit certainty.
