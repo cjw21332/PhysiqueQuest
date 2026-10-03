@@ -1,49 +1,105 @@
 ---
-description: Current visual and responsive design system for the PhysiqueQuest web app and Expo WebView. Follow these rules for every UI change.
+description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the light-theme interface, component library, responsive rules, and extension patterns. The web app is the design source; the Expo app displays it in a native WebView with device capabilities (safe-area insets, camera, file inputs).
 ---
 
-# PhysiqueQuest Design System
+# PhysiqueQuest Design System v2.1
 
-This document describes the current PhysiqueQuest product, light-theme interface, and rules for extending it. The web app is the source of UI; the Expo app displays it in a native WebView.
+This document specifies the current PhysiqueQuest product interface, design tokens, component patterns, responsive behavior, and rules for extending the system consistently. Update this document when adding new UI patterns or making significant design decisions.
 
-## 1. Current Interface
+## 1. Product Architecture & Navigation
 
-- PhysiqueQuest is a mobile-first fitness and nutrition prototype. The Next.js web app provides product UI and behavior; the Expo app hosts it in a native WebView and provides device capabilities such as safe-area insets and camera/file inputs.
-- Signed-in users have five main sections: Home, Coach, Scan, Quests, and Me. The root route shows the logo-led opener, then continues to Home for a locally authenticated user or Launch otherwise. Launch and Login are prototype entry flows. Register validates the account form, then opens a four-step calibration flow (Personal Data, Goals, Training Preference, Health & Safety); it saves the profile and starts the local session only after the final step.
-- Home contains the training dashboard, goals and milestones, progress, and notifications. Coach contains a weekly training plan, exercise library, camera check, live workout, and post-workout report. Scan contains nutrition overview, meal review, Add Food, Today’s Log with water tracking, and Food History. Quests contains level/streak progress, daily missions, rewards, and leaderboard entry. Me contains profile, safety, privacy, account settings, and Admin tools.
-- Me’s Admin tools open two focused views: Exercise Library (search, publication/pose filters, and draft creation) and Engagement Analytics (date ranges, retention visualization, emergency-event summary/export). These are frontend demonstrations backed by local in-memory sample data, not a connected admin API.
-- Authentication, onboarding, food logging, quest progress, and settings are prototype behavior. Some values use browser localStorage; other screens use static fixtures or in-memory demo state. There is no live backend, remote account service, cross-device sync, or database connection. Calorie estimates, AI/form scores, camera readiness, workout feedback, analytics, and emergency-event counts must be presented as sample/demo behavior until real services exist.
-- MongoDB Atlas is the planned future database, not an implemented system dependency. Follow `DATABASE.md` for persistence, API, domain ownership, and service rules.
-- The overall product theme is light. The live workout view intentionally uses a dark focus surface; do not extend that treatment to other sections without a product decision.
-- The opener uses the PhysiqueQuest logo and the tagline “Fitness That Fits Your Life”.
-- The main navigation has five tabs and sits above the device system-navigation area on main section screens. Focused nested/detail flows hide the tab bar to free the content layout; those views provide a clear back or completion action to their parent/root. This includes Home subviews, Coach Exercise Library/camera/live session/report, Scan review/add/log/history, and Me Admin tools. The main dashboard/plan/nutrition, Quests, and Me settings screens retain the tab bar.
-- Home is the reference for the signed-in content width and page gutters. Reuse the shared centered content frame rather than inventing different outer page widths.
+### App Structure
+PhysiqueQuest is a mobile-first fitness and nutrition prototype. The Next.js web app provides product UI and behavior; the Expo app hosts it in a native WebView and bridges device capabilities.
 
-## 2. Color and Type
+**Five Main Sections (Signed-In Users):**
+- **Home**: Training dashboard, goals & milestones, progress metrics, and notifications center
+- **Coach**: Weekly training plan, exercise library, camera readiness check, live workout session, and post-workout report
+- **Scan**: Nutrition overview, meal review, Add Food flow, Today’s Log with water tracking, and Food History
+- **Quests**: Level/streak progress, daily missions, earned badges, and leaderboard entry
+- **Me**: Profile, safety settings, privacy controls, account settings, and Admin tools (Exercise Library admin, Analytics dashboard)
 
-### Colors
+### Entry Flows & Authentication
+- **Root route** (`/`): Logo-led opener, routes to Home for authenticated users or Launch otherwise
+- **Launch** (`/launch`): Prototype entry flow with device readiness checks (camera, permissions)
+- **Login** (`/login`): Authentication form
+- **Register** (`/register`): Account creation → four-step calibration flow (Personal Data → Goals → Training Preference → Health & Safety) → saves profile, starts local session
+- **Admin Views**: Exercise Library (search, filters, draft creation) and Analytics (date ranges, retention viz, event summary) — frontend demonstrations with local in-memory sample data
 
-Core colors are CSS custom properties in frontend/app/globals.css. Reuse them for new UI.
+### Navigation Behavior
+- **Main tab bar** (five tabs): Positioned above device system-navigation on main section screens (Home, Coach, Scan, Quests, Me)
+- **Nested/detail flows**: Hide tab bar to reclaim screen space. Provide clear back button or completion action to parent. Includes:
+  - Home subviews (goals detail, progress, notifications)
+  - Coach subviews (Exercise Library, camera check, live session, report)
+  - Scan subviews (meal review, Add Food, Today’s Log, Food History)
+  - Me subviews (Admin tools)
+- **Tab bar visibility**: Main section roots retain the tab bar; nested views do not
+- **Content frame**: Home is the reference for signed-in content width and gutters; reuse this centered frame across all sections
 
-| Token | Value | Use |
+### Data & Persistence
+- **Authentication, onboarding, food logging, quest progress, settings**: Prototype behavior
+- **Storage**: Browser localStorage for some values; static fixtures or in-memory demo state for others
+- **Backend**: No live backend, remote account service, cross-device sync, or database connection (yet)
+- **Sample/demo values**: Calorie estimates, AI form scores, camera readiness, workout feedback, analytics, emergency-event counts must be labeled as sample/demo behavior until real services exist
+- **Future integration**: MongoDB Atlas planned for production (see `DATABASE.md`)
+
+## 2. Design Tokens: Color & Typography
+
+### Color Palette
+
+Core colors are CSS custom properties in `frontend/app/globals.css`. Reuse these for all new UI; do not introduce new palette variables without approval.
+
+| Token | Value | Use Case |
 |:--|:--|:--|
-| --bg | #f4f6f3 | App/page background |
-| --surface | #fff | Main content, cards, and controls |
-| --soft | #f4f7f4 | Quiet surfaces and inactive controls |
-| --line | #e8ede9 | Borders and dividers |
-| --ink | #192233 | Primary text and icons |
-| --muted | #627087 | Secondary text and hints |
-| --green | #7ee582 | Primary action and progress |
-| --green-dark | #167336 | Green-surface text and secondary brand accents |
+| `--ink` | #192233 | Primary text, headings, icons, primary interactive elements |
+| `--muted` | #627087 | Secondary text, captions, hints, disabled states |
+| `--bg` | #f4f6f3 | Page/section backgrounds, subtle fill areas |
+| `--surface` | #fff | Main content areas, cards, input fields, control surfaces |
+| `--soft` | #f4f7f4 | Quiet/inactive surfaces, subtle fills, unselected controls |
+| `--line` | #e8ede9 | Borders, dividers, separators, input focus states |
+| `--green` | #7ee582 | Primary actions, progress indicators, success states, selected controls |
+| `--green-dark` | #167336 | Text on green surfaces, secondary brand accents, dark mode alternative |
 
-Use semantic status colors already present in the stylesheet for error, warning, success, and information states. Avoid adding new palette variables or decorative color systems without approval.
+**Semantic Colors** (already in stylesheet, use instead of defining new ones):
+- Error/danger: `#e53935` / `#bd3030` (red tones)
+- Warning: `#b45e15` / `#ed641e` (orange/amber)
+- Success: `--green` and `--green-dark`
+- Information: Blue tones (use sparingly, not primary brand color)
 
-### Typography
+**Color Usage Rules:**
+- Use `--ink` for all primary text and interactive labels
+- Use `--muted` to de-emphasize secondary information
+- Use `--surface` and `--soft` for depth and layering, never both at same visual level
+- Use `--green` for all primary CTAs and progress states
+- Status colors (error, warning) must pair with icons or text labels, never color alone
+- Avoid using the dark live-workout view (#111827) elsewhere without explicit product approval
+
+### Typography System
 
 **Font Family:**
-System font stack: `-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif`
+```css
+-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif
+```
+System fonts only. Do not add web fonts or custom typefaces.
 
-Do not add web fonts. Use the native system font stack for all text.
+**Type Scale & Weight Hierarchy:**
+
+| Role | Size | Weight | Color | Usage |
+|:--|:--|:--|:--|:--|
+| Page heading (h1) | `clamp(28px, 5vw, 48px)` | 700 | `--ink` | Section/page titles (Home, Coach, Scan, Quests, Me) |
+| Section heading (h2) | `clamp(22px, 4vw, 32px)` | 700 | `--ink` | Major subsection titles, goal cards, hero sections |
+| Subsection heading (h3) | `clamp(14px, 2.8vw, 17px)` | 700 | `--ink` | Card titles, mission titles, nested section labels |
+| Body copy | `clamp(13px, 2.5vw, 16px)` | 400 | `--ink` | Main content text, descriptions, list items |
+| Secondary text | `clamp(12px, 2.4vw, 14px)` | 400 | `--muted` | Captions, subtitles, metadata, helper text |
+| Label / badge | `clamp(11px, 1.6vw, 13px)` | 600 | `--ink` | Form labels, button text, chip labels |
+| Hint / small | `clamp(10px, 1.4vw, 12px)` | 400 | `--muted` | Inline hints, error messages, timestamp, very small copy |
+| Micro / tag | `clamp(9px, 1.3vw, 11px)` | 400 | `--muted` | Tags, badges, mini metadata, icon labels |
+
+**Weight Rules:**
+- **700 (semibold)**: Headings, labels, selected states, emphasis
+- **600**: Form labels, button text, important metadata
+- **400 (regular)**: Body copy, descriptions, secondary information, unselected states
+
+**Responsive Text:** Use `clamp()` for fluid scaling across viewport widths and heights. Do not use fixed breakpoint-based sizes when `clamp()` achieves the same goal more elegantly.
 
 **Calibration Flow Typography Specifications:**
 
@@ -83,63 +139,439 @@ Do not add web fonts. Use the native system font stack for all text.
 - Regular (400) is the default weight for body text and unselected states
 - Muted color (#627087) distinguishes secondary information from primary content
 
-## 3. Shared Layout and Safe Areas
+## 3. Layout, Spacing & Safe Areas
 
-- The app fills the available viewport and keeps the same centered outer frame across Home, Coach, Scan, Quests, and Me. The shared maximum content width is 1000px and the standard gutter is --content-gutter.
-- Keep content fluid on narrow phones, tablets, and desktop. Avoid fixed page widths and horizontal overflow; let dense controls wrap or scroll within their own row.
-- The shared app-shell reserves the top, bottom, left, and right device insets. On the Expo WebView, mobile/App.tsx publishes native values as --safe-top, --safe-bottom, --safe-left, and --safe-right. CSS aliases --sat, --sab, --sal, and --sar fall back to env(safe-area-inset-*).
-- Apply each safe-area inset once. Do not add the same top or bottom inset to a child when its parent already reserves it.
-- Backgrounds may extend behind transparent system bars, but text, buttons, navigation, and other interactive content must remain clear of the status bar, cutouts, home indicator, and Android system navigation buttons.
-- Keep one primary scroll region per screen when possible. The main navigation is a separate layout item; it must not cover scroll content.
-- Use sticky action bars only when they help a form or task. Keep them inside the section scroll frame, leave enough trailing content space for the final control to scroll clear, and do not use sticky positioning for ordinary in-flow actions such as Coach’s Start session button.
+### Content Frame & Gutters
 
-## 4. Responsive Rules
+All signed-in content (Home, Coach, Scan, Quests, Me) uses a shared, centered frame to maintain visual consistency across the product.
 
-- Design mobile first from narrow portrait phones. Also check short-height screens, landscape phones, tablets, laptops, and wide desktop.
-- Existing breakpoints include small-screen rules around 380–420px, tablet rules around 700–768px, desktop rules at 1024px and 1200px, and short-screen rules around 520px and 740px. Follow nearby patterns rather than adding competing breakpoints.
-- Use grid columns that can shrink with minmax(0, 1fr), min-width: 0 on flexible children, and wrapping for chips and buttons.
-- Charts should scale to available width. Lists should preserve readable labels and touch targets instead of forcing page-wide horizontal scrolling.
-- The app’s maximum content frame stays centered on large screens; do not stretch text or controls across the full desktop width.
+**Responsive Content Widths:**
+- **Narrow phones** (< 380px): Full width minus `12px–16px` gutters per side
+- **Mobile** (380–700px): Full width minus `clamp(16px, 3vw, 32px)` gutters per side
+- **Tablet** (700–1024px): Centered at `max-width: 800px` with `clamp(24px, 4vw, 48px)` gutters
+- **Desktop** (≥ 1024px): Centered at `max-width: 1000px` with `clamp(32px, 5vw, 64px)` gutters
 
-## 5. Components and Interaction
+**Vertical Spacing:**
+Use `clamp()` for responsive vertical spacing tied to viewport height:
+- Large sections: `clamp(20px, 4vh, 32px)`
+- Medium gaps: `clamp(14px, 2.5vh, 20px)`
+- Small gaps: `clamp(8px, 1.5vh, 14px)`
 
-- Keep the current PhysiqueQuest visual language: clear page titles, restrained card surfaces, fine borders, modest radii, and limited shadows.
-- Primary actions use the existing .primary style (green surface, dark text). Secondary actions use .secondary (light surface and border).
-- Provide at least a 44px interactive hit area for touch controls. Shared back buttons use a responsive 44–52px target and must remain visually aligned with their heading.
-- Provide visible focus states, accessible names for icon-only controls, and disabled states that remain distinguishable.
-- Use the shared Icon component in frontend/sections/Home/icons.tsx for interface icons. Add to its registry before using a new icon. Do not add an icon package.
-- Secondary views need a clear way back to their parent view. Preserve the actual parent view when entering nested Scan flows such as Add Food and Food History. Hide the main tab navigation on focused nested views so they can use the available screen layout; keep navigation visible on main section roots.
-- Use concise labels and status copy. Do not present sample or demo values as verified user data.
+### Safe Area Insets (Device Notches, Home Indicator, System Nav)
 
-## 6. Motion, Overlays, and Layers
+The app reserves safe-area insets at all edges. On Expo WebView, native code publishes insets as CSS custom properties:
+```css
+--sat: var(--safe-top, env(safe-area-inset-top, 0px));
+--sab: var(--safe-bottom, env(safe-area-inset-bottom, 0px));
+--sal: var(--safe-left, env(safe-area-inset-left, 0px));
+--sar: var(--safe-right, env(safe-area-inset-right, 0px));
+```
 
-- Respect prefers-reduced-motion. The root opener skips directly to the appropriate route when reduced motion is requested.
-- Keep the logo opener brief and light themed. Reuse its existing logo asset, motion timing, fade transition, and “Fitness That Fits Your Life” tagline if adjusting it.
-- Use the existing screen-enter motion for top-level screen entry. Keep state changes and navigation understandable without animation.
-- Modals and overlays must remain within safe screen bounds, support keyboard/touch dismissal where appropriate, and use the established layer order.
-- Follow the current z-index roles: in-view sticky elements stay low; the main navigation and modal layer use the established 100 range; global status toasts use the higher 110 range. Do not raise a page control above a modal to solve clipping.
+**Safe Area Rules:**
+- Apply each inset once per element—do not stack insets on parent and child
+- Backgrounds may extend behind system bars, but text, buttons, icons, and interactive content must remain clear
+- The main tab bar sits above `--sab` (system navigation); the scroll content sits inside the main container and respects insets within its own flex/grid
+- Do not overlap interactive content with status bar (top), notches/cutouts (all edges), or system navigation buttons (bottom)
 
-## 7. Stylesheet and Maintenance
+### Scroll Behavior & Layout Structure
 
-- All active web styles belong in frontend/app/globals.css. Root layout imports this file. frontend/app/frontend/app/responsive-globals.css is legacy and is not the active global stylesheet.
-- The stylesheet contains older base rules and later responsive overrides. Search all occurrences of a selector before changing it; a later rule may control the rendered result.
-- Prefer a targeted, section-scoped rule near the relevant section or a clearly labelled responsive override at the end. Do not rewrite the full stylesheet or add a competing stylesheet.
-- Keep the existing light palette, shared content frame, safe-area aliases, and section scroll behavior consistent.
+Each section uses a consistent flex-column layout:
+```
+.section-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.section-header { flex: 0 0 auto; }       /* Fixed height */
+.section-content { flex: 1 1 auto; min-height: 0; overflow-y: auto; }  /* Scrollable */
+.section-footer { flex: 0 0 auto; }       /* Sticky or fixed */
+```
+
+**Scroll Container Best Practices:**
+- Keep one primary scroll region per screen when possible
+- Use `-webkit-overflow-scrolling: touch` for smooth momentum scrolling on iOS
+- Set `overscroll-behavior: contain` to prevent rubber-banding effects
+- Do not use sticky positioning for ordinary in-flow actions (e.g., Coach’s Start session); reserve sticky only for form footers or key control bars that genuinely benefit from staying in view
+- Ensure final scrollable content has enough trailing space (via padding or margin) so users can scroll it clear of sticky elements
+
+## 4. Responsive Design & Breakpoints
+
+**Mobile-First Approach:** Design and test on narrow portrait phones first, then verify at tablet, landscape, and desktop widths and at various heights (especially short landscape screens like iPhone SE).
+
+**Key Breakpoints & Testing Widths:**
+- **Narrow phones**: 320–380px (smallest devices, most constrained)
+- **Standard phones**: 380–420px (iPhone 12/13/14/15 portrait)
+- **Large phones**: 420–520px (iPhone Plus models, some Android)
+- **Landscape phones**: 600–740px height, variable width (short screens need special attention)
+- **Tablet**: 700–768px and above (iPad portrait/landscape)
+- **Desktop**: 1024px (standard laptop), 1200px+ (wide desktop/external displays)
+
+**Short-Height Screens** (max-height: 520–740px):
+- Reduce padding and margins
+- Hide non-essential decorative elements
+- Prioritize vertical content flow
+- Test landscape phone orientations aggressively
+
+**Responsive Units:**
+- Use `clamp(min, preferred, max)` for fluid scaling (e.g., `clamp(14px, 2.5vw, 18px)`)
+- Prefer viewport-width/height percentages (`vw`, `vh`) over fixed breakpoints where possible
+- Use `minmax(0, 1fr)` in grid columns to allow shrinking and prevent overflow
+- Use `min-width: 0` on flexible children to allow text truncation
+
+**Grid & Flexbox Best Practices:**
+- Flexible cards and lists should wrap naturally, not force horizontal scrolling
+- Multi-column grids on desktop should adapt: `grid-template-columns: repeat(auto-fill, minmax(120px, 1fr))`
+- Touch targets must remain at least 44px × 44px; do not shrink for density on small screens
+- Chart and data viz should scale to available width; preserve readability labels
+
+**Landscape Phone Layout:**
+Landscape phones (width > height) have limited vertical space. Test these scenarios:
+- Tab bar may shift to side on ultra-wide portrait (non-standard, not required)
+- Forms and tall content must scroll or adapt to short height
+- Live video/camera views should use available landscape space efficiently
+
+## 5. Components & Interaction Patterns
+
+### Button & Control Styles
+
+**Primary Action Button** (`.primary`):
+- Background: `var(--green)` (#7ee582)
+- Text: Dark (#0d2212)
+- Min height: `clamp(48px, 8vh, 62px)` (touch-safe)
+- Border radius: `clamp(10px, 2vw, 15px)`
+- Use for: CTAs, form submission, "Next", "Start Workout", "Save"
+- Hover state: `filter: brightness(0.97)` (subtle darken)
+- Active state: `transform: translateY(-1px)` (micro-elevation)
+
+**Secondary Action Button** (`.secondary`):
+- Background: White
+- Border: 1px `var(--line)` (#e8ede9)
+- Text: `var(--ink)` (#192233)
+- Min height: `clamp(48px, 8vh, 62px)`
+- Use for: Alternatives, "Cancel", "Back", optional actions
+- Hover state: None or subtle background lighten
+
+**Link Button** (text-only):
+- Background: transparent
+- Text: `var(--green-dark)` (#167336)
+- Font weight: 600
+- Use for: Navigation, secondary actions, "View All", "Edit"
+- Hover state: `opacity: 0.8`
+
+**Input Fields** (`.input-wrap`):
+- Border: 1px `var(--line)` (#e8ede9)
+- Border radius: `11px`
+- Min height: 44px
+- Padding: `0 12px`
+- Focus state: `outline: 2px solid #7ee58265` + `border-color: #70cf75`
+- Placeholder: `#a1aaba`
+- All inputs use system font stack, 13–16px, inherit font properties
+
+**Form Field Labels:**
+- Font size: 12–14px
+- Font weight: 600
+- Margin bottom: 7px
+- Color: `var(--ink)` (#192233)
+- Required indicator: Red (#d63737), font-weight 600
+- Optional label: `var(--muted)`, 11–12px
+
+### Card & Surface Components
+
+**Standard Card** (`.mission-card`, `.journey-card`):
+- Background: `var(--surface)` (#fff)
+- Border: None (or 1px `var(--line)`)
+- Border radius: `clamp(10px, 2vw, 14px)`
+- Padding: `clamp(11px, 2.2vw, 16px)`
+- Box shadow: `0 1px 3px rgba(25, 34, 51, 0.04)` or `0.06` (subtle depth)
+- Hover state: Slight scale (0.98) or shadow lift on interactive cards
+
+**Colored Card** (`.goal-card`, `.level-card`):
+- Background: Light tint (e.g., `#effaf0` for green theme)
+- Border: 1px light border or none
+- Border radius: Same as standard cards
+- Use for: Goals, milestones, achievements, themed sections
+
+**Progress Bar** (`.progress-bar-fill`):
+- Height: `clamp(5px, 1vh, 7px)`
+- Background: `var(--green)` (#7ee582)
+- Border radius: `clamp(4px, 0.8vw, 6px)` (match rounded ends)
+- Transition: `width 0.3s` (smooth animation)
+- Container background: `var(--soft)` or `#eef0ee`
+
+### Icon Usage
+
+**Icon System:**
+- Use the shared Icon component in `frontend/sections/Home/icons.tsx`
+- Add new icons to the registry before using
+- Do not import external icon packages (SVG or font-based)
+- All icons inherit the text color of their parent element
+- Icon size: Use semantic sizing (small: 16–24px, medium: 24–36px, large: 36–48px)
+
+**Icon Accessibility:**
+- Icon-only buttons must have `aria-label` or visible text label
+- Decorative icons do not need labels
+- Color contrast: Icons must meet WCAG AA standards when used as primary content
+
+### Touch & Focus States
+
+**Minimum Touch Target:** 44px × 44px (iOS standard)
+- Buttons, links, form controls, and tappable list items must meet or exceed this
+- If visual size is smaller, add padding to expand the hit area
+
+**Focus Visible State:**
+```css
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+```
+- Never remove default focus indicators without providing a replacement
+- Focus ring must be visible on all interactive elements
+
+**Active/Pressed State:**
+- Slight scale down: `transform: scale(0.98)`
+- Slight background/shadow change (do not rely on color alone)
+- Accessible to keyboard and touch
+
+## 6. Motion, Animations & Accessibility
+
+### Motion Principles
+
+**Reduce Motion Support:**
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+- The root opener skips directly to the appropriate route when `prefers-reduced-motion` is detected
+- All transitions and animations must respect this media query
+
+### Transitions & Duration
+
+Keep animations brief and purposeful:
+- **View/screen entry**: 0.32s ease-out (fade + subtle translate)
+- **UI state changes** (expand, collapse, toggle): 0.16–0.2s
+- **Progress/loading bars**: 0.3s
+- **Micro-interactions** (hover, focus): 0.16s or instant
+- **Logo opener animation**: Light and brief, fade transition
+
+### Layering & Z-Index
+
+**Z-Index Hierarchy:**
+- `z-index: 1`: In-view sticky elements, form footers
+- `z-index: 100`: Main navigation (tab bar), modal backdrops
+- `z-index: 110`: Toast notifications, popovers (above modals)
+- `z-index: 120`: System alerts or critical overlays (use sparingly)
+
+Do not raise page controls above a modal layer to solve clipping issues; fix the modal z-index instead.
+
+### Modals & Overlays
+
+**Modal Backdrop:**
+- Background: Semi-transparent dark (`rgba(0, 0, 0, 0.4)`)
+- Position: Fixed, full viewport coverage
+- Dismissible: Keyboard (Escape) and touch (backdrop click)
+
+**Modal Dialog:**
+- Background: `var(--surface)` (#fff)
+- Border radius: `clamp(14px, 2.5vw, 20px)`
+- Padding: `clamp(20px, 4vw, 24px)`
+- Max width: `min(100%, 340–440px)`
+- Box shadow: Elevation shadow (e.g., `0 10px 40px rgba(0, 0, 0, 0.15)`)
+- Position: Centered, above backdrop
+- Keyboard support: Tab focus, Enter to confirm, Escape to close
+
+**Overlay Content:**
+- Modals remain within safe screen bounds
+- Do not place interactive content outside the modal (behind the backdrop)
+- Support both dismiss and action buttons
+
+## 7. Design System Maintenance
+
+### Stylesheet Structure
+
+All active web styles live in `frontend/app/globals.css`. This file is imported by the root layout.
+
+**File Organization:**
+1. CSS custom properties (`:root { ... }`)
+2. Baseline resets (`*`, `html`, `body`)
+3. Core layout classes (`.scene`, `.app-shell`, `.launch`, `.auth-screen`, etc.)
+4. Section-specific styles (`.dashboard-container`, `.coach-section`, `.scan-content`, etc.)
+5. Component styles (`.primary`, `.secondary`, `.input-wrap`, `.mission-card`, etc.)
+6. Responsive overrides (media queries, typically at end)
+7. Deprecated/legacy styles (marked clearly)
+
+**Legacy Note:** `frontend/app/responsive-globals.css` is deprecated and should not be used. It contains older base rules; new styles go in `globals.css`.
+
+### Adding New Styles
+
+**Rules for Extension:**
+- Search all occurrences of a selector before modifying; a later rule may control the rendered result
+- Prefer targeted, component-scoped rules placed near their relevant sections
+- Clearly label responsive overrides (e.g., `/* ─── Tablet (≥700px) ─── */`)
+- Do not rewrite the full stylesheet or add competing stylesheets
+- Keep the existing light palette, shared content frame, safe-area aliases, and section scroll behavior consistent
+
+**When to Use `clamp()`:**
+Use `clamp()` for responsive sizing instead of breakpoint-based rules:
+- Text: `clamp(14px, 2.5vw, 18px)` (min, preferred, max)
+- Spacing: `clamp(12px, 2.5vh, 20px)` (vertical spacing tied to viewport height)
+- Component size: `clamp(36px, 7.5vw, 48px)` (icon size, touch target)
+
+This eliminates breakpoint sprawl and provides smooth scaling across all viewport sizes.
+
+### Color & Token Consistency
+
+- Define new semantic colors as CSS custom properties in `:root`
+- Avoid inline hex/rgb values in component styles
+- Document the purpose and use cases for new tokens
+- Group related tokens (e.g., all green variants, all gray/neutral variants)
+- Version token changes if they affect existing UI (e.g., “v2.1” in comments)
 
 ## 8. UI Review Checklist
 
-- [ ] Does the page align with Home’s shared content frame and gutters?
-- [ ] Are status-bar, cutout, and system-navigation areas clear of interactive content?
-- [ ] Is each safe-area inset applied only once?
-- [ ] Does the layout work at narrow phone, tablet, and desktop widths and at short heights?
-- [ ] Can flexible text shrink or wrap without colliding with controls?
-- [ ] Do fixed or sticky actions leave enough room to reach the final content?
-- [ ] Are touch targets at least 44px and focus states visible?
-- [ ] Are sample/demo data and camera capabilities clearly described?
-- [ ] Does the page respect reduced motion and use the shared icon system?
+Before committing any UI changes, verify:
 
-### Personal data measurement controls
+### Layout & Spacing
+- [ ] Content uses the shared centered frame (Home reference)
+- [ ] Safe-area insets applied correctly (status bar, notches, home indicator, system nav)
+- [ ] Each safe-area inset applied only once (not duplicated on parent + child)
+- [ ] Responsive padding/margins use `clamp()` or follow existing breakpoint patterns
+- [ ] Content gutters scale appropriately: 12–16px narrow phones, 16–32px mobile, 24–48px tablet+
 
-- Step 1 of calibration provides unit dropdowns for height (`cm` or `ft & in.`), body weight (`kg` or `lbs`), and body measurements (`cm` or `inch`). Keep these controls visually aligned with the existing bordered input fields, with a visible keyboard focus state and a usable touch target.
-- Imperial height uses separate feet and inches number fields. When a unit changes, convert any entered value and keep the value paired with the selected unit; do not leave a number to be silently reinterpreted.
-- BMI uses normalized metric values internally while the displayed inputs and saved profile retain the selected units.
+### Responsive & Mobile
+- [ ] Layout works at narrow phone (320–380px), standard phone (380–420px), large phone (520–740px landscape), tablet (700px+), and desktop (1024px+)
+- [ ] Text wraps gracefully without colliding with controls
+- [ ] Touch targets are at least 44px × 44px
+- [ ] Flexible grids use `minmax(0, 1fr)` to prevent overflow
+- [ ] No horizontal scrolling or overflow unless intentional (e.g., horizontal card carousel)
+- [ ] Short-height screens (≤740px) handled properly (reduced padding, hidden decorative elements)
+
+### Typography & Color
+- [ ] All text uses the system font stack (no web fonts)
+- [ ] Headings, body, and secondary text use correct size/weight from type scale
+- [ ] Colors use CSS custom properties (`--ink`, `--green`, `--muted`, etc.)
+- [ ] Color contrast meets WCAG AA standards for all text
+- [ ] Status information not communicated by color alone (pair with icons/text)
+- [ ] Demo/sample data clearly labeled as such
+
+### Components & Interaction
+- [ ] Primary CTAs use `.primary` (green surface, dark text)
+- [ ] Secondary actions use `.secondary` (white, bordered)
+- [ ] Button min-heights meet touch target requirement (44px+)
+- [ ] Focus states visible on all interactive elements
+- [ ] Icon-only buttons have `aria-label` or visible label
+- [ ] Form labels associated with inputs (not just visual alignment)
+- [ ] Disabled states distinguishable (opacity, color, pointer-events: none)
+
+### Navigation
+- [ ] Main section root retains tab bar
+- [ ] Nested/detail flows hide tab bar
+- [ ] Clear back button or completion action provided to parent
+- [ ] Back button visually aligned with page heading
+- [ ] Navigation preserves scroll position when possible
+
+### Motion & Accessibility
+- [ ] Animations respect `prefers-reduced-motion`
+- [ ] No auto-play videos or animations that distract
+- [ ] All transitions use appropriate duration (0.16–0.32s typically)
+- [ ] Modal/overlay properly layered (z-index 100 range) and dismissible
+
+### Safe Area & System Integration
+- [ ] Text and buttons clear of status bar (top)
+- [ ] Content not covered by notches or cutouts
+- [ ] Home indicator / system nav area respected (bottom)
+- [ ] Backgrounds may extend behind system bars; content does not
+- [ ] On Expo WebView, safe-area insets handled (test on actual device if possible)
+
+## 9. Section-Specific Patterns
+
+### Home Dashboard
+- **Header**: Avatar, greeting, notification bell with unread indicator
+- **Workout Card**: Hero section (green background) with today's session, start button
+- **Stats Row**: Icon + number + label (calories, level, etc.), separated by dividers
+- **Content Sections**: Mission cards, nutrition overview (circular progress + macro list), journey cards
+- **Responsive**: Nutrition card stacks vertically on narrow screens (< 380px)
+
+### Coach (Training)
+- **Header**: Section title + back button (if nested)
+- **Week View**: Grid of 7 day buttons with indicator dots, selected day highlighted green
+- **Exercise List**: Numbered items with title, time, tracking tag (manual/automatic/caution)
+- **Camera Preview**: Live video with pose frame, person overlay, distance indicator
+- **Session View**: Dark background (#111827), form score badge, rep counter, exercise label
+- **Live Controls**: Pause/End buttons, session progress bar
+
+### Scan (Nutrition)
+- **Nutrition Card**: Circular calorie display + macro list with progress bars
+- **Scan CTA**: Green button with camera icon, text overlay
+- **Meal Rows**: Meal name, calorie count, add meal button (+ icon)
+- **More Section**: Water tracking, Food History links
+- **Add Food Flow**: Search, detection results, portion entry, confirmation
+
+### Quests
+- **Level Card**: Large hero (green background), level number, streak counter, exp bar
+- **Streak Calendar**: 7×1 or 7×4 grid of daily squares (active/freeze/today states)
+- **Mission Items**: Icon + title + progress bar, complete state indicated by green icon
+- **Badges Section**: 4-column grid, locked/earned states with lock indicator
+- **Penalty Warning**: Orange/yellow background, warning icon, explanation text
+
+### Me (Profile & Settings)
+- **Profile Summary**: Avatar, name, email, edit button
+- **Settings Rows**: Icon + title + description, toggle or arrow
+- **Setting Block**: Group title + description, threshold buttons or toggles
+- **Admin Tools**: Exercise Library link, Analytics link (separate detail views)
+- **Logout Button**: Prominent danger color, bottom of scroll area
+
+## 10. Form Design & Input Controls
+
+### Measurement Unit Controls (Height, Weight, Measurements)
+
+Step 1 of calibration provides unit selectors for height (cm or ft/in), weight (kg or lbs), and measurements (cm or inches).
+
+**Unit Toggle Button** (`.unit-switch`):
+- Two-option toggle (e.g., "cm" / "in")
+- Border: 1px `var(--line)`
+- Border radius: `9px`
+- Padding: `2px`
+- Inactive option: transparent background, muted text
+- Active option: white background, green text (#167336), box-shadow, font-weight 700
+- Smooth transition on state change
+
+**Height Input (Dual Fields for Imperial):**
+- When metric: Single input for cm
+- When imperial: Separate number fields for feet and inches
+- On unit change: Convert value, keep it paired with new unit (don’t silently reinterpret)
+- BMI: Normalize to metric internally; display uses selected unit
+
+**Input Alignment:**
+- Visually aligned with existing bordered input fields
+- Keyboard focus state visible and usable
+- Touch target at least 44px height
+
+### Calibration & Multi-Step Forms
+
+**Progress Bar:**
+- Visual: 4 thin bars (one per step), light container, green fill for completed
+- Placement: Below or within step header
+
+**Step Header:**
+- Small eyebrow: "Step 1 of 4 · Calibration" (11–12px, green-dark, uppercase optional)
+- Step heading (h2): Primary title (e.g., "Personal Data")
+- Description: Subtitle (13–16px, muted, italic optional)
+
+**Step Footer:**
+- Primary button: "Next: [Step Name] →" or "Finish & build my plan →"
+- Back button: Text-only, muted, optional on first step
+- Clear spacing before button (18–27px margin)
+- Sticky positioning: Button stays in view at bottom, scroll content has trailing space
+
+**Form Validation:**
+- Inline feedback: Error text below field (12px, red #bd3030)
+- Required indicator: "Required" badge in red on labels
+- Success state: Green check or highlight (not just green border)
+- Disabled state: Reduced opacity (0.5), `pointer-events: none`
