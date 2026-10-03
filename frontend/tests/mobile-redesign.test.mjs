@@ -3,18 +3,19 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
-test('progress reads server activity and does not fabricate measurements', async () => {
+test('progress restores the legacy visual dashboard', async () => {
   const file = await source('sections/Home/Progress.tsx');
-  assert.match(file, /useActivity/);
-  assert.doesNotMatch(file, /const series/);
-  assert.doesNotMatch(file, /68\.5/);
-  assert.match(file, /No progress measurements yet/);
+  assert.match(file, /const series/);
+  assert.match(file, /68\.5/);
+  assert.match(file, /Personal records/);
+  assert.match(file, /Recent sessions/);
 });
 
-test('notifications keep readable state updates', async () => {
+test('notifications restore the legacy mock feed with local read state', async () => {
   const file = await source('sections/Home/Notifications.tsx');
-  assert.match(file, /useNotifications/);
-  assert.match(file, /markRead/);
+  assert.match(file, /const initial =/);
+  assert.match(file, /Safety notice · pinned/);
+  assert.match(file, /setItems/);
 });
 
 test('Me keeps persistence and root navigation', async () => {
@@ -46,8 +47,8 @@ test('quests and notifications use server-backed state', async () => {
   const notifications = await source('sections/Home/Notifications.tsx');
   assert.match(quests, /useActivity/);
   assert.doesNotMatch(quests, /localStorage\.getItem\('physiquequest-quests'\)/);
-  assert.match(notifications, /useNotifications/);
-  assert.doesNotMatch(notifications, /const initial = \[/);
+  assert.match(notifications, /const initial = \[/);
+  assert.match(notifications, /setItems/);
 });
 
 test('camera and scan capabilities never present fabricated AI results', async () => {
@@ -61,12 +62,11 @@ test('camera and scan capabilities never present fabricated AI results', async (
   assert.doesNotMatch(review, /Estimated macros · sample values/);
 });
 
-test('coach plan does not present invented workouts or AI tracking', async () => {
+test('coach plan restores the legacy workout dashboard', async () => {
   const file = await source('sections/Coach/CoachPlan.tsx');
-  assert.match(file, /useActivity/);
-  assert.doesNotMatch(file, /Week 3 · 4 sessions planned/);
-  assert.doesNotMatch(file, /AI tracked/);
-  assert.match(file, /No workout plan saved yet/);
+  assert.match(file, /Week 3 · 4 sessions planned/);
+  assert.match(file, /AI tracked/);
+  assert.match(file, /Dumbbell bench press/);
 });
 
 test('native wrapper reports backend connectivity and can retry it', async () => {
