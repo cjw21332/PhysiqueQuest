@@ -1,5 +1,7 @@
 // API client configuration
-function getApiBaseUrl() {
+import { clearAuthSession } from './session';
+
+export function getApiBaseUrl() {
   const configuredUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
   if (configuredUrl) return configuredUrl.replace(/\/$/, '');
 
@@ -16,6 +18,17 @@ export interface ApiError {
   message: string;
   statusCode: number;
   error?: string;
+}
+
+export class ApiRequestError extends Error {
+  constructor(
+    message: string,
+    public readonly statusCode: number,
+    public readonly error?: string,
+  ) {
+    super(message);
+    this.name = 'ApiRequestError';
+  }
 }
 
 class ApiClient {
@@ -50,7 +63,9 @@ class ApiClient {
           message: `Request failed (${response.status})`,
           statusCode: response.status,
         }));
-        throw new Error(Array.isArray(error.message) ? error.message.join(', ') : error.message || 'An error occurred');
+        if (response.status === 401) clearAuthSession();
+        const message = Array.isArray(error.message) ? error.message.join(', ') : error.message || 'An error occurred';
+        throw new ApiRequestError(message, response.status, error.error);
       }
 
       return await response.json();

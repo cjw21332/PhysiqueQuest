@@ -1,4 +1,5 @@
 import { api } from './api';
+import { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './session';
 
 // Authentication utilities
 export interface User {
@@ -9,8 +10,7 @@ export interface User {
   profile?: any; // Full profile data
 }
 
-export const AUTH_STORAGE_KEY = 'physiquequest-auth';
-export const PROFILE_STORAGE_KEY = 'physiquequest-profile';
+export { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './session';
 
 export async function register(name: string, email: string, password: string): Promise<User> {
   try {
@@ -49,7 +49,7 @@ export async function login(email: string, password: string): Promise<User> {
 }
 
 export function logout() {
-  localStorage.removeItem(AUTH_STORAGE_KEY);
+  clearAuthSession();
   // Keep profile data for convenience when user logs back in
 }
 
