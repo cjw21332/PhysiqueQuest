@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -37,8 +37,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <main className="scene">
-        <div className="app-shell">
+      <>
           <AuthForm
             mode="login"
             onModeChange={(mode) => {
@@ -59,12 +58,11 @@ export default function LoginPage() {
             <div className="toast" role="status">
               {notice}
               <button onClick={() => setNotice('')} aria-label="Dismiss">
-                ×
+                Ã—
               </button>
             </div>
           )}
-        </div>
-      </main>
+        </>
       {showForgotPassword && (
         <ForgotPasswordFlow
           onClose={() => setShowForgotPassword(false)}
@@ -74,3 +72,5 @@ export default function LoginPage() {
     </>
   );
 }
+
+

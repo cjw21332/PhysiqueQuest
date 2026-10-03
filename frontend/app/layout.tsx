@@ -1,8 +1,9 @@
-import type { Metadata, Viewport } from 'next';
+﻿import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import GlobalThemeToggle from '../components/GlobalThemeToggle';
 
 export const metadata: Metadata = {
-  title: 'PhysiqueQuest — Training that fits you',
+  title: 'PhysiqueQuest - Training that fits you',
   description: 'Your personal, AI-assisted fitness journey starts here.',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: 'PhysiqueQuest' },
 };
@@ -17,5 +18,17 @@ export const viewport: Viewport = {
   themeColor: '#f3f6f2',
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return <html lang="en" suppressHydrationWarning>
+    <head>
+      <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('physiquequest-theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){}" }}/>
+    </head>
+    <body>
+      <main className="scene">
+        <div className="app-shell">
+          <GlobalThemeToggle />
+          {children}
+        </div>
+      </main>
+    </body>
+  </html>;
 }

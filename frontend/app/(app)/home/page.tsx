@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -37,8 +37,7 @@ export default function HomePage() {
   if (!profile) return null;
 
   return (
-    <main className="scene">
-      <div className="app-shell">
+    <>
         <HomeSection
           profile={profile}
           onLogoutRequest={() => setShowLogoutModal(true)}
@@ -48,7 +47,8 @@ export default function HomePage() {
           onClose={() => setShowLogoutModal(false)}
           onConfirm={handleLogout}
         />
-      </div>
-    </main>
+      </>
   );
 }
+
+

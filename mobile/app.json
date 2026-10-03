@@ -7,7 +7,7 @@
     "sdkVersion": "57.0.0",
     "platforms": ["android", "ios"],
     "orientation": "default",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "backgroundColor": "#f4f6f3",
     "android": {
       "package": "com.physiquequest.app",

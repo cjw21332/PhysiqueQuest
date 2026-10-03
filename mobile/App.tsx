@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useColorScheme,
   View,
   useWindowDimensions,
 } from 'react-native';
@@ -15,6 +16,33 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { WebView } from 'react-native-webview';
 
 declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string } };
+
+const palettes = {
+  light: {
+    background: '#f4f6f3',
+    card: '#ffffff',
+    cardBorder: '#e2e9e3',
+    inputBorder: '#dce4dc',
+    ink: '#192233',
+    muted: '#536176',
+    hint: '#718096',
+    green: '#7ee582',
+    greenInk: '#173c1f',
+    spinner: '#26743a',
+  },
+  dark: {
+    background: '#070a0e',
+    card: '#10161f',
+    cardBorder: '#232f3c',
+    inputBorder: '#2a3846',
+    ink: '#e9eef4',
+    muted: '#a3b1c2',
+    hint: '#8d9bad',
+    green: '#4cc063',
+    greenInk: '#06170d',
+    spinner: '#7fd98c',
+  },
+};
 
 function getInitialAddress() {
   const configured = process.env.EXPO_PUBLIC_WEB_APP_URL?.trim();
@@ -53,6 +81,9 @@ function AppContent() {
   const [loadedAddress, setLoadedAddress] = useState(inferredAddress);
   const [error, setError] = useState(false);
   const [key, setKey] = useState(0);
+  const dark = useColorScheme() === 'dark';
+  const theme = dark ? palettes.dark : palettes.light;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const insetScript = useMemo(
     () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }),
@@ -80,7 +111,7 @@ function AppContent() {
 
   return (
     <View style={styles.root}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
+      <StatusBar translucent backgroundColor="transparent" barStyle={dark ? 'light-content' : 'dark-content'} />
       <WebView
         ref={webRef}
         key={key}
@@ -105,7 +136,7 @@ function AppContent() {
         textZoom={100}
         renderLoading={() => (
           <View style={[styles.loading, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
-            <ActivityIndicator size="large" color="#26743a" />
+            <ActivityIndicator size="large" color={theme.spinner} />
             <Text style={[styles.loadingText, { fontSize: bodySize }]}>Opening PhysiqueQuest…</Text>
           </View>
         )}
@@ -171,9 +202,9 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f4f6f3' },
-  webContainer: { flex: 1, backgroundColor: '#f4f6f3' },
+const makeStyles = (c: typeof palettes.light) => StyleSheet.create({
+  root: { flex: 1, backgroundColor: c.background },
+  webContainer: { flex: 1, backgroundColor: c.background },
   loading: {
     position: 'absolute',
     top: 0,
@@ -183,9 +214,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    backgroundColor: '#f4f6f3',
+    backgroundColor: c.background,
   },
-  loadingText: { color: '#536176', textAlign: 'center' },
+  loadingText: { color: c.muted, textAlign: 'center' },
   errorOverlay: {
     position: 'absolute',
     top: 0,
@@ -194,26 +225,26 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f4f6f3',
+    backgroundColor: c.background,
   },
-  errorCard: { width: '100%', backgroundColor: '#fff' },
-  title: { marginBottom: 10, color: '#192233', fontWeight: '700' },
-  body: { color: '#536176' },
-  code: { color: '#192233', fontWeight: '700' },
-  label: { marginTop: 20, marginBottom: 6, color: '#192233', fontWeight: '600' },
+  errorCard: { width: '100%', backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder },
+  title: { marginBottom: 10, color: c.ink, fontWeight: '700' },
+  body: { color: c.muted },
+  code: { color: c.ink, fontWeight: '700' },
+  label: { marginTop: 20, marginBottom: 6, color: c.ink, fontWeight: '600' },
   input: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#dce4dc',
-    color: '#192233',
+    borderColor: c.inputBorder,
+    color: c.ink,
   },
   button: {
     marginTop: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
-    backgroundColor: '#7ee582',
+    backgroundColor: c.green,
   },
-  buttonText: { color: '#173c1f', fontWeight: '700' },
-  hint: { marginTop: 12, color: '#718096' },
+  buttonText: { color: c.greenInk, fontWeight: '700' },
+  hint: { marginTop: 12, color: c.hint },
 });

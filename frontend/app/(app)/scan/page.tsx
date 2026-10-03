@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -36,8 +36,7 @@ export default function ScanPage() {
   if (!profile) return null;
 
   return (
-    <main className="scene">
-      <div className="app-shell">
+    <>
         <ScanSection
           profile={profile}
           onLogoutRequest={() => setShowLogoutModal(true)}
@@ -47,7 +46,8 @@ export default function ScanPage() {
           onClose={() => setShowLogoutModal(false)}
           onConfirm={handleLogout}
         />
-      </div>
-    </main>
+      </>
   );
 }
+
+
