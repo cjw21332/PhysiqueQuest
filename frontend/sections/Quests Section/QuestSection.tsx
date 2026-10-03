@@ -117,7 +117,7 @@ export default function QuestSection({ profile, onLogoutRequest }: { profile: Pr
             </div>
             <div className="streak-info">
               <div className="streak-number">
-                <Icon name="fire" size={16} /> {dayStreak}
+                <Icon name="fire" size={18} /> {dayStreak}
               </div>
               <div className="streak-label">day streak</div>
             </div>
@@ -128,11 +128,15 @@ export default function QuestSection({ profile, onLogoutRequest }: { profile: Pr
             <div
               className="exp-bar-fill"
               style={{ width: `${expProgress}%` }}
+              role="progressbar"
+              aria-valuenow={expProgress}
+              aria-valuemin={0}
+              aria-valuemax={100}
             />
           </div>
 
           {/* Streak Calendar */}
-          <div className="streak-calendar">
+          <div className="streak-calendar" role="img" aria-label={`${dayStreak} day streak with ${Array.from({ length: 14 }, (_, i) => (i < 7 || (i >= 8 && i < 12) ? 1 : 0)).reduce<number>((a, b) => a + b, 0)} days completed`}>
             {Array.from({ length: 14 }, (_, index) => {
               const isActive = index < 7 || (index >= 8 && index < 12);
               const isFreeze = index === 7;
@@ -144,6 +148,7 @@ export default function QuestSection({ profile, onLogoutRequest }: { profile: Pr
                   className={`calendar-day ${
                     isActive ? 'active' : ''
                   } ${isFreeze ? 'freeze' : ''} ${isToday ? 'today' : ''}`}
+                  title={isFreeze ? 'Freeze used' : isToday ? 'Today' : isActive ? 'Completed' : 'Missed'}
                 >
                   {isFreeze && '❄'}
                 </div>
@@ -152,15 +157,20 @@ export default function QuestSection({ profile, onLogoutRequest }: { profile: Pr
           </div>
 
           <div className="freeze-note">
-            One freeze used — streaks are forgiving by design.
+            <Icon name="shield" size={12} /> One freeze used — streaks are forgiving by design.
           </div>
         </section>
 
         {/* Daily Missions */}
         <section className="missions-section">
           <div className="missions-header">
-            <h3 className="missions-title">Daily missions</h3>
-            <div className="missions-reset">Resets in 4h 12m</div>
+            <div>
+              <h3 className="missions-title">Daily missions</h3>
+              <div className="missions-reset">Resets in 4h 12m</div>
+            </div>
+            <div className="missions-progress">
+              {missionConfig.filter(m => progress[m.key] >= m.total).length}/{missionConfig.length}
+            </div>
           </div>
 
           <div className="missions-list">
@@ -174,18 +184,28 @@ export default function QuestSection({ profile, onLogoutRequest }: { profile: Pr
                   key={mission.key}
                   className={`mission-item ${complete ? 'complete' : ''}`}
                   onClick={() => updateMission(mission.key, mission.total)}
-                  aria-label={`${mission.title}, ${amount} of ${mission.total}`}
+                  aria-label={`${mission.title}, ${amount} of ${mission.total}, ${mission.points} points`}
                 >
                   <div className="mission-icon">
-                    <Icon name={mission.icon} size={18} />
+                    <Icon name={mission.icon} size={20} />
                   </div>
                   <div className="mission-content">
-                    <div className="mission-title">{mission.title}</div>
+                    <div className="mission-top">
+                      <div className="mission-title">{mission.title}</div>
+                      <div className="mission-points">
+                        <Icon name="star" size={14} />
+                        {mission.points}
+                      </div>
+                    </div>
                     <div className="mission-progress">
                       <div className="progress-bar">
                         <div
                           className="progress-bar-fill"
                           style={{ width: `${percentage}%` }}
+                          role="progressbar"
+                          aria-valuenow={amount}
+                          aria-valuemin={0}
+                          aria-valuemax={mission.total}
                         />
                       </div>
                       <div className="progress-text">
@@ -193,7 +213,7 @@ export default function QuestSection({ profile, onLogoutRequest }: { profile: Pr
                       </div>
                     </div>
                   </div>
-                  <div className="mission-points">+{mission.points}</div>
+                  {complete && <div className="mission-checkmark">✓</div>}
                 </button>
               );
             })}

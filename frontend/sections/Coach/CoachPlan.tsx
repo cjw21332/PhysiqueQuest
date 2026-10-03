@@ -58,7 +58,7 @@ export default function CoachPlan({
         <h2 className="coach-title">AI Coach</h2>
       </header>
 
-      {/* Week Plan */}
+      {/* Week Plan Card */}
       <section className="week-section">
         <div className="week-info">Week 3 · 4 sessions planned</div>
         <div className="week-days-grid">
@@ -85,41 +85,52 @@ export default function CoachPlan({
       {/* Today's Workout */}
       {isWorkoutDay ? (
         <>
-          <section className="workout-info">
+          <section className="workout-info-card">
             <div className="workout-label">Today</div>
             <h3 className="workout-title">{currentWorkout}</h3>
             <div className="workout-meta">
-              {profile.duration || '45 min'} · {todayExercises.length} exercises · {profile.equipment?.[0] || 'Dumbbells'}
+              <span className="meta-item">{profile.duration || '45 min'}</span>
+              <span className="meta-separator">·</span>
+              <span className="meta-item">{todayExercises.length} exercises</span>
+              <span className="meta-separator">·</span>
+              <span className="meta-item">{profile.equipment?.[0] || 'Dumbbells'}</span>
             </div>
           </section>
 
-          {/* Exercise List */}
-          <div className="exercise-list">
-            {todayExercises.map((exercise, index) => (
-              <div key={index} className="exercise-item">
-                <div className="exercise-number">{index + 1}</div>
-                <div className="exercise-details">
-                  <div className="exercise-name">{exercise.name}</div>
-                  <div className="exercise-sets">{exercise.sets}</div>
+          {/* Exercise List Card */}
+          <section className="exercise-list-card">
+            <div className="exercise-list-header">
+              <h4>Exercises</h4>
+              <span className="exercise-count">{todayExercises.length}</span>
+            </div>
+            <div className="exercise-list">
+              {todayExercises.map((exercise, index) => (
+                <div key={index} className="exercise-item">
+                  <div className="exercise-number">{index + 1}</div>
+                  <div className="exercise-details">
+                    <div className="exercise-name">{exercise.name}</div>
+                    <div className="exercise-sets">{exercise.sets}</div>
+                  </div>
+                  <div
+                    className={`tracking-badge ${
+                      exercise.tracking === 'AI tracked' ? 'ai-tracked' : 'manual'
+                    }`}
+                  >
+                    {exercise.tracking}
+                  </div>
                 </div>
-                <div
-                  className={`tracking-badge ${
-                    exercise.tracking === 'AI tracked' ? 'ai-tracked' : 'manual'
-                  }`}
-                >
-                  {exercise.tracking}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
 
-          {/* Form Tip */}
-          <div className="form-tip">
+          {/* Form Tip Card */}
+          <div className="form-tip-card">
             <div className="tip-icon">
               <Icon name="coach" size={20} />
             </div>
             <div className="tip-content">
-              <div className="tip-title">Form tip · Dumbbell bench press</div>
+              <div className="tip-title">Form tip</div>
+              <div className="tip-exercise">Dumbbell bench press</div>
               <div className="tip-text">
                 Keep your wrists stacked over your elbows and lower until your upper arms are level with the bench.
               </div>
@@ -127,7 +138,7 @@ export default function CoachPlan({
           </div>
 
           {/* Exercise Library Link */}
-          <button className="library-link" onClick={onLibrary}>
+          <button className="library-link-card" onClick={onLibrary}>
             <div className="library-icon">
               <Icon name="medal" size={22} />
             </div>

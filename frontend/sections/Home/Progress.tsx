@@ -22,34 +22,36 @@ export default function Progress({ onBack }: { onBack: () => void }) {
         </div>
       </header>
 
-      <div className="metric-tabs">
-        {Object.keys(series).map(option => (
-          <button
-            key={option}
-            className={metric === option ? 'active' : ''}
-            onClick={() => setMetric(option)}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
+      <section className="progress-overview">
+        <div className="metric-tabs">
+          {Object.keys(series).map(option => (
+            <button
+              key={option}
+              className={metric === option ? 'active' : ''}
+              onClick={() => setMetric(option)}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
 
-      <div className="metric-value">
-        <b>{data.value} {data.unit}</b>
-        <span><Icon name="trend" size={13}/> {data.delta}</span>
-      </div>
+        <div className="metric-value">
+          <b>{data.value} {data.unit}</b>
+          <span><Icon name="trend" size={13}/> {data.delta}</span>
+        </div>
 
-      <div className="chart" role="img" aria-label={`${metric} progress over eight weeks`}>
-        {data.bars.map((height, i) => (
-          <div className="chart-col" key={i}>
-            <i
-              className={i === data.bars.length - 1 ? 'latest' : ''}
-              style={{ height: `${height}%` }}
-            />
-            {i % 2 === 0 || i === 7 ? <small>W{i + 1}</small> : <small/>}
-          </div>
-        ))}
-      </div>
+        <div className="chart" role="img" aria-label={`${metric} progress over eight weeks`}>
+          {data.bars.map((height, i) => (
+            <div className="chart-col" key={i}>
+              <i
+                className={i === data.bars.length - 1 ? 'latest' : ''}
+                style={{ height: `${height}%` }}
+              />
+              {i % 2 === 0 || i === 7 ? <small>W{i + 1}</small> : <small/>}
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="subsection records">
         <h3>Personal records</h3>
