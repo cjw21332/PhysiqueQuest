@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -29,8 +29,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="scene">
-      <div className="app-shell">
+    <>
         <AuthForm
           mode="register"
           onModeChange={(mode) => {
@@ -47,7 +46,8 @@ export default function RegisterPage() {
           onConsentChange={setConsent}
           onForgotPassword={() => {}}
         />
-      </div>
-    </main>
+      </>
   );
 }
+
+

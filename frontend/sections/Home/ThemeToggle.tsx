@@ -1,8 +1,7 @@
 'use client';
 
 import { Icon } from './icons';
-
-export type Theme = 'light' | 'dark';
+import type { Theme } from './useTheme';
 
 export default function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
   const dark = theme === 'dark';

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,8 +16,7 @@ export default function LaunchPage() {
   };
 
   return (
-    <main className="scene">
-      <div className="app-shell">
+    <>
         <section className="launch screen-enter">
           <div className="launch-brand">
             <div className="brand-mark">PQ</div>
@@ -31,21 +30,21 @@ export default function LaunchPage() {
               <span>2 of 3 ready</span>
             </div>
             <div className="ready-row">
-              <b className="ready-icon">✓</b>
+              <b className="ready-icon">âœ“</b>
               <p>
                 Android 12 or higher
                 <small>Android 14 detected</small>
               </p>
             </div>
             <div className="ready-row">
-              <b className="ready-icon">✓</b>
+              <b className="ready-icon">âœ“</b>
               <p>
                 High-speed Wi-Fi
-                <small>Connected · 84 Mbps</small>
+                <small>Connected Â· 84 Mbps</small>
               </p>
             </div>
             <div className="ready-row">
-              <b className="camera-icon">◎</b>
+              <b className="camera-icon">â—Ž</b>
               <p>
                 Camera permission
                 <small>Needed for form tracking</small>
@@ -73,11 +72,12 @@ export default function LaunchPage() {
           <div className="toast" role="status">
             {notice}
             <button onClick={() => setNotice('')} aria-label="Dismiss">
-              ×
+              Ã—
             </button>
           </div>
         )}
-      </div>
-    </main>
+      </>
   );
 }
+
+

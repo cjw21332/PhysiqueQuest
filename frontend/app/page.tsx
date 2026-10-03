@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -18,10 +18,10 @@ export default function RootPage() {
   }, [router]);
 
   return (
-    <main className="scene">
-      <div className="app-shell">
+    <>
         <div className="launch">Loading...</div>
-      </div>
-    </main>
+      </>
   );
 }
+
+
