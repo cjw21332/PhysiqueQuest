@@ -142,6 +142,11 @@ class ApiClient {
   async setWater(data: { date: string; glasses: number }) { return this.request<any>('/nutrition/water', { method: 'PUT', body: JSON.stringify(data) }); }
   async getSettings() { return this.request<any>('/settings'); }
   async updateSettings(values: Record<string, unknown>) { return this.request<any>('/settings', { method: 'PUT', body: JSON.stringify({ values }) }); }
+  async getActivity() { return this.request<any>('/activity/state'); }
+  async updateActivity(state: Record<string, unknown>) { return this.request<any>('/activity/state', { method: 'PUT', body: JSON.stringify({ state }) }); }
+  async getNotifications() { return this.request<any>('/notifications'); }
+  async markNotification(id: string, unread: boolean) { return this.request<any>(`/notifications/${encodeURIComponent(id)}/read`, { method: 'PATCH', body: JSON.stringify({ unread }) }); }
+  async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }
 }
 
 export const api = new ApiClient();

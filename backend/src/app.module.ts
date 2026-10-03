@@ -8,6 +8,8 @@ import { ProfileModule } from './profile/profile.module.js';
 import { getDatabaseConfig } from './config/database.config.js';
 import { NutritionModule } from './nutrition/nutrition.module.js';
 import { SettingsModule } from './settings/settings.module.js';
+import { ActivityModule } from './activity/activity.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { SettingsModule } from './settings/settings.module.js';
     ProfileModule,
     NutritionModule,
     SettingsModule,
+    ActivityModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

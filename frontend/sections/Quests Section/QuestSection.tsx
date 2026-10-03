@@ -1,23 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import type { Profile } from '../Home/types';
-
-type QuestProgress = {
-  workout: number;
-  meals: number;
-  water: number;
-  personalRecord: number;
-};
-
-const initialProgress: QuestProgress = {
-  workout: 0,
-  meals: 2,
-  water: 5,
-  personalRecord: 1
-};
+import { useActivity, type QuestProgress } from '../../hooks/useActivity';
 
 const missionConfig = [
   { key: 'workout', title: 'Complete one workout', total: 1, points: 100, icon: 'dumbbell' },
@@ -37,58 +24,20 @@ const badges = [
   { icon: 'sun', title: 'Early bird', earned: false }
 ];
 
-const validKeys = missionConfig.map(item => item.key);
-
 export default function QuestSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
-  const [progress, setProgress] = useState<QuestProgress>(initialProgress);
-  const [ready, setReady] = useState(false);
+  const { activity, loading, error, update } = useActivity();
+  const progress = activity.questProgress;
   const [notice, setNotice] = useState('');
+  const updateMission = async (key: keyof QuestProgress, total: number) => { await update({ questProgress: { ...progress, [key]: Math.min(total, progress[key] + 1) } }); };
 
-  useEffect(() => {
-    setReady(true);
-    try {
-      const saved = localStorage.getItem('physiquequest-quests');
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<QuestProgress>;
-        const safe = { ...initialProgress };
-        for (const key of validKeys) {
-          const value = parsed[key];
-          if (Number.isFinite(value)) {
-            const mission = missionConfig.find(m => m.key === key);
-            if (mission) {
-              safe[key] = Math.max(0, Math.min(mission.total, Number(value)));
-            }
-          }
-        }
-        setProgress(safe);
-      }
-    } catch {
-      /* Start with sample progress */
-    }
-  }, []);
-
-  useEffect(() => {
-    if (ready) localStorage.setItem('physiquequest-quests', JSON.stringify(progress));
-  }, [progress, ready]);
-
-  useEffect(() => {
-    if (!notice) return;
-    const timeout = window.setTimeout(() => setNotice(''), 2400);
-    return () => window.clearTimeout(timeout);
-  }, [notice]);
-
-  const updateMission = (key: keyof QuestProgress, total: number) => {
-    setProgress(current => ({
-      ...current,
-      [key]: Math.min(total, current[key] + 1)
-    }));
-  };
-
-  const level = 7;
-  const currentExp = 340;
-  const nextLevelExp = 500;
+  const level = activity.level;
+  const currentExp = activity.currentExp;
+  const nextLevelExp = activity.nextLevelExp;
   const expProgress = (currentExp / nextLevelExp) * 100;
-  const dayStreak = 12;
+  const dayStreak = activity.dayStreak;
+
+  if (loading) return <section className="quest-section"><div className="profile-load-state" role="status"><h2>Loading quests…</h2></div><BottomNav /></section>;
+  if (error) return <section className="quest-section"><div className="profile-load-state" role="alert"><h2>Could not load quests</h2><p>{error}</p></div><BottomNav /></section>;
 
   return (
     <section className="quest-section" aria-label="Quests">

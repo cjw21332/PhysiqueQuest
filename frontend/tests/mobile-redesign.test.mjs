@@ -12,8 +12,8 @@ test('progress keeps local metric selection', async () => {
 
 test('notifications keep readable state updates', async () => {
   const file = await source('sections/Home/Notifications.tsx');
-  assert.match(file, /setItems\(current => current\.map/);
-  assert.match(file, /onRead=\{\(\) => setItems/);
+  assert.match(file, /useNotifications/);
+  assert.match(file, /markRead/);
 });
 
 test('Me keeps persistence and root navigation', async () => {
@@ -38,4 +38,13 @@ test('nutrition and settings screens use server-backed state', async () => {
   assert.doesNotMatch(scan, /useState<FoodEntry\[\]>\(sampleMeals\)/);
   assert.match(me, /useSettings/);
   assert.doesNotMatch(me, /localStorage\.getItem\('physiquequest-me-settings'\)/);
+});
+
+test('quests and notifications use server-backed state', async () => {
+  const quests = await source('sections/Quests Section/QuestSection.tsx');
+  const notifications = await source('sections/Home/Notifications.tsx');
+  assert.match(quests, /useActivity/);
+  assert.doesNotMatch(quests, /localStorage\.getItem\('physiquequest-quests'\)/);
+  assert.match(notifications, /useNotifications/);
+  assert.doesNotMatch(notifications, /const initial = \[/);
 });
