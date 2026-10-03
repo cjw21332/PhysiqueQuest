@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 type CameraPermission = 'granted' | 'denied' | 'prompt' | 'unavailable';
 type DeviceReadiness = {
   platform: string;
-  androidVersion: string | null;
+  osName: string | null;
+  osVersion: string | null;
   networkType: string;
   wifiConnected: boolean;
   wifiSpeedMbps: number | null;
@@ -21,7 +22,8 @@ declare global {
 
 const emptyReadiness: DeviceReadiness = {
   platform: 'browser',
-  androidVersion: null,
+  osName: null,
+  osVersion: null,
   networkType: 'unknown',
   wifiConnected: false,
   wifiSpeedMbps: null,
@@ -35,7 +37,8 @@ function browserReadiness(): DeviceReadiness {
   const networkType = connection?.type ?? connection?.effectiveType ?? 'unknown';
   return {
     platform: /Android/i.test(userAgent) ? 'android' : /iPhone|iPad|iPod/i.test(userAgent) ? 'ios' : 'browser',
-    androidVersion: android?.[1] ?? null,
+    osName: /Android/i.test(userAgent) ? 'Android' : /iPhone|iPad|iPod/i.test(userAgent) ? 'iOS' : 'Browser',
+    osVersion: android?.[1] ?? null,
     networkType,
     wifiConnected: connection?.type === 'wifi',
     wifiSpeedMbps: typeof connection?.downlink === 'number' ? connection.downlink : null,
@@ -61,7 +64,7 @@ export default function LaunchPage() {
     return () => window.removeEventListener('physiquequest-device-readiness', onReadiness);
   }, []);
 
-  const readyCount = useMemo(() => [Boolean(readiness.androidVersion), readiness.wifiConnected, readiness.cameraPermission === 'granted'].filter(Boolean).length, [readiness]);
+  const readyCount = useMemo(() => [Boolean(readiness.osVersion), readiness.wifiConnected, readiness.cameraPermission === 'granted'].filter(Boolean).length, [readiness]);
 
   const requestCameraPermission = async () => {
     setCameraRequesting(true);
@@ -90,7 +93,7 @@ export default function LaunchPage() {
 
   const cameraLabel = readiness.cameraPermission === 'granted' ? 'Granted' : readiness.cameraPermission === 'denied' ? 'Blocked' : readiness.cameraPermission === 'unavailable' ? 'Unavailable' : 'Needed for form tracking';
   const networkLabel = readiness.wifiConnected ? `Connected${readiness.wifiSpeedMbps == null ? '' : ` · ${isNativeBridgeAvailable() ? '' : 'Estimated · '}${readiness.wifiSpeedMbps} Mbps`}` : readiness.networkType === 'unknown' ? 'Connection speed unavailable' : `${readiness.networkType} · Wi-Fi not detected`;
-  const deviceLabel = readiness.androidVersion ? `Android ${readiness.androidVersion} detected` : readiness.platform === 'android' ? 'Android version unavailable' : `${readiness.platform} device · Android version unavailable`;
+  const deviceLabel = readiness.osVersion ? `${readiness.osName ?? readiness.platform} ${readiness.osVersion} detected` : `${readiness.osName ?? readiness.platform} version unavailable`;
 
   return (
     <main className="scene">
@@ -100,7 +103,7 @@ export default function LaunchPage() {
           <div className="launch-spacer" />
           <div className="readiness">
             <div className="readiness-head"><b>Device readiness</b><span>{readyCount} of 3 ready</span></div>
-            <ReadinessRow ready={Boolean(readiness.androidVersion)} title="Android version" detail={deviceLabel} />
+            <ReadinessRow ready={Boolean(readiness.osVersion)} title="Device OS version" detail={deviceLabel} />
             <ReadinessRow ready={readiness.wifiConnected} title="Wi-Fi connection" detail={networkLabel} />
             <div className="ready-row">
               <b className={readiness.cameraPermission === 'granted' ? 'ready-icon' : 'camera-icon'}>{readiness.cameraPermission === 'granted' ? '✓' : '◎'}</b>

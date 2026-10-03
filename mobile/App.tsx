@@ -22,7 +22,8 @@ declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string } };
 
 type DeviceReadiness = {
   platform: string;
-  androidVersion: string | null;
+  osName: string | null;
+  osVersion: string | null;
   networkType: string;
   wifiConnected: boolean;
   wifiSpeedMbps: number | null;
@@ -98,7 +99,8 @@ function AppContent() {
     const details = network.details as { linkSpeed?: number | null } | null;
     const next: DeviceReadiness = {
       platform: Platform.OS,
-      androidVersion: Platform.OS === 'android' ? Device.osVersion ?? String(Platform.Version) : Device.osVersion,
+      osName: Device.osName ?? Platform.OS,
+      osVersion: Device.osVersion ?? (Platform.OS === 'android' ? String(Platform.Version) : null),
       networkType: network.type,
       wifiConnected: network.type === 'wifi' && network.isConnected === true,
       wifiSpeedMbps: typeof details?.linkSpeed === 'number' ? details.linkSpeed : null,

@@ -79,7 +79,7 @@ test('native wrapper reports backend connectivity and can retry it', async () =>
 test('launch readiness renders live device, network, and camera state', async () => {
   const file = await source('app/launch/page.tsx');
   assert.match(file, /DeviceReadiness/);
-  assert.match(file, /Android version/);
+  assert.match(file, /Device OS version/);
   assert.match(file, /Wi-Fi/);
   assert.match(file, /Camera permission/);
   assert.doesNotMatch(file, /Android 14 detected/);
@@ -93,5 +93,7 @@ test('Expo shell uses native readiness APIs and bridges camera permission', asyn
   assert.match(mobile, /expo-camera/);
   assert.match(mobile, /@react-native-community\/netinfo/);
   assert.match(mobile, /requestCameraPermissionsAsync/);
+  assert.match(mobile, /osName/);
+  assert.match(mobile, /osVersion/);
   assert.match(mobile, /device-readiness/);
 });
