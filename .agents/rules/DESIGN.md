@@ -516,7 +516,12 @@ Before committing any UI changes, verify:
 ### Quests
 - **Level Card**: Large hero (green background), level number, streak counter, exp bar
 - **Streak Calendar**: 7×1 or 7×4 grid of daily squares (active/freeze/today states)
-- **Mission Items**: Icon + title + progress bar, complete state indicated by green icon
+- **Mission Items**: 2-column grid layout on desktop/tablet, stacked on mobile
+  - **Incomplete missions**: Icon with NO background (transparent), title, progress bar, points in orange text
+  - **Completed missions**: Icon with green background (#7ee582) + white checkmark overlay, full card styling, progress bar filled green
+  - Card styling: White background, subtle border, thin shadow
+  - Hover state: Slight lift (translateY), enhanced shadow
+  - Progress bars: Light container (#eef0ee), green fill (#80e687), smooth animation on update
 - **Badges Section**: 4-column grid, locked/earned states with lock indicator
 - **Penalty Warning**: Orange/yellow background, warning icon, explanation text
 

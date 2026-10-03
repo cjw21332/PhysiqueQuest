@@ -2,11 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "physique-dev",
+      "name": "dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
-      "cwd": "frontend"
+      "cwd": "frontend",
+      "url": "http://localhost:3000"
     }
   ]
 }
