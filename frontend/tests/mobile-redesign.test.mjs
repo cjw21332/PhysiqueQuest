@@ -18,7 +18,24 @@ test('notifications keep readable state updates', async () => {
 
 test('Me keeps persistence and root navigation', async () => {
   const file = await source('sections/Me Section/MeSection.tsx');
-  assert.match(file, /localStorage\.getItem\('physiquequest-me-settings'\)/);
-  assert.match(file, /localStorage\.setItem\('physiquequest-me-settings'/);
+  assert.match(file, /useSettings/);
+  assert.doesNotMatch(file, /localStorage\.getItem\('physiquequest-me-settings'\)/);
+  assert.doesNotMatch(file, /localStorage\.setItem\('physiquequest-me-settings'/);
   assert.match(file, /<BottomNav \/>/);
+});
+
+test('launch actions use WebView-safe document navigation', async () => {
+  const file = await source('app/launch/page.tsx');
+  assert.match(file, /<a className="primary" href="\/register">/);
+  assert.match(file, /<a className="secondary" href="\/login">/);
+  assert.doesNotMatch(file, /router\.push\('\/(?:register|login)'\)/);
+});
+
+test('nutrition and settings screens use server-backed state', async () => {
+  const scan = await source('sections/Scan/ScanSection.tsx');
+  const me = await source('sections/Me Section/MeSection.tsx');
+  assert.match(scan, /useNutrition/);
+  assert.doesNotMatch(scan, /useState<FoodEntry\[\]>\(sampleMeals\)/);
+  assert.match(me, /useSettings/);
+  assert.doesNotMatch(me, /localStorage\.getItem\('physiquequest-me-settings'\)/);
 });

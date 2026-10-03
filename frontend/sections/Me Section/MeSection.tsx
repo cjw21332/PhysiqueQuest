@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import { api } from '../../lib/api';
@@ -8,10 +8,10 @@ import { PROFILE_STORAGE_KEY } from '../../lib/auth';
 import type { Profile } from '../Home/types';
 import AdminExerciseLibrary from './AdminExerciseLibrary';
 import EngagementAnalytics from './EngagementAnalytics';
+import { useSettings } from '../../hooks/useSettings';
 
 type Settings = { inactivity: boolean; alarmVolume: boolean; showLeaderboard: boolean; threshold: 30 | 45 | 60 };
 type AdminView = 'settings' | 'exercises' | 'engagement';
-const initialSettings: Settings = { inactivity: true, alarmVolume: true, showLeaderboard: true, threshold: 45 };
 
 function Switch({ label, checked, onChange, tone = 'green' }: { label: string; checked: boolean; onChange: () => void; tone?: 'green' | 'red' }) {
   return <button className={`me-switch ${tone} ${checked ? 'on' : ''}`} type="button" role="switch" aria-label={label} aria-checked={checked} onClick={onChange}><i/></button>;
@@ -30,37 +30,13 @@ function SettingRow({ icon, title, detail, onClick, danger = false }: { icon: st
 }
 
 export default function MeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
-  const [settings, setSettings] = useState<Settings>(initialSettings);
+  const { settings, loading: settingsLoading, error: settingsError, updateSettings } = useSettings();
   const [adminView, setAdminView] = useState<AdminView>('settings');
-  const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
 
-  useEffect(() => {
-    setReady(true);
-    try {
-      const saved = localStorage.getItem('physiquequest-me-settings');
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<Settings>;
-        setSettings({
-          inactivity: typeof parsed.inactivity === 'boolean' ? parsed.inactivity : initialSettings.inactivity,
-          alarmVolume: typeof parsed.alarmVolume === 'boolean' ? parsed.alarmVolume : initialSettings.alarmVolume,
-          showLeaderboard: typeof parsed.showLeaderboard === 'boolean' ? parsed.showLeaderboard : initialSettings.showLeaderboard,
-          threshold: parsed.threshold === 30 || parsed.threshold === 45 || parsed.threshold === 60 ? parsed.threshold : initialSettings.threshold,
-        });
-      }
-    } catch { /* Keep the default settings if stored browser data is unavailable. */ }
-  }, []);
-
-  useEffect(() => { if (ready) localStorage.setItem('physiquequest-me-settings', JSON.stringify(settings)); }, [settings, ready]);
-  useEffect(() => {
-    if (!notice) return;
-    const timeout = window.setTimeout(() => setNotice(''), 2500);
-    return () => window.clearTimeout(timeout);
-  }, [notice]);
-
-  const toggle = (key: 'inactivity' | 'alarmVolume' | 'showLeaderboard') => setSettings(current => ({ ...current, [key]: !current[key] }));
+  const toggle = async (key: 'inactivity' | 'alarmVolume' | 'showLeaderboard') => { try { await updateSettings({ [key]: !settings[key] }); } catch (error) { setSaveError(error instanceof Error ? error.message : 'Could not save settings.'); } };
   const equipment = profile.equipment?.length ? profile.equipment.join(', ') : '—';
   const daysPerWeek = profile.days?.length ?? 0;
   const conditionCount = profile.conditions?.includes('None of these') ? 0 : (profile.conditions?.length ?? 0);
@@ -85,7 +61,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       const merged = { ...profile, ...patch, ...updated };
       localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged));
       window.dispatchEvent(new Event('physiquequest-profile-updated'));
-      setNotice(`${featureName} (Coming soon)`);
+      setNotice(`${featureName} saved`);
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : 'Could not save. Please try again.');
     } finally {
@@ -121,20 +97,21 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-list">
         <SettingRow icon="phone" title="Emergency contact" detail={`${profile.contactName || '—'} · ${profile.contactPhone || '—'}`} onClick={() => saveProfile({ contactName: profile.contactName, contactPhone: profile.contactPhone })} danger/>
       </div>
-      <div className="me-setting-row"><span><b>Inactivity monitoring</b><small>Armed during every session</small></span><Switch label="Inactivity monitoring" checked={settings.inactivity} onChange={() => toggle('inactivity')}/></div>
+      {(settingsError || saveError) && <p className="error" role="alert">{settingsError || saveError}</p>}
+      {settingsLoading ? <p className="hint">Loading saved settings…</p> : <><div className="me-setting-row"><span><b>Inactivity monitoring</b><small>Armed during every session</small></span><Switch label="Inactivity monitoring" checked={settings.inactivity} onChange={() => void toggle('inactivity')}/></div>
 
       <div className="me-divider"/>
       <section className="me-setting-block">
         <h3 className="me-group-title">Inactivity threshold</h3>
         <p>Time without movement before we check on you</p>
         <div className="me-threshold" role="group" aria-label="Inactivity threshold">
-          {([30, 45, 60] as const).map(value => <button key={value} className={settings.threshold === value ? 'selected' : ''} onClick={() => setSettings(current => ({ ...current, threshold: value }))}>{value} s</button>)}
+          {([30, 45, 60] as const).map(value => <button key={value} className={settings.threshold === value ? 'selected' : ''} onClick={() => void updateSettings({ threshold: value })}>{value} s</button>)}
         </div>
       </section>
-      <div className="me-setting-row"><span><b>Maximum alarm volume</b><small>Overrides silent mode</small></span><Switch label="Maximum alarm volume" checked={settings.alarmVolume} onChange={() => toggle('alarmVolume')}/></div>
+      <div className="me-setting-row"><span><b>Maximum alarm volume</b><small>Overrides silent mode</small></span><Switch label="Maximum alarm volume" checked={settings.alarmVolume} onChange={() => void toggle('alarmVolume')}/></div>
 
       <h3 className="me-group-title me-privacy-title">Privacy</h3>
-      <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => toggle('showLeaderboard')}/></div>
+      <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
       <h3 className="me-group-title me-admin-title">Admin tools</h3>
       <div className="me-list">
