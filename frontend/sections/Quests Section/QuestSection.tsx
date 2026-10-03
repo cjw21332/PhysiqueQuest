@@ -2,15 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
+import BottomNav from '../Home/BottomNav';
+import type { Profile } from '../Home/types';
 
-type QuestProgress = { workout: number; meals: number; water: number; personalRecord: number };
-const initialProgress: QuestProgress = { workout: 0, meals: 2, water: 5, personalRecord: 1 };
+type QuestProgress = {
+  workout: number;
+  meals: number;
+  water: number;
+  personalRecord: number;
+};
+
+const initialProgress: QuestProgress = {
+  workout: 0,
+  meals: 2,
+  water: 5,
+  personalRecord: 1
+};
+
 const missionConfig = [
   { key: 'workout', title: 'Complete one workout', total: 1, points: 100, icon: 'dumbbell' },
   { key: 'meals', title: 'Log 3 meals', total: 3, points: 60, icon: 'meal' },
   { key: 'water', title: 'Drink 8 glasses of water', total: 8, points: 40, icon: 'water' },
-  { key: 'personalRecord', title: 'Beat one personal record', total: 1, points: 150, icon: 'check' },
+  { key: 'personalRecord', title: 'Beat one personal record', total: 1, points: 150, icon: 'check' }
 ] as const;
+
 const badges = [
   { icon: 'fire', title: '10-day streak', earned: true },
   { icon: 'trophy', title: 'First PR', earned: true },
@@ -19,20 +34,18 @@ const badges = [
   { icon: 'target', title: 'Macro master', earned: false },
   { icon: 'fire', title: '30-day streak', earned: false },
   { icon: 'crown', title: 'Top 10', earned: false },
-  { icon: 'sun', title: 'Early bird', earned: false },
+  { icon: 'sun', title: 'Early bird', earned: false }
 ];
+
 const validKeys = missionConfig.map(item => item.key);
 
-function MissionIcon({ name }: { name: string }) {
-  return <Icon name={name} size={15}/>;
-}
-
-export default function QuestSection() {
+export default function QuestSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const [progress, setProgress] = useState<QuestProgress>(initialProgress);
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
 
   useEffect(() => {
+    setReady(true);
     try {
       const saved = localStorage.getItem('physiquequest-quests');
       if (saved) {
@@ -40,15 +53,24 @@ export default function QuestSection() {
         const safe = { ...initialProgress };
         for (const key of validKeys) {
           const value = parsed[key];
-          if (Number.isFinite(value)) safe[key] = Math.max(0, Math.min(missionConfig.find(m => m.key === key)!.total, Number(value)));
+          if (Number.isFinite(value)) {
+            const mission = missionConfig.find(m => m.key === key);
+            if (mission) {
+              safe[key] = Math.max(0, Math.min(mission.total, Number(value)));
+            }
+          }
         }
         setProgress(safe);
       }
-    } catch { /* Start with today's sample progress when saved data is unavailable. */ }
-    setReady(true);
+    } catch {
+      /* Start with sample progress */
+    }
   }, []);
 
-  useEffect(() => { if (ready) localStorage.setItem('physiquequest-quests', JSON.stringify(progress)); }, [progress, ready]);
+  useEffect(() => {
+    if (ready) localStorage.setItem('physiquequest-quests', JSON.stringify(progress));
+  }, [progress, ready]);
+
   useEffect(() => {
     if (!notice) return;
     const timeout = window.setTimeout(() => setNotice(''), 2400);
@@ -56,43 +78,176 @@ export default function QuestSection() {
   }, [notice]);
 
   const updateMission = (key: keyof QuestProgress, total: number) => {
-    setProgress(current => ({ ...current, [key]: Math.min(total, current[key] + 1) }));
+    setProgress(current => ({
+      ...current,
+      [key]: Math.min(total, current[key] + 1)
+    }));
   };
 
-  return <section className="quest-section" aria-label="Quests">
-    <header className="quest-header"><h2>Quests</h2><button onClick={() => setNotice('Leaderboard rankings are coming soon.')}><Icon name="trophy" size={13}/>Leaderboard</button></header>
-    <div className="quest-scroll">
-      <section className="quest-level-card" aria-label="Level and streak progress">
-        <div className="quest-level-top"><div><h3>Level 7</h3><small>340 / 500 exp to level 8</small></div><div className="quest-streak"><b><span>♨</span> 12</b><small>day streak</small></div></div>
-        <div className="quest-exp-track"><i/></div>
-        <div className="streak-calendar" aria-label="Streak calendar">
-          {Array.from({ length: 14 }, (_, index) => <span key={index} className={index < 7 || (index >= 8 && index < 12) ? 'filled' : index === 7 ? 'freeze' : index === 12 ? 'today' : ''}>{index === 7 ? '✿' : ''}</span>)}
+  const level = 7;
+  const currentExp = 340;
+  const nextLevelExp = 500;
+  const expProgress = (currentExp / nextLevelExp) * 100;
+  const dayStreak = 12;
+
+  return (
+    <section className="quest-section" aria-label="Quests">
+      {/* Header */}
+      <header className="quests-header">
+        <h2 className="quests-title">Quests</h2>
+        <button
+          className="leaderboard-btn"
+          onClick={() => setNotice('Leaderboard rankings are coming soon.')}
+        >
+          <Icon name="trophy" size={14} />
+          Leaderboard
+        </button>
+      </header>
+
+      {/* Scrollable Content */}
+      <div className="quests-scroll">
+        {/* Level Card */}
+        <section className="level-card">
+          <div className="level-header">
+            <div className="level-info">
+              <h3 className="level-title">Level {level}</h3>
+              <div className="level-subtitle">
+                {currentExp} / {nextLevelExp} exp to level {level + 1}
+              </div>
+            </div>
+            <div className="streak-info">
+              <div className="streak-number">
+                <Icon name="fire" size={16} /> {dayStreak}
+              </div>
+              <div className="streak-label">day streak</div>
+            </div>
+          </div>
+
+          {/* Experience Progress Bar */}
+          <div className="exp-bar">
+            <div
+              className="exp-bar-fill"
+              style={{ width: `${expProgress}%` }}
+            />
+          </div>
+
+          {/* Streak Calendar */}
+          <div className="streak-calendar">
+            {Array.from({ length: 14 }, (_, index) => {
+              const isActive = index < 7 || (index >= 8 && index < 12);
+              const isFreeze = index === 7;
+              const isToday = index === 12;
+
+              return (
+                <div
+                  key={index}
+                  className={`calendar-day ${
+                    isActive ? 'active' : ''
+                  } ${isFreeze ? 'freeze' : ''} ${isToday ? 'today' : ''}`}
+                >
+                  {isFreeze && '❄'}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="freeze-note">
+            One freeze used — streaks are forgiving by design.
+          </div>
+        </section>
+
+        {/* Daily Missions */}
+        <section className="missions-section">
+          <div className="missions-header">
+            <h3 className="missions-title">Daily missions</h3>
+            <div className="missions-reset">Resets in 4h 12m</div>
+          </div>
+
+          <div className="missions-list">
+            {missionConfig.map(mission => {
+              const amount = progress[mission.key];
+              const complete = amount >= mission.total;
+              const percentage = (amount / mission.total) * 100;
+
+              return (
+                <button
+                  key={mission.key}
+                  className={`mission-item ${complete ? 'complete' : ''}`}
+                  onClick={() => updateMission(mission.key, mission.total)}
+                  aria-label={`${mission.title}, ${amount} of ${mission.total}`}
+                >
+                  <div className="mission-icon">
+                    <Icon name={mission.icon} size={18} />
+                  </div>
+                  <div className="mission-content">
+                    <div className="mission-title">{mission.title}</div>
+                    <div className="mission-progress">
+                      <div className="progress-bar">
+                        <div
+                          className="progress-bar-fill"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <div className="progress-text">
+                        {amount}/{mission.total}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mission-points">+{mission.points}</div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Penalty Warning */}
+        <aside className="penalty-warning">
+          <div className="penalty-header">
+            <span className="penalty-title">Penalty rule</span>
+            <span className="penalty-strikes">1 of 3 strikes</span>
+          </div>
+          <p className="penalty-text">
+            Missing all daily missions deducts 50 points and adds a strike.
+            Points never drop below your level floor.
+          </p>
+        </aside>
+
+        {/* Badges */}
+        <section className="badges-section">
+          <div className="badges-header">
+            <h3 className="badges-title">Badges</h3>
+            <div className="badges-count">4 of 24</div>
+          </div>
+
+          <div className="badges-grid">
+            {badges.map(badge => (
+              <div
+                key={badge.title}
+                className={`badge-item ${badge.earned ? 'earned' : 'locked'}`}
+              >
+                <div className="badge-icon">
+                  <Icon name={badge.icon} size={24} />
+                  {!badge.earned && (
+                    <div className="badge-lock">
+                      <Icon name="lock" size={10} />
+                    </div>
+                  )}
+                </div>
+                <div className="badge-name">{badge.title}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <BottomNav />
+
+      {/* Toast Notification */}
+      {notice && (
+        <div className="home-toast quest-toast" role="status">
+          {notice}
         </div>
-        <p>One freeze used — streaks are forgiving by design.</p>
-      </section>
-
-      <section className="quest-missions">
-        <div className="quest-section-head"><h3>Daily missions</h3><span>Resets in 4h 12m</span></div>
-        {missionConfig.map((mission, index) => {
-          const amount = progress[mission.key];
-          const complete = amount >= mission.total;
-          return <button className={`quest-mission ${complete ? 'complete' : ''}`} key={mission.key} onClick={() => updateMission(mission.key, mission.total)} aria-label={`${mission.title}, ${amount} of ${mission.total}. ${complete ? 'Completed' : 'Tap to update progress'}`}>
-            <span className="quest-mission-icon"><MissionIcon name={mission.icon}/></span>
-            <span className="quest-mission-copy"><b>{mission.title}</b><span className="quest-mission-progress"><i><em style={{ width: `${(amount / mission.total) * 100}%` }}/></i><small>{amount}/{mission.total}</small></span></span>
-            <strong>+{mission.points}</strong>
-          </button>;
-        })}
-      </section>
-
-      <aside className="quest-penalty"><b>Penalty rule</b><span>1 of 3 strikes</span><p>Missing all daily missions deducts 50 points and adds a strike. Points never drop below your level floor.</p></aside>
-
-      <section className="quest-badges">
-        <div className="quest-section-head"><h3>Badges</h3><span>4 of 24</span></div>
-        <div className="quest-badge-grid">{badges.map(badge => <div className={`quest-badge ${badge.earned ? 'earned' : 'locked'}`} key={badge.title}>
-          <span className="quest-badge-medal"><Icon name={badge.icon} size={21}/>{!badge.earned && <i aria-label="Locked"><Icon name="lock" size={9}/></i>}</span><b>{badge.title}</b>
-        </div>)}</div>
-      </section>
-    </div>
-    {notice && <div className="home-toast quest-toast" role="status">{notice}</div>}
-  </section>;
+      )}
+    </section>
+  );
 }
