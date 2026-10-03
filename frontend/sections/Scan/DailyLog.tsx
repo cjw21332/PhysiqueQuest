@@ -53,39 +53,57 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onWat
           </div>
         </div>
         <div className="daily-macros">
-          <small><b>{Math.max(0, 2300 - calories).toLocaleString()}</b> kcal remaining</small>
-          <Macro label="Protein" value={protein} goal={140} />
-          <Macro label="Carbs" value={carbs} goal={240} />
-          <Macro label="Fats" value={fats} goal={70} />
+          <div className="remaining-label"><small><b>{Math.max(0, 2300 - calories).toLocaleString()}</b> kcal remaining</small></div>
+          <div className="daily-macros-grid">
+            <Macro label="Protein" value={protein} goal={140} />
+            <Macro label="Carbs" value={carbs} goal={240} />
+            <Macro label="Fats" value={fats} goal={70} />
+          </div>
         </div>
       </div>
 
       <section className="scan-meals log-meals daily-log-meals">
         <div className="section-head">
-          <h3>Today’s meals</h3>
-          <button className="daily-log-add" onClick={() => onAdd('Dinner')}>＋ Add</button>
+          <h3>Today&apos;s meals</h3>
+          <button className="daily-log-add" onClick={() => onAdd("Dinner")}>+ Add</button>
         </div>
         <div className="daily-log-meal-list">
           {mealNames.map((meal) => {
             const entries = meals.filter((item) => item.meal === meal);
             const total = entries.reduce((sum, item) => sum + item.calories, 0);
+            const totalProtein = entries.reduce((sum, item) => sum + item.protein, 0);
 
             return (
-              <div className="log-meal" key={meal}>
-                <div className="daily-log-meal-copy">
-                  <p>
-                    <b>{meal}</b>
-                    {entries.length > 0 && <span> · {entries.map((item) => item.name).join(', ')}</span>}
-                  </p>
-                  <small>
-                    {entries.length > 0
-                      ? entries.map((item) => `${item.source} · ${item.time}`).join(' · ')
-                      : 'Not logged yet'}
-                  </small>
+              <div className="log-meal-card" key={meal}>
+                <div className="log-meal-header">
+                  <div className="log-meal-title">
+                    <b className="log-meal-name">{meal}</b>
+                    {entries.length > 0 && (
+                      <div className="log-meal-quick-stats">
+                        <span>{total} kcal</span>
+                        <span>P: {Math.round(totalProtein)}g</span>
+                      </div>
+                    )}
+                  </div>
+                  {entries.length > 0
+                    ? <strong className="log-meal-total">{total.toLocaleString()} kcal</strong>
+                    : <button onClick={() => onAdd(meal)} className="log-meal-add-btn" aria-label={`Log ${meal}`}>Log</button>}
                 </div>
-                {entries.length > 0
-                  ? <strong>{total.toLocaleString()} kcal</strong>
-                  : <button onClick={() => onAdd(meal)} aria-label={`Log ${meal}`}>Log</button>}
+                {entries.length > 0 && (
+                  <div className="log-meal-entries">
+                    {entries.map((item, idx) => (
+                      <div key={item.id} className="log-meal-entry">
+                        <span className="entry-name">{item.name}</span>
+                        <span className="entry-meta">{item.source} · {item.time}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {entries.length === 0 && (
+                  <div className="log-meal-copy">
+                    <small>Not logged yet</small>
+                  </div>
+                )}
               </div>
             );
           })}

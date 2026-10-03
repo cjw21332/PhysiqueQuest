@@ -40,32 +40,34 @@ export default function NutritionDashboard({
 
       {/* Nutrition Overview Card */}
       <div className="nutrition-card">
-        <div className="calorie-display">
-          <svg className="calorie-circle-svg" viewBox="0 0 100 100">
-            <circle
-              cx="50"
-              cy="50"
-              r="42"
-              fill="none"
-              stroke="#eef0ee"
-              strokeWidth="8"
-            />
-            <circle
-              cx="50"
-              cy="50"
-              r="42"
-              fill="none"
-              stroke="#7ee582"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray="264"
-              strokeDashoffset={264 - (264 * calories) / 2300}
-              transform="rotate(-90 50 50)"
-            />
-          </svg>
-          <div className="calorie-center">
-            <div className="calorie-value">{calories.toLocaleString()}</div>
-            <div className="calorie-label">of 2,300 kcal</div>
+        <div className="nutrition-card-left">
+          <div className="calorie-display">
+            <svg className="calorie-circle-svg" viewBox="0 0 100 100" aria-hidden="true">
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="#eef0ee"
+                strokeWidth="8"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="#7ee582"
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray="264"
+                strokeDashoffset={264 - (264 * calories) / 2300}
+                transform="rotate(-90 50 50)"
+              />
+            </svg>
+            <div className="calorie-center">
+              <div className="calorie-value">{calories.toLocaleString()}</div>
+              <div className="calorie-label">of 2,300 kcal</div>
+            </div>
           </div>
         </div>
 
@@ -73,9 +75,11 @@ export default function NutritionDashboard({
           <div className="remaining-cals">
             <strong>{remaining.toLocaleString()} kcal</strong> remaining
           </div>
-          <MacroBar label="Protein" current={Math.round(protein)} target={140} unit="g" />
-          <MacroBar label="Carbs" current={Math.round(carbs)} target={240} unit="g" />
-          <MacroBar label="Fats" current={Math.round(fats)} target={70} unit="g" />
+          <div className="macros-container">
+            <MacroBar label="Protein" current={Math.round(protein)} target={140} unit="g" />
+            <MacroBar label="Carbs" current={Math.round(carbs)} target={240} unit="g" />
+            <MacroBar label="Fats" current={Math.round(fats)} target={70} unit="g" />
+          </div>
         </div>
       </div>
 
@@ -100,16 +104,20 @@ export default function NutritionDashboard({
           {mealNames.map((mealName) => {
             const entries = meals.filter((item) => item.meal === mealName);
             const totalCals = entries.reduce((sum, item) => sum + item.calories, 0);
+            const totalProtein = entries.reduce((sum, item) => sum + item.protein, 0);
             const hasEntries = entries.length > 0;
 
             return (
-              <div key={mealName} className="meal-row">
-                <div className="meal-row-header">
-                  <div className="meal-info">
-                    <span className="meal-name">{mealName}</span>
-                    <span className="meal-calories">
-                      {hasEntries ? `${totalCals} kcal` : 'Not logged'}
-                    </span>
+              <div key={mealName} className="meal-card">
+                <div className="meal-card-header">
+                  <div className="meal-card-title">
+                    <h4 className="meal-name">{mealName}</h4>
+                    {hasEntries && (
+                      <div className="meal-stats">
+                        <span className="meal-calories">{totalCals} kcal</span>
+                        <span className="meal-protein">P: {Math.round(totalProtein)}g</span>
+                      </div>
+                    )}
                   </div>
                   <button
                     className="add-meal-btn"
@@ -119,13 +127,16 @@ export default function NutritionDashboard({
                     ＋
                   </button>
                 </div>
-                <div className="meal-details">
+                <div className="meal-card-body">
                   {hasEntries ? (
-                    entries.map((entry) => (
-                      <div key={entry.id} className="meal-entry">
-                        {entry.detail}
-                      </div>
-                    ))
+                    <div className="meal-entries">
+                      {entries.map((entry) => (
+                        <div key={entry.id} className="meal-entry-item">
+                          <span className="entry-name">{entry.name}</span>
+                          <span className="entry-detail">{entry.detail}</span>
+                        </div>
+                      ))}
+                    </div>
                   ) : (
                     <div className="meal-placeholder">
                       Add what you ate to stay on target
