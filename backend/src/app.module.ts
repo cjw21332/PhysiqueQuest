@@ -6,6 +6,8 @@ import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ProfileModule } from './profile/profile.module.js';
 import { getDatabaseConfig } from './config/database.config.js';
+import { NutritionModule } from './nutrition/nutrition.module.js';
+import { SettingsModule } from './settings/settings.module.js';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { getDatabaseConfig } from './config/database.config.js';
     }),
     AuthModule,
     ProfileModule,
+    NutritionModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
