@@ -27,4 +27,6 @@ export type Profile = {
   healthNotes?: string;
   contactName?: string;
   contactPhone?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

@@ -41,10 +41,18 @@ export class ProfileService {
 
   async update(userId: string, updateProfileDto: UpdateProfileDto): Promise<HydratedDocument<Profile>> {
     const current = await this.findByUserId(userId);
-    validateProfileMeasurements({ ...current.toObject(), ...updateProfileDto });
+    // The global ValidationPipe runs with `transform: true`, so
+    // class-transformer instantiates the DTO and every optional field is
+    // present but `undefined`. Merge only the fields the client actually
+    // sent so a partial update does not blank out the stored profile.
+    const patch: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(updateProfileDto)) {
+      if (value !== undefined) patch[key] = value;
+    }
+    validateProfileMeasurements({ ...current.toObject(), ...patch });
     const profile = await this.profileModel.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
-      { $set: updateProfileDto },
+      { $set: patch },
       { new: true, runValidators: true },
     );
 

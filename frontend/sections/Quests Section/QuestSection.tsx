@@ -185,9 +185,10 @@ export default function QuestSection({ profile, onLogoutRequest }: { profile: Pr
                   className={`mission-item ${complete ? 'complete' : ''}`}
                   onClick={() => updateMission(mission.key, mission.total)}
                   aria-label={`${mission.title}, ${amount} of ${mission.total}, ${mission.points} points`}
+                  aria-pressed={complete}
                 >
                   <div className="mission-icon">
-                    <Icon name={mission.icon} size={20} />
+                    <Icon name={complete ? 'check' : mission.icon} size={20} />
                   </div>
                   <div className="mission-content">
                     <div className="mission-top">
@@ -197,23 +198,24 @@ export default function QuestSection({ profile, onLogoutRequest }: { profile: Pr
                         {mission.points}
                       </div>
                     </div>
-                    <div className="mission-progress">
-                      <div className="progress-bar">
-                        <div
-                          className="progress-bar-fill"
-                          style={{ width: `${percentage}%` }}
-                          role="progressbar"
-                          aria-valuenow={amount}
-                          aria-valuemin={0}
-                          aria-valuemax={mission.total}
-                        />
+                    {!complete && (
+                      <div className="mission-progress">
+                        <div className="progress-bar">
+                          <div
+                            className="progress-bar-fill"
+                            style={{ width: `${percentage}%` }}
+                            role="progressbar"
+                            aria-valuenow={amount}
+                            aria-valuemin={0}
+                            aria-valuemax={mission.total}
+                          />
+                        </div>
+                        <div className="progress-text">
+                          {amount}/{mission.total}
+                        </div>
                       </div>
-                      <div className="progress-text">
-                        {amount}/{mission.total}
-                      </div>
-                    </div>
+                    )}
                   </div>
-                  {complete && <div className="mission-checkmark">✓</div>}
                 </button>
               );
             })}

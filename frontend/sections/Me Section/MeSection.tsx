@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
+import { api } from '../../lib/api';
+import { PROFILE_STORAGE_KEY } from '../../lib/auth';
 import type { Profile } from '../Home/types';
 import AdminExerciseLibrary from './AdminExerciseLibrary';
 import EngagementAnalytics from './EngagementAnalytics';
@@ -32,6 +34,8 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const [adminView, setAdminView] = useState<AdminView>('settings');
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     setReady(true);
@@ -57,11 +61,37 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   }, [notice]);
 
   const toggle = (key: 'inactivity' | 'alarmVolume' | 'showLeaderboard') => setSettings(current => ({ ...current, [key]: !current[key] }));
-  const equipment = profile.equipment?.length ? profile.equipment.join(', ') : 'Dumbbells';
-  const daysPerWeek = profile.days?.length || 4;
-  const conditionCount = profile.conditions?.includes('None of these') ? 0 : profile.conditions?.length || 1;
-  const weightUnit = profile.weightUnit || 'kg';
-  const goalWeight = profile.targetWeight ? `${profile.targetWeight} ${weightUnit}` : `74 ${weightUnit}`;
+  const equipment = profile.equipment?.length ? profile.equipment.join(', ') : '—';
+  const daysPerWeek = profile.days?.length ?? 0;
+  const conditionCount = profile.conditions?.includes('None of these') ? 0 : (profile.conditions?.length ?? 0);
+  const weightUnit = profile.weightUnit || '';
+  const goalWeight = profile.targetWeight ? `${profile.targetWeight} ${weightUnit}`.trim() : '—';
+  const memberSince = profile.createdAt
+    ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : '—';
+  const targetDate = profile.targetDate
+    ? new Date(profile.targetDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : '—';
+  const goalDetail = `${profile.goal || '—'} · ${goalWeight} by ${targetDate}`;
+
+  // Persist a partial profile update to the database (MongoDB via the
+  // JWT-guarded PUT /api/profile endpoint), then refresh the cached copy
+  // so every screen reads the new value without a reload.
+  const saveProfile = async (patch: Partial<Profile>, featureName = 'Profile') => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      const updated = await api.updateProfile(patch);
+      const merged = { ...profile, ...patch, ...updated };
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged));
+      window.dispatchEvent(new Event('physiquequest-profile-updated'));
+      setNotice(`${featureName} (Coming soon)`);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Could not save. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (adminView === 'exercises') {
     return <AdminExerciseLibrary onBack={() => setAdminView('settings')} />;
@@ -75,21 +105,21 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     <div className="me-scroll">
       <div className="me-profile-summary">
         <ProfileSilhouette/>
-        <div className="me-profile-name"><b>{profile.name || 'Toji Dela Cruz'}</b><small>Level 7 · member since Aug 2026</small></div>
-        <button className="me-edit" onClick={() => setNotice('Profile editing is coming soon.')}>Edit</button>
+        <div className="me-profile-name"><b>{profile.name || '—'}</b><small>member since {memberSince}</small></div>
+        <button className="me-edit" onClick={() => saveProfile({ name: profile.name })}>Edit</button>
       </div>
 
       <h3 className="me-group-title">Profile</h3>
       <div className="me-list">
-        <SettingRow icon="user" title="Personal data" detail="Age, height, weight, measurements" onClick={() => setNotice('Personal data editing is coming soon.')}/>
-        <SettingRow icon="target" title="Goals" detail={`${profile.goal || 'Build muscle'} · ${goalWeight} by Mar 2027`} onClick={() => setNotice('Goal editing is coming soon.')}/>
-        <SettingRow icon="dumbbell" title="Training preference" detail={`${equipment} · ${daysPerWeek} days · ${profile.duration || '45 min'}`} onClick={() => setNotice('Training preference editing is coming soon.')}/>
-        <SettingRow icon="health" title="Health profile" detail={`${conditionCount} ${conditionCount === 1 ? 'condition' : 'conditions'} logged`} onClick={() => setNotice('Health profile editing is coming soon.')}/>
+        <SettingRow icon="user" title="Personal data" detail={`Age ${profile.age ?? '—'} · ${profile.height ?? '—'} ${profile.heightUnit || ''} · ${profile.weight ?? '—'} ${weightUnit}`.replace(/\s+/g, ' ').trim()} onClick={() => saveProfile({ age: profile.age, height: profile.height, weight: profile.weight }, 'Personal data edit')}/>
+        <SettingRow icon="target" title="Goals" detail={goalDetail} onClick={() => saveProfile({ goal: profile.goal, targetWeight: profile.targetWeight, targetDate: profile.targetDate }, 'Goals edit')}/>
+        <SettingRow icon="dumbbell" title="Training preference" detail={`${equipment} · ${daysPerWeek} day${daysPerWeek === 1 ? '' : 's'} · ${profile.duration || '—'}`} onClick={() => saveProfile({ equipment: profile.equipment, days: profile.days, duration: profile.duration }, 'Training preference edit')}/>
+        <SettingRow icon="health" title="Health profile" detail={`${conditionCount} condition${conditionCount === 1 ? '' : 's'} logged`} onClick={() => saveProfile({ conditions: profile.conditions, healthNotes: profile.healthNotes }, 'Health profile edit')}/>
       </div>
 
       <h3 className="me-group-title safety">Safety</h3>
       <div className="me-list">
-        <SettingRow icon="phone" title="Emergency contact" detail={profile.contactName || 'Maria Dela Cruz'} onClick={() => setNotice('Emergency contact editing is coming soon.')} danger/>
+        <SettingRow icon="phone" title="Emergency contact" detail={`${profile.contactName || '—'} · ${profile.contactPhone || '—'}`} onClick={() => saveProfile({ contactName: profile.contactName, contactPhone: profile.contactPhone })} danger/>
       </div>
       <div className="me-setting-row"><span><b>Inactivity monitoring</b><small>Armed during every session</small></span><Switch label="Inactivity monitoring" checked={settings.inactivity} onChange={() => toggle('inactivity')}/></div>
 
