@@ -98,3 +98,14 @@ test('Expo shell uses native readiness APIs and bridges camera permission', asyn
   assert.match(mobile, /osVersion/);
   assert.match(mobile, /device-readiness/);
 });
+
+test('authenticated navigation uses full document navigation in WebView', async () => {
+  const navigation = await source('lib/navigation.ts');
+  const login = await source('app/(auth)/login/page.tsx');
+  const register = await source('app/(auth)/register/page.tsx');
+  const bottomNav = await source('sections/Home/BottomNav.tsx');
+  assert.match(navigation, /window\.location\.assign/);
+  assert.match(login, /navigate\('\/home'\)/);
+  assert.match(register, /navigate\('\/home'\)/);
+  assert.doesNotMatch(bottomNav, /router\.push\(path\)/);
+});

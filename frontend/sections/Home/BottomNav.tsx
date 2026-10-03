@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Icon } from './icons';
+import { navigate } from '../../lib/navigation';
 
 export type HomeTab = 'Home' | 'Coach' | 'Scan' | 'Quests' | 'Me';
 
@@ -14,11 +15,10 @@ const tabs: { label: HomeTab; icon: string; path: string }[] = [
 ];
 
 export default function BottomNav() {
-  const router = useRouter();
   const pathname = usePathname();
 
   const handleNavigation = (path: string) => {
-    router.push(path);
+    navigate(path);
   };
 
   return (

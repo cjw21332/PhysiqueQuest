@@ -1,13 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import AuthForm from '../../../sections/Auth/AuthForm';
 import ForgotPasswordFlow from '../../../sections/Forgot Password/ForgotPasswordFlow';
 import { login } from '../../../lib/auth';
+import { navigate } from '../../../lib/navigation';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -28,7 +27,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push('/home');
+      navigate('/home');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
     }
@@ -47,7 +46,7 @@ export default function LoginPage() {
           <AuthForm
             mode="login"
             onModeChange={(mode) => {
-              if (mode === 'register') router.push('/register');
+              if (mode === 'register') navigate('/register');
             }}
             name={name}
             email={email}

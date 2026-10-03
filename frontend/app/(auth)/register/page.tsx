@@ -1,15 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import AuthForm from '../../../sections/Auth/AuthForm';
 import CalibrationFlow from '../../../sections/Auth/CalibrationFlow';
 import { register } from '../../../lib/auth';
 import { api } from '../../../lib/api';
 import type { Profile } from '../../../sections/Home/types';
+import { navigate } from '../../../lib/navigation';
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -72,7 +71,7 @@ export default function RegisterPage() {
       // Also save to localStorage for now
       localStorage.setItem('physiquequest-profile', JSON.stringify(profile));
 
-      router.push('/home');
+      navigate('/home');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
       setCalibrating(false);
@@ -99,7 +98,7 @@ export default function RegisterPage() {
         <AuthForm
           mode="register"
           onModeChange={(mode) => {
-            if (mode === 'login') router.push('/login');
+            if (mode === 'login') navigate('/login');
           }}
           name={name}
           email={email}

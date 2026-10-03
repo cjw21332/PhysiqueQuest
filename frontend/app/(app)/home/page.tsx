@@ -1,21 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import HomeSection from '../../../sections/Home/HomeSection';
 import LogoutModal from '../../../components/LogoutModal';
 import { getCurrentUser, logout } from '../../../lib/auth';
 import { useCurrentProfile } from '../../../hooks/useCurrentProfile';
 import ProfileLoadState from '../../../components/ProfileLoadState';
+import { navigate } from '../../../lib/navigation';
 
 export default function HomePage() {
-  const router = useRouter();
   const { profile, loading, error, retry } = useCurrentProfile();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
     logout();
-    router.push('/');
+    navigate('/');
   };
 
   if (loading || error || !profile) return <ProfileLoadState loading={loading} error={error} onRetry={retry} />;

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import type { Profile } from '../Home/types';
 import { exercises } from './exercises';
 import CoachPlan from './CoachPlan';
@@ -10,16 +9,16 @@ import CameraCheck from './CameraCheck';
 import LiveSession from './LiveSession';
 import WorkoutReport from './WorkoutReport';
 import BottomNav from '../Home/BottomNav';
+import { navigate } from '../../lib/navigation';
 
 type View = 'plan' | 'library' | 'camera' | 'session' | 'report';
 
 export default function CoachSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
-  const router = useRouter();
   const [view, setView] = useState<View>('plan');
   const [elapsed, setElapsed] = useState(0);
   const [toast, setToast] = useState('');
   const say = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2500); };
-  const goHome = () => router.push('/home');
+  const goHome = () => navigate('/home');
 
   return (
     <section className={`coach-section coach-view-${view}`}>

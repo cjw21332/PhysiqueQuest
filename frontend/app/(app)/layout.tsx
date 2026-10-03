@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { isAuthenticated } from '../../lib/auth';
+import { navigate } from '../../lib/navigation';
 
 export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
 
@@ -19,9 +19,9 @@ export default function AppLayout({
 
   useEffect(() => {
     if (isClient && !isAuthenticated() && pathname !== '/') {
-      router.push('/launch');
+      navigate('/launch');
     }
-  }, [isClient, pathname, router]);
+  }, [isClient, pathname]);
 
   return <>{children}</>;
 }
