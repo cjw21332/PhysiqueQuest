@@ -75,3 +75,23 @@ test('native wrapper reports backend connectivity and can retry it', async () =>
   assert.match(mobile, /Retry backend check/);
   assert.match(mobile, /injectJavaScript/);
 });
+
+test('launch readiness renders live device, network, and camera state', async () => {
+  const file = await source('app/launch/page.tsx');
+  assert.match(file, /DeviceReadiness/);
+  assert.match(file, /Android version/);
+  assert.match(file, /Wi-Fi/);
+  assert.match(file, /Camera permission/);
+  assert.doesNotMatch(file, /Android 14 detected/);
+  assert.doesNotMatch(file, /84 Mbps/);
+  assert.match(file, /requestCameraPermission/);
+});
+
+test('Expo shell uses native readiness APIs and bridges camera permission', async () => {
+  const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
+  assert.match(mobile, /expo-device/);
+  assert.match(mobile, /expo-camera/);
+  assert.match(mobile, /@react-native-community\/netinfo/);
+  assert.match(mobile, /requestCameraPermissionsAsync/);
+  assert.match(mobile, /device-readiness/);
+});

@@ -1,5 +1,9 @@
 import Constants from 'expo-constants';
+import { Camera } from 'expo-camera';
+import * as Device from 'expo-device';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { Platform } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
   Keyboard,
@@ -15,6 +19,15 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { WebView } from 'react-native-webview';
 
 declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string } };
+
+type DeviceReadiness = {
+  platform: string;
+  androidVersion: string | null;
+  networkType: string;
+  wifiConnected: boolean;
+  wifiSpeedMbps: number | null;
+  cameraPermission: string;
+};
 
 function getInitialAddress() {
   const configured = process.env.EXPO_PUBLIC_WEB_APP_URL?.trim();
@@ -48,6 +61,11 @@ function buildBackendCheckScript() {
   return `(function(){fetch(window.location.protocol+'//'+window.location.hostname+':4000/api',{credentials:'include'}).then(function(r){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:r.ok,status:r.status}));}).catch(function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:false}));});})();true;`;
 }
 
+function buildReadinessScript(readiness: DeviceReadiness) {
+  const payload = JSON.stringify(readiness).replace(/</g, '\\u003c');
+  return `(function(){window.dispatchEvent(new CustomEvent('physiquequest-device-readiness',{detail:${payload}}));})();true;`;
+}
+
 function AppContent() {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView>(null);
@@ -58,6 +76,7 @@ function AppContent() {
   const [error, setError] = useState(!inferredAddress);
   const [key, setKey] = useState(0);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
 
   const insetScript = useMemo(
     () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }),
@@ -72,6 +91,32 @@ function AppContent() {
     setBackendStatus('checking');
     webRef.current?.injectJavaScript(buildBackendCheckScript());
   }, []);
+
+  const collectReadiness = useCallback(async () => {
+    const network = await NetInfo.fetch();
+    const camera = await Camera.getCameraPermissionsAsync();
+    const details = network.details as { linkSpeed?: number | null } | null;
+    const next: DeviceReadiness = {
+      platform: Platform.OS,
+      androidVersion: Platform.OS === 'android' ? Device.osVersion ?? String(Platform.Version) : Device.osVersion,
+      networkType: network.type,
+      wifiConnected: network.type === 'wifi' && network.isConnected === true,
+      wifiSpeedMbps: typeof details?.linkSpeed === 'number' ? details.linkSpeed : null,
+      cameraPermission: camera.status,
+    };
+    setReadiness(next);
+    return next;
+  }, []);
+
+  const publishReadiness = useCallback(async () => {
+    const next = await collectReadiness();
+    webRef.current?.injectJavaScript(buildReadinessScript(next));
+  }, [collectReadiness]);
+
+  const requestCameraPermission = useCallback(async () => {
+    await Camera.requestCameraPermissionsAsync();
+    await publishReadiness();
+  }, [publishReadiness]);
 
   const connect = () => {
     const normalized = address.trim().replace(/\/$/, '');
@@ -137,6 +182,8 @@ function AppContent() {
           try {
             const message = JSON.parse(e.nativeEvent.data) as { type?: string; ok?: boolean };
             if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
+            if (message.type === 'request-camera-permission') void requestCameraPermission();
+            if (message.type === 'request-device-readiness') void publishReadiness();
           } catch { console.log('WebView message:', e.nativeEvent.data); }
         }}
         onLoadStart={() => {
@@ -146,6 +193,7 @@ function AppContent() {
           console.log('WebView load ended:', e.nativeEvent.url);
           pushInsets();
           checkBackend();
+          void publishReadiness();
         }}
         onContentProcessDidTerminate={() => {
           console.error('WebView process terminated');
@@ -156,6 +204,11 @@ function AppContent() {
         <View style={[styles.backendBanner, { top: insets.top + 8, left: insets.left + 12, right: insets.right + 12 }]}>
           <Text style={styles.backendBannerText}>Backend unavailable · server-backed features cannot sync</Text>
           <Pressable accessibilityRole="button" onPress={checkBackend}><Text style={styles.retryText}>Retry backend check</Text></Pressable>
+        </View>
+      )}
+      {loadedAddress && !error && readiness?.cameraPermission === 'denied' && (
+        <View style={[styles.permissionBanner, { top: insets.top + 62, left: insets.left + 12, right: insets.right + 12 }]}>
+          <Text style={styles.permissionText}>Camera permission is blocked. Enable it in Android settings to use camera features.</Text>
         </View>
       )}
       {error && (
@@ -276,4 +329,15 @@ const styles = StyleSheet.create({
   },
   backendBannerText: { flex: 1, color: '#624b16', fontSize: 12, fontWeight: '600' },
   retryText: { color: '#26743a', fontSize: 12, fontWeight: '700' },
+  permissionBanner: {
+    position: 'absolute',
+    minHeight: 40,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 12,
+    backgroundColor: '#ffe4e4',
+    borderWidth: 1,
+    borderColor: '#efb3b3',
+  },
+  permissionText: { color: '#7b2525', fontSize: 12, fontWeight: '600' },
 });
