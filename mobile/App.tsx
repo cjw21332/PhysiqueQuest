@@ -44,6 +44,10 @@ function buildInsetsScript(insets: { top: number; bottom: number; left: number; 
   }catch(e){}})();true;`;
 }
 
+function buildBackendCheckScript() {
+  return `(function(){fetch(window.location.protocol+'//'+window.location.hostname+':4000/api',{credentials:'include'}).then(function(r){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:r.ok,status:r.status}));}).catch(function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:false}));});})();true;`;
+}
+
 function AppContent() {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView>(null);
@@ -53,6 +57,7 @@ function AppContent() {
   const [loadedAddress, setLoadedAddress] = useState(inferredAddress);
   const [error, setError] = useState(!inferredAddress);
   const [key, setKey] = useState(0);
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
   const insetScript = useMemo(
     () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }),
@@ -62,6 +67,11 @@ function AppContent() {
   const pushInsets = useCallback(() => {
     webRef.current?.injectJavaScript(insetScript);
   }, [insetScript]);
+
+  const checkBackend = useCallback(() => {
+    setBackendStatus('checking');
+    webRef.current?.injectJavaScript(buildBackendCheckScript());
+  }, []);
 
   const connect = () => {
     const normalized = address.trim().replace(/\/$/, '');
@@ -73,6 +83,7 @@ function AppContent() {
     setAddress(withProtocol);
     setLoadedAddress(withProtocol);
     setError(false);
+    setBackendStatus('checking');
     setKey(c => c + 1);
     Keyboard.dismiss();
   };
@@ -123,7 +134,10 @@ function AppContent() {
           if (e.nativeEvent.statusCode >= 500) setError(true);
         }}
         onMessage={(e) => {
-          console.log('WebView message:', e.nativeEvent.data);
+          try {
+            const message = JSON.parse(e.nativeEvent.data) as { type?: string; ok?: boolean };
+            if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
+          } catch { console.log('WebView message:', e.nativeEvent.data); }
         }}
         onLoadStart={() => {
           console.log('WebView load started:', loadedAddress);
@@ -131,12 +145,19 @@ function AppContent() {
         onLoadEnd={(e) => {
           console.log('WebView load ended:', e.nativeEvent.url);
           pushInsets();
+          checkBackend();
         }}
         onContentProcessDidTerminate={() => {
           console.error('WebView process terminated');
           setError(true);
         }}
       /> : null}
+      {loadedAddress && !error && backendStatus === 'offline' && (
+        <View style={[styles.backendBanner, { top: insets.top + 8, left: insets.left + 12, right: insets.right + 12 }]}>
+          <Text style={styles.backendBannerText}>Backend unavailable · server-backed features cannot sync</Text>
+          <Pressable accessibilityRole="button" onPress={checkBackend}><Text style={styles.retryText}>Retry backend check</Text></Pressable>
+        </View>
+      )}
       {error && (
         <View
           style={[
@@ -239,4 +260,20 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: '#173c1f', fontWeight: '700' },
   hint: { marginTop: 12, color: '#718096' },
+  backendBanner: {
+    position: 'absolute',
+    minHeight: 44,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 12,
+    backgroundColor: '#fff4d6',
+    borderWidth: 1,
+    borderColor: '#f0d28a',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  backendBannerText: { flex: 1, color: '#624b16', fontSize: 12, fontWeight: '600' },
+  retryText: { color: '#26743a', fontSize: 12, fontWeight: '700' },
 });

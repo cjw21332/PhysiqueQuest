@@ -1,18 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function LaunchPage() {
-  const router = useRouter();
   const [notice, setNotice] = useState('');
-  const handleGetStarted = () => {
-    router.push('/register');
-  };
-
-  const handleLogin = () => {
-    router.push('/login');
-  };
 
   return (
     <main className="scene">
@@ -60,12 +51,12 @@ export default function LaunchPage() {
             </div>
           </div>
           <div className="launch-actions">
-            <button className="primary" onClick={handleGetStarted}>
+            <a className="primary" href="/register">
               Get started
-            </button>
-            <button className="secondary" onClick={handleLogin}>
+            </a>
+            <a className="secondary" href="/login">
               I already have an account
-            </button>
+            </a>
           </div>
         </section>
         {notice && (

@@ -84,6 +84,9 @@ h3{line-height:1.3}
 .allow{margin-left:auto;border:0;background:white;border-radius:20px;padding:8px 13px;font-weight:700;color:var(--ink);cursor:pointer}
 .launch-actions{width:100%;display:grid;gap:9px;margin-top:clamp(16px,2.5vh,28px)}
 .primary,.secondary{
+  display:flex;
+  align-items:center;
+  justify-content:center;
   width:100%;
   min-height:clamp(48px,8vh,62px);
   border:0;
@@ -93,6 +96,8 @@ h3{line-height:1.3}
   font-size:clamp(13px,2vw,16px);
   font-weight:700;
   cursor:pointer;
+  text-align:center;
+  text-decoration:none;
   transition:filter .2s,transform .2s;
 }
 @media(prefers-reduced-motion:reduce){

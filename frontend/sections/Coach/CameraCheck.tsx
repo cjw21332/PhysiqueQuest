@@ -7,7 +7,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
   const [mode, setMode] = useState<'live' | 'upload'>('live');
   const [fileUrl, setFileUrl] = useState('');
   const [fileName, setFileName] = useState('');
-  const [cameraMessage, setCameraMessage] = useState('Camera preview is a demo until camera tracking is connected.');
+  const [cameraMessage, setCameraMessage] = useState('Live pose tracking is unavailable in this build. Camera access only shows a local preview.');
   const [cameraOn, setCameraOn] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -19,8 +19,8 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
       streamRef.current = stream;
       setCameraOn(true);
       if (videoRef.current) videoRef.current.srcObject = stream;
-      setCameraMessage('Camera ready · keep your full body in frame.');
-    } catch { setCameraMessage('Camera access was not available. You can continue with the demo preview or upload a video.'); }
+      setCameraMessage('Camera preview is ready. Pose detection is not connected, so no form results will be reported.');
+    } catch { setCameraMessage('Camera access was not available. Upload a recorded video or log the workout manually.'); }
   };
   const switchToUpload = () => { streamRef.current?.getTracks().forEach(track => track.stop()); streamRef.current = null; setCameraOn(false); setMode('upload'); };
 
@@ -53,22 +53,20 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
                 <i className="person-leg right"/>
               </div>
             )}
-            <span className="distance-pill">
-              <i/> Distance 2.7 m · in range
-            </span>
           </div>
 
           <div className="readiness-list">
             <div className="section-head">
               <h3>Readiness checks</h3>
-              <small>4 of 4</small>
+              <small>Unavailable</small>
             </div>
-            <Check label="Full body in frame" value="Detected"/>
-            <Check label="Lighting" value="Sufficient"/>
+            <p className="scan-warning">Live pose tracking is unavailable. Full-body framing, lighting, distance, and form scores cannot be verified.</p>
           </div>
 
+          <p className="scan-warning" role="status">{cameraMessage}</p>
+
           <footer className="coach-footer">
-            <button className="primary" onClick={onStart}>Start session</button>
+            <button className="secondary" onClick={switchToUpload}>Upload a video instead</button>
           </footer>
         </>
       ) : (
@@ -78,7 +76,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
               <>
                 <video src={fileUrl} controls/>
                 <b>{fileName}</b>
-                <small>Video stays on this device in this prototype.</small>
+                <small>Video is previewed locally. Pose analysis is unavailable; use it as a reference for manual logging.</small>
                 <button className="quiet-link" onClick={() => { URL.revokeObjectURL(fileUrl); setFileUrl(''); setFileName(''); }}>
                   Choose a different video
                 </button>
@@ -96,7 +94,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
 
           <footer className="coach-footer">
             {fileUrl ? (
-              <button className="primary" onClick={onStart}>Start session</button>
+              <button className="primary" onClick={onStart}>Start manual session</button>
             ) : (
               <label className="primary choose-video">
                 Choose a video
@@ -110,4 +108,3 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
   );
 }
 
-function Check({ label, value }: { label: string; value: string }) { return <div className="readiness-check"><span><i><Icon name="check" size={11}/></i>{label}</span><small>{value}</small></div>; }

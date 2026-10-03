@@ -3,11 +3,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
-test('progress keeps local metric selection', async () => {
+test('progress reads server activity and does not fabricate measurements', async () => {
   const file = await source('sections/Home/Progress.tsx');
-  assert.match(file, /useState\('Weight'\)/);
-  assert.match(file, /onClick=\{\(\) => setMetric\(option\)\}/);
-  assert.match(file, /const data = series\[metric\]/);
+  assert.match(file, /useActivity/);
+  assert.doesNotMatch(file, /const series/);
+  assert.doesNotMatch(file, /68\.5/);
+  assert.match(file, /No progress measurements yet/);
 });
 
 test('notifications keep readable state updates', async () => {
@@ -47,4 +48,30 @@ test('quests and notifications use server-backed state', async () => {
   assert.doesNotMatch(quests, /localStorage\.getItem\('physiquequest-quests'\)/);
   assert.match(notifications, /useNotifications/);
   assert.doesNotMatch(notifications, /const initial = \[/);
+});
+
+test('camera and scan capabilities never present fabricated AI results', async () => {
+  const camera = await source('sections/Coach/CameraCheck.tsx');
+  const review = await source('sections/Scan/ReviewEstimate.tsx');
+  assert.match(camera, /Live pose tracking is unavailable/);
+  assert.doesNotMatch(camera, /Distance 2\.7 m · in range/);
+  assert.doesNotMatch(camera, /value="Detected"/);
+  assert.match(review, /Image analysis is unavailable/);
+  assert.doesNotMatch(review, /Grilled chicken breast/);
+  assert.doesNotMatch(review, /Estimated macros · sample values/);
+});
+
+test('coach plan does not present invented workouts or AI tracking', async () => {
+  const file = await source('sections/Coach/CoachPlan.tsx');
+  assert.match(file, /useActivity/);
+  assert.doesNotMatch(file, /Week 3 · 4 sessions planned/);
+  assert.doesNotMatch(file, /AI tracked/);
+  assert.match(file, /No workout plan saved yet/);
+});
+
+test('native wrapper reports backend connectivity and can retry it', async () => {
+  const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
+  assert.match(mobile, /backend-status/);
+  assert.match(mobile, /Retry backend check/);
+  assert.match(mobile, /injectJavaScript/);
 });
