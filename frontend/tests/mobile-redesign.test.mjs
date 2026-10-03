@@ -92,6 +92,7 @@ test('Expo shell uses native readiness APIs and bridges camera permission', asyn
   assert.match(mobile, /expo-device/);
   assert.match(mobile, /expo-camera/);
   assert.match(mobile, /@react-native-community\/netinfo/);
+  assert.match(mobile, /expo-network/);
   assert.match(mobile, /requestCameraPermissionsAsync/);
   assert.match(mobile, /osName/);
   assert.match(mobile, /osVersion/);

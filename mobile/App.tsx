@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import { Camera } from 'expo-camera';
 import * as Device from 'expo-device';
+import * as Network from 'expo-network';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
@@ -94,17 +95,30 @@ function AppContent() {
   }, []);
 
   const collectReadiness = useCallback(async () => {
-    const network = await NetInfo.fetch();
-    const camera = await Camera.getCameraPermissionsAsync();
-    const details = network.details as { linkSpeed?: number | null } | null;
+    const network = await Network.getNetworkStateAsync();
+    let wifiSpeedMbps: number | null = null;
+    try {
+      const netInfo = await NetInfo.fetch();
+      const details = netInfo.details as { linkSpeed?: number | null } | null;
+      wifiSpeedMbps = typeof details?.linkSpeed === 'number' ? details.linkSpeed : null;
+    } catch (error) {
+      console.warn('Wi-Fi link speed is unavailable in this Expo runtime:', error);
+    }
+    let cameraPermission = 'unavailable';
+    try {
+      const camera = await Camera.getCameraPermissionsAsync();
+      cameraPermission = camera.status;
+    } catch (error) {
+      console.warn('Camera permission status is unavailable in this Expo runtime:', error);
+    }
     const next: DeviceReadiness = {
       platform: Platform.OS,
       osName: Device.osName ?? Platform.OS,
       osVersion: Device.osVersion ?? (Platform.OS === 'android' ? String(Platform.Version) : null),
-      networkType: network.type,
-      wifiConnected: network.type === 'wifi' && network.isConnected === true,
-      wifiSpeedMbps: typeof details?.linkSpeed === 'number' ? details.linkSpeed : null,
-      cameraPermission: camera.status,
+      networkType: network.type ?? 'unknown',
+      wifiConnected: network.type === Network.NetworkStateType.WIFI && network.isConnected === true,
+      wifiSpeedMbps,
+      cameraPermission,
     };
     setReadiness(next);
     return next;
@@ -116,7 +130,11 @@ function AppContent() {
   }, [collectReadiness]);
 
   const requestCameraPermission = useCallback(async () => {
-    await Camera.requestCameraPermissionsAsync();
+    try {
+      await Camera.requestCameraPermissionsAsync();
+    } catch (error) {
+      console.warn('Camera permission request failed:', error);
+    }
     await publishReadiness();
   }, [publishReadiness]);
 
