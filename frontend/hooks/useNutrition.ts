@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { api } from '../lib/api';
+import { api, type ScannedItem } from '../lib/api';
 import type { FoodEntry, MealName } from '../sections/Scan/types';
 
 type ServerNutrition = { meals: FoodEntry[]; water: { date: string; glasses: number }[] };
@@ -32,6 +32,9 @@ export function useNutrition() {
   const addMeal = useCallback(async (meal: Omit<FoodEntry, 'id' | 'date'>) => {
     const next = mapState(await api.addMeal(meal)); setMeals(next.meals); setWaterState(next.water);
   }, []);
+  const addMealsFromScan = useCallback(async (payload: { items: ScannedItem[]; meal: MealName }) => {
+    const next = mapState(await api.addMealsFromScan(payload)); setMeals(next.meals); setWaterState(next.water);
+  }, []);
   const updateMeal = useCallback(async (id: string, meal: Partial<FoodEntry>) => {
     const next = mapState(await api.updateMeal(id, meal)); setMeals(next.meals); setWaterState(next.water);
   }, []);
@@ -42,5 +45,5 @@ export function useNutrition() {
     const next = mapState(await api.setWater({ date: today(), glasses })); setMeals(next.meals); setWaterState(next.water);
   }, []);
 
-  return { meals, water, loading, error, refresh, addMeal, updateMeal, deleteMeal, setWater };
+  return { meals, water, loading, error, refresh, addMeal, addMealsFromScan, updateMeal, deleteMeal, setWater };
 }

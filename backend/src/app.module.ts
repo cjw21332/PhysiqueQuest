@@ -10,6 +10,7 @@ import { NutritionModule } from './nutrition/nutrition.module.js';
 import { SettingsModule } from './settings/settings.module.js';
 import { ActivityModule } from './activity/activity.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
+import { FoodScanModule } from './foodscan/foodscan.module.js';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NotificationsModule } from './notifications/notifications.module.js';
     SettingsModule,
     ActivityModule,
     NotificationsModule,
+    FoodScanModule,
   ],
   controllers: [AppController],
   providers: [AppService],

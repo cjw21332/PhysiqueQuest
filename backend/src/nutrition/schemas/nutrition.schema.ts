@@ -16,6 +16,16 @@ export class MealEntry {
   @Prop({ default: 0, min: 0 }) carbs: number;
   @Prop({ default: 0, min: 0 }) fat: number;
   @Prop({ required: true }) date: string;
+
+  // Provenance for meals written by POST /api/nutrition/meals/from-scan. All
+  // optional, so documents written before scanning existed stay valid and no
+  // migration is required.
+  /** USDA FoodData Central identifier, when the item matched a record. */
+  @Prop({ min: 1 }) fdcId?: number;
+  /** Vision model confidence in the identification, 0 to 1. */
+  @Prop({ min: 0, max: 1 }) confidence?: number;
+  /** Estimated edible weight the macros were scaled to, in grams. */
+  @Prop({ min: 0 }) estWeightG?: number;
 }
 
 @Schema({ _id: false })

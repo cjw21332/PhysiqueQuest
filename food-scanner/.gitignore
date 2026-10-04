@@ -1,0 +1,21 @@
+node_modules/
+dist/
+*.log
+
+# secrets
+.env
+.env.local
+.env.*.local
+
+# TLS material for the optional nginx listener
+docker/certs/*
+!docker/certs/README.md
+
+# local database, unused since meal persistence moved to the main backend
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# os / editor
+.DS_Store
+Thumbs.db

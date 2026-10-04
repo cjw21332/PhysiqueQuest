@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { randomUUID } from 'node:crypto';
-import { MealDto, WaterDto } from './dto/nutrition.dto.js';
+import { MealDto, MealFromScanDto, WaterDto } from './dto/nutrition.dto.js';
 import { Nutrition, type NutritionDocument } from './schemas/nutrition.schema.js';
 
 @Injectable()
@@ -50,5 +50,46 @@ export class NutritionService {
     if (existing) existing.glasses = dto.glasses;
     else current.water.push(dto);
     return current.save();
+  }
+
+  /**
+   * Writes one meal row per item a scan actually priced.
+   *
+   * Items with `found: false` carry no USDA match and therefore no meaningful
+   * macros, so they are skipped rather than stored as a zero-calorie meal. If
+   * that leaves nothing to write the whole request is rejected: silently
+   * recording an empty meal would look like a successful save.
+   */
+  async addMealsFromScan(userId: string, dto: MealFromScanDto): Promise<NutritionDocument> {
+    const matched = dto.items.filter((item) => item.found);
+    if (matched.length === 0) {
+      throw new BadRequestException('None of the scanned items matched a nutrition record');
+    }
+
+    const date = dto.date || new Date().toISOString().slice(0, 10);
+    const meals = matched.map((item) => ({
+      id: randomUUID(),
+      name: item.food_name,
+      meal: dto.meal,
+      calories: item.kcal,
+      detail: item.description ?? '',
+      time: dto.time ?? '',
+      source: 'Scanned',
+      protein: item.protein_g,
+      carbs: item.carbs_g,
+      fat: item.fat_g,
+      date,
+      // Spread conditionally so an unmatched optional field is absent from the
+      // document rather than persisted as an explicit null.
+      ...(item.fdc_id === undefined ? {} : { fdcId: item.fdc_id }),
+      ...(item.confidence === undefined ? {} : { confidence: item.confidence }),
+      ...(item.est_weight_g === undefined ? {} : { estWeightG: item.est_weight_g }),
+    }));
+
+    return this.model.findOneAndUpdate(
+      { userId: new Types.ObjectId(userId) },
+      { $push: { meals: { $each: meals } } },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+    );
   }
 }

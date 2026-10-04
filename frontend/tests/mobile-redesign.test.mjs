@@ -54,12 +54,43 @@ test('quests and notifications use server-backed state', async () => {
 test('camera and scan capabilities never present fabricated AI results', async () => {
   const camera = await source('sections/Coach/CameraCheck.tsx');
   const review = await source('sections/Scan/ReviewEstimate.tsx');
+  const scan = await source('sections/Scan/ScanSection.tsx');
   assert.match(camera, /Live pose tracking is unavailable/);
   assert.doesNotMatch(camera, /Distance 2\.7 m · in range/);
   assert.doesNotMatch(camera, /value="Detected"/);
-  assert.match(review, /Image analysis is unavailable/);
+  // The review screen must show what the scan endpoint returned, never a
+  // hardcoded stand-in for a result that was never requested.
+  assert.match(scan, /analyzeImage/);
+  assert.match(scan, /addMealsFromScan/);
+  assert.doesNotMatch(review, /Image analysis is unavailable/);
+  assert.doesNotMatch(scan, /Grilled chicken rice bowl/);
   assert.doesNotMatch(review, /Grilled chicken breast/);
   assert.doesNotMatch(review, /Estimated macros · sample values/);
+});
+
+test('a scan waits visibly, then offers a retry once it hits the limit', async () => {
+  const api = await source('lib/api.ts');
+  const review = await source('sections/Scan/ReviewEstimate.tsx');
+  const scan = await source('sections/Scan/ScanSection.tsx');
+
+  // The give-up point must be a real enforced deadline, not a label: an
+  // unbounded fetch leaves the screen spinning forever on a dropped request.
+  assert.match(api, /SCAN_TIMEOUT_MS = 60_000/);
+  assert.match(api, /AbortController/);
+  assert.match(api, /timeoutMs/);
+  assert.match(api, /ApiTimeoutError/);
+
+  // Progress is shown, not implied, and the timer is cleaned up per attempt.
+  assert.match(review, /setInterval/);
+  assert.match(review, /clearInterval/);
+  assert.match(review, /Waiting for the result/);
+  assert.match(review, /SCAN_TIMEOUT_MS/);
+
+  // A timeout is reported as a timeout, and recovery stays a deliberate tap
+  // rather than an automatic resend that would stack scans on the provider.
+  assert.match(scan, /ApiTimeoutError/);
+  assert.match(review, /Try again/);
+  assert.doesNotMatch(scan, /setTimeout\(.*analyse/);
 });
 
 test('coach plan restores the legacy workout dashboard', async () => {
@@ -108,4 +139,17 @@ test('authenticated navigation uses full document navigation in WebView', async 
   assert.match(login, /navigate\('\/home'\)/);
   assert.match(register, /navigate\('\/home'\)/);
   assert.doesNotMatch(bottomNav, /router\.push\(path\)/);
+});
+
+test('scan errors keep the backend message instead of a generic fallback', async () => {
+  const api = await source('lib/api.ts');
+  const scan = await source('sections/Scan/ScanSection.tsx');
+  // AppError bodies nest the payload under `error`, so reading message/code off
+  // the top level silently produced 'An error occurred' for every failure.
+  assert.match(api, /typeof nested === 'object'/);
+  assert.match(api, /throw new ApiRequestError\(message, response\.status, error\.code\)/);
+  assert.doesNotMatch(api, /'An error occurred'/);
+  // An upstream timeout is the provider being slow, not a bad photo.
+  assert.match(scan, /err\.statusCode===504/);
+  assert.match(scan, /UPSTREAM_TIMEOUT/);
 });
