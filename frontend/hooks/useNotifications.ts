@@ -8,7 +8,7 @@ export function useNotifications() {
   const [error, setError] = useState('');
   const refresh = useCallback(async () => { setLoading(true); setError(''); try { const result = await api.getNotifications(); setItems(result.items ?? []); } catch (err) { setError(err instanceof Error ? err.message : 'Could not load notifications.'); } finally { setLoading(false); } }, []);
   useEffect(() => { void refresh(); }, [refresh]);
-  const markRead = useCallback(async (id: string) => { const result = await api.markNotification(id, false); setItems(result.items ?? []); }, []);
-  const markAllRead = useCallback(async () => { const result = await api.markAllNotifications(); setItems(result.items ?? []); }, []);
+  const markRead = useCallback(async (id: string) => { setError(''); try { const result = await api.markNotification(id, false); setItems(result.items ?? []); } catch (err) { setError(err instanceof Error ? err.message : 'Could not update notification.'); } }, []);
+  const markAllRead = useCallback(async () => { setError(''); try { const result = await api.markAllNotifications(); setItems(result.items ?? []); } catch (err) { setError(err instanceof Error ? err.message : 'Could not update notifications.'); } }, []);
   return { items, loading, error, refresh, markRead, markAllRead };
 }

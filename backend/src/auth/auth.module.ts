@@ -8,10 +8,13 @@ import { AuthService } from './auth.service.js';
 import { User, UserSchema } from './schemas/user.schema.js';
 import { JwtStrategy } from './jwt.strategy.js';
 import type { SignOptions } from 'jsonwebtoken';
+import { RecoveryToken, RecoveryTokenSchema } from './recovery-token.schema.js';
+import { PasswordRecoveryService } from './password-recovery.service.js';
+import { EmailDeliveryProvider } from '../providers/email-delivery.provider.js';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: RecoveryToken.name, schema: RecoveryTokenSchema }]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -25,7 +28,7 @@ import type { SignOptions } from 'jsonwebtoken';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  providers: [AuthService, JwtStrategy, PasswordRecoveryService, EmailDeliveryProvider],
+  exports: [AuthService, PasswordRecoveryService],
 })
 export class AuthModule {}

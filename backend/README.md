@@ -25,6 +25,71 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Food scanning
+
+`POST /api/nutrition/scan` runs a photo of a meal through a vision model to
+identify the food, then prices each identified item against USDA FoodData
+Central. All three scanner routes require a valid JWT, like the rest of the API.
+
+| Route | Purpose |
+| --- | --- |
+| `POST /api/nutrition/scan` | Analyse a base64 image. Returns one entry per detected item with macros scaled to the estimated weight, plus `totals` and `unmatched`. |
+| `GET /api/nutrition/foods/search?q=` | Search USDA for a single food by name. |
+| `GET /api/nutrition/foods/:fdcId` | Fetch per-100 g macros for one USDA record. |
+| `POST /api/nutrition/meals/from-scan` | Save a scan result. Writes one meal row per item that matched a nutrition record. |
+
+The request and response bodies use `snake_case` and the `items` array from a
+scan can be posted straight back to `meals/from-scan` without remapping:
+
+```bash
+curl -X POST /api/nutrition/scan -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"image":"<base64 png or jpeg>"}'
+
+curl -X POST /api/nutrition/meals/from-scan -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"meal":"Lunch","items":[ ... ]}'
+```
+
+Items with `"found": false` matched no USDA record and are skipped rather than
+saved as zero-calorie meals. A request where nothing matched is rejected.
+
+Scanner errors use a structured envelope rather than Nest's default body:
+
+```json
+{ "error": { "code": "UPSTREAM_TIMEOUT", "message": "…", "request_id": "…" } }
+```
+
+Codes: `INVALID_REQUEST` (400), `UNAUTHENTICATED` (401), `NOT_FOUND` (404),
+`PAYLOAD_TOO_LARGE` (413), `UNSUPPORTED_MEDIA_TYPE` (415), `RATE_LIMITED` (429),
+`INTERNAL` (500), `UPSTREAM_UNAVAILABLE` (502), `SERVICE_UNAVAILABLE` (503),
+`UPSTREAM_TIMEOUT` (504). Every response echoes an `x-request-id` header; send
+your own to correlate the call with these logs.
+
+The Gemini and USDA keys are both optional. Without them the process still
+boots and every other route keeps working; the scanner answers 503. See
+`.env.example` for the full list of variables.
+
+Two of those variables are worth knowing about when a scan is slow or fails:
+
+- `GEMINI_THINKING_LEVEL` (default `LOW`) caps how much the model deliberates.
+  Under a structured-output schema the unset level took about 9s per scan and
+  overran `FOODSCAN_UPSTREAM_TIMEOUT_MS`, which surfaced as a 504 on a request
+  that would otherwise have succeeded. `LOW` answers in roughly 4s.
+- `GEMINI_ATTEMPTS` (default `3`) bounds retries. The provider intermittently
+  answers 503 while a model is under load, and only that case is retried; an
+  exhausted quota or a timeout is reported immediately rather than spending more
+  of the caller's budget.
+
+`FOODSCAN_REQUEST_TIMEOUT_MS` (default 25s) bounds a whole scan and is
+deliberately far below the 60s the mobile client waits before offering a retry.
+Keep it that way: a longer server deadline means the user abandons a request the
+server is still working on, so the vision provider is still charged for a result
+nobody sees, and an immediate retry starts a second scan alongside the first.
+Raising the client cap instead means raising this too. `FOODSCAN_UPSTREAM_TIMEOUT_MS`
+(default 20s) caps any single vision call, so a slow provider is reported as a
+timeout rather than holding the request open until the deadline.
+
 ## Project setup
 
 ```bash
@@ -104,6 +169,25 @@ Check out a few resources that may come in handy when working with NestJS:
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
 ## Stay in touch
+
+## Admin access
+
+New accounts receive the `user` role. Admin routes require the role stored on the authenticated MongoDB user record; a client cannot grant itself access by changing a request or token. Provision only a trusted account using a database administrator connection:
+
+```javascript
+db.users.updateOne(
+  { email: "trusted-admin@example.com" },
+  { $set: { role: "admin" } }
+)
+```
+
+The user must sign in again before the app shows the admin tools. To revoke access, set `role` back to `user`.
+
+## Password reset email
+
+Password reset tokens are one-time, expire after 30 minutes, and are stored only as hashes. Delivery stays unavailable until `EMAIL_DELIVERY_URL` and `EMAIL_DELIVERY_API_KEY` are set in `backend/.env`. The configured server endpoint receives a JSON payload with `template: "password-reset"`, recipient, token, and expiry minutes, and must return a successful HTTP response only after accepting delivery. These values and reset tokens must never be put in frontend or Expo environment variables.
+
+Emergency alert delivery and pose analysis also stay unavailable until their corresponding `ALERT_DELIVERY_URL`/`ALERT_DELIVERY_API_KEY` or `POSE_ANALYSIS_URL`/`POSE_ANALYSIS_API_KEY` pair is configured. Alert delivery must return HTTP success only after accepting the idempotency key. Pose analysis accepts base64 video/image metadata on the backend and expects `{ "analysis": { ... } }` in the provider response. Credentials are read only by the backend.
 
 - Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
 - Website - [https://nestjs.com](https://nestjs.com/)

@@ -3,13 +3,17 @@
 import { Icon } from '../Home/icons';
 import { mealNames, type FoodEntry, type MealName } from './types';
 
+const calorieTarget = 2300;
+const macroTargets = { Protein: 140, Carbs: 240, Fats: 70 };
+const ringCircumference = 2 * Math.PI * 43;
+
 export default function NutritionDashboard({
   meals,
   water,
   onScan,
   onAdd,
   onLogs,
-  onHistory
+  onHistory,
 }: {
   meals: FoodEntry[];
   water: number;
@@ -22,189 +26,98 @@ export default function NutritionDashboard({
   const protein = meals.reduce((sum, item) => sum + item.protein, 0);
   const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
   const fats = meals.reduce((sum, item) => sum + item.fat, 0);
-
-  const remaining = Math.max(0, 2300 - calories);
+  const calorieProgress = Math.min(100, Math.max(0, (calories / calorieTarget) * 100));
 
   return (
-    <div className="nutrition-dashboard">
-      {/* Header */}
-      <header className="nutrition-header">
-        <h2 className="nutrition-title">Nutrition</h2>
-        <button
-          className="manual-entry-btn"
-          onClick={() => onAdd('Dinner')}
-        >
-          ＋ Manual entry
+    <div className="scan-dashboard">
+      <header className="scan-dashboard-header">
+        <h1>Nutrition</h1>
+        <button type="button" className="scan-dashboard-manual" onClick={() => onAdd('Dinner')}>
+          <span aria-hidden="true">＋</span> Manual entry
         </button>
       </header>
 
-      {/* Nutrition Overview Card */}
-      <div className="nutrition-card">
-        <div className="nutrition-card-left">
-          <div className="calorie-display">
-            <svg className="calorie-circle-svg" viewBox="0 0 100 100" aria-hidden="true">
-              <circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="#eef0ee"
-                strokeWidth="8"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="#7ee582"
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray="264"
-                strokeDashoffset={264 - (264 * calories) / 2300}
-                transform="rotate(-90 50 50)"
-              />
-            </svg>
-            <div className="calorie-center">
-              <div className="calorie-value">{calories.toLocaleString()}</div>
-              <div className="calorie-label">of 2,300 kcal</div>
-            </div>
-          </div>
+      <section className="scan-dashboard-summary" aria-label="Today's nutrition">
+        <div className="scan-dashboard-calorie-ring" role="img" aria-label={`${Math.round(calories)} of ${calorieTarget} calories today`}>
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle className="scan-ring-track" cx="50" cy="50" r="43" />
+            <circle
+              className="scan-ring-progress"
+              cx="50"
+              cy="50"
+              r="43"
+              strokeDasharray={ringCircumference}
+              strokeDashoffset={ringCircumference * (1 - calorieProgress / 100)}
+            />
+          </svg>
+          <span className="scan-ring-value">{Math.round(calories).toLocaleString()}</span>
+          <span className="scan-ring-target">of {calorieTarget.toLocaleString()} kcal</span>
         </div>
 
-        <div className="macro-details">
-          <div className="remaining-cals">
-            <strong>{remaining.toLocaleString()} kcal</strong> remaining
-          </div>
-          <div className="macros-container">
-            <MacroBar label="Protein" current={Math.round(protein)} target={140} unit="g" />
-            <MacroBar label="Carbs" current={Math.round(carbs)} target={240} unit="g" />
-            <MacroBar label="Fats" current={Math.round(fats)} target={70} unit="g" />
-          </div>
+        <div className="scan-dashboard-macros">
+          <p className="scan-calories-remaining">
+            <strong>{Math.max(0, Math.round(calorieTarget - calories)).toLocaleString()} kcal</strong> remaining
+          </p>
+          <MacroBar label="Protein" current={protein} target={macroTargets.Protein} />
+          <MacroBar label="Carbs" current={carbs} target={macroTargets.Carbs} />
+          <MacroBar label="Fats" current={fats} target={macroTargets.Fats} />
         </div>
-      </div>
+      </section>
 
-      {/* Scan Meal CTA */}
-      <button className="scan-cta" onClick={onScan}>
-        <div className="scan-icon-box">
-          <Icon name="scan" size={24} />
-        </div>
-        <div className="scan-text">
-          <div className="scan-title">Scan your meal</div>
-          <div className="scan-subtitle">
-            Snap your plate — we'll estimate the macros
-          </div>
-        </div>
+      <button type="button" className="scan-dashboard-scan" onClick={onScan}>
+        <span className="scan-dashboard-scan-icon"><Icon name="scan" size={22} /></span>
+        <span className="scan-dashboard-scan-copy">
+          <strong>Scan your meal</strong>
+          <small>Snap your plate — we&apos;ll estimate the macros</small>
+        </span>
         <Icon name="arrow" size={18} />
       </button>
 
-      {/* Today's Meals */}
-      <section className="meals-section">
-        <h3 className="section-heading">Today's meals</h3>
-        <div className="meals-list">
+      <section className="scan-dashboard-meals" aria-labelledby="scan-today-heading">
+        <h2 id="scan-today-heading">Today&apos;s meals</h2>
+        <div className="scan-dashboard-meal-list">
           {mealNames.map((mealName) => {
             const entries = meals.filter((item) => item.meal === mealName);
-            const totalCals = entries.reduce((sum, item) => sum + item.calories, 0);
-            const totalProtein = entries.reduce((sum, item) => sum + item.protein, 0);
-            const hasEntries = entries.length > 0;
-
+            const mealCalories = entries.reduce((sum, item) => sum + item.calories, 0);
+            const detail = entries.map((item) => item.detail || item.name).join(' · ');
             return (
-              <div key={mealName} className="meal-card">
-                <div className="meal-card-header">
-                  <div className="meal-card-title">
-                    <h4 className="meal-name">{mealName}</h4>
-                    {hasEntries && (
-                      <div className="meal-stats">
-                        <span className="meal-calories">{totalCals} kcal</span>
-                        <span className="meal-protein">P: {Math.round(totalProtein)}g</span>
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    className="add-meal-btn"
-                    onClick={() => onAdd(mealName)}
-                    aria-label={`Add food to ${mealName}`}
-                  >
-                    ＋
-                  </button>
+              <article className="scan-dashboard-meal" key={mealName}>
+                <div className="scan-dashboard-meal-head">
+                  <h3>{mealName}</h3>
+                  <span>{entries.length ? `${Math.round(mealCalories).toLocaleString()} kcal` : 'Not logged'}</span>
+                  <button type="button" onClick={() => onAdd(mealName)} aria-label={`Add food to ${mealName}`}>＋</button>
                 </div>
-                <div className="meal-card-body">
-                  {hasEntries ? (
-                    <div className="meal-entries">
-                      {entries.map((entry) => (
-                        <div key={entry.id} className="meal-entry-item">
-                          <span className="entry-name">{entry.name}</span>
-                          <span className="entry-detail">{entry.detail}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="meal-placeholder">
-                      Add what you ate to stay on target
-                    </div>
-                  )}
-                </div>
-              </div>
+                <p>{entries.length ? detail : 'Add what you ate to stay on target'}</p>
+              </article>
             );
           })}
         </div>
       </section>
 
-      {/* More Section */}
-      <section className="more-section">
-        <h3 className="section-heading">More</h3>
-        <div className="more-list">
-          <button className="more-item" onClick={onLogs}>
-            <div className="more-icon more-icon-water">
-              <Icon name="water" size={20} />
-            </div>
-            <div className="more-content">
-              <div className="more-title">Log & water intake</div>
-              <div className="more-subtitle">{water} of 8 glasses today</div>
-            </div>
-            <Icon name="arrow" size={16} />
-          </button>
-          <button className="more-item" onClick={onHistory}>
-            <div className="more-icon more-icon-history">
-              <Icon name="trend" size={20} />
-            </div>
-            <div className="more-content">
-              <div className="more-title">Food history</div>
-              <div className="more-subtitle">7-day average · 1,947 kcal</div>
-            </div>
-            <Icon name="arrow" size={16} />
-          </button>
-        </div>
+      <section className="scan-dashboard-more" aria-labelledby="scan-more-heading">
+        <h2 id="scan-more-heading">More</h2>
+        <button type="button" className="scan-dashboard-link" onClick={onLogs}>
+          <span className="scan-dashboard-link-icon water"><Icon name="water" size={19} /></span>
+          <span><strong>Log &amp; water intake</strong><small>{water} of 8 glasses today</small></span>
+          <Icon name="arrow" size={16} />
+        </button>
+        <button type="button" className="scan-dashboard-link" onClick={onHistory}>
+          <span className="scan-dashboard-link-icon history"><Icon name="trend" size={19} /></span>
+          <span><strong>Food history</strong><small>Review your saved meals</small></span>
+          <Icon name="arrow" size={16} />
+        </button>
       </section>
     </div>
   );
 }
 
-function MacroBar({
-  label,
-  current,
-  target,
-  unit
-}: {
-  label: string;
-  current: number;
-  target: number;
-  unit: string;
-}) {
-  const percentage = Math.min(100, (current / target) * 100);
-
+function MacroBar({ label, current, target }: { label: string; current: number; target: number }) {
+  const progress = Math.min(100, Math.max(0, (current / target) * 100));
   return (
-    <div className="macro-row">
-      <div className="macro-info">
-        <span className="macro-name">{label}</span>
-        <span className="macro-values">
-          {current} / {target} {unit}
-        </span>
-      </div>
-      <div className="macro-progress">
-        <div
-          className="macro-progress-fill"
-          style={{ width: `${percentage}%` }}
-        />
+    <div className="scan-dashboard-macro">
+      <div><span>{label}</span><small>{Math.round(current)} / {target} g</small></div>
+      <div className="scan-dashboard-track" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(target, Math.round(current))}>
+        <span style={{ width: `${progress}%` }} />
       </div>
     </div>
   );

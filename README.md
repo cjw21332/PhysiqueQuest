@@ -14,7 +14,7 @@ Install root dependencies with `npm install`. Start the backend from `backend/` 
 4. Start the Expo Go bridge with `npm run expo` in a third terminal.
 5. Connect your phone and computer to the same Wi-Fi, install or update Expo Go, and scan the Expo terminal QR code.
 
-The Expo app opens the live Next.js app in a native WebView. Changes to the web app appear on the phone as you work. The WebView infers the computer address from the Expo connection, and API requests use that same LAN host on port 4000. If your phone cannot connect, make sure both devices are on the same network, allow Node.js through the private-network firewall, and enter the computer's LAN address with `:3000` on the connection screen. Expo's tunnel can carry the Expo bundle, but your phone still needs network access to ports 3000 and 4000.
+The Expo app opens the live Next.js app in a native WebView. On a LAN session it infers the computer's private IPv4 address, loads the frontend on port 3000, and sends API requests to that host on port 4000. The wrapper reports frontend/backend connectivity separately and provides manual frontend address recovery. Expo's tunnel only carries the Expo bundle; it does not tunnel ports 3000 or 4000. See [RUNNING.md](./RUNNING.md#mobile-application-expo-go) for optional public URL settings and recovery steps.
 
 ## Folders
 
@@ -23,14 +23,14 @@ The Expo app opens the live Next.js app in a native WebView. Changes to the web 
 - `frontend/sections/Home/` — dashboard, bottom navigation, goals, progress, notifications, and shared Home icons.
 - `frontend/sections/Coach/` — coach plan, exercise library, camera check, live session, and workout report.
 - `frontend/sections/Scan/` — nutrition overview, meal review, manual food entry, daily log, and history.
-- `frontend/sections/Quests Section/` — level and streak progress, daily missions, penalty rules, and badges.
-- `frontend/sections/Me Section/` — profile summary, safety preferences, privacy controls, and account settings.
+- `frontend/sections/Quests Section/` — server-derived daily missions, badges, and streak state.
+- `frontend/sections/Me Section/` — profile summary, settings, safety alert delivery state, and role-protected admin tools.
 - `mobile/` — Expo Go companion that opens the live Next.js app in a native WebView.
-- `backend/` — NestJS authentication and profile API with MongoDB persistence.
+- `backend/` — NestJS authenticated APIs and MongoDB persistence for user features, admin data, and provider-backed services.
 
 ## Current prototype
 
-Registration and login use the backend and MongoDB Atlas for accounts and profiles. The four onboarding steps collect personal data, goals, training setup, and health/emergency contact information. Unit selections are persisted alongside raw measurement values. Other features such as nutrition history, quests, workout tracking, and password reset still include prototype/local behavior; live camera/form tracking is not implemented.
+Registration, login, profiles, nutrition, settings, notifications, workout sessions, progress measurements, and mission state use authenticated backend APIs. Workout form analysis, reset-email delivery, and emergency alert delivery require optional backend provider credentials; the app shows an unavailable state until those services are configured. Admin APIs require a database-provisioned admin role. See `backend/README.md` and `RUNNING.md` for setup and verification details.
 
 ## Progress report
 

@@ -8,5 +8,6 @@ import { Nutrition, NutritionSchema } from './schemas/nutrition.schema.js';
   imports: [MongooseModule.forFeature([{ name: Nutrition.name, schema: NutritionSchema }])],
   controllers: [NutritionController],
   providers: [NutritionService],
+  exports: [NutritionService],
 })
 export class NutritionModule {}

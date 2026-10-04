@@ -18,7 +18,9 @@ export function useSettings() {
   }, []);
   useEffect(() => { void retry(); }, [retry]);
   const updateSettings = useCallback(async (patch: Partial<UserSettings>) => {
-    const result = await api.updateSettings(patch); setSettings({ ...defaults, ...(result.values ?? {}) });
+    setError('');
+    try { const result = await api.updateSettings(patch); setSettings({ ...defaults, ...(result.values ?? {}) }); }
+    catch (err) { setError(err instanceof Error ? err.message : 'Could not save settings.'); throw err; }
   }, []);
   return { settings, loading, error, updateSettings, retry };
 }

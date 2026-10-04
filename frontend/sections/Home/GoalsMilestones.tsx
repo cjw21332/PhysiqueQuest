@@ -2,83 +2,26 @@
 
 import type { Profile } from './types';
 import { Icon } from './icons';
-
-const milestones = [
-  { label: '70 kg body weight', detail: 'Reached Oct 12', done: true },
-  { label: 'Bench press 60 kg × 8', detail: 'Reached Nov 03', done: true },
-  { label: '72 kg body weight', detail: 'In progress · 3.5 kg to go', done: 'current' as const },
-  { label: 'Bench press 70 kg × 8', detail: 'Upcoming', done: false },
-];
+import { useProgress } from '../../hooks/useProgress';
 
 export default function GoalsMilestones({ profile, onBack }: { profile: Profile; onBack: () => void }) {
-  const weight = Number(profile.weight) || 68.5;
-  const target = Number(profile.targetWeight) || 74;
-  const percent = 62;
-  const unit = profile.weightUnit || 'kg';
-
-  return (
-    <>
-      <header className="section-page-head">
-        <div className="section-back-title">
-          <button className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="arrow" size={24}/></button>
-          <h2>Goals</h2>
-        </div>
-      </header>
-
-      <section className="goal-hero">
-        <small>Primary goal</small>
-        <div className="goal-hero-title">
-          <h2>{profile.goal || 'Build muscle'}</h2>
-          <b>{percent}%</b>
-        </div>
-        <div className="goal-progress">
-          <i style={{ width: `${percent}%` }}/>
-        </div>
-        <div className="goal-weights">
-          <b>{weight} {unit} now</b>
-          <span>{target} {unit} target</span>
-        </div>
-        <small className="goal-date">Target date · March 2027 · 23 weeks left</small>
-      </section>
-
-      <section className="subsection">
-        <div className="section-head">
-          <h3>Milestones</h3>
-          <span>2 of 4 reached</span>
-        </div>
-        <div className="milestone-list">
-          {milestones.map((item, i) => (
-            <div className={`milestone ${item.done === true ? 'done' : item.done === 'current' ? 'current' : ''}`} key={item.label}>
-              <span className="milestone-dot">
-                {item.done === true ? <Icon name="check" size={12}/> : item.done === 'current' ? '·' : ''}
-              </span>
-              <div>
-                <b>{item.label}</b>
-                <small>{item.detail}</small>
-              </div>
-              {i < milestones.length - 1 && <i className="milestone-line"/>}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="subsection secondary-goals">
-        <h3>Secondary goals</h3>
-        <div className="secondary-goal">
-          <span className="mini-progress">75%</span>
-          <div>
-            <b>Train 4× per week</b>
-            <small>3 of 4 workouts completed</small>
-          </div>
-        </div>
-        <div className="secondary-goal">
-          <span className="mini-progress">50%</span>
-          <div>
-            <b>Improve form accuracy</b>
-            <small>Average score · 88%</small>
-          </div>
-        </div>
-      </section>
-    </>
-  );
+  const { entries, loading, error, refresh } = useProgress('weight');
+  const latest = entries[0];
+  const target = Number(profile.targetWeight);
+  const current = latest?.value ?? (Number(profile.weight) || null);
+  const unit = latest?.unit ?? profile.weightUnit ?? 'kg';
+  const progress = current && Number.isFinite(target) && target > 0 ? Math.min(100, Math.round(current / target * 100)) : null;
+  return <>
+    <header className="section-page-head"><div className="section-back-title"><button className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="arrow" size={24}/></button><h2>Goals</h2></div></header>
+    <section className="goal-hero"><small>Primary goal</small><div className="goal-hero-title"><h2>{profile.goal || 'No goal set'}</h2>{progress !== null && <b>{progress}%</b>}</div>
+      {progress !== null && <div className="goal-progress"><i style={{ width: `${progress}%` }}/></div>}
+      <div className="goal-weights"><b>{current ? `${current} ${unit} current` : 'No weight measurement saved'}</b><span>{target > 0 ? `${target} ${profile.weightUnit || unit} target` : 'No target weight set'}</span></div>
+      <small className="goal-date">{profile.targetDate ? `Target date · ${new Date(`${profile.targetDate}T12:00:00`).toLocaleDateString()}` : 'No target date set'}</small>
+    </section>
+    <section className="subsection"><div className="section-head"><h3>Weight milestones</h3></div>
+      {error && <div role="alert" className="scan-warning">{error}<button onClick={() => void refresh()}>Retry</button></div>}
+      {loading ? <p role="status">Loading saved measurements…</p> : entries.length ? <div className="milestone-list">{entries.map(entry => <div className="milestone done" key={entry._id}><span className="milestone-dot"><Icon name="check" size={12}/></span><div><b>{entry.value} {entry.unit}</b><small>{entry.measuredAt ? new Date(entry.measuredAt).toLocaleDateString() : 'Date unavailable'}</small></div></div>)}</div> : <p>No weight milestones yet. Save a measurement in Progress to start your history.</p>}
+    </section>
+    <section className="subsection secondary-goals"><h3>Other tracked goals</h3><p>Workout history and form analysis appear here when saved workout and analysis data is available.</p></section>
+  </>;
 }

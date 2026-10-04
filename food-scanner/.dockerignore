@@ -1,0 +1,36 @@
+# Secrets must never enter an image layer. The service reads every credential
+# from the environment, and the container is expected to start with none of
+# them present in the filesystem.
+.env
+.env.*
+!.env.example
+
+# Local database, now unused: meal persistence moved to the main backend.
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+node_modules
+**/node_modules
+**/dist
+
+# Tests and tooling are not needed at runtime.
+**/test
+**/*.test.ts
+**/vitest.config.ts
+**/.vscode
+**/.github
+
+# Docs and client sources are not part of the service image.
+docs
+client/src
+client/dist
+client/index.html
+README.md
+docker-compose*.yml
+docker
+.git
+.gitignore
+*.log
+.DS_Store
+Thumbs.db

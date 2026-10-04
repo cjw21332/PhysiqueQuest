@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import { api } from '../../lib/api';
@@ -35,8 +35,21 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [safetyBusy, setSafetyBusy] = useState(false);
+  const [safetyMessage, setSafetyMessage] = useState('');
+  useEffect(() => { let active = true; api.getAuthMe().then(user => { if (active) setIsAdmin(user.role === 'admin'); }).catch(() => { if (active) setIsAdmin(false); }); return () => { active = false; }; }, []);
 
   const toggle = async (key: 'inactivity' | 'alarmVolume' | 'showLeaderboard') => { try { await updateSettings({ [key]: !settings[key] }); } catch (error) { setSaveError(error instanceof Error ? error.message : 'Could not save settings.'); } };
+  const sendSafetyAlert = async () => {
+    setSafetyBusy(true); setSafetyMessage('');
+    try {
+      const idempotencyKey = globalThis.crypto?.randomUUID?.() ?? `manual-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const result = await api.sendSafetyAlert(idempotencyKey);
+      setSafetyMessage(result.status === 'delivered' ? 'The delivery provider confirmed the alert.' : result.errorCode === 'PROVIDER_NOT_CONFIGURED' ? 'Alert delivery is not configured on the backend.' : 'Delivery was not confirmed. No success notification was sent.');
+    } catch (error) { setSafetyMessage(error instanceof Error ? error.message : 'Could not send safety alert.'); }
+    finally { setSafetyBusy(false); }
+  };
   const equipment = profile.equipment?.length ? profile.equipment.join(', ') : '—';
   const daysPerWeek = profile.days?.length ?? 0;
   const conditionCount = profile.conditions?.includes('None of these') ? 0 : (profile.conditions?.length ?? 0);
@@ -97,6 +110,8 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-list">
         <SettingRow icon="phone" title="Emergency contact" detail={`${profile.contactName || '—'} · ${profile.contactPhone || '—'}`} onClick={() => saveProfile({ contactName: profile.contactName, contactPhone: profile.contactPhone })} danger/>
       </div>
+      <button type="button" className="secondary" disabled={safetyBusy || !profile.contactPhone} onClick={() => void sendSafetyAlert()}>{safetyBusy ? 'Checking delivery…' : 'Send alert to emergency contact'}</button>
+      {safetyMessage && <p className="hint" role="status">{safetyMessage}</p>}
       {(settingsError || saveError) && <p className="error" role="alert">{settingsError || saveError}</p>}
       {settingsLoading ? <p className="hint">Loading saved settings…</p> : <><div className="me-setting-row"><span><b>Inactivity monitoring</b><small>Armed during every session</small></span><Switch label="Inactivity monitoring" checked={settings.inactivity} onChange={() => void toggle('inactivity')}/></div>
 
@@ -105,7 +120,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
         <h3 className="me-group-title">Inactivity threshold</h3>
         <p>Time without movement before we check on you</p>
         <div className="me-threshold" role="group" aria-label="Inactivity threshold">
-          {([30, 45, 60] as const).map(value => <button key={value} className={settings.threshold === value ? 'selected' : ''} onClick={() => void updateSettings({ threshold: value })}>{value} s</button>)}
+          {([30, 45, 60] as const).map(value => <button key={value} className={settings.threshold === value ? 'selected' : ''} onClick={() => void updateSettings({ threshold: value }).catch(error => setSaveError(error instanceof Error ? error.message : 'Could not save threshold.'))}>{value} s</button>)}
         </div>
       </section>
       <div className="me-setting-row"><span><b>Maximum alarm volume</b><small>Overrides silent mode</small></span><Switch label="Maximum alarm volume" checked={settings.alarmVolume} onChange={() => void toggle('alarmVolume')}/></div>
@@ -113,11 +128,10 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <h3 className="me-group-title me-privacy-title">Privacy</h3>
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
-      <h3 className="me-group-title me-admin-title">Admin tools</h3>
-      <div className="me-list">
+      {isAdmin && <><h3 className="me-group-title me-admin-title">Admin tools</h3><div className="me-list">
         <SettingRow icon="dumbbell" title="Exercise library" detail="Publish exercises and pose templates" onClick={() => setAdminView('exercises')}/>
         <SettingRow icon="trend" title="Engagement Analytics" detail="Users, sessions, safety events" onClick={() => setAdminView('engagement')}/>
-      </div>
+      </div></>}
 
       <button className="me-logout" onClick={() => onLogoutRequest?.()}><span>⇥</span>Log out</button>
     </div>

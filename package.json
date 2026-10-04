@@ -5,10 +5,14 @@
     "dev": "npm run dev --workspace frontend",
     "expo": "npm run start --workspace mobile",
     "build": "npm run build --workspace frontend",
-    "start": "npm run start --workspace frontend"
+    "start": "npm run start --workspace frontend",
+    "seed": "ts-node seed.ts"
   },
   "devDependencies": {
     "expo": "^57.0.26"
   },
-  "workspaces": ["frontend", "mobile"]
+  "workspaces": [
+    "frontend",
+    "mobile"
+  ]
 }

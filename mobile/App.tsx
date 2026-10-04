@@ -18,8 +18,9 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
+import { resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
 
-declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string } };
+declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string } };
 
 type DeviceReadiness = {
   platform: string;
@@ -32,11 +33,8 @@ type DeviceReadiness = {
 };
 
 function getInitialAddress() {
-  const configured = process.env.EXPO_PUBLIC_WEB_APP_URL?.trim();
-  if (configured) return configured.replace(/\/$/, '');
-  const hostUri = Constants.expoConfig?.hostUri;
-  const host = hostUri?.split(':')[0];
-  return host ? `http://${host}:3000` : 'http://192.168.100.5:3000';
+  const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_WEB_APP_URL?: string } | undefined;
+  return resolveFrontendUrl(process.env.EXPO_PUBLIC_WEB_APP_URL ?? extra?.EXPO_PUBLIC_WEB_APP_URL, Constants.expoConfig?.hostUri);
 }
 
 /**
@@ -44,8 +42,9 @@ function getInitialAddress() {
  * display cutouts) to the web document as CSS custom properties so the web app
  * can pad its content clear of the system UI.
  */
-function buildInsetsScript(insets: { top: number; bottom: number; left: number; right: number }) {
+function buildInsetsScript(insets: { top: number; bottom: number; left: number; right: number }, apiUrl: string) {
   const { top, bottom, left, right } = insets;
+  const encodedApiUrl = JSON.stringify(apiUrl);
   return `(function(){try{
     var r=document.documentElement.style;
     r.setProperty('--safe-top','${top}px');
@@ -56,11 +55,12 @@ function buildInsetsScript(insets: { top: number; bottom: number; left: number; 
     m.name='viewport';
     m.content='width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover';
     document.head.appendChild(m);
+    localStorage.setItem('physiquequest-runtime-api-url',${encodedApiUrl});
   }catch(e){}})();true;`;
 }
 
-function buildBackendCheckScript() {
-  return `(function(){fetch(window.location.protocol+'//'+window.location.hostname+':4000/api',{credentials:'include'}).then(function(r){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:r.ok,status:r.status}));}).catch(function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:false}));});})();true;`;
+function buildBackendCheckScript(apiUrl: string) {
+  return `(function(){fetch(${JSON.stringify(apiUrl)},{credentials:'include'}).then(function(r){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:r.ok,status:r.status}));}).catch(function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:false}));});})();true;`;
 }
 
 function buildReadinessScript(readiness: DeviceReadiness) {
@@ -73,16 +73,18 @@ function AppContent() {
   const webRef = useRef<WebView>(null);
   const { width } = useWindowDimensions();
   const inferredAddress = useMemo(getInitialAddress, []);
-  const [address, setAddress] = useState(inferredAddress);
+  const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_API_URL?: string } | undefined;
+  const [address, setAddress] = useState(inferredAddress ?? '');
   const [loadedAddress, setLoadedAddress] = useState(inferredAddress);
+  const apiUrl = useMemo(() => loadedAddress ? resolveApiUrl(process.env.EXPO_PUBLIC_API_URL ?? extra?.EXPO_PUBLIC_API_URL, loadedAddress) : null, [extra?.EXPO_PUBLIC_API_URL, loadedAddress]);
   const [error, setError] = useState(!inferredAddress);
   const [key, setKey] = useState(0);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
 
   const insetScript = useMemo(
-    () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }),
-    [insets.top, insets.bottom, insets.left, insets.right],
+    () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }, apiUrl ?? 'invalid-api-address'),
+    [apiUrl, insets.top, insets.bottom, insets.left, insets.right],
   );
 
   const pushInsets = useCallback(() => {
@@ -91,8 +93,9 @@ function AppContent() {
 
   const checkBackend = useCallback(() => {
     setBackendStatus('checking');
-    webRef.current?.injectJavaScript(buildBackendCheckScript());
-  }, []);
+    if (apiUrl) webRef.current?.injectJavaScript(buildBackendCheckScript(apiUrl));
+    else setBackendStatus('offline');
+  }, [apiUrl]);
 
   const collectReadiness = useCallback(async () => {
     const network = await Network.getNetworkStateAsync();

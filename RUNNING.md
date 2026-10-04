@@ -8,23 +8,23 @@ PhysiqueQuest consists of three main components:
 
 ```
 ┌─────────────────┐
-│  Expo Go App    │  Mobile Application (WebView wrapper)
+│  Expo Go App    │  Mobile Application (native WebView shell)
 │  React Native   │
 └────────┬────────┘
-         │ Loads
-         ▼
+          │ Loads frontend in WebView
+          ▼
 ┌─────────────────┐
 │  Next.js Web    │  Frontend Application
 │  Port: 3000     │  http://localhost:3000
 └────────┬────────┘
-         │ API Calls
-         ▼
+          │ API Calls
+          ▼
 ┌─────────────────┐
 │  NestJS API     │  Backend Server
 │  Port: 4000     │  http://localhost:4000
 └────────┬────────┘
-         │ Database Connection
-         ▼
+          │ Database Connection
+          ▼
 ┌─────────────────┐
 │  MongoDB Atlas  │  Cloud Database
 │  PhysiqueQuest  │
@@ -170,13 +170,16 @@ http://localhost:3000
 
 3. Scan the QR code displayed in Terminal 3
 
-4. Expo Go opens the mobile wrapper. It automatically loads the frontend at `http://[your-computer-ip]:3000`; API requests then use that same host on port 4000.
+4. Expo Go opens the mobile wrapper. On a LAN session, it infers the computer's private IPv4 address and loads `http://[your-computer-ip]:3000`; API requests use the same host at `http://[your-computer-ip]:4000/api`. The app reports frontend and backend connectivity separately.
+
+Expo's tunnel can transport the Expo JavaScript bundle, but it does not expose your computer's Next.js or NestJS server. When using an Expo tunnel, provide the real computer/deployment URLs below or enter the frontend LAN URL on the connection screen. The phone must still be able to reach both ports.
 
 **If the app shows a connection screen:**
 - Verify both devices are on the same Wi-Fi network
 - Check that the frontend, backend, and MongoDB Atlas connection are running
 - Enter your computer's LAN address and port 3000 in the app, for example `http://192.168.1.10:3000` (replace with your actual IP)
 - Allow Node.js through Windows Defender Firewall for private networks so the phone can reach ports 3000 and 4000
+- If the frontend opens but the backend banner says unavailable, check port 4000 and retry the backend check; this does not require reloading the Expo bundle
 
 ### Finding Your Computer's IP Address
 
@@ -197,6 +200,17 @@ ip addr show
 
 ## Environment Variables
 
+### Mobile URLs (optional)
+
+Leave both values unset for automatic LAN discovery. If the frontend and API are hosted at known reachable addresses, set these in `mobile/.env` before starting Expo:
+
+```env
+EXPO_PUBLIC_WEB_APP_URL=http://192.168.1.10:3000
+EXPO_PUBLIC_API_URL=http://192.168.1.10:4000/api
+```
+
+Replace those example addresses with your actual reachable host. These are public URLs, not credentials. Restart Expo after editing `mobile/.env`. Never place MongoDB, JWT, email, alert-provider, or AI-provider secrets in a mobile environment file; those belong in `backend/.env`.
+
 ### Backend (.env)
 
 Create or verify the `backend/.env` file exists with the following variables:
@@ -215,12 +229,22 @@ NODE_ENV=development
 
 # Frontend URL (for CORS)
 FRONTEND_URL=http://localhost:3000
+
+# Optional backend-only providers. Leave blank to show setup/unavailable states.
+EMAIL_DELIVERY_URL=
+EMAIL_DELIVERY_API_KEY=
+ALERT_DELIVERY_URL=
+ALERT_DELIVERY_API_KEY=
+POSE_ANALYSIS_URL=
+POSE_ANALYSIS_API_KEY=
 ```
 
 **Important:** 
 - Replace placeholder values with your actual credentials
 - Never commit the `.env` file to version control
 - The `.env` file should be listed in `.gitignore`
+
+Email reset, emergency alert delivery, and pose analysis remain unavailable until their URL and API key pairs are set. The provider keys stay in `backend/.env`; never copy them into `mobile/.env` or `frontend/.env`. Admin users must be explicitly provisioned in MongoDB; follow the instructions in [backend/README.md](./backend/README.md#admin-access).
 
 ### Mobile (Optional)
 
@@ -369,15 +393,19 @@ cd mobile && npx expo start
 - [Expo Documentation](https://docs.expo.dev/)
 - [MongoDB Atlas Documentation](https://www.mongodb.com/docs/atlas/)
 
-## Support
+## Expo Go Verification Status
 
-If you encounter any issues not covered in this guide:
+The current checkout was verified on 2026-10-04 with the repository's installed dependencies. From the repository root, `npm run build --workspace frontend` succeeds; from `backend/`, `npm test` passes 219 tests and `npm run build` succeeds; from `mobile/`, `npx tsc --noEmit -p tsconfig.json`, `node --test connection.test.mjs`, `npx expo config --type public`, and Android/iOS `npx expo export` succeed. Frontend behavior tests (`node --test frontend/tests/*.test.mjs`) pass 36 tests, and `npm run test:ui-guard --workspace frontend` passes 14 tests.
 
-1. Check the terminal logs for error messages
-2. Verify all prerequisites are installed
-3. Ensure all environment variables are correctly set
-4. Check that no other applications are using ports 3000 or 4000
+The live LAN smoke check reached the running Expo Metro server on port 8081, frontend on port 3000, and backend on port 4000 from this computer. API/CORS requests passed, MongoDB-backed writes were confirmed by fresh authenticated reads, and a second account was denied access to the first account's records. Temporary smoke-test accounts and their records were removed after the run. Android and iOS JavaScript bundles each exported successfully; a bundle scan found no backend credential names.
 
----
+This environment has no available Android Debug Bridge or controllable Expo Go device, so on-phone QR loading, touch interaction, camera permission prompts, and phone-to-computer Wi-Fi reachability have not been exercised. Email delivery, emergency alert delivery, and pose analysis also remain unavailable until their backend provider URL/key pairs are configured. The API correctly reports these services as unavailable; configure the backend-only provider variables above to enable them. Successful exports and same-computer LAN checks do not substitute for those device/provider checks.
 
-**Last Updated:** October 2, 2026
+
+
+## Mobile (Expo Go) - WebView Shell
+
+- App.tsx retains the native WebView shell, device readiness, camera permission bridge, and connection recovery
+- .npmrc added with allow-scripts=true
+- Backend CORS enabled; API uses LAN IP 192.168.100.5
+- Start: npm run start:dev (backend) / npm run dev (frontend) / npx expo start --lan (mobile)

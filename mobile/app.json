@@ -41,6 +41,10 @@
     },
     "web": {
       "favicon": "./assets/physiquequest-icon.png"
+    },
+    "extra": {
+      "EXPO_PUBLIC_API_URL": "http://192.168.100.5:4000/api",
+      "EXPO_PUBLIC_WEB_APP_URL": "http://192.168.100.5:3000"
     }
   }
 }

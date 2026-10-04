@@ -4,6 +4,7 @@ frontend/.next-dev/
 frontend/out/
 mobile/.expo/
 mobile/dist/
+mobile/dist-*/
 *.log
 .env
 .env.*

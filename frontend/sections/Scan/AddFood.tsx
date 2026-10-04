@@ -1,8 +1,27 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { foodCatalog, mealNames, type MealName } from './types';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { mealNames, type MealName } from './types';
+import { api, type FoodCandidate, type FoodDetail } from '../../lib/api';
 import { Icon } from '../Home/icons';
+
+type FoodSelection = FoodCandidate & { detail?: FoodDetail };
+type SavedFood = {
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  per: string;
+  group: string;
+  fdcId: number;
+  description: string;
+  servingSizeG: number;
+};
+
+const RECENT_KEY = 'physiquequest-recent-foods';
+const SUGGESTIONS = ['Chicken breast', 'White rice', 'Egg', 'Banana'];
+const round = (value: number) => Math.round(value * 10) / 10;
 
 export default function AddFood({
   initialMeal,
@@ -11,86 +30,183 @@ export default function AddFood({
 }: {
   initialMeal: MealName;
   onBack: () => void;
-  onSave: (food: typeof foodCatalog[number], meal: MealName, amount: number, unit: 'grams' | 'servings') => void;
+  onSave: (food: SavedFood, meal: MealName, amount: number, unit: 'grams' | 'servings') => void;
 }) {
   const [meal, setMeal] = useState<MealName>(initialMeal);
   const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState(foodCatalog[0]);
+  const [results, setResults] = useState<FoodSelection[]>([]);
+  const [selected, setSelected] = useState<FoodSelection | null>(null);
+  const [recent, setRecent] = useState<string[]>(SUGGESTIONS);
   const [amount, setAmount] = useState('150');
   const [unit, setUnit] = useState<'grams' | 'servings'>('grams');
-  const results = useMemo(
-    () => foodCatalog.filter(food => food.name.toLowerCase().includes(query.toLowerCase()) || food.group.toLowerCase().includes(query.toLowerCase())),
-    [query],
-  );
-  const scale = unit === 'grams' ? Number(amount) / 100 : Number(amount);
+  const [loading, setLoading] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [error, setError] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestQueryRef = useRef('');
+  const detailRequestRef = useRef(0);
 
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+      if (Array.isArray(stored)) setRecent(stored.filter((value): value is string => typeof value === 'string').slice(0, 6));
+    } catch { /* Use the suggested foods when there is no saved history. */ }
+  }, []);
+
+  const fetchResults = useCallback(async (search: string) => {
+    const trimmed = search.trim();
+    latestQueryRef.current = trimmed;
+    if (!trimmed) { setResults([]); setLoading(false); setError(''); return; }
+    setLoading(true);
+    setError('');
+    try {
+      const response = await api.searchFoods(trimmed);
+      const candidates = response.candidates.slice(0, 5);
+      const withNutrition = await Promise.all(candidates.map(async candidate => {
+        try { return { ...candidate, detail: await api.getFoodDetail(candidate.fdc_id) }; }
+        catch { return candidate; }
+      }));
+      if (latestQueryRef.current === trimmed) setResults(withNutrition);
+    } catch (err) {
+      if (latestQueryRef.current === trimmed) {
+        setResults([]);
+        setError(err instanceof Error ? err.message : 'Food search is unavailable. Try again.');
+      }
+    } finally {
+      if (latestQueryRef.current === trimmed) setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    latestQueryRef.current = query.trim();
+    detailRequestRef.current += 1;
+    setDetailLoading(false);
+    setSelected(null);
+    if (query.trim()) {
+      setResults([]);
+      setError('');
+      setLoading(true);
+      debounceRef.current = setTimeout(() => void fetchResults(query), 300);
+    } else { setResults([]); setLoading(false); setError(''); }
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [query, fetchResults]);
+
+  const selectFood = async (food: FoodCandidate) => {
+    const requestId = ++detailRequestRef.current;
+    const item: FoodSelection = results.find(result => result.fdc_id === food.fdc_id) ?? { ...food };
+    setSelected(item);
+    setError('');
+    if (item.detail) { setDetailLoading(false); return; }
+    setDetailLoading(true);
+    try {
+      const detail = await api.getFoodDetail(food.fdc_id);
+      if (detailRequestRef.current === requestId) setSelected({ ...item, detail });
+    } catch (err) {
+      if (detailRequestRef.current === requestId) setError(err instanceof Error ? err.message : 'Could not load nutrition for this food.');
+    } finally {
+      if (detailRequestRef.current === requestId) setDetailLoading(false);
+    }
+  };
+
+  const servingSizeG = selected?.detail?.serving_size_g ?? 100;
+  const grams = unit === 'grams' ? Number(amount) : Number(amount) * servingSizeG;
+  const scale = grams / 100;
+  const macros = selected?.detail?.per_100g;
+  const calculated = useMemo(() => macros && Number.isFinite(scale) ? {
+    kcal: macros.kcal * scale,
+    protein: macros.protein_g * scale,
+    carbs: macros.carbs_g * scale,
+    fat: macros.fat_g * scale,
+  } : null, [macros, scale]);
+
+  const useRecent = (food: string) => {
+    setQuery(food);
+  };
+
+  const handleSave = () => {
+    if (!selected || !selected.detail || !calculated || !Number.isFinite(grams) || grams <= 0) return;
+    const nextRecent = [selected.description, ...recent.filter(name => name !== selected.description)].slice(0, 6);
+    setRecent(nextRecent);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(nextRecent)); } catch { /* Saving the food entry still succeeds. */ }
+    onSave({
+      name: selected.description,
+      calories: round(calculated.kcal),
+      protein: round(calculated.protein),
+      carbs: round(calculated.carbs),
+      fat: round(calculated.fat),
+      per: 'per 100 g',
+      group: selected.data_type,
+      fdcId: selected.fdc_id,
+      description: selected.description,
+      servingSizeG,
+    }, meal, Number(amount), unit);
+  };
+
+  const validAmount = Number.isFinite(Number(amount)) && Number(amount) > 0;
   return (
-    <>
+    <div className="add-food-screen">
       <header className="scan-header add-food-header">
-        <button className="coach-back" onClick={onBack} aria-label="Back"><Icon name="arrow" size={24}/></button>
+        <button className="coach-back" onClick={onBack} aria-label="Back"><Icon name="arrow" size={20} /></button>
         <h2>Add food</h2>
       </header>
 
-      <div className="scan-chips meal-select" aria-label="Choose a meal">
-        {mealNames.map(item => (
-          <button className={meal === item ? 'active' : ''} key={item} onClick={() => setMeal(item)}>{item}</button>
-        ))}
-      </div>
-
-      <label className="food-search">
-        <Icon name="scan" size={16}/>
-        <input placeholder="Search food" value={query} onChange={event => setQuery(event.target.value)}/>
-      </label>
-
-      <div className="recent-foods">
-        <b>Recent &amp; frequent</b>
-        <div>
-          {['Chicken breast', 'White rice', 'Egg', 'Banana'].map((name, index) => (
-            <button key={name} onClick={() => { setSelected(foodCatalog[[0, 3, 5, 6][index]]); setQuery(''); }}>{name}</button>
-          ))}
+      <div className="add-food-content">
+        <div className="scan-chips meal-select" aria-label="Choose a meal">
+          {mealNames.map(item => <button key={item} className={meal === item ? 'active' : ''} aria-pressed={meal === item} onClick={() => setMeal(item)}>{item}</button>)}
         </div>
-      </div>
 
-      <section className="food-results">
-        <div className="section-head"><h3>Results</h3><small>{results.length} found</small></div>
-        <div className="food-result-list">
-          {results.slice(0, 5).map(food => (
-            <button className={selected.name === food.name ? 'selected' : ''} key={food.name} onClick={() => setSelected(food)}>
-              <i className={selected.name === food.name ? 'checked' : ''}/>
-              <span><b>{food.name}</b><small>{food.group} · {food.per}</small></span>
-              <strong>{food.calories} kcal</strong>
-            </button>
-          ))}
-          {!results.length && <p className="empty-food-results">No foods found. Try a different search.</p>}
-        </div>
-      </section>
+        <label className="food-search">
+          <Icon name="search" size={16} />
+          <input aria-label="Search food" placeholder="Search food" value={query} onChange={event => setQuery(event.target.value)} />
+          {query && <button type="button" onClick={() => setQuery('')} aria-label="Clear search">×</button>}
+        </label>
 
-      <section className="portion-entry">
-        <h3>Portion</h3>
-        <div className="quantity-row">
-          <label><small>Quantity</small><input type="number" min="0" value={amount} onChange={event => setAmount(event.target.value)}/></label>
-          <div className="scan-chips">
-            <button className={unit === 'grams' ? 'active' : ''} onClick={() => setUnit('grams')}>grams</button>
-            <button className={unit === 'servings' ? 'active' : ''} onClick={() => setUnit('servings')}>servings</button>
+        <section className="recent-foods" aria-label="Recent and frequent foods">
+          <b>Recent &amp; frequent</b>
+          <div>{(recent.length ? recent : SUGGESTIONS).map(food => <button key={food} type="button" onClick={() => useRecent(food)}>{food}</button>)}</div>
+        </section>
+
+        <section className="food-results" aria-label="Search results">
+          <div className="section-head"><h3>Results</h3><small>{loading ? 'Searching…' : `${results.length} found`}</small></div>
+          <div className="food-result-list">
+            {results.map(food => {
+              const isSelected = selected?.fdc_id === food.fdc_id;
+              return <button type="button" key={food.fdc_id} className={isSelected ? 'selected' : ''} aria-pressed={isSelected} onClick={() => void selectFood(food)}>
+                <i className={isSelected ? 'checked' : ''} aria-hidden="true" />
+                <span><b>{food.description}</b><small>{food.data_type} · per 100 g</small></span>
+                <strong>{food.detail ? `${Math.round(food.detail.per_100g.kcal)} kcal` : 'Nutrition unavailable'}</strong>
+              </button>;
+            })}
+            {!loading && !results.length && <p className="empty-food-results">{error || (query ? 'No foods found. Try another search.' : 'Search or choose a recent food.')}</p>}
           </div>
-        </div>
-        <div className="calculated-head">
-          <h3>Calculated nutrition</h3>
-          <small>{unit === 'grams' ? `${amount} g` : `${amount} serving(s)`}</small>
-        </div>
-        <FoodValue name="Calories" value={`${Math.round(selected.calories * scale)} kcal`}/>
-        <FoodValue name="Protein" value={`${(selected.protein * scale).toFixed(1)} g`}/>
-        <FoodValue name="Carbohydrates" value={`${(selected.carbs * scale).toFixed(1)} g`}/>
-        <FoodValue name="Fat" value={`${(selected.fat * scale).toFixed(1)} g`}/>
-      </section>
+        </section>
 
-      <footer className="scan-footer">
-        <button className="primary" disabled={!Number(amount)} onClick={() => onSave(selected, meal, Number(amount), unit)}>Save to {meal}</button>
+        <section className="portion-entry">
+          <h3>Portion</h3>
+          <div className="quantity-row">
+            <label><small>Quantity</small><input type="number" min="0.1" step="any" inputMode="decimal" value={amount} onChange={event => setAmount(event.target.value)} aria-label="Quantity" /></label>
+            <div className="scan-chips" aria-label="Portion unit">
+              {(['grams', 'servings'] as const).map(value => <button type="button" key={value} className={unit === value ? 'active' : ''} aria-pressed={unit === value} onClick={() => setUnit(value)}>{value}</button>)}
+            </div>
+          </div>
+          <div className="calculated-head"><h3>Calculated nutrition</h3><small>{unit === 'grams' ? `${Number(amount) || 0} g` : `${round(grams) || 0} g`}</small></div>
+          {detailLoading && <p className="food-detail-loading" role="status">Loading nutrition…</p>}
+          {!detailLoading && selected && !selected.detail && error && <p className="food-detail-loading" role="alert">{error}</p>}
+          {[
+            ['Calories', calculated ? `${round(calculated.kcal)} kcal` : '—'],
+            ['Protein', calculated ? `${round(calculated.protein)} g` : '—'],
+            ['Carbohydrates', calculated ? `${round(calculated.carbs)} g` : '—'],
+            ['Fat', calculated ? `${round(calculated.fat)} g` : '—'],
+          ].map(([label, value]) => <div className="food-value" key={label}><span>{label}</span><b>{value}</b></div>)}
+          {unit === 'servings' && <small className="serving-basis">One serving = {round(servingSizeG)} g{selected?.detail?.serving_size_g ? '' : ' (USDA serving size unavailable)'}</small>}
+          {error && !selected && <p className="food-detail-loading" role="alert">{error}</p>}
+        </section>
+      </div>
+
+      <footer className="scan-footer add-food-footer">
+        <button className="primary" disabled={!selected?.detail || detailLoading || !calculated || !validAmount} onClick={handleSave}>Save to {meal}</button>
       </footer>
-    </>
+    </div>
   );
-}
-
-function FoodValue({ name, value }: { name: string; value: string }) {
-  return <div className="food-value"><span>{name}</span><b>{value}</b></div>;
 }

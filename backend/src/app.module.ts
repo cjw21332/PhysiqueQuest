@@ -10,6 +10,14 @@ import { NutritionModule } from './nutrition/nutrition.module.js';
 import { SettingsModule } from './settings/settings.module.js';
 import { ActivityModule } from './activity/activity.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
+import { FoodScanModule } from './foodscan/foodscan.module.js';
+import { WorkoutsModule } from './workouts/workouts.module.js';
+import { ProgressModule } from './progress/progress.module.js';
+import { ExerciseLibraryModule } from './exercises/exercise-library.module.js';
+import { ExercisesModule } from './exercises/exercises.module.js';
+import { SafetyModule } from './safety/safety.module.js';
+import { PoseModule } from './pose/pose.module.js';
+import { AdminModule } from './admin/admin.module.js';
 
 @Module({
   imports: [
@@ -28,6 +36,14 @@ import { NotificationsModule } from './notifications/notifications.module.js';
     SettingsModule,
     ActivityModule,
     NotificationsModule,
+    FoodScanModule,
+    WorkoutsModule,
+    ProgressModule,
+    ExerciseLibraryModule,
+    ExercisesModule,
+    SafetyModule,
+    PoseModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
