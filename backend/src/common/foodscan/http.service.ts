@@ -70,7 +70,15 @@ export class HttpService {
 
 function isTimeout(err: unknown): boolean {
   if (err instanceof Error) {
-    if (err.name === 'TimeoutError' || err.name === 'AbortError') return true;
+    if (
+      err.name === 'TimeoutError' ||
+      err.name === 'AbortError' ||
+      (err as any).name === 'TimeoutError' ||
+      (err as any).code === 'ETIMEDOUT' ||
+      err.message.includes('timeout')
+    ) {
+      return true;
+    }
   }
   return false;
 }
