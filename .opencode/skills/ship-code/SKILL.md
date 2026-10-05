@@ -10,5 +10,5 @@ This skill commits and pushes all changes in the current directory to the main r
 ```bash
 git add .
 git commit -m "feat: work update"
-git push origin main
+git push origin HEAD:main
 ```
