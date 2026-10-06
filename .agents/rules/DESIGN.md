@@ -2,7 +2,7 @@
 description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the light-theme interface, component library, responsive rules, and extension patterns. The web app is the design source; the Expo app displays it in a native WebView with device capabilities (safe-area insets, camera, file inputs).
 ---
 
-# PhysiqueQuest Design System v2.1
+# PhysiqueQuest Design System v2.2
 
 This document specifies the current PhysiqueQuest product interface, design tokens, component patterns, responsive behavior, and rules for extending the system consistently. Update this document when adding new UI patterns or making significant design decisions.
 
@@ -23,7 +23,7 @@ PhysiqueQuest is a mobile-first fitness and nutrition prototype. The Next.js web
 - **Launch** (`/launch`): Prototype entry flow with device readiness checks (camera, permissions)
 - **Login** (`/login`): Authentication form
 - **Register** (`/register`): Account creation → four-step calibration flow (Personal Data → Goals → Training Preference → Health & Safety) → saves profile, starts local session
-- **Admin Views**: Exercise Library (search, filters, draft creation) and Analytics (date ranges, retention viz, event summary) — frontend demonstrations with local in-memory sample data
+- **Admin Views**: Exercise Library (search, filters, draft creation) and Analytics (date ranges, retention viz, event summary) — frontend views over live backend endpoints, gated by an admin role
 
 ### Navigation Behavior
 - **Main tab bar** (five tabs): Positioned above device system-navigation on main section screens (Home, Coach, Scan, Quests, Me)
@@ -36,11 +36,19 @@ PhysiqueQuest is a mobile-first fitness and nutrition prototype. The Next.js web
 - **Content frame**: Home is the reference for signed-in content width and gutters; reuse this centered frame across all sections
 
 ### Data & Persistence
-- **Authentication, onboarding, food logging, quest progress, settings**: Prototype behavior
-- **Storage**: Browser localStorage for some values; static fixtures or in-memory demo state for others
-- **Backend**: No live backend, remote account service, cross-device sync, or database connection (yet)
-- **Sample/demo values**: Calorie estimates, AI form scores, camera readiness, workout feedback, analytics, emergency-event counts must be labeled as sample/demo behavior until real services exist
-- **Future integration**: MongoDB Atlas planned for production (see `DATABASE.md`)
+- **Authentication and onboarding**: Live. Users and profiles are persisted to MongoDB Atlas via the NestJS API; the JWT and a profile cache live in localStorage.
+- **Nutrition, workouts, progress, quests, notifications, settings**: Live. Served by the backend API from real Atlas collections.
+- **Local-only**: The food log's "recent foods" cache (`physiquequest-recent-foods`) and a few presentation caches. Nothing else is localStorage-only.
+- **Backend**: A live NestJS API on port 4000 with a global `/api` prefix, connected to MongoDB Atlas. The Expo WebView loads the web app; the API host is derived from the page's LAN hostname.
+- **Sample/demo values**: Calorie estimates, AI form scores, camera readiness, workout feedback, pose analysis, and the Quests leaderboard preview must be labeled as sample/demo behavior. Real services exist for nutrition, workouts, progress, quests, notifications, settings, and admin analytics — those surfaces show live data, not samples.
+
+### Backend Integration (Design-Relevant)
+The web app is the product surface; the NestJS API supplies the data behind it. Design decisions must account for this:
+
+- **Loading, empty, and error states** are part of the UI. Every data-driven surface (Home progress, notifications, Scan nutrition, Quests activity, Me settings, admin views) must show a loading state, an honest empty state, and a retry path on failure — not sample data dressed up as live data.
+- **Sample/demo labeling**: surfaces that still show sample data (calorie estimates, AI form scores, camera readiness, pose analysis, the Quests leaderboard preview) must label themselves as such. Surfaces backed by real collections must not.
+- **Offline and degraded behavior**: the API may be unreachable (phone off the LAN, backend down). The client caches the JWT and profile locally and should degrade gracefully; it must not silently fall back to local writes that create a second source of truth.
+- **Consistency across surfaces**: when the backend returns updated data (a new meal, a completed workout, a saved measurement), the UI should reflect it without a full reload. The app uses custom events (`physiquequest-nutrition-updated`, `physiquequest-profile-updated`) and hook refreshers for this.
 
 ## 2. Design Tokens: Color & Typography
 
@@ -431,7 +439,7 @@ This eliminates breakpoint sprawl and provides smooth scaling across all viewpor
 - Avoid inline hex/rgb values in component styles
 - Document the purpose and use cases for new tokens
 - Group related tokens (e.g., all green variants, all gray/neutral variants)
-- Version token changes if they affect existing UI (e.g., “v2.1” in comments)
+- Version token changes if they affect existing UI (e.g., “v2.2” in comments)
 
 ## 8. UI Review Checklist
 
@@ -529,7 +537,7 @@ Before committing any UI changes, verify:
 - **Profile Summary**: Avatar, name, email, edit button
 - **Settings Rows**: Icon + title + description, toggle or arrow
 - **Setting Block**: Group title + description, threshold buttons or toggles
-- **Admin Tools**: Exercise Library link, Analytics link (separate detail views)
+- **Admin Tools**: Exercise Library link, Analytics link (separate detail views, admin role-gated, live data)
 - **Logout Button**: Prominent danger color, bottom of scroll area
 
 ## 10. Form Design & Input Controls

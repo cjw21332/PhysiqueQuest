@@ -12,10 +12,10 @@ This document is the source of truth for persistence and data-service decisions.
 - The frontend is a Next.js app; the Expo app hosts it in a WebView. The `backend/` folder contains the operational NestJS API server.
 - **Database:** MongoDB Atlas cluster is provisioned and operational at `pq.kbfjuql.mongodb.net` with database name `PhysiqueQuest`.
 - **Authentication:** JWT-based authentication is implemented with bcrypt password hashing. Users and profiles are persisted to MongoDB Atlas.
-- **Collections Active:** `users` (authentication), `profiles` (user profile data)
+- **Collections Active (12):** `users` (authentication), `profiles` (user profile data), `nutrition` (meals + water), `workout_sessions`, `progress_entries`, `settings`, `activity` (quest/streak state), `notifications`, `safety_alert_events`, `password_recovery_tokens`, plus `admin_exercises` (admin-managed exercise catalog) and `exercise` (public exercise library).
 - The web client and Expo WebView communicate with the NestJS API at `/api`. On a computer, development uses `http://localhost:4000/api`; on a phone, the API host must be the same reachable LAN hostname as the Next.js page, on port 4000. Production must use HTTPS. Clients never connect directly to Atlas.
 - Registration flow creates user accounts in MongoDB Atlas after completing the full calibration process. Login authenticates against stored credentials.
-- Other features (workout tracking, nutrition logs, quest progress) still use localStorage and sample data. They will be migrated to the backend in future iterations following the patterns established for authentication and profiles.
+- Nutrition, workouts, progress, quests/streaks, notifications, and settings are now served by the backend API from real Atlas collections. Only a few client-side caches and the food log's "recent foods" remain local.
 
 ## 2. Data Flow
 
@@ -112,10 +112,11 @@ Current login and password-recovery behavior:
   - Frontend stores token and redirects to `/home`
   - Profile loaded from backend on subsequent requests
 
-- **Password Recovery:** Still prototype/placeholder (not implemented)
-  - UI shows forgot password flow but doesn't connect to backend
-  - Future implementation will use email verification and secure reset tokens
-  - Must implement: rate limiting, secure token generation, email delivery
+- **Password Recovery:** Fully implemented
+  - `POST /api/auth/password-reset/request` and `POST /api/auth/password-reset/confirm`
+  - `password_recovery_tokens` collection stores SHA-256 hashes of one-time tokens (never plaintext), with expiry and one-time use
+  - Delivery is via an external `EMAIL_DELIVERY_URL` endpoint; when unconfigured, `request` returns `{ accepted: true, delivery: "unavailable" }` without error
+  - Responses are neutral about whether an email is registered
 
 Target backend flow when remote registration is implemented:
 
@@ -125,7 +126,7 @@ Target backend flow when remote registration is implemented:
 4. Persist the profile and training preferences through their domain repositories. Keep health restrictions/notes and emergency contacts separately protected when their distinct access, retention, or deletion rules warrant it. Use an idempotency key so retries cannot create duplicate onboarding records.
 5. Only mark onboarding complete and activate the pending account after profile persistence succeeds. Return a minimal profile summary and route the client to the home screen. If persistence fails, retain/recover the safe client draft and allow retry; do not pretend setup completed or silently write a second local source of truth.
 
-The backend and Atlas connection are implemented. The preceding sequence describes recommended production hardening beyond the current first-party JWT implementation; add an external identity provider, email verification, onboarding idempotency, consent evidence, and recovery controls only as product and operational requirements are approved.
+The backend and Atlas connection are implemented, including nutrition, workouts, progress, quests, notifications, and settings endpoints. The preceding sequence describes recommended production hardening beyond the current first-party JWT implementation; add an external identity provider, email verification, onboarding idempotency, consent evidence, and recovery controls only as product and operational requirements are approved.
 
 ### Authentication and recovery flow analysis
 
@@ -148,17 +149,23 @@ These collections are currently active in MongoDB Atlas:
 |:--|:--|:--|
 | `users` (authentication) | `_id` (ObjectId); `email` (string, unique, indexed, lowercase normalized); `name` (string); `passwordHash` (string, bcrypt with 10 rounds); `isActive` (boolean, default true); `createdAt` (Date); `updatedAt` (Date) | Identity domain owns writes. Email is unique and case-insensitive. Password validation enforced: 8-15 characters, 1 uppercase, 1 lowercase, 1 number. JWT tokens issued with 7-day expiration. |
 | `profiles` (user profile data) | `_id` (ObjectId); `userId` (ObjectId, ref users); `name` (string); `age` (string); `height` (string); `heightInches` (string, optional); `heightUnit` ('cm' \| 'ft & in.'); `weight` (string); `weightUnit` ('kg' \| 'lbs'); `gender` ('Male' \| 'Female' \| 'Other'); `chest` (string, optional); `chestUnit` ('cm' \| 'inch', optional); `waist` (string, optional); `waistUnit` ('cm' \| 'inch', optional); `arms` (string, optional); `armsUnit` ('cm' \| 'inch', optional); `measurementUnit` ('cm' \| 'inch', optional legacy shared unit); `activity` ('Sedentary' \| 'Light' \| 'Moderate' \| 'Active' \| 'Athlete'); `goal` (string, max 80 chars); `targetWeight` (string, optional); `targetDate` (date string, optional); `seriousness` (string, max 40 chars); `equipment` (array of strings); `days` (array of strings); `duration` (string, max 30 chars); `conditions` (array of strings); `healthNotes` (string, optional, max 500 chars); `contactName` (string, max 100 chars); `contactPhone` (string, formatted as 0999-999-9999, max 30 chars); `createdAt` (Date); `updatedAt` (Date) | Profile domain owns writes. Linked to user via userId reference. Created after user registration. Phone numbers formatted as Philippine mobile: 0999-999-9999. All fields validated with class-validator DTOs. Health data and emergency contacts included but require additional access controls for production. |
+| `nutrition` (meals + water) | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `meals: MealEntry[]` (`id`, `name`, `meal`, `calories`, `detail`, `time`, `source`, `protein`, `carbs`, `fat`, `date`); `water: WaterEntry[]` (`date`, `glasses`) | Nutrition domain owns writes. One document per user holding all meals and water entries. |
+| `workout_sessions` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed); session fields, sets/reps/load, outcomes | Training domain owns writes. |
+| `progress_entries` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed); `metric`, `value`, `unit`, `occurredAt` | Progress domain owns writes. |
+| `settings` | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `values: Record<string, unknown>` | Settings domain owns writes. |
+| `activity` | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `state: Record<string, unknown>` (quest progress, level, streak, points) | Engagement domain owns writes. |
+| `notifications` | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `items: NotificationItem[]` | Engagement domain owns writes. |
+| `safety_alert_events` | `_id` (ObjectId); `userId` (ObjectId, ref users); alert fields | Safety domain owns writes. |
+| `password_recovery_tokens` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed); `tokenHash` (unique, `select: false`, SHA-256); `expiresAt` (TTL 0); `usedAt` (Date \| null) | Auth domain owns writes. One-time use, expiry, never stores plaintext. |
+| `admin_exercises` | `_id` (ObjectId); `name` (maxlength 80); `group`; admin-managed fields | Admin domain owns writes. |
+| `exercise` | `_id` (ObjectId); public exercise library fields | Admin domain owns writes; read by the public exercise library. |
 
 **Collections NOT yet implemented (future work):**
 - `sessions` - Session management with refresh tokens
 - `passwordCredentials` - Separate credential store (currently in users collection)
-- `authChallenges` - Email verification, password reset tokens
+- `authChallenges` - Email verification challenges
 - `consentEvidence` - Consent tracking with versions
 - `authAuditEvents` - Security audit log
-- `mealEntries`, `waterLogs` - Nutrition tracking
-- `workoutPlans`, `workoutSessions` - Training data
-- `measurements`, `personalRecords` - Progress tracking
-- `questProgress`, `pointEvents` - Gamification data
 
 #### Authentication indexes and invariants - IMPLEMENTED
 
@@ -176,13 +183,12 @@ Current indexes in MongoDB Atlas:
 - `sessions`: Index on `userId` with revocation/expiry lookups, unique index on token hash
 - `authChallenges`: Index on purpose/subject/status and expiry for bounded lookup and rate limits
 - `consentEvidence`: Index on `userId` plus `capturedAt` for retrieval
-- Domain-specific indexes for meal entries, workout sessions, etc. as those features are implemented
 
 **Current implementation notes:**
 - Email uniqueness enforced by unique index and duplicate-key error handling
 - Concurrent registrations handled via MongoDB duplicate key error (code 11000)
 - No session revocation yet (JWT tokens expire after 7 days)
-- No password reset tokens or email verification challenges yet
+- Password reset is implemented: `password_recovery_tokens` has `userId` index, unique `tokenHash` (SHA-256), and a TTL `expiresAt` index.
 
 #### Required authentication API contract behavior
 
@@ -199,15 +205,15 @@ Use this as the initial migration map. Persist only when the feature needs accou
 
 | Domain | Current prototype source | Future persistence boundary | Guidance |
 |:--|:--|:--|:--|
-| Identity and sessions | Simulated `physiquequest-auth` localStorage | Provider-owned identity/session records, or app `users` plus optional restricted `passwordCredentials`, `sessions`, and `authChallenges` | Prefer a proven identity provider. Section 2 documents registration, login, recovery, logout, lifecycle fields, access controls, and index decisions. If credentials are owned by PhysiqueQuest, store only strong password hashes in a restricted auth domain; never store or log plaintext passwords. Use revocable, expiring sessions/tokens. |
-| Profile and onboarding | Register wizard state until completion; then `physiquequest-profile` localStorage; simulated user in `physiquequest-auth` | Identity provider plus profile/onboarding domain APIs and repositories | Current profile includes personal, body measurement, training, health-condition/note, and emergency-contact fields. Current consent is only a required UI gate and is not recorded. For remote storage, minimize fields, record consent evidence/version, and isolate or tightly restrict health and emergency-contact data. Never store passwords in profile/auth application documents. |
-| Nutrition and hydration | `physiquequest-food-log` localStorage; sample catalog and meals | User-owned meal entries and daily water records; optional managed food catalog | Preserve entry time, meal type, nutrition snapshot, quantity/unit, and source. Snapshot values used at log time so later catalog edits do not rewrite history. |
-| Workout plan and sessions | Exercise fixtures, coach state, demo form scores | Workout plans and completed sessions | Store planned prescription separately from actual sets/reps/load and session outcomes. Mark demo or estimated metrics as such. |
-| Progress and personal records | Sample charts and local/profile state | User measurements and verified record events | Store source and measurement time. Prefer deriving charts/rollups from authoritative events; cache aggregates only when measured performance requires it. |
-| Quests, streaks, and rewards | `physiquequest-quests` localStorage and sample missions | User quest progress/reward ledger | Make point awards and mission completion idempotent. Keep an auditable award/reversal record instead of silently editing balances. |
-| Settings and preferences | `physiquequest-me-settings` localStorage | User settings/preferences | Persist only cross-device or server-required settings. Keep presentation-only state local. |
-| Notifications | Sample notifications and local settings | Notification preferences and user notification records | Store delivery state only when needed. Do not treat generated sample notices as real events. |
-| Exercise/food reference catalog | Static TypeScript fixtures | Seeded or managed reference data only if updates, search, moderation, or scale require it | Static, version-controlled fixtures are appropriate for the current prototype. Avoid adding a database just to copy constants. |
+| Identity and sessions | `physiquequest-auth` localStorage (JWT + user identity); backend `users` is authoritative | Provider-owned identity/session records, or app `users` plus optional restricted `passwordCredentials`, `sessions`, and `authChallenges` | Prefer a proven identity provider. Section 2 documents registration, login, recovery, logout, lifecycle fields, access controls, and index decisions. If credentials are owned by PhysiqueQuest, store only strong password hashes in a restricted auth domain; never store or log plaintext passwords. Use revocable, expiring sessions/tokens. |
+| Profile and onboarding | Backend `profiles` collection (authoritative); `physiquequest-profile` localStorage is a cache only | Identity provider plus profile/onboarding domain APIs and repositories | Current profile includes personal, body measurement, training, health-condition/note, and emergency-contact fields. Current consent is only a required UI gate and is not recorded. For remote storage, minimize fields, record consent evidence/version, and isolate or tightly restrict health and emergency-contact data. Never store passwords in profile/auth application documents. |
+| Nutrition and hydration | Backend `nutrition` collection (meals + water); `physiquequest-recent-foods` localStorage for recent picks | User-owned meal entries and daily water records; optional managed food catalog | Preserve entry time, meal type, nutrition snapshot, quantity/unit, and source. Snapshot values used at log time so later catalog edits do not rewrite history. |
+| Workout plan and sessions | Backend `workout_sessions` collection; exercise fixtures in `exercises.ts` | Workout plans and completed sessions | Store planned prescription separately from actual sets/reps/load and session outcomes. Mark demo or estimated metrics as such. |
+| Progress and personal records | Backend `progress_entries` collection | User measurements and verified record events | Store source and measurement time. Prefer deriving charts/rollups from authoritative events; cache aggregates only when measured performance requires it. |
+| Quests, streaks, and rewards | Backend `activity` collection (quest/streak/points state) | User quest progress/reward ledger | Make point awards and mission completion idempotent. Keep an auditable award/reversal record instead of silently editing balances. |
+| Settings and preferences | Backend `settings` collection | User settings/preferences | Persist only cross-device or server-required settings. Keep presentation-only state local. |
+| Notifications | Backend `notifications` collection | Notification preferences and user notification records | Store delivery state only when needed. Do not treat generated sample notices as real events. |
+| Exercise/food reference catalog | Public `exercise` collection + admin `admin_exercises` collection; food catalog is a static TypeScript fixture | Managed reference data only if updates, search, moderation, or scale require it | Static, version-controlled fixtures are appropriate for the current prototype. Avoid adding a database just to copy constants. |
 | Camera/video and form analysis | Local device input and demo analysis | Consent-aware metadata/results; media in protected object storage only if required | Do not store raw video in MongoDB by default. Define purpose, consent, access, retention, deletion, and storage location before upload is implemented. |
 
 Do not persist derived data twice without a clear reason. For example, calorie totals can be calculated from meal entries; a cached daily summary must have an invalidation/rebuild strategy and must not become a second source of truth.
@@ -301,7 +307,32 @@ Start with collections that match the first supported use cases, not a generic c
 - Threat-model every endpoint that changes profile, account, nutrition, workout, reward, or media data. Protect against broken object-level authorization, mass assignment, injection, replay, and abuse.
 - Confirm applicable privacy, data-residency, and health-data obligations for actual launch jurisdictions with qualified owners; do not infer regulatory compliance from using Atlas or encryption alone.
 
-## 10. Environments, Configuration, and Releases
+## 10. External Services and Backend Structure
+
+The NestJS backend is a single application served from `backend/` (not a root npm workspace). It is built with `nest build`, started with `nest start`, and listens on port 4000 with a global `/api` prefix. It connects to MongoDB Atlas through `MongooseModule` and exposes these domain modules:
+
+| Module | Base route | Purpose |
+|:--|:--|:--|
+| `auth` | `/auth` | Register, login, `GET /me`, password reset request/confirm |
+| `profile` | `/profile` | Create, read, update, delete the authenticated user's profile |
+| `nutrition` | `/nutrition` | Meals, water, and `meals/from-scan` |
+| `workouts` | `/workouts` | Workout sessions, plus `/pause` and `/complete` |
+| `progress` | `/progress` | Measurement entries |
+| `settings` | `/settings` | User settings values |
+| `activity` | `/activity/state` | Quest, streak, and points state |
+| `notifications` | `/notifications` | Notification items and read state |
+| `safety` | `/safety/alerts` | Emergency alert events |
+| `pose` | `/pose` | Pose analysis status and analyze |
+| `exercises` | `/exercises` | Public exercise library |
+| `exercise` | (admin) | Admin-managed exercise catalog |
+| `admin` | `/admin` | Admin analytics and exercise management (roles-guarded) |
+| `foodscan` | `/nutrition/scan`, `/nutrition/foods/...` | Food image analysis via an external service |
+
+**External food-scanner service.** `food-scanner/` is a separate, internal-only Node service (own git repo, own workspace, own `.env`). It is not part of the PhysiqueQuest npm workspaces and is not a public API. The main backend calls it over a private network path, presenting a shared secret in the `X-Internal-Api-Key` header. The scanner is stateless: it holds no user data and writes nothing to disk. When the scanner or its provider keys are unavailable, the scan endpoints answer 503 and every other route keeps working. The scanner's own configuration and contract are documented in `food-scanner/README.md`.
+
+**Optional external services.** The backend also supports confirmed emergency delivery (`ALERT_DELIVERY_URL`) and pose analysis (`POSE_ANALYSIS_URL`) via server-only endpoints. Email delivery for password reset uses `EMAIL_DELIVERY_URL`. All are configured in `backend/.env.example`; none are required for the app to boot.
+
+## 11. Environments, Configuration, and Releases
 
 - Keep the connection URI server-only (for example `MONGODB_URI`); never prefix it with `NEXT_PUBLIC_` or expose it through a WebView bridge.
 - Validate required configuration at backend startup and fail closed if production secrets or required security settings are missing. Do not silently connect production to a local or development database.
@@ -310,7 +341,7 @@ Start with collections that match the first supported use cases, not a generic c
 - Deploy backward-compatible schema/API changes in stages: expand schema, deploy readers/writers, backfill, observe, then remove obsolete fields in a later release.
 - Provide operational runbooks for backup restore, credential rotation, migration failure, Atlas outage, queue backlog, data deletion, and incident response before relying on production persistence.
 
-## 11. Static-to-Database Migration Flow
+## 12. Static-to-Database Migration Flow
 
 When remote persistence is approved for implementation, use this order:
 
@@ -323,7 +354,7 @@ When remote persistence is approved for implementation, use this order:
 7. Verify access controls, duplicate/retry behavior, indexes, backup restore, deletion, and cross-device behavior in staging before production rollout.
 8. Remove obsolete local persistence only after remote flows are proven and a user-data export/deletion approach exists where required.
 
-## 12. Implementation Checklist
+## 13. Implementation Checklist
 
 - [x] Is the database actually implemented in this environment, or is this still static/demo behavior?
   - **MongoDB Atlas is connected and operational with users and profiles collections**
@@ -338,19 +369,19 @@ When remote persistence is approved for implementation, use this order:
 - [ ] Are schemas/version changes and migrations safe, repeatable, and backward-compatible?
   - **Initial schema v1.0, no migrations yet - to be addressed in future versions**
 - [x] Do indexes match bounded, paginated access patterns and uniqueness requirements?
-  - **Unique email index, userId reference index implemented**
+  - **Unique email index, userId reference indexes implemented on users, profiles, progress_entries, workout_sessions, and password_recovery_tokens**
 - [ ] Are retries, duplicate requests, concurrent updates, and partial failures handled?
-  - **Duplicate email handled, concurrent profile updates need optimistic locking**
+  - **Duplicate email handled; concurrent profile updates need optimistic locking; activity/settings updates are single-document upserts**
 - [x] Are Atlas credentials private, least-privilege, environment-specific, and rotated?
   - **Credentials in .env file, not in version control, .env.example provided**
 - [ ] Are backup/restore, monitoring, deletion, and incident procedures defined for the environment?
-  - **Atlas automated backups enabled, monitoring and procedures to be documented**
+  - **Atlas automated backups enabled; monitoring and procedures to be documented**
 - [x] Is raw media kept out of MongoDB unless a documented requirement justifies it?
   - **No media storage in MongoDB, only metadata if needed**
 - [x] Do client-facing messages accurately describe offline, demo, sample, and synchronization behavior?
   - **Clear error messages, localStorage used only for caching JWT and profile**
 
-## 13. Measurement units in profile data
+## 14. Measurement units in profile data
 
 Personal-data measurements are user-entered values and their unit is part of the data contract. The registration wizard sends the selected values and units through the authenticated profile API, and the profile document persists the values in MongoDB Atlas. The browser also caches the returned profile in localStorage. Do not treat entered values as canonical metric values or omit their unit when moving data between the UI, API, cache, and database.
 

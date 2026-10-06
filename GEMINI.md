@@ -6,7 +6,7 @@
 
 ## 1. Architecture & Monorepo Structure
 
-- This is an **npm workspaces monorepo** with three packages: `frontend/`, `mobile/`, `backend/`.
+- This is an **npm workspaces monorepo** with two workspace packages: `frontend/` and `mobile/`. `backend/` is a separately managed NestJS service (own `package.json`, installed and run from `backend/`), and `food-scanner/` is an internal-only external service with its own repo.
 - **NEVER** create files outside these packages (except root config files like `package.json`, `.gitignore`, `GEMINI.md`, `PROGRESS-*.md`, `README.md`).
 - **NEVER** install dependencies at the root. Use `--workspace frontend` or `--workspace mobile`.
 - The `frontend/app/frontend/` directory exists for legacy routing reasons. Do NOT create new routes there.
@@ -15,7 +15,7 @@
 
 | Layer        | Technology                           | Version Pinning             |
 |:-------------|:-------------------------------------|:----------------------------|
-| Framework    | Next.js (App Router)                 | `^15.x`                    |
+| Framework    | Next.js (App Router)                 | `^16.x`                    |
 | Language     | TypeScript (strict mode)             | `^5.x`                     |
 | Styling      | Tailwind CSS v4 + vanilla CSS        | `^4.x` via `@tailwindcss/postcss` |
 | UI Runtime   | React                                | `19.x`                     |
