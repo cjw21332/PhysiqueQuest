@@ -1,4 +1,4 @@
-import { api } from './api';
+import { api, ApiRequestError } from './api';
 import { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './session';
 
 // Authentication utilities
@@ -26,7 +26,10 @@ export async function register(name: string, email: string, password: string): P
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
     return user;
   } catch (error) {
-    console.error('Register API error:', error instanceof Error ? error.message : String(error));
+    if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
+      console.error('Register API error:', error instanceof Error ? error.message : String(error));
+    }
+    if (error instanceof ApiRequestError) throw error;
     throw new Error(error instanceof Error ? error.message : 'Registration failed');
   }
 }
@@ -45,7 +48,10 @@ export async function login(email: string, password: string): Promise<User> {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
     return user;
   } catch (error) {
-    console.error('Login API error:', error instanceof Error ? error.message : String(error));
+    if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
+      console.error('Login API error:', error instanceof Error ? error.message : String(error));
+    }
+    if (error instanceof ApiRequestError) throw error;
     throw new Error(error instanceof Error ? error.message : 'Login failed');
   }
 }

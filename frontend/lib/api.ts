@@ -201,8 +201,12 @@ class ApiClient {
 
       return await response.json();
     } catch (error) {
-      // Log network failures so Expo Go shows them instead of freezing silently
-      console.error('Network/API error:', error instanceof Error ? error.message : String(error));
+      // HTTP rejections are expected application responses (for example, an
+      // already-registered email). Keep those for the caller to handle without
+      // reporting them as network failures; log transport and server failures.
+      if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
+        console.error('Network/API error:', error instanceof Error ? error.message : String(error));
+      }
       // Only report a timeout when our own timer fired; otherwise throw the real error
       if (timedOut) throw new ApiTimeoutError(cap);
       if (error instanceof Error) throw error;
@@ -284,8 +288,9 @@ class ApiClient {
   async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }
 
   async getAuthMe() { return this.request<{ id: string; email: string; role: 'user' | 'admin' }>('/auth/me'); }
-  async requestPasswordReset(email: string) { return this.request<{ accepted: boolean; delivery: 'queued' | 'unavailable' }>('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }); }
-  async confirmPasswordReset(data: { token: string; password: string }) { return this.request<{ updated: boolean }>('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify(data) }); }
+  async requestPasswordReset(email: string) { return this.request<{ accepted: boolean; delivery: 'queued' | 'unavailable'; code?: string }>('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }); }
+  async verifyPasswordResetCode(code: string) { return this.request<{ verified: boolean }>('/auth/password-reset/verify', { method: 'POST', body: JSON.stringify({ code }) }); }
+  async confirmPasswordReset(data: { code: string; password: string }) { return this.request<{ updated: boolean }>('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify(data) }); }
 
   async getProgress(metric: string, limit = 90) { return this.request<any>(`/progress?metric=${encodeURIComponent(metric)}&limit=${limit}`); }
   async addProgress(data: any) { return this.request<any>('/progress', { method: 'POST', body: JSON.stringify(data) }); }

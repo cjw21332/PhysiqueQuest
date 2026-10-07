@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type Ref } from 'react';
 import PasswordStrengthChecker, { validatePassword } from '../../components/PasswordStrengthChecker';
 
 type Props = {
@@ -16,13 +16,15 @@ type Props = {
   consent: boolean;
   onConsentChange: (value: boolean) => void;
   onForgotPassword: () => void;
+  busy?: boolean;
+  emailInputRef?: Ref<HTMLInputElement>;
 };
 
 function EyeIcon({ visible }: { visible: boolean }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true">{visible ? <><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 002.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0112 5c5.5 0 9 7 9 7a15.6 15.6 0 01-3.1 3.8M6.2 6.2C4.1 7.5 3 12 3 12s3.5 7 9 7a9 9 0 003-.5"/></> : <><path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z"/><circle cx="12" cy="12" r="3"/></>}</svg>;
 }
 
-export default function AuthForm({ mode, onModeChange, name, email, onNameChange, onEmailChange, onContinue, error, onErrorChange, consent, onConsentChange, onForgotPassword }: Props) {
+export default function AuthForm({ mode, onModeChange, name, email, onNameChange, onEmailChange, onContinue, error, onErrorChange, consent, onConsentChange, onForgotPassword, busy = false, emailInputRef }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState('');
@@ -101,7 +103,7 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
         <label className="field">
           <span>Email address</span>
           <div className="input-wrap">
-            <input type="email" placeholder="you@email.com" value={email} onChange={e => onEmailChange(e.target.value)}/>
+            <input ref={emailInputRef} type="email" inputMode="email" autoCapitalize="none" spellCheck={false} autoComplete="email" placeholder="you@email.com" value={email} onChange={e => onEmailChange(e.target.value)}/>
           </div>
         </label>
         {register && <small className="hint">Tip: try juan@email.com to see the error state</small>}
@@ -119,8 +121,8 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
         {error && <p className="error" role="alert">{error}</p>}
       </div>
       <div className="auth-footer">
-        <button className="primary" onClick={handleContinue}>
-          {register ? 'Create account' : 'Log in'}
+        <button className="primary" onClick={handleContinue} disabled={busy}>
+          {busy ? 'Creating account…' : register ? 'Create account' : 'Log in'}
         </button>
       </div>
     </section>

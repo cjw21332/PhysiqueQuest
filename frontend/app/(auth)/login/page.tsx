@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import AuthForm from '../../../sections/Auth/AuthForm';
 import ForgotPasswordFlow from '../../../sections/Forgot Password/ForgotPasswordFlow';
+import AuthOutcomeModal from '../../../sections/Auth/AuthOutcomeModal';
 import { login } from '../../../lib/auth';
+import { ApiRequestError } from '../../../lib/api';
 import { navigate } from '../../../lib/navigation';
 
 export default function LoginPage() {
@@ -12,6 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [loginDialog, setLoginDialog] = useState<{ locked: boolean } | null>(null);
   const [notice, setNotice] = useState('');
 
   const handleContinue = async (password: string) => {
@@ -29,7 +32,12 @@ export default function LoginPage() {
       await login(email, password);
       navigate('/home');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
+      if (err instanceof ApiRequestError && (err.statusCode === 401 || err.statusCode === 429)) {
+        setError('');
+        setLoginDialog({ locked: err.statusCode === 429 });
+      } else {
+        setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
+      }
     }
   };
 
@@ -75,6 +83,19 @@ export default function LoginPage() {
           onSuccess={handleForgotPasswordSuccess}
         />
       )}
+      {loginDialog && <AuthOutcomeModal
+        kind="login-failed"
+        locked={loginDialog.locked}
+        onPrimary={() => {
+          if (loginDialog.locked) {
+            setLoginDialog(null);
+            setShowForgotPassword(true);
+          } else {
+            setLoginDialog(null);
+          }
+        }}
+        onSecondary={() => { setLoginDialog(null); setShowForgotPassword(true); }}
+      />}
     </>
   );
 }

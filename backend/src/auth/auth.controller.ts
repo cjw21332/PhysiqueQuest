@@ -2,7 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus, Get, Req, UseGuards } fro
 import type { Request } from 'express';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 import { PasswordRecoveryService } from './password-recovery.service.js';
-import { PasswordResetConfirmDto, PasswordResetRequestDto } from './dto/password-recovery.dto.js';
+import { PasswordResetConfirmDto, PasswordResetRequestDto, PasswordResetVerifyDto } from './dto/password-recovery.dto.js';
 import { AuthService } from './auth.service.js';
 import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto.js';
 
@@ -24,8 +24,11 @@ export class AuthController {
   @Post('password-reset/request')
   requestPasswordReset(@Body() dto: PasswordResetRequestDto) { return this.recovery.request(dto.email); }
 
+  @Post('password-reset/verify')
+  verifyPasswordResetCode(@Body() dto: PasswordResetVerifyDto) { return this.recovery.verify(dto.code); }
+
   @Post('password-reset/confirm')
-  confirmPasswordReset(@Body() dto: PasswordResetConfirmDto) { return this.recovery.confirm(dto.token, dto.password); }
+  confirmPasswordReset(@Body() dto: PasswordResetConfirmDto) { return this.recovery.confirm(dto.code, dto.password); }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)

@@ -23,25 +23,23 @@ The web app is the source of product UI. Do not create parallel native screens i
 
 | Route | Purpose |
 |:--|:--|
-| / | Server-side redirect to /launch so the Expo WebView does not depend on client hydration to leave a splash page |
+| / | Client-side redirect to /launch (avoids splash-page hydration issue) |
 | /launch | Welcome and device-readiness introduction |
-| /login | Prototype sign-in and forgot-password flow |
+| /login | Sign-in and forgot-password flow (backend-backed) |
 | /register | Profile and training onboarding |
-| /exercises | Public exercise library (standalone route, not inside a tab) |
-| /home | Dashboard, goals and milestones, progress, notifications |
+| /home | Dashboard, goals and milestones, progress, notifications, quests |
 | /coach | Weekly plan, exercise library, camera check, live session, workout report |
 | /scan | Nutrition overview, review estimate, add food, daily log, food history |
-| /quests | Level, streak, daily missions, penalties, badges, leaderboard |
-| /me | Profile, safety, privacy, and settings |
+| /me | Profile, safety, privacy, settings, and admin tools (Exercise Library, Engagement Analytics — admin role) |
 
-The five main signed-in tabs are Home, Coach, Scan, Quests, and Me. Most secondary views are internal section state, not separate routes. Use the existing section controller and a back callback for nested views. The `/exercises` page is a standalone public route outside the tab shell.
+The five main signed-in tabs are Home, Coach, Scan, and Me. Quests live inside Home (no standalone `/quests` route). The `/exercises` route serves the public exercise library (`exercise-library.controller.ts`, `/exercises`); admin exercise management is separate (`admin/exercises`, admin-role guarded). Most secondary views are internal section state, not separate routes. Use the existing section controller and a back callback for nested views.
 
 ### Current prototype boundaries
 
 - Registration and login call the backend auth endpoints and store a JWT in localStorage. Authenticated profile pages retrieve profile data from the backend and cache the response locally.
 - Password reset is fully implemented: request + confirm endpoints, `password_recovery_tokens` collection, token hashing, expiry, and one-time use.
-- Food log data is saved locally; exercise, progress, quest, notification, and nutrition data come from the backend API (not sample/demo). Only the recent-foods cache remains local.
-- Coach exercise library is fetched from `GET /exercises` with a static fallback in `exercises.ts`. Camera permission and local video selection can use device inputs, but readiness checks, form tracking, calorie estimates, exercise scoring, and workout reports are prototype/demo behavior. Do not describe these results as connected AI or verified tracking. Uploaded video is currently handled locally in the WebView flow.
+- Nutrition (meals, water), workouts, progress, quests/streaks, notifications, and settings are served by the backend API from real Atlas collections. Only the food log's `physiquequest-recent-foods` cache and the JWT/profile cache remain local.
+- Coach exercise library is fetched from `GET /exercises` (admin exercise library) and the public exercise catalog with a static fallback in `exercises.ts`. Camera permission and local video selection can use device inputs, but readiness checks, form tracking, calorie estimates, exercise scoring, and workout reports are prototype/demo behavior. Do not describe these results as connected AI or verified tracking. Uploaded video is currently handled locally in the WebView flow.
 - The client calls the NestJS API; the API connects to MongoDB Atlas. Expo Go loads the frontend from the development computer and derives the API host from that page's LAN hostname. The phone and computer must share a reachable network; clients never connect directly to Atlas.
 
 ## 2. Run and Build

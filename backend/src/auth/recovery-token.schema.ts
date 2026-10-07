@@ -7,5 +7,7 @@ export class RecoveryToken {
   @Prop({ required: true, unique: true, select: false }) tokenHash: string;
   @Prop({ required: true, expires: 0 }) expiresAt: Date;
   @Prop({ type: Date, default: null }) usedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 export const RecoveryTokenSchema = SchemaFactory.createForClass(RecoveryToken);

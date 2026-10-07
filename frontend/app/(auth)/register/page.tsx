@@ -1,40 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import AuthForm from '../../../sections/Auth/AuthForm';
 import CalibrationFlow from '../../../sections/Auth/CalibrationFlow';
+import AuthOutcomeModal from '../../../sections/Auth/AuthOutcomeModal';
 import { register } from '../../../lib/auth';
-import { api } from '../../../lib/api';
+import { ApiRequestError, api } from '../../../lib/api';
 import type { Profile } from '../../../sections/Home/types';
 import { navigate } from '../../../lib/navigation';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
   const [calibrating, setCalibrating] = useState(false);
+  const [creatingAccount, setCreatingAccount] = useState(false);
+  const [calibrationError, setCalibrationError] = useState('');
+  const [authDialog, setAuthDialog] = useState<'email-registered' | 'account-created' | null>(null);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleContinue = (pass: string) => {
+  const handleContinue = async (pass: string) => {
     if (!name.trim() || !email.trim() || !consent) {
       setError('Add your name and email, then agree to continue.');
+      return;
+    }
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setError('Enter a valid email address.');
+      emailInputRef.current?.focus();
       return;
     }
     if (pass.length < 8) {
       setError('Password must be at least 8 characters.');
       return;
     }
-    setPassword(pass);
     setError('');
-    setCalibrating(true);
+    setCreatingAccount(true);
+    try {
+      await register(name, normalizedEmail, pass);
+      setAuthDialog('account-created');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+      if ((err instanceof ApiRequestError && err.statusCode === 409) || /email already registered/i.test(message)) {
+        setAuthDialog('email-registered');
+      } else {
+        setError(message);
+      }
+    } finally {
+      setCreatingAccount(false);
+    }
   };
 
   const finishCalibration = async (profile: Profile) => {
+    setCalibrationError('');
     try {
-      // Register user with backend ONLY after completing calibration
-      const user = await register(name, email, password);
-
       // Prepare profile data for backend - remove fields that aren't in the DTO
       const profileData = {
         name: profile.name,
@@ -73,8 +93,7 @@ export default function RegisterPage() {
 
       navigate('/home');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
-      setCalibrating(false);
+      setCalibrationError(err instanceof Error ? err.message : 'Could not save your profile. Please try again.');
     }
   };
 
@@ -86,13 +105,14 @@ export default function RegisterPage() {
             name={name}
             email={email}
             onComplete={finishCalibration}
+            submitError={calibrationError}
           />
         </div>
       </main>
     );
   }
 
-  return (
+  return <>
     <main className="scene">
       <div className="app-shell">
         <AuthForm
@@ -110,8 +130,25 @@ export default function RegisterPage() {
           consent={consent}
           onConsentChange={setConsent}
           onForgotPassword={() => {}}
+          busy={creatingAccount}
+          emailInputRef={emailInputRef}
         />
       </div>
     </main>
-  );
+    {authDialog === 'email-registered' && <AuthOutcomeModal
+      kind="email-registered"
+      email={email}
+      onPrimary={() => navigate('/login')}
+      onSecondary={() => {
+        setAuthDialog(null);
+        setEmail('');
+        window.requestAnimationFrame(() => emailInputRef.current?.focus());
+      }}
+    />}
+    {authDialog === 'account-created' && <AuthOutcomeModal
+      kind="account-created"
+      name={name}
+      onPrimary={() => { setAuthDialog(null); setCalibrationError(''); setCalibrating(true); }}
+    />}
+  </>;
 }

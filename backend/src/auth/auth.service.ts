@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, type HydratedDocument } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -15,6 +15,8 @@ export class AuthService {
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     const { email, name, password } = registerDto;
+    // Ensure the unique email index exists before accepting any registration.
+    await this.userModel.init();
 
     // Check if user already exists
     const normalizedEmail = email.trim().toLowerCase();
@@ -61,11 +63,33 @@ export class AuthService {
       throw new UnauthorizedException('Account is disabled');
     }
 
+    const now = new Date();
+    if (user.lockoutUntil && user.lockoutUntil > now) {
+      throw new HttpException('Sign-in is paused for 15 minutes after too many failed attempts.', HttpStatus.TOO_MANY_REQUESTS);
+    }
+    if (user.lockoutUntil && user.lockoutUntil <= now) {
+      await this.userModel.updateOne({ _id: user._id }, { $set: { failedLoginAttempts: 0, lockoutUntil: null } });
+      user.failedLoginAttempts = 0;
+      user.lockoutUntil = null;
+    }
+
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
+      const failedUser = await this.userModel.findByIdAndUpdate(
+        user._id,
+        { $inc: { failedLoginAttempts: 1 } },
+        { new: true },
+      );
+      if (failedUser && failedUser.failedLoginAttempts >= 5) {
+        const lockoutUntil = new Date(Date.now() + 15 * 60_000);
+        await this.userModel.updateOne({ _id: user._id }, { $set: { lockoutUntil } });
+        throw new HttpException('Sign-in is paused for 15 minutes after too many failed attempts.', HttpStatus.TOO_MANY_REQUESTS);
+      }
       throw new UnauthorizedException('Invalid email or password');
     }
+
+    await this.userModel.updateOne({ _id: user._id }, { $set: { failedLoginAttempts: 0, lockoutUntil: null } });
 
     // Generate JWT token
     const payload = { sub: user._id.toString(), email: user.email };

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { createHash, randomBytes } from 'node:crypto';
 import { Model, Types } from 'mongoose';
@@ -18,19 +18,40 @@ export class PasswordRecoveryService {
 
   async request(emailAddress: string) {
     const available = this.email.isAvailable();
-    if (!available) return { accepted: true, delivery: 'unavailable' as const };
     const user = await this.users.findOne({ email: emailAddress.trim().toLowerCase(), isActive: true });
-    if (!user) return { accepted: true, delivery: 'queued' as const };
-    const token = randomBytes(32).toString('base64url');
+    // Keep the response neutral about whether an email is registered.
+    if (!user) return { accepted: true, delivery: available ? 'queued' as const : 'unavailable' as const };
+    const now = new Date();
+    const recentRequest = await this.tokens.findOne({ userId: user._id, expiresAt: { $gt: now } }).sort({ createdAt: -1 });
+    if (recentRequest && now.getTime() - recentRequest.createdAt.getTime() < 60_000) {
+      throw new HttpException('Please wait 60 seconds before requesting another code.', HttpStatus.TOO_MANY_REQUESTS);
+    }
+    const code = String(Math.floor(100000 + Math.random() * 900000));
     const userId = new Types.ObjectId(String(user._id));
     await this.tokens.deleteMany({ userId, usedAt: null });
-    await this.tokens.create({ userId, tokenHash: digest(token), expiresAt: new Date(Date.now() + 30 * 60_000), usedAt: null });
-    const sent = await this.email.sendPasswordReset(user.email, token);
-    if (!sent) {
-      await this.tokens.deleteMany({ userId, tokenHash: digest(token) });
-      return { accepted: true, delivery: 'unavailable' as const };
+    await this.tokens.create({ userId, tokenHash: digest(code), expiresAt: new Date(Date.now() + 30 * 60_000), usedAt: null });
+    if (available) {
+      const sent = await this.email.sendPasswordReset(user.email, code);
+      if (!sent) {
+        await this.tokens.deleteMany({ userId, tokenHash: digest(code) });
+        return { accepted: true, delivery: 'unavailable' as const };
+      }
+      return { accepted: true, delivery: 'queued' as const };
     }
-    return { accepted: true, delivery: 'queued' as const };
+    // Email delivery is not configured: persist the code anyway so the
+    // confirm flow works in development, and surface it to the developer.
+    console.log(`[password-reset] EMAIL_DELIVERY_URL not configured. Recovery code for ${user.email}: ${code}`);
+    return { accepted: true, delivery: 'unavailable' as const, code };
+  }
+
+  async verify(token: string) {
+    const recovery = await this.tokens.findOne({
+      tokenHash: digest(token),
+      expiresAt: { $gt: new Date() },
+      usedAt: null,
+    });
+    if (!recovery) throw new BadRequestException('Verification code is invalid or expired');
+    return { verified: true };
   }
 
   async confirm(token: string, password: string) {

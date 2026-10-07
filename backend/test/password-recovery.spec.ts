@@ -5,12 +5,26 @@ import { PasswordRecoveryService } from '../src/auth/password-recovery.service.j
 import type { EmailDeliveryProvider } from '../src/providers/email-delivery.provider.js';
 
 describe('password recovery', () => {
-  it('returns an account-neutral unavailable response without storing tokens', async () => {
+  it('returns an account-neutral unavailable response for unknown emails', async () => {
     const findOne = vi.fn();
     const provider = { isAvailable: () => false, sendPasswordReset: vi.fn() } as unknown as EmailDeliveryProvider;
     const service = new PasswordRecoveryService({ findOne } as any, {} as any, provider);
     expect(await service.request('unknown@example.com')).toEqual({ accepted: true, delivery: 'unavailable' });
-    expect(findOne).not.toHaveBeenCalled();
+  });
+
+  it('persists and returns a 6-digit recovery code when delivery is unavailable so the flow works locally', async () => {
+    const user = { _id: new Types.ObjectId(), email: 'member@example.com' };
+    const created: any[] = [];
+    const tokens = { deleteMany: vi.fn(), create: vi.fn(async item => { created.push(item); }), findOneAndUpdate: vi.fn(async (filter, update) => { const item = created.find(entry => entry.tokenHash === filter.tokenHash && !entry.usedAt); if (!item) return null; item.usedAt = update.$set.usedAt; return item; }) };
+    const users = { findOne: vi.fn(async () => user), updateOne: vi.fn(async (...args) => { return { matchedCount: 1 }; }) };
+    const provider = { isAvailable: () => false, sendPasswordReset: vi.fn() } as unknown as EmailDeliveryProvider;
+    const service = new PasswordRecoveryService(users as any, tokens as any, provider);
+    const response = await service.request(' MEMBER@example.com ');
+    expect(response).toEqual({ accepted: true, delivery: 'unavailable', code: expect.stringMatching(/^\d{6}$/) });
+    expect(created).toHaveLength(1);
+    expect(created[0].tokenHash).not.toBe(response.code);
+    await service.confirm(response.code as string, 'StrongPass1');
+    expect((users.updateOne as any).mock.calls[0][1].$set.passwordHash).toBeTruthy();
   });
 
   it('stores only a token hash and confirms one-time password changes', async () => {

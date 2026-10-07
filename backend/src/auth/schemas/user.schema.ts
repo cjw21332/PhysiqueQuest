@@ -20,6 +20,12 @@ export class User {
   @Prop({ enum: ['user', 'admin'], default: 'user', required: true })
   role: 'user' | 'admin';
 
+  @Prop({ default: 0, min: 0 })
+  failedLoginAttempts: number;
+
+  @Prop({ type: Date, default: null })
+  lockoutUntil: Date | null;
+
   @Prop()
   createdAt?: Date;
 

@@ -53,10 +53,11 @@ const dayOptions = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const activityOptions = ['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete'];
 const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'None of these'];
 
-export default function CalibrationFlow({ name, email, onComplete }: {
+export default function CalibrationFlow({ name, email, onComplete, submitError = '' }: {
   name: string;
   email: string;
   onComplete: (profile: Profile) => void;
+  submitError?: string;
 }) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<CalibrationData>(initialData);
@@ -318,7 +319,7 @@ export default function CalibrationFlow({ name, email, onComplete }: {
               <label className="field"><span>Mobile number</span><div className="input-wrap"><input type="tel" value={data.contactPhone} onChange={(event) => setField('contactPhone', formatPhoneNumber(event.target.value))} autoComplete="tel" placeholder="0999-999-9999" maxLength={13} /></div></label>
             </div>
           </>}
-          {error && <p className="error" role="alert">{error}</p>}
+          {(error || submitError) && <p className="error" role="alert">{error || submitError}</p>}
         </div>
 
         <footer className="wizard-footer calibration-footer">
