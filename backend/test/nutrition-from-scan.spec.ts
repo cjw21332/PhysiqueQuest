@@ -138,7 +138,7 @@ describe('NutritionService.addMealsFromScan', () => {
   it('upserts so the first scan of a new user creates the document', async () => {
     await service.addMealsFromScan(USER_ID, payload());
 
-    expect(findOneAndUpdate.mock.calls[0][2]).toMatchObject({ upsert: true, new: true });
+    expect(findOneAndUpdate.mock.calls[0][2]).toMatchObject({ upsert: true, returnDocument: 'after' });
   });
 
   it('scopes the write to the requesting user', async () => {

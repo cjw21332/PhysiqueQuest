@@ -6,6 +6,8 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
     home: <><path d="m3 10 9-7 9 7v10a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z"/></>,
     coach: <><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></>,
     scan: <><path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3"/><path d="M7 12h10"/></>,
+    camera: <><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V8a1 1 0 011-1z"/><circle cx="12" cy="13" r="3.5"/></>,
+    image: <><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></>,
     trophy: <><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM7 6H4v2a4 4 0 004 4M17 6h3v2a4 4 0 01-4 4"/></>,
     user: <><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0114 0"/></>,
     fire: <><path d="M12 22a7 7 0 007-7c0-4-3-6-4-10-2 2-2 4-2 5-2-2-3-4-3-7-4 4-5 8-5 12a7 7 0 007 7z"/><path d="M12 22a3 3 0 003-3c0-2-2-3-3-5-1 2-3 3-3 5a3 3 0 003 3z"/></>,

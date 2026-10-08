@@ -12,7 +12,7 @@ export class SettingsService {
     return this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       { $setOnInsert: { userId: new Types.ObjectId(userId), values: {} } },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
     );
   }
 

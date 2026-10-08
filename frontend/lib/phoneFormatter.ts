@@ -1,5 +1,5 @@
 /**
- * Format phone number to Philippine format: 0999-999-9999
+ * Format phone number to Philippine format: 0999 999 9999
  * @param value - Raw phone number input
  * @returns Formatted phone number
  */
@@ -10,13 +10,13 @@ export function formatPhoneNumber(value: string): string {
   // Limit to 11 digits (Philippine mobile format)
   const limited = digits.slice(0, 11);
 
-  // Format as 0999-999-9999
+  // Format as 0999 999 9999
   if (limited.length <= 4) {
     return limited;
   } else if (limited.length <= 7) {
-    return `${limited.slice(0, 4)}-${limited.slice(4)}`;
+    return `${limited.slice(0, 4)} ${limited.slice(4)}`;
   } else {
-    return `${limited.slice(0, 4)}-${limited.slice(4, 7)}-${limited.slice(7)}`;
+    return `${limited.slice(0, 4)} ${limited.slice(4, 7)} ${limited.slice(7)}`;
   }
 }
 

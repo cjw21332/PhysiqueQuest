@@ -7,6 +7,7 @@ export interface FetchJsonOptions {
   upstream: string;
   timeoutMs?: number;
   headers?: Record<string, string>;
+  retryServerErrors?: boolean;
 }
 
 @Injectable()
@@ -45,6 +46,10 @@ export class HttpService {
       // Read and discard the body: it is not surfaced to the caller, and leaving
       // it unread can keep the socket open.
       await res.text().catch(() => '');
+      if (opts.retryServerErrors && [500, 502, 503, 504].includes(res.status)) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        return this.fetchJson<T>(url, { ...opts, retryServerErrors: false });
+      }
       if (res.status === 404) {
         throw new AppError(ErrorCode.NOT_FOUND, `${opts.upstream} has no record for that identifier`);
       }

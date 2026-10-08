@@ -61,12 +61,7 @@ export default function AddFood({
     setError('');
     try {
       const response = await api.searchFoods(trimmed);
-      const candidates = response.candidates.slice(0, 5);
-      const withNutrition = await Promise.all(candidates.map(async candidate => {
-        try { return { ...candidate, detail: await api.getFoodDetail(candidate.fdc_id) }; }
-        catch { return candidate; }
-      }));
-      if (latestQueryRef.current === trimmed) setResults(withNutrition);
+      if (latestQueryRef.current === trimmed) setResults(response.candidates.slice(0, 5));
     } catch (err) {
       if (latestQueryRef.current === trimmed) {
         setResults([]);
@@ -87,7 +82,7 @@ export default function AddFood({
       setResults([]);
       setError('');
       setLoading(true);
-      debounceRef.current = setTimeout(() => void fetchResults(query), 300);
+      debounceRef.current = setTimeout(() => void fetchResults(query), 500);
     } else { setResults([]); setLoading(false); setError(''); }
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query, fetchResults]);
@@ -172,13 +167,17 @@ export default function AddFood({
           <div className="food-result-list">
             {results.map(food => {
               const isSelected = selected?.fdc_id === food.fdc_id;
+              const detail = isSelected ? selected?.detail : food.detail;
               return <button type="button" key={food.fdc_id} className={isSelected ? 'selected' : ''} aria-pressed={isSelected} onClick={() => void selectFood(food)}>
                 <i className={isSelected ? 'checked' : ''} aria-hidden="true" />
                 <span><b>{food.description}</b><small>{food.data_type} · per 100 g</small></span>
-                <strong>{food.detail ? `${Math.round(food.detail.per_100g.kcal)} kcal` : 'Nutrition unavailable'}</strong>
+                <strong>{detail ? `${Math.round(detail.per_100g.kcal)} kcal` : 'Select to load'}</strong>
               </button>;
             })}
-            {!loading && !results.length && <p className="empty-food-results">{error || (query ? 'No foods found. Try another search.' : 'Search or choose a recent food.')}</p>}
+            {!loading && !results.length && <>
+              <p className="empty-food-results" role={error ? 'alert' : undefined}>{error || (query ? 'No foods found. Try another search.' : 'Search or choose a recent food.')}</p>
+              {error && <button type="button" className="scan-retry" onClick={() => void fetchResults(query)}>Try again</button>}
+            </>}
           </div>
         </section>
 
@@ -200,7 +199,6 @@ export default function AddFood({
             ['Fat', calculated ? `${round(calculated.fat)} g` : '—'],
           ].map(([label, value]) => <div className="food-value" key={label}><span>{label}</span><b>{value}</b></div>)}
           {unit === 'servings' && <small className="serving-basis">One serving = {round(servingSizeG)} g{selected?.detail?.serving_size_g ? '' : ' (USDA serving size unavailable)'}</small>}
-          {error && !selected && <p className="food-detail-loading" role="alert">{error}</p>}
         </section>
       </div>
 

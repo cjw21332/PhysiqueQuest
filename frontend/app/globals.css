@@ -6243,6 +6243,68 @@ iframe[src*="notification"] {
 .scan-dashboard-scan-copy strong { font-size: 13px; line-height: 1.2; }
 .scan-dashboard-scan-copy small { color: #36583d; font-size: 10px; line-height: 1.3; }
 .scan-dashboard-scan > svg { flex: none; transform: rotate(-90deg); }
+.scan-source-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(25 34 51 / 48%);
+}
+.scan-source-dialog {
+  width: min(100%, 420px);
+  padding: 22px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 18px 55px rgb(25 34 51 / 22%);
+}
+.scan-source-dialog h2 { margin: 0; color: var(--ink); font-size: 20px; line-height: 1.25; }
+.scan-source-dialog > p { margin: 7px 0 18px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.scan-source-option {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 9px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.scan-source-option:focus-visible,
+.scan-source-cancel:focus-visible { outline: 2px solid var(--green-dark); outline-offset: 3px; }
+.scan-source-icon {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #effaf0;
+  color: var(--green-dark);
+}
+.scan-source-option > span:nth-child(2) { min-width: 0; flex: 1; display: grid; gap: 4px; }
+.scan-source-option strong { font-size: 14px; line-height: 1.2; }
+.scan-source-option small { color: var(--muted); font-size: 11px; line-height: 1.35; }
+.scan-source-option > svg:last-child { color: var(--muted); }
+.scan-source-cancel {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
 .scan-dashboard-meals { margin-bottom: 18px; }
 .scan-dashboard-meals > h2,
 .scan-dashboard-more > h2 {
@@ -6531,4 +6593,211 @@ iframe[src*="notification"] {
 }
 @media (prefers-reduced-motion: reduce) {
   .quest-v2-exp-track span { transition: none; }
+}
+
+/* Me Edit Screens */
+.me-edit-screen { position: absolute; inset: 0; background: var(--bg); z-index: 10; display: flex; flex-direction: column; overflow: hidden; }
+.edit-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.edit-header h2 { margin: 0; font-size: 16px; font-weight: 600; color: var(--ink); text-transform: none; letter-spacing: normal; }
+.edit-header .back-btn { width: 32px; height: 32px; display: grid; place-items: center; margin-left: -8px; transform: rotate(180deg); color: var(--ink); padding: 0; }
+.edit-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; }
+.edit-scroll > .step-content { padding: 0; display: grid; gap: 24px; }
+.edit-description { padding: 0 0 16px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.edit-footer { padding: 16px; background: var(--surface); border-top: 1px solid var(--line); margin-top: auto; display: flex; gap: 12px; }
+.edit-footer .secondary { flex: 1; background: var(--surface); }
+.edit-footer .primary { flex: 1; }
+
+/* Logs & Target keeps the day's totals, meals, and water visible together. */
+.target-log-header {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.target-log-header h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(14px, 3.8vw, 17px);
+  line-height: 1.25;
+  font-weight: 650;
+}
+.target-log-history {
+  min-height: 40px;
+  padding: 0 2px 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--green-dark);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.target-log-summary {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+}
+.target-log-ring {
+  position: relative;
+  width: 76px;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.15;
+}
+.target-log-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.target-log-ring-track,
+.target-log-ring-progress { fill: none; stroke-width: 8; }
+.target-log-ring-track { stroke: var(--line); }
+.target-log-ring-progress {
+  stroke: var(--green);
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset .3s ease;
+}
+.target-log-ring strong { position: relative; color: var(--ink); font-size: clamp(13px, 3.7vw, 16px); }
+.target-log-ring small { position: relative; margin-top: 3px; color: var(--muted); font-size: 8px; white-space: nowrap; }
+.target-log-macros { min-width: 0; display: grid; gap: 7px; }
+.target-log-remaining { margin: 0 0 1px; color: var(--muted); font-size: 10px; line-height: 1.2; }
+.target-log-remaining strong { color: var(--ink); font-weight: 650; }
+.target-log-macro { min-width: 0; }
+.target-log-macro > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+  color: var(--ink);
+  font-size: 9px;
+  line-height: 1.2;
+}
+.target-log-macro small { color: var(--muted); font-size: inherit; white-space: nowrap; }
+.target-log-macro-track { height: 4px; overflow: hidden; border-radius: 99px; background: var(--line); }
+.target-log-macro-track span { display: block; height: 100%; border-radius: inherit; background: var(--green); transition: width .25s ease; }
+.target-log-section-head {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.target-log-section-head h3 { margin: 0; color: var(--ink); font-size: 11px; line-height: 1.3; font-weight: 650; }
+.target-log-section-head > button {
+  min-height: 38px;
+  padding: 0 2px 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--green-dark);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.target-log-meal-list { border-top: 1px solid var(--line); }
+.target-log-meal {
+  min-height: 49px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.target-log-meal-copy { min-width: 0; flex: 1; padding: 6px 0; }
+.target-log-meal-copy p {
+  overflow: hidden;
+  margin: 0;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.target-log-meal-copy p strong { color: var(--ink); font-weight: 600; }
+.target-log-meal-copy small { display: block; margin-top: 2px; color: var(--muted); font-size: 8px; line-height: 1.3; }
+.target-log-meal-calories { flex: none; color: var(--ink); font-size: 9px; font-weight: 600; white-space: nowrap; }
+.target-log-meal-add {
+  min-width: 38px;
+  min-height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.target-log-water { margin-top: 11px; }
+.target-log-water .target-log-section-head { min-height: 28px; }
+.target-log-water .target-log-section-head > small { color: var(--muted); font-size: 9px; white-space: nowrap; }
+.target-log-water-glasses { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 5px; }
+.target-log-water-glasses button {
+  min-width: 0;
+  min-height: 37px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+.target-log-water-glasses button.filled { border-color: var(--green); background: var(--green); color: var(--green-dark); }
+.target-log-header button:focus-visible,
+.target-log-section-head button:focus-visible,
+.target-log-meal-add:focus-visible,
+.target-log-water-glasses button:focus-visible {
+  outline: 2px solid var(--green-dark);
+  outline-offset: 2px;
+}
+@media (min-width: 700px) {
+  .target-log-header { min-height: 50px; margin-bottom: 12px; }
+  .target-log-header h2 { font-size: 18px; }
+  .target-log-summary { grid-template-columns: 88px minmax(0, 1fr); gap: 16px; margin-bottom: 18px; }
+  .target-log-ring { width: 88px; }
+  .target-log-ring strong { font-size: 18px; }
+  .target-log-ring small { font-size: 9px; }
+  .target-log-macros { gap: 9px; }
+  .target-log-remaining { font-size: 12px; }
+  .target-log-macro > div:first-child { font-size: 11px; }
+  .target-log-macro-track { height: 5px; }
+  .target-log-section-head { min-height: 34px; }
+  .target-log-section-head h3 { font-size: 13px; }
+  .target-log-meal { min-height: 58px; }
+  .target-log-meal-copy p { font-size: 11px; }
+  .target-log-meal-copy small { font-size: 9px; }
+  .target-log-meal-calories { font-size: 11px; }
+  .target-log-water { margin-top: 16px; }
+  .target-log-water .target-log-section-head > small { font-size: 11px; }
+  .target-log-water-glasses { gap: 7px; }
+  .target-log-water-glasses button { min-height: 42px; }
+}
+@media (max-width: 340px) {
+  .target-log-summary { grid-template-columns: 68px minmax(0, 1fr); gap: 8px; }
+  .target-log-ring { width: 68px; }
+  .target-log-ring strong { font-size: 13px; }
+  .target-log-ring small { font-size: 7px; }
+  .target-log-macros { gap: 6px; }
+  .target-log-water-glasses { gap: 3px; }
+  .target-log-water-glasses button { min-height: 34px; }
+}
+@media (max-height: 700px) {
+  .target-log-header { min-height: 40px; margin-bottom: 6px; }
+  .target-log-summary { margin-bottom: 10px; }
+  .target-log-meal { min-height: 43px; }
+  .target-log-water { margin-top: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .target-log-ring-progress,
+  .target-log-macro-track span { transition: none; }
 }

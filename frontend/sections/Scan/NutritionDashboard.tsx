@@ -1,10 +1,10 @@
 'use client';
 
 import { Icon } from '../Home/icons';
-import { mealNames, type FoodEntry, type MealName } from './types';
+import { mealNames, nutritionTargets, type FoodEntry, type MealName } from './types';
 
-const calorieTarget = 2300;
-const macroTargets = { Protein: 140, Carbs: 240, Fats: 70 };
+const calorieTarget = nutritionTargets.calories;
+const macroTargets = { Protein: nutritionTargets.protein, Carbs: nutritionTargets.carbs, Fats: nutritionTargets.fats };
 const ringCircumference = 2 * Math.PI * 43;
 
 export default function NutritionDashboard({

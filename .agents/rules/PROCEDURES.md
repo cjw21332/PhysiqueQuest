@@ -1,7 +1,7 @@
 ---
 name: physiquequest-dev
 description: >-
-  Current development procedures for the PhysiqueQuest prototype. Use when
+  Current development procedures for the PhysiqueQuest app and services. Use when
   changing routes, section UI, styling, local data, or the Expo WebView.
 ---
 
@@ -13,9 +13,9 @@ PhysiqueQuest has two root npm workspaces plus a separately managed backend serv
 
 - frontend/ is the Next.js 16 App Router web app. React and TypeScript are used for UI and behavior; all active global styles are in frontend/app/globals.css.
 - mobile/ is an Expo 57 app that hosts the web app in a React Native WebView and passes native safe-area insets into CSS.
-- backend/ is an operational NestJS API service with JWT authentication, protected profile endpoints, and a MongoDB/Mongoose connection. It is not a root npm workspace; install and run its package from `backend/`.
-- MongoDB Atlas stores user identities and profiles. Nutrition, workout, quest, notification, progress, and settings state are now served by the backend API (real collections, not localStorage). Only a few client-side caches and the food log's recent-foods cache remain local.
-- `backend/` is a separately managed NestJS service (not a root npm workspace); install and run it from `backend/`. `food-scanner/` is an internal-only external service with its own repo and workspace; the backend calls it over a private network with a shared secret. See DATABASE.md §10.
+- backend/ contains the NestJS API with JWT authentication, protected profile endpoints, and MongoDB/Mongoose models. It is not a root npm workspace; install and run its package from `backend/`. Model/API code does not prove that a configured remote database is reachable.
+- Nutrition, workout, quest, notification, progress, settings, and profile data have backend API/model implementations. Client-only keys include the JWT, a non-authoritative profile cache, recent-food suggestions, and an optional API URL override.
+- `food-scanner/` is independently managed and is not a root npm workspace. The main backend exposes the food-scan API itself and uses its configured Gemini/USDA provider integrations; do not assume a backend-to-food-scanner service call. See DATABASE.md §10.
 
 The web app is the source of product UI. Do not create parallel native screens in mobile/ for features that already belong to the web app.
 
@@ -23,24 +23,27 @@ The web app is the source of product UI. Do not create parallel native screens i
 
 | Route | Purpose |
 |:--|:--|
-| / | Client-side redirect to /launch (avoids splash-page hydration issue) |
+| / | Server redirect to /launch |
 | /launch | Welcome and device-readiness introduction |
 | /login | Sign-in and forgot-password flow (backend-backed) |
 | /register | Profile and training onboarding |
 | /home | Dashboard, goals and milestones, progress, notifications, quests |
 | /coach | Weekly plan, exercise library, camera check, live session, workout report |
 | /scan | Nutrition overview, review estimate, add food, daily log, food history |
+| /quests | Quests, level/streak progress, missions, badges, and leaderboard preview |
 | /me | Profile, safety, privacy, settings, and admin tools (Exercise Library, Engagement Analytics — admin role) |
+| /exercises | Public exercise library |
 
-The five main signed-in tabs are Home, Coach, Scan, and Me. Quests live inside Home (no standalone `/quests` route). The `/exercises` route serves the public exercise library (`exercise-library.controller.ts`, `/exercises`); admin exercise management is separate (`admin/exercises`, admin-role guarded). Most secondary views are internal section state, not separate routes. Use the existing section controller and a back callback for nested views.
+The five signed-in tabs are Home, Coach, Scan, Quests, and Me. Quests has its own `/quests` route and tab. The `/exercises` route serves the public exercise library; admin exercise management and analytics are separate, role-gated tools. Most detail screens are internal section state, not separate routes. Use the existing section controller and an explicit back callback for nested views.
 
-### Current prototype boundaries
+### Current implementation and prototype boundaries
 
-- Registration and login call the backend auth endpoints and store a JWT in localStorage. Authenticated profile pages retrieve profile data from the backend and cache the response locally.
-- Password reset is fully implemented: request + confirm endpoints, `password_recovery_tokens` collection, token hashing, expiry, and one-time use.
-- Nutrition (meals, water), workouts, progress, quests/streaks, notifications, and settings are served by the backend API from real Atlas collections. Only the food log's `physiquequest-recent-foods` cache and the JWT/profile cache remain local.
-- Coach exercise library is fetched from `GET /exercises` (admin exercise library) and the public exercise catalog with a static fallback in `exercises.ts`. Camera permission and local video selection can use device inputs, but readiness checks, form tracking, calorie estimates, exercise scoring, and workout reports are prototype/demo behavior. Do not describe these results as connected AI or verified tracking. Uploaded video is currently handled locally in the WebView flow.
-- The client calls the NestJS API; the API connects to MongoDB Atlas. Expo Go loads the frontend from the development computer and derives the API host from that page's LAN hostname. The phone and computer must share a reachable network; clients never connect directly to Atlas.
+- Registration and login call the backend auth endpoints and store a JWT in localStorage. Registration submits the profile after onboarding; authenticated profile pages retrieve it from the backend and cache the response locally. The profile cache is not an offline source of truth.
+- Password reset has request, verify, and confirm endpoints with hashed, expiring, one-time codes. Email delivery requires `EMAIL_DELIVERY_URL` and `EMAIL_DELIVERY_API_KEY`; a no-email code response is restricted to development and must never be exposed in production.
+- Nutrition (meals, water, food search, and saved scan results), workouts, progress, quests/streaks, notifications, and settings use backend API endpoints and MongoDB/Mongoose models. The recent-food picks, JWT, profile cache, and optional API URL override are client-side only; they are not authoritative copies of server data.
+- Meal-photo selection opens the review screen immediately, then sends the image to the authenticated backend scan endpoint. The user reviews and saves matched scan items; scanning alone does not create a meal.
+- Coach exercise library uses the public `GET /exercises` API with a static fallback in `exercises.ts`. Camera permission and local video selection can use device inputs, but readiness checks, form tracking, calorie estimates, and exercise scoring are prototype/demo behavior. Do not describe these results as connected AI or verified tracking. Workout records use the backend; uploaded video is handled locally in the WebView flow.
+- The client calls the NestJS API; the API is configured for MongoDB through server-side environment settings. Expo Go loads the frontend from the development computer and derives the API host from that page's LAN hostname. The phone and computer must share a reachable network; clients never connect directly to MongoDB.
 
 ## 2. Run and Build
 
@@ -58,13 +61,13 @@ The frontend uses .next-dev/ for development and .next/ for production build out
 
     cd backend && npm install && npm run start:dev
 
-The food-scanner service is separate again (`cd food-scanner && npm install && npm run dev`); it is not part of the PhysiqueQuest workspaces and only the backend talks to it.
+The food-scanner service is separately managed and is not part of the root npm workspaces. Follow its own README and deployment instructions; its browser client should call the main backend, whose scan implementation uses its own provider integrations.
 
 ### Tests
 
-- Frontend: `npm run test:ui-guard` (node:test static source assertions in `frontend/tests/`). There is no runtime browser or unit-test suite.
+- Frontend: run the full Node test suite with `node --test tests/*.test.mjs` from `frontend/`. `npm run test:ui-guard` runs only `mobile-redesign.test.mjs`; it is not the full suite. These tests include static source assertions and focused utility/API tests, not a browser-driven UI suite.
 - Backend: `npm run test` (vitest unit + e2e in `backend/test/`), `npm run test:e2e`, `npm run lint` (oxlint).
-- Use the production build (`npm run build`) to check TypeScript and route compilation after frontend code changes.
+- Use `npm run build` from the repository root for the frontend production build. Build and test the separately managed API from `backend/` when its code or API contract changes.
 
 ## 3. Find the Right Place to Change
 
@@ -89,7 +92,7 @@ Do not create routes under frontend/app/frontend/. That directory contains a leg
 - Home: frontend/sections/Home/HomeSection.tsx and HomeDashboard.tsx; subviews are GoalsMilestones.tsx, Progress.tsx, and Notifications.tsx.
 - Coach: frontend/sections/Coach/CoachSection.tsx controls plan, library, camera, session, and report views.
 - Scan: frontend/sections/Scan/ScanSection.tsx controls nutrition, review, add, daily log, and history.
-- Quests: frontend/sections/Quests Section/QuestSection.tsx (leaderboard is hardcoded preview data — labeled as sample).
+- Quests: frontend/sections/Quests Section/QuestSection.tsx (activity is backend-backed; the leaderboard is sample preview data).
 - Me: frontend/sections/Me Section/MeSection.tsx.
 - Expo host and inset bridge: mobile/App.tsx and mobile/app.json.
 
@@ -128,12 +131,13 @@ Do not create routes under frontend/app/frontend/. That directory contains a leg
 
 ## 7. Procedure: Add or Update Food Data
 
-- Food types and sample values live in frontend/sections/Scan/types.ts.
-- ScanSection.tsx owns the food-log state and persistence.
+- Food and meal types live in frontend/sections/Scan/types.ts.
+- The `useNutrition` hook and backend API own meal and water data; `ScanSection.tsx` coordinates scan, review, add, log, and history views.
 - Add catalog records with name, group, serving description, calories, protein, carbs, and fat.
 - Preserve the existing save and return flows for Add Food, Review Estimate, Today's Log, and Food History.
-- The food log storage key is physiquequest-food-log with a meals array and water count. Validate parsed data before using it; retain a usable fallback if browser storage is empty or malformed.
-- Keep demo estimate and nutrition copy clear about its sample-data status.
+- Recent-food picks are cached under `physiquequest-recent-foods`; this is not the meal log.
+- Photo analysis uses the backend food-scanning contract. Keep the estimate review/edit/save path explicit, handle unavailable scanner/provider errors, and do not save until the user confirms.
+- Today's Log displays the live day's meals and water state, uses the shared nutrition targets, and retains the main tab bar.
 
 ## 8. Procedure: Update Coach Exercises or Workout Flows
 
@@ -151,7 +155,7 @@ Current localStorage keys:
 |:--|:--|:--|
 | physiquequest-auth | Backend user identity and JWT access token; never the password | frontend/lib/auth.ts |
 | physiquequest-profile | Cached backend profile; it is not the authoritative copy | frontend/hooks/useCurrentProfile.ts and signed-in route wrappers |
-| physiquequest-recent-foods | Recently added food entries (the only food-log data still local) | frontend/sections/Scan/AddFood.tsx |
+| physiquequest-recent-foods | Recently selected food suggestions; not meal history | frontend/sections/Scan/AddFood.tsx |
 | physiquequest-runtime-api-url | User-overridable API base URL (LAN address fallback) | frontend/lib/api.ts |
 
 Ephemeral client-side state that is NOT persisted (in-memory or event-driven):
@@ -185,7 +189,7 @@ After a UI, route, or behavior change:
 
 - Run `npm run build` from the root and resolve TypeScript, CSS parsing, and static route errors.
 - Run the backend tests (`cd backend && npm run test`) when the change touches API contracts, schemas, or persistence.
-- Run the frontend UI-guard tests (`npm run test:ui-guard`) when a section component changes.
+- Run the relevant frontend test(s), and use `node --test tests/*.test.mjs` from `frontend/` for the full frontend suite when a section component or shared flow changes.
 - Review the changed screen at a narrow phone width, a short-height phone, tablet width, and desktop width when the change affects responsive behavior.
 - Check that no control overlaps the status bar, cutout, system navigation, or app bottom tabs.
 - Check that primary touch targets remain at least 44px, back buttons return to the correct parent view, and inputs remain usable with a mobile keyboard.
@@ -205,7 +209,7 @@ The rule docs are a contract with the codebase, and they have drifted before. Ma
    - `DESIGN.md` — visual and interaction rules, plus backend-integration design concerns (loading, empty, and error states; sample/demo labeling).
    - `PROCEDURES.md` — current architecture and how to make changes safely.
    - `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` — locked project rules (Next.js version, monorepo structure, styling constraints). These are edited only when the stack itself changes.
-6. **Version the design doc when the interface changes.** Bump the version in the DESIGN.md title (currently v2.2) and note the change in the maintenance section.
+6. **Version the design doc when the interface changes.** Bump the DESIGN.md title and record the user-visible change in its maintenance section.
 
 ## 13. Documentation Updates
 

@@ -316,7 +316,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
               <div className="group-title"><b>Emergency contact</b><small className="required">Required</small></div>
               <div className="safety-note"><span><Icon name="shield" size={16} /></span><p>Emergency contact information is saved with your profile. Safety alerts are not connected in this prototype.</p></div>
               <label className="field"><span>Name</span><div className="input-wrap"><input value={data.contactName} onChange={(event) => setField('contactName', event.target.value)} autoComplete="name" maxLength={100} /></div></label>
-              <label className="field"><span>Mobile number</span><div className="input-wrap"><input type="tel" value={data.contactPhone} onChange={(event) => setField('contactPhone', formatPhoneNumber(event.target.value))} autoComplete="tel" placeholder="0999-999-9999" maxLength={13} /></div></label>
+              <label className="field"><span>Mobile number</span><div className="input-wrap"><input type="tel" value={data.contactPhone} onChange={(event) => setField('contactPhone', formatPhoneNumber(event.target.value))} autoComplete="tel" placeholder="0999 999 9999" maxLength={13} /></div></label>
             </div>
           </>}
           {(error || submitError) && <p className="error" role="alert">{error || submitError}</p>}

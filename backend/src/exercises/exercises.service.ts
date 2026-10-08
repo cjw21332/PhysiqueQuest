@@ -11,7 +11,7 @@ export class AdminExercisesService {
   async create(dto: ExerciseDto) { return this.model.create({ name: dto.name, group: dto.group || 'General', status: dto.status || 'draft', pose: dto.pose || 'missing' }); }
   async update(id: string, dto: ExerciseDto) {
     if (!Types.ObjectId.isValid(id)) throw new NotFoundException('Exercise not found');
-    const updated = await this.model.findOneAndUpdate({ _id: new Types.ObjectId(id) }, { $set: dto }, { new: true, runValidators: true });
+    const updated = await this.model.findOneAndUpdate({ _id: new Types.ObjectId(id) }, { $set: dto }, { returnDocument: 'after', runValidators: true });
     if (!updated) throw new NotFoundException('Exercise not found');
     return updated;
   }

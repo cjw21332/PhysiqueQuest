@@ -116,6 +116,10 @@ export class CreateProfileDto {
   @MinLength(3)
   @MaxLength(30)
   contactPhone: string;
+
+  @IsOptional()
+  @IsIn(['Parent', 'Partner', 'Sibling', 'Friend', 'Other'])
+  contactRelationship?: string;
 }
 
 export class UpdateProfileDto {
@@ -146,4 +150,5 @@ export class UpdateProfileDto {
   @IsOptional() @IsString() @MaxLength(500) healthNotes?: string;
   @IsOptional() @IsString() @MinLength(1) @MaxLength(100) contactName?: string;
   @IsOptional() @IsString() @MinLength(3) @MaxLength(30) contactPhone?: string;
+  @IsOptional() @IsIn(['Parent', 'Partner', 'Sibling', 'Friend', 'Other']) contactRelationship?: string;
 }

@@ -6,16 +6,17 @@ description: Database and backend data rules for PhysiqueQuest. Follow when desi
 
 This document is the source of truth for persistence and data-service decisions. It applies to the web app, Expo WebView host, backend APIs, background workers, and any future microservices, regardless of implementation language.
 
-## 1. Current State and Target
+## 1. Current State
 
-- **Status:** Backend API is implemented and connected to MongoDB Atlas (production database).
+- **Status:** The repository contains an implemented NestJS API and Mongoose persistence layer. Whether Atlas is reachable, which environment is configured, and whether that environment is production cannot be established from source alone.
 - The frontend is a Next.js app; the Expo app hosts it in a WebView. The `backend/` folder contains the operational NestJS API server.
-- **Database:** MongoDB Atlas cluster is provisioned and operational at `pq.kbfjuql.mongodb.net` with database name `PhysiqueQuest`.
-- **Authentication:** JWT-based authentication is implemented with bcrypt password hashing. Users and profiles are persisted to MongoDB Atlas.
-- **Collections Active (12):** `users` (authentication), `profiles` (user profile data), `nutrition` (meals + water), `workout_sessions`, `progress_entries`, `settings`, `activity` (quest/streak state), `notifications`, `safety_alert_events`, `password_recovery_tokens`, plus `admin_exercises` (admin-managed exercise catalog) and `exercise` (public exercise library).
-- The web client and Expo WebView communicate with the NestJS API at `/api`. On a computer, development uses `http://localhost:4000/api`; on a phone, the API host must be the same reachable LAN hostname as the Next.js page, on port 4000. Production must use HTTPS. Clients never connect directly to Atlas.
-- Registration flow creates user accounts in MongoDB Atlas after completing the full calibration process. Login authenticates against stored credentials.
-- Nutrition, workouts, progress, quests/streaks, notifications, and settings are now served by the backend API from real Atlas collections. Only a few client-side caches and the food log's "recent foods" remain local.
+- **Database:** MongoDB/Mongoose is configured by the backend using server-side environment settings. Do not record connection strings, cluster hosts, credentials, or claims about deployed environments in these rules.
+- **Authentication:** JWT-based authentication and bcrypt password hashing are implemented. Backend models define user and profile persistence; environment connectivity must be verified at runtime.
+- **Defined collections:** The backend defines models for `users`, `profiles`, `nutrition`, `workout_sessions`, `progress_entries`, `settings`, `activity`, `notifications`, `safety_alert_events`, `password_recovery_tokens`, and exercise catalogs. Model definitions do not prove that a remote deployment is currently reachable.
+- The web client and Expo WebView communicate with the NestJS API using the `/api` prefix. Development uses port 4000 by default; the mobile client derives the host from the web app's LAN address. Clients never connect directly to MongoDB.
+- The backend registration handler creates user documents after the full calibration process. Login authenticates against stored credentials; configured database connectivity is environment-dependent.
+- Profiles, meals, water, workouts, progress, quests/streaks, notifications, settings, and exercise data use backend API/model implementations. The JWT, profile response cache, recent-food suggestions, and optional API URL override remain client-side; they are not authoritative copies of backend records.
+- Food-photo analysis is handled by the authenticated backend's Gemini/USDA integrations. The user reviews the estimate before saving matched items as meals. The separately managed `food-scanner/` directory is not a backend runtime dependency.
 
 ## 2. Data Flow
 
@@ -26,9 +27,8 @@ flowchart LR
   G --> A[Authentication and authorization]
   A --> D[Domain modules or services]
   D --> R[Persistence adapters]
-  R --> DB[(MongoDB Atlas)]
-  D --> O[Outbox / background jobs]
-  O --> N[Notifications and integrations]
+  R --> DB[(MongoDB / Mongoose)]
+  D --> I[Optional external integrations]
 ```
 
 Rules:
@@ -41,7 +41,7 @@ Rules:
 
 ### Registration and calibration data flow
 
-The flow below represents the **current implemented behavior** with MongoDB Atlas backend integration.
+The flow below represents the **current implemented API behavior**; runtime database connectivity is environment-dependent.
 
 ```mermaid
 sequenceDiagram
@@ -50,7 +50,7 @@ sequenceDiagram
   participant Page as Register page
   participant Wizard as CalibrationFlow (React state)
   participant API as Backend API
-  participant DB as MongoDB Atlas
+  participant DB as MongoDB/Mongoose
   User->>Form: Enter name, email, password, confirmation, consent
   Form->>Form: Validate password requirements (8-15 chars, uppercase, lowercase, number)
   Form->>Page: Create account callback with password
@@ -68,7 +68,7 @@ sequenceDiagram
   API->>DB: Create profile document in profiles collection
   API->>Page: Return profile confirmation
   Page->>localStorage: Save JWT token in physiquequest-auth
-  Page->>localStorage: Save profile in physiquequest-profile (for offline)
+  Page->>localStorage: Cache profile in physiquequest-profile (not authoritative or offline mode)
   Page->>Home: Navigate to /home
 ```
 
@@ -99,7 +99,7 @@ Current registration rules and implemented behavior:
 
 - **Data Storage:**
   - **Server (MongoDB Atlas):** Authoritative source of truth for users and profiles
-  - **Client (localStorage):** JWT token and a cached profile copy; profile routes currently fetch the backend and are not an offline mode
+  - **Client (localStorage):** JWT token and a cached profile copy; profile routes fetch the backend and are not an offline mode
   - **Security:** Passwords never stored in plain text, only bcrypt hashes in database
 
 Current login and password-recovery behavior:
@@ -126,7 +126,7 @@ Target backend flow when remote registration is implemented:
 4. Persist the profile and training preferences through their domain repositories. Keep health restrictions/notes and emergency contacts separately protected when their distinct access, retention, or deletion rules warrant it. Use an idempotency key so retries cannot create duplicate onboarding records.
 5. Only mark onboarding complete and activate the pending account after profile persistence succeeds. Return a minimal profile summary and route the client to the home screen. If persistence fails, retain/recover the safe client draft and allow retry; do not pretend setup completed or silently write a second local source of truth.
 
-The backend and Atlas connection are implemented, including nutrition, workouts, progress, quests, notifications, and settings endpoints. The preceding sequence describes recommended production hardening beyond the current first-party JWT implementation; add an external identity provider, email verification, onboarding idempotency, consent evidence, and recovery controls only as product and operational requirements are approved.
+The repository implements the first-party JWT API and MongoDB/Mongoose integration for nutrition, workouts, progress, quests, notifications, and settings. Runtime database connectivity is environment-dependent. Remaining production hardening includes email verification, onboarding idempotency, and recorded consent evidence. Password reset request/verify/confirm flows are implemented; configure both `EMAIL_DELIVERY_URL` and `EMAIL_DELIVERY_API_KEY` in deployed environments. The no-email code response is development-only.
 
 ### Authentication and recovery flow analysis
 
@@ -169,7 +169,7 @@ These collections are currently active in MongoDB Atlas:
 
 #### Authentication indexes and invariants - IMPLEMENTED
 
-Current indexes in MongoDB Atlas:
+Indexes defined or ensured by the backend:
 
 - **users collection:**
   - Unique index on `email` (case-insensitive, enforced at application level with `.toLowerCase()`)
@@ -199,22 +199,21 @@ Current indexes in MongoDB Atlas:
 - Add explicit consent copy/versioning before recording evidence. Registration must not treat consent as granted if onboarding/profile persistence fails or the user withdraws it.
 - Preserve an idempotency/correlation key for registration, verification, and reset mutations where retries could duplicate side effects; make email delivery and challenge consumption safe to retry.
 
-## 3. What Needs Persistence
+## 3. Current Persistence Map
 
-Use this as the initial migration map. Persist only when the feature needs accounts, durable history, multiple devices, collaboration, or server-side processing. Keep prototype fixtures clearly identified and out of production user collections.
+The following summarizes the repository's current source-of-truth boundaries. The backend implementation does not by itself prove that any remote deployment is healthy or production-ready.
 
-| Domain | Current prototype source | Future persistence boundary | Guidance |
+| Domain | Current source of truth | Client-only state or limitations | Guidance |
 |:--|:--|:--|:--|
-| Identity and sessions | `physiquequest-auth` localStorage (JWT + user identity); backend `users` is authoritative | Provider-owned identity/session records, or app `users` plus optional restricted `passwordCredentials`, `sessions`, and `authChallenges` | Prefer a proven identity provider. Section 2 documents registration, login, recovery, logout, lifecycle fields, access controls, and index decisions. If credentials are owned by PhysiqueQuest, store only strong password hashes in a restricted auth domain; never store or log plaintext passwords. Use revocable, expiring sessions/tokens. |
-| Profile and onboarding | Backend `profiles` collection (authoritative); `physiquequest-profile` localStorage is a cache only | Identity provider plus profile/onboarding domain APIs and repositories | Current profile includes personal, body measurement, training, health-condition/note, and emergency-contact fields. Current consent is only a required UI gate and is not recorded. For remote storage, minimize fields, record consent evidence/version, and isolate or tightly restrict health and emergency-contact data. Never store passwords in profile/auth application documents. |
-| Nutrition and hydration | Backend `nutrition` collection (meals + water); `physiquequest-recent-foods` localStorage for recent picks | User-owned meal entries and daily water records; optional managed food catalog | Preserve entry time, meal type, nutrition snapshot, quantity/unit, and source. Snapshot values used at log time so later catalog edits do not rewrite history. |
-| Workout plan and sessions | Backend `workout_sessions` collection; exercise fixtures in `exercises.ts` | Workout plans and completed sessions | Store planned prescription separately from actual sets/reps/load and session outcomes. Mark demo or estimated metrics as such. |
-| Progress and personal records | Backend `progress_entries` collection | User measurements and verified record events | Store source and measurement time. Prefer deriving charts/rollups from authoritative events; cache aggregates only when measured performance requires it. |
-| Quests, streaks, and rewards | Backend `activity` collection (quest/streak/points state) | User quest progress/reward ledger | Make point awards and mission completion idempotent. Keep an auditable award/reversal record instead of silently editing balances. |
-| Settings and preferences | Backend `settings` collection | User settings/preferences | Persist only cross-device or server-required settings. Keep presentation-only state local. |
-| Notifications | Backend `notifications` collection | Notification preferences and user notification records | Store delivery state only when needed. Do not treat generated sample notices as real events. |
-| Exercise/food reference catalog | Public `exercise` collection + admin `admin_exercises` collection; food catalog is a static TypeScript fixture | Managed reference data only if updates, search, moderation, or scale require it | Static, version-controlled fixtures are appropriate for the current prototype. Avoid adding a database just to copy constants. |
-| Camera/video and form analysis | Local device input and demo analysis | Consent-aware metadata/results; media in protected object storage only if required | Do not store raw video in MongoDB by default. Define purpose, consent, access, retention, deletion, and storage location before upload is implemented. |
+| Identity and sessions | Backend `users` model and JWT auth; `physiquequest-auth` stores the client credential/user cache | No password is stored in the browser; JWT revocation is not implemented | Derive ownership from validated server-side JWT claims. Never treat localStorage as proof of identity. |
+| Profile and onboarding | Backend `profiles` model/API | `physiquequest-profile` is a cache; registration/profile writes use API requests | Profile data includes personal, body measurement, training, health-condition/note, and emergency-contact fields. Minimize access and define consent, retention, and deletion controls before production use. |
+| Nutrition and hydration | Backend nutrition API/model stores meals and water | `physiquequest-recent-foods` stores suggestions only | Scan estimates are not saved until confirmed; persist the nutrition snapshot and source with the meal entry. |
+| Workouts | Backend workout API/model | Coach camera readiness/form feedback and some workout signals are prototype behavior | Distinguish persisted workout records from estimated or unverified performance signals. |
+| Progress | Backend progress API/model | None of the logged records should be represented as verified measurements unless the input source establishes that | Retain unit, source, and measurement time. |
+| Quests, streaks, and rewards | Backend activity API/model | The leaderboard is preview/sample data | Keep the sample leaderboard clearly labeled; do not present it as live cross-user ranking. |
+| Settings and notifications | Backend settings and notifications APIs/models | Presentation-only state may remain in memory | Keep user-owned state on the API; do not create divergent local write copies. |
+| Exercise and food reference data | Backend exercise APIs/models plus versioned frontend exercise fallback; authenticated food lookup and scan endpoints use the backend Gemini/USDA integrations | A static exercise fallback may appear when the API is unavailable | Mark fallback/sample data accurately; do not present it as a successful live API response. |
+| Camera/video and pose analysis | Device input and optional backend pose endpoint | Camera readiness, local video handling, and unconfigured pose integrations are not verified AI analysis | Do not store raw video in MongoDB by default. Define purpose, consent, access, retention, deletion, and storage location before media upload is implemented. |
 
 Do not persist derived data twice without a clear reason. For example, calorie totals can be calculated from meal entries; a cached daily summary must have an invalidation/rebuild strategy and must not become a second source of truth.
 
@@ -313,7 +312,7 @@ The NestJS backend is a single application served from `backend/` (not a root np
 
 | Module | Base route | Purpose |
 |:--|:--|:--|
-| `auth` | `/auth` | Register, login, `GET /me`, password reset request/confirm |
+| `auth` | `/auth` | Register, login, authenticated user lookup, password reset request/verify/confirm |
 | `profile` | `/profile` | Create, read, update, delete the authenticated user's profile |
 | `nutrition` | `/nutrition` | Meals, water, and `meals/from-scan` |
 | `workouts` | `/workouts` | Workout sessions, plus `/pause` and `/complete` |
@@ -326,9 +325,9 @@ The NestJS backend is a single application served from `backend/` (not a root np
 | `exercises` | `/exercises` | Public exercise library |
 | `exercise` | (admin) | Admin-managed exercise catalog |
 | `admin` | `/admin` | Admin analytics and exercise management (roles-guarded) |
-| `foodscan` | `/nutrition/scan`, `/nutrition/foods/...` | Food image analysis via an external service |
+| `foodscan` | `/nutrition/scan`, `/nutrition/foods/...` | Food image analysis and food lookup through the backend Gemini/USDA integrations |
 
-**External food-scanner service.** `food-scanner/` is a separate, internal-only Node service (own git repo, own workspace, own `.env`). It is not part of the PhysiqueQuest npm workspaces and is not a public API. The main backend calls it over a private network path, presenting a shared secret in the `X-Internal-Api-Key` header. The scanner is stateless: it holds no user data and writes nothing to disk. When the scanner or its provider keys are unavailable, the scan endpoints answer 503 and every other route keeps working. The scanner's own configuration and contract are documented in `food-scanner/README.md`.
+**Food scanning.** The main NestJS backend implements authenticated `/api/nutrition/scan` and `/api/nutrition/foods/...` endpoints and uses Gemini and USDA credentials configured on the backend. Meal persistence remains in the backend nutrition domain; image analysis alone does not save a meal. Provider availability depends on environment configuration. `food-scanner/` is independently managed; its README describes its own service and browser client, but the main backend source uses its own provider integrations and does not depend on that service.
 
 **Optional external services.** The backend also supports confirmed emergency delivery (`ALERT_DELIVERY_URL`) and pose analysis (`POSE_ANALYSIS_URL`) via server-only endpoints. Email delivery for password reset uses `EMAIL_DELIVERY_URL`. All are configured in `backend/.env.example`; none are required for the app to boot.
 
@@ -341,49 +340,49 @@ The NestJS backend is a single application served from `backend/` (not a root np
 - Deploy backward-compatible schema/API changes in stages: expand schema, deploy readers/writers, backfill, observe, then remove obsolete fields in a later release.
 - Provide operational runbooks for backup restore, credential rotation, migration failure, Atlas outage, queue backlog, data deletion, and incident response before relying on production persistence.
 
-## 12. Static-to-Database Migration Flow
+## 12. Adding or Changing Persistence
 
-When remote persistence is approved for implementation, use this order:
+Most current user-owned domains already use backend APIs and models. For a new domain, or when replacing a deliberately local-only feature, use this order:
 
-1. Inventory the static/localStorage data, ownership, sample status, and required user flows. Do not migrate demo fixtures as real user records.
+1. Inventory current data, ownership, sample status, and user flows. Do not migrate demo fixtures as real user records.
 2. Define domain ownership, data contracts, retention/consent rules, access patterns, and failure behavior.
-3. Provision isolated Atlas development/staging environments and server-only secrets. Establish backup/restore and access controls before importing personal data.
+3. Confirm the target environment, server-only secrets, access controls, backup/restore plan, and approvals before importing personal data. Do not assume these are configured because schema code exists.
 4. Implement authentication/authorization and one domain API first. Add request validation, repository interfaces, persistence schemas, indexes, and safe errors.
-5. Replace one localStorage owner at a time with a client API adapter. Provide loading, offline, retry, conflict, and sign-out behavior; do not silently fall back to local writes that create divergent sources of truth.
+5. Connect the owning UI through the existing API client/hooks. Provide loading, error, retry, conflict, and sign-out behavior; do not silently fall back to local writes that create divergent sources of truth.
 6. Migrate user data only with an explicit, validated, idempotent migration and a rollback/recovery plan. Confirm ownership and data quality; preserve sample/demo labeling.
 7. Verify access controls, duplicate/retry behavior, indexes, backup restore, deletion, and cross-device behavior in staging before production rollout.
 8. Remove obsolete local persistence only after remote flows are proven and a user-data export/deletion approach exists where required.
 
 ## 13. Implementation Checklist
 
-- [x] Is the database actually implemented in this environment, or is this still static/demo behavior?
-  - **MongoDB Atlas is connected and operational with users and profiles collections**
+- [x] Are database models and API integrations implemented in the repository?
+  - **Mongoose models and backend APIs exist for the listed user-owned domains. Runtime connectivity and deployment status must be checked in the target environment.**
 - [x] Does each record have an owner, source of truth, purpose, timestamp, units, and retention/deletion rule?
   - **Users and profiles have explicit ownership, timestamps, and units specified**
-- [x] Are sample/demo records separated from real user data?
-  - **Real user data stored in Atlas, sample data remains in frontend fixtures**
+- [x] Are sample/demo records separate from backend model definitions?
+  - **Sample leaderboard and frontend fallbacks remain distinguishable from backend-owned user data; verify the configured database environment before describing remote records as live.**
 - [x] Are domain boundaries and read/write ownership clear, including if services are split later?
   - **Identity (users) and Profile domains clearly separated with proper references**
 - [x] Are inputs validated, outputs minimized, and object-level authorization enforced on the server?
-  - **class-validator DTOs for all inputs, JWT guards on protected endpoints**
+  - **DTO endpoints use class-validator and scan contracts use Zod; protected domain endpoints use JWT guards. Verify each new route against its controller and service.**
 - [ ] Are schemas/version changes and migrations safe, repeatable, and backward-compatible?
   - **Initial schema v1.0, no migrations yet - to be addressed in future versions**
 - [x] Do indexes match bounded, paginated access patterns and uniqueness requirements?
   - **Unique email index, userId reference indexes implemented on users, profiles, progress_entries, workout_sessions, and password_recovery_tokens**
 - [ ] Are retries, duplicate requests, concurrent updates, and partial failures handled?
   - **Duplicate email handled; concurrent profile updates need optimistic locking; activity/settings updates are single-document upserts**
-- [x] Are Atlas credentials private, least-privilege, environment-specific, and rotated?
-  - **Credentials in .env file, not in version control, .env.example provided**
+- [ ] Are database credentials private, least-privilege, environment-specific, and rotated?
+  - **Verify in the target environment; the repository alone cannot establish deployed IAM/network/rotation controls.**
 - [ ] Are backup/restore, monitoring, deletion, and incident procedures defined for the environment?
-  - **Atlas automated backups enabled; monitoring and procedures to be documented**
+  - **Verify with the service owner; no deployed backup/monitoring state is asserted here.**
 - [x] Is raw media kept out of MongoDB unless a documented requirement justifies it?
   - **No media storage in MongoDB, only metadata if needed**
-- [x] Do client-facing messages accurately describe offline, demo, sample, and synchronization behavior?
-  - **Clear error messages, localStorage used only for caching JWT and profile**
+- [ ] Do client-facing messages accurately describe offline, demo, sample, and synchronization behavior?
+  - **Review each affected screen and API failure state; the profile cache is not an offline source of truth.**
 
 ## 14. Measurement units in profile data
 
-Personal-data measurements are user-entered values and their unit is part of the data contract. The registration wizard sends the selected values and units through the authenticated profile API, and the profile document persists the values in MongoDB Atlas. The browser also caches the returned profile in localStorage. Do not treat entered values as canonical metric values or omit their unit when moving data between the UI, API, cache, and database.
+Personal-data measurements are user-entered values and their unit is part of the data contract. The registration wizard sends the selected values and units through the authenticated profile API, and the profile model stores those values. The browser also caches the returned profile in localStorage. Do not treat entered values as canonical metric values or omit their unit when moving data between the UI, API, cache, and database.
 
 Current profile fields:
 

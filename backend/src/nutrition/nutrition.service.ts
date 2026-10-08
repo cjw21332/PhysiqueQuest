@@ -13,7 +13,7 @@ export class NutritionService {
     return this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       { $setOnInsert: { userId: new Types.ObjectId(userId), meals: [], water: [] } },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
     );
   }
 
@@ -22,7 +22,7 @@ export class NutritionService {
     return this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       { $push: { meals: meal } },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
     );
   }
 
@@ -38,7 +38,7 @@ export class NutritionService {
     const updated = await this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId), 'meals.id': id },
       { $pull: { meals: { id } } },
-      { new: true },
+      { returnDocument: 'after' },
     );
     if (!updated) throw new NotFoundException('Meal not found');
     return updated;
@@ -89,7 +89,7 @@ export class NutritionService {
     return this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       { $push: { meals: { $each: meals } } },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
     );
   }
 }

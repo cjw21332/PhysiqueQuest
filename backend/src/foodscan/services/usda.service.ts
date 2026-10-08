@@ -103,15 +103,18 @@ export class UsdaService {
     }
   }
 
-  private searchUrl(query: string, pageSize: number, dataTypes: string): string {
+  private searchUrl(query: string, pageSize: number, dataTypes: readonly string[]): string {
     const cfg = this.config.value;
     // USDA requires the key as a query parameter, so this URL is a secret in
     // transit. It is never logged; safeUrl() strips the query string.
-    return (
-      `${cfg.usda.base}/foods/search?api_key=${encodeURIComponent(cfg.usda.apiKey)}` +
-      `&query=${encodeURIComponent(query)}&pageSize=${pageSize}` +
-      `&dataType=${dataTypes}`
-    );
+    const url = new URL(`${cfg.usda.base.replace(/\/$/, '')}/foods/search`);
+    url.search = new URLSearchParams({
+      api_key: cfg.usda.apiKey,
+      query,
+      pageSize: String(pageSize),
+      dataType: dataTypes.join(','),
+    }).toString();
+    return url.toString();
   }
 
   private async searchFood(query: string): Promise<UsdaFood | undefined> {
@@ -121,8 +124,8 @@ export class UsdaService {
     if (cached) return cached;
 
     const data = await this.http.fetchJson<{ foods?: UsdaFood[] }>(
-      this.searchUrl(query, 10, 'Foundation,SR%20Legacy'),
-      { upstream: 'nutrition database' }
+      this.searchUrl(query, 10, ['Foundation', 'SR Legacy']),
+      { upstream: 'nutrition database', retryServerErrors: true }
     );
 
     const foods = (data.foods || []).filter((f) => f.fdcId && (f.foodNutrients?.length ?? 0) > 0);
@@ -139,7 +142,10 @@ export class UsdaService {
 
     const cfg = this.config.value;
     const url = `${cfg.usda.base}/food/${fdcId}?api_key=${encodeURIComponent(cfg.usda.apiKey)}`;
-    const data = await this.http.fetchJson<UsdaFood>(url, { upstream: 'nutrition database' });
+    const data = await this.http.fetchJson<UsdaFood>(url, {
+      upstream: 'nutrition database',
+      retryServerErrors: true,
+    });
 
     if (!data?.fdcId) throw notFound('No food record exists for that identifier');
 
@@ -186,8 +192,8 @@ export class UsdaService {
     // Bounded independently of caller input.
     const pageSize = Math.max(1, Math.min(25, Math.trunc(limit)));
     const data = await this.http.fetchJson<{ foods?: UsdaFood[] }>(
-      this.searchUrl(query, 25, 'Foundation,SR%20Legacy,Survey%20(FNDDS),Branded'),
-      { upstream: 'nutrition database' }
+      this.searchUrl(query, 25, ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded']),
+      { upstream: 'nutrition database', retryServerErrors: true }
     );
 
     const foods = (data.foods || []).filter((food) => food.fdcId && food.description);

@@ -9,6 +9,7 @@ test('password recovery uses server-issued 6-digit codes and shows provider setu
   assert.match(screen, /confirmPasswordReset/);
   assert.match(screen, /6-digit code/);
   assert.match(screen, /response\.code/);
+  assert.match(screen, /Password reset email is unavailable/);
   assert.doesNotMatch(screen, /Simulate OTP|Show success modal/);
   assert.match(api, /password-reset/);
 });

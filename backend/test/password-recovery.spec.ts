@@ -12,26 +12,53 @@ describe('password recovery', () => {
     expect(await service.request('unknown@example.com')).toEqual({ accepted: true, delivery: 'unavailable' });
   });
 
-  it('persists and returns a 6-digit recovery code when delivery is unavailable so the flow works locally', async () => {
-    const user = { _id: new Types.ObjectId(), email: 'member@example.com' };
-    const created: any[] = [];
-    const tokens = { deleteMany: vi.fn(), create: vi.fn(async item => { created.push(item); }), findOneAndUpdate: vi.fn(async (filter, update) => { const item = created.find(entry => entry.tokenHash === filter.tokenHash && !entry.usedAt); if (!item) return null; item.usedAt = update.$set.usedAt; return item; }) };
-    const users = { findOne: vi.fn(async () => user), updateOne: vi.fn(async (...args) => { return { matchedCount: 1 }; }) };
+  it('persists and returns a 6-digit recovery code when delivery is unavailable in development', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    try {
+      const user = { _id: new Types.ObjectId(), email: 'member@example.com' };
+      const created: any[] = [];
+      const tokens = { deleteMany: vi.fn(), create: vi.fn(async item => { created.push(item); }), findOne: vi.fn(() => ({ sort: vi.fn().mockResolvedValue(null) })), findOneAndUpdate: vi.fn(async (filter, update) => { const item = created.find(entry => entry.tokenHash === filter.tokenHash && !entry.usedAt); if (!item) return null; item.usedAt = update.$set.usedAt; return item; }) };
+      const users = { findOne: vi.fn(async () => user), updateOne: vi.fn(async (...args) => { return { matchedCount: 1 }; }) };
+      const provider = { isAvailable: () => false, sendPasswordReset: vi.fn() } as unknown as EmailDeliveryProvider;
+      const service = new PasswordRecoveryService(users as any, tokens as any, provider);
+      const response = await service.request(' MEMBER@example.com ');
+      expect(response).toEqual({ accepted: true, delivery: 'unavailable', code: expect.stringMatching(/^\d{6}$/) });
+      expect(created).toHaveLength(1);
+      expect(created[0].tokenHash).not.toBe(response.code);
+      await service.confirm(response.code as string, 'StrongPass1');
+      expect((users.updateOne as any).mock.calls[0][1].$set.passwordHash).toBeTruthy();
+    } finally {
+      if (originalNodeEnv === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = originalNodeEnv;
+    }
+  });
+
+  it('does not create or expose recovery codes outside development when delivery is unavailable', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    const findOne = vi.fn();
+    const create = vi.fn();
     const provider = { isAvailable: () => false, sendPasswordReset: vi.fn() } as unknown as EmailDeliveryProvider;
-    const service = new PasswordRecoveryService(users as any, tokens as any, provider);
-    const response = await service.request(' MEMBER@example.com ');
-    expect(response).toEqual({ accepted: true, delivery: 'unavailable', code: expect.stringMatching(/^\d{6}$/) });
-    expect(created).toHaveLength(1);
-    expect(created[0].tokenHash).not.toBe(response.code);
-    await service.confirm(response.code as string, 'StrongPass1');
-    expect((users.updateOne as any).mock.calls[0][1].$set.passwordHash).toBeTruthy();
+    const service = new PasswordRecoveryService({ findOne } as any, { create } as any, provider);
+    try {
+      await expect(service.request('member@example.com')).resolves.toEqual({
+        accepted: true,
+        delivery: 'unavailable',
+      });
+      expect(findOne).not.toHaveBeenCalled();
+      expect(create).not.toHaveBeenCalled();
+    } finally {
+      if (originalNodeEnv === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 
   it('stores only a token hash and confirms one-time password changes', async () => {
     const user = { _id: new Types.ObjectId(), email: 'member@example.com' };
     const created: any[] = [];
     const updates: any[] = [];
-    const tokens = { deleteMany: vi.fn(), create: vi.fn(async item => { created.push(item); }), findOneAndUpdate: vi.fn(async (filter, update) => { const item = created.find(entry => entry.tokenHash === filter.tokenHash && !entry.usedAt); if (!item) return null; item.usedAt = update.$set.usedAt; return item; }) };
+    const tokens = { deleteMany: vi.fn(), create: vi.fn(async item => { created.push(item); }), findOne: vi.fn(() => ({ sort: vi.fn().mockResolvedValue(null) })), findOneAndUpdate: vi.fn(async (filter, update) => { const item = created.find(entry => entry.tokenHash === filter.tokenHash && !entry.usedAt); if (!item) return null; item.usedAt = update.$set.usedAt; return item; }) };
     const users = { findOne: vi.fn(async () => user), updateOne: vi.fn(async (...args) => { updates.push(args); return { matchedCount: 1 }; }) };
     const provider = { isAvailable: () => true, sendPasswordReset: vi.fn(async () => true) } as unknown as EmailDeliveryProvider;
     const service = new PasswordRecoveryService(users as any, tokens as any, provider);

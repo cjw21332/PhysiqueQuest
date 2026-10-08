@@ -1,5 +1,6 @@
 export type MealName = 'Breakfast' | 'Lunch' | 'Snack' | 'Dinner';
 export type FoodEntry = { id: string; name: string; meal: MealName; calories: number; detail: string; time: string; source: 'Scanned' | 'Manual'; protein: number; carbs: number; fat: number; date?: string; fdcId?: number };
+export const nutritionTargets = { calories: 2300, protein: 140, carbs: 240, fats: 70 };
 export const mealNames: MealName[] = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
 export const sampleMeals: FoodEntry[] = [
   { id: 'sample-breakfast', name: 'Oats and eggs', meal: 'Breakfast', calories: 420, detail: 'Rolled oats · 1 cup · Egg · 2 large', time: '07:20', source: 'Scanned', protein: 28, carbs: 54, fat: 12 },

@@ -8,10 +8,15 @@ import { PROFILE_STORAGE_KEY } from '../../lib/auth';
 import type { Profile } from '../Home/types';
 import AdminExerciseLibrary from './AdminExerciseLibrary';
 import EngagementAnalytics from './EngagementAnalytics';
+import PersonalDataEdit from './PersonalDataEdit';
+import GoalsEdit from './GoalsEdit';
+import TrainingPreferenceEdit from './TrainingPreferenceEdit';
+import HealthProfileEdit from './HealthProfileEdit';
+import EmergencyContactEdit from './EmergencyContactEdit';
 import { useSettings } from '../../hooks/useSettings';
 
 type Settings = { inactivity: boolean; alarmVolume: boolean; showLeaderboard: boolean; threshold: 30 | 45 | 60 };
-type AdminView = 'settings' | 'exercises' | 'engagement';
+type MeView = 'settings' | 'exercises' | 'engagement' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
 
 function Switch({ label, checked, onChange, tone = 'green' }: { label: string; checked: boolean; onChange: () => void; tone?: 'green' | 'red' }) {
   return <button className={`me-switch ${tone} ${checked ? 'on' : ''}`} type="button" role="switch" aria-label={label} aria-checked={checked} onClick={onChange}><i/></button>;
@@ -31,7 +36,7 @@ function SettingRow({ icon, title, detail, onClick, danger = false }: { icon: st
 
 export default function MeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const { settings, loading: settingsLoading, error: settingsError, updateSettings } = useSettings();
-  const [adminView, setAdminView] = useState<AdminView>('settings');
+  const [view, setView] = useState<MeView>('settings');
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -82,11 +87,17 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     }
   };
 
-  if (adminView === 'exercises') {
-    return <AdminExerciseLibrary onBack={() => setAdminView('settings')} />;
+  if (view === 'edit-personal') return <PersonalDataEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Personal data edit')} />;
+  if (view === 'edit-goals') return <GoalsEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Goals edit')} />;
+  if (view === 'edit-training') return <TrainingPreferenceEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Training preference edit')} />;
+  if (view === 'edit-health') return <HealthProfileEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Health profile edit')} />;
+  if (view === 'edit-emergency') return <EmergencyContactEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Emergency contact edit')} />;
+
+  if (view === 'exercises') {
+    return <AdminExerciseLibrary onBack={() => setView('settings')} />;
   }
-  if (adminView === 'engagement') {
-    return <EngagementAnalytics onBack={() => setAdminView('settings')} />;
+  if (view === 'engagement') {
+    return <EngagementAnalytics onBack={() => setView('settings')} />;
   }
 
   return <section className="me-section" aria-label="Account and settings">
@@ -95,20 +106,20 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-profile-summary">
         <ProfileSilhouette/>
         <div className="me-profile-name"><b>{profile.name || '—'}</b><small>member since {memberSince}</small></div>
-        <button className="me-edit" onClick={() => saveProfile({ name: profile.name })}>Edit</button>
+        <button className="me-edit" onClick={() => setView('edit-personal')}>Edit</button>
       </div>
 
       <h3 className="me-group-title">Profile</h3>
       <div className="me-list">
-        <SettingRow icon="user" title="Personal data" detail={`Age ${profile.age ?? '—'} · ${profile.height ?? '—'} ${profile.heightUnit || ''} · ${profile.weight ?? '—'} ${weightUnit}`.replace(/\s+/g, ' ').trim()} onClick={() => saveProfile({ age: profile.age, height: profile.height, weight: profile.weight }, 'Personal data edit')}/>
-        <SettingRow icon="target" title="Goals" detail={goalDetail} onClick={() => saveProfile({ goal: profile.goal, targetWeight: profile.targetWeight, targetDate: profile.targetDate }, 'Goals edit')}/>
-        <SettingRow icon="dumbbell" title="Training preference" detail={`${equipment} · ${daysPerWeek} day${daysPerWeek === 1 ? '' : 's'} · ${profile.duration || '—'}`} onClick={() => saveProfile({ equipment: profile.equipment, days: profile.days, duration: profile.duration }, 'Training preference edit')}/>
-        <SettingRow icon="health" title="Health profile" detail={`${conditionCount} condition${conditionCount === 1 ? '' : 's'} logged`} onClick={() => saveProfile({ conditions: profile.conditions, healthNotes: profile.healthNotes }, 'Health profile edit')}/>
+        <SettingRow icon="user" title="Personal data" detail={`Age ${profile.age ?? '—'} · ${profile.height ?? '—'} ${profile.heightUnit || ''} · ${profile.weight ?? '—'} ${weightUnit}`.replace(/\s+/g, ' ').trim()} onClick={() => setView('edit-personal')}/>
+        <SettingRow icon="target" title="Goals" detail={goalDetail} onClick={() => setView('edit-goals')}/>
+        <SettingRow icon="dumbbell" title="Training preference" detail={`${equipment} · ${daysPerWeek} day${daysPerWeek === 1 ? '' : 's'} · ${profile.duration || '—'}`} onClick={() => setView('edit-training')}/>
+        <SettingRow icon="health" title="Health profile" detail={`${conditionCount} condition${conditionCount === 1 ? '' : 's'} logged`} onClick={() => setView('edit-health')}/>
       </div>
 
       <h3 className="me-group-title safety">Safety</h3>
       <div className="me-list">
-        <SettingRow icon="phone" title="Emergency contact" detail={`${profile.contactName || '—'} · ${profile.contactPhone || '—'}`} onClick={() => saveProfile({ contactName: profile.contactName, contactPhone: profile.contactPhone })} danger/>
+        <SettingRow icon="phone" title="Emergency contact" detail={`${profile.contactName || '—'} · ${profile.contactPhone || '—'}`} onClick={() => setView('edit-emergency')} danger/>
       </div>
       <button type="button" className="secondary" disabled={safetyBusy || !profile.contactPhone} onClick={() => void sendSafetyAlert()}>{safetyBusy ? 'Checking delivery…' : 'Send alert to emergency contact'}</button>
       {safetyMessage && <p className="hint" role="status">{safetyMessage}</p>}
@@ -129,8 +140,8 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
       {isAdmin && <><h3 className="me-group-title me-admin-title">Admin tools</h3><div className="me-list">
-        <SettingRow icon="dumbbell" title="Exercise library" detail="Publish exercises and pose templates" onClick={() => setAdminView('exercises')}/>
-        <SettingRow icon="trend" title="Engagement Analytics" detail="Users, sessions, safety events" onClick={() => setAdminView('engagement')}/>
+        <SettingRow icon="dumbbell" title="Exercise library" detail="Publish exercises and pose templates" onClick={() => setView('exercises')}/>
+        <SettingRow icon="trend" title="Engagement Analytics" detail="Users, sessions, safety events" onClick={() => setView('engagement')}/>
       </div></>}
 
       <button className="me-logout" onClick={() => onLogoutRequest?.()}><span>⇥</span>Log out</button>

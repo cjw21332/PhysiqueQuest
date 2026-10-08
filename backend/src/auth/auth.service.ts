@@ -79,7 +79,7 @@ export class AuthService {
       const failedUser = await this.userModel.findByIdAndUpdate(
         user._id,
         { $inc: { failedLoginAttempts: 1 } },
-        { new: true },
+        { returnDocument: 'after' },
       );
       if (failedUser && failedUser.failedLoginAttempts >= 5) {
         const lockoutUntil = new Date(Date.now() + 15 * 60_000);

@@ -95,6 +95,9 @@ export class Profile {
   contactPhone: string;
 
   @Prop()
+  contactRelationship?: string;
+
+  @Prop()
   createdAt?: Date;
 
   @Prop()

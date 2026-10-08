@@ -8,6 +8,7 @@ import DailyLog from './DailyLog';
 import FoodHistory from './FoodHistory';
 import { type MealName } from './types';
 import BottomNav from '../Home/BottomNav';
+import { Icon } from '../Home/icons';
 import type { Profile } from '../Home/types';
 import { useNutrition } from '../../hooks/useNutrition';
 import { toScanImage } from '../../lib/scanImage';
@@ -18,6 +19,7 @@ type View = 'nutrition' | 'review' | 'add' | 'logs' | 'history';
 type ScanStatus = 'loading' | 'ready' | 'error';
 export default function ScanSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const [view,setView]=useState<View>('nutrition');
+  const [photoSourceOpen,setPhotoSourceOpen]=useState(false);
   const [addReturnView,setAddReturnView]=useState<View>('nutrition');
   const [historyReturnView,setHistoryReturnView]=useState<View>('nutrition');
   const { meals, water, loading, error, addMeal, addMealsFromScan, setWater, refresh } = useNutrition();
@@ -31,9 +33,16 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const [analysis,setAnalysis]=useState<ScanAnalysis|null>(null);
   const [scanError,setScanError]=useState('');
   const [selectedMeal,setSelectedMeal]=useState<MealName>('Dinner');
-  const photoInput=useRef<HTMLInputElement>(null);
+  const cameraInput=useRef<HTMLInputElement>(null);
+  const uploadInput=useRef<HTMLInputElement>(null);
   useEffect(()=>()=>{if(imageUrl)URL.revokeObjectURL(imageUrl);},[imageUrl]);
-  const scan=()=>photoInput.current?.click();
+  useEffect(()=>{
+    if(!photoSourceOpen)return;
+    const closeOnEscape=(event:KeyboardEvent)=>{if(event.key==='Escape')setPhotoSourceOpen(false);};
+    window.addEventListener('keydown',closeOnEscape);
+    return ()=>window.removeEventListener('keydown',closeOnEscape);
+  },[photoSourceOpen]);
+  const scan=()=>setPhotoSourceOpen(true);
 
   const analyse=useCallback(async(file:File)=>{
     setScanStatus('loading');setScanError('');setAnalysis(null);
@@ -56,6 +65,7 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
 
   const onPhoto=(file?:File)=>{
     if(!file)return;
+    setPhotoSourceOpen(false);
     photo.current=file;
     if(imageUrl)URL.revokeObjectURL(imageUrl);
     setImageUrl(URL.createObjectURL(file));
@@ -66,16 +76,37 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const openHistory=()=>{setHistoryReturnView(view);setView('history');};
   const saveScan=async(meal:MealName,items:ScannedItem[])=>{try{await addMealsFromScan({items,meal});setView('logs');}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');}};
   const saveFood=async(food:{name:string;calories:number;protein:number;carbs:number;fat:number;fdcId:number;servingSizeG:number},meal:MealName,amount:number,unit:'grams'|'servings')=>{const grams=unit==='grams'?amount:amount*food.servingSizeG;const now=new Date();try{await addMeal({name:food.name,meal,calories:food.calories,detail:`${food.name} · ${unit==='grams'?`${amount} g`:`${amount} serving(s) (${Math.round(grams)} g)`}`,time:now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),source:'Manual',protein:food.protein,carbs:food.carbs,fat:food.fat,fdcId:food.fdcId});setView('logs');}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');}};
-  const retake=()=>{setView('nutrition');window.setTimeout(()=>photoInput.current?.click(),0);};
+  const retake=()=>{setView('nutrition');setPhotoSourceOpen(true);};
   const retryScan=()=>{if(photo.current)void analyse(photo.current);};
-  if (loading) return <section className="scan-section"><div className="profile-load-state" role="status"><h2>Loading nutrition…</h2><p>Connecting to your saved nutrition log.</p></div><BottomNav /></section>;
-  return <section className="scan-section"><input ref={photoInput} className="visually-hidden" type="file" accept="image/*" aria-label="Choose a meal photo" onChange={e=>{onPhoto(e.target.files?.[0]);e.target.value='';}}/><div className="scan-content">
+  return <section className="scan-section">
+    <input ref={cameraInput} className="visually-hidden" type="file" accept="image/*" capture="environment" aria-label="Take a meal photo" onChange={e=>{onPhoto(e.target.files?.[0]);e.target.value='';}}/>
+    <input ref={uploadInput} className="visually-hidden" type="file" accept="image/*" aria-label="Upload a meal photo" onChange={e=>{onPhoto(e.target.files?.[0]);e.target.value='';}}/>
+    {photoSourceOpen&&<div className="scan-source-overlay" onClick={()=>setPhotoSourceOpen(false)}>
+      <section className="scan-source-dialog" role="dialog" aria-modal="true" aria-labelledby="scan-source-title" onClick={event=>event.stopPropagation()}>
+        <h2 id="scan-source-title">Add a meal photo</h2>
+        <p>Take a new photo or choose one from your device.</p>
+        <button type="button" className="scan-source-option" autoFocus onClick={()=>cameraInput.current?.click()}>
+          <span className="scan-source-icon"><Icon name="camera" size={21}/></span>
+          <span><strong>Take a photo</strong><small>Open your camera</small></span>
+          <Icon name="arrow" size={17}/>
+        </button>
+        <button type="button" className="scan-source-option" onClick={()=>uploadInput.current?.click()}>
+          <span className="scan-source-icon"><Icon name="image" size={21}/></span>
+          <span><strong>Upload a photo</strong><small>Choose from your photos or files</small></span>
+          <Icon name="arrow" size={17}/>
+        </button>
+        <button type="button" className="scan-source-cancel" onClick={()=>setPhotoSourceOpen(false)}>Cancel</button>
+      </section>
+    </div>}
+    <div className="scan-content">
+    {loading && view === 'nutrition' ? <div className="profile-load-state" role="status"><h2>Loading nutrition…</h2><p>Connecting to your saved nutrition log.</p></div> : <>
     {(error || actionError) && <p className="error" role="alert">{actionError || error}</p>}
     {view==='nutrition'&&<NutritionDashboard meals={todayMeals} water={water} onScan={scan} onAdd={add} onLogs={()=>{void refresh();setView('logs');}} onHistory={openHistory}/>}
     {view==='review'&&<ReviewEstimate imageUrl={imageUrl} status={scanStatus} analysis={analysis} error={scanError} onBack={()=>setView('nutrition')} onRetake={retake} onRetry={retryScan} onAddManual={add} onSave={saveScan}/>}
 
     {view==='add'&&<AddFood initialMeal={selectedMeal} onBack={()=>setView(addReturnView)} onSave={saveFood}/>}
-    {view==='logs'&&<DailyLog meals={todayMeals} water={water} onBack={()=>setView('nutrition')} onHistory={openHistory} onAdd={add} onWater={setWater}/>}
+    {view==='logs'&&<DailyLog meals={todayMeals} water={water} onHistory={openHistory} onAdd={add} onWater={value=>{void setWater(value).then(()=>setActionError('')).catch(err=>setActionError(err instanceof Error?err.message:'Could not update water intake.'));}}/>}
     {view==='history'&&<FoodHistory meals={meals} onBack={()=>setView(historyReturnView)}/>}
-    </div>{view === 'nutrition' && <BottomNav />}</section>;
+    </>}
+    </div>{(loading || view === 'nutrition' || view === 'logs') && <BottomNav />}</section>;
 }

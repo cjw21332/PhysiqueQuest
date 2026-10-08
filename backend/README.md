@@ -70,6 +70,10 @@ The Gemini and USDA keys are both optional. Without them the process still
 boots and every other route keeps working; the scanner answers 503. See
 `.env.example` for the full list of variables.
 
+USDA requests are retried once after transient 500, 502, 503, or 504 responses.
+Food search loads nutrition details only after a result is selected, to avoid
+unnecessary provider requests while the user is typing.
+
 Two of those variables are worth knowing about when a scan is slow or fails:
 
 - `GEMINI_THINKING_LEVEL` (default `LOW`) caps how much the model deliberates.

@@ -18,6 +18,9 @@ export class PasswordRecoveryService {
 
   async request(emailAddress: string) {
     const available = this.email.isAvailable();
+    if (!available && process.env.NODE_ENV !== 'development') {
+      return { accepted: true, delivery: 'unavailable' as const };
+    }
     const user = await this.users.findOne({ email: emailAddress.trim().toLowerCase(), isActive: true });
     // Keep the response neutral about whether an email is registered.
     if (!user) return { accepted: true, delivery: available ? 'queued' as const : 'unavailable' as const };
@@ -38,9 +41,7 @@ export class PasswordRecoveryService {
       }
       return { accepted: true, delivery: 'queued' as const };
     }
-    // Email delivery is not configured: persist the code anyway so the
-    // confirm flow works in development, and surface it to the developer.
-    console.log(`[password-reset] EMAIL_DELIVERY_URL not configured. Recovery code for ${user.email}: ${code}`);
+    // Keep the no-email recovery path local to development only.
     return { accepted: true, delivery: 'unavailable' as const, code };
   }
 
@@ -59,7 +60,7 @@ export class PasswordRecoveryService {
     const recovery = await this.tokens.findOneAndUpdate(
       { tokenHash: digest(token), expiresAt: { $gt: now }, usedAt: null },
       { $set: { usedAt: now } },
-      { new: true },
+      { returnDocument: 'after' },
     );
     if (!recovery) throw new BadRequestException('Reset token is invalid or expired');
     const passwordHash = await bcrypt.hash(password, 10);

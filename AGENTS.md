@@ -9,7 +9,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 <!-- END:nextjs-agent-rules -->
 
 # Custom Rules
-Always read RTK.md for Redux Toolkit instructions and state management guidelines.
+Read RTK.md for the repository's Rust Token Killer command-prefix guidance. It is not Redux Toolkit documentation; frontend state follows the React and browser-persistence rules in this file.
 
 # Project Guidelines
-Always read and follow the state management rules defined in `./RTK.md`.
+Use the project's existing React hooks and API-backed persistence patterns. Do not introduce Redux or another state-management library without approval.

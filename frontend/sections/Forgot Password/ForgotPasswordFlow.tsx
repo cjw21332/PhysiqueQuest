@@ -33,7 +33,10 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     setError('');
     try {
       const response = await api.requestPasswordReset(email.trim());
-      // In local development, the API returns the code when email delivery is unavailable.
+      if (response.delivery === 'unavailable' && !response.code) {
+        setError('Password reset email is unavailable. Please contact support or try again later.');
+        return;
+      }
       setCode(response.delivery === 'unavailable' && response.code ? response.code : '');
       setResendSeconds(RESEND_DELAY);
       setStep('verify');
@@ -50,6 +53,10 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     setError('');
     try {
       const response = await api.requestPasswordReset(email.trim());
+      if (response.delivery === 'unavailable' && !response.code) {
+        setError('Password reset email is unavailable. Please contact support or try again later.');
+        return;
+      }
       setCode(response.delivery === 'unavailable' && response.code ? response.code : '');
       setResendSeconds(RESEND_DELAY);
     } catch (err) {

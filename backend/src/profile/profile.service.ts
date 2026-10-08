@@ -53,7 +53,7 @@ export class ProfileService {
     const profile = await this.profileModel.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       { $set: patch },
-      { new: true, runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     );
 
     if (!profile) {

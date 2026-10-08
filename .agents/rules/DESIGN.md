@@ -2,7 +2,7 @@
 description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the light-theme interface, component library, responsive rules, and extension patterns. The web app is the design source; the Expo app displays it in a native WebView with device capabilities (safe-area insets, camera, file inputs).
 ---
 
-# PhysiqueQuest Design System v2.3
+# PhysiqueQuest Design System v2.4.1
 
 This document specifies the current PhysiqueQuest product interface, design tokens, component patterns, responsive behavior, and rules for extending the system consistently. Update this document when adding new UI patterns or making significant design decisions.
 
@@ -19,35 +19,35 @@ PhysiqueQuest is a mobile-first fitness and nutrition prototype. The Next.js web
 - **Me**: Profile, safety settings, privacy controls, account settings, and Admin tools (Exercise Library admin, Analytics dashboard)
 
 ### Entry Flows & Authentication
-- **Root route** (`/`): Logo-led opener, routes to Home for authenticated users or Launch otherwise
+- **Root route** (`/`): Server-redirects to `/launch`; signed-in route guards send unauthenticated users to `/launch`
 - **Launch** (`/launch`): Prototype entry flow with device readiness checks (camera, permissions)
 - **Login** (`/login`): Authentication form
-- **Register** (`/register`): Account creation → four-step calibration flow (Personal Data → Goals → Training Preference → Health & Safety) → saves profile, starts local session
+- **Register** (`/register`): Account details and consent → four-step calibration (Personal Data → Goals → Training Preference → Health & Safety) → creates the account/profile through the API and stores the returned session
 - **Admin Views**: Exercise Library (search, filters, draft creation) and Analytics (date ranges, retention viz, event summary) — frontend views over live backend endpoints, gated by an admin role
 
 ### Navigation Behavior
 - **Main tab bar** (five tabs): Positioned above device system-navigation on main section screens (Home, Coach, Scan, Quests, Me)
-- **Nested/detail flows**: Hide tab bar to reclaim screen space. Provide clear back button or completion action to parent. Includes:
+- **Nested/detail flows**: Usually hide the tab bar to reclaim screen space; Today’s Log is an intentional exception and retains it. Provide a clear back button or completion action to parent. Includes:
   - Home subviews (goals detail, progress, notifications)
   - Coach subviews (Exercise Library, camera check, live session, report)
-  - Scan subviews (meal review, Add Food, Today’s Log, Food History)
+  - Scan subviews (meal review, Add Food, Food History; Today’s Log retains the main tab bar)
   - Me subviews (Admin tools)
-- **Tab bar visibility**: Main section roots retain the tab bar; nested views do not
+- **Tab bar visibility**: Main section roots retain the tab bar. Today’s Log also retains it; other nested views follow the owning section’s explicit navigation behavior.
 - **Content frame**: Home is the reference for signed-in content width and gutters; reuse this centered frame across all sections
 
 ### Data & Persistence
-- **Authentication and onboarding**: Live. Users and profiles are persisted to MongoDB Atlas via the NestJS API; the JWT and a profile cache live in localStorage.
-- **Nutrition, workouts, progress, quests, notifications, settings**: Live. Served by the backend API from real Atlas collections.
-- **Local-only**: The food log's "recent foods" cache (`physiquequest-recent-foods`) and a few presentation caches. Nothing else is localStorage-only.
-- **Backend**: A live NestJS API on port 4000 with a global `/api` prefix, connected to MongoDB Atlas. The Expo WebView loads the web app; the API host is derived from the page's LAN hostname.
-- **Sample/demo values**: Calorie estimates, AI form scores, camera readiness, workout feedback, pose analysis, and the Quests leaderboard preview must be labeled as sample/demo behavior. Real services exist for nutrition, workouts, progress, quests, notifications, settings, and admin analytics — those surfaces show live data, not samples.
+- **Authentication and onboarding**: The NestJS API implements registration, login, and profile persistence. The JWT and a non-authoritative profile cache live in localStorage. Repository code does not prove any specific Atlas deployment is reachable.
+- **Nutrition, workouts, progress, quests, notifications, settings**: These domains have backend API/model implementations. A screen must still show the actual API state and must not imply live data when a request failed.
+- **Local-only**: `physiquequest-recent-foods` stores food suggestions, not the meal log. The app also stores the JWT, profile cache, and optional API URL override in localStorage.
+- **Backend**: The NestJS API uses a global `/api` prefix and defaults to port 4000. The Expo WebView loads the web app; the API host is derived from the page's LAN hostname in development.
+- **Estimate/demo values**: Meal-photo analysis returns a model/provider estimate and requires user review; it is not a verified measurement. Camera readiness, form scores, workout feedback, local video handling, and the Quests leaderboard preview must be labeled as sample/demo behavior. Backend-backed nutrition, workouts, progress, quests, notifications, settings, and admin analytics should show live responses only when those requests succeed.
 
 ### Backend Integration (Design-Relevant)
 The web app is the product surface; the NestJS API supplies the data behind it. Design decisions must account for this:
 
 - **Loading, empty, and error states** are part of the UI. Every data-driven surface (Home progress, notifications, Scan nutrition, Quests activity, Me settings, admin views) must show a loading state, an honest empty state, and a retry path on failure — not sample data dressed up as live data.
-- **Sample/demo labeling**: surfaces that still show sample data (calorie estimates, AI form scores, camera readiness, pose analysis, the Quests leaderboard preview) must label themselves as such. Surfaces backed by real collections must not.
-- **Offline and degraded behavior**: the API may be unreachable (phone off the LAN, backend down). The client caches the JWT and profile locally and should degrade gracefully; it must not silently fall back to local writes that create a second source of truth.
+- **Sample/demo labeling**: label AI form scores, camera readiness, unconfigured pose analysis, and the Quests leaderboard preview as sample/demo behavior. Meal-scan results are provider estimates that require review; do not label a live response as a sample. Surfaces backed by real collections must not be presented as samples.
+- **Offline and degraded behavior**: the API may be unreachable (phone off the LAN, backend down). The client may retain a profile cache for presentation, but that cache is not an offline mode or source of truth; show failures and never silently fall back to local writes.
 - **Consistency across surfaces**: when the backend returns updated data (a new meal, a completed workout, a saved measurement), the UI should reflect it without a full reload. The app uses custom events (`physiquequest-nutrition-updated`, `physiquequest-profile-updated`) and hook refreshers for this.
 
 ## 2. Design Tokens: Color & Typography
@@ -439,7 +439,7 @@ This eliminates breakpoint sprawl and provides smooth scaling across all viewpor
 - Avoid inline hex/rgb values in component styles
 - Document the purpose and use cases for new tokens
 - Group related tokens (e.g., all green variants, all gray/neutral variants)
-- Version token changes if they affect existing UI (e.g., “v2.2” in comments)
+- Update the design-system version and maintenance note when a significant interface pattern changes.
 
 ## 8. UI Review Checklist
 
@@ -515,11 +515,11 @@ Before committing any UI changes, verify:
 - **Live Controls**: Pause/End buttons, session progress bar
 
 ### Scan (Nutrition)
-- **Nutrition Card**: Circular calorie display + macro list with progress bars
+- **Nutrition Card**: Circular calorie display + macro list with progress bars, backed by the nutrition API
 - **Scan CTA**: Green button with camera icon, text overlay
-- **Meal Rows**: Meal name, calorie count, add meal button (+ icon)
-- **More Section**: Water tracking, Food History links
-- **Add Food Flow**: Search, detection results, portion entry, confirmation
+- **Photo scan flow**: Camera/upload selection opens Review Estimate immediately; show progress, actionable errors, detected items, and unmatched items. Require user confirmation before saving matched items.
+- **Logs & Target**: Daily calorie ring with remaining calories, macro progress, compact meal rows, water controls, and History action. Targets are shared with the nutrition overview. Keep the five-tab navigation visible on this screen.
+- **Add Food Flow**: Search, food result details, portion entry, and save confirmation; recent selections are suggestions, not meal history.
 
 ### Quests
 - **Level Card**: Large hero (green background), level number, streak counter, exp bar
