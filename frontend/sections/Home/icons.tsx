@@ -23,6 +23,8 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
     download: <><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 002 2h10a2 2 0 002-2v-4"/></>,
     medal: <><circle cx="12" cy="8" r="5"/><path d="m8 12-2 9 6-3 6 3-2-9"/></>,
     shield: <><path d="M12 3 20 6v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></>,
+    clipboard: <><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5.5V4a1 1 0 011-1h4a1 1 0 011 1v1.5M8 10h8M8 14h8M8 18h5"/></>,
+    'minus-circle': <><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></>,
     phone: <><path d="M7 3h3l2 5-2.2 1.8a14 14 0 004.4 4.4L16 12l5 2v3c0 1.1-.9 2-2 2C10.2 19 5 13.8 5 5c0-1.1.9-2 2-2z"/></>,
     health: <><path d="M20.4 8.8c0 4-8.4 10-8.4 10s-8.4-6-8.4-10a4.6 4.6 0 018.4-2.1 4.6 4.6 0 018.4 2.1z"/><path d="M6.7 11.5h3l1.5-2.7 2.2 5 1.4-2.6h2.7"/></>,
     crown: <><path d="m3 7 5 4 4-7 4 7 5-4-2 12H5L3 7z"/><path d="M6 22h12"/></>,

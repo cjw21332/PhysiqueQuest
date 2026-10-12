@@ -113,6 +113,8 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+For production startup, run `npm run build` first, then run `npm run start:prod` from `backend/`. The build emits `dist/main.js`; do not start the app with the extensionless path `node dist/main`.
+
 ## Run tests
 
 ```bash

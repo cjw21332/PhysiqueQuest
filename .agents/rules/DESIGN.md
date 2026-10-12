@@ -15,7 +15,7 @@ This document specifies the current PhysiqueQuest product interface, design toke
 - Reuse the established light palette and CSS custom properties. Do not introduce new palette tokens, UI frameworks, component kits, or icon packages without approval.
 - Treat the web app as the UI source for both browsers and the Expo WebView. Design mobile-first, account for safe-area insets, and preserve the established 390px, 700px, and 740px responsive breakpoints.
 - Use the shared `Icon` registry, existing React state and API-backed persistence patterns, and the established five-tab navigation.
-- Keep backend-backed screens truthful: render real API data and explicit loading, empty, and error/retry states; never substitute fabricated records or silently fall back to sample data.
+- Keep backend-backed screens truthful: render real API data and explicit loading, empty, and error/retry states. If the user explicitly requests a temporary sample preview, identify it as sample content, use it only after a successful empty response (never mask loading or API errors), and keep sample-only actions local.
 - Preserve accessible names, visible keyboard focus, and 44px minimum touch targets for interactive controls. Respect reduced-motion preferences.
 
 ### App Structure
@@ -540,9 +540,9 @@ Before committing any UI changes, verify:
 
 ### Notifications
 - **Header**: Home back arrow, Notifications title, and a “Mark all read” action when unread items exist.
-- **Pinned safety notice**: Use the pale-red alert surface only for an actual API notification identified as a safety alert. Keep its title and body from the API; its CTA marks that notification read. Do not invent a “review session” destination or fabricate a sample safety event.
+- **Pinned safety notice**: Use the pale-red alert surface for an actual API safety notification, or for the clearly labeled sample preview when that fallback has explicitly been requested. Keep live title and body API-sourced and make its CTA mark the live item read. Sample-only review actions must not imply access to a real session.
 - **Notification groups**: Show Today first and Earlier last when those groups are present; preserve other API-provided group names. Render each API item as a compact, hairline-separated row with its icon, title, body, time, and a clear unread marker.
-- **Data states**: Retain the API-backed loading, honest empty, error/retry, individual mark-read, and mark-all-read behavior. Keep the Home bottom navigation and safe-area spacing intact.
+- **Data states**: Retain the API-backed loading and error/retry states. When no live records are returned successfully, show the requested screenshot-matched sample preview with an explicit sample label; its read actions are local and never sent to the backend. For live records, individual mark-read and mark-all-read remain API-backed. Keep the Home bottom navigation and safe-area spacing intact.
 
 ### Coach (Training)
 - **Header**: Section title + back button (if nested)

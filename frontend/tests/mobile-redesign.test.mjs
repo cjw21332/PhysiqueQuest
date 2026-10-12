@@ -16,21 +16,38 @@ test('progress displays saved measurement history and honest empty states', asyn
   assert.match(file, /Form accuracy/);
 });
 
-test('notifications render authenticated API data instead of sample events', async () => {
+test('notifications prefer API records and show the requested preview only for a successful empty response', async () => {
   const file = await source('sections/Home/Notifications.tsx');
   assert.match(file, /useNotifications/);
   assert.match(file, /markAllRead/);
   assert.match(file, /Try again/);
-  assert.doesNotMatch(file, /const initial =/);
-  assert.doesNotMatch(file, /Maria Dela Cruz/);
+  assert.match(file, /const sampleNotifications: AppNotification\[\]/);
+  assert.match(file, /!loading && !error && items\.length === 0/);
+  assert.match(file, /showingSamples \? sampleItems : items/);
+  assert.match(file, /Emergency alert sent — Nov 14, 7:42 PM/);
+  assert.match(file, /Maria Dela Cruz was notified\. Review the flagged session\./);
+  assert.match(file, /2 missions left/);
+  assert.match(file, /Post-workout report ready/);
+  assert.match(file, /Streak penalty applied/);
+  assert.match(file, /New badge unlocked/);
+  assert.match(file, /Sample notifications · live notifications will replace this preview\./);
+  assert.match(file, /This sample alert is not linked to a real session\./);
+});
+
+test('sample notification read actions stay local and do not call the API', async () => {
+  const file = await source('sections/Home/Notifications.tsx');
+  assert.match(file, /if \(showingSamples\) \{\s+setSampleItems/);
+  assert.match(file, /if \(showingSamples\) \{\s+setSampleItems\(current => current\.map\(sample => \(\{ \.\.\.sample, unread: false \}\)\)\)/);
+  assert.match(file, /void markRead\(item\.id\)/);
+  assert.match(file, /void markAllRead\(\)/);
 });
 
 test('notifications pin real safety alerts and preserve truthful actions', async () => {
   const file = await source('sections/Home/Notifications.tsx');
   const styles = await source('app/globals.css');
-  assert.match(file, /items\.find\(item =>/);
+  assert.match(file, /displayedItems\.find\(item =>/);
   assert.match(file, /item\.icon === 'shield'/);
-  assert.match(file, /<SafetyNotification item=\{pinnedSafety\}/);
+  assert.match(file, /<SafetyNotification\s+item=\{pinnedSafety\}/);
   assert.match(file, /Safety notice · pinned/);
   assert.match(file, /Mark as read/);
   assert.match(file, /notification-unread-label/);

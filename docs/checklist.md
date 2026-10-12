@@ -8,9 +8,9 @@ This checklist separates what is implemented in the frontend, what is implemente
 
 ### Post-baseline implementation update — October 13, 2026
 
-- **Notifications presentation:** The Home Notifications view now conditionally promotes a real API-backed safety notification to a pinned safety card, retains returned API content and grouping, and exposes truthful individual/mark-all read actions. Loading, empty, and error/retry states remain present.
-- **Verification:** The frontend production build passed and the complete frontend test suite passed (66/66). The backend test suite passed (273/273) and the backend production build passed. These checks verify implementation and automated behavior, not a fresh live database round trip.
-- **Checklist impact:** Notifications frontend and backend implementation criteria remain checked. The joint notification workflow remains unchecked until real notification records and persisted read-state changes are verified using a safe live test account.
+- **Notifications presentation:** The Home Notifications screen shows the screenshot-matched sample preview (pinned safety notice, Today and Earlier groups) only after the API successfully returns no records. It labels this data as a sample, keeps sample read actions local, and does not display it over loading or API errors. Non-empty API results remain authoritative.
+- **Verification:** Frontend production build passed and all frontend tests passed (67/67). These checks cover the sample fallback and interactions but do not verify a live notification round trip. Earlier backend test/build results do not validate this frontend change.
+- **Checklist impact:** Notifications frontend/API wiring stays marked implemented; the joint notification workflow remains unchecked until real notification records and persisted read-state changes are verified using a safe live test account. Sample preview behavior is not end-to-end evidence.
 
 ## How to interpret the marks
 
@@ -149,7 +149,7 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 ### 14. Notifications
 
 - [✅] Notification list, individual read-state updates, and mark-all-read use notifications API operations.
-- [✅] The UI renders returned notification records rather than built-in example events; actual safety notices may use the pinned alert presentation, while returned text, time, grouping, and unread state remain API-sourced.
+- [✅] Non-empty API results render as authoritative data; when the API successfully returns no records, the requested screenshot-matched preview is shown with an explicit sample label and local-only read actions. API failures remain visible and do not trigger the sample fallback.
 
 ### 15. Administrator tools
 
@@ -256,6 +256,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 
 - [✅] DTO validation, JWT guards, request context, structured scanner errors, limits, and timeout paths have backend implementation/test coverage.
 - [✅] Backend production build and automated backend suite pass; a passing build is not a production database/provider connectivity test.
+- [✅] Backend production startup uses the compiled `dist/main.js` entrypoint; run `npm run build` then `npm run start:prod` from `backend/` (not extensionless `node dist/main`).
 
 ---
 

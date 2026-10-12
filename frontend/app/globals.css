@@ -6095,6 +6095,12 @@ iframe[src*="notification"] {
 .home-notifications-head .section-back-title h2 {
   margin: 0;
 }
+.home-notifications .notification-preview-note {
+  margin: 5px 0 7px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
 .home-notifications .mark-all-btn {
   min-height: 44px;
   padding: 0 10px;
@@ -6163,6 +6169,12 @@ iframe[src*="notification"] {
   font-size: 12px;
   font-weight: 700;
 }
+.notification-safety-card .notification-sample-message {
+  margin: 7px 0 0;
+  color: #625c60;
+  font-size: 11px;
+  line-height: 1.4;
+}
 .notification-safety-card > .notification-time {
   display: flex;
   align-items: center;
@@ -6205,6 +6217,10 @@ iframe[src*="notification"] {
   border-radius: 9px;
   background: #eff9ef;
   color: var(--green-dark);
+}
+.home-notifications .notification-icon.minus-circle {
+  background: #fff4e6;
+  color: #b45e15;
 }
 .home-notifications .notification-copy {
   min-width: 0;
