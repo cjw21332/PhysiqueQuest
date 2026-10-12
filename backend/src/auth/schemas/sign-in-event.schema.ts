@@ -8,7 +8,7 @@ export class SignInEvent {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, index: true })
   userId: Types.ObjectId;
 
-  @Prop({ type: Date, required: true, index: true })
+  @Prop({ type: Date, required: true })
   occurredAt: Date;
 
   @Prop({ enum: ['login', 'register'], required: true })

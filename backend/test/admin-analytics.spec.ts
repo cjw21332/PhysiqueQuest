@@ -3,12 +3,20 @@ import { describe, expect, it, vi } from 'vitest';
 import { AdminAnalyticsService } from '../src/admin/admin-analytics.service.js';
 import { RolesGuard } from '../src/auth/roles.guard.js';
 import { AdminAnalyticsController } from '../src/admin/admin-analytics.controller.js';
+import { SignInEventSchema } from '../src/auth/schemas/sign-in-event.schema.js';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 
 const signInModel = (rows: unknown[]) =>
   ({ find: vi.fn(() => ({ select: () => ({ lean: () => ({ exec: async () => rows }) }) })) }) as any;
 
 describe('admin analytics', () => {
+  it('defines the occurredAt index once for sign-in event queries', () => {
+    const occurredAtIndexes = SignInEventSchema.indexes().filter(([index]) =>
+      Object.keys(index).length === 1 && index.occurredAt === 1,
+    );
+    expect(occurredAtIndexes).toHaveLength(1);
+  });
+
   it('requires the admin role and limits ranges', async () => {
     expect(Reflect.getMetadata(GUARDS_METADATA, AdminAnalyticsController)).toContain(RolesGuard);
     const service = new AdminAnalyticsService({ countDocuments: vi.fn() } as any, { countDocuments: vi.fn() } as any, { countDocuments: vi.fn() } as any, signInModel([]));

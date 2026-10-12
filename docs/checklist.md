@@ -11,6 +11,7 @@ This checklist separates what is implemented in the frontend, what is implemente
 - **Notifications presentation:** The Home Notifications screen shows the screenshot-matched sample preview (pinned safety notice, Today and Earlier groups) only after the API successfully returns no records. It labels this data as a sample, keeps sample read actions local, and does not display it over loading or API errors. Non-empty API results remain authoritative.
 - **Verification:** Frontend production build passed and all frontend tests passed (67/67). These checks cover the sample fallback and interactions but do not verify a live notification round trip. Earlier backend test/build results do not validate this frontend change.
 - **Checklist impact:** Notifications frontend/API wiring stays marked implemented; the joint notification workflow remains unchecked until real notification records and persisted read-state changes are verified using a safe live test account. Sample preview behavior is not end-to-end evidence.
+- **Sign-in event index:** Removed the duplicate `occurredAt` index declaration from the Mongoose property metadata while retaining the explicit query index. A schema regression test verifies that the single-field index is declared once.
 
 ## How to interpret the marks
 
@@ -257,6 +258,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 - [✅] DTO validation, JWT guards, request context, structured scanner errors, limits, and timeout paths have backend implementation/test coverage.
 - [✅] Backend production build and automated backend suite pass; a passing build is not a production database/provider connectivity test.
 - [✅] Backend production startup uses the compiled `dist/main.js` entrypoint; run `npm run build` then `npm run start:prod` from `backend/` (not extensionless `node dist/main`).
+- [✅] Sign-in event analytics retain one `occurredAt` index declaration for time-range queries; schema tests guard against duplicate index metadata.
 
 ---
 
