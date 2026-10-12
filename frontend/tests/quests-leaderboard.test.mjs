@@ -22,3 +22,14 @@ test('leaderboard layout adapts its ranked list and podium to narrow screens', a
   assert.match(styles, /\.leaderboard-podium/);
   assert.match(styles, /@media\s*\(max-width:\s*390px\)/);
 });
+
+test('leaderboard is fed by the ranking API instead of sample data', async () => {
+  const screen = await source('sections/Quests Section/QuestSection.tsx');
+  assert.match(screen, /useLeaderboard/);
+  assert.match(screen, /leaderboard\?\.entries/);
+  assert.match(screen, /leaderboard\.self/);
+  assert.match(screen, /leaderboardError/);
+  assert.doesNotMatch(screen, /Sample rankings shown for preview/);
+  const client = await source('lib/api.ts');
+  assert.match(client, /getLeaderboard\(period/);
+});

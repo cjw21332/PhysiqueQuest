@@ -5,42 +5,11 @@ import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import type { Profile } from '../Home/types';
 import { useActivity } from '../../hooks/useActivity';
+import { useLeaderboard } from '../../hooks/useLeaderboard';
 import { useSettings } from '../../hooks/useSettings';
+import type { LeaderboardEntryRecord, LeaderboardPeriod } from '../../lib/api';
 
-type LeaderboardPeriod = 'week' | 'month' | 'all';
-type LeaderboardEntry = { name: string; points: number; movement: number | 'same' };
 type Screen = 'quests' | 'leaderboard';
-
-// Preview rankings follow the supplied UI while the ranking API is being prepared.
-const leaderboardEntries: Record<LeaderboardPeriod, LeaderboardEntry[]> = {
-  week: [
-    { name: 'Levi M.', points: 4210, movement: 'same' },
-    { name: 'Charles W.', points: 3980, movement: 2 },
-    { name: 'Michael A.', points: 3650, movement: 1 },
-    { name: 'Rico M.', points: 3120, movement: 2 },
-    { name: 'Angel P.', points: 2980, movement: 1 },
-    { name: 'Karl D.', points: 2760, movement: -4 },
-    { name: 'Bea S.', points: 2540, movement: 'same' },
-  ],
-  month: [
-    { name: 'Charles W.', points: 18420, movement: 3 },
-    { name: 'Levi M.', points: 17650, movement: -1 },
-    { name: 'Michael A.', points: 15980, movement: 2 },
-    { name: 'Rico M.', points: 14720, movement: 1 },
-    { name: 'Angel P.', points: 13980, movement: 'same' },
-    { name: 'Bea S.', points: 12640, movement: 4 },
-    { name: 'Karl D.', points: 11920, movement: -2 },
-  ],
-  all: [
-    { name: 'Michael A.', points: 68420, movement: 1 },
-    { name: 'Charles W.', points: 65210, movement: 'same' },
-    { name: 'Levi M.', points: 61780, movement: 2 },
-    { name: 'Angel P.', points: 58320, movement: 1 },
-    { name: 'Rico M.', points: 56740, movement: -2 },
-    { name: 'Karl D.', points: 52490, movement: 3 },
-    { name: 'Bea S.', points: 49810, movement: -1 },
-  ],
-};
 
 const periodLabels: { key: LeaderboardPeriod; label: string }[] = [
   { key: 'week', label: 'This week' },
@@ -56,11 +25,20 @@ function getInitials(name: string) {
   return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]?.toUpperCase() ?? '').join('');
 }
 
+function movementClass(movement: LeaderboardEntryRecord['movement']) {
+  return typeof movement === 'number' ? (movement > 0 ? 'up' : 'down') : 'same';
+}
+
+function movementLabel(movement: LeaderboardEntryRecord['movement']) {
+  return typeof movement === 'number' ? `${Math.abs(movement)} places ${movement > 0 ? 'up' : 'down'}` : 'No rank change';
+}
+
 export default function QuestSection({ profile, onLogoutRequest: _onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const { activity, dailyMissions, badges, loading, error, refresh } = useActivity();
   const { settings } = useSettings();
   const [screen, setScreen] = useState<Screen>('quests');
   const [period, setPeriod] = useState<LeaderboardPeriod>('week');
+  const { data: leaderboard, loading: leaderboardLoading, error: leaderboardError, refresh: refreshLeaderboard } = useLeaderboard(period);
   const level = activity.level;
   const currentExp = activity.currentExp;
   const nextLevelExp = activity.nextLevelExp;
@@ -70,8 +48,8 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
   if (error) return <section className="quest-section"><div className="profile-load-state" role="alert"><h2>Could not load quests</h2><p>{error}</p><button onClick={() => void refresh()}>Try again</button></div><BottomNav /></section>;
 
   if (screen === 'leaderboard') {
-    const entries = leaderboardEntries[period];
-    const podium = [entries[1], entries[0], entries[2]];
+    const entries = leaderboard?.entries ?? [];
+    const podium = [entries[1], entries[0], entries[2]].filter((entry): entry is LeaderboardEntryRecord => Boolean(entry));
     const currentName = profile.name.trim() || 'You';
     return <section className="quest-section leaderboard-screen" aria-label="Leaderboard">
       <header className="leaderboard-header">
@@ -82,41 +60,41 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
         <div className="leaderboard-periods" role="tablist" aria-label="Leaderboard period">
           {periodLabels.map(option => <button key={option.key} type="button" role="tab" aria-selected={period === option.key} aria-pressed={period === option.key} className={period === option.key ? 'selected' : ''} onClick={() => setPeriod(option.key)}>{option.label}</button>)}
         </div>
-        <section className="leaderboard-podium" aria-label="Top three players">
-          {podium.map((entry, index) => {
-            const rank = index === 0 ? 2 : index === 1 ? 1 : 3;
-            return <div className={`podium-player podium-rank-${rank}`} key={entry.name}>
-              {rank === 1 && <Icon name="crown" size={19}/>}
-              <div className="podium-avatar">{getInitials(entry.name)}</div>
-              <strong>{entry.name}</strong>
-              <small>{formatPoints(entry.points)} pts</small>
-              <div className="podium-step">{rank}</div>
-            </div>;
-          })}
-        </section>
-        <div className="leaderboard-rankings" role="list" aria-label="Leaderboard rankings">
-          {entries.slice(3).map((entry, index) => {
-            const rank = index + 4;
-            return <div className="leaderboard-row" role="listitem" key={entry.name}>
-              <span className="leaderboard-rank">{rank}</span>
+        {leaderboardLoading ? <div className="profile-load-state" role="status"><h2>Loading rankings…</h2></div> : leaderboardError ? <div className="profile-load-state" role="alert"><h2>Could not load rankings</h2><p>{leaderboardError}</p><button onClick={() => void refreshLeaderboard()}>Try again</button></div> : entries.length === 0 ? <p className="leaderboard-context" role="status">No ranked activity in this period yet.</p> : <>
+          <section className="leaderboard-podium" aria-label="Top three players">
+            {podium.map(entry => {
+              const rank = entry.rank;
+              return <div className={`podium-player podium-rank-${rank}`} key={entry.userId}>
+                {rank === 1 && <Icon name="crown" size={19}/>}
+                <div className="podium-avatar">{getInitials(entry.name)}</div>
+                <strong>{entry.name}</strong>
+                <small>{formatPoints(entry.points)} pts</small>
+                <div className="podium-step">{rank}</div>
+              </div>;
+            })}
+          </section>
+          <div className="leaderboard-rankings" role="list" aria-label="Leaderboard rankings">
+            {entries.slice(3).map(entry => <div className="leaderboard-row" role="listitem" key={entry.userId}>
+              <span className="leaderboard-rank">{entry.rank}</span>
               <span className="leaderboard-avatar">{getInitials(entry.name)}</span>
               <span className="leaderboard-person"><strong>{entry.name}</strong><small>{formatPoints(entry.points)} pts</small></span>
-              <span className={`leaderboard-movement ${typeof entry.movement === 'number' ? (entry.movement > 0 ? 'up' : 'down') : 'same'}`} aria-label={typeof entry.movement === 'number' ? `${Math.abs(entry.movement)} places ${entry.movement > 0 ? 'up' : 'down'}` : 'No rank change'}>
+              <span className={`leaderboard-movement ${movementClass(entry.movement)}`} aria-label={movementLabel(entry.movement)}>
                 {typeof entry.movement === 'number' ? <>{entry.movement > 0 ? '↑' : '↓'} {Math.abs(entry.movement)}</> : '—'}
               </span>
-            </div>;
-          })}
-        </div>
-        {settings.showLeaderboard ? <>
-          <div className="leaderboard-self-row" aria-label={`Your rank, 14, ${currentName}`}>
-            <span className="leaderboard-rank">14</span>
-            <span className="leaderboard-self-avatar">{getInitials(currentName)}</span>
-            <span className="leaderboard-person"><strong>You · {currentName}</strong><small>1,840 pts · {activity.dayStreak}-day streak</small></span>
-            <span className="leaderboard-movement up" aria-label="3 places up">↑ 3</span>
+            </div>)}
           </div>
-          <p className="leaderboard-context">1,280 pts behind rank 7 — two workouts closes most of it.</p>
+        </>}
+        {leaderboard && settings.showLeaderboard ? <>
+          <div className="leaderboard-self-row" aria-label={`Your rank, ${leaderboard.self.rank}, ${currentName}`}>
+            <span className="leaderboard-rank">{leaderboard.self.rank}</span>
+            <span className="leaderboard-self-avatar">{getInitials(currentName)}</span>
+            <span className="leaderboard-person"><strong>You · {currentName}</strong><small>{formatPoints(leaderboard.self.points)} pts · {activity.dayStreak}-day streak</small></span>
+            <span className={`leaderboard-movement ${movementClass(leaderboard.self.movement)}`} aria-label={movementLabel(leaderboard.self.movement)}>
+              {typeof leaderboard.self.movement === 'number' ? <>{leaderboard.self.movement > 0 ? '↑' : '↓'} {Math.abs(leaderboard.self.movement)}</> : '—'}
+            </span>
+          </div>
+          {leaderboard.context && <p className="leaderboard-context">{formatPoints(leaderboard.context.pointsBehind)} pts behind {leaderboard.context.previousName} — a strong week closes most of it.</p>}
         </> : <p className="leaderboard-context" role="status">Your ranking is hidden. Turn on leaderboard visibility in privacy settings to show your profile.</p>}
-        <p className="leaderboard-preview-note">Sample rankings shown for preview. Your activity, streak, and leaderboard privacy setting are live.</p>
       </div>
       <BottomNav />
     </section>;

@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { User, UserSchema } from './schemas/user.schema.js';
+import { SignInEvent, SignInEventSchema } from './schemas/sign-in-event.schema.js';
 import { JwtStrategy } from './jwt.strategy.js';
 import type { SignOptions } from 'jsonwebtoken';
 import { RecoveryToken, RecoveryTokenSchema } from './recovery-token.schema.js';
@@ -14,7 +15,7 @@ import { EmailDeliveryProvider } from '../providers/email-delivery.provider.js';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: RecoveryToken.name, schema: RecoveryTokenSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: RecoveryToken.name, schema: RecoveryTokenSchema }, { name: SignInEvent.name, schema: SignInEventSchema }]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

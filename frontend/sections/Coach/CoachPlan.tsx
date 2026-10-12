@@ -3,32 +3,30 @@
 import { useState } from 'react';
 import { Icon } from '../Home/icons';
 import type { Profile } from '../Home/types';
-
-const days = [{ label: 'M', key: 0 }, { label: 'T', key: 1 }, { label: 'W', key: 2 }, { label: 'T', key: 3 }, { label: 'F', key: 4 }, { label: 'S', key: 5 }, { label: 'S', key: 6 }];
-const scheduledDays = [0, 2, 4, 5];
+import { useCoachPlan } from '../../hooks/useCoachPlan';
 
 export default function CoachPlan({ profile, onStart, onLibrary }: { profile: Profile; onStart: () => void; onLibrary: () => void }) {
+  const { plan, loading, error, refresh } = useCoachPlan();
   const [selectedDay, setSelectedDay] = useState(0);
-  const workoutTitles = ['Upper Body — Push', 'Recovery day', 'Lower Body', 'Recovery day', 'Upper Body — Pull', 'Full Body', 'Rest day'];
-  const currentWorkout = workoutTitles[selectedDay];
-  const isWorkoutDay = scheduledDays.includes(selectedDay);
-  const todayExercises = [
-    { name: 'Push-up', sets: '3 × 12', tracking: 'AI tracked' },
-    { name: 'Dumbbell bench press', sets: '4 × 10 · 22 kg', tracking: 'AI tracked' },
-    { name: 'Overhead press', sets: '3 × 10 · 16 kg', tracking: 'AI tracked' },
-    { name: 'Lateral raise', sets: '3 × 15 · 6 kg', tracking: 'AI tracked' },
-    { name: 'Triceps extension', sets: '3 × 12 · 10 kg', tracking: 'Manual' },
-    { name: 'Plank', sets: '3 × 45 s', tracking: 'AI tracked' },
-  ];
+
+  if (loading) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="status"><h2>Building your plan…</h2></div></div>;
+  if (error || !plan) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="alert"><h2>Could not load your plan</h2><p>{error || 'Your profile is required to build a plan.'}</p><button onClick={() => void refresh()}>Try again</button></div></div>;
+
+  const currentDay = plan.days[selectedDay] ?? plan.days[0];
+  const isWorkoutDay = currentDay?.isWorkoutDay ?? false;
+  const todayExercises = currentDay?.exercises ?? [];
+
   return <div className="coach-plan">
     <header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header>
-    <section className="week-section"><div className="week-info">Week 3 · 4 sessions planned</div><div className="week-days-grid">{days.map((day, index) => { const hasSession = scheduledDays.includes(index); const isSelected = selectedDay === index; return <button key={index} className={`day-button ${isSelected ? 'selected' : ''} ${hasSession ? 'has-session' : ''}`} onClick={() => setSelectedDay(index)}><span className="day-label">{day.label}</span>{hasSession && <div className="day-dot" />}</button>; })}</div></section>
+    <section className="week-section"><div className="week-info">{plan.weekLabel}</div><div className="week-days-grid">{plan.days.map((day, index) => <button key={index} className={`day-button ${selectedDay === index ? 'selected' : ''} ${day.isWorkoutDay ? 'has-session' : ''}`} onClick={() => setSelectedDay(index)}><span className="day-label">{day.label}</span>{day.isWorkoutDay && <div className="day-dot" />}</button>)}</div></section>
     {isWorkoutDay ? <>
-      <section className="workout-info-card"><div className="workout-label">Today</div><h3 className="workout-title">{currentWorkout}</h3><div className="workout-meta"><span className="meta-item">{profile.duration || '45 min'}</span><span className="meta-separator">·</span><span className="meta-item">{todayExercises.length} exercises</span><span className="meta-separator">·</span><span className="meta-item">{profile.equipment?.[0] || 'Dumbbells'}</span></div></section>
-      <section className="exercise-list-card"><div className="exercise-list-header"><h4>Exercises</h4><span className="exercise-count">{todayExercises.length}</span></div><div className="exercise-list">{todayExercises.map((exercise, index) => <div key={index} className="exercise-item"><div className="exercise-number">{index + 1}</div><div className="exercise-details"><div className="exercise-name">{exercise.name}</div><div className="exercise-sets">{exercise.sets}</div></div><div className={`tracking-badge ${exercise.tracking === 'AI tracked' ? 'ai-tracked' : 'manual'}`}>{exercise.tracking}</div></div>)}</div></section>
-      <div className="form-tip-card"><div className="tip-icon"><Icon name="coach" size={20} /></div><div className="tip-content"><div className="tip-title">Form tip</div><div className="tip-exercise">Dumbbell bench press</div><div className="tip-text">Keep your wrists stacked over your elbows and lower until your upper arms are level with the bench.</div></div></div>
+      <section className="workout-info-card"><div className="workout-label">Today</div><h3 className="workout-title">{currentDay.title}</h3><div className="workout-meta"><span className="meta-item">{plan.duration || profile.duration || '45 min'}</span><span className="meta-separator">·</span><span className="meta-item">{todayExercises.length} exercises</span><span className="meta-separator">·</span><span className="meta-item">{profile.equipment?.[0] || 'Dumbbells'}</span></div></section>
+      {!plan.libraryReady ? <div className="rest-day-message"><h3>Exercises coming soon</h3><p>Your coach needs published exercises in the library before it can fill this session.</p></div> : <>
+        <section className="exercise-list-card"><div className="exercise-list-header"><h4>Exercises</h4><span className="exercise-count">{todayExercises.length}</span></div><div className="exercise-list">{todayExercises.map((exercise, index) => <div key={exercise.exerciseId} className="exercise-item"><div className="exercise-number">{index + 1}</div><div className="exercise-details"><div className="exercise-name">{exercise.name}</div><div className="exercise-sets">{plan.sets}</div></div><div className={`tracking-badge ${exercise.tracking === 'AI tracked' ? 'ai-tracked' : 'manual'}`}>{exercise.tracking}</div></div>)}</div></section>
+        {todayExercises[0] && <div className="form-tip-card"><div className="tip-icon"><Icon name="coach" size={20} /></div><div className="tip-content"><div className="tip-title">Form tip</div><div className="tip-exercise">{todayExercises[0].name}</div><div className="tip-text">Move with control and keep your core braced through every rep of {todayExercises[0].name}.</div></div></div>}
+      </>}
       <button className="library-link-card" onClick={onLibrary}><div className="library-icon"><Icon name="medal" size={22} /></div><div className="library-info"><div className="library-title">Exercise library</div><div className="library-subtitle">Demos and form guides</div></div><Icon name="arrow" size={18} /></button>
       <div className="start-button-container"><button className="start-session-btn" onClick={onStart}><Icon name="play" size={18} />Start session</button></div>
-    </> : <div className="rest-day-message"><h3>{currentWorkout}</h3><p>No workout scheduled for this day. Rest and recover!</p></div>}
+    </> : <div className="rest-day-message"><h3>{currentDay?.title ?? 'Rest day'}</h3><p>No workout scheduled for this day. Rest and recover!</p></div>}
   </div>;
 }

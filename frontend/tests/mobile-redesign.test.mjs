@@ -97,11 +97,12 @@ test('a scan waits visibly, then offers a retry once it hits the limit', async (
   assert.doesNotMatch(scan, /setTimeout\(.*analyse/);
 });
 
-test('coach plan restores the legacy workout dashboard', async () => {
+test('coach plan renders a library-backed workout dashboard', async () => {
   const file = await source('sections/Coach/CoachPlan.tsx');
-  assert.match(file, /Week 3 · 4 sessions planned/);
+  assert.match(file, /useCoachPlan/);
   assert.match(file, /AI tracked/);
-  assert.match(file, /Dumbbell bench press/);
+  assert.match(file, /plan\.libraryReady/);
+  assert.match(file, /Start session/);
 });
 
 test('native wrapper reports backend connectivity and can retry it', async () => {

@@ -77,6 +77,53 @@ export type AdminAlertRow = {
   locationShared: boolean;
 };
 
+export type LeaderboardPeriod = 'week' | 'month' | 'all';
+
+export interface LeaderboardEntryRecord {
+  userId: string;
+  name: string;
+  points: number;
+  rank: number;
+  movement: number | 'same';
+  isCurrentUser: boolean;
+}
+
+export interface LeaderboardRecord {
+  period: LeaderboardPeriod;
+  entries: LeaderboardEntryRecord[];
+  self: LeaderboardEntryRecord;
+  context: { previousName: string; pointsBehind: number } | null;
+}
+
+export interface CoachExercise {
+  exerciseId: string;
+  name: string;
+  group: string;
+  targetMuscle: string;
+  equipment: string;
+  tracking: 'AI tracked' | 'Manual';
+}
+
+export interface CoachDay {
+  label: string;
+  name: string;
+  index: number;
+  isWorkoutDay: boolean;
+  title: string;
+  focus: string | null;
+  exercises: CoachExercise[];
+}
+
+export interface CoachPlanRecord {
+  goal: string;
+  weekLabel: string;
+  sessionCount: number;
+  duration: string;
+  libraryReady: boolean;
+  sets: string;
+  days: CoachDay[];
+}
+
 export interface AdminAnalyticsRecord {
   rangeDays: 7 | 30 | 90;
   generatedAt: string;
@@ -314,6 +361,8 @@ class ApiClient {
   async updateSettings(values: Record<string, unknown>) { return this.request<any>('/settings', { method: 'PUT', body: JSON.stringify({ values }) }); }
   async getActivity() { return this.request<any>('/activity/state'); }
   async updateActivity(state: Record<string, unknown>) { return this.request<any>('/activity/state', { method: 'PUT', body: JSON.stringify({ state }) }); }
+  async getLeaderboard(period: LeaderboardPeriod = 'week') { return this.request<LeaderboardRecord>(`/leaderboard?period=${encodeURIComponent(period)}`); }
+  async getCoachPlan() { return this.request<CoachPlanRecord>('/coach/plan'); }
   async getNotifications() { return this.request<any>('/notifications'); }
   async markNotification(id: string, unread: boolean) { return this.request<any>(`/notifications/${encodeURIComponent(id)}/read`, { method: 'PATCH', body: JSON.stringify({ unread }) }); }
   async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }

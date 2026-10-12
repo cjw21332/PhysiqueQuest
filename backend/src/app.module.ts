@@ -13,6 +13,8 @@ import { NotificationsModule } from './notifications/notifications.module.js';
 import { FoodScanModule } from './foodscan/foodscan.module.js';
 import { WorkoutsModule } from './workouts/workouts.module.js';
 import { ProgressModule } from './progress/progress.module.js';
+import { LeaderboardModule } from './leaderboard/leaderboard.module.js';
+import { CoachModule } from './coach/coach.module.js';
 import { ExerciseLibraryModule } from './exercises/exercise-library.module.js';
 import { ExercisesModule } from './exercises/exercises.module.js';
 import { SafetyModule } from './safety/safety.module.js';
@@ -39,6 +41,8 @@ import { AdminModule } from './admin/admin.module.js';
     FoodScanModule,
     WorkoutsModule,
     ProgressModule,
+    LeaderboardModule,
+    CoachModule,
     ExerciseLibraryModule,
     ExercisesModule,
     SafetyModule,

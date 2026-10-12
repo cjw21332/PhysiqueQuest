@@ -1,17 +1,31 @@
-import { Injectable, UnauthorizedException, ConflictException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, ConflictException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, type HydratedDocument } from 'mongoose';
+import { Model, Types, type HydratedDocument } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
 import { User } from './schemas/user.schema.js';
+import { SignInEvent } from './schemas/sign-in-event.schema.js';
 import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto.js';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(SignInEvent.name) private signInEvents: Model<SignInEvent>,
     private jwtService: JwtService,
   ) {}
+
+  /**
+   * Records one row per successful authentication for admin analytics
+   * (activeUsers, weeklyRetention). Best-effort: a logging failure must never
+   * block an otherwise successful sign-in.
+   */
+  private recordSignIn(userId: string, source: 'login' | 'register'): void {
+    void this.signInEvents.create({ userId: new Types.ObjectId(userId), occurredAt: new Date(), source })
+      .catch(() => this.logger.warn('Failed to record sign-in event for admin analytics'));
+  }
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     const { email, name, password } = registerDto;
@@ -38,6 +52,7 @@ export class AuthService {
     // Generate JWT token
     const payload = { sub: user._id.toString(), email: user.email };
     const access_token = this.jwtService.sign(payload);
+    this.recordSignIn(user._id.toString(), 'register');
 
     return {
       access_token,
@@ -94,6 +109,7 @@ export class AuthService {
     // Generate JWT token
     const payload = { sub: user._id.toString(), email: user.email };
     const access_token = this.jwtService.sign(payload);
+    this.recordSignIn(user._id.toString(), 'login');
 
     return {
       access_token,
