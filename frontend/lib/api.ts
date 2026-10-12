@@ -46,6 +46,29 @@ function readErrorBody(body: unknown): ApiError {
 
 export interface ProgressRecord { _id: string; metric: 'weight' | 'waist' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
 export interface WorkoutSessionRecord { _id: string; exerciseIds: string[]; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; }
+export type AlertRecord = {
+  _id?: string;
+  id?: string;
+  eventType: 'manual' | 'inactivity' | 'cancelled';
+  status: 'pending' | 'delivered' | 'failed' | 'cancelled';
+  errorCode?: string;
+  resolvedAt?: string | null;
+  flagged?: boolean;
+};
+
+export type AdminAlertRow = {
+  id: string;
+  userName: string;
+  eventType: 'manual' | 'inactivity' | 'cancelled';
+  status: 'pending' | 'delivered' | 'failed' | 'cancelled';
+  errorCode: string | null;
+  occurredAt: string;
+  resolvedAt: string | null;
+  flagged: boolean;
+  exerciseId: string | null;
+  locationShared: boolean;
+};
+
 export interface AdminAnalyticsRecord {
   rangeDays: 7 | 30 | 90;
   generatedAt: string;
@@ -303,10 +326,31 @@ class ApiClient {
   async deleteAdminExercise(id: string) { return this.request<any>(`/admin/exercises/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
   async getAdminAnalytics(days: 7 | 30 | 90) { return this.request<AdminAnalyticsRecord>(`/admin/analytics?days=${days}`); }
   async sendSafetyAlert(idempotencyKey: string) {
-    return this.request<{ status: 'pending' | 'delivered' | 'failed'; errorCode?: string }>('/safety/alerts', {
+    return this.request<AlertRecord>('/safety/alerts', {
       method: 'POST',
       body: JSON.stringify({ idempotencyKey, eventType: 'manual' }),
     });
+  }
+
+  /** Sends an inactivity alert, a cancelled-countdown record, or a location-bearing alarm. */
+  async sendInactivityEvent(payload: {
+    idempotencyKey: string;
+    eventType: 'inactivity' | 'cancelled';
+    location?: { lat: number; lng: number; accuracyMeters: number; capturedAt: string };
+    workoutSessionId?: string;
+    exerciseId?: string;
+  }) {
+    return this.request<AlertRecord>('/safety/alerts', { method: 'POST', body: JSON.stringify(payload) });
+  }
+
+  async resolveSafetyAlert(id: string) {
+    return this.request<AlertRecord>(`/safety/alerts/${encodeURIComponent(id)}/resolve`, { method: 'POST' });
+  }
+
+  async getAdminAlerts(days: 7 | 30 | 90, status?: string) {
+    const qs = new URLSearchParams({ days: String(days) });
+    if (status) qs.set('status', status);
+    return this.request<AdminAlertRow[]>(`/admin/alerts?${qs.toString()}`);
   }
 
   async getExercises(query?: { search?: string; muscle?: string; equipment?: string; page?: number; limit?: number }) {

@@ -8,6 +8,7 @@ import { PROFILE_STORAGE_KEY } from '../../lib/auth';
 import type { Profile } from '../Home/types';
 import AdminExerciseLibrary from './AdminExerciseLibrary';
 import EngagementAnalytics from './EngagementAnalytics';
+import EmergencyAlertLog from './EmergencyAlertLog';
 import PersonalDataEdit from './PersonalDataEdit';
 import GoalsEdit from './GoalsEdit';
 import TrainingPreferenceEdit from './TrainingPreferenceEdit';
@@ -16,7 +17,7 @@ import EmergencyContactEdit from './EmergencyContactEdit';
 import { useSettings } from '../../hooks/useSettings';
 
 type Settings = { inactivity: boolean; alarmVolume: boolean; showLeaderboard: boolean; threshold: 30 | 45 | 60 };
-type MeView = 'settings' | 'exercises' | 'engagement' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
+type MeView = 'settings' | 'exercises' | 'engagement' | 'alerts' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
 
 function Switch({ label, checked, onChange, tone = 'green' }: { label: string; checked: boolean; onChange: () => void; tone?: 'green' | 'red' }) {
   return <button className={`me-switch ${tone} ${checked ? 'on' : ''}`} type="button" role="switch" aria-label={label} aria-checked={checked} onClick={onChange}><i/></button>;
@@ -99,6 +100,9 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   if (view === 'engagement') {
     return <EngagementAnalytics onBack={() => setView('settings')} />;
   }
+  if (view === 'alerts') {
+    return <EmergencyAlertLog onBack={() => setView('settings')} />;
+  }
 
   return <section className="me-section" aria-label="Account and settings">
     <header className="me-header"><h2>Account &amp; settings</h2></header>
@@ -134,7 +138,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
           {([30, 45, 60] as const).map(value => <button key={value} className={settings.threshold === value ? 'selected' : ''} onClick={() => void updateSettings({ threshold: value }).catch(error => setSaveError(error instanceof Error ? error.message : 'Could not save threshold.'))}>{value} s</button>)}
         </div>
       </section>
-      <div className="me-setting-row"><span><b>Maximum alarm volume</b><small>Overrides silent mode</small></span><Switch label="Maximum alarm volume" checked={settings.alarmVolume} onChange={() => void toggle('alarmVolume')}/></div>
+      <div className="me-setting-row"><span><b>Alarm volume (best effort)</b><small>Plays at your phone's current volume</small></span><Switch label="Alarm volume (best effort)" checked={settings.alarmVolume} onChange={() => void toggle('alarmVolume')}/></div>
 
       <h3 className="me-group-title me-privacy-title">Privacy</h3>
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}
@@ -142,6 +146,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       {isAdmin && <><h3 className="me-group-title me-admin-title">Admin tools</h3><div className="me-list">
         <SettingRow icon="dumbbell" title="Exercise library" detail="Publish exercises and pose templates" onClick={() => setView('exercises')}/>
         <SettingRow icon="trend" title="Engagement Analytics" detail="Users, sessions, safety events" onClick={() => setView('engagement')}/>
+        <SettingRow icon="bell" title="Emergency alert log" detail="Inactivity alarms and false alarms" onClick={() => setView('alerts')}/>
       </div></>}
 
       <button className="me-logout" onClick={() => onLogoutRequest?.()}><span>⇥</span>Log out</button>

@@ -11,6 +11,8 @@ import WorkoutReport from './WorkoutReport';
 import BottomNav from '../Home/BottomNav';
 import { navigate } from '../../lib/navigation';
 import { useWorkouts } from '../../hooks/useWorkouts';
+import { useSettings } from '../../hooks/useSettings';
+import { primeAlarmAudio } from '../../lib/alarmAudio';
 import type { WorkoutSessionRecord } from '../../lib/api';
 
 type View = 'plan' | 'library' | 'camera' | 'session' | 'report';
@@ -20,6 +22,7 @@ export default function CoachSection({ profile, onLogoutRequest }: { profile: Pr
   const [workout, setWorkout] = useState<WorkoutSessionRecord | null>(null);
   const [actionError, setActionError] = useState('');
   const { startWorkout, setPaused, completeWorkout } = useWorkouts();
+  const { settings } = useSettings();
   const [toast, setToast] = useState('');
   const say = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2500); };
   const goHome = () => navigate('/home');
@@ -29,8 +32,8 @@ export default function CoachSection({ profile, onLogoutRequest }: { profile: Pr
       <div className="coach-scroll">
         {view === 'plan' && <CoachPlan profile={profile} onStart={() => setView('camera')} onLibrary={() => setView('library')}/>}
         {view === 'library' && <ExerciseLibrary selectedEquipment={profile.equipment ?? []} onBack={() => setView('plan')}/>}
-        {view === 'camera' && <CameraCheck onBack={() => setView('plan')} onStart={async () => { setActionError(''); try { const created = await startWorkout(exercises.map((_, index) => `exercise-${index + 1}`)); setWorkout(created); setView('session'); } catch (err) { setActionError(err instanceof Error ? err.message : 'Could not start workout.'); } }}/>}
-        {view === 'session' && workout && <LiveSession exercise={exercises[1]} onPause={async paused => { await setPaused(workout._id, paused); }} onEnd={async () => { const saved = await completeWorkout(workout._id, 0); setWorkout(saved); setView('report'); }}/>}
+        {view === 'camera' && <CameraCheck onBack={() => setView('plan')} onStart={async () => { setActionError(''); try { primeAlarmAudio(); const created = await startWorkout(exercises.map((_, index) => `exercise-${index + 1}`)); setWorkout(created); setView('session'); } catch (err) { setActionError(err instanceof Error ? err.message : 'Could not start workout.'); } }}/>}
+        {view === 'session' && workout && <LiveSession exercise={exercises[1]} workoutId={workout._id} thresholdSeconds={settings.threshold} contactName={profile.contactName ?? ''} contactPhone={profile.contactPhone ?? ''} onPause={async paused => { await setPaused(workout._id, paused); }} onEnd={async () => { const saved = await completeWorkout(workout._id, 0); setWorkout(saved); setView('report'); }}/>}
         {view === 'report' && workout && <WorkoutReport workout={workout} onHome={goHome} onShare={() => say('Sharing is not available in this Expo Go session.')}/>}
       </div>
       {view === 'plan' && <BottomNav />}

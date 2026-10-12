@@ -12,13 +12,16 @@
     "expo-camera": "~57.0.6",
     "expo-constants": "57.0.20",
     "expo-device": "~57.0.2",
+    "expo-keep-awake": "~57.0.2",
+    "expo-location": "~57.0.20",
     "expo-network": "~57.0.2",
+    "expo-sensors": "~57.0.3",
     "expo-web-browser": "~57.0.3",
     "next": "^16.3.8",
     "react": "19.2.3",
     "react-native": "0.86.3",
-    "react-native-webview": "13.16.1",
-    "react-native-safe-area-context": "5.7.0"
+    "react-native-safe-area-context": "5.7.0",
+    "react-native-webview": "13.16.1"
   },
   "devDependencies": {
     "cross-env": "^10.1.0",

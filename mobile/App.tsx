@@ -19,6 +19,7 @@ import {
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
+import { createNativeMonitor } from './inactivity/nativeMonitor';
 
 declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string } };
 
@@ -63,6 +64,12 @@ function buildBackendCheckScript(apiUrl: string) {
   return `(function(){fetch(${JSON.stringify(apiUrl)},{credentials:'include'}).then(function(r){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:r.ok,status:r.status}));}).catch(function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:false}));});})();true;`;
 }
 
+/** Delivers a host event to the WebView as the `physiquequest-inactivity` CustomEvent. */
+function buildInactivityScript(detail: Record<string, unknown>) {
+  const payload = JSON.stringify(detail).replace(/</g, '\\u003c');
+  return `(function(){window.dispatchEvent(new CustomEvent('physiquequest-inactivity',{detail:${payload}}));})();true;`;
+}
+
 function buildReadinessScript(readiness: DeviceReadiness) {
   const payload = JSON.stringify(readiness).replace(/</g, '\\u003c');
   return `(function(){window.dispatchEvent(new CustomEvent('physiquequest-device-readiness',{detail:${payload}}));})();true;`;
@@ -81,6 +88,12 @@ function AppContent() {
   const [key, setKey] = useState(0);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
+  const monitor = useRef<ReturnType<typeof createNativeMonitor> | null>(null);
+  if (!monitor.current) {
+    monitor.current = createNativeMonitor({
+      onEvent: detail => webRef.current?.injectJavaScript(buildInactivityScript(detail)),
+    });
+  }
 
   const insetScript = useMemo(
     () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }, apiUrl ?? 'invalid-api-address'),
@@ -207,6 +220,15 @@ function AppContent() {
             if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
             if (message.type === 'request-camera-permission') void requestCameraPermission();
             if (message.type === 'request-device-readiness') void publishReadiness();
+            const native = monitor.current;
+            if (native && message.type?.startsWith('inactivity-')) {
+              const payload = JSON.parse(e.nativeEvent.data) as { type: string; thresholdMs?: number };
+              if (payload.type === 'inactivity-start') void native.start(payload.thresholdMs ?? 45_000);
+              if (payload.type === 'inactivity-stop') native.stop();
+              if (payload.type === 'inactivity-im-okay') native.imOkay();
+              if (payload.type === 'inactivity-hold-stop') native.holdStop();
+              if (payload.type === 'inactivity-request-motion-status') void native.reportMotionStatus();
+            }
           } catch { console.log('WebView message:', e.nativeEvent.data); }
         }}
         onLoadStart={() => {
