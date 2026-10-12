@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import type { Exercise } from './exercises';
 import { InactivityCountdown, EmergencyAlarm } from './InactivityViews';
 import { api } from '../../lib/api';
+import { useCameraStream } from '../../hooks/useCameraStream';
+import { startAlarm, stopAlarm } from '../../lib/alarmAudio';
 import { COUNTDOWN_SECONDS } from '../../lib/inactivityConstants.mjs';
 
 type NativeEvent =
@@ -46,7 +48,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   const [alert, setAlert] = useState<{ id: string; status: 'pending' | 'delivered' | 'failed' | 'cancelled'; errorCode?: string; locationShared: boolean; resolved: boolean } | null>(null);
   const [recordedAt, setRecordedAt] = useState('');
   const [motionAvailable, setMotionAvailable] = useState<boolean | null>(null);
-  const audio = useRef<{ ctx: AudioContext; osc: OscillatorNode; gain: GainNode } | null>(null);
+  const camera = useCameraStream();
 
   useEffect(() => {
     if (paused) return;
@@ -94,30 +96,8 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
 
   const time = `${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;
 
-  // Creating the audio context inside the Start tap satisfies mobile autoplay rules.
-  const primeAudio = () => {
-    if (audio.current || typeof AudioContext === 'undefined') return;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.value = 880;
-    gain.gain.value = 0;
-    osc.connect(gain).connect(ctx.destination);
-    osc.start();
-    audio.current = { ctx, osc, gain };
-  };
-  const playSound = () => {
-    const a = audio.current;
-    if (!a) return;
-    void a.ctx.resume();
-    a.gain.gain.value = 0.6;
-  };
-  function stopSound() {
-    const a = audio.current;
-    if (!a) return;
-    a.gain.gain.value = 0;
-  }
+  const playSound = () => startAlarm();
+  const stopSound = () => stopAlarm();
 
   async function raiseAlarm(location: Extract<NativeEvent, { type: 'alarm' }>['location']) {
     playSound();
@@ -197,13 +177,26 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
 
   return (
     <section className="live-session">
-      <header className="live-session-head"><span className="session-meta">Manual workout · form tracking unavailable</span><b className="session-time">{time}</b></header>
+      <header className="live-session-head">
+        <span className="session-meta">{exercise.name}</span>
+        <b className="session-time" aria-label="Elapsed time">{time}</b>
+      </header>
       <div className="live-video">
-        <div className="live-scene"><span className="live-dumbbell">◆</span><div className="live-athlete"><i/><span/><b/><b/></div></div>
+        <video ref={camera.videoRef} className="live-camera" autoPlay muted playsInline />
+        {camera.status !== 'on' && <div className="live-scene" aria-hidden="true" />}
         <span className="form-score"><Icon name="shield" size={14}/> Form analysis unavailable</span>
+        <div className="live-time-card"><small>Elapsed</small><b>{time}</b></div>
         <div className="exercise-label"><small>{exercise.equipment}</small><b>{exercise.name}</b></div>
       </div>
-      <p className="inactivity-notice-line" role="note">Keep the app open and the screen on during your workout. Detection pauses when the phone is locked.</p>
+      {camera.status !== 'on' && (
+        <div className="live-camera-action">
+          <button type="button" className="secondary" disabled={camera.status === 'starting'} onClick={() => void camera.start()}>
+            {camera.status === 'starting' ? 'Starting camera...' : 'Enable camera'}
+          </button>
+          {camera.message && <p role="alert">{camera.message}</p>}
+        </div>
+      )}
+      <p className="live-notice" role="note">Keep the app open and the screen on during your workout. Detection pauses when the phone is locked.</p>
       {motionAvailable === false && <p className="scan-warning" role="status">Movement detection needs the phone app with an accelerometer. Countdown is off on this device.</p>}
       <div className="session-progress-label"><span>Elapsed time</span><b>{time}</b></div>
       <div className="session-progress-track"><i style={{width: `${Math.min(seconds / 1800 * 100, 100)}%`}}/></div>
@@ -213,7 +206,6 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       </div>
       {paused && <div className="paused-banner">Session paused</div>}
       {error && <p className="scan-warning" role="alert">{error}</p>}
-      <button type="button" className="sr-only" onClick={primeAudio} aria-hidden="true" tabIndex={-1}>prime</button>
     </section>
   );
 }

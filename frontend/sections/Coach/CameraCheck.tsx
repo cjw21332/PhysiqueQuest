@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../Home/icons';
 import { api } from '../../lib/api';
+import { useCameraStream } from '../../hooks/useCameraStream';
 
 export default function CameraCheck({ onBack, onStart }: { onBack: () => void; onStart: () => void }) {
   const [mode, setMode] = useState<'live' | 'upload'>('live');
@@ -14,10 +15,8 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
   const [analysisError, setAnalysisError] = useState('');
   const [cameraMessage, setCameraMessage] = useState('Checking pose-analysis service…');
   const [poseAvailable, setPoseAvailable] = useState(false);
-  const [cameraOn, setCameraOn] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  useEffect(() => { return () => { if (fileUrl) URL.revokeObjectURL(fileUrl); streamRef.current?.getTracks().forEach(track => track.stop()); }; }, [fileUrl]);
+  const live = useCameraStream();
+  useEffect(() => { return () => { if (fileUrl) URL.revokeObjectURL(fileUrl); }; }, [fileUrl]);
   useEffect(() => { let active = true; api.getPoseStatus().then(status => { if (!active) return; setPoseAvailable(status.available); setCameraMessage(status.available ? 'Pose analysis is available after a video is submitted.' : 'Pose analysis provider is not configured on the backend.'); }).catch(error => { if (active) setCameraMessage(error instanceof Error ? error.message : 'Could not check pose-analysis availability.'); }); return () => { active = false; }; }, []);
   const chooseFile = (file?: File) => { if (!file) return; if (fileUrl) URL.revokeObjectURL(fileUrl); setFileUrl(URL.createObjectURL(file)); setFileName(file.name); setSelectedFile(file); setAnalysis(null); setAnalysisError(''); };
   const analyzeVideo = async () => {
@@ -32,16 +31,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
     } catch (error) { setAnalysisError(error instanceof Error ? error.message : 'Pose analysis did not complete.'); }
     finally { setAnalysisBusy(false); }
   };
-  const requestCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-      streamRef.current = stream;
-      setCameraOn(true);
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      setCameraMessage(poseAvailable ? 'Camera preview is ready. Submit a supported video for analysis.' : 'Camera preview is ready. Pose analysis is not configured, so no form results will be reported.');
-    } catch { setCameraMessage('Camera access was not available. Upload a recorded video or log the workout manually.'); }
-  };
-  const switchToUpload = () => { streamRef.current?.getTracks().forEach(track => track.stop()); streamRef.current = null; setCameraOn(false); setMode('upload'); };
+  const switchToUpload = () => { live.stop(); setMode('upload'); };
 
   return (
     <>
@@ -57,41 +47,44 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
 
       {mode === 'live' ? (
         <>
-          <div className={`camera-preview ${cameraOn?'camera-on':''}`}>
-            <video ref={videoRef} autoPlay muted playsInline/>
-            <div className="camera-frame">
-              <span/><span/><span/><span/>
-            </div>
-            {!cameraOn && (
-              <div className="camera-person">
-                <i className="person-head"/>
-                <i className="person-body"/>
-                <i className="person-arm left"/>
-                <i className="person-arm right"/>
-                <i className="person-leg left"/>
-                <i className="person-leg right"/>
+          <div className={`camera-preview ${live.status === 'on' ? 'camera-on' : ''}`}>
+            <video ref={live.videoRef} autoPlay muted playsInline/>
+            {live.status !== 'on' && (
+              <div className="camera-off">
+                <button type="button" className="camera-enable" disabled={live.status === 'starting'} onClick={() => void live.start()}>
+                  {live.status === 'starting' ? 'Starting camera...' : 'Enable camera'}
+                </button>
               </div>
             )}
-          </div>
-
-          <div className="readiness-list">
-            <div className="section-head">
-              <h3>Readiness checks</h3>
-              <small>Unavailable</small>
+            <div className="camera-frame" aria-hidden="true">
+              <span/><span/><span/><span/>
             </div>
-            <p className="scan-warning">Live pose tracking is unavailable. Full-body framing, lighting, distance, and form scores cannot be verified.</p>
+            {live.status === 'on' && (
+              <p className="camera-distance-pill" role="status"><i aria-hidden="true"/>Distance not measured</p>
+            )}
           </div>
+          {live.message && <p className="camera-message" role="alert">{live.message}</p>}
 
-          <p className="scan-warning" role="status">{cameraMessage}</p>
+          <section className="readiness-list" aria-labelledby="readiness-title">
+            <div className="section-head">
+              <h3 id="readiness-title">Readiness checks</h3>
+              <small>{poseAvailable ? 'Pose analysis on' : 'Unavailable'}</small>
+            </div>
+            <ul className="readiness-rows">
+              <li className="readiness-row"><span>Full body in frame</span><b>{poseAvailable ? 'Waiting for video' : 'Unavailable'}</b></li>
+              <li className="readiness-row"><span>Lighting</span><b>{live.status === 'on' ? 'Camera on' : 'Camera off'}</b></li>
+              <li className="readiness-row"><span>Distance</span><b>{poseAvailable ? 'Waiting for video' : 'Unavailable'}</b></li>
+            </ul>
+            <p className="camera-note">{cameraMessage}</p>
+          </section>
 
           <footer className="coach-footer">
-            <button className="primary" onClick={onStart}>Start manual session</button>
-            <button className="secondary" onClick={switchToUpload}>Upload a video instead</button>
+            <button className="primary" onClick={onStart}>Start session</button>
           </footer>
         </>
       ) : (
         <>
-          <div className="upload-panel">
+          <div className="upload-dropzone">
             {fileUrl ? (
               <>
                 <video src={fileUrl} controls/>

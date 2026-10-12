@@ -57,7 +57,8 @@ test('camera and scan capabilities never present fabricated AI results', async (
   const camera = await source('sections/Coach/CameraCheck.tsx');
   const review = await source('sections/Scan/ReviewEstimate.tsx');
   const scan = await source('sections/Scan/ScanSection.tsx');
-  assert.match(camera, /Live pose tracking is unavailable/);
+  assert.match(camera, /useCameraStream/);
+  assert.match(camera, /getPoseStatus/);
   assert.doesNotMatch(camera, /Distance 2\.7 m · in range/);
   assert.doesNotMatch(camera, /value="Detected"/);
   // The review screen must show what the scan endpoint returned, never a
