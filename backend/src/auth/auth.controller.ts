@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Req, UseGuards, NotFoundException } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 import { PasswordRecoveryService } from './password-recovery.service.js';
@@ -23,6 +23,12 @@ export class AuthController {
 
   @Post('password-reset/request')
   requestPasswordReset(@Body() dto: PasswordResetRequestDto) { return this.recovery.request(dto.email); }
+
+  @Get('password-reset/status')
+  passwordResetStatus() {
+    if (process.env.NODE_ENV === 'production') throw new NotFoundException();
+    return this.recovery.diagnostics();
+  }
 
   @Post('password-reset/verify')
   verifyPasswordResetCode(@Body() dto: PasswordResetVerifyDto) { return this.recovery.verify(dto.code); }

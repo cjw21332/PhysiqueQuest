@@ -60,7 +60,7 @@ describe('password recovery', () => {
     const updates: any[] = [];
     const tokens = { deleteMany: vi.fn(), create: vi.fn(async item => { created.push(item); }), findOne: vi.fn(() => ({ sort: vi.fn().mockResolvedValue(null) })), findOneAndUpdate: vi.fn(async (filter, update) => { const item = created.find(entry => entry.tokenHash === filter.tokenHash && !entry.usedAt); if (!item) return null; item.usedAt = update.$set.usedAt; return item; }) };
     const users = { findOne: vi.fn(async () => user), updateOne: vi.fn(async (...args) => { updates.push(args); return { matchedCount: 1 }; }) };
-    const provider = { isAvailable: () => true, sendPasswordReset: vi.fn(async () => true) } as unknown as EmailDeliveryProvider;
+    const provider = { isAvailable: () => true, sendPasswordReset: vi.fn(async () => ({ ok: true })) } as unknown as EmailDeliveryProvider;
     const service = new PasswordRecoveryService(users as any, tokens as any, provider);
     const response = await service.request(' MEMBER@example.com ');
     expect(response).toEqual({ accepted: true, delivery: 'queued' });
@@ -71,5 +71,29 @@ describe('password recovery', () => {
     expect(updates).toHaveLength(1);
     expect(await bcrypt.compare('StrongPass1', updates[0][1].$set.passwordHash)).toBe(true);
     await expect(service.confirm(rawToken, 'OtherPass2')).rejects.toThrow();
+  });
+
+  it('surfaces the delivery failure reason outside production', async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    try {
+      const user = { _id: new Types.ObjectId(), email: 'member@example.com' };
+      const created: any[] = [];
+      const tokens = { deleteMany: vi.fn(), create: vi.fn(async item => { created.push(item); }), findOne: vi.fn(() => ({ sort: vi.fn().mockResolvedValue(null) })) };
+      const users = { findOne: vi.fn(async () => user) };
+      const provider = {
+        isAvailable: () => true,
+        sendPasswordReset: vi.fn(async () => ({ ok: false, code: 'EMAIL_PROVIDER_AUTH', status: 403, reason: 'invalid origin' })),
+      } as unknown as EmailDeliveryProvider;
+      const service = new PasswordRecoveryService(users as any, tokens as any, provider);
+      const response = await service.request('member@example.com');
+      expect(response.delivery).toBe('unavailable');
+      expect(response).toMatchObject({ reason: expect.stringContaining('EMAIL_PROVIDER_AUTH') });
+      expect(created).toHaveLength(1);
+      expect(tokens.deleteMany).toHaveBeenCalled();
+    } finally {
+      if (originalNodeEnv === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 });

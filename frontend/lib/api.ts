@@ -319,7 +319,7 @@ class ApiClient {
   async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }
 
   async getAuthMe() { return this.request<{ id: string; email: string; role: 'user' | 'admin' }>('/auth/me'); }
-  async requestPasswordReset(email: string) { return this.request<{ accepted: boolean; delivery: 'queued' | 'unavailable'; code?: string }>('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }); }
+  async requestPasswordReset(email: string) { return this.request<{ accepted: boolean; delivery: 'queued' | 'unavailable'; code?: string; reason?: string }>('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }); }
   async verifyPasswordResetCode(code: string) { return this.request<{ verified: boolean }>('/auth/password-reset/verify', { method: 'POST', body: JSON.stringify({ code }) }); }
   async confirmPasswordReset(data: { code: string; password: string }) { return this.request<{ updated: boolean }>('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify(data) }); }
 

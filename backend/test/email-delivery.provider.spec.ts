@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { EmailDeliveryProvider } from '../src/providers/email-delivery.provider.js';
 
 const emailJsSettings = {
-  EMAILJS_SERVICE_ID: 'service-id',
-  EMAILJS_TEMPLATE_ID: 'template-id',
-  EMAILJS_PUBLIC_KEY: 'public-key',
+  SERVICE_ID: 'service-id',
+  TEMPLATE_ID: 'template-id',
+  PUBLIC_KEY: 'public-key',
   EMAILJS_PRIVATE_KEY: 'private-key',
 };
 
@@ -25,7 +25,7 @@ describe('EmailDeliveryProvider', () => {
     const provider = createProvider(emailJsSettings);
 
     expect(provider.isAvailable()).toBe(true);
-    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toBe(true);
+    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toEqual({ ok: true });
     expect(fetch).toHaveBeenCalledWith('https://api.emailjs.com/api/v1.0/email/send', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -35,9 +35,9 @@ describe('EmailDeliveryProvider', () => {
         user_id: 'public-key',
         accessToken: 'private-key',
         template_params: {
-          to_email: 'member@example.com',
-          otp: '123456',
-          expires_in_minutes: 30,
+          email: 'member@example.com',
+          passcode: '123456',
+          time: '30 minutes',
         },
       }),
     }));
@@ -45,9 +45,9 @@ describe('EmailDeliveryProvider', () => {
 
   it('does not require a private key when the EmailJS public key is configured', () => {
     const provider = createProvider({
-      EMAILJS_SERVICE_ID: 'service-id',
-      EMAILJS_TEMPLATE_ID: 'template-id',
-      EMAILJS_PUBLIC_KEY: 'public-key',
+      SERVICE_ID: 'service-id',
+      TEMPLATE_ID: 'template-id',
+      PUBLIC_KEY: 'public-key',
     });
 
     expect(provider.isAvailable()).toBe(true);
@@ -62,7 +62,7 @@ describe('EmailDeliveryProvider', () => {
     });
 
     expect(provider.isAvailable()).toBe(true);
-    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toBe(true);
+    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toEqual({ ok: true });
     expect(fetch).toHaveBeenCalledWith('https://delivery.example.test/send', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
@@ -74,10 +74,35 @@ describe('EmailDeliveryProvider', () => {
     }));
   });
 
-  it('reports a rejected EmailJS delivery', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(null, { status: 400 })));
+  it('reports a rejected EmailJS delivery with a classified reason', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('invalid service', { status: 400 })));
     const provider = createProvider(emailJsSettings);
 
-    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toBe(false);
+    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toEqual({
+      ok: false,
+      code: 'EMAIL_PROVIDER_REJECTED',
+      status: 400,
+      reason: 'invalid service',
+    });
+  });
+
+  it('classifies an authentication rejection from EmailJS', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('', { status: 403 })));
+    const provider = createProvider(emailJsSettings);
+
+    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toMatchObject({
+      ok: false,
+      code: 'EMAIL_PROVIDER_AUTH',
+      status: 403,
+    });
+  });
+
+  it('reports when no provider is configured', async () => {
+    const provider = createProvider({});
+
+    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toMatchObject({
+      ok: false,
+      code: 'EMAIL_NOT_CONFIGURED',
+    });
   });
 });
