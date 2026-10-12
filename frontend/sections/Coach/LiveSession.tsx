@@ -107,7 +107,11 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       const detail = (event as CustomEvent<NativeEvent>).detail;
       if (!detail) return;
       if (detail.type === 'motion-status') setMotionAvailable(detail.available);
-      if (detail.type === 'countdown-started' && phaseRef.current === 'active') { setCountdown(COUNTDOWN_SECONDS); changePhase('countdown'); }
+      if (detail.type === 'countdown-started' && phaseRef.current === 'active') {
+        camera.stop();
+        setCountdown(COUNTDOWN_SECONDS);
+        changePhase('countdown');
+      }
       if (detail.type === 'cancelled') {
         if (phaseRef.current !== 'countdown') return;
         changePhase('active');
@@ -118,9 +122,9 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
     };
     window.addEventListener('physiquequest-inactivity', onNative);
     return () => window.removeEventListener('physiquequest-inactivity', onNative);
-    // raiseAlarm and stopSound read refs and stable setters, so binding once is correct.
+    // raiseAlarm and stopSound read refs and stable setters; camera.stop is stable.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workoutId]);
+  }, [camera.stop, workoutId]);
 
   // Start the host's inactivity monitor when the session mounts; stop it on unmount.
   useEffect(() => {
@@ -258,9 +262,11 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       <div ref={camera.frameRef} className="live-video">
         <video ref={camera.videoRef} className={`live-camera ${camera.facing === 'front' ? 'front-facing' : ''}`} autoPlay muted playsInline style={camera.nativePreview ? { opacity: 0 } : undefined} />
         {camera.status !== 'on' && <div className="live-scene" aria-hidden="true" />}
-        <span className="form-score"><Icon name="shield" size={14}/> Form analysis unavailable</span>
-        <div className="live-time-card"><small>Elapsed</small><b>{time}</b></div>
-        <div className="exercise-label"><small>{exercise.equipment}</small><b>{exercise.name}</b></div>
+        {!camera.nativePreview && <>
+          <span className="form-score"><Icon name="shield" size={14}/> Form analysis unavailable</span>
+          <div className="live-time-card"><small>Elapsed</small><b>{time}</b></div>
+          <div className="exercise-label"><small>{exercise.equipment}</small><b>{exercise.name}</b></div>
+        </>}
         {camera.status === 'on' && !camera.nativePreview && (
           <button type="button" className="camera-facing-toggle" onClick={camera.switchFacing} aria-label={`Switch to ${camera.facing === 'back' ? 'front' : 'back'} camera`}>
             {camera.facing === 'back' ? 'Front camera' : 'Back camera'}
@@ -280,7 +286,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       <div className="session-progress-label"><span>Elapsed time</span><b>{time}</b></div>
       <div className="session-progress-track"><i style={{width: `${Math.min(seconds / 1800 * 100, 100)}%`}}/></div>
       <div className="session-controls">
-        <button className="pause-button" disabled={busy} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <span className="pause-glyph" aria-hidden="true">II</span>}{paused ? 'Resume' : 'Pause'}</button>
+        <button type="button" className="pause-button" aria-label={paused ? 'Resume workout' : 'Pause workout'} disabled={busy} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <Icon name="pause" size={16}/>}{paused ? 'Resume' : 'Pause'}</button>
         <button className="end-button" disabled={busy} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
       </div>
       {paused && <div className="paused-banner">Session paused</div>}

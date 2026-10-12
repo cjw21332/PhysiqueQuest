@@ -15,6 +15,7 @@ import TrainingPreferenceEdit from './TrainingPreferenceEdit';
 import HealthProfileEdit from './HealthProfileEdit';
 import EmergencyContactEdit from './EmergencyContactEdit';
 import { useSettings } from '../../hooks/useSettings';
+import { formatTrainingDays, normalizeTrainingDays } from '../../lib/trainingDays';
 
 type Settings = { inactivity: boolean; alarmVolume: boolean; showLeaderboard: boolean; threshold: 30 | 45 | 60 };
 type MeView = 'settings' | 'exercises' | 'engagement' | 'alerts' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
@@ -37,6 +38,7 @@ function SettingRow({ icon, title, detail, onClick, danger = false }: { icon: st
 
 export default function MeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const { settings, loading: settingsLoading, error: settingsError, updateSettings } = useSettings();
+  const [currentProfile, setCurrentProfile] = useState(profile);
   const [view, setView] = useState<MeView>('settings');
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
@@ -44,6 +46,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const [isAdmin, setIsAdmin] = useState(false);
   const [safetyBusy, setSafetyBusy] = useState(false);
   const [safetyMessage, setSafetyMessage] = useState('');
+  useEffect(() => setCurrentProfile(profile), [profile]);
   useEffect(() => { let active = true; api.getAuthMe().then(user => { if (active) setIsAdmin(user.role === 'admin'); }).catch(() => { if (active) setIsAdmin(false); }); return () => { active = false; }; }, []);
 
   const toggle = async (key: 'inactivity' | 'alarmVolume' | 'showLeaderboard') => { try { await updateSettings({ [key]: !settings[key] }); } catch (error) { setSaveError(error instanceof Error ? error.message : 'Could not save settings.'); } };
@@ -56,18 +59,19 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     } catch (error) { setSafetyMessage(error instanceof Error ? error.message : 'Could not send safety alert.'); }
     finally { setSafetyBusy(false); }
   };
-  const equipment = profile.equipment?.length ? profile.equipment.join(', ') : '—';
-  const daysPerWeek = profile.days?.length ?? 0;
-  const conditionCount = profile.conditions?.includes('None of these') ? 0 : (profile.conditions?.length ?? 0);
-  const weightUnit = profile.weightUnit || '';
-  const goalWeight = profile.targetWeight ? `${profile.targetWeight} ${weightUnit}`.trim() : '—';
-  const memberSince = profile.createdAt
-    ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  const equipment = currentProfile.equipment?.length ? currentProfile.equipment.join(', ') : '—';
+  const selectedTrainingDays = normalizeTrainingDays(currentProfile.days || []);
+  const daysPerWeek = selectedTrainingDays.length;
+  const conditionCount = currentProfile.conditions?.includes('None of these') ? 0 : (currentProfile.conditions?.length ?? 0);
+  const weightUnit = currentProfile.weightUnit || '';
+  const goalWeight = currentProfile.targetWeight ? `${currentProfile.targetWeight} ${weightUnit}`.trim() : '—';
+  const memberSince = currentProfile.createdAt
+    ? new Date(currentProfile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     : '—';
-  const targetDate = profile.targetDate
-    ? new Date(profile.targetDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  const targetDate = currentProfile.targetDate
+    ? new Date(currentProfile.targetDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     : '—';
-  const goalDetail = `${profile.goal || '—'} · ${goalWeight} by ${targetDate}`;
+  const goalDetail = `${currentProfile.goal || '—'} · ${goalWeight} by ${targetDate}`;
 
   // Persist a partial profile update to the database (MongoDB via the
   // JWT-guarded PUT /api/profile endpoint), then refresh the cached copy
@@ -77,22 +81,25 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     setSaveError('');
     try {
       const updated = await api.updateProfile(patch);
-      const merged = { ...profile, ...patch, ...updated };
+      const merged = { ...currentProfile, ...patch, ...updated };
+      setCurrentProfile(merged);
       localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged));
       window.dispatchEvent(new Event('physiquequest-profile-updated'));
       setNotice(`${featureName} saved`);
+      return true;
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : 'Could not save. Please try again.');
+      return false;
     } finally {
       setSaving(false);
     }
   };
 
-  if (view === 'edit-personal') return <PersonalDataEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Personal data edit')} />;
-  if (view === 'edit-goals') return <GoalsEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Goals edit')} />;
-  if (view === 'edit-training') return <TrainingPreferenceEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Training preference edit')} />;
-  if (view === 'edit-health') return <HealthProfileEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Health profile edit')} />;
-  if (view === 'edit-emergency') return <EmergencyContactEdit profile={profile} onBack={() => setView('settings')} onSave={patch => saveProfile(patch, 'Emergency contact edit')} />;
+  if (view === 'edit-personal') return <PersonalDataEdit profile={currentProfile} onBack={() => setView('settings')} onSave={async patch => { await saveProfile(patch, 'Personal data edit'); }} />;
+  if (view === 'edit-goals') return <GoalsEdit profile={currentProfile} onBack={() => setView('settings')} onSave={async patch => { await saveProfile(patch, 'Goals edit'); }} />;
+  if (view === 'edit-training') return <TrainingPreferenceEdit profile={currentProfile} error={saveError} onBack={() => { setSaveError(''); setView('settings'); }} onSave={patch => saveProfile(patch, 'Training preference edit')} />;
+  if (view === 'edit-health') return <HealthProfileEdit profile={currentProfile} onBack={() => setView('settings')} onSave={async patch => { await saveProfile(patch, 'Health profile edit'); }} />;
+  if (view === 'edit-emergency') return <EmergencyContactEdit profile={currentProfile} onBack={() => setView('settings')} onSave={async patch => { await saveProfile(patch, 'Emergency contact edit'); }} />;
 
   if (view === 'exercises') {
     return <AdminExerciseLibrary onBack={() => setView('settings')} />;
@@ -109,23 +116,23 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     <div className="me-scroll">
       <div className="me-profile-summary">
         <ProfileSilhouette/>
-        <div className="me-profile-name"><b>{profile.name || '—'}</b><small>member since {memberSince}</small></div>
+        <div className="me-profile-name"><b>{currentProfile.name || '—'}</b><small>member since {memberSince}</small></div>
         <button className="me-edit" onClick={() => setView('edit-personal')}>Edit</button>
       </div>
 
       <h3 className="me-group-title">Profile</h3>
       <div className="me-list">
-        <SettingRow icon="user" title="Personal data" detail={`Age ${profile.age ?? '—'} · ${profile.height ?? '—'} ${profile.heightUnit || ''} · ${profile.weight ?? '—'} ${weightUnit}`.replace(/\s+/g, ' ').trim()} onClick={() => setView('edit-personal')}/>
+        <SettingRow icon="user" title="Personal data" detail={`Age ${currentProfile.age ?? '—'} · ${currentProfile.height ?? '—'} ${currentProfile.heightUnit || ''} · ${currentProfile.weight ?? '—'} ${weightUnit}`.replace(/\s+/g, ' ').trim()} onClick={() => setView('edit-personal')}/>
         <SettingRow icon="target" title="Goals" detail={goalDetail} onClick={() => setView('edit-goals')}/>
-        <SettingRow icon="dumbbell" title="Training preference" detail={`${equipment} · ${daysPerWeek} day${daysPerWeek === 1 ? '' : 's'} · ${profile.duration || '—'}`} onClick={() => setView('edit-training')}/>
+        <SettingRow icon="dumbbell" title="Training preference" detail={`${equipment} · ${daysPerWeek} day${daysPerWeek === 1 ? '' : 's'} (${formatTrainingDays(selectedTrainingDays) || 'none'}) · ${currentProfile.duration || '—'}`} onClick={() => { setSaveError(''); setView('edit-training'); }}/>
         <SettingRow icon="health" title="Health profile" detail={`${conditionCount} condition${conditionCount === 1 ? '' : 's'} logged`} onClick={() => setView('edit-health')}/>
       </div>
 
       <h3 className="me-group-title safety">Safety</h3>
       <div className="me-list">
-        <SettingRow icon="phone" title="Emergency contact" detail={`${profile.contactName || '—'} · ${profile.contactPhone || '—'}`} onClick={() => setView('edit-emergency')} danger/>
+        <SettingRow icon="phone" title="Emergency contact" detail={`${currentProfile.contactName || '—'} · ${currentProfile.contactPhone || '—'}`} onClick={() => setView('edit-emergency')} danger/>
       </div>
-      <button type="button" className="secondary" disabled={safetyBusy || !profile.contactPhone} onClick={() => void sendSafetyAlert()}>{safetyBusy ? 'Checking delivery…' : 'Send alert to emergency contact'}</button>
+      <button type="button" className="secondary" disabled={safetyBusy || !currentProfile.contactPhone} onClick={() => void sendSafetyAlert()}>{safetyBusy ? 'Checking delivery…' : 'Send alert to emergency contact'}</button>
       {safetyMessage && <p className="hint" role="status">{safetyMessage}</p>}
       {(settingsError || saveError) && <p className="error" role="alert">{settingsError || saveError}</p>}
       {settingsLoading ? <p className="hint">Loading saved settings…</p> : <><div className="me-setting-row"><span><b>Inactivity monitoring</b><small>Armed during every session</small></span><Switch label="Inactivity monitoring" checked={settings.inactivity} onChange={() => void toggle('inactivity')}/></div>

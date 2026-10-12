@@ -6,6 +6,7 @@ import { mealNames, nutritionTargets, type FoodEntry, type MealName } from './ty
 type DailyLogProps = {
   meals: FoodEntry[];
   water: number;
+  onBack: () => void;
   onHistory: () => void;
   onAdd: (meal: MealName) => void;
   onWater: (value: number) => void;
@@ -13,7 +14,7 @@ type DailyLogProps = {
 
 const ringCircumference = 2 * Math.PI * 43;
 
-export default function DailyLog({ meals, water, onHistory, onAdd, onWater }: DailyLogProps) {
+export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onWater }: DailyLogProps) {
   const calories = meals.reduce((sum, item) => sum + item.calories, 0);
   const protein = meals.reduce((sum, item) => sum + item.protein, 0);
   const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
@@ -23,7 +24,10 @@ export default function DailyLog({ meals, water, onHistory, onAdd, onWater }: Da
   return (
     <>
       <header className="target-log-header">
-        <h2>Today&apos;s log</h2>
+        <div className="target-log-title">
+          <button type="button" className="coach-back" onClick={onBack} aria-label="Back to Nutrition"><Icon name="arrow" size={20}/></button>
+          <h2>Today&apos;s log</h2>
+        </div>
         <button type="button" className="target-log-history" onClick={onHistory}>History</button>
       </header>
 

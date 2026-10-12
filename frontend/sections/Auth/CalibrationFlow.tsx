@@ -4,6 +4,7 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { Icon } from '../Home/icons';
 import type { Profile } from '../Home/types';
 import { formatPhoneNumber, unformatPhoneNumber } from '../../lib/phoneFormatter';
+import { normalizeTrainingDays, TRAINING_DAYS } from '../../lib/trainingDays';
 
 type CalibrationData = {
   age: string;
@@ -49,7 +50,6 @@ const goalOptions = [
   { title: 'General fitness', detail: 'Balanced weekly plan', icon: 'target' },
 ];
 const equipmentOptions = ['Bodyweight only', 'Dumbbells', 'Resistance bands', 'Full gym'];
-const dayOptions = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const activityOptions = ['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete'];
 const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'None of these'];
 
@@ -88,7 +88,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
   });
 
   const toggleDay = (index: number) => {
-    const dayId = `${dayOptions[index]}-${index}`;
+    const dayId = TRAINING_DAYS[index].legacyId;
     setData((current) => ({
       ...current,
       days: current.days.includes(dayId) ? current.days.filter((day) => day !== dayId) : [...current.days, dayId],
@@ -132,7 +132,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
       return;
     }
 
-    const days = data.days.map((value) => value.split('-')[0]);
+    const days = normalizeTrainingDays(data.days);
     onComplete({
       name: name.trim(), email: email.trim(), age: data.age, gender: data.gender,
       height: data.height, heightInches: data.heightInches, heightUnit: data.heightUnit,
@@ -281,9 +281,9 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
                 <button type="button" className="ghost clear-section-btn" onClick={clearTrainingDays}>Clear</button>
               </div>
               <div className="day-grid">
-                {dayOptions.map((day, index) => {
-                  const selected = data.days.includes(`${day}-${index}`);
-                  return <button type="button" key={`${day}-${index}`} className={`day ${selected ? 'active' : ''}`} aria-label={`${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index]}${selected ? ', selected' : ''}`} aria-pressed={selected} onClick={() => toggleDay(index)}>{day}</button>;
+                {TRAINING_DAYS.map((day, index) => {
+                  const selected = data.days.includes(day.legacyId);
+                  return <button type="button" key={day.value} className={`day ${selected ? 'active' : ''}`} aria-label={`${day.value}${selected ? ', selected' : ''}`} aria-pressed={selected} onClick={() => toggleDay(index)}>{day.label}</button>;
                 })}
               </div>
             </div>

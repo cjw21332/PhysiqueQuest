@@ -2,11 +2,21 @@
 description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the light-theme interface, component library, responsive rules, and extension patterns. The web app is the design source; the Expo app displays it in a native WebView with device capabilities (safe-area insets, camera, file inputs).
 ---
 
-# PhysiqueQuest Design System v2.4.1
+# PhysiqueQuest Design System
 
-This document specifies the current PhysiqueQuest product interface, design tokens, component patterns, responsive behavior, and rules for extending the system consistently. Update this document when adding new UI patterns or making significant design decisions.
+This document specifies the current PhysiqueQuest product interface, design tokens, component patterns, responsive behavior, and rules for extending the system consistently. It describes the current codebase rather than asserting a product release version. Update this document when adding new UI patterns or making significant design decisions.
+
+**Mandatory governing rules:** Follow [GENERAL.md](./GENERAL.md) together with this frontend design guide. [PROCEDURES.md](./PROCEDURES.md) governs architecture and engineering workflow; [DATABASE.md](./DATABASE.md) governs backend and persistence.
 
 ## 1. Product Architecture & Navigation
+
+### Non-Negotiable System Design Rules
+- Keep all frontend styles in `frontend/app/globals.css`; scope new rules to the relevant component instead of creating stylesheets or CSS modules.
+- Reuse the established light palette and CSS custom properties. Do not introduce new palette tokens, UI frameworks, component kits, or icon packages without approval.
+- Treat the web app as the UI source for both browsers and the Expo WebView. Design mobile-first, account for safe-area insets, and preserve the established 390px, 700px, and 740px responsive breakpoints.
+- Use the shared `Icon` registry, existing React state and API-backed persistence patterns, and the established five-tab navigation.
+- Keep backend-backed screens truthful: render real API data and explicit loading, empty, and error/retry states; never substitute fabricated records or silently fall back to sample data.
+- Preserve accessible names, visible keyboard focus, and 44px minimum touch targets for interactive controls. Respect reduced-motion preferences.
 
 ### App Structure
 PhysiqueQuest is a mobile-first fitness and nutrition prototype. The Next.js web app provides product UI and behavior; the Expo app hosts it in a native WebView and bridges device capabilities.
@@ -527,6 +537,12 @@ Before committing any UI changes, verify:
 - **Stats Row**: Icon + number + label (calories, level, etc.), separated by dividers
 - **Content Sections**: Mission cards, nutrition overview (circular progress + macro list), journey cards
 - **Responsive**: Nutrition card stacks vertically on narrow screens (< 380px)
+
+### Notifications
+- **Header**: Home back arrow, Notifications title, and a “Mark all read” action when unread items exist.
+- **Pinned safety notice**: Use the pale-red alert surface only for an actual API notification identified as a safety alert. Keep its title and body from the API; its CTA marks that notification read. Do not invent a “review session” destination or fabricate a sample safety event.
+- **Notification groups**: Show Today first and Earlier last when those groups are present; preserve other API-provided group names. Render each API item as a compact, hairline-separated row with its icon, title, body, time, and a clear unread marker.
+- **Data states**: Retain the API-backed loading, honest empty, error/retry, individual mark-read, and mark-all-read behavior. Keep the Home bottom navigation and safe-area spacing intact.
 
 ### Coach (Training)
 - **Header**: Section title + back button (if nested)

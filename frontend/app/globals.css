@@ -3824,8 +3824,14 @@ body{min-height:100dvh}
 }
 
 .report-header h2 {
+  flex: 1;
   font-size: 18px;
   font-weight: 700;
+}
+.report-header .coach-back {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
 }
 
 .share-button {
@@ -4757,7 +4763,6 @@ body{min-height:100dvh}
 .session-controls button { height: 50px; border-radius: 13px; font-size: 14px; }
 .pause-button { background: #273142; color: #fff; }
 .end-button { background: #fff; color: #111827; }
-.pause-glyph { font-size: 16px; font-weight: 800; letter-spacing: -3px; }
 .paused-banner { padding: 12px 18px; font-size: 14px; }
 
 /* Workout report */
@@ -5209,15 +5214,15 @@ body{min-height:100dvh}
   min-width: 44px;
   height: clamp(44px, 10vw, 52px);
   border: 0;
-  border-radius: 50%;
+  border-radius: 0;
   background: transparent;
   color: var(--ink);
   font-size: clamp(30px, 7vw, 38px);
   line-height: 1;
   text-align: center;
-  transition: background-color .2s, transform .1s;
+  transition: transform .1s;
 }
-.coach-back:hover { background: var(--soft); }
+.coach-back:hover { background: transparent; }
 .coach-back:active { transform: scale(.96); }
 .coach-back:focus-visible { outline: 2px solid var(--green-dark); outline-offset: 2px; }
 .section-back-title { gap: clamp(6px, 1.5vw, 12px); }
@@ -5235,11 +5240,12 @@ body{min-height:100dvh}
   .water-glasses button { min-height: 36px; }
 }
 
-/* Make secondary screen back controls easy to spot and tap. */
+/* Back controls stay icon-only while preserving their mobile-sized tap target. */
 .coach-back {
-  border: 1px solid var(--line);
-  background: var(--soft);
-  color: var(--green-dark);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
 }
 .coach-back svg {
   width: clamp(22px, 5.5vw, 26px);
@@ -5247,7 +5253,7 @@ body{min-height:100dvh}
   transform: rotate(180deg);
   stroke-width: 2.3;
 }
-.coach-back:hover { background: #e9f8eb; }
+.coach-back:hover { background: transparent; }
 
 /* Four-step account calibration uses the existing onboarding design primitives. */
 .calibration-wizard {
@@ -6075,6 +6081,194 @@ iframe[src*="notification"] {
   background: var(--green-dark);
 }
 
+.home-notifications {
+  width: 100%;
+  max-width: 520px;
+  margin-inline: auto;
+}
+.home-notifications-head {
+  gap: 10px;
+}
+.home-notifications-head .section-back-title {
+  min-width: 0;
+}
+.home-notifications-head .section-back-title h2 {
+  margin: 0;
+}
+.home-notifications .mark-all-btn {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--green-dark);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.home-notifications .mark-all-btn:focus-visible,
+.home-notifications .alert-action:focus-visible {
+  outline: 2px solid var(--green-dark);
+  outline-offset: 2px;
+}
+.home-notifications .notification-safety-card {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  margin: 12px 0 20px;
+  padding: 13px;
+  border-radius: 14px;
+}
+.notification-safety-card .alert-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #ffe7e7;
+  color: #a52a2a;
+}
+.notification-safety-card .alert-content {
+  min-width: 0;
+}
+.notification-safety-card .alert-badge {
+  display: block;
+  margin-bottom: 5px;
+  color: #a52a2a;
+  font-size: 11px;
+  font-weight: 650;
+}
+.notification-safety-card .alert-title {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.35;
+}
+.notification-safety-card .alert-body {
+  margin: 4px 0 10px;
+  color: #625c60;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.notification-safety-card .alert-action {
+  min-height: 44px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--green);
+  color: #173a1e;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+.notification-safety-card > .notification-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.home-notifications .notification-group {
+  margin: 0 0 18px;
+}
+.home-notifications .notification-group h3 {
+  margin: 0 0 5px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+.home-notifications .notification-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 64px;
+  padding: 9px 2px;
+  border-right: 0;
+  border-left: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+.home-notifications .notification-item.unread {
+  background: transparent;
+}
+.home-notifications .notification-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #eff9ef;
+  color: var(--green-dark);
+}
+.home-notifications .notification-copy {
+  min-width: 0;
+}
+.home-notifications .notification-copy b {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+.home-notifications .notification-unread-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+.home-notifications .notification-copy small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.home-notifications .notification-item > .notification-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.home-notifications .unread-dot {
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  flex: none;
+  border-radius: 50%;
+}
+.home-notifications .notifications-state,
+.home-notifications .notification-empty {
+  padding: 18px 4px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+@media (max-width: 390px) {
+  .home-notifications .notification-safety-card {
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 11px;
+  }
+  .home-notifications .notification-item {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .home-notifications .notification-copy b {
+    font-size: 12px;
+  }
+  .home-notifications .notification-copy small {
+    font-size: 11px;
+  }
+}
+
 /* Goals: connected milestone timeline, quiet secondary rows */
 .milestone-dot {
   box-shadow: none;
@@ -6643,6 +6837,17 @@ iframe[src*="notification"] {
   line-height: 1.25;
   font-weight: 650;
 }
+.target-log-title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.target-log-title .coach-back {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+}
 .target-log-history {
   min-height: 40px;
   padding: 0 2px 0 10px;
@@ -7083,6 +7288,7 @@ iframe[src*="notification"] {
   font-weight: 700;
 }
 .coach-view-session .pause-button { background: #273142; color: #fff; }
+.coach-view-session .pause-button svg { flex: 0 0 auto; }
 .coach-view-session .end-button { background: #fff; color: #111827; }
 @media (prefers-reduced-motion: reduce) {
   .coach-view-session .session-progress-track i { transition: none; }
@@ -7366,4 +7572,566 @@ iframe[src*="notification"] {
 }
 @media (prefers-reduced-motion: reduce) {
   .inactivity-ring svg circle:last-child { transition: none; }
+}
+
+/* Home, goals, and progress follow the compact mobile reference while
+   retaining the existing profile, activity, nutrition, and workout data. */
+.home-ref-dashboard {
+  box-sizing: border-box;
+  height: auto;
+  min-height: 100%;
+  padding: max(12px, var(--sat)) clamp(14px, 4vw, 20px) 20px;
+  overflow: visible;
+}
+.home-ref-header {
+  min-height: 48px;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+.home-ref-header .user-greeting { gap: 9px; }
+.home-ref-header .avatar-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #e9efea;
+  color: var(--ink);
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 700;
+}
+.home-ref-header .greeting-text { gap: 2px; }
+.home-ref-header .greeting-meta {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.home-ref-header .greeting-name { font-size: 17px; line-height: 1.2; }
+.home-ref-header .notification-bell { width: 34px; height: 34px; }
+.home-ref-workout {
+  margin-bottom: 9px;
+  padding: 13px 12px 11px;
+  border-radius: 16px;
+}
+.home-ref-session-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.home-ref-session-top .workout-label { color: var(--green-dark); font-size: 11px; font-weight: 550; letter-spacing: 0; text-transform: none; }
+.home-ref-session-top .workout-duration { gap: 3px; font-size: 11px; }
+.home-ref-workout .workout-title { margin: 0 0 8px; font-size: 18px; line-height: 1.3; font-weight: 700; letter-spacing: -.25px; }
+.home-ref-session-meta { display: flex; flex-wrap: wrap; gap: 5px 11px; margin-bottom: 10px; color: var(--muted); font-size: 12px; }
+.home-ref-session-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.home-ref-session-meta svg { flex: 0 0 auto; }
+.home-ref-inline-error { margin: 8px 0; color: #a11a12; font-size: 10px; }
+.home-ref-workout .start-button { min-height: 44px; border-radius: 10px; font-size: 13px; font-weight: 650; box-shadow: none; letter-spacing: 0; }
+.home-ref-workout .link-text { min-height: 36px; padding-top: 7px; font-size: 12px; font-weight: 600; }
+.home-ref-stats {
+  min-height: 49px;
+  margin-bottom: 13px;
+  padding: 7px 10px;
+  border-radius: 12px;
+}
+.home-ref-stats .stat-box { gap: 2px; }
+.home-ref-stats .stat-number { font-size: 12px; letter-spacing: 0; }
+.home-ref-stats .stat-text { font-size: 11px; }
+.home-ref-stats .stat-separator { height: 30px; margin: 0 8px; }
+.home-ref-stats .stat-level-box { gap: 3px; }
+.home-ref-stats .level-bar-container { width: 48px; height: 4px; }
+.home-ref-section { margin-bottom: 15px; }
+.home-ref-section .section-title-row { min-height: 20px; margin-bottom: 3px; }
+.home-ref-section .section-title { font-size: 14px; font-weight: 650; letter-spacing: 0; }
+.home-ref-section .view-all-link,
+.home-ref-section .scan-link { min-height: 40px; padding: 2px 4px; font-size: 12px; font-weight: 600; }
+.home-ref-section .missions-container { gap: 0; }
+.home-ref-section .mission-card {
+  padding: 7px 0 6px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+.home-ref-section .mission-card:last-child { border-bottom: 0; }
+.home-ref-section .mission-header { margin-bottom: 4px; gap: 7px; }
+.home-ref-section .mission-title { font-size: 12px; font-weight: 500; }
+.home-ref-section .mission-count { font-size: 11px; }
+.home-ref-section .mission-bar { height: 5px; }
+.home-ref-section .home-ref-nutrition {
+  gap: 10px;
+  padding: 9px;
+  border-radius: 12px;
+}
+.home-ref-nutrition .calorie-circle { width: 62px; height: 62px; }
+.home-ref-nutrition .circle-bg,
+.home-ref-nutrition .circle-progress { stroke-width: 7; }
+.home-ref-nutrition .calorie-amount { font-size: 14px; }
+.home-ref-nutrition .calorie-goal { margin-top: 2px; font-size: 10px; }
+.home-ref-nutrition .macros-list { gap: 6px; }
+.home-ref-nutrition .macro-item { gap: 3px; }
+.home-ref-nutrition .macro-header { gap: 5px; }
+.home-ref-nutrition .macro-label,
+.home-ref-nutrition .macro-values { font-size: 11px; font-weight: 500; }
+.home-ref-nutrition .macro-bar { height: 4px; }
+.home-ref-journey { padding-bottom: 4px; }
+.home-ref-journey > .section-title { margin: 0 0 7px; }
+.home-ref-journey .journey-cards { gap: 0; }
+.home-ref-journey .journey-card {
+  min-height: 51px;
+  padding: 6px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+.home-ref-journey .journey-card:last-child { border-bottom: 0; }
+.home-ref-journey .journey-icon { width: 28px; height: 28px; border-radius: 8px; }
+.home-ref-journey .journey-info { gap: 2px; }
+.home-ref-journey .journey-title { font-size: 13px; font-weight: 600; letter-spacing: 0; }
+.home-ref-journey .journey-subtitle { font-size: 11px; }
+
+.home-subview.home-ref-subview,
+.home-ref-subview {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 520px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: max(10px, var(--sat)) 0 20px;
+  background: var(--surface);
+}
+.home-ref-page-head {
+  height: 43px;
+  margin-bottom: 11px;
+  border-bottom-color: var(--line);
+}
+.home-ref-page-head .section-back-title { gap: 5px; }
+.home-ref-page-head .coach-back { width: 44px; height: 44px; display: grid; place-items: center; }
+.home-ref-page-head .coach-back svg { transform: rotate(180deg); }
+.home-ref-page-head h2 { font-size: 17px; font-weight: 650; }
+.home-ref-edit {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 3px;
+  border: 0;
+  background: transparent;
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+.home-ref-goal {
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 15px;
+  background: var(--green-light);
+}
+.home-ref-goal-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.home-ref-goal-top small { color: var(--green-dark); font-size: 12px; }
+.home-ref-goal-top > b { color: var(--ink); font-size: 20px; line-height: 1; }
+.home-ref-goal .goal-hero-title h2 { margin: 2px 0 9px; font-size: 18px; line-height: 1.3; font-weight: 700; }
+.home-ref-goal .goal-progress { height: 5px; margin: 0 0 7px; background: #fff; }
+.home-ref-goal .goal-weights { margin: 0 0 9px; }
+.home-ref-goal .goal-weights > b,
+.home-ref-goal .goal-weights > span { font-size: 11px; font-weight: 500; }
+.home-ref-goal-foot { display: flex; justify-content: space-between; gap: 8px; padding-top: 7px; border-top: 1px solid rgba(22, 115, 54, .12); color: var(--muted); font-size: 11px; }
+.home-ref-milestones { margin-bottom: 15px; }
+.home-ref-milestones .section-head { min-height: 20px; margin-bottom: 3px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.home-ref-milestones .section-head h3,
+.home-ref-secondary > h3 { margin: 0; color: var(--ink); font-size: 14px; font-weight: 650; }
+.home-ref-milestones .section-head > span { color: var(--muted); font-size: 11px; }
+.home-ref-milestone-list { padding-left: 18px; }
+.home-ref-milestone-list .milestone { min-height: 39px; gap: 8px; padding-bottom: 7px; }
+.home-ref-milestone-list .milestone-dot { left: -18px; width: 14px; height: 14px; }
+.home-ref-milestone-list .milestone.current .milestone-dot { border: 1px solid var(--green-dark); font-size: 13px; line-height: 1; }
+.home-ref-milestone-list .milestone.current .milestone-dot span { transform: translateY(-1px); }
+.home-ref-milestone-list .milestone-line { left: -12px; top: 13px; }
+.home-ref-milestone-list .milestone > div { padding: 0 0 0 5px; }
+.home-ref-milestone-list .milestone b { font-size: 12px; font-weight: 500; }
+.home-ref-milestone-list .milestone small { margin-top: 2px; font-size: 11px; }
+.home-ref-secondary { gap: 6px; }
+.home-ref-training-goal { min-height: 46px; padding: 5px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+.home-ref-training-goal .mini-progress { width: 32px; height: 32px; flex: 0 0 32px; display: flex; align-items: center; justify-content: center; gap: 2px; background: var(--green-light); color: var(--green-dark); font-size: 10px; font-weight: 650; }
+.home-ref-training-goal .mini-progress small { font-size: 6px; font-weight: 500; }
+.home-ref-training-goal > div { display: grid; gap: 2px; }
+.home-ref-training-goal > div b { color: var(--ink); font-size: 12px; font-weight: 550; }
+.home-ref-training-goal > div small { color: var(--muted); font-size: 11px; }
+.home-ref-empty { margin: 7px 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+.home-ref-progress-overview { margin: 0; }
+.home-ref-metric-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.home-ref-metric-tabs button { min-height: 44px; padding: 0 12px; font-size: 12px; }
+.home-ref-trend { margin-bottom: 13px; }
+.home-ref-measurement { display: grid; gap: 3px; margin-bottom: 8px; }
+.home-ref-measurement > strong { color: var(--ink); font-size: 24px; line-height: 1.2; letter-spacing: -.4px; }
+.home-ref-change { color: var(--green-dark); font-size: 11px; }
+.home-ref-chart {
+  height: 98px;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  align-items: end;
+  gap: 5px;
+  padding: 0 0 1px;
+  border-bottom: 1px solid var(--line);
+}
+.home-ref-chart-column { height: 100%; min-width: 0; display: flex; align-items: center; flex-direction: column; justify-content: flex-end; gap: 4px; }
+.home-ref-chart-column > span { width: 100%; max-width: 28px; min-height: 4px; display: block; border-radius: 4px 4px 0 0; background: #d0f2d1; }
+.home-ref-chart-column > span.latest { background: var(--green); }
+.home-ref-chart-column > small { min-height: 24px; color: var(--muted); font-size: 9px; line-height: 1.15; text-align: center; }
+.home-ref-chart-empty { min-height: 76px; display: grid; place-items: center; border-radius: 10px; background: var(--soft); color: var(--muted); font-size: 12px; text-align: center; }
+.home-ref-entry-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px; margin: 8px 0 12px; }
+.home-ref-entry-form label { min-width: 0; font-size: 12px; }
+.home-ref-entry-form input { min-height: 44px; font-size: 16px; }
+.home-ref-entry-form .primary { min-height: 44px; padding: 0 10px; font-size: 12px; }
+.home-ref-records,
+.home-ref-sessions { margin: 0 0 14px; }
+.home-ref-records .section-head,
+.home-ref-sessions .section-head { min-height: 21px; margin: 0; display: flex; align-items: center; }
+.home-ref-records .section-head h3,
+.home-ref-sessions .section-head h3 { margin: 0; color: var(--ink); font-size: 14px; font-weight: 650; }
+.home-ref-record-list { display: grid; }
+.home-ref-record {
+  width: 100%;
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+.home-ref-record[aria-pressed="true"] .record-icon { background: var(--green-light); color: var(--green-dark); }
+.home-ref-record .record-icon { width: 22px; height: 22px; flex: 0 0 22px; display: grid; place-items: center; border-radius: 6px; background: var(--soft); color: var(--green-dark); }
+.home-ref-record-copy { min-width: 0; flex: 1; display: grid; gap: 2px; }
+.home-ref-record-copy b { font-size: 12px; font-weight: 550; }
+.home-ref-record-copy small { color: var(--muted); font-size: 11px; }
+.home-ref-record > strong { flex: 0 0 auto; font-size: 12px; font-weight: 650; }
+.home-ref-history { margin: 7px 0; color: var(--ink); }
+.home-ref-history summary { min-height: 36px; display: flex; align-items: center; color: var(--green-dark); font-size: 12px; cursor: pointer; }
+.home-ref-history .history-records { padding: 0 0 5px; }
+.home-ref-history .history-entry { min-height: 38px; padding: 4px 0; }
+.home-ref-history .history-entry b { font-size: 12px; }
+.home-ref-history .history-entry small,
+.home-ref-history .history-entry button { font-size: 11px; }
+.home-ref-session-list { display: grid; }
+.home-ref-session-row { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--line); }
+.home-ref-session-row > span:first-child { min-width: 0; display: grid; gap: 2px; }
+.home-ref-session-row b { color: var(--ink); font-size: 12px; font-weight: 550; }
+.home-ref-session-row small { color: var(--muted); font-size: 11px; }
+.home-ref-session-detail { flex: 0 0 auto; display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 11px; }
+.home-ref-session-detail svg { color: #8793a1; }
+.home-ref-subview :is(button, summary):focus-visible,
+.home-ref-dashboard :is(button):focus-visible {
+  outline: 2px solid var(--green-dark);
+  outline-offset: 2px;
+}
+@media (min-width: 700px) {
+  .home-ref-dashboard { padding: 20px 24px 24px; }
+  .home-ref-subview { padding: 16px 24px 24px; }
+  .home-ref-goal { padding: 16px; }
+  .home-ref-chart { height: 140px; }
+}
+@media (max-width: 390px) {
+  .home-ref-dashboard,
+  .home-ref-subview { padding-right: 12px; padding-left: 12px; }
+  .home-ref-session-meta { gap: 4px 7px; }
+  .home-ref-nutrition .calorie-circle { width: 56px; height: 56px; }
+  .home-ref-chart { gap: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-ref-subview *,
+  .home-ref-dashboard * { scroll-behavior: auto; transition-duration: 0.01ms !important; }
+}
+
+/* Responsive finish for the shared app shell and dense feature screens. */
+html { text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
+body, .scene, .app-shell, main, section, nav, header, footer { min-width: 0; }
+img, video, canvas, iframe { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+:is(button, a, summary):focus-visible {
+  outline: 2px solid var(--green-dark);
+  outline-offset: 2px;
+}
+
+@media (max-width: 699px) {
+  .scene { height: 100dvh; min-height: 100svh; }
+  .app-shell { width: 100%; min-height: 0; }
+  .home-content,
+  .quests-scroll,
+  .me-scroll,
+  .coach-scroll,
+  .scan-content,
+  .leaderboard-scroll {
+    min-width: 0;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .quests-header,
+  .me-header,
+  .coach-plan-header,
+  .coach-header,
+  .report-header,
+  .scan-header,
+  .section-page-head {
+    min-width: 0;
+    gap: 8px;
+  }
+  .quests-header h1,
+  .me-header h1,
+  .coach-plan-header h1,
+  .coach-header h1,
+  .report-header h1,
+  .scan-header h1,
+  .section-page-head h2 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .quest-section,
+  .me-section,
+  .coach-section,
+  .scan-section {
+    max-width: none;
+  }
+  .quest-v2-level-top p,
+  .quest-v2-level-card > p { font-size: 12px; }
+  .quest-v2-streak small,
+  .quest-v2-section-heading > span,
+  .quest-v2-mission-progress small { font-size: 11px; }
+  .quest-v2-section-heading h3 { font-size: 14px; }
+  .quest-v2-mission-main > strong,
+  .quest-v2-mission-points { font-size: 12px; }
+  .quest-v2-badge > small { font-size: 10px; }
+  .leaderboard-periods button { min-height: 40px; font-size: 12px; }
+  .scan-dashboard-macro > div:first-child,
+  .scan-calories-remaining { font-size: 12px; }
+  .scan-calories-remaining strong { font-size: 14px; }
+  .scan-ring-target { font-size: 10px; }
+  .home-bottom-nav button { min-height: 44px; }
+  .home-bottom-nav button .nav-icon { min-height: 28px; }
+  .home-ref-edit { min-height: 40px; }
+  :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea):not(.visually-hidden):not([hidden]) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .me-row-copy small,
+  .me-setting-row small,
+  .me-profile-name small { font-size: 12px; }
+  .scan-dashboard-meal-head h3,
+  .scan-dashboard-meal-head > span,
+  .scan-dashboard-meal > p,
+  .scan-dashboard-link strong,
+  .scan-dashboard-link small { font-size: 12px; }
+  .target-log-ring small,
+  .target-log-remaining,
+  .target-log-macro > div:first-child,
+  .target-log-section-head h3,
+  .target-log-section-head > button,
+  .target-log-meal-copy p,
+  .target-log-meal-copy small,
+  .target-log-meal-calories,
+  .target-log-water .target-log-section-head > small { font-size: 11px; }
+  .target-log-meal-add { min-width: 44px; min-height: 44px; }
+  .admin-filters button,
+  .engagement-ranges button,
+  .admin-status,
+  .admin-pose,
+  .admin-list-caption,
+  .admin-list-caption small,
+  .engagement-active-users > small,
+  .engagement-stat-grid small,
+  .emergency-event-row b,
+  .emergency-event-row small { font-size: 11px; }
+  .admin-filters button,
+  .engagement-ranges button { min-height: 40px; }
+  .coach-back,
+  .leaderboard-back,
+  .notification-bell { min-width: 44px; min-height: 44px; }
+}
+
+@media (max-width: 390px) {
+  .content-shell,
+  .home-subview,
+  .quests-scroll,
+  .me-scroll,
+  .coach-scroll,
+  .scan-content,
+  .leaderboard-scroll {
+    padding-left: max(12px, var(--sal));
+    padding-right: max(12px, var(--sar));
+  }
+  .home-ref-header { gap: 6px; }
+  .home-ref-workout { padding: 12px; }
+  .home-ref-stats .stat-separator { margin: 0 5px; }
+  .home-ref-session-meta { gap: 6px 9px; }
+  .home-ref-entry-form { grid-template-columns: minmax(0, 1fr); }
+  .home-ref-entry-form .primary { width: 100%; }
+  .home-ref-chart { gap: 2px; }
+  .home-ref-chart-column > small { font-size: 10px; overflow-wrap: anywhere; }
+  .home-ref-session-row { align-items: flex-start; flex-direction: column; justify-content: center; gap: 3px; padding: 8px 0; }
+  .home-ref-session-detail { white-space: normal; }
+  .quest-v2-badge-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 4px; }
+  .target-log-water-glasses { grid-template-columns: repeat(4, minmax(44px, 1fr)); }
+  .target-log-water-glasses button { min-height: 44px; }
+}
+
+@media (min-width: 700px) {
+  .home-bottom-nav {
+    width: min(100%, var(--content-max));
+    margin-inline: auto;
+  }
+  .home-ref-dashboard,
+  .home-ref-subview { padding-bottom: max(24px, var(--sab)); }
+}
+
+/* Use only the safe-area inset and compact content spacing above and below
+   authenticated screens; the bottom navigation itself supplies the controls. */
+.home-ref-dashboard,
+.home-subview,
+.home-ref-subview,
+.me-scroll,
+.quests-scroll,
+.coach-scroll,
+.scan-content {
+  padding-top: 4px;
+  padding-bottom: 6px;
+}
+.home-bottom-nav {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.home-bottom-nav button {
+  min-height: 44px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.home-bottom-nav button .nav-icon {
+  height: 28px;
+}
+
+.home-ref-training-goal .mini-progress {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  font-size: 0;
+}
+.home-ref-training-goal .mini-progress::before {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--surface);
+  content: "";
+}
+.home-ref-training-goal .mini-progress > span {
+  position: relative;
+  z-index: 1;
+  color: var(--green-dark);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.home-ref-progress-page .home-ref-trend {
+  margin-bottom: 8px;
+}
+.home-ref-personal-record {
+  cursor: default;
+}
+.home-ref-sample-label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 450;
+}
+.home-ref-accuracy {
+  margin: 0 0 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--soft);
+}
+.home-ref-accuracy .section-head {
+  min-height: 20px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.home-ref-accuracy .section-head h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+}
+.home-ref-accuracy .section-head > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.home-ref-accuracy-chart {
+  height: 88px;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  align-items: end;
+  gap: 5px;
+  border-bottom: 1px solid var(--line);
+}
+.home-ref-accuracy-column {
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.home-ref-accuracy-column > span {
+  width: 100%;
+  max-width: 28px;
+  min-height: 4px;
+  display: block;
+  border-radius: 4px 4px 0 0;
+  background: #d0f2d1;
+}
+.home-ref-accuracy-column > span.latest {
+  background: var(--green);
+}
+.home-ref-accuracy-column > small {
+  min-height: 15px;
+  color: var(--muted);
+  font-size: 9px;
+}
+.home-ref-accuracy > p {
+  margin-top: 7px;
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.home-ref-accuracy > p b {
+  font-weight: 650;
+}
+
+@media (min-width: 700px) {
+  .home-ref-accuracy-chart {
+    height: 112px;
+  }
+}
+
+/* Keep form focus on the field border; avoid the extra rectangular browser ring. */
+:is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"])):focus,
+:is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"])):focus-visible,
+:is(select, textarea):focus,
+:is(select, textarea):focus-visible {
+  outline: none;
+  outline-offset: 0;
+}
+
+:is(.input-wrap, .focus-within):focus-within,
+textarea:focus {
+  outline: none;
 }

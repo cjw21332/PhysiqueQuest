@@ -6,18 +6,65 @@ import { Settings } from '../settings/schemas/settings.schema.js';
 import { ExerciseRecord } from '../exercises/schemas/exercise.schema.js';
 
 const WEEKDAYS = [
-  { label: 'M', name: 'Mon', index: 0 },
-  { label: 'T', name: 'Tue', index: 1 },
-  { label: 'W', name: 'Wed', index: 2 },
-  { label: 'T', name: 'Thu', index: 3 },
-  { label: 'F', name: 'Fri', index: 4 },
-  { label: 'S', name: 'Sat', index: 5 },
-  { label: 'S', name: 'Sun', index: 6 },
+  { label: 'Mon', name: 'Monday', index: 0 },
+  { label: 'Tue', name: 'Tuesday', index: 1 },
+  { label: 'Wed', name: 'Wednesday', index: 2 },
+  { label: 'Thu', name: 'Thursday', index: 3 },
+  { label: 'Fri', name: 'Friday', index: 4 },
+  { label: 'Sat', name: 'Saturday', index: 5 },
+  { label: 'Sun', name: 'Sunday', index: 6 },
 ];
 
 // Preferred training slots, in order, so a plan of N sessions spreads out
 // instead of clustering at the start of the week.
 const SLOT_ORDER = [0, 2, 4, 5, 1, 3, 6];
+const WEEKDAY_INDEX: Record<string, number> = Object.fromEntries(
+  WEEKDAYS.map(day => [day.name.toLowerCase(), day.index]),
+);
+const LEGACY_WEEKDAY_INDEX: Record<string, number> = {
+  'm-0': 0,
+  't-1': 1,
+  'w-2': 2,
+  't-3': 3,
+  'f-4': 4,
+  's-5': 5,
+  's-6': 6,
+};
+const LEGACY_INITIALS: Record<string, number[]> = {
+  m: [0],
+  t: [1, 3],
+  w: [2],
+  f: [4],
+  s: [5, 6],
+};
+
+function scheduledWeekdays(days: string[] | undefined): Set<number> {
+  const selected = new Set<number>();
+  const totals = new Map<string, number>();
+  const occurrences = new Map<string, number>();
+  for (const value of days ?? []) {
+    const key = value.trim().toLowerCase();
+    if (LEGACY_INITIALS[key]) totals.set(key, (totals.get(key) ?? 0) + 1);
+  }
+
+  for (const value of days ?? []) {
+    const key = value.trim().toLowerCase();
+    const index = WEEKDAY_INDEX[key] ?? LEGACY_WEEKDAY_INDEX[key];
+    if (index !== undefined) {
+      selected.add(index);
+      continue;
+    }
+    const matches = LEGACY_INITIALS[key];
+    if (!matches) continue;
+    const occurrence = occurrences.get(key) ?? 0;
+    occurrences.set(key, occurrence + 1);
+    selected.add(matches[Math.min(occurrence, (totals.get(key) ?? 1) - 1)]);
+  }
+
+  if (selected.size > 0) return selected;
+  const sessionCount = Math.min(days?.length || 3, 7);
+  return new Set(SLOT_ORDER.slice(0, sessionCount));
+}
 
 type Focus = [title: string, keywords: string[]];
 
@@ -82,8 +129,8 @@ export class CoachService {
     }));
 
     const available = this.filterByEquipment(library, equipment);
-    const sessionCount = Math.min(profile.days?.length || 3, 7);
-    const scheduled = new Set(SLOT_ORDER.slice(0, sessionCount));
+    const scheduled = scheduledWeekdays(profile.days);
+    const sessionCount = scheduled.size;
     const focusRotation = FOCUS_BY_GOAL[profile.goal] ?? FOCUS_BY_GOAL['General fitness'];
     const perWorkout = EXERCISES_BY_DURATION[duration] ?? 5;
     let workoutIndex = 0;

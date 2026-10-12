@@ -26,7 +26,7 @@ export default function BottomNav() {
       {tabs.map(tab => (
         <button
           key={tab.label}
-          className={pathname === tab.path ? 'active' : ''}
+          className={pathname === tab.path || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) ? 'active' : ''}
           onClick={() => handleNavigation(tab.path)}
         >
           <span className="nav-icon">

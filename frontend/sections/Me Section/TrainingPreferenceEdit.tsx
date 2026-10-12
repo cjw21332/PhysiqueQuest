@@ -3,30 +3,31 @@ import { useState } from 'react';
 import type { Profile } from '../Home/types';
 import MeEditLayout from './MeEditLayout';
 import { Icon } from '../Home/icons';
+import { formatTrainingDays, normalizeTrainingDays, TRAINING_DAYS } from '../../lib/trainingDays';
 
 type Props = {
   profile: Profile;
   onBack: () => void;
-  onSave: (patch: Partial<Profile>) => Promise<void>;
+  onSave: (patch: Partial<Profile>) => Promise<boolean>;
+  error?: string;
 };
 
 const equipmentOptions = ['Bodyweight only', 'Dumbbells', 'Resistance bands', 'Full gym'];
-const dayOptions = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-export default function TrainingPreferenceEdit({ profile, onBack, onSave }: Props) {
+export default function TrainingPreferenceEdit({ profile, onBack, onSave, error }: Props) {
   const [data, setData] = useState({
     equipment: profile.equipment || [],
-    days: profile.days || [],
+    days: normalizeTrainingDays(profile.days || []),
     duration: profile.duration || '',
-    placementConfirmed: true, // We can default this or read from profile
   });
   const [saving, setSaving] = useState(false);
+  const [validationError, setValidationError] = useState('');
 
   const isDirty = JSON.stringify(data.equipment) !== JSON.stringify(profile.equipment || []) ||
-    JSON.stringify(data.days) !== JSON.stringify(profile.days || []) ||
+    JSON.stringify(data.days) !== JSON.stringify(normalizeTrainingDays(profile.days || [])) ||
     data.duration !== (profile.duration || '');
 
-  const setField = (key: keyof typeof data, value: any) => setData(curr => ({ ...curr, [key]: value }));
+  const setDuration = (value: string) => setData(curr => ({ ...curr, duration: value }));
 
   const toggleEquipment = (value: string) => setData(curr => {
     const equipment = curr.equipment.includes(value)
@@ -35,19 +36,26 @@ export default function TrainingPreferenceEdit({ profile, onBack, onSave }: Prop
     return { ...curr, equipment };
   });
 
-  const toggleDay = (index: number) => {
-    const dayId = `${dayOptions[index]}-${index}`;
+  const toggleDay = (day: string) => {
     setData(curr => ({
       ...curr,
-      days: curr.days.includes(dayId) ? curr.days.filter(day => day !== dayId) : [...curr.days, dayId],
+      days: curr.days.includes(day) ? curr.days.filter(selected => selected !== day) : [...curr.days, day],
     }));
   };
 
   const handleSave = async () => {
+    setValidationError('');
+    if (data.days.length === 0) {
+      setValidationError('Choose at least one training day.');
+      return;
+    }
+
     setSaving(true);
-    await onSave(data);
-    setSaving(false);
-    onBack();
+    try {
+      if (await onSave({ ...data, days: normalizeTrainingDays(data.days) })) onBack();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -59,6 +67,7 @@ export default function TrainingPreferenceEdit({ profile, onBack, onSave }: Prop
       onSave={handleSave}
       isDirty={isDirty}
       isSaving={saving}
+      error={validationError || error}
     >
       <div className="choice-group training-equipment">
         <div className="group-title"><b>Equipment available</b></div>
@@ -71,11 +80,11 @@ export default function TrainingPreferenceEdit({ profile, onBack, onSave }: Prop
       </div>
 
       <div className="choice-group">
-        <div className="group-title"><b>Training days</b><small>{data.days.length} selected</small></div>
+        <div className="group-title"><b>Training days</b><small>{formatTrainingDays(data.days) || 'None selected'}</small></div>
         <div className="day-grid">
-          {dayOptions.map((day, index) => {
-            const selected = data.days.includes(`${day}-${index}`);
-            return <button type="button" key={`${day}-${index}`} className={`day ${selected ? 'active' : ''}`} aria-pressed={selected} onClick={() => toggleDay(index)}>{day}</button>;
+          {TRAINING_DAYS.map(day => {
+            const selected = data.days.includes(day.value);
+            return <button type="button" key={day.value} className={`day ${selected ? 'active' : ''}`} aria-label={day.value} aria-pressed={selected} onClick={() => toggleDay(day.value)}>{day.label}</button>;
           })}
         </div>
       </div>
@@ -87,7 +96,7 @@ export default function TrainingPreferenceEdit({ profile, onBack, onSave }: Prop
             const option = `${val} min`;
             // Some profiles might store "20", some "20 min". Handle safely:
             const isActive = data.duration === option || data.duration === val;
-            return <button type="button" key={val} className={`chip ${isActive ? 'active' : ''}`} aria-pressed={isActive} onClick={() => setField('duration', option)}>{val}</button>;
+            return <button type="button" key={val} className={`chip ${isActive ? 'active' : ''}`} aria-pressed={isActive} onClick={() => setDuration(option)}>{val}</button>;
           })}
         </div>
       </div>

@@ -18,7 +18,7 @@ const library = (overrides: Partial<{ name: string; group: string; targetMuscle:
 
 const profile = {
   goal: 'Build muscle',
-  days: ['M', 'W', 'F', 'S'],
+  days: ['Monday', 'Wednesday', 'Friday', 'Saturday'],
   duration: '45 min',
   equipment: ['Dumbbells'],
   conditions: [] as string[],
@@ -63,6 +63,34 @@ describe('coach plan', () => {
     const plan = await service.getPlan(USER);
 
     expect(plan.days.flatMap(day => day.exercises).some(exercise => exercise.name === 'Overhead press')).toBe(false);
+  });
+
+  it('schedules workouts on the exact weekdays saved in the profile', async () => {
+    const service = new CoachService(
+      profileModel({ ...profile, days: ['Tuesday', 'Thursday', 'Sunday'] }),
+      settingsModel(),
+      exercisesModel([]),
+    );
+
+    const plan = await service.getPlan(USER);
+
+    expect(plan.sessionCount).toBe(3);
+    expect(plan.days.filter(day => day.isWorkoutDay).map(day => day.index)).toEqual([1, 3, 6]);
+    expect(plan.days.map(day => day.name)).toEqual([
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+    ]);
+  });
+
+  it('maps duplicate legacy day initials to distinct weekdays when possible', async () => {
+    const service = new CoachService(
+      profileModel({ ...profile, days: ['T', 'T', 'S', 'S'] }),
+      settingsModel(),
+      exercisesModel([]),
+    );
+
+    const plan = await service.getPlan(USER);
+
+    expect(plan.days.filter(day => day.isWorkoutDay).map(day => day.index)).toEqual([1, 3, 5, 6]);
   });
 
   it('flags an empty published library instead of inventing exercises', async () => {

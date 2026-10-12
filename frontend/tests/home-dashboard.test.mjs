@@ -8,5 +8,8 @@ test('home cards reflect saved activity and route actions to real screens', asyn
   assert.match(home, /useNutrition/);
   assert.match(home, /navigate\('\/coach'\)/);
   assert.match(home, /navigate\('\/scan'\)/);
-  assert.doesNotMatch(home, /1,840|1\.4k|12\s*<|Week 3|AI form tracking|68%/);
+  assert.match(home, /navigate\('\/goals'\)/);
+  assert.match(home, /navigate\('\/progress'\)/);
+  assert.match(home, /navigate\('\/quests'\)/);
+  assert.doesNotMatch(home, /1,840|1\.4k|12\s*<|Week 3|68%/);
 });

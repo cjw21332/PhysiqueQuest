@@ -375,7 +375,7 @@ class ApiClient {
   async getProgress(metric: string, limit = 90) { return this.request<any>(`/progress?metric=${encodeURIComponent(metric)}&limit=${limit}`); }
   async addProgress(data: any) { return this.request<any>('/progress', { method: 'POST', body: JSON.stringify(data) }); }
   async deleteProgress(id: string) { return this.request<any>(`/progress/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
-  async getWorkouts(limit = 20) { return this.request<any[]>(`/workouts?limit=${encodeURIComponent(limit)}`); }
+  async getWorkouts(limit = 20) { return this.request<WorkoutSessionRecord[]>(`/workouts?limit=${encodeURIComponent(limit)}`); }
   async createWorkout(data: any) { return this.request<any>('/workouts', { method: 'POST', body: JSON.stringify(data) }); }
   async getAdminExercises() { return this.request<any[]>('/admin/exercises'); }
   async createAdminExercise(data: any) { return this.request<any>('/admin/exercises', { method: 'POST', body: JSON.stringify(data) }); }

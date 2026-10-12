@@ -1,10 +1,16 @@
 # PhysiqueQuest — Frontend, Backend, and End-to-End Checklist
 
-> **Audit date:** October 12, 2026  
-> **Release baseline:** `PhysiqueQuest-v2.5.0`  
+> **Audit date:** October 13, 2026  
+> **Release baseline:** `PhysiqueQuest-v2.5.2` (`37c4309`)
 > **Scope:** Frontend UI/API wiring, backend services, and proven frontend → API → persisted-user-data workflows.
 
 This checklist separates what is implemented in the frontend, what is implemented and tested in the backend, and what has actually been demonstrated as a complete user journey using genuine account data.
+
+### Post-baseline implementation update — October 13, 2026
+
+- **Notifications presentation:** The Home Notifications view now conditionally promotes a real API-backed safety notification to a pinned safety card, retains returned API content and grouping, and exposes truthful individual/mark-all read actions. Loading, empty, and error/retry states remain present.
+- **Verification:** The frontend production build passed and the complete frontend test suite passed (66/66). The backend test suite passed (273/273) and the backend production build passed. These checks verify implementation and automated behavior, not a fresh live database round trip.
+- **Checklist impact:** Notifications frontend and backend implementation criteria remain checked. The joint notification workflow remains unchecked until real notification records and persisted read-state changes are verified using a safe live test account.
 
 ## How to interpret the marks
 
@@ -20,19 +26,19 @@ This checklist separates what is implemented in the frontend, what is implemente
 
 ### Frontend implementation coverage
 
-- **Modules with all frontend criteria checked:** 13 / 17 (**76.5%**, rounded **76%**)
-- **Frontend criteria checked:** 30 / 34 (**88.2%**, rounded **88%**)
+- **Modules with all frontend criteria checked:** 15 / 17 (**88.2%**, rounded **88%**)
+- **Frontend criteria checked:** 32 / 34 (**94.1%**, rounded **94%**)
 
-<progress value="13" max="17" aria-label="13 of 17 modules meet frontend implementation criteria">13 of 17 frontend modules (76%)</progress>
-<progress value="30" max="34" aria-label="30 of 34 frontend criteria verified">30 of 34 frontend criteria (88%)</progress>
+<progress value="15" max="17" aria-label="15 of 17 modules meet frontend implementation criteria">15 of 17 frontend modules (88%)</progress>
+<progress value="32" max="34" aria-label="32 of 34 frontend criteria verified">32 of 34 frontend criteria (94%)</progress>
 
 ### Backend implementation and automated-test coverage
 
-- **Applicable modules with all backend criteria checked:** 9 / 16 (**56.3%**, rounded **56%**); 1 system module is not applicable to the backend.
-- **Backend criteria checked:** 25 / 32 (**78.1%**, rounded **78%**)
+- **Applicable modules with all backend criteria checked:** 11 / 16 (**68.8%**, rounded **69%**); 1 system module is not applicable to the backend.
+- **Backend criteria checked:** 27 / 32 (**84.4%**, rounded **84%**)
 
-<progress value="9" max="16" aria-label="9 of 16 applicable modules meet backend implementation criteria">9 of 16 applicable backend modules (56%)</progress>
-<progress value="25" max="32" aria-label="25 of 32 applicable backend criteria verified">25 of 32 applicable backend criteria (78%)</progress>
+<progress value="11" max="16" aria-label="11 of 16 applicable backend modules meet backend implementation criteria">11 of 16 applicable backend modules (69%)</progress>
+<progress value="27" max="32" aria-label="27 of 32 applicable backend criteria verified">27 of 32 applicable backend criteria (84%)</progress>
 
 ### Genuine end-to-end user-data verification
 
@@ -55,7 +61,7 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 | 2 | [Password recovery](#2-password-recovery) | Verified | Partial | Not verified |
 | 3 | [Onboarding and profile](#3-onboarding-and-profile) | Verified | Verified | Verified historically |
 | 4 | [Home dashboard and navigation](#4-home-dashboard-and-navigation) | Verified | Verified | Not verified |
-| 5 | [Coach plan and exercise library](#5-coach-plan-and-exercise-library) | Partial | Partial | Not verified |
+| 5 | [Coach plan and exercise library](#5-coach-plan-and-exercise-library) | Verified | Verified | Not verified |
 | 6 | [Camera Check and pose readiness](#6-camera-check-and-pose-readiness) | Verified | Partial | Not verified |
 | 7 | [Workout session and report](#7-workout-session-and-report) | Partial | Partial | Not verified |
 | 8 | [Inactivity and emergency safety](#8-inactivity-and-emergency-safety) | Verified | Partial | Not verified |
@@ -65,7 +71,7 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 | 12 | [Progress measurements](#12-progress-measurements) | Verified | Verified | Not verified |
 | 13 | [Me, settings, and preferences](#13-me-settings-and-preferences) | Verified | Verified | Not verified |
 | 14 | [Notifications](#14-notifications) | Verified | Verified | Not verified |
-| 15 | [Administrator tools](#15-administrator-tools) | Partial | Partial | Not verified |
+| 15 | [Administrator tools](#15-administrator-tools) | Verified | Verified | Not verified |
 | 16 | [Expo Go mobile shell](#16-expo-go-mobile-shell) | Verified | Not applicable | Not verified |
 | 17 | [API and data-service reliability](#17-api-and-data-service-reliability) | Verified | Verified | Not verified |
 
@@ -98,7 +104,7 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 ### 5. Coach plan and exercise library
 
 - [✅] Exercise-library search and exercise details load through the exercise API.
-- [❌] Coach plan personalization is not verified as a user-generated backend plan; curated plan/exercise content is not proof of a dynamically generated plan for the signed-in user.
+- [✅] The authenticated coach-plan API builds a weekly plan from the user's profile, equipment, duration, goal, schedule, and health conditions; the UI renders the returned plan.
 
 ### 6. Camera Check and pose readiness
 
@@ -143,17 +149,17 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 ### 14. Notifications
 
 - [✅] Notification list, individual read-state updates, and mark-all-read use notifications API operations.
-- [✅] The UI renders returned notification records rather than built-in example events.
+- [✅] The UI renders returned notification records rather than built-in example events; actual safety notices may use the pinned alert presentation, while returned text, time, grouping, and unread state remain API-sourced.
 
 ### 15. Administrator tools
 
 - [✅] Admin exercise and alert/analytics views use protected APIs and display access/API errors.
-- [❌] Some analytics are knowingly unavailable because sign-in event history is not collected; the UI cannot provide that missing dataset.
+- [✅] Sign-in analytics load from the admin analytics API; successful sign-ins are collected for active-user and weekly-retention metrics.
 
 ### 16. Expo Go mobile shell
 
 - [✅] Expo shell loads the web app and reports backend/frontend connectivity with recovery paths.
-- [✅] Web-to-native camera and inactivity bridges are implemented and mobile tests/type-check/export pass; physical-device behavior is not established by those checks.
+- [✅] Web-to-native camera and inactivity bridges are implemented; mobile state/connectivity tests and TypeScript check pass. Expo export was not rerun for v2.5.2, and physical-device behavior is not established by those checks.
 
 ### 17. API and data-service reliability
 
@@ -190,7 +196,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 ### 5. Coach plan and exercise library
 
 - [✅] Public exercise-catalog queries and role-protected exercise administration routes are implemented and tested.
-- [❌] A personalized workout-plan generation service is not established as a backend capability; curated catalog data should not be presented as a generated personal plan.
+- [✅] Authenticated coach-plan service builds a scheduled plan from profile/settings and the published exercise library, filters by equipment and health conditions, and has service tests.
 
 ### 6. Camera Check and pose readiness
 
@@ -219,8 +225,8 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 
 ### 11. Quests, streaks, and leaderboard
 
-- [✅] User activity/quest state and notification-related activity routes are implemented and tested.
-- [✅] Mission progress is derived from saved activity rather than trusting client-submitted completion claims.
+- [✅] User activity/quest state and notification-related activity routes are implemented and tested; the authenticated leaderboard ranks users from workout, meal, and water activity.
+- [✅] Mission progress is derived from saved activity rather than trusting client-submitted completion claims; leaderboard period selection, privacy opt-out, and rank movement have service tests.
 
 ### 12. Progress measurements
 
@@ -240,7 +246,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 ### 15. Administrator tools
 
 - [✅] Admin alert, analytics, and exercise-management APIs are protected by the administrator role and have test coverage.
-- [❌] Active-user/retention analytics based on sign-ins cannot be verified or supplied because sign-in history is not collected.
+- [✅] Successful login and registration events are recorded for analytics; the analytics service derives active users and weekly retention and has test coverage.
 
 ### 16. Expo Go mobile shell
 
@@ -277,7 +283,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 
 ### 5. Coach plan and exercise library
 
-- [❌] Verify exercise catalog API data appears in the UI for a real user; separately verify whether a personalized plan is implemented (currently not established).
+- [❌] Verify the exercise catalog and profile-specific coach plan against the current safe deployment, then confirm the returned plan reflects that user's persisted profile/settings and published library.
 
 ### 6. Camera Check and pose readiness
 
@@ -333,17 +339,27 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 
 ---
 
-## Automated verification run for the code-level audit
+## Version 2.5.2 changes
+
+Version 2.5.2 (`37c4309`) adds three API-backed capabilities:
+
+- **Coach plans:** the authenticated coach API assembles a weekly workout schedule from the user's goal, training days, duration, equipment, health conditions, and published exercise library. The frontend loads and renders the backend response rather than creating a local sample plan.
+- **Leaderboard:** a new authenticated endpoint provides weekly, monthly, and all-time rankings based on completed workouts, meal activity, and water goals. It includes rank movement/context and respects each user's leaderboard visibility setting.
+- **Sign-in analytics:** successful login and registration events are recorded for the admin analytics service, which calculates active users and week-over-week retention.
+
+Automated tests cover these code paths. These checks do not demonstrate a live deployment, provider integration, or real-user-data round trip; the corresponding end-to-end criteria below remain unchecked.
+
+## Automated verification run for version 2.5.2
 
 | Check | Result | What it proves (and does not prove) |
 |---|---|---|
-| Frontend test suite (`node --test tests/*.test.mjs`, from `frontend/`) | Passed: 52/52 | Frontend source/behavior guards; some tests inspect source or use mocked responses. Not a live service run. |
-| Backend Vitest suite (`npm test`, from `backend/`) | Passed: 30 files, 246/246 tests | Backend validation and service behavior; many tests mock provider/model boundaries. Not proof of production credentials or a live MongoDB round-trip. |
+| Frontend test suite (all `frontend/tests/*.test.mjs` files) | Passed: 55/55 | Frontend source/behavior guards; some tests inspect source or use mocked responses. Not a live service run. |
+| Backend Vitest suite (`npm test`, from `backend/`) | Passed: 34 files, 270/270 tests | Backend validation and service behavior; many tests mock provider/model boundaries. Not proof of production credentials or a live MongoDB round-trip. |
 | Frontend production build (`npm run build`, from `frontend/`) | Passed | Compilation, types, and static route generation only. |
 | Backend production build (`npm run build`, from `backend/`) | Passed | Backend compilation only. |
-| Expo state/connectivity tests (`node --test connection.test.mjs inactivity/inactivity.test.mjs`, from `mobile/`) | Passed: 20/20 | Pure native state/connectivity behavior; not device hardware. |
+| Expo state/connectivity tests (`mobile/connection.test.mjs` and `mobile/inactivity/inactivity.test.mjs`) | Passed: 20/20 | Pure native state/connectivity behavior; not device hardware. |
 | Expo TypeScript check (`npx tsc --noEmit --project tsconfig.json`, from `mobile/`) | Passed | Type correctness only. |
-| Expo Android/iOS export | Passed on 2026-10-12 | Bundling only; not camera/sensor/device acceptance. |
+| Expo Android/iOS export | Not rerun for this v2.5.2 checklist update | Earlier export evidence is not counted as verification of this release. |
 
 ## Remaining live verification plan
 

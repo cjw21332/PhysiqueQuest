@@ -7,6 +7,8 @@ description: >-
 
 # PhysiqueQuest Development Procedures
 
+**Mandatory governing rules:** Read [GENERAL.md](./GENERAL.md) for the required checklist review, progress-report threshold, and shared repository constraints. This document governs architecture and engineering procedures; [DESIGN.md](./DESIGN.md) governs frontend design; [DATABASE.md](./DATABASE.md) governs backend and persistence. All three are mandatory.
+
 ## 1. Project State and Architecture
 
 PhysiqueQuest has two root npm workspaces plus a separately managed backend service:
@@ -200,21 +202,23 @@ After a UI, route, or behavior change:
 
 The rule docs are a contract with the codebase, and they have drifted before. Make sure they cannot drift again.
 
-1. **When the system changes, the rules change with it.** Any change to architecture, routes, navigation, palette, safe-area handling, persistence, supported workflows, backend modules, or external services must update DATABASE.md, DESIGN.md, and PROCEDURES.md in the same change.
+1. **When the system changes, the relevant rules change with it.** Update every affected domain document, and update the other two when the change affects their responsibilities. Do not make unrelated edits just to touch all documents.
 2. **State the current behavior, not the planned one.** Write what is implemented. If a feature is a prototype, a demo, or not yet connected, say so explicitly — do not describe sample data as live data or vice versa.
 3. **Before editing a rule doc, verify against the live system.** Check the actual backend modules, schemas, routes, and env config; the actual frontend hooks, sections, and localStorage keys; and the actual versions in package.json. Do not edit a rule doc from memory.
 4. **When a doc is stale, fix the doc — never the code to match a stale rule.** If the rules contradict the system, the system is right; update the rules and record what changed.
 5. **Keep each doc in its lane.**
+   - `GENERAL.md` — mandatory shared governance, checklist maintenance, progress reports, and project-wide guardrails.
    - `DATABASE.md` — persistence state and language-independent database/backend data rules.
-   - `DESIGN.md` — visual and interaction rules, plus backend-integration design concerns (loading, empty, and error states; sample/demo labeling).
+   - `DESIGN.md` — frontend visual and interaction rules, including loading, empty, and error states and sample/demo labeling.
    - `PROCEDURES.md` — current architecture and how to make changes safely.
    - `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` — locked project rules (Next.js version, monorepo structure, styling constraints). These are edited only when the stack itself changes.
 6. **Version the design doc when the interface changes.** Bump the DESIGN.md title and record the user-visible change in its maintenance section.
 
 ## 13. Documentation Updates
 
+- Follow [GENERAL.md](./GENERAL.md) after every task: recheck `docs/checklist.md`, update evidence/status where warranted, and create the next numbered progress report for substantial work.
 - Keep DESIGN.md focused on visual and interaction rules.
 - Keep PROCEDURES.md focused on current architecture and how to make changes safely.
 - Keep DATABASE.md focused on current persistence state and language-independent database/backend data rules.
-- Update all three when app structure, navigation, palette, safe-area handling, persistence, or supported workflows change.
+- Update each of the three domain documents when the change affects its scope; cross-layer architecture changes may affect multiple documents.
 - Keep README.md's quick-start and folder overview aligned with the actual npm workspaces and separately managed backend service.

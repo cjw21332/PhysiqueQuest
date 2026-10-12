@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api, type AdminAlertRow } from '../../lib/api';
 import { alertLogBadge } from '../../lib/inactivityConstants.mjs';
+import { Icon } from '../Home/icons';
 
 type Range = 7 | 30 | 90;
 
@@ -26,7 +27,7 @@ export default function EmergencyAlertLog({ onBack }: { onBack: () => void }) {
   return (
     <section className="me-section" aria-label="Emergency alert log">
       <header className="me-header">
-        <button type="button" className="link-button" onClick={onBack}>Back</button>
+        <button type="button" className="coach-back" onClick={onBack} aria-label="Back to account settings"><Icon name="arrow" size={20}/></button>
         <h2>Emergency alert log</h2>
         <span className="admin-view-label">Admin view</span>
       </header>

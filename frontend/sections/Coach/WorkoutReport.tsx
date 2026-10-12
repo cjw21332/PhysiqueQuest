@@ -3,12 +3,12 @@
 import { Icon } from '../Home/icons';
 import type { WorkoutSessionRecord } from '../../lib/api';
 
-export default function WorkoutReport({ workout, onHome, onShare }: { workout: WorkoutSessionRecord; onHome: () => void; onShare: () => void }) {
+export default function WorkoutReport({ workout, onBack, onHome, onShare }: { workout: WorkoutSessionRecord; onBack: () => void; onHome: () => void; onShare: () => void }) {
   const duration = workout.durationSeconds ?? 0;
   const elapsed = `${Math.floor(duration/60).toString().padStart(2,'0')}:${(duration%60).toString().padStart(2,'0')}`;
   const startedAt = new Date(workout.startedAt);
   return <>
-    <header className="coach-header report-header"><h2>Workout report</h2><button className="share-button" onClick={onShare}><Icon name="trend" size={14}/> Share</button></header>
+    <header className="coach-header report-header"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button><h2>Workout report</h2><button className="share-button" onClick={onShare}><Icon name="trend" size={14}/> Share</button></header>
     <div className="report-date">{startedAt.toLocaleString()}</div>
     <h3 className="report-title">Workout session</h3>
     <div className="report-summary"><div className="report-score"><b>—</b><small>form</small></div><div className="report-stats"><span>Duration<b>{elapsed}</b></span><span>Exercises<b>{workout.exerciseIds.length}</b></span><span>Status<b>{workout.status}</b></span></div></div>

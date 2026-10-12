@@ -21,3 +21,26 @@ test('the API client exposes the coach plan and leaderboard endpoints', async ()
   assert.match(client, /CoachPlanRecord/);
   assert.match(client, /LeaderboardRecord/);
 });
+
+test('training preferences store canonical weekdays and report failed saves', async () => {
+  const days = await source('lib/trainingDays.ts');
+  const onboarding = await source('sections/Auth/CalibrationFlow.tsx');
+  const editor = await source('sections/Me Section/TrainingPreferenceEdit.tsx');
+  const me = await source('sections/Me Section/MeSection.tsx');
+
+  assert.match(days, /value: 'Tuesday'/);
+  assert.match(days, /normalizeTrainingDays/);
+  assert.match(onboarding, /const days = normalizeTrainingDays\(data\.days\)/);
+  assert.match(editor, /onSave: \(patch: Partial<Profile>\) => Promise<boolean>/);
+  assert.match(editor, /if \(await onSave\([\s\S]*?\)\) onBack\(\)/);
+  assert.match(me, /const updated = await api\.updateProfile\(patch\)/);
+  assert.match(me, /return true/);
+  assert.match(me, /return false/);
+});
+
+test('coach plan shows the saved weekday schedule with full accessible day names', async () => {
+  const coach = await source('sections/Coach/CoachPlan.tsx');
+  assert.match(coach, /day\.name\}, \$\{day\.isWorkoutDay/);
+  assert.match(coach, /new Date\(\)\.getDay\(\)/);
+  assert.match(coach, /currentDay\?\.name/);
+});

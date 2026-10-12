@@ -82,15 +82,19 @@ npm install
 
 **Frontend:**
 ```bash
-cd frontend
-npm install
+npm install --workspace frontend
 ```
 
 **Mobile:**
 ```bash
-cd mobile
-npm install
+npm install --workspace mobile
 ```
+
+Run workspace install commands from the repository root so npm uses the root
+workspace lockfile and the Expo SDK versions declared by the project. Do not use
+`npm audit fix --force` to address audit warnings: it can make breaking major
+version changes to Expo and React Native that are incompatible with this app.
+Review dependency upgrades against the Expo SDK compatibility requirements.
 
 ## Running the Application
 
@@ -135,9 +139,12 @@ npm run dev
 ### Terminal 3: Mobile App (Optional)
 
 ```bash
-cd mobile
-npx expo start --lan
+npm run expo
 ```
+
+Run this command from the repository root. It invokes the mobile workspace's
+local Expo CLI with LAN hosting. From inside `mobile/`, `npm run expo` works as
+well. Do not install the deprecated global `expo-cli`.
 
 **Expected Output:**
 - Expo DevTools opening in browser

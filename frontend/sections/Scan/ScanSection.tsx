@@ -105,7 +105,7 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
     {view==='review'&&<ReviewEstimate imageUrl={imageUrl} status={scanStatus} analysis={analysis} error={scanError} onBack={()=>setView('nutrition')} onRetake={retake} onRetry={retryScan} onAddManual={add} onSave={saveScan}/>}
 
     {view==='add'&&<AddFood initialMeal={selectedMeal} onBack={()=>setView(addReturnView)} onSave={saveFood}/>}
-    {view==='logs'&&<DailyLog meals={todayMeals} water={water} onHistory={openHistory} onAdd={add} onWater={value=>{void setWater(value).then(()=>setActionError('')).catch(err=>setActionError(err instanceof Error?err.message:'Could not update water intake.'));}}/>}
+    {view==='logs'&&<DailyLog meals={todayMeals} water={water} onBack={()=>setView('nutrition')} onHistory={openHistory} onAdd={add} onWater={value=>{void setWater(value).then(()=>setActionError('')).catch(err=>setActionError(err instanceof Error?err.message:'Could not update water intake.'));}}/>}
     {view==='history'&&<FoodHistory meals={meals} onBack={()=>setView(historyReturnView)}/>}
     </>}
     </div>{(loading || view === 'nutrition' || view === 'logs') && <BottomNav />}</section>;

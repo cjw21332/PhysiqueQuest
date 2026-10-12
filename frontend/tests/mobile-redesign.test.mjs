@@ -8,8 +8,12 @@ test('progress displays saved measurement history and honest empty states', asyn
   const file = await source('sections/Home/Progress.tsx');
   assert.match(file, /useProgress/);
   assert.match(file, /Save measurement/);
-  assert.match(file, /No measurements yet/);
-  assert.doesNotMatch(file, /const series|68\.5|Personal records|Recent sessions/);
+  assert.match(file, /Log your first .* to start a trend/);
+  assert.match(file, /api\.getWorkouts\(\)/);
+  assert.match(file, /completedWorkouts/);
+  assert.match(file, /samplePersonalRecords/);
+  assert.match(file, /Sample data/);
+  assert.match(file, /Form accuracy/);
 });
 
 test('notifications render authenticated API data instead of sample events', async () => {
@@ -19,6 +23,20 @@ test('notifications render authenticated API data instead of sample events', asy
   assert.match(file, /Try again/);
   assert.doesNotMatch(file, /const initial =/);
   assert.doesNotMatch(file, /Maria Dela Cruz/);
+});
+
+test('notifications pin real safety alerts and preserve truthful actions', async () => {
+  const file = await source('sections/Home/Notifications.tsx');
+  const styles = await source('app/globals.css');
+  assert.match(file, /items\.find\(item =>/);
+  assert.match(file, /item\.icon === 'shield'/);
+  assert.match(file, /<SafetyNotification item=\{pinnedSafety\}/);
+  assert.match(file, /Safety notice · pinned/);
+  assert.match(file, /Mark as read/);
+  assert.match(file, /notification-unread-label/);
+  assert.match(file, /aria-label=\{\`\$\{group\} notifications\`\}/);
+  assert.match(styles, /\.home-notifications \.notification-safety-card/);
+  assert.match(styles, /\.home-notifications \.notification-item\.unread/);
 });
 
 test('Me keeps persistence and root navigation', async () => {
@@ -203,9 +221,23 @@ test('safety phases replace the session, cancel stale phases, and restore the se
   const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
   assert.match(live, /phaseRef\.current === 'active'/);
   assert.match(live, /phaseRef\.current === 'countdown'/);
+  assert.match(live, /detail\.type === 'countdown-started'[\s\S]*?camera\.stop\(\)/);
   assert.match(live, /camera\.shouldAutoStart && camera\.status === 'idle'/);
+  assert.match(live, /!\s*camera\.nativePreview\s*&&\s*<>\s*<span className="form-score"/);
   assert.match(css, /\.coach-view-session \.inactivity-view\s*\{[^}]*position: absolute/s);
   assert.match(mobile, /detail\.type === 'countdown-started'.*setCameraPreview\(null\)/s);
+});
+
+test('Live Session uses a proper pause icon and hides duplicate native-preview labels', async () => {
+  const live = await source('sections/Coach/LiveSession.tsx');
+  const icons = await source('sections/Home/icons.tsx');
+  const css = await source('app/globals.css');
+
+  assert.match(live, /<Icon name="pause" size=\{16\}/);
+  assert.match(live, /aria-label=\{paused \? 'Resume workout' : 'Pause workout'\}/);
+  assert.match(icons, /pause:.*M7 5h3v14H7zM14 5h3v14h-3z/s);
+  assert.doesNotMatch(live, /pause-glyph/);
+  assert.doesNotMatch(css, /\.pause-glyph/);
 });
 
 test('live inactivity countdown and alarm have connected safety UI and persistent resolution', async () => {

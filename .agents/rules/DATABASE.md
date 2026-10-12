@@ -6,6 +6,8 @@ description: Database and backend data rules for PhysiqueQuest. Follow when desi
 
 This document is the source of truth for persistence and data-service decisions. It applies to the web app, Expo WebView host, backend APIs, background workers, and any future microservices, regardless of implementation language.
 
+**Mandatory governing rules:** Follow [GENERAL.md](./GENERAL.md) together with this backend and persistence guide. [DESIGN.md](./DESIGN.md) governs frontend design; [PROCEDURES.md](./PROCEDURES.md) governs architecture and engineering workflow.
+
 ## 1. Current State
 
 - **Status:** The repository contains an implemented NestJS API and Mongoose persistence layer. Whether Atlas is reachable, which environment is configured, and whether that environment is production cannot be established from source alone.

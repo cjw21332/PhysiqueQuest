@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
+    "expo": "npx expo start --lan",
     "start": "npx expo start --lan"
   },
   "dependencies": {
