@@ -5,7 +5,16 @@ import { ConfigService } from '@nestjs/config';
 export class AlertDeliveryProvider {
   constructor(private readonly config: ConfigService) {}
   isAvailable() { return Boolean(this.config.get<string>('ALERT_DELIVERY_URL') && this.config.get<string>('ALERT_DELIVERY_API_KEY')); }
-  async send(payload: { to: string; contactName: string; eventType: string; occurredAt: string; idempotencyKey: string }) {
+  async send(payload: {
+    to: string;
+    contactName: string;
+    eventType: string;
+    occurredAt: string;
+    idempotencyKey: string;
+    location?: { lat: number; lng: number; accuracyMeters: number; capturedAt?: string };
+    workoutSessionId?: string;
+    exerciseId?: string;
+  }) {
     const endpoint = this.config.get<string>('ALERT_DELIVERY_URL');
     const apiKey = this.config.get<string>('ALERT_DELIVERY_API_KEY');
     if (!endpoint || !apiKey) return { confirmed: false };
