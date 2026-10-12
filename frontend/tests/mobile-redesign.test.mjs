@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import ts from 'typescript';
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
 test('progress displays saved measurement history and honest empty states', async () => {
@@ -131,6 +132,98 @@ test('Expo shell uses native readiness APIs and bridges camera permission', asyn
   assert.match(mobile, /osName/);
   assert.match(mobile, /osVersion/);
   assert.match(mobile, /device-readiness/);
+});
+
+test('Expo camera preview uses the native camera instead of insecure WebView media APIs', async () => {
+  const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
+  const cameraHook = await source('hooks/useCameraStream.ts');
+  assert.match(mobile, /<CameraView/);
+  assert.match(mobile, /camera-start/);
+  assert.match(mobile, /camera-update-frame/);
+  assert.match(mobile, /camera-stop/);
+  assert.match(cameraHook, /ReactNativeWebView/);
+  assert.match(cameraHook, /navigator\.mediaDevices\?\.getUserMedia/);
+  assert.doesNotMatch(cameraHook, /Open the app over https or through the Expo app/);
+});
+
+test('Camera Check waits for its visible frame, supports both cameras, and requests live readiness analysis', async () => {
+  const camera = await source('sections/Coach/CameraCheck.tsx');
+  const cameraHook = await source('hooks/useCameraStream.ts');
+  const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
+  const api = await source('lib/api.ts');
+  assert.match(camera, /ref={live\.frameRef}/);
+  assert.match(cameraHook, /frameRef\.current/);
+  assert.doesNotMatch(cameraHook, /camera preview is not visible yet/);
+  assert.match(camera, /live\.switchFacing/);
+  assert.match(cameraHook, /requestedFacing === 'front' \? 'user' : 'environment'/);
+  assert.match(camera, /analysisType: 'readiness'/);
+  assert.match(camera, /requestedChecks: \['fullBodyInFrame', 'lighting', 'distance'\]/);
+  assert.match(camera, /Full body in frame/);
+  assert.match(camera, /Lighting/);
+  assert.match(camera, /Distance/);
+  assert.match(mobile, /camera-capture-readiness/);
+  assert.match(mobile, /takePictureAsync/);
+  assert.match(api, /analysisType\?: 'workout' \| 'readiness'/);
+  assert.match(api, /requestedChecks\?: \('fullBodyInFrame' \| 'lighting' \| 'distance'\)\[\]/);
+});
+
+test('camera readiness displays only results actually present in provider analysis', async () => {
+  const file = await source('lib/cameraReadiness.ts');
+  const compiled = ts.transpileModule(file, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+  }).outputText;
+  const module = { exports: {} };
+  new Function('exports', 'module', compiled)(module.exports, module);
+  const { parseCameraReadiness, readyCheckCount } = module.exports;
+
+  const measured = parseCameraReadiness({
+    readiness: {
+      fullBodyInFrame: true,
+      lighting: 'sufficient',
+      distance: { meters: 2.7 },
+    },
+  });
+  assert.deepEqual(measured.fullBody, { status: 'ready', label: 'Detected' });
+  assert.deepEqual(measured.lighting, { status: 'ready', label: 'Sufficient' });
+  assert.deepEqual(measured.distance, { status: 'ready', label: '2.7 m · in range' });
+  assert.equal(readyCheckCount(measured, true), 4);
+
+  const missing = parseCameraReadiness({ summary: 'Camera view received.' });
+  assert.equal(missing.fullBody.status, 'unknown');
+  assert.equal(missing.lighting.status, 'unknown');
+  assert.equal(missing.distance.status, 'unknown');
+  assert.equal(readyCheckCount(missing, true), 1);
+  assert.equal(parseCameraReadiness({ distance: { meters: 3.6 } }).distance.status, 'adjust');
+});
+
+test('safety phases replace the session, cancel stale phases, and restore the selected camera', async () => {
+  const live = await source('sections/Coach/LiveSession.tsx');
+  const css = await source('app/globals.css');
+  const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
+  assert.match(live, /phaseRef\.current === 'active'/);
+  assert.match(live, /phaseRef\.current === 'countdown'/);
+  assert.match(live, /camera\.shouldAutoStart && camera\.status === 'idle'/);
+  assert.match(css, /\.coach-view-session \.inactivity-view\s*\{[^}]*position: absolute/s);
+  assert.match(mobile, /detail\.type === 'countdown-started'.*setCameraPreview\(null\)/s);
+});
+
+test('live inactivity countdown and alarm have connected safety UI and persistent resolution', async () => {
+  const live = await source('sections/Coach/LiveSession.tsx');
+  const views = await source('sections/Coach/InactivityViews.tsx');
+  const styles = await source('app/globals.css');
+  const holdComplete = live.match(/const holdComplete = async \(\) => \{([\s\S]*?)\n  \};/);
+
+  assert.match(live, /phase === 'countdown'/);
+  assert.match(live, /phase === 'alarm'/);
+  assert.ok(holdComplete, 'alarm hold-stop handler should exist');
+  assert.match(holdComplete[1], /resolveAlert/);
+  assert.doesNotMatch(holdComplete[1], /setPhase\('active'\)/);
+  assert.match(views, /className="inactivity-view inactivity-countdown"/);
+  assert.match(views, /className="inactivity-view emergency-alarm"/);
+  assert.match(views, /api\.getAdminAlerts\(30\)/);
+  assert.match(views, /canViewAdmin &&/);
+  assert.match(styles, /\.coach-view-session \.inactivity-countdown/);
+  assert.match(styles, /\.coach-view-session \.emergency-alarm/);
 });
 
 test('authenticated navigation uses full document navigation in WebView', async () => {

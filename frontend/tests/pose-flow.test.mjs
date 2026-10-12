@@ -7,7 +7,7 @@ test('camera and reports use pose provider status and never fabricate a score', 
   const api = await source('lib/api.ts');
   const report = await source('sections/Coach/WorkoutReport.tsx');
   assert.match(camera, /getPoseStatus/);
-  assert.match(camera, /Pose analysis provider is not configured/);
+  assert.match(camera, /Pose analysis is not configured/);
   assert.match(api, /\/pose\/status/);
   assert.match(report, /Form analysis.*unavailable/i);
   assert.doesNotMatch(report, /\d+%/);

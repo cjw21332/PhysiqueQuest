@@ -1,0 +1,350 @@
+# PhysiqueQuest — Frontend, Backend, and End-to-End Checklist
+
+> **Audit date:** October 12, 2026  
+> **Release baseline:** `PhysiqueQuest-v2.5.0`  
+> **Scope:** Frontend UI/API wiring, backend services, and proven frontend → API → persisted-user-data workflows.
+
+This checklist separates what is implemented in the frontend, what is implemented and tested in the backend, and what has actually been demonstrated as a complete user journey using genuine account data.
+
+## How to interpret the marks
+
+- **`[✅]` Verified for this layer:** the specific criterion below has supporting source and test/build evidence.
+- **`[❌]` Incomplete or unverified:** the reason and next verification step are stated on that item. It does not always mean the feature is broken; it means the criterion has not been demonstrated.
+- A check in the **Frontend** column means the UI/function is wired to the API client where it uses user data, and does not depend on hardcoded sample-user records. It does **not** by itself prove the server is running or the deployment is configured.
+- A check in the **Backend** column means the corresponding service/API behavior exists and is covered by automated backend tests. Unit tests may use mocked models; that is not evidence of a live database transaction.
+- **Only a check in the End-to-end section means complete frontend-to-backend behavior was demonstrated with genuine user data.** A checked frontend or backend item must not be described as a fully completed system flow by itself.
+- Static product content such as exercise descriptions, nutrition targets, and UI copy is not user-record mock data. Test fixtures are allowed in tests; they do not establish that production user records are live.
+- Dates appear only when a dated implementation or verification record exists. Pending live checks have no estimated completion date.
+
+## Status at a glance
+
+### Frontend implementation coverage
+
+- **Modules with all frontend criteria checked:** 13 / 17 (**76.5%**, rounded **76%**)
+- **Frontend criteria checked:** 30 / 34 (**88.2%**, rounded **88%**)
+
+<progress value="13" max="17" aria-label="13 of 17 modules meet frontend implementation criteria">13 of 17 frontend modules (76%)</progress>
+<progress value="30" max="34" aria-label="30 of 34 frontend criteria verified">30 of 34 frontend criteria (88%)</progress>
+
+### Backend implementation and automated-test coverage
+
+- **Applicable modules with all backend criteria checked:** 9 / 16 (**56.3%**, rounded **56%**); 1 system module is not applicable to the backend.
+- **Backend criteria checked:** 25 / 32 (**78.1%**, rounded **78%**)
+
+<progress value="9" max="16" aria-label="9 of 16 applicable modules meet backend implementation criteria">9 of 16 applicable backend modules (56%)</progress>
+<progress value="25" max="32" aria-label="25 of 32 applicable backend criteria verified">25 of 32 applicable backend criteria (78%)</progress>
+
+### Genuine end-to-end user-data verification
+
+- **Modules with a documented real-user-data flow:** 2 / 17 (**11.8%**, rounded **12%**)
+- **End-to-end workflows documented as verified:** 2 / 21 (**9.5%**, rounded **10%**)
+- The two checked items are backed by the live registration → login → profile creation/update/read verification recorded in Progress Report 13 (October 3, 2026). This is dated historical evidence, not a claim that a production system was re-tested on this audit date.
+- These are modules with at least one documented historical workflow, **not fully completed end-to-end modules**. Each still has an unchecked workflow, so none of the 17 modules meets the strict fully verified end-to-end completion definition yet.
+- Every other joint workflow is marked ❌ because this audit did not run it against a safe, live backend and database using a real test account.
+
+<progress value="2" max="17" aria-label="2 of 17 modules have documented genuine end-to-end verification">2 of 17 end-to-end modules (12%)</progress>
+<progress value="2" max="21" aria-label="2 of 21 genuine user-data workflows documented as verified">2 of 21 end-to-end workflows (10%)</progress>
+
+The progress bars are native HTML progress indicators. They are audit snapshots; change their values, the text totals, and the relevant checklist marks together when new verification is performed.
+
+## Quick navigation
+
+| # | Module | Frontend | Backend | Genuine end-to-end |
+|---:|---|---|---|---|
+| 1 | [Authentication and session](#1-authentication-and-session) | Partial | Verified | Verified historically |
+| 2 | [Password recovery](#2-password-recovery) | Verified | Partial | Not verified |
+| 3 | [Onboarding and profile](#3-onboarding-and-profile) | Verified | Verified | Verified historically |
+| 4 | [Home dashboard and navigation](#4-home-dashboard-and-navigation) | Verified | Verified | Not verified |
+| 5 | [Coach plan and exercise library](#5-coach-plan-and-exercise-library) | Partial | Partial | Not verified |
+| 6 | [Camera Check and pose readiness](#6-camera-check-and-pose-readiness) | Verified | Partial | Not verified |
+| 7 | [Workout session and report](#7-workout-session-and-report) | Partial | Partial | Not verified |
+| 8 | [Inactivity and emergency safety](#8-inactivity-and-emergency-safety) | Verified | Partial | Not verified |
+| 9 | [Meal scanning and food search](#9-meal-scanning-and-food-search) | Verified | Partial | Not verified |
+| 10 | [Nutrition log, water, and history](#10-nutrition-log-water-and-history) | Verified | Verified | Not verified |
+| 11 | [Quests, streaks, and leaderboard](#11-quests-streaks-and-leaderboard) | Verified | Verified | Not verified |
+| 12 | [Progress measurements](#12-progress-measurements) | Verified | Verified | Not verified |
+| 13 | [Me, settings, and preferences](#13-me-settings-and-preferences) | Verified | Verified | Not verified |
+| 14 | [Notifications](#14-notifications) | Verified | Verified | Not verified |
+| 15 | [Administrator tools](#15-administrator-tools) | Partial | Partial | Not verified |
+| 16 | [Expo Go mobile shell](#16-expo-go-mobile-shell) | Verified | Not applicable | Not verified |
+| 17 | [API and data-service reliability](#17-api-and-data-service-reliability) | Verified | Verified | Not verified |
+
+---
+
+## A. Frontend checklist
+
+**Frontend verification rule:** a capability is checked when the UI flow is present, user-specific data is loaded/saved through the API client rather than filled with sample user records, and the frontend test/build evidence covers the relevant behavior. Provider execution and hardware behavior are tracked separately.
+
+### 1. Authentication and session
+
+- [✅] Registration form, password checks, consent, duplicate-account result, and account-creation request are implemented.
+- [❌] Login/session end-to-end behavior is not re-tested against a live backend in this audit; the API client and source tests exist, but require a safe-account runtime check.
+
+### 2. Password recovery
+
+- [✅] Forgot-password UI requests, verifies, and confirms reset through backend API calls and visibly handles unavailable email delivery.
+- [✅] Code entry, paste/navigation, password confirmation, resend state, and error paths have frontend coverage; actual email delivery belongs to provider/live verification.
+
+### 3. Onboarding and profile
+
+- [✅] Calibration captures and validates the profile fields, preferences, health notes, and emergency contact.
+- [✅] Profile loading and updates use the authenticated profile API; failed loads/saves are surfaced rather than replaced with sample profile values.
+
+### 4. Home dashboard and navigation
+
+- [✅] Dashboard cards read profile, activity, meal, and progress data from app hooks backed by the API.
+- [✅] Main tab navigation and dashboard actions open the implemented feature routes.
+
+### 5. Coach plan and exercise library
+
+- [✅] Exercise-library search and exercise details load through the exercise API.
+- [❌] Coach plan personalization is not verified as a user-generated backend plan; curated plan/exercise content is not proof of a dynamically generated plan for the signed-in user.
+
+### 6. Camera Check and pose readiness
+
+- [✅] Camera preview, front/rear switching, capture, and readiness submission are wired through browser or Expo camera paths and the pose API.
+- [✅] Readiness values are rendered only when the API response contains recognized values; absent values display “Not assessed,” not a fabricated pass.
+
+### 7. Workout session and report
+
+- [✅] Start, pause, resume, and completion controls use workout API operations; the report opens only after backend completion succeeds.
+- [❌] Report sharing is unavailable in the current Expo Go flow; form-analysis and workout metrics remain unavailable without provider results.
+
+### 8. Inactivity and emergency safety
+
+- [✅] Countdown, “I'm okay,” alarm, hold-to-stop, and resolution feedback are implemented with explicit phase handling.
+- [✅] Safety events and delivery status are requested from backend APIs; the Expo native sensor/camera bridge is present in source.
+
+### 9. Meal scanning and food search
+
+- [✅] Camera capture and photo upload enter the same API-backed scan/review flow, with loading, retry, and provider-error handling.
+- [✅] Food search, scan review, and save actions use API data; no sample scan result is represented as a user's saved meal.
+
+### 10. Nutrition log, water, and history
+
+- [✅] Meal create/update/delete, scan-to-meal save, daily water, and history are wired through nutrition APIs.
+- [✅] Loading, errors, empty history, and daily totals use saved account data rather than seeded sample meals.
+
+### 11. Quests, streaks, and leaderboard
+
+- [✅] Activity, mission, badge, and streak views consume activity/settings API state.
+- [✅] Leaderboard selection and completion views are wired to the feature's account/activity data path.
+
+### 12. Progress measurements
+
+- [✅] Measurement creation, list/history, metric selection, and deletion use the progress API.
+- [✅] The UI shows a real empty state when no saved measurement exists.
+
+### 13. Me, settings, and preferences
+
+- [✅] Me/profile data is loaded from the API; personal data, goals, contact, and training preferences save through backend calls.
+- [✅] Settings and profile failures are surfaced; profile localStorage is a cache of API data, not the authoritative source.
+
+### 14. Notifications
+
+- [✅] Notification list, individual read-state updates, and mark-all-read use notifications API operations.
+- [✅] The UI renders returned notification records rather than built-in example events.
+
+### 15. Administrator tools
+
+- [✅] Admin exercise and alert/analytics views use protected APIs and display access/API errors.
+- [❌] Some analytics are knowingly unavailable because sign-in event history is not collected; the UI cannot provide that missing dataset.
+
+### 16. Expo Go mobile shell
+
+- [✅] Expo shell loads the web app and reports backend/frontend connectivity with recovery paths.
+- [✅] Web-to-native camera and inactivity bridges are implemented and mobile tests/type-check/export pass; physical-device behavior is not established by those checks.
+
+### 17. API and data-service reliability
+
+- [✅] Frontend API client resolves runtime/LAN base URLs, sends available auth, handles failures, and clears expired sessions.
+- [✅] User-facing components expose loading/error/unavailable states for service-backed data instead of silently substituting sample user records.
+
+---
+
+## B. Backend checklist
+
+**Backend verification rule:** checked items have backend implementation and automated test evidence. Unit tests that mock Mongo models verify service logic and ownership rules; they do not prove that a deployed MongoDB, provider, or email service is reachable.
+Backend criteria that do not apply to a frontend/native-shell module are labeled **N/A** and excluded from the backend progress denominator.
+
+### 1. Authentication and session
+
+- [✅] Registration/login routes, password handling, JWT issuance, and protected current-user endpoint are implemented and covered by backend tests.
+- [✅] Authenticated endpoints identify the user from the verified JWT rather than trusting a client-supplied owner ID.
+
+### 2. Password recovery
+
+- [✅] Recovery codes are hashed, expiring, single-use, account-neutral, and rate-limited by service logic.
+- [❌] Production email delivery is not confirmed; configure `EMAIL_DELIVERY_URL` and `EMAIL_DELIVERY_API_KEY`, then verify receipt and reset on a real test account.
+
+### 3. Onboarding and profile
+
+- [✅] Profile create/read/update/delete and validation routes are implemented with user ownership checks.
+- [✅] Partial profile updates preserve untouched fields; Progress Report 13 records a prior live database verification of profile round-trips.
+
+### 4. Home dashboard and navigation
+
+- [✅] Profile, activity, nutrition, progress, and notification endpoints needed by dashboard views are registered in the backend.
+- [✅] User data endpoints derive ownership from the authenticated account and have service/API test coverage.
+
+### 5. Coach plan and exercise library
+
+- [✅] Public exercise-catalog queries and role-protected exercise administration routes are implemented and tested.
+- [❌] A personalized workout-plan generation service is not established as a backend capability; curated catalog data should not be presented as a generated personal plan.
+
+### 6. Camera Check and pose readiness
+
+- [✅] Pose status and authenticated analysis endpoints validate request types, including readiness-check metadata.
+- [❌] Actual analysis depends on `POSE_ANALYSIS_URL` and `POSE_ANALYSIS_API_KEY`; provider readiness response shape/availability is not verified against deployment.
+
+### 7. Workout session and report
+
+- [✅] Workout session create/list/pause/complete operations persist through the workout service and enforce user ownership.
+- [❌] Actual form scoring, calorie estimation, and personal-record analysis require a configured pose-analysis provider and are not verified.
+
+### 8. Inactivity and emergency safety
+
+- [✅] Safety-event create/resolve and admin listing endpoints enforce owner/admin access; event state has automated tests.
+- [❌] Contact notification delivery is not confirmed; configure `ALERT_DELIVERY_URL` and `ALERT_DELIVERY_API_KEY` and test provider-confirmed delivery.
+
+### 9. Meal scanning and food search
+
+- [✅] Scan/search APIs validate input, return structured errors, enforce limits/deadlines, and save matched items without zero-calorie fabricated entries.
+- [❌] Live recognition/food-data execution is not verified; `GEMINI_API_KEY` and USDA service configuration must be supplied and tested with real images/queries.
+
+### 10. Nutrition log, water, and history
+
+- [✅] User-owned meal and water reads/writes, edit/delete behavior, and scan-import ownership are implemented and tested.
+- [✅] Empty nutrition state is returned without seeding sample meals.
+
+### 11. Quests, streaks, and leaderboard
+
+- [✅] User activity/quest state and notification-related activity routes are implemented and tested.
+- [✅] Mission progress is derived from saved activity rather than trusting client-submitted completion claims.
+
+### 12. Progress measurements
+
+- [✅] Measurement create/list/delete operations validate bounds/units and scope records to the authenticated user.
+- [✅] Automated tests cover ownership, empty histories, and invalid measurements.
+
+### 13. Me, settings, and preferences
+
+- [✅] Profile and settings APIs persist updates and return merged user-owned state.
+- [✅] Validation and partial-update handling have automated coverage; the profile live test is separately identified in the joint section.
+
+### 14. Notifications
+
+- [✅] Notification list, mark-one, and mark-all operations are implemented as authenticated API routes.
+- [✅] Backend test coverage checks the activity/notification service paths.
+
+### 15. Administrator tools
+
+- [✅] Admin alert, analytics, and exercise-management APIs are protected by the administrator role and have test coverage.
+- [❌] Active-user/retention analytics based on sign-ins cannot be verified or supplied because sign-in history is not collected.
+
+### 16. Expo Go mobile shell
+
+*N/A — the Expo shell is a frontend/native wrapper; it has no dedicated backend module. Its physical-device behavior is tracked in the frontend and joint checklists.*
+
+### 17. API and data-service reliability
+
+- [✅] DTO validation, JWT guards, request context, structured scanner errors, limits, and timeout paths have backend implementation/test coverage.
+- [✅] Backend production build and automated backend suite pass; a passing build is not a production database/provider connectivity test.
+
+---
+
+## C. Joint frontend-to-backend checklist
+
+**Strict end-to-end rule:** check an item only with evidence that a real user action traversed the frontend, reached the running API, wrote or retrieved that user's real persisted data, and displayed the returned result. Source inspection, frontend tests with mocked responses, backend unit tests with mocked models, and a production build are not end-to-end evidence.
+
+### 1. Authentication and session
+
+- [✅] **Verified historically (October 3, 2026):** register → login → authenticated profile creation/update → reload and confirm the returned account data, as documented in [Progress Report 13](../ProgressReports/PROGRESS-13.md).
+- [❌] Re-run the complete signup/login/session/logout path against the current safe test deployment; no fresh live run was performed for this checklist.
+
+### 2. Password recovery
+
+- [❌] Request an email, receive its code, verify it, change the password, and log in with the new password against a configured email provider.
+
+### 3. Onboarding and profile
+
+- [✅] **Verified historically (October 3, 2026):** create profile, save partial profile updates, then GET and confirm saved and untouched fields through the running backend/database; see [Progress Report 13](../ProgressReports/PROGRESS-13.md).
+- [❌] Re-run calibration/profile CRUD against the current safe test deployment and verify the signed-in account sees its persisted values.
+
+### 4. Home dashboard and navigation
+
+- [❌] Change user-owned activity/nutrition/progress data through the API and confirm the dashboard reload reflects that same user's current persisted records.
+
+### 5. Coach plan and exercise library
+
+- [❌] Verify exercise catalog API data appears in the UI for a real user; separately verify whether a personalized plan is implemented (currently not established).
+
+### 6. Camera Check and pose readiness
+
+- [❌] Capture a real camera frame, receive structured readiness results from the deployed pose provider, and verify full-body, lighting, and distance values in the UI.
+
+### 7. Workout session and report
+
+- [❌] Start, pause/resume, complete, then reload a workout report and confirm its session values from the same user's database record.
+- [❌] Verify report sharing and provider-backed form analysis; report sharing is currently unavailable and analysis is unconfigured/unverified.
+
+### 8. Inactivity and emergency safety
+
+- [❌] On a real phone, trigger/cancel/resolve an inactivity event and verify matching persisted event state.
+- [❌] Verify actual emergency-contact delivery and delivery status using a configured provider and test contact.
+
+### 9. Meal scanning and food search
+
+- [❌] Submit a real meal image to configured vision/USDA providers, review returned results, save matched items, and reload the resulting user's meal log.
+
+### 10. Nutrition log, water, and history
+
+- [❌] Add/edit/delete real account meals, change water, and reload history from the running backend/database; automated tests alone do not prove this full deployed round-trip.
+
+### 11. Quests, streaks, and leaderboard
+
+- [❌] Perform qualifying account activity, persist it, reload quest/streak state, and verify the resulting leaderboard against real user records.
+
+### 12. Progress measurements
+
+- [❌] Create a real account measurement, reload it in history, delete it, and verify it is absent from the backend response.
+
+### 13. Me, settings, and preferences
+
+- [❌] Update account settings/profile in the frontend, reload the application, and verify the current user's persisted values on the running service.
+
+### 14. Notifications
+
+- [❌] Verify real notification records load and read-state changes persist for the same authenticated account.
+
+### 15. Administrator tools
+
+- [❌] Verify an actual admin account can retrieve/manage allowed records and a non-admin is denied; source/unit tests are not a deployed role-authorization check.
+
+### 16. Expo Go mobile shell
+
+- [❌] Exercise frontend↔API connectivity, camera switching, permissions, accelerometer, location, and alarm behavior on physical Android and iOS devices.
+
+### 17. API and data-service reliability
+
+- [❌] Run a safe deployment smoke test covering authentication, database connection, authorized user data, and provider configuration. Local builds/tests do not certify live deployment.
+
+**Joint status:** 2 modules have documented historical real-user-data evidence; 15 modules do not have such evidence in this audit. Unchecked means **not demonstrated here**, not necessarily a confirmed defect.
+
+---
+
+## Automated verification run for the code-level audit
+
+| Check | Result | What it proves (and does not prove) |
+|---|---|---|
+| Frontend test suite (`node --test tests/*.test.mjs`, from `frontend/`) | Passed: 52/52 | Frontend source/behavior guards; some tests inspect source or use mocked responses. Not a live service run. |
+| Backend Vitest suite (`npm test`, from `backend/`) | Passed: 30 files, 246/246 tests | Backend validation and service behavior; many tests mock provider/model boundaries. Not proof of production credentials or a live MongoDB round-trip. |
+| Frontend production build (`npm run build`, from `frontend/`) | Passed | Compilation, types, and static route generation only. |
+| Backend production build (`npm run build`, from `backend/`) | Passed | Backend compilation only. |
+| Expo state/connectivity tests (`node --test connection.test.mjs inactivity/inactivity.test.mjs`, from `mobile/`) | Passed: 20/20 | Pure native state/connectivity behavior; not device hardware. |
+| Expo TypeScript check (`npx tsc --noEmit --project tsconfig.json`, from `mobile/`) | Passed | Type correctness only. |
+| Expo Android/iOS export | Passed on 2026-10-12 | Bundling only; not camera/sensor/device acceptance. |
+
+## Remaining live verification plan
+
+Run the joint section against a **safe staging/test deployment**, not an unapproved production database. Use a dedicated test account and test emergency contact. For each unchecked item, record the run date, frontend build/deployment, API environment, test-account identifier (non-sensitive), observed persisted result, and any provider/device versions. Only then change `[❌]` to `[✅]`, update dates and all six progress elements, and revise the README summary if needed.

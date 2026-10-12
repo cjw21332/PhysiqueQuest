@@ -2,6 +2,13 @@
 
 A responsive, mobile-first fitness application with a Next.js frontend, Expo Go WebView shell, NestJS API, and MongoDB Atlas persistence for authentication and user profiles.
 
+## System status
+
+**[Open the full system functionality checklist](./docs/checklist.md)** for all 17 modules, specific completed and outstanding functions, verification dates, and progress totals.
+
+- The checklist reports frontend implementation, backend implementation/test coverage, and genuine end-to-end user-data verification separately.
+- Only the end-to-end section indicates a demonstrated frontend-to-backend flow; its checked items refer to historical evidence, not a fresh production run.
+
 ## Run locally
 
 Install root dependencies with `npm install`. Start the backend from `backend/` with `npm install` and `npm run start:dev`; start the frontend with `npm run dev` from the root. Start Expo Go with `npm run expo` from a third terminal. Configure MongoDB and JWT environment variables in `backend/.env`; keep secrets out of client environment files.
@@ -40,6 +47,7 @@ See [PROGRESS-10.md](./ProgressReports/PROGRESS-10.md) and [PROGRESS-11.md](./Pr
 
 ## Documentation
 
+- [System functionality checklist](./docs/checklist.md) — module inventory, function-level status, verification evidence, and progress bars.
 - [docs/superpowers/](./docs/superpowers/) — cross-project design specs and implementation plans.
 - [docs/mobile/](./docs/mobile/) — Expo Go reliability design and mobile plans.
 - [ProgressReports/](./ProgressReports/) — numbered progress reports.

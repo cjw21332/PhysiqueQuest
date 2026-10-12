@@ -5,7 +5,13 @@ import { ConfigService } from '@nestjs/config';
 export class PoseAnalysisProvider {
   constructor(private readonly config: ConfigService) {}
   isAvailable() { return Boolean(this.config.get<string>('POSE_ANALYSIS_URL') && this.config.get<string>('POSE_ANALYSIS_API_KEY')); }
-  async analyze(payload: { mediaBase64: string; mimeType: string; durationSeconds?: number }) {
+  async analyze(payload: {
+    mediaBase64: string;
+    mimeType: string;
+    analysisType?: 'workout' | 'readiness';
+    requestedChecks?: ('fullBodyInFrame' | 'lighting' | 'distance')[];
+    durationSeconds?: number;
+  }) {
     const endpoint = this.config.get<string>('POSE_ANALYSIS_URL');
     const apiKey = this.config.get<string>('POSE_ANALYSIS_API_KEY');
     if (!endpoint || !apiKey) throw new Error('Pose provider is not configured');

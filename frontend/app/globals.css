@@ -35,6 +35,23 @@
   --sal:var(--safe-left,env(safe-area-inset-left,0px));
   --sar:var(--safe-right,env(safe-area-inset-right,0px));
 }
+.camera-facing-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 12px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid rgba(255,255,255,.62);
+  border-radius: 999px;
+  background: rgba(25,34,51,.72);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.camera-facing-toggle:disabled { opacity: .55; cursor: wait; }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{
   margin:0;padding:0;width:100%;height:100%;
@@ -43,6 +60,8 @@ html,body{
   overflow:hidden;-webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
 }
+.coach-view-session .inactivity-countdown,
+.coach-view-session .emergency-alarm { flex: 0 0 100%; }
 body{min-height:100dvh;position:relative}
 .scene{
   width:100%;height:100dvh;
@@ -4697,7 +4716,7 @@ body{min-height:100dvh}
 
 /* Live session takes over the Coach area, like the reference workout screen. */
 .coach-view-session { background: #101827; }
-.coach-view-session > .coach-scroll { width: 100%; max-width: var(--content-max); display: flex; padding: 0; background: #101827; }
+.coach-view-session > .coach-scroll { position: relative; width: 100%; max-width: var(--content-max); height: 100%; min-height: 0; flex: 1 1 0; display: flex; overflow: hidden; padding: 0; background: #101827; }
 .live-session {
   width: 100%;
   min-height: 0;
@@ -6821,8 +6840,8 @@ iframe[src*="notification"] {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1);
 }
+.camera-preview video.front-facing { transform: scaleX(-1); }
 .camera-preview:not(.camera-on) video { display: none; }
 .camera-off {
   position: absolute;
@@ -6906,6 +6925,40 @@ iframe[src*="notification"] {
   color: var(--ink);
 }
 .readiness-row b { font-size: 13px; font-weight: 400; color: var(--muted); }
+.readiness-row > span { display: inline-flex; align-items: center; gap: 9px; }
+.readiness-row > span i {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e9efea;
+  color: #66736a;
+}
+.readiness-row.ready > span i { background: #7ee582; color: #123b19; }
+.readiness-row.ready > b { color: #176a30; }
+.readiness-row.adjust > span i { background: #fff0d9; color: #8d5511; }
+.readiness-row.adjust > b { color: #8d5511; }
+.readiness-row.unknown > b { color: var(--muted); }
+.readiness-retry {
+  min-height: 36px;
+  margin-top: 9px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.readiness-retry:disabled { opacity: .6; cursor: wait; }
+.camera-facing-toggle:focus-visible,
+.readiness-retry:focus-visible {
+  outline: 3px solid #27733b;
+  outline-offset: 2px;
+}
 .camera-note { margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
 .upload-dropzone {
   min-height: 330px;
@@ -6970,8 +7023,8 @@ iframe[src*="notification"] {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1);
 }
+.coach-view-session .live-camera.front-facing { transform: scaleX(-1); }
 .coach-view-session .live-camera-off {
   position: absolute;
   inset: 0;
@@ -7079,3 +7132,238 @@ iframe[src*="notification"] {
 .coach-view-session .live-time-card small { font-size: 11px; color: var(--muted); }
 .coach-view-session .live-time-card b { font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; }
 .coach-view-session .live-video .exercise-label { right: 12px; bottom: 12px; }
+
+/* Inactivity safety screens replace the live workout, rather than sitting inside it. */
+.coach-view-session .coach-scroll { padding: 0; }
+.coach-view-session .inactivity-view {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: max(16px, var(--sat)) clamp(22px, 7vw, 38px) max(18px, var(--sab));
+  font-family: inherit;
+  text-align: center;
+}
+.coach-view-session .inactivity-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f4f7f4;
+  color: var(--ink);
+}
+.inactivity-ring {
+  position: relative;
+  display: grid;
+  width: clamp(142px, 23vh, 180px);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  place-items: center;
+  margin: clamp(18px, 4vh, 34px) 0 0;
+}
+.inactivity-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.inactivity-ring svg circle:last-child { transition: stroke-dashoffset 0.35s linear; }
+.inactivity-ring-label { display: grid; gap: 0; justify-items: center; }
+.inactivity-ring-label b {
+  color: #151e2e;
+  font-size: clamp(38px, 7vh, 48px);
+  font-weight: 750;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.inactivity-ring-label span { color: #526075; font-size: 12px; }
+.inactivity-kicker {
+  margin: clamp(18px, 3.5vh, 28px) 0 3px;
+  color: #c9251c;
+  font-size: 13px;
+  font-weight: 600;
+}
+.inactivity-question {
+  margin: 0;
+  color: #151e2e;
+  font-size: clamp(25px, 5vw, 30px);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+.inactivity-copy {
+  max-width: 350px;
+  margin: 10px 0 0;
+  color: #526075;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.inactivity-notice {
+  display: flex;
+  width: 100%;
+  max-width: 420px;
+  align-items: flex-start;
+  gap: 11px;
+  margin-top: clamp(18px, 3.5vh, 26px);
+  padding: 15px;
+  border-radius: 15px;
+  background: #fff;
+  text-align: left;
+}
+.inactivity-notice > svg { flex: 0 0 auto; color: #d9231b; }
+.inactivity-notice p { margin: 0; color: #192233; font-size: 12px; line-height: 1.55; }
+.inactivity-notice b { font-weight: 700; }
+.inactivity-ok {
+  width: 100%;
+  max-width: 420px;
+  min-height: 54px;
+  flex: 0 0 auto;
+  margin-top: auto;
+  border: 0;
+  border-radius: 14px;
+  background: #7ee582;
+  color: #14231a;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.inactivity-ok:focus-visible,
+.alarm-hold:focus-visible,
+.alarm-finish:focus-visible {
+  outline: 3px solid #27733b;
+  outline-offset: 3px;
+}
+.inactivity-footnote { margin: 9px 0 0; color: #526075; font-size: 11px; line-height: 1.4; }
+.coach-view-session .emergency-alarm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  overflow-y: auto;
+  background: #a11a12;
+  color: #fff;
+  text-align: center;
+}
+.alarm-bell {
+  display: grid;
+  width: 74px;
+  height: 74px;
+  flex: 0 0 auto;
+  place-items: center;
+  margin-top: clamp(3px, 1.5vh, 14px);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+}
+.alarm-state { margin: 15px 0 7px; color: #f5d6d3; font-size: 12px; }
+.alarm-title { margin: 0; color: #fff; font-size: clamp(25px, 5.5vw, 30px); font-weight: 750; letter-spacing: -0.025em; }
+.alarm-copy { max-width: 410px; margin: 10px 0 16px; color: #ffe6e2; font-size: 13px; line-height: 1.55; }
+.alarm-card {
+  display: grid;
+  width: 100%;
+  max-width: 440px;
+  gap: 6px;
+  padding: 13px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.13);
+  text-align: left;
+}
+.alarm-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #f8d5d1; font-size: 11px; }
+.alarm-contact { color: #fff; font-size: 15px; }
+.alarm-card > small { color: #ffe5e2; font-size: 11px; line-height: 1.4; }
+.coach-view-session .alarm-badge {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.coach-view-session .alarm-badge.delivered { background: #ffffff2b; }
+.coach-view-session .alarm-badge.failed { background: #53150f; }
+.alarm-hold,
+.alarm-finish {
+  position: relative;
+  display: grid;
+  width: 100%;
+  max-width: 440px;
+  min-height: 52px;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  margin-top: 13px;
+  border: 0;
+  border-radius: 13px;
+  background: #fff;
+  color: #a11a12;
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.alarm-hold { touch-action: none; user-select: none; }
+.alarm-hold-fill {
+  position: absolute;
+  inset: 0;
+  background: #f4aaa3;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.alarm-hold-label { position: relative; z-index: 1; }
+.alarm-hint { margin: 9px 0 0; color: #ffe2de; font-size: 11px; }
+.alarm-error {
+  width: 100%;
+  max-width: 440px;
+  margin: 10px 0 0;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.alarm-finish { margin-top: 13px; }
+.alarm-finish:disabled { opacity: 0.7; cursor: wait; }
+.alarm-log {
+  width: 100%;
+  max-width: 440px;
+  margin-top: auto;
+  padding: 13px;
+  border-radius: 15px;
+  background: #fff;
+  color: #192233;
+  text-align: left;
+}
+.alarm-log-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.alarm-log-head b { font-size: 12px; }
+.alarm-log-head > span { color: #526075; font-size: 10px; }
+.alarm-log-state { margin: 10px 0 2px; color: #526075; font-size: 11px; }
+.alarm-log-list { margin: 0; padding: 0; list-style: none; }
+.alarm-log-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  min-height: 52px;
+  border-top: 1px solid #edf0ed;
+}
+.alarm-log-list li > span:first-child { display: grid; min-width: 0; gap: 3px; }
+.alarm-log-list b { color: #192233; font-size: 11px; }
+.alarm-log-list small { overflow: hidden; color: #526075; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.alarm-log-badge { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; background: #fff0ed; color: #a11a12; font-size: 9px; }
+.alarm-log-badge.resolved { background: #eaf7ec; color: #176a30; }
+.alarm-log-badge.false-alarm { background: #eef1f2; color: #526075; }
+@media (max-height: 700px) {
+  .inactivity-ring { width: clamp(125px, 20vh, 150px); margin-top: 8px; }
+  .inactivity-kicker { margin-top: 12px; }
+  .inactivity-notice { margin-top: 12px; padding: 12px; }
+  .alarm-bell { width: 58px; height: 58px; }
+  .alarm-state { margin-top: 9px; }
+  .alarm-copy { margin: 7px 0 10px; }
+  .alarm-log { margin-top: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inactivity-ring svg circle:last-child { transition: none; }
+}

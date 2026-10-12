@@ -56,6 +56,14 @@ export type AlertRecord = {
   flagged?: boolean;
 };
 
+export type PoseAnalysisInput = {
+  mediaBase64: string;
+  mimeType: 'video/mp4' | 'video/quicktime' | 'image/jpeg' | 'image/png';
+  analysisType?: 'workout' | 'readiness';
+  requestedChecks?: ('fullBodyInFrame' | 'lighting' | 'distance')[];
+  durationSeconds?: number;
+};
+
 export type AdminAlertRow = {
   id: string;
   userName: string;
@@ -392,7 +400,7 @@ class ApiClient {
   }
 
   async getPoseStatus() { return this.request<any>('/pose/status'); }
-  async analyzePose(data: any) { return this.request<any>('/pose/analyze', { method: 'POST', body: JSON.stringify(data), timeoutMs: 60000 }); }
+  async analyzePose(data: PoseAnalysisInput) { return this.request<unknown>('/pose/analyze', { method: 'POST', body: JSON.stringify(data), timeoutMs: 60000 }); }
   async pauseWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/pause`, { method: 'PATCH', body: JSON.stringify(data) }); }
   async completeWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/complete`, { method: 'POST', body: JSON.stringify(data) }); }
 

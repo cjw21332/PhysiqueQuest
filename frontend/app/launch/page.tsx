@@ -71,7 +71,7 @@ export default function LaunchPage() {
     try {
       if (isNativeBridgeAvailable()) {
         window.ReactNativeWebView?.postMessage(JSON.stringify({ type: 'request-camera-permission' }));
-        setNotice('Android camera permission request sent. Approve it to enable camera features.');
+        setNotice('Phone camera permission request sent. Approve it to enable camera features.');
         return;
       }
       if (!navigator.mediaDevices?.getUserMedia) {

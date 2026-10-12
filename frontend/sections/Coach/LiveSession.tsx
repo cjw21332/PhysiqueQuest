@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../Home/icons';
 import type { Exercise } from './exercises';
 import { InactivityCountdown, EmergencyAlarm } from './InactivityViews';
@@ -44,17 +44,34 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [phase, setPhase] = useState<Phase>('active');
+  const phaseRef = useRef<Phase>('active');
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const [alert, setAlert] = useState<{ id: string; status: 'pending' | 'delivered' | 'failed' | 'cancelled'; errorCode?: string; locationShared: boolean; resolved: boolean } | null>(null);
   const [recordedAt, setRecordedAt] = useState('');
   const [motionAvailable, setMotionAvailable] = useState<boolean | null>(null);
-  const camera = useCameraStream();
+  const [canViewAdmin, setCanViewAdmin] = useState(false);
+  const [adminAccessError, setAdminAccessError] = useState('');
+  const [stopError, setStopError] = useState('');
+  const [stopPending, setStopPending] = useState(false);
+  const [finishBusy, setFinishBusy] = useState(false);
+  const alarmStopRequested = useRef(false);
+  const time = `${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;
+  const changePhase = (nextPhase: Phase) => {
+    phaseRef.current = nextPhase;
+    setPhase(nextPhase);
+  };
+  const camera = useCameraStream({
+    screen: 'live-session',
+    exerciseName: exercise.name,
+    equipment: exercise.equipment,
+    elapsed: time,
+  });
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || phase !== 'active') return;
     const id = window.setInterval(() => setSeconds(s => s + 1), 1000);
     return () => window.clearInterval(id);
-  }, [paused]);
+  }, [paused, phase]);
 
   // Countdown ticks down locally once the host reports it started; the host decides when it ends.
   useEffect(() => {
@@ -63,18 +80,40 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
     return () => window.clearInterval(id);
   }, [phase]);
 
+  useEffect(() => {
+    let active = true;
+    api.getAuthMe()
+      .then(user => {
+        if (!active) return;
+        setCanViewAdmin(user.role === 'admin');
+        setAdminAccessError('');
+      })
+      .catch(() => {
+        if (!active) return;
+        setCanViewAdmin(false);
+        setAdminAccessError('Administrator access could not be verified. The alert log is unavailable.');
+      });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (phase !== 'active') camera.stop();
+    else if (camera.shouldAutoStart && camera.status === 'idle') void camera.start();
+  }, [camera.start, camera.status, camera.stop, camera.shouldAutoStart, phase]);
+
   // Native host events arrive through the WebView bridge.
   useEffect(() => {
     const onNative = (event: Event) => {
       const detail = (event as CustomEvent<NativeEvent>).detail;
       if (!detail) return;
       if (detail.type === 'motion-status') setMotionAvailable(detail.available);
-      if (detail.type === 'countdown-started') { setCountdown(COUNTDOWN_SECONDS); setPhase('countdown'); }
+      if (detail.type === 'countdown-started' && phaseRef.current === 'active') { setCountdown(COUNTDOWN_SECONDS); changePhase('countdown'); }
       if (detail.type === 'cancelled') {
-        setPhase('active');
+        if (phaseRef.current !== 'countdown') return;
+        changePhase('active');
         void api.sendInactivityEvent({ idempotencyKey: newKey(), eventType: 'cancelled', workoutSessionId: workoutId }).catch(() => undefined);
       }
-      if (detail.type === 'alarm') void raiseAlarm(detail.location);
+      if (detail.type === 'alarm' && phaseRef.current === 'countdown') void raiseAlarm(detail.location);
       if (detail.type === 'stopped') stopSound();
     };
     window.addEventListener('physiquequest-inactivity', onNative);
@@ -94,14 +133,13 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thresholdSeconds]);
 
-  const time = `${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;
-
   const playSound = () => startAlarm();
   const stopSound = () => stopAlarm();
 
   async function raiseAlarm(location: Extract<NativeEvent, { type: 'alarm' }>['location']) {
+    alarmStopRequested.current = false;
     playSound();
-    setPhase('alarm');
+    changePhase('alarm');
     setRecordedAt(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
     const key = newKey();
     try {
@@ -113,34 +151,64 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         ...(location ? { location } : {}),
       });
       setAlert({
-        id: String(record._id ?? record.id),
+        id: record._id ?? record.id ?? '',
         status: record.status,
         errorCode: record.errorCode,
         locationShared: Boolean(location),
         resolved: false,
       });
+      if (alarmStopRequested.current) await resolveAlert(record._id ?? record.id ?? '');
     } catch {
       setAlert({ id: '', status: 'failed', errorCode: 'DELIVERY_NOT_CONFIRMED', locationShared: Boolean(location), resolved: false });
+      if (alarmStopRequested.current) {
+        setStopPending(false);
+        setStopError('The alert could not be confirmed by the server. Keep this screen open and contact your administrator.');
+      }
     }
   }
+
+  const resolveAlert = async (alertId: string) => {
+    if (!alertId) {
+      setStopPending(false);
+      setStopError('The alert could not be confirmed by the server. Keep this screen open and contact your administrator.');
+      return;
+    }
+    try {
+      await api.resolveSafetyAlert(alertId);
+      setAlert(current => current ? { ...current, resolved: true } : current);
+      setStopError('');
+    } catch (err) {
+      setStopError(err instanceof Error ? err.message : 'Could not record the stop. Hold again to retry.');
+    } finally {
+      setStopPending(false);
+    }
+  };
 
   const holdComplete = async () => {
     postToHost({ type: 'inactivity-hold-stop' });
     stopSound();
-    if (alert?.id) {
-      try {
-        await api.resolveSafetyAlert(alert.id);
-        setAlert({ ...alert, resolved: true });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Could not record the stop.');
-      }
+    alarmStopRequested.current = true;
+    setStopPending(true);
+    setStopError('');
+    if (alert?.id) await resolveAlert(alert.id);
+  };
+
+  const finishSession = async () => {
+    setFinishBusy(true);
+    setStopError('');
+    try {
+      await onEnd(seconds);
+    } catch (err) {
+      setStopError(err instanceof Error ? err.message : 'Could not save the workout.');
+    } finally {
+      setFinishBusy(false);
     }
-    setPhase('active');
   };
 
   const imOkay = () => {
     postToHost({ type: 'inactivity-im-okay' });
-    setPhase('active');
+    changePhase('active');
+    void api.sendInactivityEvent({ idempotencyKey: newKey(), eventType: 'cancelled', workoutSessionId: workoutId }).catch(() => undefined);
   };
 
   const togglePause = async () => {
@@ -170,7 +238,13 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         errorCode={alert?.errorCode}
         locationShared={alert?.locationShared ?? false}
         resolved={alert?.resolved ?? false}
+        canViewAdmin={canViewAdmin}
+        adminAccessError={adminAccessError}
+        stopError={stopError}
+        finishing={finishBusy}
+        stopping={stopPending}
         onHoldComplete={() => void holdComplete()}
+        onFinishSession={finishSession}
       />
     );
   }
@@ -181,12 +255,17 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         <span className="session-meta">{exercise.name}</span>
         <b className="session-time" aria-label="Elapsed time">{time}</b>
       </header>
-      <div className="live-video">
-        <video ref={camera.videoRef} className="live-camera" autoPlay muted playsInline />
+      <div ref={camera.frameRef} className="live-video">
+        <video ref={camera.videoRef} className={`live-camera ${camera.facing === 'front' ? 'front-facing' : ''}`} autoPlay muted playsInline style={camera.nativePreview ? { opacity: 0 } : undefined} />
         {camera.status !== 'on' && <div className="live-scene" aria-hidden="true" />}
         <span className="form-score"><Icon name="shield" size={14}/> Form analysis unavailable</span>
         <div className="live-time-card"><small>Elapsed</small><b>{time}</b></div>
         <div className="exercise-label"><small>{exercise.equipment}</small><b>{exercise.name}</b></div>
+        {camera.status === 'on' && !camera.nativePreview && (
+          <button type="button" className="camera-facing-toggle" onClick={camera.switchFacing} aria-label={`Switch to ${camera.facing === 'back' ? 'front' : 'back'} camera`}>
+            {camera.facing === 'back' ? 'Front camera' : 'Back camera'}
+          </button>
+        )}
       </div>
       {camera.status !== 'on' && (
         <div className="live-camera-action">
