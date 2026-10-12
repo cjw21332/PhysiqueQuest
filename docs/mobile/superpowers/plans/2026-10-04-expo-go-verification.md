@@ -31,7 +31,7 @@
 
 **Files:**
 - Modify: `README.md`, `RUNNING.md`
-- Update only if implementation changes a command/contract: connectivity and feature plan docs under `mobile/docs/superpowers/plans/`
+- Update only if implementation changes a command/contract: connectivity and feature plan docs under `docs/mobile/superpowers/plans/`
 
 - [x] Run `npm run` at repository root, `npm run` in `backend/`, and inspect `mobile/package.json`; record only scripts that exist.
 - [x] Run backend/frontend/mobile build checks from their actual package contexts and record exact commands/results.

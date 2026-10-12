@@ -254,7 +254,7 @@ frontend/
     └── login/page.tsx                      # Updated login flow
 
 documentation/
-└── progress-10.md                          # This file
+└── PROGRESS-10.md                          # This file
 ```
 
 ## Testing Results

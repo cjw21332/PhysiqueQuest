@@ -147,18 +147,18 @@ These collections are currently active in MongoDB Atlas:
 
 | Document type / collection | Implemented fields | Lifecycle and access |
 |:--|:--|:--|
-| `users` (authentication) | `_id` (ObjectId); `email` (string, unique, indexed, lowercase normalized); `name` (string); `passwordHash` (string, bcrypt with 10 rounds); `isActive` (boolean, default true); `createdAt` (Date); `updatedAt` (Date) | Identity domain owns writes. Email is unique and case-insensitive. Password validation enforced: 8-15 characters, 1 uppercase, 1 lowercase, 1 number. JWT tokens issued with 7-day expiration. |
-| `profiles` (user profile data) | `_id` (ObjectId); `userId` (ObjectId, ref users); `name` (string); `age` (string); `height` (string); `heightInches` (string, optional); `heightUnit` ('cm' \| 'ft & in.'); `weight` (string); `weightUnit` ('kg' \| 'lbs'); `gender` ('Male' \| 'Female' \| 'Other'); `chest` (string, optional); `chestUnit` ('cm' \| 'inch', optional); `waist` (string, optional); `waistUnit` ('cm' \| 'inch', optional); `arms` (string, optional); `armsUnit` ('cm' \| 'inch', optional); `measurementUnit` ('cm' \| 'inch', optional legacy shared unit); `activity` ('Sedentary' \| 'Light' \| 'Moderate' \| 'Active' \| 'Athlete'); `goal` (string, max 80 chars); `targetWeight` (string, optional); `targetDate` (date string, optional); `seriousness` (string, max 40 chars); `equipment` (array of strings); `days` (array of strings); `duration` (string, max 30 chars); `conditions` (array of strings); `healthNotes` (string, optional, max 500 chars); `contactName` (string, max 100 chars); `contactPhone` (string, formatted as 0999-999-9999, max 30 chars); `createdAt` (Date); `updatedAt` (Date) | Profile domain owns writes. Linked to user via userId reference. Created after user registration. Phone numbers formatted as Philippine mobile: 0999-999-9999. All fields validated with class-validator DTOs. Health data and emergency contacts included but require additional access controls for production. |
+| `users` (authentication) | `_id` (ObjectId); `email` (string, unique, lowercase, trimmed); `name` (string); `passwordHash` (string, bcrypt with 10 rounds, `select: false`); `isActive` (boolean, default true); `role` (`user` \| `admin`, default `user`); `failedLoginAttempts` (number, default 0); `lockoutUntil` (Date \| null, default null); `createdAt` (Date); `updatedAt` (Date) | Identity domain owns writes. Email is unique. Password validation enforced: 8-15 characters, 1 uppercase, 1 lowercase, 1 number. JWT tokens issued with `JWT_EXPIRES_IN` (default `7d`). Five failed logins set `lockoutUntil` 15 minutes ahead (`auth.service.ts`). |
+| `profiles` (user profile data) | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `name` (string, required); `age`, `height`, `weight` (strings, required); `heightInches` (string, optional); `heightUnit` (`cm` \| `ft & in.`); `weightUnit` (`kg` \| `lbs`); `gender` (string, required); `chest`, `waist`, `arms` (strings, optional) with `chestUnit`, `waistUnit`, `armsUnit` (`cm` \| `inch`, optional); `measurementUnit` (`cm` \| `inch`, optional legacy shared unit); `activity` (string, required); `goal` (string, required); `targetWeight`, `targetDate` (strings, optional); `seriousness` (string, required); `equipment`, `days` (string arrays, required); `duration` (string, required); `conditions` (string array, default `[]`); `healthNotes` (string, default `''`); `contactName`, `contactPhone` (strings, required); `contactRelationship` (string, optional); `createdAt`, `updatedAt` (Date) | Profile domain owns writes. Linked to user via `userId` reference (unique). Created after user registration. Enum constraints exist only for unit fields in the schema; value ranges and formats (for example the `0999-999-9999` phone format and `gender`/`activity` choices) are enforced by the class-validator DTOs, not the schema. Health data and emergency contacts require additional access controls for production. |
 | `nutrition` (meals + water) | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `meals: MealEntry[]` (`id`, `name`, `meal`, `calories`, `detail`, `time`, `source`, `protein`, `carbs`, `fat`, `date`); `water: WaterEntry[]` (`date`, `glasses`) | Nutrition domain owns writes. One document per user holding all meals and water entries. |
-| `workout_sessions` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed); session fields, sets/reps/load, outcomes | Training domain owns writes. |
-| `progress_entries` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed); `metric`, `value`, `unit`, `occurredAt` | Progress domain owns writes. |
+| `workout_sessions` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed, non-unique); `exerciseIds` (string array); `startedAt` (Date); `endedAt`, `pausedAt` (Date, optional); `pausedSeconds` (number, default 0); `status` (`active` \| `completed`, default `active`); `durationSeconds` (number, optional); `exerciseResults` (embedded: `exerciseId`, `reps`, `loadKg?`); `createdAt`, `updatedAt` | Training domain owns writes. Results are embedded because they are bounded per session and share its lifecycle. |
+| `progress_entries` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed, non-unique); `metric` (`weight` \| `waist` \| `benchPress`); `value` (number, 0.1–1000); `unit` (`kg` \| `lb` \| `cm` \| `in`); `measuredAt` (Date, required); `createdAt`, `updatedAt` | Progress domain owns writes. `measuredAt` is the measurement time, separate from write time. |
 | `settings` | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `values: Record<string, unknown>` | Settings domain owns writes. |
 | `activity` | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `state: Record<string, unknown>` (quest progress, level, streak, points) | Engagement domain owns writes. |
-| `notifications` | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `items: NotificationItem[]` | Engagement domain owns writes. |
-| `safety_alert_events` | `_id` (ObjectId); `userId` (ObjectId, ref users); alert fields | Safety domain owns writes. |
-| `password_recovery_tokens` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed); `tokenHash` (unique, `select: false`, SHA-256); `expiresAt` (TTL 0); `usedAt` (Date \| null) | Auth domain owns writes. One-time use, expiry, never stores plaintext. |
-| `admin_exercises` | `_id` (ObjectId); `name` (maxlength 80); `group`; admin-managed fields | Admin domain owns writes. |
-| `exercise` | `_id` (ObjectId); public exercise library fields | Admin domain owns writes; read by the public exercise library. |
+| `notifications` | `_id` (ObjectId); `userId` (ObjectId, ref users, unique); `items` (embedded `NotificationItem[]`: `id`, `icon`, `title`, `subtitle` (default ''), `body`, `time`, `group`, `unread` (default true)) | Engagement domain owns writes. |
+| `safety_alert_events` | `_id` (ObjectId); `userId` (ObjectId, ref users); `idempotencyKey`; `eventType` (`manual`); `status` (`pending` \| `delivered` \| `failed`); `errorCode`, `providerReference` (optional); `occurredAt` (Date) | Safety domain owns writes. Compound unique index on `{ userId, idempotencyKey }` makes retries safe. |
+| `password_recovery_tokens` | `_id` (ObjectId); `userId` (ObjectId, ref users, indexed); `tokenHash` (unique, `select: false`, SHA-256); `expiresAt` (TTL, `expires: 0`); `usedAt` (Date \| null, default null) | Auth domain owns writes. One-time use, expiry, never stores plaintext. |
+| `admin_exercises` (`exercises/schemas`) | `_id` (ObjectId); `name` (max 80); `slug`; `group`; `status` (`draft` \| `published`, default `draft`); `pose` (`missing` \| `ready` \| `training`, default `missing`); `targetMuscle`, `equipment`, `difficulty`, `pictureUrl`, `videoUrl`, `trackingStatus`; `instructions` (string array) | Admin domain owns writes. Indexes on `targetMuscle`, `equipment`, and `{ status, pose }`. |
+| `exercises` (`exercise/exercise.schema.ts`, default collection name) | `_id` (ObjectId); `name` (required, unique); `targetMuscle`, `equipment`, `difficulty` (required strings); `pictureUrl`, `videoUrl` (optional); `instructions` (string array); `trackingStatus` (default `Manual`) | Read by the public exercise library. Confirm which exercise model each module writes to before adding fields; two exercise schemas coexist. |
 
 **Collections NOT yet implemented (future work):**
 - `sessions` - Session management with refresh tokens
@@ -171,13 +171,10 @@ These collections are currently active in MongoDB Atlas:
 
 Indexes defined or ensured by the backend:
 
-- **users collection:**
-  - Unique index on `email` (case-insensitive, enforced at application level with `.toLowerCase()`)
-  - Index on `_id` (default MongoDB primary key)
-  
-- **profiles collection:**
-  - Index on `userId` (for user-to-profile lookups)
-  - Index on `_id` (default MongoDB primary key)
+- **users collection:** unique index on `email` (schema `lowercase: true` normalizes the value before insert).
+- **profiles collection:** unique index on `userId` (one profile per user).
+- **password_recovery_tokens collection:** index on `userId`, unique index on `tokenHash`, and TTL index on `expiresAt`.
+- **Other user-owned collections:** `nutrition`, `settings`, `activity`, and `notifications` have unique `userId`. `workout_sessions`, `progress_entries`, and `safety_alert_events` (compound unique on `{ userId, idempotencyKey }`) are indexed by owner. `workout_sessions` and `progress_entries` `userId` indexes are non-unique.
 
 **Future indexes needed:**
 - `sessions`: Index on `userId` with revocation/expiry lookups, unique index on token hash
@@ -368,7 +365,7 @@ Most current user-owned domains already use backend APIs and models. For a new d
 - [ ] Are schemas/version changes and migrations safe, repeatable, and backward-compatible?
   - **Initial schema v1.0, no migrations yet - to be addressed in future versions**
 - [x] Do indexes match bounded, paginated access patterns and uniqueness requirements?
-  - **Unique email index, userId reference indexes implemented on users, profiles, progress_entries, workout_sessions, and password_recovery_tokens**
+  - **Unique email on users; unique userId on profiles, nutrition, settings, activity, notifications; non-unique userId on progress_entries, workout_sessions, and password_recovery_tokens; compound unique on safety_alert_events.**
 - [ ] Are retries, duplicate requests, concurrent updates, and partial failures handled?
   - **Duplicate email handled; concurrent profile updates need optimistic locking; activity/settings updates are single-document upserts**
 - [ ] Are database credentials private, least-privilege, environment-specific, and rotated?

@@ -34,6 +34,13 @@ Registration, login, profiles, nutrition, settings, notifications, workout sessi
 
 ## Progress report
 
-See [PROGRESS.md](./PROGRESS.md) for the initial onboarding handoff, [PROGRESS-2.md](./PROGRESS-2.md) for Home, [PROGRESS-3.md](./PROGRESS-3.md) for Coach, [PROGRESS-4.md](./PROGRESS-4.md) for Scan, [PROGRESS-5.md](./PROGRESS-5.md) for Quests, and [PROGRESS-6.md](./PROGRESS-6.md) for Me.
+All reports live in [ProgressReports/](./ProgressReports/). See [PROGRESS.md](./ProgressReports/PROGRESS.md) for the initial onboarding handoff, [PROGRESS-2.md](./ProgressReports/PROGRESS-2.md) for Home, [PROGRESS-3.md](./ProgressReports/PROGRESS-3.md) for Coach, [PROGRESS-4.md](./ProgressReports/PROGRESS-4.md) for Scan, [PROGRESS-5.md](./ProgressReports/PROGRESS-5.md) for Quests, and [PROGRESS-6.md](./ProgressReports/PROGRESS-6.md) for Me.
 
-See [progress-10.md](./progress-10.md) and [PROGRESS-11.md](./PROGRESS-11.md) for backend integration, unit-aware profile persistence, and Expo Go improvements.
+See [PROGRESS-10.md](./ProgressReports/PROGRESS-10.md) and [PROGRESS-11.md](./ProgressReports/PROGRESS-11.md) for backend integration, unit-aware profile persistence, and Expo Go improvements.
+
+## Documentation
+
+- [docs/superpowers/](./docs/superpowers/) — cross-project design specs and implementation plans.
+- [docs/mobile/](./docs/mobile/) — Expo Go reliability design and mobile plans.
+- [ProgressReports/](./ProgressReports/) — numbered progress reports.
+- `backend/scripts/` — one-off maintenance scripts (for example `delete-user.ts`).

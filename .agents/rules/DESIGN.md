@@ -66,6 +66,18 @@ Core colors are CSS custom properties in `frontend/app/globals.css`. Reuse these
 | `--line` | #e8ede9 | Borders, dividers, separators, input focus states |
 | `--green` | #7ee582 | Primary actions, progress indicators, success states, selected controls |
 | `--green-dark` | #167336 | Text on green surfaces, secondary brand accents, dark mode alternative |
+| `--green-light` | #eefaf0 | Tinted green surfaces (brand mark, colored cards) |
+| `--green-alt` | #80e687 | Alternate green used in existing components; prefer `--green` for new work |
+| `--bg-secondary` | #f4f7f4 | Secondary page fill (same value as `--soft`) |
+| `--bg-tertiary` | #f9faf9 | Tertiary fill for subtle layering |
+| `--text-secondary` | #344256 | Secondary body text between `--ink` and `--muted` |
+| `--focus-ring` | #7ee58265 | Translucent green focus/outline fill |
+| `--orange-light` / `--orange-mid` / `--orange-dark` | #fff5e5 / #ed641e / #bc4d13 | Warning surfaces and text |
+| `--red-light` / `--red-line` / `--red-dark` | #fff0f0 / #f8d7d7 / #e4433a | Error surfaces, borders, and text |
+| `--blue-light` / `--blue-dark` | #f0f9ff / #176a30 | Information surfaces (note: `--blue-dark` holds a green value; treat its name as legacy) |
+| `--gray-light` / `--gray-mid` / `--gray-dark` | #f3f6f4 / #8793a1 / #536071 | Neutral utility grays |
+
+These extended tokens are declared in `frontend/app/globals.css` `:root` and are the only palette variables to use. Do not add new palette variables without approval.
 
 **Semantic Colors** (already in stylesheet, use instead of defining new ones):
 - Error/danger: `#e53935` / `#bd3030` (red tones)
@@ -154,10 +166,11 @@ System fonts only. Do not add web fonts or custom typefaces.
 All signed-in content (Home, Coach, Scan, Quests, Me) uses a shared, centered frame to maintain visual consistency across the product.
 
 **Responsive Content Widths:**
-- **Narrow phones** (< 380px): Full width minus `12px–16px` gutters per side
-- **Mobile** (380–700px): Full width minus `clamp(16px, 3vw, 32px)` gutters per side
-- **Tablet** (700–1024px): Centered at `max-width: 800px` with `clamp(24px, 4vw, 48px)` gutters
-- **Desktop** (≥ 1024px): Centered at `max-width: 1000px` with `clamp(32px, 5vw, 64px)` gutters
+- **Narrow phones** (≤ 390px): Full width with reduced horizontal padding (about `15–18px` per side, per the `@media (max-width: 390px)` rules in `globals.css`)
+- **Mobile** (391px and up): Full width with the section's own padding
+- **Tablet** (700px and up): Centered at `max-width: 800px` in the section containers (Coach, Me, Quests, Scan)
+- **Desktop** (1024px and up): Centered at `max-width: 1000px` in the same containers
+- **Shared tokens:** `--content-max: 1000px` and `--content-gutter: clamp(16px, 4vw, 40px)` are declared in `globals.css` and used by the shared content frame. Prefer these tokens for new layout work.
 
 **Vertical Spacing:**
 Use `clamp()` for responsive vertical spacing tied to viewport height:
@@ -174,6 +187,9 @@ The app reserves safe-area insets at all edges. On Expo WebView, native code pub
 --sal: var(--safe-left, env(safe-area-inset-left, 0px));
 --sar: var(--safe-right, env(safe-area-inset-right, 0px));
 ```
+`globals.css` declares these twice: once in the top `:root` block (with the `--safe-*` fallback above) and again in a later `:root` block (around line 878) that uses plain `env()` and also sets `--pad-x`. The later declaration wins for the plain `env()` form, so the `--safe-*` override from native code is ignored there. Treat this duplication as a known issue. Do not add a third declaration; consolidate to the first form when the file is next edited.
+
+The shared `--pad-x` token (`clamp(16px, 4vw, 40px)`) is set in the same later block and widens at tablet and desktop breakpoints (`clamp(24px, 4vw, 48px)` and `clamp(32px, 5vw, 72px)`).
 
 **Safe Area Rules:**
 - Apply each inset once per element—do not stack insets on parent and child
@@ -245,12 +261,14 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 
 **Primary Action Button** (`.primary`):
 - Background: `var(--green)` (#7ee582)
-- Text: Dark (#0d2212)
+- Text: `#0d2212` (dark green-black, hard-coded in `.primary`)
 - Min height: `clamp(48px, 8vh, 62px)` (touch-safe)
 - Border radius: `clamp(10px, 2vw, 15px)`
+- Font: `clamp(13px, 2vw, 16px)`, weight 700
 - Use for: CTAs, form submission, "Next", "Start Workout", "Save"
-- Hover state: `filter: brightness(0.97)` (subtle darken)
-- Active state: `transform: translateY(-1px)` (micro-elevation)
+- Hover state: `filter: brightness(.96)`, `translateY(-2px)`, green glow shadow
+- Active state: `transform: scale(0.96)`
+- Disabled: `opacity: 0.6`, no transform or shadow
 
 **Secondary Action Button** (`.secondary`):
 - Background: White
@@ -258,7 +276,8 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 - Text: `var(--ink)` (#192233)
 - Min height: `clamp(48px, 8vh, 62px)`
 - Use for: Alternatives, "Cancel", "Back", optional actions
-- Hover state: None or subtle background lighten
+- Hover state: `filter: brightness(.98)`, `translateY(-2px)`, background `#fafbfa`, soft shadow
+- Active state: `transform: scale(0.96)`
 
 **Link Button** (text-only):
 - Background: transparent
@@ -272,8 +291,8 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 - Border radius: `11px`
 - Min height: 44px
 - Padding: `0 12px`
-- Focus state: `outline: 2px solid #7ee58265` + `border-color: #70cf75`
-- Placeholder: `#a1aaba`
+- Focus state: `.focus-within:focus-within` applies `outline: 2px solid #7ee58265` + `border-color: #70cf75`
+- Placeholder: `#a1aaba` (hard-coded in `globals.css`)
 - All inputs use system font stack, 13–16px, inherit font properties
 
 **Form Field Labels:**
@@ -329,11 +348,12 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 
 **Focus Visible State:**
 ```css
-:focus-visible {
-  outline: 2px solid var(--green);
+.focus-ring:focus-visible {
+  outline: 2px solid #7ee582; /* --green */
   outline-offset: 2px;
 }
 ```
+- Components also set their own focus outlines; `.eye:focus-visible` and `.input-wrap select:focus-visible` use `#7ee582`, and `.eye-toggle:focus-visible` uses `var(--green-dark)`
 - Never remove default focus indicators without providing a replacement
 - Focus ring must be visible on all interactive elements
 
@@ -372,17 +392,19 @@ Keep animations brief and purposeful:
 
 **Z-Index Hierarchy:**
 - `z-index: 1`: In-view sticky elements, form footers
-- `z-index: 100`: Main navigation (tab bar), modal backdrops
-- `z-index: 110`: Toast notifications, popovers (above modals)
-- `z-index: 120`: System alerts or critical overlays (use sparingly)
+- `z-index: 100`: Section headers (`.quest-header`, `.me-header`), the sticky bottom nav (`.home-bottom-nav`), and other persistent chrome
+- `z-index: 110`: Toast notifications (`.quest-toast`, `.me-toast`, toast rules in `globals.css`) and popovers
+- `z-index: 120`: Full-viewport overlays, such as the auth outcome modal (`.auth-outcome-overlay`). Use sparingly.
+
+The `globals.css` header comment still reads "100=overlays, 110=modals"; the values above are authoritative.
 
 Do not raise page controls above a modal layer to solve clipping issues; fix the modal z-index instead.
 
 ### Modals & Overlays
 
 **Modal Backdrop:**
-- Background: Semi-transparent dark (`rgba(0, 0, 0, 0.4)`)
-- Position: Fixed, full viewport coverage
+- Background: Semi-transparent dark navy `rgba(21, 29, 46, 0.48)` with `backdrop-filter: blur(1px)` (`.auth-outcome-overlay`)
+- Position: Fixed, full viewport coverage, `z-index: 120`
 - Dismissible: Keyboard (Escape) and touch (backdrop click)
 
 **Modal Dialog:**

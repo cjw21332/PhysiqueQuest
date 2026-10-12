@@ -7,7 +7,8 @@
 ## 1. Architecture & Monorepo Structure
 
 - This is an **npm workspaces monorepo** with two workspace packages: `frontend/` and `mobile/`. `backend/` is a separately managed NestJS service (own `package.json`, installed and run from `backend/`), and `food-scanner/` is an internal-only external service with its own repo.
-- **NEVER** create files outside these packages (except root config files like `package.json`, `.gitignore`, `GEMINI.md`, `PROGRESS-*.md`, `README.md`).
+- **NEVER** create files outside these packages (except root config files like `package.json`, `.gitignore`, `GEMINI.md`, `README.md`, and the `ProgressReports/` and `docs/` folders).
+- Repository layout (overrides prior placement rules): progress reports live in `ProgressReports/` as `PROGRESS-N.md`; design specs and plans live in `docs/` (`docs/superpowers/`, `docs/mobile/`); one-off maintenance scripts live in `backend/scripts/`.
 - **NEVER** install dependencies at the root. Use `--workspace frontend` or `--workspace mobile`.
 - The `frontend/app/frontend/` directory exists for legacy routing reasons. Do NOT create new routes there.
 
@@ -179,8 +180,8 @@ Every section component MUST:
 - **ALWAYS read the file** before editing. Never edit blind.
 - **ALWAYS preserve existing comments and code** unrelated to the fix.
 - When fixing a bug: (1) identify the root cause, (2) explain the fix before applying, (3) verify no regressions.
-- **NEVER** delete or rename existing PROGRESS-*.md files.
-- When making significant changes, create or update the next `PROGRESS-N.md` file.
+- Progress reports may be reorganized, renamed, or moved when the user requests it, but their content must be preserved. Keep them in `ProgressReports/` using the `PROGRESS-N.md` naming.
+- When making significant changes, create or update the next `ProgressReports/PROGRESS-N.md` file.
 - **NEVER** clear `globals.css` or rewrite it from scratch — it is 3600+ lines and accumulated over 7 iterations.
 
 ## 10. Build & Dev Commands
@@ -213,6 +214,6 @@ Every section component MUST:
 - ❌ Do NOT use Pages Router patterns (like `getServerSideProps`).
 - ❌ Do NOT introduce server components for routes that need client interactivity — use `'use client'`.
 - ❌ Do NOT use `any` for new code — add proper TypeScript types. (Existing `any` usage in route pages is tech debt to be cleaned up later.)
-- ❌ Do NOT delete or overwrite `PROGRESS-*.md` files.
+- ❌ Do NOT delete or overwrite existing `ProgressReports/PROGRESS-*.md` content without user approval (reorganizing or renaming is allowed when requested).
 - ❌ Do NOT modify the root `package.json` workspace config.
 - ❌ Do NOT create API routes until the `backend/` package is set up.
