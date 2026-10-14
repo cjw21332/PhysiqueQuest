@@ -1,14 +1,16 @@
 'use client';
 
 import { Icon } from '../Home/icons';
+import CalorieProgress from '../Home/CalorieProgress';
 import { mealNames, nutritionTargets, type FoodEntry, type MealName } from './types';
+import { summarizeHistory } from './nutritionPresentation';
 
 const calorieTarget = nutritionTargets.calories;
 const macroTargets = { Protein: nutritionTargets.protein, Carbs: nutritionTargets.carbs, Fats: nutritionTargets.fats };
-const ringCircumference = 2 * Math.PI * 43;
 
 export default function NutritionDashboard({
   meals,
+  historyMeals = meals,
   water,
   onScan,
   onAdd,
@@ -16,6 +18,7 @@ export default function NutritionDashboard({
   onHistory,
 }: {
   meals: FoodEntry[];
+  historyMeals?: FoodEntry[];
   water: number;
   onScan: () => void;
   onAdd: (meal: MealName) => void;
@@ -26,7 +29,7 @@ export default function NutritionDashboard({
   const protein = meals.reduce((sum, item) => sum + item.protein, 0);
   const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
   const fats = meals.reduce((sum, item) => sum + item.fat, 0);
-  const calorieProgress = Math.min(100, Math.max(0, (calories / calorieTarget) * 100));
+  const historyAverage = summarizeHistory(historyMeals, 7).average;
 
   return (
     <div className="scan-dashboard">
@@ -38,25 +41,11 @@ export default function NutritionDashboard({
       </header>
 
       <section className="scan-dashboard-summary" aria-label="Today's nutrition">
-        <div className="scan-dashboard-calorie-ring" role="img" aria-label={`${Math.round(calories)} of ${calorieTarget} calories today`}>
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <circle className="scan-ring-track" cx="50" cy="50" r="43" />
-            <circle
-              className="scan-ring-progress"
-              cx="50"
-              cy="50"
-              r="43"
-              strokeDasharray={ringCircumference}
-              strokeDashoffset={ringCircumference * (1 - calorieProgress / 100)}
-            />
-          </svg>
-          <span className="scan-ring-value">{Math.round(calories).toLocaleString()}</span>
-          <span className="scan-ring-target">of {calorieTarget.toLocaleString()} kcal</span>
-        </div>
+        <CalorieProgress calories={calories} target={calorieTarget}/>
 
         <div className="scan-dashboard-macros">
           <p className="scan-calories-remaining">
-            <strong>{Math.max(0, Math.round(calorieTarget - calories)).toLocaleString()} kcal</strong> remaining
+            <strong>{Math.max(0, calorieTarget - Math.round(calories)).toLocaleString()} kcal</strong> remaining
           </p>
           <MacroBar label="Protein" current={protein} target={macroTargets.Protein} />
           <MacroBar label="Carbs" current={carbs} target={macroTargets.Carbs} />
@@ -65,7 +54,7 @@ export default function NutritionDashboard({
       </section>
 
       <button type="button" className="scan-dashboard-scan" onClick={onScan}>
-        <span className="scan-dashboard-scan-icon"><Icon name="scan" size={22} /></span>
+        <span className="scan-dashboard-scan-icon"><Icon name="camera" size={22} /></span>
         <span className="scan-dashboard-scan-copy">
           <strong>Scan your meal</strong>
           <small>Snap your plate — we&apos;ll estimate the macros</small>
@@ -102,8 +91,8 @@ export default function NutritionDashboard({
           <Icon name="arrow" size={16} />
         </button>
         <button type="button" className="scan-dashboard-link" onClick={onHistory}>
-          <span className="scan-dashboard-link-icon history"><Icon name="trend" size={19} /></span>
-          <span><strong>Food history</strong><small>Review your saved meals</small></span>
+          <span className="scan-dashboard-link-icon history"><Icon name="chart-bars" size={19} /></span>
+          <span><strong>Food history</strong><small>{historyAverage ? `7-day average ${historyAverage.toLocaleString()} kcal` : 'Review your saved meals'}</small></span>
           <Icon name="arrow" size={16} />
         </button>
       </section>

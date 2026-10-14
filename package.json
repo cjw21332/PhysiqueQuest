@@ -1,6 +1,7 @@
 {
   "name": "physique-quest",
   "private": true,
+  "main": "mobile/index.ts",
   "scripts": {
     "dev": "npm run dev --workspace frontend",
     "expo": "npm run start --workspace mobile",

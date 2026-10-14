@@ -1,6 +1,7 @@
 'use client';
 
 import { Icon } from '../Home/icons';
+import CalorieProgress from '../Home/CalorieProgress';
 import { mealNames, nutritionTargets, type FoodEntry, type MealName } from './types';
 
 type DailyLogProps = {
@@ -9,17 +10,16 @@ type DailyLogProps = {
   onBack: () => void;
   onHistory: () => void;
   onAdd: (meal: MealName) => void;
+  onEdit: (entries: FoodEntry[]) => void;
   onWater: (value: number) => void;
 };
 
-const ringCircumference = 2 * Math.PI * 43;
 
-export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onWater }: DailyLogProps) {
+export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdit, onWater }: DailyLogProps) {
   const calories = meals.reduce((sum, item) => sum + item.calories, 0);
   const protein = meals.reduce((sum, item) => sum + item.protein, 0);
   const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
   const fats = meals.reduce((sum, item) => sum + item.fat, 0);
-  const calorieProgress = Math.min(100, Math.max(0, (calories / nutritionTargets.calories) * 100));
 
   return (
     <>
@@ -32,29 +32,11 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onWat
       </header>
 
       <section className="target-log-summary" aria-label="Today's calories and nutrition targets">
-        <div
-          className="target-log-ring"
-          role="img"
-          aria-label={`${Math.round(calories).toLocaleString()} of ${nutritionTargets.calories.toLocaleString()} calories`}
-        >
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <circle className="target-log-ring-track" cx="50" cy="50" r="43" />
-            <circle
-              className="target-log-ring-progress"
-              cx="50"
-              cy="50"
-              r="43"
-              strokeDasharray={ringCircumference}
-              strokeDashoffset={ringCircumference * (1 - calorieProgress / 100)}
-            />
-          </svg>
-          <strong>{Math.round(calories).toLocaleString()}</strong>
-          <small>of {nutritionTargets.calories.toLocaleString()} kcal</small>
-        </div>
+        <CalorieProgress calories={calories} target={nutritionTargets.calories}/>
 
         <div className="target-log-macros">
           <p className="target-log-remaining">
-            <strong>{Math.max(0, Math.round(nutritionTargets.calories - calories)).toLocaleString()} kcal</strong> remaining
+            <strong>{Math.max(0, nutritionTargets.calories - Math.round(calories)).toLocaleString()} kcal</strong> remaining
           </p>
           <MacroProgress label="Protein" current={protein} target={nutritionTargets.protein} />
           <MacroProgress label="Carbs" current={carbs} target={nutritionTargets.carbs} />
@@ -72,14 +54,14 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onWat
             const entries = meals.filter((item) => item.meal === meal);
             const total = entries.reduce((sum, item) => sum + item.calories, 0);
             const names = entries.map((item) => item.name).join(' · ');
-            const times = entries.map((item) => `${item.source} · ${item.time}`).join(' · ');
+            const times = entries.map((item) => [item.source === 'Scanned' ? 'Scanned' : 'Manual', item.edited ? 'edited' : '', item.time].filter(Boolean).join(' · ')).join(' / ');
 
             return (
               <article className="target-log-meal" key={meal}>
-                <div className="target-log-meal-copy">
-                  <p><strong>{meal}</strong>{names && <> · {names}</>}</p>
-                  <small>{times || 'Not logged yet'}</small>
-                </div>
+                {entries.length ? <button type="button" className="target-log-meal-copy target-log-meal-edit" onClick={() => onEdit(entries)} aria-label={`Edit ${meal}: ${names}`}>
+                  <p><strong>{meal}</strong>{names && <> · {names}</>} <Icon name="edit" size={13}/></p>
+                  <small>{times}</small>
+                </button> : <div className="target-log-meal-copy"><p><strong>{meal}</strong></p><small>No logged yet</small></div>}
                 {entries.length
                   ? <strong className="target-log-meal-calories">{Math.round(total).toLocaleString()} kcal</strong>
                   : <button
@@ -112,7 +94,7 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onWat
                 aria-pressed={filled}
                 onClick={() => onWater(glass === water ? glass - 1 : glass)}
               >
-                <Icon name="water" size={15} />
+                <Icon name="glass" size={15} />
               </button>
             );
           })}

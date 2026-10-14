@@ -1,131 +1,77 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api } from '../../lib/api';
+import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../Home/icons';
+import { filterLibrary, libraryEquipment, libraryMuscles, libraryPreview, type LibraryExercise } from './libraryPreview';
 
-const MUSCLES = ['All', 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'];
-const EQUIPMENT = ['Any equipment', 'Dumbbells', 'Bodyweight', 'Resistance bands', 'Full gym'];
-
-type ExerciseItem = {
-  _id?: string;
-  name: string;
-  targetMuscle?: string;
-  equipment?: string;
-  difficulty?: string;
-  trackingStatus?: string;
-  pictureUrl?: string;
-  videoUrl?: string;
-  instructions?: string[];
-  slug?: string;
-};
-
-export default function ExerciseLibrary({ onBack, selectedEquipment }: { onBack: () => void; selectedEquipment: string[] }) {
-  const [exercises, setExercises] = useState<ExerciseItem[]>([]);
+export default function ExerciseLibrary({ onBack }: { onBack: () => void; selectedEquipment: string[] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState('All');
-  const initialEquipment = selectedEquipment[0] === 'Dumbbells' ? 'Dumbbells' : 'Any equipment';
-  const [equipmentState, setEquipmentState] = useState(initialEquipment);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<ExerciseItem | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const fetchExercises = useCallback(async (q: string, m: string, e: string) => {
-    setLoading(true);
-    try {
-      const data = await api.getExercises({
-        search: q || undefined,
-        muscle: m === 'All' ? undefined : m,
-        equipment: e === 'Any equipment' ? undefined : e,
-        page: 1,
-        limit: 100,
-      });
-      setExercises(data?.items ?? []);
-    } catch {
-      setExercises([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const [equipment, setEquipment] = useState('Dumbbells');
+  const [selected, setSelected] = useState<LibraryExercise | null>(null);
+  const [mediaNotice, setMediaNotice] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const openerRef = useRef<HTMLButtonElement | null>(null);
+  const exercises = filterLibrary(libraryPreview, searchTerm, selectedMuscle, equipment);
 
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => fetchExercises(searchTerm.trim(), selectedMuscle, equipmentState === 'Any equipment' ? initialEquipment : equipmentState), 300);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [searchTerm, selectedMuscle, equipmentState, fetchExercises, initialEquipment]);
+    if (!selected) return;
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => { dialog?.close(); openerRef.current?.focus(); };
+  }, [selected]);
 
-  const handleSelect = (ex: ExerciseItem) => {
-    setSelected(ex);
-  };
+  const closeSheet = () => setSelected(null);
+  const showMediaNotice = () => setMediaNotice(true);
 
   return (
-    <>
-      <header className="coach-header">
-        <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
+    <div className="coach-library">
+      <header className="coach-header library-header">
+        <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button>
         <h2>Exercise library</h2>
       </header>
-
       <label className="library-search">
-        <Icon name="scan" size={16}/>
-        <input placeholder="Search Exercise" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}/>
-        {searchTerm && <button onClick={() => setSearchTerm('')} aria-label="Clear search">×</button>}
+        <Icon name="search" size={19}/>
+        <input type="search" aria-label="Search Exercise" placeholder="Search Exercise" value={searchTerm} onChange={event => setSearchTerm(event.target.value)}/>
+        {searchTerm && <button type="button" onClick={() => setSearchTerm('')} aria-label="Clear search"><Icon name="close" size={16}/></button>}
       </label>
-
-      <div className="filter-row">
-        {MUSCLES.map(item => (
-          <button key={item} className={selectedMuscle === item ? 'selected' : ''} onClick={() => setSelectedMuscle(item)}>{item}</button>
-        ))}
+      <div className="filter-row" role="group" aria-label="Muscle group">
+        {libraryMuscles.map(item => <button type="button" key={item} aria-pressed={selectedMuscle === item} onClick={() => setSelectedMuscle(item)}><span>{item}</span></button>)}
       </div>
-
-      <div className="filter-row equipment-filters">
-        {EQUIPMENT.map(item => (
-          <button key={item} className={equipmentState === item ? 'selected' : ''} onClick={() => setEquipmentState(item)}>{item}</button>
-        ))}
+      <div className="filter-row equipment-filters" role="group" aria-label="Equipment">
+        {libraryEquipment.map(item => <button type="button" key={item} aria-pressed={equipment === item} onClick={() => setEquipment(item)}><span>{item}</span></button>)}
       </div>
-
-      <p className="result-count">{loading ? 'Loading...' : `${exercises.length} results`}</p>
-
-      <div className="library-list" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+      <div className="library-caption"><p className="result-count" role="status">{exercises.length} results</p><span className="library-sample-label">Sample library</span></div>
+      <div className="library-list">
         {exercises.map(item => (
-          <button className="library-item" key={item._id || item.name} onClick={() => handleSelect(item)}>
-            <span className="exercise-thumb">
-              {item.pictureUrl ? <img src={item.pictureUrl} alt={item.name} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} /> : <Icon name="dumbbell" size={22}/>}
-              <i>▶</i>
-            </span>
-            <span className="library-copy">
-              <b>{item.name}</b>
-              <small>{item.targetMuscle || '—'} · {item.equipment || '—'} · {item.difficulty || '—'}</small>
-            </span>
-            <span className={`tracking-tag ${item.trackingStatus === 'Caution' ? 'caution' : item.trackingStatus === 'Manual' ? 'manual' : ''}`}>{item.trackingStatus || 'Manual'}</span>
+          <button type="button" className="library-item" key={item.name} aria-haspopup="dialog" onClick={event => { openerRef.current = event.currentTarget; setMediaNotice(false); setSelected(item); }}>
+            <span className="exercise-thumb"><Icon name="library-dumbbells" size={24}/><i><Icon name="play" size={8}/></i></span>
+            <span className="library-copy"><b>{item.name}</b><small>{item.muscle} · {item.equipment} · {item.level}</small></span>
+            <span className={`tracking-tag ${item.tag === 'Caution' ? 'caution' : item.tag === 'Manual' ? 'manual' : ''}`}>{item.tag === 'Caution' && <Icon name="warning" size={11}/>} {item.tag}</span>
           </button>
         ))}
-        {!loading && !exercises.length && <div className="empty-library">No exercises match those filters.</div>}
+        {!exercises.length && <div className="empty-library"><p>No exercises match those filters.</p><button type="button" className="secondary" onClick={() => { setSearchTerm(''); setSelectedMuscle('All'); setEquipment('Any equipment'); }}>Reset filters</button></div>}
       </div>
-
       {selected && (
-        <div className="coach-overlay" role="dialog" aria-modal="true" aria-label={`${selected.name} details`}>
-          <div className="exercise-sheet" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
-            <button className="sheet-close" onClick={() => setSelected(null)} aria-label="Close">×</button>
-            {selected.videoUrl ? (
-              <video src={selected.videoUrl} autoPlay loop muted playsInline style={{ width: '100%', maxHeight: 240, borderRadius: 12, background: '#0f172a' }} />
-            ) : selected.pictureUrl ? (
-              <img src={selected.pictureUrl} alt={selected.name} style={{ width: '100%', maxHeight: 240, objectFit: 'cover', borderRadius: 12, display: 'block', background: '#334155' }} />
-            ) : (
-              <div style={{ width: '100%', height: 160, background: '#1e293b', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>No media</div>
-            )}
-            <h3>{selected.name}</h3>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{selected.targetMuscle} · {selected.equipment} · {selected.difficulty}</p>
-            <span className={`tracking-tag ${selected.trackingStatus === 'Caution' ? 'caution' : selected.trackingStatus === 'Manual' ? 'manual' : ''}`}>{selected.trackingStatus || 'Manual'}</span>
-
-            <h4 style={{ marginTop: '1rem', fontWeight: 600 }}>Instructions</h4>
-            <ol style={{ paddingLeft: '1.2rem', lineHeight: 1.6, fontSize: '0.9rem' }}>
-              {(selected.instructions || []).map((step, i) => <li key={i}>{step}</li>)}
-            </ol>
-
-            <button className="primary" onClick={() => setSelected(null)}>Add to today plan</button>
-          </div>
-        </div>
+        <dialog ref={dialogRef} className="library-dialog" aria-labelledby="library-exercise-title" aria-describedby="library-preview-note" onCancel={closeSheet} onClick={event => { if (event.target === event.currentTarget) closeSheet(); }}>
+          <article className="exercise-sheet library-exercise-sheet">
+            <header className="library-sheet-header">
+              <div><h3 id="library-exercise-title">{selected.name}</h3><p>{selected.muscle} · {selected.equipment} · {selected.level}</p></div>
+              <button type="button" className="sheet-close" onClick={closeSheet} aria-label="Close exercise details" autoFocus><Icon name="close" size={18}/></button>
+            </header>
+            <div className={`library-video ${selected.poster ? 'library-video-bench' : 'library-video-placeholder'}`}>
+              {selected.poster ? <img className="library-reference-poster" src={selected.poster} alt="Sample dumbbell bench press video preview"/> : <span className="library-video-unavailable"><Icon name="library-dumbbells" size={40}/><small>Video coming soon</small></span>}
+              <button type="button" className="library-video-play" onClick={showMediaNotice} aria-label="Play exercise video preview"><Icon name="play" size={22}/></button>
+              <div className="library-video-controls"><button type="button" onClick={showMediaNotice} aria-label="Play exercise video preview"><Icon name="play" size={12}/></button><span className="library-video-track" aria-hidden="true"/><span>0:00 / {selected.poster ? '0:42' : '—'}</span></div>
+            </div>
+            {mediaNotice && <p className="library-media-notice" role="status">Sample preview only. Exercise video playback is not connected yet.</p>}
+            <div className="library-recommendation"><span>Recommended <b>{selected.recommended}</b></span><span className={selected.tag === 'Caution' ? 'library-form-caution' : 'library-form-label'}><Icon name={selected.tag === 'Caution' ? 'warning' : 'coach'} size={15}/>{selected.tag === 'Caution' ? 'Caution' : 'AI form tracking'}</span></div>
+            <section className="library-instructions"><h4>How to do it</h4><ol>{selected.instructions.map((step, index) => <li key={step}><span>{index + 1}</span><p>{step}</p></li>)}</ol></section>
+            <section className="library-form-checks"><h4>What the AI checks</h4><ul>{selected.checks.map(check => <li key={check}><Icon name="check-circle" size={16}/><span>{check}</span></li>)}</ul></section>
+            <p id="library-preview-note" className="library-preview-note">Sample preview · AI form tracking is not connected.</p>
+          </article>
+        </dialog>
       )}
-    </>
+    </div>
   );
 }

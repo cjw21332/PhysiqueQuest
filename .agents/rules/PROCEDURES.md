@@ -36,7 +36,7 @@ The web app is the source of product UI. Do not create parallel native screens i
 | /me | Profile, safety, privacy, settings, and admin tools (Exercise Library, Engagement Analytics — admin role) |
 | /exercises | Public exercise library |
 
-The five signed-in tabs are Home, Coach, Scan, Quests, and Me. Quests has its own `/quests` route and tab. The `/exercises` route serves the public exercise library; admin exercise management and analytics are separate, role-gated tools. Most detail screens are internal section state, not separate routes. Use the existing section controller and an explicit back callback for nested views.
+The five signed-in tabs are Home, Coach, Scan, Quests, and Me. Quests has its own `/quests` route and tab. The `/exercises` route serves the public exercise library. Me's exercise-management and analytics mock previews are visible to all signed-in accounts; live admin endpoints remain role-protected. Most detail screens are internal section state, not separate routes. Use the existing section controller and an explicit back callback for nested views.
 
 ### Current implementation and prototype boundaries
 
@@ -44,7 +44,7 @@ The five signed-in tabs are Home, Coach, Scan, Quests, and Me. Quests has its ow
 - Password reset has request, verify, and confirm endpoints with hashed, expiring, one-time codes. Email delivery requires `EMAIL_DELIVERY_URL` and `EMAIL_DELIVERY_API_KEY`; a no-email code response is restricted to development and must never be exposed in production.
 - Nutrition (meals, water, food search, and saved scan results), workouts, progress, quests/streaks, notifications, and settings use backend API endpoints and MongoDB/Mongoose models. The recent-food picks, JWT, profile cache, and optional API URL override are client-side only; they are not authoritative copies of server data.
 - Meal-photo selection opens the review screen immediately, then sends the image to the authenticated backend scan endpoint. The user reviews and saves matched scan items; scanning alone does not create a meal.
-- Coach exercise library uses the public `GET /exercises` API with a static fallback in `exercises.ts`. Camera permission and local video selection can use device inputs, but readiness checks, form tracking, calorie estimates, and exercise scoring are prototype/demo behavior. Do not describe these results as connected AI or verified tracking. Workout records use the backend; uploaded video is handled locally in the WebView flow.
+- Coach Exercise Library is an explicitly requested local sample preview using `libraryPreview.ts`, with six screenshot-matched exercises and local search/filter/detail actions. It is not a fallback for API errors and writes no workout data. The separate public `/exercises` route and admin library remain API-backed. Camera permission and local video selection can use device inputs, but unconfigured form tracking and exercise video previews must not be described as connected AI or real playback. Workout records use the backend; uploaded video is handled locally in the WebView flow.
 - The client calls the NestJS API; the API is configured for MongoDB through server-side environment settings. Expo Go loads the frontend from the development computer and derives the API host from that page's LAN hostname. The phone and computer must share a reachable network; clients never connect directly to MongoDB.
 
 ## 2. Run and Build
@@ -66,6 +66,10 @@ The frontend uses .next-dev/ for development and .next/ for production build out
 The food-scanner service is separately managed and is not part of the root npm workspaces. Follow its own README and deployment instructions; its browser client should call the main backend, whose scan implementation uses its own provider integrations.
 
 ### Tests
+
+**Mobile startup:** The root package explicitly points `main` to `mobile/index.ts`, which registers `mobile/App.tsx`. This prevents Expo started at the repository root from falling back to `expo/AppEntry.js` and looking for a nonexistent root `App`. Prefer `npm run expo` so Expo uses the mobile workspace's app configuration. To restart with a clean Metro cache from the root, use `npm run start --workspace mobile -- --clear`.
+
+- Mobile: run `node --test mobile/*.test.mjs mobile/inactivity/*.test.mjs` from the root. `mobile/entry.test.mjs` checks Expo's actual Android entry resolution from both the root and mobile workspace. An Android export validates bundling, not physical-device behavior.
 
 - Frontend: run the full Node test suite with `node --test tests/*.test.mjs` from `frontend/`. `npm run test:ui-guard` runs only `mobile-redesign.test.mjs`; it is not the full suite. These tests include static source assertions and focused utility/API tests, not a browser-driven UI suite.
 - Backend: `npm run test` (vitest unit + e2e in `backend/test/`), `npm run test:e2e`, `npm run lint` (oxlint).
@@ -96,6 +100,7 @@ Do not create routes under frontend/app/frontend/. That directory contains a leg
 - Scan: frontend/sections/Scan/ScanSection.tsx controls nutrition, review, add, daily log, and history.
 - Quests: frontend/sections/Quests Section/QuestSection.tsx (activity is backend-backed; the leaderboard is sample preview data).
 - Me: frontend/sections/Me Section/MeSection.tsx.
+- Me's requested admin preview entry points explicitly enable local fixtures in AdminExerciseLibrary and EngagementAnalytics. New opens an inline form page in the catalog; preview saves stay in component memory. The components default to API mode when `preview` is omitted, preserving the existing backend contract. Account/profile/settings have no sample-profile mode.
 - Expo host and inset bridge: mobile/App.tsx and mobile/app.json.
 
 ## 4. Procedure: Add or Change a Signed-in Main Tab
@@ -140,10 +145,15 @@ Do not create routes under frontend/app/frontend/. That directory contains a leg
 - Recent-food picks are cached under `physiquequest-recent-foods`; this is not the meal log.
 - Photo analysis uses the backend food-scanning contract. Keep the estimate review/edit/save path explicit, handle unavailable scanner/provider errors, and do not save until the user confirms.
 - Today's Log displays the live day's meals and water state, uses the shared nutrition targets, and retains the main tab bar.
+- Scan’s reference presentation uses `nutritionPresentation.ts` for shared display summaries, portion scaling, and the explicitly requested sample fixtures. Preview eligibility requires a successful nutrition response with no meals or water; live records/errors take priority. Sample saves/water updates stay in section memory, never in the nutrition API or browser persistence.
+- Camera and uploaded photos continue through `api.analyzeImage`; sample estimates are opened only through the explicit sample action in the photo chooser. Keep matched-item IDs and API field names when scaling portions for scan save. The backend and API client contracts were not changed for the visual redesign.
+- Food History retains the main tab bar and opens from either Nutrition or Today’s Log, returning to its caller. Internal view changes start at the top of the shared content region. Add Food and Review Estimate retain sticky save footers and hide the tab bar.
 
 ## 8. Procedure: Update Coach Exercises or Workout Flows
 
-- Exercise records and filter values live in frontend/sections/Coach/exercises.ts.
+- Workout exercise records live in frontend/sections/Coach/exercises.ts. The separate, explicitly labeled Coach library sample catalog, filter choices, instructions, and form cues live in frontend/sections/Coach/libraryPreview.ts; do not change the workout catalog just to match library preview content.
+- The Coach library retains BottomNav; exercise details use a native modal dialog above it. Search/filter/open/close remain local, and playback controls explain the unavailable video service. Temporary UI verification routes must be removed before delivery.
+- The sample library entry remains available on rest days and while the weekly plan loads or fails; preserve the plan's actual loading/error messages and retry control.
 - CoachSection.tsx owns internal view state; its current flow is plan -> library or camera -> live session -> workout report.
 - Exercise tags are AI tracked, Manual, and Caution. These are labels in the prototype and do not imply real model tracking.
 - Use the supplied callbacks to return to the plan or finish a workout. Do not create a parallel route for an internal Coach view unless the product structure changes.

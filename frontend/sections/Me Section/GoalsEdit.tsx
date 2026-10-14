@@ -7,18 +7,19 @@ import { Icon } from '../Home/icons';
 type Props = {
   profile: Profile;
   onBack: () => void;
-  onSave: (patch: Partial<Profile>) => Promise<void>;
+  onSave: (patch: Partial<Profile>) => Promise<boolean>;
+  error?: string;
 };
 
 const goalOptions = [
-  { title: 'Weight loss', detail: 'Calorie deficit + conditioning', icon: 'trend' },
-  { title: 'Build muscle', detail: 'Hypertrophy split, higher protein', icon: 'dumbbell' },
-  { title: 'Strength', detail: 'Low reps, progressive overload', icon: 'health' },
-  { title: 'Endurance', detail: 'Circuit and interval focus', icon: 'clock' },
-  { title: 'General fitness', detail: 'Balanced weekly plan', icon: 'target' },
+  { title: 'Weight loss', detail: 'Calorie deficit + conditioning', icon: 'weight-loss' },
+  { title: 'Build muscle', detail: 'Hypertrophy split, higher protein', icon: 'library-dumbbells' },
+  { title: 'Strength', detail: 'Low reps, progressive overload', icon: 'strength' },
+  { title: 'Endurance', detail: 'Circuit and interval focus', icon: 'pulse' },
+  { title: 'General fitness', detail: 'Balanced weekly plan', icon: 'health' },
 ];
 
-export default function GoalsEdit({ profile, onBack, onSave }: Props) {
+export default function GoalsEdit({ profile, onBack, onSave, error }: Props) {
   const [data, setData] = useState({
     goal: profile.goal || '',
     targetWeight: profile.targetWeight || '',
@@ -36,9 +37,7 @@ export default function GoalsEdit({ profile, onBack, onSave }: Props) {
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave(data);
-    setSaving(false);
-    onBack();
+    try { if (await onSave(data)) onBack(); } finally { setSaving(false); }
   };
 
   return (
@@ -50,6 +49,7 @@ export default function GoalsEdit({ profile, onBack, onSave }: Props) {
       onSave={handleSave}
       isDirty={isDirty}
       isSaving={saving}
+      error={error}
     >
       <div className="goal-list">
         {goalOptions.map(option => (
@@ -66,7 +66,7 @@ export default function GoalsEdit({ profile, onBack, onSave }: Props) {
           <span>Target weight</span>
           <div className="input-wrap">
             <input type="number" inputMode="decimal" value={data.targetWeight} min={25} max={350} step="0.1" onChange={e => setField('targetWeight', e.target.value)} />
-            <small>kg</small>
+            <small>{profile.weightUnit || 'kg'}</small>
           </div>
         </label>
         <label className="field">

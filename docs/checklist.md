@@ -13,7 +13,38 @@ This checklist separates what is implemented in the frontend, what is implemente
 - **Checklist impact:** Notifications frontend/API wiring stays marked implemented; the joint notification workflow remains unchecked until real notification records and persisted read-state changes are verified using a safe live test account. Sample preview behavior is not end-to-end evidence.
 - **Sign-in event index:** Removed the duplicate `occurredAt` index declaration from the Mongoose property metadata while retaining the explicit query index. A schema regression test verifies that the single-field index is declared once.
 
+### Exercise Library presentation update — October 14, 2026
+
+- Coach Exercise Library now uses the explicitly requested local sample catalog: six reference exercises, working search/muscle/equipment filters, retained bottom navigation, and a white detail sheet with the supplied bench-press image, instructions, recommendations, and form cues. Video playback and AI tracking are explicitly unavailable; sample actions never save workout data.
+- The public `/exercises` route and administrator library retain their API integrations. This Coach preview is intentionally independent of their requests, not an error fallback.
+- Verification: 70/70 frontend tests passed, production build passed, and local browser checks covered search, empty/reset states, media notice, close/Escape/focus restoration, and responsive layouts at 320×568, 390×844, 768×1024, and 1440×900. A rendered regression test confirms the sample library link remains reachable while the weekly plan loads or fails. The temporary preview route was removed before delivery. No device/provider or live database workflow was verified; checklist status totals are unchanged.
+
+### Scan presentation update — October 14, 2026
+
+- Nutrition, Review Estimate, Today’s Log, Add Food, and Food History follow the supplied reference screens, including connected navigation, portion controls, confidence guidance, shared totals, water glasses, and history records. The existing API client, nutrition hook, and backend implementation remain the live-data path.
+- The requested sample preview appears only after a successful response containing no meals and no recorded water. Its manual/scan saves and water updates stay in section memory; real uploaded photos still request backend analysis, and API failures never become sample scan results. The photo chooser offers a separate, explicit sample estimate.
+- Verification: 74/74 frontend tests and the production build passed. A temporary local test service exercised the actual Scan controller, including food search/detail, manual save, water update, upload/analysis, selected scan-item save, sample isolation, and visible nutrition/scan failures. Responsive browser checks covered phone, short phone, tablet, desktop, and landscape widths. The temporary route/service were removed or stopped before delivery.
+- These are frontend and simulated API-integration checks, not evidence of a deployed microservice, real provider, database persistence, or physical-device verification. Checklist completion marks and summary totals remain unchanged.
+
 ## How to interpret the marks
+
+**v2.7.0 branch preparation — October 14, 2026:** Created the user-requested `PhysiqueQuest-v2.7.0` branch for the complete current project snapshot. Frontend and mobile tests passed together (110 tests), the backend suite passed, and frontend/backend production builds passed. Root Expo device-cache files are now ignored alongside the existing mobile cache, build outputs, dependencies, and environment files. Publishing this snapshot does not establish deployment, provider, database, or physical-device verification; checklist completion totals are unchanged.
+
+**Me mock-link visibility fix — October 14, 2026:** Removed the frontend administrator-role condition from the two explicit mock links. Exercise Library and Engagement analytics now appear under Admin tools, directly after Change password and before Log out, for all signed-in users. No backend authorization was changed. All 88 frontend tests and the production build passed; regression assertions verify both links and their order. Checklist completion totals are unchanged.
+
+**Me admin mock presentation — October 14, 2026:** Exercise Library, New exercise, and Engagement analytics now match the requested reference layouts and intentionally show labeled local fixtures from the Me entry points. Search/filter/create/cancel, analytics ranges, and CSV output work locally; mock actions never contact the admin API. Default API modes and existing backend contracts remain available, and denied API calls never become mock results. Account & Settings remains API-backed; sample-profile mode and the unrequested manual alert/alert-log controls were removed. All 88 frontend tests and the production build passed; fixture-based browser layout checks covered 320×568, 390×844, and 1440×900. Live provider/database and physical-device checks were not performed. The two admin frontend API-integration criteria are now pending activation because the Me entry points intentionally use mock mode; backend and end-to-end counts are unchanged.
+
+**Me reference presentation — October 14, 2026:** Account & Settings, Personal Data, Goals, Training Preference, Health Profile, and Emergency Contact use the supplied reference layout and shared form theme. Summary labels derive from saved profile/settings values, account level reads the existing activity endpoint, and profile edits retain the existing update API/cache refresh flow. Editors return only after confirmed saves; error states stay visible. Measurement units/BMI, weekday labels, rounded switches/checks, reference artwork, footer positioning, and icon treatments were reviewed. All 85 frontend tests and the production build passed. Browser checks of rendered components at 320×568, 390×844, and 1440×900 found no horizontal overflow and visible save footers. These fixture-based checks do not prove live database or physical-device round trips; checklist totals remain unchanged.
+
+**Scan calorie progress consistency — October 14, 2026:** The Scan overview now reuses the same CalorieProgress component and summary-column styling as Today's Log, matching Home Nutrition today's ring, colors, sizing, and compact calorie text. Existing nutrition totals and API paths are retained. All 82 frontend tests and the production build passed; completion totals remain unchanged.
+
+**Meal food search and shared calorie progress — October 14, 2026:** Edit Meal searches matching USDA food names through the existing authenticated backend endpoint, keeping the provider key server-side. Suggestions are debounced, discard obsolete responses, and support loading/empty/error retry. Selection updates the food name and USDA reference while preserving editable nutrition values. Home Nutrition today and Today's Log now share the same calorie-progress component and styles. All 82 frontend tests and the production build passed; USDA provider availability and physical-device behavior were not verified. Checklist totals are unchanged.
+
+**Today's Log editing update — October 14, 2026:** Logged rows display Scanned or Manual, edited status, and the original device-local logging time; empty categories show "No logged yet". Tapping a logged row opens a Scan-themed food editor, with individual selection for multi-food meals, validation, cancel, and save-error retry. Account edits use the existing nutrition update endpoint; the server persists the edited flag and retains the original source/time/date. Sample edits stay local. All 80 frontend tests and 275 backend tests passed; both production builds passed. No live database or physical-device workflow was verified, and checklist status totals remain unchanged.
+
+**Nested-page navigation update — October 14, 2026:** Back icons precede page titles in markup and visual order throughout the nested Home, Coach, Scan, Quests, and Me screens. Exercise Library, Review Estimate, Food History, Add Food, and Today's Log headers were corrected; existing parent callbacks and trailing actions are retained. Header regression checks cover 15 page/shared-layout components. All 76 frontend tests and the production build passed. Checklist completion totals are unchanged; these checks do not establish physical-device or live-service behavior.
+
+**Mobile entry verification — October 14, 2026:** Expo's Android resolver now selects `mobile/index.ts` from both the repository root and mobile workspace instead of the default entry that expected a root `App`. All 22 mobile tests passed, and an Android export from the root successfully bundled 651 modules. This verifies entry resolution and bundling; physical Expo/device and live backend checks remain unverified, so checklist totals are unchanged.
 
 - **`[✅]` Verified for this layer:** the specific criterion below has supporting source and test/build evidence.
 - **`[❌]` Incomplete or unverified:** the reason and next verification step are stated on that item. It does not always mean the feature is broken; it means the criterion has not been demonstrated.
@@ -27,11 +58,11 @@ This checklist separates what is implemented in the frontend, what is implemente
 
 ### Frontend implementation coverage
 
-- **Modules with all frontend criteria checked:** 15 / 17 (**88.2%**, rounded **88%**)
-- **Frontend criteria checked:** 32 / 34 (**94.1%**, rounded **94%**)
+- **Modules with all frontend criteria checked:** 14 / 17 (**82.4%**, rounded **82%**)
+- **Frontend criteria checked:** 30 / 34 (**88.2%**, rounded **88%**)
 
-<progress value="15" max="17" aria-label="15 of 17 modules meet frontend implementation criteria">15 of 17 frontend modules (88%)</progress>
-<progress value="32" max="34" aria-label="32 of 34 frontend criteria verified">32 of 34 frontend criteria (94%)</progress>
+<progress value="14" max="17" aria-label="14 of 17 modules meet frontend implementation criteria">14 of 17 frontend modules (82%)</progress>
+<progress value="30" max="34" aria-label="30 of 34 frontend criteria verified">30 of 34 frontend criteria (88%)</progress>
 
 ### Backend implementation and automated-test coverage
 
@@ -72,7 +103,7 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 | 12 | [Progress measurements](#12-progress-measurements) | Verified | Verified | Not verified |
 | 13 | [Me, settings, and preferences](#13-me-settings-and-preferences) | Verified | Verified | Not verified |
 | 14 | [Notifications](#14-notifications) | Verified | Verified | Not verified |
-| 15 | [Administrator tools](#15-administrator-tools) | Verified | Verified | Not verified |
+| 15 | [Administrator tools](#15-administrator-tools) | Mock preview | Verified | Not verified |
 | 16 | [Expo Go mobile shell](#16-expo-go-mobile-shell) | Verified | Not applicable | Not verified |
 | 17 | [API and data-service reliability](#17-api-and-data-service-reliability) | Verified | Verified | Not verified |
 
@@ -104,7 +135,7 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 
 ### 5. Coach plan and exercise library
 
-- [✅] Exercise-library search and exercise details load through the exercise API.
+- [✅] Public exercise-library search and details load through the exercise API at `/exercises`. The Coach library intentionally uses the separate, labeled local sample preview requested on October 14, 2026; connecting that preview to the future exercise service remains pending.
 - [✅] The authenticated coach-plan API builds a weekly plan from the user's profile, equipment, duration, goal, schedule, and health conditions; the UI renders the returned plan.
 
 ### 6. Camera Check and pose readiness
@@ -125,12 +156,12 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 ### 9. Meal scanning and food search
 
 - [✅] Camera capture and photo upload enter the same API-backed scan/review flow, with loading, retry, and provider-error handling.
-- [✅] Food search, scan review, and save actions use API data; no sample scan result is represented as a user's saved meal.
+- [✅] Live food search, scan review, and save actions use API data. The separate, explicitly labeled sample estimate stays local and is never represented as a user's saved meal.
 
 ### 10. Nutrition log, water, and history
 
 - [✅] Meal create/update/delete, scan-to-meal save, daily water, and history are wired through nutrition APIs.
-- [✅] Loading, errors, empty history, and daily totals use saved account data rather than seeded sample meals.
+- [✅] Live loading/errors, history, and daily totals use returned account data. The explicitly requested reference preview is limited to a successful empty meals/water response; its local changes are labeled and never persisted as account data.
 
 ### 11. Quests, streaks, and leaderboard
 
@@ -154,13 +185,13 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 
 ### 15. Administrator tools
 
-- [✅] Admin exercise and alert/analytics views use protected APIs and display access/API errors.
-- [✅] Sign-in analytics load from the admin analytics API; successful sign-ins are collected for active-user and weekly-retention metrics.
+- [❌] Me's admin catalog/New/analytics entry points intentionally use local mock data. Default component API modes and protected backend endpoints are preserved and error handling is tested, but activation and real-data UI checks are pending. The unrequested alert-log menu row was removed.
+- [❌] Me's analytics currently displays the requested mock figures. Backend sign-in collection and real active-user/retention analytics remain implemented; activate the API-backed screen and verify returned data before marking this frontend criterion complete.
 
 ### 16. Expo Go mobile shell
 
 - [✅] Expo shell loads the web app and reports backend/frontend connectivity with recovery paths.
-- [✅] Web-to-native camera and inactivity bridges are implemented; mobile state/connectivity tests and TypeScript check pass. Expo export was not rerun for v2.5.2, and physical-device behavior is not established by those checks.
+- [✅] Web-to-native camera and inactivity bridges are implemented. Entry/state/connectivity tests passed (22/22) and Android export succeeded on October 14, 2026. These automated checks do not establish physical-device camera, sensor, or backend behavior.
 
 ### 17. API and data-service reliability
 

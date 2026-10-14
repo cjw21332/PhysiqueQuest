@@ -7,12 +7,13 @@ import { Icon } from '../Home/icons';
 type Props = {
   profile: Profile;
   onBack: () => void;
-  onSave: (patch: Partial<Profile>) => Promise<void>;
+  onSave: (patch: Partial<Profile>) => Promise<boolean>;
+  error?: string;
 };
 
 const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'None of these'];
 
-export default function HealthProfileEdit({ profile, onBack, onSave }: Props) {
+export default function HealthProfileEdit({ profile, onBack, onSave, error }: Props) {
   const [data, setData] = useState({
     conditions: profile.conditions || [],
     healthNotes: profile.healthNotes || '',
@@ -32,9 +33,7 @@ export default function HealthProfileEdit({ profile, onBack, onSave }: Props) {
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave(data);
-    setSaving(false);
-    onBack();
+    try { if (await onSave(data)) onBack(); } finally { setSaving(false); }
   };
 
   return (
@@ -46,6 +45,7 @@ export default function HealthProfileEdit({ profile, onBack, onSave }: Props) {
       onSave={handleSave}
       isDirty={isDirty}
       isSaving={saving}
+      error={error}
     >
       <div className="choice-group condition-list">
         <div className="group-title"><b>Existing conditions</b></div>
@@ -57,7 +57,7 @@ export default function HealthProfileEdit({ profile, onBack, onSave }: Props) {
         ))}
       </div>
 
-      <div className="safety-note" style={{ marginBottom: '24px' }}>
+      <div className="safety-note">
         <span><Icon name="shield" size={16} /></span>
         <p>Exercises that load a flagged area get a caution tag in your library and are swapped out of new plans.</p>
       </div>

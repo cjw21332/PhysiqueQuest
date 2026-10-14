@@ -4,6 +4,32 @@ import { readFile } from 'node:fs/promises';
 
 const source = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
+test('every nested section header places its back control before the page heading', async () => {
+  const pages = [
+    'Home/GoalsMilestones', 'Home/Progress', 'Home/Notifications',
+    'Coach/ExerciseLibrary', 'Coach/CameraCheck', 'Coach/WorkoutReport',
+    'Scan/ReviewEstimate', 'Scan/AddFood', 'Scan/DailyLog', 'Scan/FoodHistory', 'Scan/EditMeal',
+    'Quests Section/QuestSection', 'Me Section/MeEditLayout',
+    'Me Section/AdminExerciseLibrary', 'Me Section/EngagementAnalytics', 'Me Section/EmergencyAlertLog',
+  ];
+  for (const page of pages) {
+    const content = await source(`sections/${page}.tsx`);
+    const back = content.search(/<button\b[^>]*className="(?:coach-back|leaderboard-back|ghost back-btn)"/);
+    assert.ok(back >= 0, `${page} has a back control`);
+    const headerStart = content.lastIndexOf('<header', back);
+    const headerEnd = content.indexOf('</header>', back);
+    const heading = content.indexOf('<h2', headerStart);
+    assert.ok(headerStart >= 0 && heading > back && heading < headerEnd, `${page}: back icon precedes heading in its header`);
+  }
+});
+
+test('Scan and Exercise Library visually keep back controls beside the title', async () => {
+  const css = await source('app/globals.css');
+  assert.doesNotMatch(css, /\.scan-reference[^{}]*coach-back\s*\{[^}]*\border\s*:/);
+  assert.match(css, /\.coach-library \.library-header\s*\{[^}]*justify-content:\s*flex-start/);
+  assert.match(css, /\.scan-reference \.scan-header\.add-food-header\s*\{[^}]*justify-content:\s*flex-start/);
+});
+
 test('standalone Goals and Progress pages return to the Home dashboard', async () => {
   const goals = await source('sections/Home/GoalsMilestones.tsx');
   const progress = await source('sections/Home/Progress.tsx');

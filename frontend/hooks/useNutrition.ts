@@ -87,7 +87,7 @@ export function useNutrition() {
     applyState(next);
   }, [applyState]);
   const addMealsFromScan = useCallback(async (payload: { items: ScannedItem[]; meal: MealName }) => {
-    const response = await api.addMealsFromScan({ ...payload, date: today() });
+    const response = await api.addMealsFromScan({ ...payload, date: today(), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) });
     revision.current += 1;
     const next = mapState(response);
     applyState(next);

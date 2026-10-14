@@ -3,6 +3,7 @@ frontend/.next/
 frontend/.next-dev/
 frontend/out/
 mobile/.expo/
+/.expo/
 mobile/dist/
 mobile/dist-*/
 *.log

@@ -36,7 +36,7 @@ export default function CoachSection({ profile, onLogoutRequest }: { profile: Pr
         {view === 'session' && workout && <LiveSession exercise={exercises[1]} workoutId={workout._id} thresholdSeconds={settings.threshold} contactName={profile.contactName ?? ''} contactPhone={profile.contactPhone ?? ''} onPause={async paused => { await setPaused(workout._id, paused); }} onEnd={async seconds => { const saved = await completeWorkout(workout._id, seconds); setWorkout(saved); setView('report'); }}/> }
         {view === 'report' && workout && <WorkoutReport workout={workout} onBack={() => setView('plan')} onHome={goHome} onShare={() => say('Sharing is not available in this Expo Go session.')}/>}
       </div>
-      {view === 'plan' && <BottomNav />}
+      {(view === 'plan' || view === 'library') && <BottomNav />}
       {actionError && <div className="scan-warning" role="alert">{actionError}</div>}
       {toast && <div className="home-toast coach-toast" role="status">{toast}</div>}
     </section>

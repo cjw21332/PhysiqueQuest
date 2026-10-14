@@ -80,18 +80,18 @@ export default function TrainingPreferenceEdit({ profile, onBack, onSave, error 
       </div>
 
       <div className="choice-group">
-        <div className="group-title"><b>Training days</b><small>{formatTrainingDays(data.days) || 'None selected'}</small></div>
+        <div className="group-title"><b>Training days</b><small>{data.days.length} selected<span className="visually-hidden">{formatTrainingDays(data.days) || 'None selected'}</span></small></div>
         <div className="day-grid">
           {TRAINING_DAYS.map(day => {
             const selected = data.days.includes(day.value);
-            return <button type="button" key={day.value} className={`day ${selected ? 'active' : ''}`} aria-label={day.value} aria-pressed={selected} onClick={() => toggleDay(day.value)}>{day.label}</button>;
+            return <button type="button" key={day.value} className={`day ${selected ? 'active' : ''}`} aria-label={day.value} aria-pressed={selected} onClick={() => toggleDay(day.value)}>{day.label.slice(0, 1)}</button>;
           })}
         </div>
       </div>
 
       <div className="choice-group">
         <b>Session duration</b>
-        <div className="chips">
+        <div className="chips duration-chips">
           {['20', '30', '45', '60'].map(val => {
             const option = `${val} min`;
             // Some profiles might store "20", some "20 min". Handle safely:
@@ -102,7 +102,7 @@ export default function TrainingPreferenceEdit({ profile, onBack, onSave, error 
       </div>
 
       <div className="placement-card">
-        <span className="phone-icon"><Icon name="phone" size={18} /></span>
+        <span className="phone-icon"><Icon name="phone-device" size={18} /></span>
         <div><b>Phone placement for form tracking</b><p>Prop your phone at waist height, 2.5–3.0 m away, so your full body stays in frame.</p></div>
       </div>
     </MeEditLayout>

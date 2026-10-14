@@ -1,0 +1,11 @@
+# Me admin references and removal of sample-profile mode — October 14, 2026
+
+- Rebuilt the Me admin exercise catalog around the six supplied exercise/status/pose records, search, and All/Published/Draft/Missing pose filters. New opens the requested inline green form page with name, muscle group, equipment, Published switch, disabled-until-valid Save, and Cancel. Preview creation updates local component state only; published records appear below the New form.
+- Engagement analytics shows the supplied 30-day sample figures (1,284 active users, +8.2%, 312 sessions, 84% form score, 67% mission completion), eight retention bars, and emergency counts 14/9/5. Date ranges select explicit alternate mock fixtures, and Export creates a clearly named sample CSV of the visible event rows.
+- Me explicitly enables preview mode for these admin screens. Their default API modes, API client, role gate, and backend contracts remain intact. Failed live reads are displayed and never replaced by mock results.
+- Removed View sample profile, its fixture/module/state/save branches, the manual emergency alert test, and the unrequested alert-log menu/view entry. Account/profile/settings/privacy/security/logout remain dynamic and API-backed. Maximum alarm volume retains truthful best-effort device wording.
+- All styling stays in globals.css, preserving mobile safe areas and accessible controls. Existing back-before-title navigation is retained, with small mock labels in the admin screens for clarity.
+
+Verification: all 88 frontend tests and the production build passed. Component tests cover reference values, search/filter combinations, local New/save/cancel, CSV escaping, mock API isolation, and denied live requests without fallback. Fixture browser checks at 320×568, 390×844, and 1440×900 found no horizontal overflow, visible headers, and no removed Me controls. The external preview service was stopped and its tab/viewport cleaned up. Live database/provider and physical-device workflows were not verified.
+
+Checklist: admin frontend API criteria now await activation because Me intentionally opens mock mode. Frontend totals are 14/17 modules and 30/34 criteria; backend and end-to-end totals are unchanged. No backend or dependency changes were made for this task.

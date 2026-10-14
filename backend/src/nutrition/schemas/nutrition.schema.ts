@@ -12,6 +12,7 @@ export class MealEntry {
   @Prop({ default: '' }) detail: string;
   @Prop({ default: '' }) time: string;
   @Prop({ default: 'Manual' }) source: string;
+  @Prop({ default: false }) edited: boolean;
   @Prop({ default: 0, min: 0 }) protein: number;
   @Prop({ default: 0, min: 0 }) carbs: number;
   @Prop({ default: 0, min: 0 }) fat: number;

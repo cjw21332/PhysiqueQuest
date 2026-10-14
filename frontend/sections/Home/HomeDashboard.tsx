@@ -1,6 +1,7 @@
 'use client';
 
 import { Icon } from './icons';
+import CalorieProgress from './CalorieProgress';
 import { useActivity } from '../../hooks/useActivity';
 import { useNutrition } from '../../hooks/useNutrition';
 import { useCoachPlan } from '../../hooks/useCoachPlan';
@@ -39,7 +40,6 @@ export default function HomeDashboard({ profile, onNotify }: {
     ? Math.min(100, activity.currentExp / activity.nextLevelExp * 100)
     : 0;
   const initials = profile.name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
-  const caloriePercent = Math.min(100, totals.calories / nutritionTargets.calories * 100);
 
   return <div className="dashboard-container home-ref-dashboard">
     <header className="dashboard-header home-ref-header">
@@ -86,13 +86,7 @@ export default function HomeDashboard({ profile, onNotify }: {
     <section className="content-section home-ref-section">
       <div className="section-title-row"><h3 className="section-title">Nutrition today</h3><button className="scan-link" onClick={() => navigate('/scan')}><Icon name="scan" size={12} />Scan meal</button></div>
       {nutritionError ? <p role="alert" className="error">{nutritionError}</p> : nutritionLoading ? <p role="status">Loading your nutrition…</p> : <div className="nutrition-overview home-ref-nutrition">
-        <div className="calorie-circle" role="img" aria-label={`${Math.round(totals.calories)} of ${nutritionTargets.calories} calories logged`}>
-          <svg className="circle-svg" viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="45" className="circle-bg" />
-            <circle cx="50" cy="50" r="45" className="circle-progress" strokeDasharray={2 * Math.PI * 45} strokeDashoffset={2 * Math.PI * 45 * (1 - caloriePercent / 100)} />
-          </svg>
-          <div className="circle-content"><div className="calorie-amount">{totals.calories >= 1000 ? `${(totals.calories / 1000).toFixed(1)}k` : Math.round(totals.calories)}</div><div className="calorie-goal">of {nutritionTargets.calories.toLocaleString()}</div></div>
-        </div>
+        <CalorieProgress calories={totals.calories} target={nutritionTargets.calories}/>
         <div className="macros-list">
           {(Object.keys(macroTargets) as (keyof typeof macroTargets)[]).map(label => <MacroProgress key={label} label={label} value={totals[label]} target={macroTargets[label]} />)}
         </div>

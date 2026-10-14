@@ -30,7 +30,8 @@ export class NutritionService {
     const current = await this.get(userId);
     const index = current.meals.findIndex((meal) => meal.id === id);
     if (index < 0) throw new NotFoundException('Meal not found');
-    Object.assign(current.meals[index], dto, { id });
+    const original = current.meals[index];
+    Object.assign(original, dto, { id, source: original.source, time: original.time, date: original.date, edited: true });
     return current.save();
   }
 

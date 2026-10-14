@@ -8,9 +8,10 @@ import { useCoachPlan } from '../../hooks/useCoachPlan';
 export default function CoachPlan({ profile, onStart, onLibrary }: { profile: Profile; onStart: () => void; onLibrary: () => void }) {
   const { plan, loading, error, refresh } = useCoachPlan();
   const [selectedDay, setSelectedDay] = useState(() => (new Date().getDay() + 6) % 7);
+  const libraryLink = <button className="library-link-card" onClick={onLibrary}><div className="library-icon"><Icon name="medal" size={22} /></div><div className="library-info"><div className="library-title">Exercise library</div><div className="library-subtitle">Demos and form guides</div></div><Icon name="arrow" size={18} /></button>;
 
-  if (loading) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="status"><h2>Building your plan…</h2></div></div>;
-  if (error || !plan) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="alert"><h2>Could not load your plan</h2><p>{error || 'Your profile is required to build a plan.'}</p><button onClick={() => void refresh()}>Try again</button></div></div>;
+  if (loading) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="status"><h2>Building your plan…</h2></div>{libraryLink}</div>;
+  if (error || !plan) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="alert"><h2>Could not load your plan</h2><p>{error || 'Your profile is required to build a plan.'}</p><button onClick={() => void refresh()}>Try again</button></div>{libraryLink}</div>;
 
   const currentDay = plan.days[selectedDay] ?? plan.days[0];
   const todayIndex = (new Date().getDay() + 6) % 7;
@@ -26,8 +27,8 @@ export default function CoachPlan({ profile, onStart, onLibrary }: { profile: Pr
         <section className="exercise-list-card"><div className="exercise-list-header"><h4>Exercises</h4><span className="exercise-count">{todayExercises.length}</span></div><div className="exercise-list">{todayExercises.map((exercise, index) => <div key={exercise.exerciseId} className="exercise-item"><div className="exercise-number">{index + 1}</div><div className="exercise-details"><div className="exercise-name">{exercise.name}</div><div className="exercise-sets">{plan.sets}</div></div><div className={`tracking-badge ${exercise.tracking === 'AI tracked' ? 'ai-tracked' : 'manual'}`}>{exercise.tracking}</div></div>)}</div></section>
         {todayExercises[0] && <div className="form-tip-card"><div className="tip-icon"><Icon name="coach" size={20} /></div><div className="tip-content"><div className="tip-title">Form tip</div><div className="tip-exercise">{todayExercises[0].name}</div><div className="tip-text">Move with control and keep your core braced through every rep of {todayExercises[0].name}.</div></div></div>}
       </>}
-      <button className="library-link-card" onClick={onLibrary}><div className="library-icon"><Icon name="medal" size={22} /></div><div className="library-info"><div className="library-title">Exercise library</div><div className="library-subtitle">Demos and form guides</div></div><Icon name="arrow" size={18} /></button>
+      {libraryLink}
       <div className="start-button-container"><button className="start-session-btn" onClick={onStart}><Icon name="play" size={18} />Start session</button></div>
-    </> : <div className="rest-day-message"><h3>{currentDay?.title ?? 'Rest day'}</h3><p>No workout scheduled for this day. Rest and recover!</p></div>}
+    </> : <><div className="rest-day-message"><h3>{currentDay?.title ?? 'Rest day'}</h3><p>No workout scheduled for this day. Rest and recover!</p></div>{libraryLink}</>}
   </div>;
 }

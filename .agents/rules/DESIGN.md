@@ -2,7 +2,7 @@
 description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the light-theme interface, component library, responsive rules, and extension patterns. The web app is the design source; the Expo app displays it in a native WebView with device capabilities (safe-area insets, camera, file inputs).
 ---
 
-# PhysiqueQuest Design System
+# PhysiqueQuest Design System (2026-10-14)
 
 This document specifies the current PhysiqueQuest product interface, design tokens, component patterns, responsive behavior, and rules for extending the system consistently. It describes the current codebase rather than asserting a product release version. Update this document when adding new UI patterns or making significant design decisions.
 
@@ -16,6 +16,7 @@ This document specifies the current PhysiqueQuest product interface, design toke
 - Treat the web app as the UI source for both browsers and the Expo WebView. Design mobile-first, account for safe-area insets, and preserve the established 390px, 700px, and 740px responsive breakpoints.
 - Use the shared `Icon` registry, existing React state and API-backed persistence patterns, and the established five-tab navigation.
 - Keep backend-backed screens truthful: render real API data and explicit loading, empty, and error/retry states. If the user explicitly requests a temporary sample preview, identify it as sample content, use it only after a successful empty response (never mask loading or API errors), and keep sample-only actions local.
+- Coach Exercise Library and the explicitly requested Me admin catalog/New exercise/analytics previews use separate local fixtures, never API-error fallbacks. Me opens the admin components with `preview` explicitly enabled; their default API mode and the public library's integration are preserved. Mock admin actions make no provider or persistence writes, and mock data is labeled in the admin screens.
 - Preserve accessible names, visible keyboard focus, and 44px minimum touch targets for interactive controls. Respect reduced-motion preferences.
 
 ### App Structure
@@ -36,13 +37,18 @@ PhysiqueQuest is a mobile-first fitness and nutrition prototype. The Next.js web
 - **Admin Views**: Exercise Library (search, filters, draft creation) and Analytics (date ranges, retention viz, event summary) — frontend views over live backend endpoints, gated by an admin role
 
 ### Navigation Behavior
+- **Mock admin entry visibility:** Exercise Library and Engagement analytics appear below Change password in Me for every signed-in account while they open explicit local previews. Backend administrator authorization remains unchanged; exposing these mock links grants no access to live administrator data or writes.
+- **Me reference screens:** Account & Settings and its five profile editors use the supplied white surface, green chips/switches, icon rows, quiet input borders, and shared back/title and save/discard layout. Render saved profile/settings values; retain role-gated admin tools and honest alarm-volume wording. Editors preserve saved measurement units, keep failed saves open, and hide the tab bar. Reference avatar artwork is decorative. Sample-profile mode, manual alert testing, and the alert-log menu row were removed at the user's request; profile/settings/security/logout retain API behavior. Only the three requested admin pages display mock data.
+- **Nutrition calorie display:** Home Nutrition today, Today's Log, and the Scan overview reuse `Home/CalorieProgress.tsx` and its shared ring sizing/type styles, including the empty track and clamped fill. Edit Meal food names use debounced backend USDA suggestions with loading, empty, and retry states. Selecting a suggestion updates its name/reference; nutrition values remain available for user review rather than being replaced without a portion calculation.
+- **Today's Log meal rows:** Show the original input source (Scanned or Manual), an edited marker when applicable, and the original device-local logging time last. Empty meal categories show "No logged yet". Logged food buttons open the shared Scan-themed editor; a multi-food meal offers a food selector. Cancel keeps the existing data, and failed saves remain in the editor for retry.
+- **Nested-page headers:** Place the back icon immediately before the page title in both markup and visual order. Keep secondary actions such as History, Retake, and Share at the trailing edge; do not move the back control after the title with CSS ordering.
 - **Main tab bar** (five tabs): Positioned above device system-navigation on main section screens (Home, Coach, Scan, Quests, Me)
 - **Nested/detail flows**: Usually hide the tab bar to reclaim screen space; Today’s Log is an intentional exception and retains it. Provide a clear back button or completion action to parent. Includes:
   - Home subviews (goals detail, progress, notifications)
-  - Coach subviews (Exercise Library, camera check, live session, report)
-  - Scan subviews (meal review, Add Food, Food History; Today’s Log retains the main tab bar)
+  - Coach subviews (camera check, live session, report; Exercise Library retains the main tab bar to match its supplied reference)
+  - Scan subviews (meal review and Add Food hide navigation; Today’s Log and Food History retain the main tab bar)
   - Me subviews (Admin tools)
-- **Tab bar visibility**: Main section roots retain the tab bar. Today’s Log also retains it; other nested views follow the owning section’s explicit navigation behavior.
+- **Tab bar visibility**: Main section roots, Today’s Log, Food History, and the Coach Exercise Library retain the tab bar; the exercise modal covers navigation while open. Other nested views follow the owning section’s explicit navigation behavior.
 - **Content frame**: Home is the reference for signed-in content width and gutters; reuse this centered frame across all sections
 
 ### Data & Persistence
@@ -435,6 +441,10 @@ Do not raise page controls above a modal layer to solve clipping issues; fix the
 
 ### Stylesheet Structure
 
+**October 14, 2026:** Coach Exercise Library now follows the supplied compact list and white video-detail sheet. The library keeps bottom navigation; its native modal dialog covers navigation while open, contains keyboard focus, closes with Escape/backdrop/close, and restores focus to its opener. The original safe-area aliases now remain authoritative instead of being overridden by duplicate declarations.
+
+**October 14, 2026 — Scan:** Nutrition, Review Estimate, Today’s Log, Add Food, and Food History follow the supplied mobile references using shared palette/system typography and scoped styles. The existing API client and nutrition hook remain the live data path. A labeled, local reference preview is eligible only after a successful response with no meals and no recorded water; it persists across internal navigation and background refresh without replacing errors or real records. Sample manual/scan saves and water updates never call persistence APIs. Camera/upload always use backend analysis; the photo-source chooser offers a separate, explicit sample-estimate action.
+
 All active web styles live in `frontend/app/globals.css`. This file is imported by the root layout.
 
 **File Organization:**
@@ -545,6 +555,8 @@ Before committing any UI changes, verify:
 - **Data states**: Retain the API-backed loading and error/retry states. When no live records are returned successfully, show the requested screenshot-matched sample preview with an explicit sample label; its read actions are local and never sent to the backend. For live records, individual mark-read and mark-all-read remain API-backed. Keep the Home bottom navigation and safe-area spacing intact.
 
 ### Coach (Training)
+- **Exercise Library sample preview**: Default to All muscles and Dumbbells, displaying the six supplied exercises in reference order. Use two horizontally scrollable filter rows with pill surfaces inside 44px touch targets, a search icon/input, result count, muted sample label, compact thumbnail rows, and AI tracked/Caution badges. Search and filters are local and combine; Any equipment removes the equipment restriction.
+- **Exercise details**: White bottom sheet on phones, centered dialog at 700px and wider. Title and metadata precede the video preview, recommendation and form-tracking label, numbered instructions, and green check-circle form cues. The bench-press poster displays the media area of the unchanged supplied reference; other exercises state that video is coming soon. Play controls explicitly report that playback is not connected. No autoplay, fabricated AI analysis, or plan-saving action. Keep the sample/AI-unavailable note visible in the sheet.
 - **Header**: Section title + back button (if nested)
 - **Week View**: Grid of 7 day buttons with indicator dots, selected day highlighted green
 - **Exercise List**: Numbered items with title, time, tracking tag (manual/automatic/caution)
@@ -553,6 +565,10 @@ Before committing any UI changes, verify:
 - **Live Controls**: Pause/End buttons, session progress bar
 
 ### Scan (Nutrition)
+- **Reference presentation**: Compact sticky headers, a full green calorie-summary ring, macro tracks, rounded green scan CTA, thin meal dividers, and More links. Use the camera icon for scanning, shared glass icons for water, and shared bar-chart icons for history. Keep touch areas at least 44px; water displays eight glasses across standard phones and wraps to four columns on the narrowest phones.
+- **Review Estimate**: Detected photo/items precede confidence badges and low-confidence guidance, Meal and Portion size pills, and the bordered macro table. Excluding an item or changing portions updates totals and the existing scan-save payload. Retain loading/time-limit progress, explicit errors/retry, unmatched-item exclusions, and degraded-result notices. Edit manually opens Add Food; the sticky footer keeps the save action disabled until matched items exist and while saving.
+- **Add Food**: Meal pills, search, recent suggestions, radio-style results, quantity/unit controls, calculated nutrition, and a sticky Save to [meal] footer. Live search/detail/save remain API-backed. Convert the quantity when switching grams/servings so the actual portion stays the same. Disable save for invalid/incomplete/pending data and show failures without implying persistence.
+- **Food History**: 7/30/90-day period pills, average daily intake over days with records, target comparison, calorie bars with target line, energy-based macro percentages, and expandable daily records. Derive live summaries from returned meals; the labeled preview uses the shared local fixtures. Retain bottom navigation on history and Today’s Log; Review Estimate and Add Food hide it.
 - **Nutrition Card**: Circular calorie display + macro list with progress bars, backed by the nutrition API
 - **Scan CTA**: Green button with camera icon, text overlay
 - **Photo scan flow**: Camera/upload selection opens Review Estimate immediately; show progress, actionable errors, detected items, and unmatched items. Require user confirmation before saving matched items.
@@ -575,7 +591,7 @@ Before committing any UI changes, verify:
 - **Profile Summary**: Avatar, name, email, edit button
 - **Settings Rows**: Icon + title + description, toggle or arrow
 - **Setting Block**: Group title + description, threshold buttons or toggles
-- **Admin Tools**: Exercise Library link, Analytics link (separate detail views, admin role-gated, live data)
+- **Admin Tools**: Exercise Library and Analytics links open explicit local mock detail views for every signed-in account. The separate live backend endpoints retain administrator authorization.
 - **Logout Button**: Prominent danger color, bottom of scroll area
 
 ## 10. Form Design & Input Controls

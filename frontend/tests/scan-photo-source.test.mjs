@@ -38,7 +38,7 @@ test('today log shows calorie and macro targets with live meals and water contro
   assert.match(types, /nutritionTargets = \{ calories: 2300, protein: 140, carbs: 240, fats: 70 \}/);
   assert.match(dashboard, /nutritionTargets/);
   assert.match(log, /nutritionTargets\.calories/);
-  assert.match(log, /target-log-ring-progress/);
+  assert.match(log, /<CalorieProgress calories=\{calories\} target=\{nutritionTargets.calories\}/);
   assert.match(log, /role="progressbar"/);
   assert.match(log, /onClick=\{onHistory\}/);
   assert.match(log, /onAdd\(meal\)/);

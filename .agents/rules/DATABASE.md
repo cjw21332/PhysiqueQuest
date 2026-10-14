@@ -22,6 +22,8 @@ This document is the source of truth for persistence and data-service decisions.
 
 ## 2. Data Flow
 
+Meal updates through the existing user-owned nutrition endpoint persist `edited: true` while retaining the original source, logging time, and date. The optional/default-false schema field requires no backfill for older records. New scan and manual writes include device-local date/time from the web client; existing records with no recorded time cannot be retroactively assigned a logging time.
+
 ```mermaid
 flowchart LR
   W[Next.js web app] -->|HTTPS + access token| G[API entry point]

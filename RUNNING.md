@@ -146,6 +146,16 @@ Run this command from the repository root. It invokes the mobile workspace's
 local Expo CLI with LAN hosting. From inside `mobile/`, `npm run expo` works as
 well. Do not install the deprecated global `expo-cli`.
 
+The repository root also declares `mobile/index.ts` as its Expo entry point, so
+starting Expo there no longer searches for a nonexistent root `App`. The mobile
+workspace remains the recommended launch location so its app configuration is used.
+If an existing session reports `Unable to resolve "../../App"`, stop that Expo
+process with Ctrl+C, then restart from the repository root with a clean cache:
+
+```bash
+npm run start --workspace mobile -- --clear
+```
+
 **Expected Output:**
 - Expo DevTools opening in browser
 - QR code displayed in terminal
