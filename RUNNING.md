@@ -2,6 +2,12 @@
 
 This guide provides complete instructions for setting up and running the PhysiqueQuest application across all platforms.
 
+## Exercise library catalog
+
+Coach's Exercise library and `/exercises` use free ExerciseDB V1 through the independent Coach service. Build the backend, then run `npm run coach` from the repository root (or `npm run coach:dev` during development). It listens on port 4050 without MongoDB or other feature modules. The Coach screen loads per-user programs from the authenticated main backend on port 4000 (`npm run start:dev` inside `backend`); this Coach module generates and saves a program once per training-preference version, then reuses MongoDB's `coach_programs` records. Both processes are needed for the full Coach experience. See [AI Coach setup](docs/AI_COACH.md).
+
+The old `npm run seed` and Me's role-protected administrator catalog still manage local legacy records, but these records no longer supply Coach or its public library. They are not a fallback for ExerciseDB errors. GIF demonstrations, instructions and metadata come from ExerciseDB. Missing media remains unavailable; V1 does not certify AI tracking. Analytics remains a separate preview.
+
 ## System Architecture
 
 PhysiqueQuest consists of three main components:

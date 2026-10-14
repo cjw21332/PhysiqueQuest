@@ -35,7 +35,7 @@ export default function AdminExerciseLibrary({ onBack, preview = false }: { onBa
     event.preventDefault();
     if (busy || !name.trim() || !equipment.trim()) return;
     setBusy(true); setError('');
-    const payload = { name: name.trim(), group: `${muscle} · ${equipment.trim()}`, status: published ? 'published' as const : 'draft' as const, pose: 'missing' as const };
+    const payload = { name: name.trim(), group: `${muscle} · ${equipment.trim()}`, targetMuscle: muscle, equipment: equipment.trim(), status: published ? 'published' as const : 'draft' as const, pose: 'missing' as const };
     try {
       if (preview) setExercises(current => [...current, { ...payload, _id: `preview-new-${Date.now()}` }]);
       else await api.createAdminExercise(payload);

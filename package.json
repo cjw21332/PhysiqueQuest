@@ -7,7 +7,9 @@
     "expo": "npm run start --workspace mobile",
     "build": "npm run build --workspace frontend",
     "start": "npm run start --workspace frontend",
-    "seed": "ts-node seed.ts"
+    "coach": "npm --prefix backend run start:coach",
+    "coach:dev": "npm --prefix backend run start:coach:dev",
+    "seed": "npm --prefix backend run seed:exercises"
   },
   "devDependencies": {
     "expo": "^57.0.28"

@@ -14,7 +14,7 @@ const tabs: { label: HomeTab; icon: string; path: string }[] = [
   { label: 'Me', icon: 'user', path: '/me' }
 ];
 
-export default function BottomNav() {
+export default function BottomNav({ coachIcon = 'coach' }: { coachIcon?: string } = {}) {
   const pathname = usePathname();
 
   const handleNavigation = (path: string) => {
@@ -26,11 +26,11 @@ export default function BottomNav() {
       {tabs.map(tab => (
         <button
           key={tab.label}
-          className={pathname === tab.path || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) ? 'active' : ''}
+          className={pathname === tab.path || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) || (tab.path === '/coach' && pathname === '/exercises') ? 'active' : ''}
           onClick={() => handleNavigation(tab.path)}
         >
           <span className="nav-icon">
-            <Icon name={tab.icon} size={17}/>
+            <Icon name={tab.label === 'Coach' ? coachIcon : tab.icon} size={17}/>
           </span>
           <small>{tab.label}</small>
         </button>

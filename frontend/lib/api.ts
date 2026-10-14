@@ -1,6 +1,15 @@
 // API client configuration
 import { clearAuthSession } from './session';
 import { resolveApiBaseUrl } from './apiBaseUrl.mjs';
+import { resolveCoachBaseUrl } from './coachBaseUrl.mjs';
+
+export function getCoachApiBaseUrl() {
+  let runtime: string | undefined;
+  try { if (typeof window !== 'undefined') runtime = localStorage.getItem('physiquequest-runtime-coach-url') ?? undefined; } catch { /* Optional runtime override. */ }
+  const base = resolveCoachBaseUrl(process.env.NEXT_PUBLIC_COACH_API_URL, runtime, typeof window === 'undefined' ? undefined : window.location);
+  if (!base) throw new Error('The AI Coach service address is invalid. Check the app connection settings.');
+  return base;
+}
 
 export function getApiBaseUrl() {
   let runtimeApiUrl: string | undefined;
@@ -44,6 +53,13 @@ function readErrorBody(body: unknown): ApiError {
   return record as ApiError;
 }
 
+export interface ExerciseRecord {
+  _id: string; slug?: string; name: string; group?: string; targetMuscle?: string; equipment?: string;
+  difficulty?: string; pictureUrl?: string; videoUrl?: string; instructions?: string[];
+  trackingStatus?: string; pose?: 'missing' | 'ready' | 'training';
+  gifUrl?: string; description?: string; checks?: string[]; recommended?: string; source?: string;
+}
+export interface ExerciseCatalog { items: ExerciseRecord[]; total: number; page: number; limit: number; pages: number; source?: string; coverageNote?: string; }
 export interface ProgressRecord { _id: string; metric: 'weight' | 'waist' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
 export interface WorkoutSessionRecord { _id: string; exerciseIds: string[]; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; }
 export type AlertRecord = {
@@ -102,6 +118,8 @@ export interface CoachExercise {
   targetMuscle: string;
   equipment: string;
   tracking: 'AI tracked' | 'Manual';
+  prescription?: string;
+  formTip?: string | null;
 }
 
 export interface CoachDay {
@@ -112,6 +130,9 @@ export interface CoachDay {
   title: string;
   focus: string | null;
   exercises: CoachExercise[];
+  equipmentLabel?: string;
+  formTip?: { exerciseName: string; text: string } | null;
+  availabilityNote?: string | null;
 }
 
 export interface CoachPlanRecord {
@@ -228,9 +249,10 @@ export class ApiTimeoutError extends Error {
 class ApiClient {
   private async request<T>(
     endpoint: string,
-    options: RequestOptions = {}
+    options: RequestOptions = {},
+    baseUrl?: string
   ): Promise<T> {
-    const url = `${getApiBaseUrl()}${endpoint}`;
+    const url = `${baseUrl ?? getApiBaseUrl()}${endpoint}`;
 
     const { timeoutMs, ...init } = options;
     const config: RequestInit = {
@@ -416,10 +438,14 @@ class ApiClient {
     if (query?.muscle) qs.set('muscle', query.muscle);
     if (query?.equipment) qs.set('equipment', query.equipment);
     if (query?.page) qs.set('page', String(query.page));
-    qs.set('limit', String(query?.limit ?? 100));
-    return this.request<any>(`/exercises?${qs.toString()}`);
+    qs.set('limit', String(query?.limit ?? 12));
+    return this.request<ExerciseCatalog>(`/exercises?${qs.toString()}`, { timeoutMs: 60_000 }, getCoachApiBaseUrl());
   }
-  async getExercise(slug: string) { return this.request<any>(`/exercises/${encodeURIComponent(slug)}`); }
+  async getExercise(slug: string) { return this.request<ExerciseRecord>(`/exercises/${encodeURIComponent(slug)}`, { timeoutMs: 30_000 }, getCoachApiBaseUrl()); }
+  async getIndependentCoachPlan(profile: Record<string, unknown>) {
+    const { goal, days, duration, equipment, conditions, createdAt } = profile;
+    return this.request<CoachPlanRecord>('/coach/plan', { method: 'POST', timeoutMs: 60_000, body: JSON.stringify({ profile: { goal, days, duration, equipment, conditions, createdAt } }) }, getCoachApiBaseUrl());
+  }
 
   // Food scanning
   /**

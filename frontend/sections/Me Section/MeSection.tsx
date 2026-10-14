@@ -83,7 +83,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   if (view === 'edit-emergency') return <EmergencyContactEdit profile={currentProfile} error={saveError} onBack={() => { setSaveError(''); setView('settings'); }} onSave={patch => saveProfile(patch, 'Emergency contact edit')} />;
 
   if (view === 'exercises') {
-    return <AdminExerciseLibrary preview onBack={() => setView('settings')} />;
+    return <AdminExerciseLibrary onBack={() => setView('settings')} />;
   }
   if (view === 'engagement') {
     return <EngagementAnalytics preview onBack={() => setView('settings')} />;

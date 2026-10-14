@@ -7,17 +7,21 @@ import { getCurrentUser, logout } from '../../../lib/auth';
 import { useCurrentProfile } from '../../../hooks/useCurrentProfile';
 import ProfileLoadState from '../../../components/ProfileLoadState';
 import { navigate } from '../../../lib/navigation';
+import ExerciseLibrary from '../../../sections/Coach/ExerciseLibrary';
+import BottomNav from '../../../sections/Home/BottomNav';
 
 export default function CoachPage() {
   const { profile, loading, error, retry } = useCurrentProfile();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [browseLibrary, setBrowseLibrary] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  if (loading || error || !profile) return <ProfileLoadState loading={loading} error={error} onRetry={retry} />;
+  if (browseLibrary) return <main className="scene"><div className="app-shell"><section className="coach-section coach-view-library"><div className="coach-scroll"><ExerciseLibrary onBack={() => setBrowseLibrary(false)}/></div><BottomNav coachIcon="coach-wand"/></section></div></main>;
+  if (loading || error || !profile) return <main className="scene"><div className="app-shell"><ProfileLoadState loading={loading} error={error} onRetry={retry}/><button type="button" className="primary" onClick={() => setBrowseLibrary(true)}>Browse exercise library</button></div></main>;
 
   return (
     <main className="scene">

@@ -1,11 +1,13 @@
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
-import { CoachService } from '../src/coach/coach.service.js';
+import { CoachService as SavedCoachService } from '../src/coach/coach.service.js';
+
+class CoachService extends SavedCoachService { constructor(profiles: any, settings: any, exercises: any) { super(profiles, settings, exercises, { findOne: () => ({ lean: () => ({ exec: async () => null }) }), findOneAndUpdate: (_filter: any, update: any) => ({ lean: () => ({ exec: async () => update.$setOnInsert }) }) } as any); } }
 
 const USER = '507f1f77bcf86cd799439011';
 
 const exercisesModel = (rows: unknown[]) =>
-  ({ find: vi.fn(() => ({ select: () => ({ lean: () => ({ exec: async () => rows }) }) })) }) as any;
+  ({ getForPlan: vi.fn(async () => rows.map((row: any) => ({ group: 'General', targetMuscle: '', equipment: '', pose: 'missing', instructions: [], ...row, pose: 'missing' }))) }) as any;
 
 const profileModel = (profile: unknown) =>
   ({ findOne: vi.fn(() => ({ lean: () => ({ exec: async () => profile }) })) }) as any;
@@ -41,15 +43,15 @@ describe('coach plan', () => {
 
     const plan = await service.getPlan(USER);
 
-    expect(exercises.find).toHaveBeenCalledWith({ status: 'published' });
+    expect(exercises.getForPlan).toHaveBeenCalledWith(['Dumbbells'], 'Build muscle');
     expect(plan.sessionCount).toBe(4);
     expect(plan.libraryReady).toBe(true);
     const workoutDays = plan.days.filter(day => day.isWorkoutDay);
     expect(workoutDays.map(day => day.index)).toEqual([0, 2, 4, 5]);
     expect(plan.days[6]).toMatchObject({ isWorkoutDay: false, title: 'Rest day' });
-    for (const day of workoutDays) expect(day.exercises).toHaveLength(5);
+    for (const day of workoutDays) expect(day.exercises.length).toBeLessThanOrEqual(6);
     expect(workoutDays.flatMap(day => day.exercises).some(exercise => exercise.name.includes('Barbell'))).toBe(false);
-    expect(workoutDays.flatMap(day => day.exercises).find(exercise => exercise.name === 'Dumbbell bench press')?.tracking).toBe('AI tracked');
+    expect(workoutDays.flatMap(day => day.exercises).find(exercise => exercise.name === 'Dumbbell bench press')?.tracking).toBe('Manual');
   });
 
   it('keeps exercises that conflict with a health condition out of the plan', async () => {
@@ -105,5 +107,49 @@ describe('coach plan', () => {
   it('rejects a user without a profile', async () => {
     const service = new CoachService(profileModel(null), settingsModel(), exercisesModel([]));
     await expect(service.getPlan(USER)).rejects.toThrow();
+  });
+
+  it('keeps push/lower/pull days aligned with their program instead of rotating into unrelated muscles', async () => {
+    const rows = library([
+      { name: 'Dumbbell bench press', targetMuscle: 'Chest', equipment: 'Dumbbell' },
+      { name: 'Overhead press', targetMuscle: 'Shoulders', equipment: 'Dumbbell' },
+      { name: 'Triceps extension', targetMuscle: 'Arms', equipment: 'Dumbbell' },
+      { name: 'Goblet squat', targetMuscle: 'Legs', equipment: 'Dumbbell' },
+      { name: 'Bent-over row', targetMuscle: 'Back', equipment: 'Dumbbell' },
+      { name: 'Biceps curl', targetMuscle: 'Arms', equipment: 'Dumbbell' },
+      { name: 'Lateral raise', targetMuscle: 'Shoulders', equipment: 'Dumbbell' },
+    ]);
+    const plan = await new CoachService(profileModel(profile), settingsModel(), exercisesModel(rows)).getPlan(USER);
+    const workoutDays = plan.days.filter(day => day.isWorkoutDay);
+    expect(workoutDays[0].title).toBe('Upper Body — Push');
+    expect(workoutDays[0].exercises.map(item => item.name)).toEqual(expect.arrayContaining(['Dumbbell bench press', 'Overhead press', 'Triceps extension']));
+    expect(workoutDays[0].exercises.some(item => /squat|row|curl/i.test(item.name))).toBe(false);
+    expect(workoutDays[1].exercises.map(item => item.name)).toEqual(['Goblet squat']);
+    expect(workoutDays[2].exercises.map(item => item.name)).toEqual(expect.arrayContaining(['Bent-over row', 'Biceps curl']));
+    expect(workoutDays[2].exercises.some(item => /press|squat|lateral/i.test(item.name))).toBe(false);
+  });
+
+  it('returns individual prescriptions and a form tip from the real catalog instructions', async () => {
+    const rows = [{ _id: USER, name: 'Plank', targetMuscle: 'Core', equipment: 'Bodyweight', pose: 'missing', instructions: ['Keep hips level.'] }];
+    const plan = await new CoachService(profileModel({ ...profile, goal: 'General fitness' }), settingsModel(), exercisesModel(rows)).getPlan(USER);
+    const day = plan.days.find(item => item.isWorkoutDay)!;
+    expect(day.exercises[0]).toMatchObject({ prescription: '3 × 45 s', equipment: 'Bodyweight', tracking: 'Manual' });
+    expect(day.formTip).toEqual({ exerciseName: 'Plank', text: 'Keep hips level.' });
+    expect(day.equipmentLabel).toBe('Bodyweight');
+  });
+
+  it('does not silently treat missing equipment as available or invent filler for an empty focus', async () => {
+    const rows = library([{ name: 'Unknown equipment squat', targetMuscle: 'Legs' }, { name: 'Bench press', targetMuscle: 'Chest', equipment: 'Dumbbell' }]);
+    const plan = await new CoachService(profileModel(profile), settingsModel(), exercisesModel(rows)).getPlan(USER);
+    expect(plan.days[2].exercises).toEqual([]);
+    expect(plan.days.flatMap(item => item.exercises).some(item => item.name === 'Unknown equipment squat')).toBe(false);
+  });
+
+  it('keeps distinct core exercises for a core-focused program', async () => {
+    const rows = library(['Plank', 'Bird dog', 'Dead bug'].map(name => ({ name, targetMuscle: 'Core', equipment: 'Bodyweight' })));
+    const plan = await new CoachService(profileModel({ ...profile, goal: 'General fitness' }), settingsModel(), exercisesModel(rows)).getPlan(USER);
+    const core = plan.days.find(day => day.title === 'Core & Mobility')!;
+    expect(core.exercises.map(item => item.name)).toEqual(expect.arrayContaining(['Plank', 'Bird dog', 'Dead bug']));
+    expect(core.exercises).toHaveLength(3);
   });
 });

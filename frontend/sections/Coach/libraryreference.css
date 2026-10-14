@@ -1,0 +1,39 @@
+.coach-library .library-header { min-height: 54px; margin-bottom: 14px; }
+.coach-library .library-search { height: 43px; border-radius: 10px; }
+.coach-library .filter-row { gap: 6px; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+.coach-library .filter-row::-webkit-scrollbar { display: none; }
+.coach-library .filter-row button { flex: none; }
+.coach-library .filter-row button > span { min-height: 28px; padding: 0 10px; font-size: 11px; }
+.coach-library .library-caption { margin-top: 10px; }
+.coach-library .library-item { min-height: 67px; padding: 10px 0; gap: 11px; }
+.coach-library .exercise-thumb { width: 46px; height: 46px; flex: 0 0 46px; border-radius: 9px; }
+.coach-library .library-copy { flex: 1; overflow: hidden; }
+.coach-library .library-copy b,.coach-library .library-copy small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.coach-library .library-copy b { font-size: 13px; font-weight: 500; }
+.coach-library .library-copy small { font-size: 11px; }
+.coach-library .tracking-tag.manual { padding: 3px 8px; font-size: 10px; }
+.library-dialog.library-dialog { inset: auto 0 0; width: min(100%, 560px); margin: 0 auto; min-height: min(80dvh, 760px); max-height: calc(100dvh - 72px); border-radius: 24px 24px 0 0; }
+.library-dialog .library-exercise-sheet { padding: 20px 18px 30px; }
+.library-dialog .library-sheet-header { align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+.library-dialog .library-sheet-header h3 { font-size: 16px; }
+.library-dialog .library-sheet-header p { margin: 0; font-size: 11px; }
+.library-dialog .sheet-close { margin-top: -6px; margin-right: -6px; }
+.library-demo { position: relative; width: 100%; height: clamp(175px, 28dvh, 265px); overflow: hidden; background: #f5f7f5; border-radius: 0 0 10px 10px; }
+.library-demo img,.library-demo canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+.library-demo canvas { position: absolute; inset: 0; }
+.library-demo .library-video-unavailable { color: var(--muted); }
+.library-demo .library-video-unavailable small { margin-top: 0; }
+.library-demo-toggle { position: absolute; inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--surface); color: var(--ink); display: grid; place-items: center; box-shadow: 0 1px 8px #17203322; }
+.library-demo-toggle.is-playing { inset: auto 10px 10px auto; transform: none; width: 36px; height: 36px; font-size: 20px; }
+.library-dialog .library-recommendation { margin: 12px 0; font-size: 11px; }
+.library-manual-label { margin-left: auto; color: var(--muted); }
+.library-dialog .library-instructions h4 { font-size: 12px; margin-bottom: 14px; }
+.library-dialog .library-instructions ol { gap: 13px; }
+.library-dialog .library-instructions li { gap: 10px; }
+.library-dialog .library-instructions li > span { width: 22px; height: 22px; flex-basis: 22px; }
+.library-dialog .library-instructions li p { margin: 0; font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
+.library-description { margin: 0 0 16px; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+.library-dialog .library-preview-note { margin-top: 24px; font-size: 10px; }
+.library-preview-note a { text-decoration: underline; color: inherit; }
+.library-dialog .library-media-retry { margin-top: 10px; }
+@media (max-width: 340px) { .coach-library .exercise-thumb { width: 40px; height: 40px; flex-basis: 40px; } .coach-library .library-item { gap: 8px; } .coach-library .library-copy b { font-size: 12px; } .library-dialog .library-exercise-sheet { padding-inline: 14px; } }

@@ -10,6 +10,9 @@ type AuthenticatedRequest = Request & { user: { userId: string } };
 export class CoachController {
   constructor(private readonly service: CoachService) {}
 
+  @Get('status')
+  status() { return { status: 'ready', source: 'ExerciseDB V1', media: 'GIF', attribution: 'ExerciseDB by AscendAPI — https://oss.exercisedb.dev' }; }
+
   @Get('plan')
   getPlan(@Req() req: AuthenticatedRequest) {
     return this.service.getPlan(req.user.userId);

@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../Home/icons';
-import type { Exercise } from './exercises';
 import { InactivityCountdown, EmergencyAlarm } from './InactivityViews';
-import { api } from '../../lib/api';
+import { api, type CoachExercise } from '../../lib/api';
 import { useCameraStream } from '../../hooks/useCameraStream';
 import { startAlarm, stopAlarm } from '../../lib/alarmAudio';
 import { COUNTDOWN_SECONDS } from '../../lib/inactivityConstants.mjs';
@@ -19,7 +18,7 @@ type NativeEvent =
 type Phase = 'active' | 'countdown' | 'alarm';
 
 type Props = {
-  exercise: Exercise;
+  exercise: Pick<CoachExercise, 'exerciseId' | 'name' | 'equipment'>;
   workoutId: string;
   thresholdSeconds: number;
   contactName: string;
@@ -151,7 +150,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         idempotencyKey: key,
         eventType: 'inactivity',
         workoutSessionId: workoutId,
-        exerciseId: exercise.name,
+        exerciseId: exercise.exerciseId ?? exercise.name,
         ...(location ? { location } : {}),
       });
       setAlert({

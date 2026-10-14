@@ -1,0 +1,103 @@
+/* Coach reference: plain white surfaces, compact type, quiet rules and green actions. */
+.coach-reference {
+  --coach-width: 560px;
+  --coach-nav-height: 72px;
+  height: 100%;
+  min-height: 0;
+  background: #fff;
+  color: #111a2c;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.coach-reference > .coach-scroll {
+  position: static;
+  max-width: var(--coach-width);
+  padding: 0 20px 104px;
+  scrollbar-width: none;
+}
+.coach-reference .coach-plan { position: static; padding: 0; }
+.coach-reference .coach-plan-header {
+  width: calc(100% + 40px);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 56px;
+  min-height: 56px;
+  margin: 0 -20px 16px;
+  padding: 0 24px;
+  border-bottom: 1px solid #edf0ed;
+  background: #fff;
+}
+.coach-reference .coach-title { font-size: 16px; font-weight: 600; letter-spacing: 0; line-height: 1.3; }
+.coach-reference .week-section { margin: 0 0 22px; }
+.coach-reference .week-info { margin: 0 0 10px; font-size: 12px; font-weight: 400; color: #536176; }
+.coach-reference .week-days-grid { gap: 6px; }
+.coach-reference .day-button {
+  height: 54px;
+  border: 1px solid #e8ede9;
+  border-radius: 12px;
+  gap: 8px;
+  transition: none;
+}
+.coach-reference .day-button .day-label { font-size: 13px; font-weight: 400; }
+.coach-reference .day-button .day-dot { width: 5px; height: 5px; background: #167336; }
+.coach-reference .day-button.selected { background: #80e687; border-color: #80e687; color: #123b19; }
+.coach-reference .day-button.selected .day-label { font-weight: 600; }
+.coach-reference .workout-info-card { margin: 0 0 12px; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+.coach-reference .workout-label { margin-bottom: 5px; color: #167336; font-size: 12px; font-weight: 500; text-transform: none; letter-spacing: 0; }
+.coach-reference .workout-title { margin: 0 0 6px; color: #111a2c; font-size: 21px; line-height: 1.25; letter-spacing: -.25px; }
+.coach-reference .workout-meta { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 5px; color: #536176; font-size: 12px; line-height: 1.45; }
+.coach-reference .workout-meta .meta-item, .coach-reference .workout-meta .meta-separator { display: inline; width: auto; flex: 0 0 auto; }
+.coach-reference .meta-separator { color: #536176; }
+.coach-reference .exercise-list-card { margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+.coach-reference .exercise-list { border: 0; }
+.coach-reference .exercise-item { min-height: 64px; padding: 12px 0; gap: 12px; border-bottom: 1px solid #edf0ed; }
+.coach-reference .exercise-item:last-child { border-bottom: 1px solid #edf0ed; }
+.coach-reference .exercise-number { width: 30px; height: 30px; flex: 0 0 30px; color: #536176; background: #f4f7f4; font-size: 12px; font-weight: 400; }
+.coach-reference .exercise-details { gap: 4px; }
+.coach-reference .exercise-name { color: #111a2c; font-size: 14px; font-weight: 400; line-height: 1.35; }
+.coach-reference .exercise-sets { color: #536176; font-size: 12px; font-weight: 400; }
+.coach-reference .tracking-badge { padding: 4px 9px; color: #167336; background: #eefaf0; border-radius: 20px; font-size: 11px; font-weight: 400; }
+.coach-reference .tracking-badge.manual { color: #536176; background: #f4f7f4; }
+.coach-reference .form-tip-card { margin: 22px 0 16px; padding: 16px; gap: 12px; border: 0; border-radius: 14px; background: #eefaf0; }
+.coach-reference .tip-icon { width: 18px; height: 20px; flex: 0 0 18px; background: transparent; border-radius: 0; color: #167336; }
+.coach-reference .tip-content { gap: 7px; }
+.coach-reference .tip-title { color: #167336; font-size: 12px; font-weight: 500; line-height: 1.4; }
+.coach-reference .tip-text { color: #111a2c; font-size: 14px; font-weight: 400; line-height: 1.65; }
+.coach-reference .library-link-card { min-height: 72px; margin: 0; padding: 12px 0; gap: 12px; border: 0; border-radius: 0; box-shadow: none; transform: none; }
+.coach-reference .library-icon { width: 32px; height: 32px; flex: 0 0 32px; background: #f4f7f4; border-radius: 6px; color: #536176; }
+.coach-reference .library-info { gap: 5px; }
+.coach-reference .library-title { color: #111a2c; font-size: 14px; font-weight: 400; }
+.coach-reference .library-subtitle { color: #536176; font-size: 12px; }
+.coach-reference .library-link-card > svg { color: #8793a1; }
+.coach-reference .start-button-container {
+  position: absolute;
+  z-index: 4;
+  bottom: var(--coach-nav-height);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--coach-width);
+  height: 84px;
+  margin: 0;
+  padding: 14px 20px 16px;
+  border-top: 1px solid #edf0ed;
+  background: #fff;
+}
+.coach-reference .start-session-btn { min-height: 54px; height: 54px; gap: 8px; border-radius: 13px; background: #80e687; color: #111a2c; font-size: 15px; font-weight: 600; box-shadow: none; transform: none; transition: none; }
+.coach-reference .start-session-btn:disabled { opacity: .5; cursor: not-allowed; }
+.coach-reference > .home-bottom-nav { height: var(--coach-nav-height); min-height: var(--coach-nav-height); flex: 0 0 var(--coach-nav-height); max-width: var(--coach-width); margin: 0 auto; padding: 8px 8px 10px; background: #fff; border-top: 1px solid #edf0ed; }
+.coach-reference .home-bottom-nav button { min-height: 44px; gap: 5px; padding: 0; color: #536176; }
+.coach-reference .home-bottom-nav button .nav-icon { width: 50px; height: 30px; min-height: 30px; border-radius: 18px; }
+.coach-reference .home-bottom-nav button.active .nav-icon { background: #80e687; }
+.coach-reference .home-bottom-nav small { font-size: 10px; line-height: 1.2; font-weight: 400; }
+.coach-reference .home-bottom-nav button.active small { color: #111a2c; font-weight: 600; }
+.coach-reference .coach-plan-note { padding: 12px 0 0; color: #536176; font-size: 12px; line-height: 1.5; }
+.coach-reference .rest-day-message { margin-top: 0; background: #f4f7f4; }
+@media (max-width: 350px) {
+  .coach-reference > .coach-scroll { padding-inline: 16px; }
+  .coach-reference .coach-plan-header { width: calc(100% + 32px); margin-inline: -16px; padding-inline: 20px; }
+  .coach-reference .exercise-item { gap: 9px; }
+  .coach-reference .exercise-name { font-size: 13px; }
+  .coach-reference .tracking-badge { padding-inline: 7px; font-size: 10px; }
+  .coach-reference .start-button-container { padding-inline: 16px; }
+}

@@ -8,7 +8,7 @@ import { ExerciseRecord } from './schemas/exercise.schema.js';
 export class AdminExercisesService {
   constructor(@InjectModel(ExerciseRecord.name) private readonly model: Model<ExerciseRecord>) {}
   async list(limit = 100) { return this.model.find({}).sort({ createdAt: -1 }).limit(Math.min(Math.max(limit, 1), 100)); }
-  async create(dto: ExerciseDto) { return this.model.create({ name: dto.name, group: dto.group || 'General', status: dto.status || 'draft', pose: dto.pose || 'missing' }); }
+  async create(dto: ExerciseDto) { return this.model.create({ ...dto, group: dto.group || 'General', status: dto.status || 'draft', pose: dto.pose || 'missing' }); }
   async update(id: string, dto: ExerciseDto) {
     if (!Types.ObjectId.isValid(id)) throw new NotFoundException('Exercise not found');
     const updated = await this.model.findOneAndUpdate({ _id: new Types.ObjectId(id) }, { $set: dto }, { returnDocument: 'after', runValidators: true });

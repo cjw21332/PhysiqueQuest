@@ -1,10 +1,82 @@
 # PhysiqueQuest — Frontend, Backend, and End-to-End Checklist
 
-> **Audit date:** October 13, 2026  
-> **Release baseline:** `PhysiqueQuest-v2.5.2` (`37c4309`)
+> **Audit date:** October 15, 2026
+>
+> **Current release:** `PhysiqueQuest-v2.7.3`, prepared on October 15, 2026
+>
+> **Previous release:** `PhysiqueQuest-v2.7.2` (`574f4f9`)
+>
+> **Historical release baseline:** `PhysiqueQuest-v2.5.2` (`37c4309`)
 > **Scope:** Frontend UI/API wiring, backend services, and proven frontend → API → persisted-user-data workflows.
 
 This checklist separates what is implemented in the frontend, what is implemented and tested in the backend, and what has actually been demonstrated as a complete user journey using genuine account data.
+
+### Current Coach / ExerciseDB V1 verification — October 15, 2026
+
+Latest persistence update: the Coach screen now reads authenticated `GET /api/coach/plan` on the main backend. Per-user versions are stored in `coach_programs` with daily exercise IDs, order and prescriptions; unchanged preferences reuse them across reloads and process restarts without ExerciseDB calls. Goal, days, equipment, duration and health changes select a new version. Catalog/detail/GIF browsing remains independent on port 4050. This supersedes earlier descriptions of the screen calling the stateless provider planner directly.
+
+- [✅] Actual existing account program saved in MongoDB; browser reload rendered identical daily exercises. A new service instance restored the same snapshot with its provider deliberately unavailable, making zero provider calls. The saved user program is retained as requested.
+- [✅] Persistence tests cover user isolation, concurrent loads, changed preferences, equivalent legacy weekdays, provider outages and empty generations. Frontend/mobile tests: 120/120; browser tests: 10/10; both production builds pass.
+
+This entry supersedes earlier Coach/catalog source and camera-entry descriptions. Coach and the exercise library now use the free live ExerciseDB V1 API, with no subscription/key and no seeded catalog fallback. V1 has approximately 1,500 exercises; the earlier V2 11,000-exercise/video proposal is not implemented. Demonstrations use real animated GIFs. The independent Coach service runs on port 4050 without MongoDB or other feature modules. Account profile and workout storage remain on the account API.
+
+- [✅] Backend suite: 309/309 tests across 41 files; backend and frontend production builds pass.
+- [✅] Saved legacy training days (`M, T, W, T, F` and indexed IDs) are accepted by the independent Coach service and normalized to full weekdays; invalid and duplicate canonical days remain rejected. Regression tests cover both legacy formats. Live browser verification against the existing saved profile returned HTTP 201, five weekday sessions and eight rendered Monday exercises, without changing profile or workout records.
+- [✅] Frontend/mobile Node tests: 120/120, including independent service addressing and protection against stale program responses.
+- [✅] Browser suite: 10/10 using Microsoft Edge, including library/detail errors, GIF controls, responsive layout, Coach rendering, hidden beta/deep links, and library access during account-service failure. Test fixtures cover error/interaction cases; live evidence is recorded separately below.
+- [✅] Live provider browsing: all six body categories and all seven equipment categories return at least 12 exercises. Resistance bands has 78 selected matches, Kettlebell 46; larger categories use a bounded 100-record selection. Cardio returns 12 of 33. Counts describe the provider selection, not exhaustive category totals or measured popularity.
+- [✅] Live specific search: “barbell bench press” returns three matching names with all query words, without unrelated suggestions.
+- [✅] Live detail: six provider instruction steps and a real GIF load successfully; rendered frames change while playing and remain stable while paused. Fresh details and retry are supported.
+- [✅] Genuine profile → independent provider program → account workout persistence: a dedicated temporary account loaded its saved profile, rendered ExerciseDB recommendations, and saved six matching provider exercise IDs in MongoDB. Temporary records were removed after verification. This does not certify physical camera counting or production deployment.
+- [✅] Camera rep counting beta controls and automatic tracking deep links are removed from frontend entry points; backend, shared counter and native/worker capability files are retained.
+- [✅] Library/list/detail follow the supplied reference layout, using actual metadata, descriptions and form cues. Manual tracking labels reflect the available capability; no fabricated AI assessments, difficulty, weights or MP4 durations.
+
+Live screenshots: [library](../artifacts/exercisedb/library-390.png), [exercise detail](../artifacts/exercisedb/library-detail-390.png), [Coach](../artifacts/exercisedb/coach-390.png). Setup and provider restrictions: [AI Coach](AI_COACH.md). Free-provider rate limits remain visible as recoverable errors; commercial use requires appropriate provider access.
+
+### Version 2.7.2 verification — October 15, 2026
+
+The complete remote branch was fetched and checked out; the local release commit matches origin. Compared with v2.7.0, this release adds shared on-device rep counting for bodyweight squats and standing biceps curls, browser worker/model assets, a native pose-camera bridge, camera setup guidance, pause/resume, count review/correction, and workout completion with `exerciseResults`. Ordinary mobile launch commands explicitly target Expo Go; native tracking uses a development build. See [release notes](RELEASE-v2.7.2.md) and [camera tracking setup](CAMERA_TRACKING.md).
+
+| Current-release check | Result | Evidence boundary |
+|---|---|---|
+| All frontend/mobile Node tests | Passed: 118/118 | Includes six synthetic rep-counter tests and two Expo-launch tests; no physical camera accuracy evidence. |
+| Backend service suite | Passed: 35 files, 275/275 tests | Service/validation coverage, including mocked model/provider boundaries. |
+| Backend application smoke suite | Passed: 1/1 | Boots AppModule and verifies `GET /`; does not exercise frontend account actions or saved workout reps. |
+| Frontend production build | Passed | Compilation, TypeScript, and static route generation. |
+| Backend production build | Passed | Backend compilation. |
+| Mobile TypeScript check | Passed | Native wrapper source type correctness. |
+| Expo Android/iOS export | Passed: Android 1,398 modules; iOS 1,397 modules | Both bundles include the pose model asset; bundling does not prove native compilation or physical-device behavior. |
+| Browser tracking suite | Passed: 2/2 using installed Microsoft Edge | Real local model inference with synthetic camera, pause/resume, review/correct/save via mocked workout API, and simulated phone bridge rejecting stale request frames. The default Chrome executable was absent; the documented executable override was used. |
+
+Current-release camera verification checklist (supplemental; excluded from the existing module/criterion totals):
+
+- [✅] Synthetic squat/curl cycles, partial motion, jitter, missing/uncertain/offscreen/stale joints, out-of-order frames, resets, and aspect-ratio handling pass shared-counter tests.
+- [✅] Browser worker loads the bundled model and processes synthetic camera frames; pause/review release capture, and corrected reps reach the workout completion request without camera-frame payloads.
+- [✅] Simulated native bridge uses the shared counter, rejects old camera request frames, and preserves completed counts on pause.
+- [✅] Expo Go launch resolves explicitly to Go and skips custom native pose-module loading during startup; development tracking has its own command.
+- [✅] Android and iOS production JavaScript/assets export successfully with the bundled Lite pose model.
+- [❌] Compile/install native Android and iOS development builds and validate real camera permissions, bridge behavior, interruption recovery, and front/rear cameras on physical devices.
+- [❌] Compare prototype squat/curl counts with manually counted real sets across lighting, occlusion, orientations, and users; measure 15-minute timing, memory, heat, and battery against preview-only operation.
+- [❌] Save corrected camera reps through the frontend to a running backend/database, reload the same account's workout, and confirm persisted `exerciseResults` and report values.
+
+Camera rep counts are prototype motion counts, not provider-backed form scores or validated calorie estimates. No new genuine frontend-to-database workflow was demonstrated, so the existing module/criterion totals remain unchanged. Earlier dated verification records below are retained as historical evidence.
+
+### Coach reference layout and program suggestions — October 15, 2026
+
+- Coach uses the supplied reference's white layout, compact typography, weekday buttons, numbered exercise rows, quiet tracking pills, lightbulb tip, book library link and fixed green Start session action above bottom navigation. The operating-system status bar/phone frame are not duplicated. Reference example loads and tracking labels are not substituted for account data.
+- Backend suggestions match the selected goal's push/lower/pull/full-body focus, use available equipment and existing health exclusions, prioritize varied movements, and return individual rep/hold prescriptions, equipment summaries and a catalog-sourced form tip. Keyword boundaries prevent “lat” from incorrectly selecting lateral raises for pull sessions. Core-focused programs retain distinct core exercises. Limited catalog coverage is stated rather than filled with unrelated items. Week labels derive from the saved profile's creation date when present.
+- The saved product catalog now contains twenty exercises covering dumbbells, bodyweight and resistance bands. The explicit import preserves existing records and adds missing names. No placeholder media, example loads or invented tracking scores are supplied. The current Coach planner is a backend rule engine; this update does not claim language-model-generated programs or validated medical suitability.
+- Start session now carries the selected day's real catalog IDs through camera setup into the saved workout, replacing the old `exercise-1` identifiers and fixed sample session exercise. The camera rep-counting beta remains reachable in the Exercise library, with its direct tracking link preserved.
+- Live verification used a dedicated temporary account and persisted profile on the configured MongoDB. The running localhost:3000 frontend called localhost:4000 without intercepted/mocked responses, displayed the profile-specific program, and created a persisted workout containing the same six selected catalog IDs. Test account/profile/workout records were removed afterward. Screenshots reviewed at 320×568, 390×844, 768×1024 and 1440×900 confirm visible start/navigation controls and no horizontal overflow. See [phone view](../artifacts/coach/coach-390.png) and [scrolled view](../artifacts/coach/coach-scrolled.png).
+- Verification passed: 118/118 frontend/mobile tests, 283/283 backend tests across 37 files, seven browser integration/tracking tests, and frontend/backend production builds. Browser suites use HTTP fixtures; the separate live run described above used genuine persisted test data. The Coach/catalog joint criterion is now verified locally; hosting/device/provider checks remain separate.
+
+### Exercise library backend activation — October 15, 2026
+
+- Coach and `/exercises` now share the API-backed catalog, with debounced search, muscle/equipment filters, pagination, loading, retry, genuine empty states, backend instructions, and configured picture/video rendering. Obsolete requests cannot replace the latest filter results. The six-row Coach sample is no longer used.
+- Me's Exercise library uses protected admin APIs instead of preview mode. Create persists muscle/equipment along with publication state. Published manual exercises are visible without pose models; draft detail access is excluded. Searches escape regex characters, and singular/plural equipment names match consistently. Analytics preview is outside this change.
+- The configured MongoDB catalog was initially empty. The explicit `npm run seed` command now targets the API's `admin_exercises` collection and imports eight product catalog entries using insert-only upserts. Existing records are preserved, no records are deleted, and unrelated demo videos/unsupported AI labels are omitted. This is saved product content, not a frontend fallback.
+- Live check: a temporary database-backed test account served real authenticated catalog requests to the frontend browser. Eight persisted exercises loaded; instructions, muscle filtering, search, and reload passed. After the isolated-backend check, the same journey passed directly from the running frontend on localhost:3000 to the running API on localhost:4000 without mocked/intercepted requests, verifying local HTTP/CORS behavior. The temporary account was removed afterward. Production hosting, user-specific coach-plan verification and deployed administrator CRUD remain pending.
+- Automated verification: 118/118 frontend/mobile tests, 279/279 backend tests, six browser integration/tracking tests, and frontend/backend builds passed. The browser admin create/denial checks use mocked HTTP responses; the separate catalog run used the running backend and MongoDB. Frontend criteria increase to 31/34; fully checked frontend modules remain 14/17 because analytics remains a preview. Backend and genuine user-data end-to-end totals are unchanged.
 
 ### Post-baseline implementation update — October 13, 2026
 
@@ -59,10 +131,10 @@ This checklist separates what is implemented in the frontend, what is implemente
 ### Frontend implementation coverage
 
 - **Modules with all frontend criteria checked:** 14 / 17 (**82.4%**, rounded **82%**)
-- **Frontend criteria checked:** 30 / 34 (**88.2%**, rounded **88%**)
+- **Frontend criteria checked:** 31 / 34 (**91.2%**, rounded **91%**)
 
 <progress value="14" max="17" aria-label="14 of 17 modules meet frontend implementation criteria">14 of 17 frontend modules (82%)</progress>
-<progress value="30" max="34" aria-label="30 of 34 frontend criteria verified">30 of 34 frontend criteria (88%)</progress>
+<progress value="31" max="34" aria-label="31 of 34 frontend criteria verified">31 of 34 frontend criteria (91%)</progress>
 
 ### Backend implementation and automated-test coverage
 
@@ -74,14 +146,14 @@ This checklist separates what is implemented in the frontend, what is implemente
 
 ### Genuine end-to-end user-data verification
 
-- **Modules with a documented real-user-data flow:** 2 / 17 (**11.8%**, rounded **12%**)
-- **End-to-end workflows documented as verified:** 2 / 21 (**9.5%**, rounded **10%**)
-- The two checked items are backed by the live registration → login → profile creation/update/read verification recorded in Progress Report 13 (October 3, 2026). This is dated historical evidence, not a claim that a production system was re-tested on this audit date.
-- These are modules with at least one documented historical workflow, **not fully completed end-to-end modules**. Each still has an unchecked workflow, so none of the 17 modules meets the strict fully verified end-to-end completion definition yet.
+- **Modules with a documented real-user-data flow:** 3 / 17 (**17.6%**, rounded **18%**)
+- **End-to-end workflows documented as verified:** 3 / 21 (**14.3%**, rounded **14%**)
+- Authentication and profile checks retain the historical registration → login → profile creation/update/read evidence in Progress Report 13 (October 3, 2026). Coach/catalog has fresh local frontend → API → MongoDB evidence from October 15, 2026, including starting a workout with the returned program IDs. These dates do not imply production hosting was re-tested.
+- These counts represent modules with a documented workflow. Coach/catalog's single joint criterion is verified locally; authentication and profile still have separate unchecked workflows. Other modules retain their outstanding criteria.
 - Every other joint workflow is marked ❌ because this audit did not run it against a safe, live backend and database using a real test account.
 
-<progress value="2" max="17" aria-label="2 of 17 modules have documented genuine end-to-end verification">2 of 17 end-to-end modules (12%)</progress>
-<progress value="2" max="21" aria-label="2 of 21 genuine user-data workflows documented as verified">2 of 21 end-to-end workflows (10%)</progress>
+<progress value="3" max="17" aria-label="3 of 17 modules have documented genuine end-to-end verification">3 of 17 end-to-end modules (18%)</progress>
+<progress value="3" max="21" aria-label="3 of 21 genuine user-data workflows documented as verified">3 of 21 end-to-end workflows (14%)</progress>
 
 The progress bars are native HTML progress indicators. They are audit snapshots; change their values, the text totals, and the relevant checklist marks together when new verification is performed.
 
@@ -93,7 +165,7 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 | 2 | [Password recovery](#2-password-recovery) | Verified | Partial | Not verified |
 | 3 | [Onboarding and profile](#3-onboarding-and-profile) | Verified | Verified | Verified historically |
 | 4 | [Home dashboard and navigation](#4-home-dashboard-and-navigation) | Verified | Verified | Not verified |
-| 5 | [Coach plan and exercise library](#5-coach-plan-and-exercise-library) | Verified | Verified | Not verified |
+| 5 | [Coach plan and exercise library](#5-coach-plan-and-exercise-library) | Verified | Verified | Verified locally October 15 |
 | 6 | [Camera Check and pose readiness](#6-camera-check-and-pose-readiness) | Verified | Partial | Not verified |
 | 7 | [Workout session and report](#7-workout-session-and-report) | Partial | Partial | Not verified |
 | 8 | [Inactivity and emergency safety](#8-inactivity-and-emergency-safety) | Verified | Partial | Not verified |
@@ -103,7 +175,7 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 | 12 | [Progress measurements](#12-progress-measurements) | Verified | Verified | Not verified |
 | 13 | [Me, settings, and preferences](#13-me-settings-and-preferences) | Verified | Verified | Not verified |
 | 14 | [Notifications](#14-notifications) | Verified | Verified | Not verified |
-| 15 | [Administrator tools](#15-administrator-tools) | Mock preview | Verified | Not verified |
+| 15 | [Administrator tools](#15-administrator-tools) | Partial: catalog API, analytics preview | Verified | Not verified |
 | 16 | [Expo Go mobile shell](#16-expo-go-mobile-shell) | Verified | Not applicable | Not verified |
 | 17 | [API and data-service reliability](#17-api-and-data-service-reliability) | Verified | Verified | Not verified |
 
@@ -135,8 +207,8 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 
 ### 5. Coach plan and exercise library
 
-- [✅] Public exercise-library search and details load through the exercise API at `/exercises`. The Coach library intentionally uses the separate, labeled local sample preview requested on October 14, 2026; connecting that preview to the future exercise service remains pending.
-- [✅] The authenticated coach-plan API builds a weekly plan from the user's profile, equipment, duration, goal, schedule, and health conditions; the UI renders the returned plan.
+- [✅] Coach and `/exercises` share the backend catalog: search, filters, pagination, instructions and configured media come from authenticated exercise API responses. Backend failures offer retry and never become sample records. A live browser/backend/MongoDB catalog read and reload passed on October 15, 2026.
+- [✅] The authenticated coach-plan API builds a weekly plan from the user's saved profile, equipment, duration, goal, schedule and health conditions; the reference UI renders server exercises, individual prescriptions, form tips and equipment summaries. Starting a session saves the returned day's real exercise IDs.
 
 ### 6. Camera Check and pose readiness
 
@@ -145,8 +217,8 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 
 ### 7. Workout session and report
 
-- [✅] Start, pause, resume, and completion controls use workout API operations; the report opens only after backend completion succeeds.
-- [❌] Report sharing is unavailable in the current Expo Go flow; form-analysis and workout metrics remain unavailable without provider results.
+- [✅] Start, pause, resume, and completion controls use workout API operations; the report opens only after backend completion succeeds. The v2.7.2 squat/curl prototype adds local camera counting and manual review/correction, sending reviewed reps through the existing completion API's `exerciseResults`; browser integration tests use a mocked API.
+- [❌] Report sharing is unavailable in the current Expo Go flow; provider-backed form scores, calorie estimates, and personal-record analysis remain unverified. Prototype rep counting does not establish these metrics or physical-device accuracy.
 
 ### 8. Inactivity and emergency safety
 
@@ -185,13 +257,13 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 
 ### 15. Administrator tools
 
-- [❌] Me's admin catalog/New/analytics entry points intentionally use local mock data. Default component API modes and protected backend endpoints are preserved and error handling is tested, but activation and real-data UI checks are pending. The unrequested alert-log menu row was removed.
+- [✅] Me's admin catalog/New entry uses protected backend APIs; create includes muscle/equipment and refreshes returned records. Browser tests cover returned catalog rows, create/refresh and denied access without samples. Deployment-specific admin CRUD remains in the joint checklist; analytics retains its separate preview.
 - [❌] Me's analytics currently displays the requested mock figures. Backend sign-in collection and real active-user/retention analytics remain implemented; activate the API-backed screen and verify returned data before marking this frontend criterion complete.
 
 ### 16. Expo Go mobile shell
 
 - [✅] Expo shell loads the web app and reports backend/frontend connectivity with recovery paths.
-- [✅] Web-to-native camera and inactivity bridges are implemented. Entry/state/connectivity tests passed (22/22) and Android export succeeded on October 14, 2026. These automated checks do not establish physical-device camera, sensor, or backend behavior.
+- [✅] Web-to-native camera and inactivity bridges are implemented. On October 15, 2026, the combined frontend/mobile suite passed (118/118), mobile types passed, and Android/iOS exports succeeded. Expo Go explicitly supports preview/manual counting and skips the custom pose module; automatic native rep tracking requires a development build. Native compilation and physical-device camera, sensor, accuracy, and backend behavior remain unverified.
 
 ### 17. API and data-service reliability
 
@@ -227,7 +299,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 
 ### 5. Coach plan and exercise library
 
-- [✅] Public exercise-catalog queries and role-protected exercise administration routes are implemented and tested.
+- [✅] Authenticated exercise-catalog queries and role-protected exercise administration routes are implemented and tested. Published manual entries are included, drafts are excluded from catalog/details, literal searches are escaped, and equipment filters support singular/plural names. The explicit catalog import preserves existing records.
 - [✅] Authenticated coach-plan service builds a scheduled plan from profile/settings and the published exercise library, filters by equipment and health conditions, and has service tests.
 
 ### 6. Camera Check and pose readiness
@@ -317,7 +389,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 
 ### 5. Coach plan and exercise library
 
-- [❌] Verify the exercise catalog and profile-specific coach plan against the current safe deployment, then confirm the returned plan reflects that user's persisted profile/settings and published library.
+- [✅] **Verified locally (October 15, 2026):** a dedicated persisted test profile with four saved training weekdays and dumbbell equipment received the backend-generated push/lower/pull/full-body program through the running frontend/API/MongoDB path. Catalog reads, filtering/search and reload passed; selecting Monday and starting a session persisted the same six returned exercise IDs. The temporary account/profile/workout were removed. This is local deployment evidence, not production hosting or physical-device certification.
 
 ### 6. Camera Check and pose readiness
 
@@ -369,7 +441,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 
 - [❌] Run a safe deployment smoke test covering authentication, database connection, authorized user data, and provider configuration. Local builds/tests do not certify live deployment.
 
-**Joint status:** 2 modules have documented historical real-user-data evidence; 15 modules do not have such evidence in this audit. Unchecked means **not demonstrated here**, not necessarily a confirmed defect.
+**Joint status:** 2 modules retain historical real-user-data evidence and Coach/catalog has fresh local evidence; 14 modules have no documented joint workflow verification. Unchecked means **not demonstrated here**, not necessarily a confirmed defect.
 
 ---
 
