@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { TrackingKind, TrackingSide } from '../../shared/repCounter';
 
 export type CameraStatus = 'idle' | 'starting' | 'on' | 'denied' | 'unavailable';
 export type CameraFacing = 'back' | 'front';
 export type CameraPreviewContext =
   | { screen: 'camera-check' }
-  | { screen: 'live-session'; exerciseName: string; equipment: string; elapsed: string };
+  | { screen: 'live-session'; exerciseName: string; equipment: string; elapsed: string; tracking?: { requestId: string; kind: TrackingKind; side: TrackingSide; active: boolean } };
 
 let preferredFacing: CameraFacing = 'back';
 let cameraWasEnabled = false;
@@ -124,8 +125,12 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       release();
       let stream: MediaStream;
       const facingMode = requestedFacing === 'front' ? 'user' : 'environment';
+      const context = previewContextRef.current;
+      const trackingConstraints = context.screen === 'live-session' && context.tracking
+        ? { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } }
+        : {};
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facingMode } }, audio: false });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facingMode }, ...trackingConstraints }, audio: false });
       } catch (error) {
         // Laptops have no rear camera, so retry with any camera before giving up.
         if (error instanceof DOMException && error.name === 'OverconstrainedError') {

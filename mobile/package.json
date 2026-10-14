@@ -4,17 +4,24 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "expo": "npx expo start --lan",
-    "start": "npx expo start --lan"
+    "expo": "npx expo start --go --lan",
+    "start": "npx expo start --go --lan",
+    "start:tracking": "expo start --dev-client --lan",
+    "android": "expo run:android --device",
+    "ios": "expo run:ios --device"
   },
   "dependencies": {
     "@react-native-community/netinfo": "12.0.1",
+    "effect": "^3.21.4",
     "expo": "~57.0.27",
+    "expo-asset": "^57.0.19",
     "expo-camera": "~57.0.6",
     "expo-constants": "57.0.20",
+    "expo-dev-client": "^57.0.20",
     "expo-device": "~57.0.2",
     "expo-keep-awake": "~57.0.2",
     "expo-location": "~57.0.20",
+    "expo-mediapipe-pose": "0.3.0",
     "expo-network": "~57.0.2",
     "expo-sensors": "~57.0.3",
     "expo-web-browser": "~57.0.3",
@@ -22,6 +29,7 @@
     "react": "19.2.3",
     "react-native": "0.86.3",
     "react-native-safe-area-context": "5.7.0",
+    "react-native-svg": "^15.15.4",
     "react-native-webview": "13.16.1"
   },
   "devDependencies": {

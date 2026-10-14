@@ -6,6 +6,8 @@ mobile/.expo/
 /.expo/
 mobile/dist/
 mobile/dist-*/
+frontend/test-results/
+frontend/playwright-report/
 *.log
 .env
 .env.*

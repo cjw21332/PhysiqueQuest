@@ -10,7 +10,7 @@
     "seed": "ts-node seed.ts"
   },
   "devDependencies": {
-    "expo": "^57.0.26"
+    "expo": "^57.0.28"
   },
   "workspaces": [
     "frontend",

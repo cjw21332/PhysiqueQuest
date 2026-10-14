@@ -20,6 +20,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { WebView } from 'react-native-webview';
 import { resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
+import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
 
 declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string } };
 
@@ -36,13 +37,18 @@ type DeviceReadiness = {
 type CameraFrame = { x: number; y: number; width: number; height: number };
 type NativeCameraContext =
   | { screen: 'camera-check' }
-  | { screen: 'live-session'; exerciseName: string; equipment: string; elapsed: string };
+  | { screen: 'live-session'; exerciseName: string; equipment: string; elapsed: string; tracking?: NativeTrackingOptions };
 type NativeCameraPreview = { frame: CameraFrame; facing: 'back' | 'front'; context: NativeCameraContext };
 
 function isNativeCameraContext(value: unknown): value is NativeCameraContext {
   if (!value || typeof value !== 'object' || !('screen' in value)) return false;
   const context = value as Record<string, unknown>;
   if (context.screen === 'camera-check') return true;
+  if (context.tracking !== undefined) {
+    const tracking = context.tracking as Partial<NativeTrackingOptions> | null;
+    if (!tracking || typeof tracking !== 'object' || typeof tracking.requestId !== 'string' || tracking.requestId.length > 100 ||
+      !['squat', 'curl'].includes(tracking.kind ?? '') || !['left', 'right'].includes(tracking.side ?? '') || typeof tracking.active !== 'boolean') return false;
+  }
   return context.screen === 'live-session'
     && typeof context.exerciseName === 'string'
     && typeof context.equipment === 'string'
@@ -332,10 +338,14 @@ function AppContent() {
               facing?: 'back' | 'front';
               previewContext?: unknown;
               requestId?: string;
+              side?: 'left' | 'right';
             };
             if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
             if (message.type === 'request-camera-permission') void requestCameraPermission();
             if (message.type === 'request-device-readiness') void publishReadiness();
+            if (message.type === 'pose-status' && !nativePoseAvailable) {
+              webRef.current?.injectJavaScript(poseScript({ type: 'error', requestId: message.requestId, side: message.side, message: 'Camera rep counting needs a development build. Camera preview and manual counting are available.' }));
+            }
             if (message.type === 'camera-start' && message.frame) {
               const requestId = cameraRequestId.current + 1;
               cameraRequestId.current = requestId;
@@ -410,7 +420,23 @@ function AppContent() {
           setError(true);
         }}
       /> : null}
-      {cameraPreview && (
+      {cameraPreview && cameraPreview.context.screen === 'live-session' && cameraPreview.context.tracking && nativePoseAvailable && (
+        <NativeTrackingCamera
+          key={`${cameraPreview.context.tracking.requestId}-${cameraPreview.facing}`}
+          options={cameraPreview.context.tracking}
+          facing={cameraPreview.facing}
+          style={[styles.nativeCameraPreview, { left: cameraPreview.frame.x, top: cameraPreview.frame.y, width: cameraPreview.frame.width, height: cameraPreview.frame.height }]}
+          emit={detail => {
+            webRef.current?.injectJavaScript(poseScript(detail));
+            if (detail.type === 'error') {
+              setCameraPreview(null);
+              webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'unavailable', message: String(detail.message) }));
+            }
+          }}
+          ready={() => webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }))}
+        />
+      )}
+      {cameraPreview && !(cameraPreview.context.screen === 'live-session' && cameraPreview.context.tracking && nativePoseAvailable) && (
         <CameraView
           key={cameraPreview.facing}
           ref={nativeCameraRef}
@@ -425,7 +451,12 @@ function AppContent() {
               height: cameraPreview.frame.height,
             },
           ]}
-          onCameraReady={() => webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }))}
+          onCameraReady={() => {
+            webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }));
+            if (cameraPreview.context.screen === 'live-session' && cameraPreview.context.tracking) {
+              webRef.current?.injectJavaScript(poseScript({ type: 'error', requestId: cameraPreview.context.tracking.requestId, side: cameraPreview.context.tracking.side, message: 'Camera rep counting needs a development build. Camera preview and manual counting are available.' }));
+            }
+          }}
           onMountError={event => {
             console.error('Native camera preview failed:', event.message);
             setCameraPreview(null);

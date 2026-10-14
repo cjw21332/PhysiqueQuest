@@ -7,6 +7,7 @@
     "version": "1.0.0",
     "sdkVersion": "57.0.0",
     "platforms": ["android", "ios"],
+    "plugins": [["expo-camera", { "cameraPermission": "Allow camera access for exercise rep counting.", "recordAudioAndroid": false }]],
     "orientation": "default",
     "userInterfaceStyle": "light",
     "backgroundColor": "#f4f6f3",

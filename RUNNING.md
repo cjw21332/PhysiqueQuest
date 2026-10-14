@@ -143,7 +143,10 @@ npm run expo
 ```
 
 Run this command from the repository root. It invokes the mobile workspace's
-local Expo CLI with LAN hosting. From inside `mobile/`, `npm run expo` works as
+local Expo CLI with LAN hosting and an explicit Expo Go launch target (`--go`).
+The `start:tracking` mobile script targets a custom development build for native
+camera rep counting. Installing `expo-dev-client` does not change the normal
+scripts' launch target. From inside `mobile/`, `npm run expo` works as
 well. Do not install the deprecated global `expo-cli`.
 
 The repository root also declares `mobile/index.ts` as its Expo entry point, so
