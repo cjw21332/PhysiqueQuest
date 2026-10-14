@@ -32,7 +32,7 @@ test('search combines with muscle and equipment filters, including a true any-eq
   assert.equal(filterLibrary(libraryPreview, 'does not exist', 'All', 'Any equipment').length, 0);
 });
 
-test('the independent sample library stays reachable during loading, plan errors, and rest days', async () => {
+test('the exercise library stays reachable during loading, plan errors, and rest days', async () => {
   const require = createRequire(import.meta.url);
   const source = await readFile(new URL('../sections/Coach/CoachPlan.tsx', import.meta.url), 'utf8');
   const icons = await readFile(new URL('../sections/Home/icons.tsx', import.meta.url), 'utf8');
@@ -54,4 +54,69 @@ test('the independent sample library stays reachable during loading, plan errors
     assert.match(html, /Exercise library/);
     assert.match(html, state.loading ? /Building your plan/ : state.plan ? /Rest day/ : /Backend unavailable/);
   }
+});
+
+async function libraryHarness(getExercises) {
+  const require = createRequire(import.meta.url);
+  const states = []; let cursor = 0; let effects = [];
+  const react = { ...React,
+    useState(initial) { const index = cursor++; if (!(index in states)) states[index] = initial; return [states[index], value => { states[index] = typeof value === 'function' ? value(states[index]) : value; }]; },
+    useRef() { return { current: null }; },
+    useEffect(effect) { effects.push(effect); },
+  };
+  const compile = (source, imports) => {
+    const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } }).outputText;
+    const module = { exports: {} };
+    new Function('require', 'module', 'exports', output)(imports, module, module.exports);
+    return module.exports;
+  };
+  const icons = compile(await readFile(new URL('../sections/Home/icons.tsx', import.meta.url), 'utf8'), require);
+  const component = compile(await readFile(new URL('../sections/Coach/ExerciseLibrary.tsx', import.meta.url), 'utf8'), name => {
+    if (name === 'react') return react;
+    if (name.endsWith('/api')) return { api: { getExercises } };
+    if (name.endsWith('/icons')) return icons;
+    return require(name);
+  }).default;
+  return { render() { cursor = 0; effects = []; const element = component({ onBack() {}, selectedEquipment: [] }); return renderToStaticMarkup(element); }, effects() { return effects; } };
+}
+
+test('live library renders fetched records and total pages instead of sample exercises', async () => {
+  const requests = [];
+  const harness = await libraryHarness(async query => {
+    requests.push(query);
+    return { items: [{ _id: 'wger-9', name: 'Kettlebell swing', targetMuscle: 'Legs', equipment: 'Kettlebell', pictureUrl: '' }], total: 50, pages: 3 };
+  });
+  assert.match(harness.render(), /Loading exercises/);
+  const cleanup = harness.effects()[0]();
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const html = harness.render();
+  assert.match(html, /Kettlebell swing/);
+  assert.match(html, /50 results/);
+  assert.match(html, /Page 1 of 3/);
+  assert.match(html, /Powered by wger/);
+  assert.doesNotMatch(html, /Sample library|Dumbbell bench press/);
+  assert.equal(requests[0].equipment, 'Any equipment');
+  cleanup();
+});
+
+test('upstream failures offer retry and do not masquerade as empty search results', async () => {
+  const harness = await libraryHarness(async () => { throw new Error('wger is unavailable'); });
+  harness.render(); const cleanup = harness.effects()[0]();
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const html = harness.render();
+  assert.match(html, /role="alert"/);
+  assert.match(html, /wger is unavailable/);
+  assert.match(html, /Try again/);
+  assert.doesNotMatch(html, /No exercises match/);
+  cleanup();
+});
+
+test('unmounted library ignores late responses', async () => {
+  let resolve;
+  const harness = await libraryHarness(() => new Promise(done => { resolve = done; }));
+  harness.render(); const cleanup = harness.effects()[0]();
+  await new Promise(done => setTimeout(done, 300));
+  cleanup(); resolve({ items: [{ _id: 'late', name: 'Late exercise' }], total: 1, pages: 1 });
+  await new Promise(done => setImmediate(done));
+  assert.doesNotMatch(harness.render(), /Late exercise/);
 });

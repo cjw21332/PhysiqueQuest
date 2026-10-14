@@ -202,3 +202,17 @@ Emergency alert delivery and pose analysis also stay unavailable until their cor
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Exercise library
+
+The authenticated `GET /api/exercises` endpoint reads the English wger catalog,
+with search, muscle, equipment and page filters. Details use stable `wger-<id>`
+slugs. Set `WGER_API_KEY` in the backend `.env` to use a permanent wger token;
+the key is optional for public exercise reads and is never sent to the frontend.
+Restart the backend after changing the environment file.
+
+The catalog is cached for one hour per backend process. Upstream failures return
+503 so the screen can offer a retry. The interface preserves source, author and
+license attribution for instructions, images and videos. Exercises without
+English translations are excluded; media is displayed only when wger supplies it.
+wger exercises use manual tracking because catalog membership does not establish
+support for the app's pose analysis. Admin exercise records remain separate.

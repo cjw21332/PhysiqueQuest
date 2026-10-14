@@ -104,6 +104,14 @@ export interface CoachExercise {
   tracking: 'AI tracked' | 'Manual';
 }
 
+export type ExerciseCredit = { author: string; license: string; licenseUrl: string; sourceUrl: string };
+export type LibraryExerciseRecord = {
+  _id: string; slug: string; name: string; targetMuscle: string; equipment: string;
+  difficulty: string; instructions: string[]; trackingStatus: string; pictureUrl: string; videoUrl: string;
+  source: 'wger'; attribution: ExerciseCredit; imageAttribution: ExerciseCredit | null; videoAttribution: ExerciseCredit | null;
+};
+export type ExerciseLibraryResult = { items: LibraryExerciseRecord[]; total: number; page: number; limit: number; pages: number };
+
 export interface CoachDay {
   label: string;
   name: string;
@@ -417,7 +425,7 @@ class ApiClient {
     if (query?.equipment) qs.set('equipment', query.equipment);
     if (query?.page) qs.set('page', String(query.page));
     qs.set('limit', String(query?.limit ?? 100));
-    return this.request<any>(`/exercises?${qs.toString()}`);
+    return this.request<ExerciseLibraryResult>(`/exercises?${qs.toString()}`, { timeoutMs: 55_000 });
   }
   async getExercise(slug: string) { return this.request<any>(`/exercises/${encodeURIComponent(slug)}`); }
 
