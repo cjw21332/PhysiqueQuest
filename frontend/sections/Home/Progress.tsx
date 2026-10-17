@@ -6,26 +6,14 @@ import type { ProgressRecord, WorkoutSessionRecord } from '../../lib/api';
 import { api } from '../../lib/api';
 import { Icon } from './icons';
 import { navigate } from '../../lib/navigation';
+import { useWorkoutSummary } from '../../hooks/useWorkoutSummary';
+import { convertMeasurement } from '../../../shared/measurements';
 
 const choices: { metric: ProgressRecord['metric']; label: string; unit: ProgressRecord['unit'] }[] = [
   { metric: 'weight', label: 'Weight', unit: 'kg' },
   { metric: 'waist', label: 'Waist', unit: 'cm' },
   { metric: 'benchPress', label: 'Bench press', unit: 'kg' },
 ];
-
-const samplePersonalRecords = [
-  { label: 'Bench press', value: '62.5 kg', date: 'Set Nov 18' },
-  { label: 'Squat', value: '90 kg', date: 'Set Nov 16' },
-  { label: 'Deadlift', value: '110 kg', date: 'Set Nov 09' },
-];
-
-const sampleSessions = [
-  { title: 'Upper Body — Push', date: 'Nov 18', score: 88 },
-  { title: 'Lower Body', date: 'Nov 16', score: 84 },
-  { title: 'Upper Body — Pull', date: 'Nov 14', score: 81 },
-];
-
-const sampleFormScores = [35, 42, 49, 57, 64, 71, 80, 88];
 
 function shortDate(value?: string) {
   if (!value) return 'Date unavailable';
@@ -39,26 +27,8 @@ function formatValue(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
-function personalRecords(workouts: WorkoutSessionRecord[]) {
-  const records = new Map<string, { label: string; load: number; date: string }>();
-  for (const workout of workouts) {
-    for (const result of workout.exerciseResults ?? []) {
-      if (!result.loadKg || result.loadKg <= 0 || /^[a-f\d]{24}$/i.test(result.exerciseId)) continue;
-      const label = result.exerciseId
-        .replace(/[-_]+/g, ' ')
-        .replace(/\b\w/g, character => character.toUpperCase());
-      const current = records.get(result.exerciseId);
-      if (!current || result.loadKg > current.load) {
-        records.set(result.exerciseId, { label, load: result.loadKg, date: shortDate(workout.startedAt) });
-      }
-    }
-  }
-  return [...records.values()]
-    .sort((left, right) => right.load - left.load)
-    .slice(0, 3);
-}
-
 export default function Progress() {
+  const training = useWorkoutSummary();
   const [metric, setMetric] = useState<ProgressRecord['metric']>('weight');
   const [value, setValue] = useState('');
   const [saving, setSaving] = useState(false);
@@ -73,7 +43,7 @@ export default function Progress() {
   const selected = choices.find(choice => choice.metric === metric)!;
   const selectedProgress = metric === 'weight' ? weight : metric === 'waist' ? waist : benchPress;
   const { entries, loading, error, refresh, addMeasurement, deleteMeasurement } = selectedProgress;
-  const sortedEntries = [...entries].sort((a, b) =>
+  const sortedEntries = entries.map(entry => ({ ...entry, value: convertMeasurement(entry.value, entry.unit, selected.unit), unit: selected.unit })).sort((a, b) =>
     new Date(a.measuredAt ?? a.date ?? 0).getTime() - new Date(b.measuredAt ?? b.date ?? 0).getTime(),
   );
   const chartEntries = sortedEntries.slice(-8);
@@ -125,9 +95,7 @@ export default function Progress() {
   const completedWorkouts = workouts
     .filter(workout => workout.status === 'completed' && workout.endedAt)
     .sort((left, right) => new Date(right.startedAt).getTime() - new Date(left.startedAt).getTime());
-  const realRecords = personalRecords(completedWorkouts);
-  const showSampleRecords = realRecords.length === 0 && !workoutLoading && !workoutError;
-  const showSampleSessions = completedWorkouts.length === 0 && !workoutLoading && !workoutError;
+  const realRecords = (training.data?.personalRecords ?? []).map(record => ({ label: record.name, value: `${record.durationSeconds === undefined ? `${record.reps} reps` : `${record.durationSeconds} seconds`}${record.loadKg === undefined ? '' : ` at ${record.loadKg} kg`}`, date: record.date }));
 
   return <div className="home-ref-subview home-ref-progress home-ref-progress-page">
     <header className="section-page-head home-ref-page-head">
@@ -183,12 +151,12 @@ export default function Progress() {
     <section className="subsection home-ref-records" aria-labelledby="progress-records-heading">
       <div className="section-head">
         <h3 id="progress-records-heading">Personal records</h3>
-        {showSampleRecords && <span className="home-ref-sample-label">Sample data</span>}
       </div>
-      {workoutError ? <p className="error" role="alert">{workoutError}</p> : workoutLoading ? <p role="status">Loading personal records…</p> : <div className="home-ref-record-list">
-        {(showSampleRecords ? samplePersonalRecords : realRecords).map(record => {
+      {training.error ? <p className="error" role="alert">{training.error}</p> : training.loading ? <p role="status">Loading personal records…</p> : <div className="home-ref-record-list">
+        {!realRecords.length && <p>No saved set records yet. Log a set in Coach to start tracking.</p>}
+        {realRecords.map(record => {
           const date = 'date' in record ? record.date : '';
-          const detail = 'value' in record ? record.value : `${formatValue(record.load)} kg`;
+          const detail = record.value;
           return <article className="home-ref-record home-ref-personal-record" key={record.label}>
             <span className="record-icon"><Icon name="dumbbell" size={16}/></span>
             <span className="home-ref-record-copy"><b>{record.label}</b><small>{date}</small></span>
@@ -201,31 +169,20 @@ export default function Progress() {
     <section className="subsection home-ref-accuracy" aria-labelledby="form-accuracy-heading">
       <div className="section-head">
         <h3 id="form-accuracy-heading">Form accuracy</h3>
-        <span>8 weeks <span className="home-ref-sample-label">Sample</span></span>
       </div>
-      <div className="home-ref-accuracy-chart" role="img" aria-label="Sample form accuracy trend improves from 35 percent in week one to 88 percent in week eight">
-        {sampleFormScores.map((score, index) => <div className="home-ref-accuracy-column" key={index}>
-          <span className={index === sampleFormScores.length - 1 ? 'latest' : ''} style={{ height: `${score}%` }} />
-          <small>{index === 0 ? 'W1' : index === 2 ? 'W3' : index === 4 ? 'W5' : index === 6 ? 'W7' : index === 7 ? 'W8' : ''}</small>
-        </div>)}
-      </div>
-      <p>Average form score improved from <b>58%</b> to <b>88%</b>.</p>
+      <p>Form accuracy is not measured by the rep counter. Reviewed reps and loads appear in your records above.</p>
     </section>
 
     <section className="subsection home-ref-sessions" aria-labelledby="recent-sessions-heading">
       <div className="section-head">
         <h3 id="recent-sessions-heading">Recent sessions</h3>
-        {showSampleSessions && <span className="home-ref-sample-label">Sample data</span>}
       </div>
-      {workoutError ? <p className="error" role="alert">{workoutError}</p> : workoutLoading ? <p role="status">Loading recent sessions…</p> : showSampleSessions
-        ? <div className="home-ref-session-list">{sampleSessions.map(session => <article className="home-ref-session-row" key={session.title}>
-          <span><b>{session.title}</b><small>{session.date}</small></span>
-          <span className="home-ref-session-detail">{session.score}% form<Icon name="arrow" size={13}/></span>
-        </article>)}</div>
-        : <div className="home-ref-session-list">{completedWorkouts.slice(0, 3).map(workout => <article className="home-ref-session-row" key={workout._id}>
-          <span><b>Workout session</b><small>{shortDate(workout.startedAt)}</small></span>
+      {workoutError ? <p className="error" role="alert">{workoutError}</p> : workoutLoading ? <p role="status">Loading recent sessions…</p>
+        : <div className="home-ref-session-list">{!completedWorkouts.length && <p>No completed sessions yet.</p>}{completedWorkouts.slice(0, 3).map(workout => <article className="home-ref-session-row" key={workout._id}>
+          <span><button className="quiet-link" onClick={() => navigate(`/workouts/${workout._id}`)}>{workout.exercises?.[0]?.name ?? 'Workout session'}</button><small>{shortDate(workout.startedAt)}</small></span>
           <span className="home-ref-session-detail">{workout.exerciseIds.length} exercises{workout.durationSeconds === undefined ? '' : ` · ${Math.round(workout.durationSeconds / 60)} min`}<Icon name="arrow" size={13}/></span>
         </article>)}</div>}
     </section>
   </div>;
 }
+

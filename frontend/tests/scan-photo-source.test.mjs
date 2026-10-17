@@ -36,7 +36,7 @@ test('today log shows calorie and macro targets with live meals and water contro
   const types = await source('sections/Scan/types.ts');
 
   assert.match(types, /nutritionTargets = \{ calories: 2300, protein: 140, carbs: 240, fats: 70 \}/);
-  assert.match(dashboard, /nutritionTargets/);
+  assert.match(dashboard, /useNutritionTargets/);
   assert.match(log, /nutritionTargets\.calories/);
   assert.match(log, /<CalorieProgress calories=\{calories\} target=\{nutritionTargets.calories\}/);
   assert.match(log, /role="progressbar"/);
@@ -46,3 +46,4 @@ test('today log shows calorie and macro targets with live meals and water contro
   assert.match(scan, /onWater=\{value=>\{void setWater\(value\).*catch/);
   assert.match(scan, /view === 'logs'.*<BottomNav/);
 });
+

@@ -8628,3 +8628,5 @@ textarea:focus {
 .admin-reference .emergency-event-row b { font-size: 13px; font-weight: 500; }
 .admin-reference .emergency-event-row small { display: block; margin-top: 4px; font-size: 11px; color: var(--muted); }
 .admin-reference .emergency-event-row strong { font-size: 16px; font-weight: 600; }
+
+.nutrition-target-editor{padding:16px;background:#fff;border-radius:12px}.nutrition-target-editor form,.nutrition-target-editor label{display:grid;gap:8px}.nutrition-target-editor input{min-height:44px;max-width:100%;border:1px solid #cbd5ce;border-radius:8px;padding:8px}

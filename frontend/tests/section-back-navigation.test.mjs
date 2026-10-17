@@ -52,9 +52,9 @@ test('Scan Today log returns to Nutrition and retains its history action', async
 test('Me alert log and Coach workout report return to their section roots', async () => {
   const alerts = await source('sections/Me Section/EmergencyAlertLog.tsx');
   const report = await source('sections/Coach/WorkoutReport.tsx');
-  const coach = await source('sections/Coach/CoachSection.tsx');
+  const coach = await source('app/(app)/workouts/[id]/page.tsx');
 
   assert.match(alerts, /aria-label="Back to account settings"[^>]*><Icon name="arrow"/);
   assert.match(report, /aria-label="Back to AI Coach"[^>]*><Icon name="arrow"/);
-  assert.match(coach, /<WorkoutReport[^>]*onBack=\{\(\) => setView\('plan'\)\}/);
+  assert.match(coach, /onBack=\{\(\) => navigate\('\/coach'\)\}/);
 });

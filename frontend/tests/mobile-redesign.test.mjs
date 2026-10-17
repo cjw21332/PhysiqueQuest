@@ -11,8 +11,8 @@ test('progress displays saved measurement history and honest empty states', asyn
   assert.match(file, /Log your first .* to start a trend/);
   assert.match(file, /api\.getWorkouts\(\)/);
   assert.match(file, /completedWorkouts/);
-  assert.match(file, /samplePersonalRecords/);
-  assert.match(file, /Sample data/);
+  assert.match(file, /useWorkoutSummary/);
+  assert.match(file, /No saved set records yet/);
   assert.match(file, /Form accuracy/);
 });
 
@@ -251,7 +251,7 @@ test('Live Session uses a proper pause icon and hides duplicate native-preview l
   const css = await source('app/globals.css');
 
   assert.match(live, /<Icon name="pause" size=\{16\}/);
-  assert.match(live, /aria-label=\{paused \? 'Resume workout' : 'Pause workout'\}/);
+  assert.match(live, /aria-label=\{paused \? 'Continue session' : 'Pause session'\}/);
   assert.match(icons, /pause:.*M7 5h3v14H7zM14 5h3v14h-3z/s);
   assert.doesNotMatch(live, /pause-glyph/);
   assert.doesNotMatch(css, /\.pause-glyph/);

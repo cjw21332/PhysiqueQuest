@@ -16,7 +16,7 @@ describe('user-owned persistence services', () => {
   it('merges settings into one user-owned state', async () => {
     const state: any = { values: { threshold: 30 }, save: async function () { return this; } };
     const model = {
-      findOneAndUpdate: async () => state,
+      findOneAndUpdate: async (_filter: unknown, update: { $set: Record<string, unknown> }) => { for (const [key, value] of Object.entries(update.$set)) state.values[key.replace('values.', '')] = value; return state; },
     } as any;
     const result = await new SettingsService(model).update('507f1f77bcf86cd799439011', {
       values: { threshold: 45, notifications: true },

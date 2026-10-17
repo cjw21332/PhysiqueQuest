@@ -9,7 +9,7 @@ const muscles = ['All', 'Chest', 'Back', 'Legs', 'Core', 'Shoulders', 'Arms'];
 const equipmentOptions = ['Any equipment', 'Dumbbells', 'Barbell', 'Bodyweight', 'Cable', 'Machine', 'Kettlebell', 'Resistance bands'];
 const metadata = (item: ExerciseRecord) => [item.targetMuscle || item.group, item.equipment, item.difficulty].filter(Boolean).join(' · ');
 
-export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { onBack: () => void; selectedEquipment?: string[] }) {
+export default function ExerciseLibrary({ onBack, selectedEquipment = [], backLabel = 'Back to AI Coach' }: { onBack: () => void; selectedEquipment?: string[]; backLabel?: string }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState('All');
   const [equipment, setEquipment] = useState(() => selectedEquipment.length === 1 ? equipmentOptions.find(option => option.toLowerCase().replace(/s$/, '') === selectedEquipment[0].toLowerCase().replace(/s$/, '')) || 'Any equipment' : 'Any equipment');
@@ -72,7 +72,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
 
   return <div className="coach-library">
     <header className="coach-header library-header">
-      <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button>
+      <button className="coach-back" onClick={onBack} aria-label={backLabel}><Icon name="arrow" size={20}/></button>
       <h2>Exercise library</h2>
     </header>
     <label className="library-search">

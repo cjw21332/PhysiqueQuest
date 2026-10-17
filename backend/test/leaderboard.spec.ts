@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
 import { LeaderboardService } from '../src/leaderboard/leaderboard.service.js';
+import { activityDate, earnsWorkoutCredit } from '../src/workouts/workout-contract.js';
 
 const A = '507f1f77bcf86cd799439011';
 const B = '507f1f77bcf86cd799439012';
@@ -30,13 +31,22 @@ const build = (overrides: {
     findModel(overrides.users ?? []),
     findModel(overrides.settings ?? []),
     findModel(overrides.nutrition ?? []),
-    findModel(overrides.workouts ?? []),
+    { aggregate: vi.fn(async () => {
+      const rows = (overrides.workouts ?? []).map((row: any) => ({ status: 'completed', endedAt: new Date('2099-01-01T10:00:00Z'), ...row }));
+      const days = new Map();
+      for (const row of rows) if (earnsWorkoutCredit(row)) { const day = row.activityDate || activityDate(row.endedAt, row.timezone ?? 'UTC'); days.set(`${row.userId}:${day}`, { userId: row.userId, day }); }
+      return [...days.values()];
+    }) } as any,
   );
 
 describe('leaderboard', () => {
+  it('credits a training day once and excludes standalone recordings and skipped sessions', async () => {
+    const service = build({ workouts: [{ userId: A }, { userId: A }, { userId: A, origin: 'recorded-set' }, { userId: A, sets: [{ status: 'skipped' }] }], users: [{ _id: A, name: 'Ana' }] });
+    expect((await service.get(A, 'all')).self.points).toBe(100);
+  });
   it('ranks by points, hides opted-out users, and always returns the caller', async () => {
     const service = build({
-      workouts: [{ userId: A }, { userId: A }, { userId: B }],
+      workouts: [{ userId: A }, { userId: A, endedAt: new Date('2099-01-02T10:00:00Z') }, { userId: B }],
       users: [{ _id: A, name: 'Ana' }, { _id: B, name: 'Ben' }, { _id: C, name: 'Cara' }],
       settings: [{ userId: B, values: { showLeaderboard: false } }],
     });

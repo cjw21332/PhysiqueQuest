@@ -2,7 +2,8 @@
 
 import { Icon } from '../Home/icons';
 import CalorieProgress from '../Home/CalorieProgress';
-import { mealNames, nutritionTargets, type FoodEntry, type MealName } from './types';
+import { mealNames, type FoodEntry, type MealName } from './types';
+import { useNutritionTargets } from '../../hooks/useNutritionTargets';
 
 type DailyLogProps = {
   meals: FoodEntry[];
@@ -16,6 +17,7 @@ type DailyLogProps = {
 
 
 export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdit, onWater }: DailyLogProps) {
+  const nutritionTargets = useNutritionTargets();
   const calories = meals.reduce((sum, item) => sum + item.calories, 0);
   const protein = meals.reduce((sum, item) => sum + item.protein, 0);
   const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
@@ -105,7 +107,7 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
 }
 
 function MacroProgress({ label, current, target }: { label: string; current: number; target: number }) {
-  const progress = Math.min(100, Math.max(0, (current / target) * 100));
+  const progress = target > 0 ? Math.min(100, Math.max(0, (current / target) * 100)) : 0;
   return (
     <div className="target-log-macro">
       <div><span>{label}</span><small>{Math.round(current)} / {target} g</small></div>
@@ -122,3 +124,4 @@ function MacroProgress({ label, current, target }: { label: string; current: num
     </div>
   );
 }
+

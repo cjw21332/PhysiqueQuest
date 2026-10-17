@@ -61,7 +61,10 @@ export interface ExerciseRecord {
 }
 export interface ExerciseCatalog { items: ExerciseRecord[]; total: number; page: number; limit: number; pages: number; source?: string; coverageNote?: string; }
 export interface ProgressRecord { _id: string; metric: 'weight' | 'waist' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
-export interface WorkoutSessionRecord { _id: string; exerciseIds: string[]; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; }
+export type { WorkoutRecord as WorkoutSessionRecord } from '../../shared/workouts';
+import type { WorkoutRecord as WorkoutSessionRecord, SetResult, WorkoutExercise } from '../../shared/workouts';
+export type WorkoutSummary = { trainingDates: string[]; personalRecords: { exerciseId: string; name: string; reps: number; durationSeconds?: number; loadKg?: number; date: string }[]; policyVersion: number };
+export type RecordingPlan = { programVersion: string; dayIndex: number; scheduledDate: string; timezone: string; exercises: WorkoutExercise[] };
 export type AlertRecord = {
   _id?: string;
   id?: string;
@@ -105,6 +108,8 @@ export interface LeaderboardEntryRecord {
 }
 
 export interface LeaderboardRecord {
+  creditPolicy?: string;
+  creditPolicyVersion?: number;
   period: LeaderboardPeriod;
   entries: LeaderboardEntryRecord[];
   self: LeaderboardEntryRecord;
@@ -136,6 +141,7 @@ export interface CoachDay {
 }
 
 export interface CoachPlanRecord {
+  programVersion?: string;
   goal: string;
   weekLabel: string;
   sessionCount: number;
@@ -232,7 +238,7 @@ export class ApiRequestError extends Error {
  */
 export const SCAN_TIMEOUT_MS = 60_000;
 
-type RequestOptions = RequestInit & { timeoutMs?: number };
+type RequestOptions = RequestInit & { timeoutMs?: number; allowEmpty?: boolean };
 
 /**
  * Raised when the caller gave up waiting, as opposed to the server having
@@ -254,7 +260,7 @@ class ApiClient {
   ): Promise<T> {
     const url = `${baseUrl ?? getApiBaseUrl()}${endpoint}`;
 
-    const { timeoutMs, ...init } = options;
+    const { timeoutMs, allowEmpty, ...init } = options;
     const config: RequestInit = {
       ...init,
       headers: {
@@ -299,6 +305,11 @@ class ApiClient {
         throw new ApiRequestError(message, response.status, error.code);
       }
 
+      if (allowEmpty) {
+        // Older servers send an empty body when no active session exists.
+        const body = await response.text();
+        return (body.trim() ? JSON.parse(body) : null) as T;
+      }
       return await response.json();
     } catch (error) {
       // HTTP rejections are expected application responses (for example, an
@@ -381,7 +392,7 @@ class ApiClient {
   async setWater(data: { date: string; glasses: number }) { return this.request<any>('/nutrition/water', { method: 'PUT', body: JSON.stringify(data) }); }
   async getSettings() { return this.request<any>('/settings'); }
   async updateSettings(values: Record<string, unknown>) { return this.request<any>('/settings', { method: 'PUT', body: JSON.stringify({ values }) }); }
-  async getActivity() { return this.request<any>('/activity/state'); }
+  async getActivity() { return this.request<any>(`/activity/state?timezone=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC')}`); }
   async updateActivity(state: Record<string, unknown>) { return this.request<any>('/activity/state', { method: 'PUT', body: JSON.stringify({ state }) }); }
   async getLeaderboard(period: LeaderboardPeriod = 'week') { return this.request<LeaderboardRecord>(`/leaderboard?period=${encodeURIComponent(period)}`); }
   async getCoachPlan() { return this.request<CoachPlanRecord>('/coach/plan'); }
@@ -397,7 +408,14 @@ class ApiClient {
   async getProgress(metric: string, limit = 90) { return this.request<any>(`/progress?metric=${encodeURIComponent(metric)}&limit=${limit}`); }
   async addProgress(data: any) { return this.request<any>('/progress', { method: 'POST', body: JSON.stringify(data) }); }
   async deleteProgress(id: string) { return this.request<any>(`/progress/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
-  async getWorkouts(limit = 20) { return this.request<WorkoutSessionRecord[]>(`/workouts?limit=${encodeURIComponent(limit)}`); }
+  async getWorkouts(limit = 20, before?: string) { return this.request<WorkoutSessionRecord[]>(`/workouts?limit=${encodeURIComponent(limit)}${before ? `&before=${encodeURIComponent(before)}` : ''}`); }
+  async getDayWorkouts(date: string, timezone: string) { return this.request<WorkoutSessionRecord[]>(`/workouts?date=${encodeURIComponent(date)}&timezone=${encodeURIComponent(timezone)}`); }
+  async getWorkout(id: string) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}`); }
+  async getActiveWorkout() { return this.request<WorkoutSessionRecord | null>('/workouts/active', { allowEmpty: true }); }
+  async getWorkoutSummary() { return this.request<WorkoutSummary>(`/workouts/summary?timezone=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC')}`); }
+  async saveWorkoutSet(id: string, expectedRevision: number, result: SetResult) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}/sets`, { method: 'PATCH', body: JSON.stringify({ expectedRevision, result }) }); }
+  async saveRecordedWorkout(data: { requestKey: string; exercise: WorkoutExercise; result: SetResult; performedAt: string; timezone: string }) { return this.request<WorkoutSessionRecord>('/workouts/recorded', { method: 'POST', body: JSON.stringify(data) }); }
+  async applyRecordedWorkout(id: string, plan: RecordingPlan, exerciseId: string) { return this.request<WorkoutSessionRecord>(`/workouts/recorded/${encodeURIComponent(id)}/apply`, { method: 'POST', body: JSON.stringify({ ...plan, exerciseId }) }); }
   async createWorkout(data: any) { return this.request<any>('/workouts', { method: 'POST', body: JSON.stringify(data) }); }
   async getAdminExercises() { return this.request<any[]>('/admin/exercises'); }
   async createAdminExercise(data: any) { return this.request<any>('/admin/exercises', { method: 'POST', body: JSON.stringify(data) }); }

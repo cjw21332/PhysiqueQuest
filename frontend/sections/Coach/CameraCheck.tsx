@@ -5,15 +5,13 @@ import { Icon } from '../Home/icons';
 import { api } from '../../lib/api';
 import { useCameraStream } from '../../hooks/useCameraStream';
 import { parseCameraReadiness, readyCheckCount, type CameraReadiness, type ReadinessCheck } from '../../lib/cameraReadiness';
+import RecordedRepCounter from './RecordedRepCounter';
+import type { WorkoutSessionRecord } from '../../lib/api';
 
-export default function CameraCheck({ onBack, onStart }: { onBack: () => void; onStart: () => void }) {
+export default function CameraCheck({ onBack, onStart, onRecordingSaved }: { onBack: () => void; onStart: () => void; onRecordingSaved: (workout: WorkoutSessionRecord) => void }) {
   const [mode, setMode] = useState<'live' | 'upload'>('live');
-  const [fileUrl, setFileUrl] = useState('');
-  const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [analysis, setAnalysis] = useState<unknown>(null);
-  const [analysisBusy, setAnalysisBusy] = useState(false);
-  const [analysisError, setAnalysisError] = useState('');
+  const [autoScan, setAutoScan] = useState(true);
   const [cameraMessage, setCameraMessage] = useState('Checking pose-analysis service…');
   const [poseAvailable, setPoseAvailable] = useState(false);
   const [liveReadiness, setLiveReadiness] = useState<CameraReadiness | null>(null);
@@ -21,7 +19,6 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
   const [readinessError, setReadinessError] = useState('');
   const readinessRequestRef = useRef(0);
   const live = useCameraStream();
-  useEffect(() => { return () => { if (fileUrl) URL.revokeObjectURL(fileUrl); }; }, [fileUrl]);
   useEffect(() => { let active = true; api.getPoseStatus().then(status => { if (!active) return; setPoseAvailable(status.available); setCameraMessage(status.available ? 'Live framing, lighting, and distance checks use the configured pose-analysis service.' : 'Pose analysis is not configured. Camera preview is available, but framing, lighting, and distance cannot be verified.'); }).catch(error => { if (active) setCameraMessage(error instanceof Error ? error.message : 'Could not check pose-analysis availability.'); }); return () => { active = false; }; }, []);
   const analyzeReadiness = useCallback(async () => {
     const requestId = ++readinessRequestRef.current;
@@ -50,20 +47,6 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
     void analyzeReadiness();
     return () => { readinessRequestRef.current += 1; };
   }, [analyzeReadiness, live.facing, live.status, mode, poseAvailable]);
-  const chooseFile = (file?: File) => { if (!file) return; if (fileUrl) URL.revokeObjectURL(fileUrl); setFileUrl(URL.createObjectURL(file)); setFileName(file.name); setSelectedFile(file); setAnalysis(null); setAnalysisError(''); };
-  const analyzeVideo = async () => {
-    if (!selectedFile) return;
-    if (selectedFile.size > 20 * 1024 * 1024) { setAnalysisError('Choose a video smaller than 20 MB.'); return; }
-    const mimeType = selectedFile.type;
-    if (mimeType !== 'video/mp4' && mimeType !== 'video/quicktime') { setAnalysisError('Choose an MP4 or MOV video.'); return; }
-    setAnalysisBusy(true); setAnalysisError('');
-    try {
-      const mediaBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onerror = () => reject(new Error('Could not read selected video.')); reader.onload = () => resolve(String(reader.result).split(',')[1] ?? ''); reader.readAsDataURL(selectedFile); });
-      const result = await api.analyzePose({ mediaBase64, mimeType });
-      setAnalysis(result);
-    } catch (error) { setAnalysisError(error instanceof Error ? error.message : 'Pose analysis did not complete.'); }
-    finally { setAnalysisBusy(false); }
-  };
   const switchToUpload = () => { live.stop(true); setMode('upload'); };
 
   return (
@@ -133,37 +116,22 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
         </>
       ) : (
         <>
-          <div className="upload-dropzone">
-            {fileUrl ? (
-              <>
-                <video src={fileUrl} controls/>
-                <b>{fileName}</b>
-            <small>{poseAvailable ? 'Video is previewed locally. Submit it to request analysis.' : 'Video is previewed locally. Pose analysis is unavailable; use it as a reference for manual logging.'}</small>
-                {poseAvailable && <button type="button" className="secondary" disabled={analysisBusy} onClick={() => void analyzeVideo()}>{analysisBusy ? 'Analyzing…' : 'Analyze video'}</button>}
-                {analysisError && <p role="alert" className="error">{analysisError}</p>}
-                {analysis && <pre className="pose-analysis-result">{JSON.stringify(analysis, null, 2)}</pre>}
-                <button className="quiet-link" onClick={() => { URL.revokeObjectURL(fileUrl); setFileUrl(''); setFileName(''); setSelectedFile(null); setAnalysis(null); setAnalysisError(''); }}>
-                  Choose a different video
-                </button>
-              </>
-            ) : (
+          {selectedFile ? <RecordedRepCounter file={selectedFile} autoScan={autoScan} onSaved={onRecordingSaved} onChooseAnother={() => setSelectedFile(null)}/> : <div className="upload-dropzone">
               <>
                 <span className="upload-icon">
                   <Icon name="trend" size={24}/>
                 </span>
                 <b>Upload a recorded set</b>
-                <p>MP4 or MOV, up to 2 minutes. Film from the side with your full body visible.</p>
+                <p>Automatically scan a squat, biceps curl or push-up set and review its exercise name and reps. MP4 or MOV, up to 20 MB and 2 minutes. Film from the side with your full body visible.</p>
+                <label><input type="checkbox" checked={autoScan} onChange={event => setAutoScan(event.target.checked)}/>Scan automatically when video opens</label>
               </>
-            )}
-          </div>
+          </div>}
 
           <footer className="coach-footer">
-            {fileUrl ? (
-              <button className="primary" onClick={onStart}>Start manual session</button>
-            ) : (
+            {!selectedFile && (
               <label className="primary choose-video">
                 Choose a video
-                <input type="file" accept="video/mp4,video/quicktime,video/*" onChange={e => chooseFile(e.target.files?.[0])}/>
+                <input type="file" accept="video/mp4,video/quicktime,.mp4,.mov" onChange={e => setSelectedFile(e.target.files?.[0] ?? null)}/>
               </label>
             )}
           </footer>

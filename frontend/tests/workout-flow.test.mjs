@@ -7,10 +7,11 @@ const source = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 test('workout UI only opens a report after the API confirms completion', async () => {
   const coach = await source('sections/Coach/CoachSection.tsx');
   const session = await source('sections/Coach/LiveSession.tsx');
+  const runner = await source('sections/Coach/WorkoutRunner.tsx');
   const report = await source('sections/Coach/WorkoutReport.tsx');
   assert.match(coach, /useWorkouts/);
-  assert.match(coach, /completeWorkout/);
-  assert.match(coach, /workout={/);
+  assert.match(runner, /await api.completeWorkout/);
+  assert.match(coach, /createSession/);
   assert.match(session, /onPause/);
   assert.match(session, /paused/);
   assert.doesNotMatch(session, /setReps/);

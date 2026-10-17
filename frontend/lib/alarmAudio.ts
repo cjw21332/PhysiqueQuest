@@ -21,10 +21,10 @@ export function primeAlarmAudio(): void {
   engine = { ctx, gain };
 }
 
-export function startAlarm(): void {
+export function startAlarm(maximum = true): void {
   if (!engine) return;
   void engine.ctx.resume();
-  engine.gain.gain.value = 0.6;
+  engine.gain.gain.value = maximum ? 0.6 : 0.25;
 }
 
 export function stopAlarm(): void {

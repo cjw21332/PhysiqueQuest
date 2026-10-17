@@ -52,6 +52,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
     const podium = [entries[1], entries[0], entries[2]].filter((entry): entry is LeaderboardEntryRecord => Boolean(entry));
     const currentName = profile.name.trim() || 'You';
     return <section className="quest-section leaderboard-screen" aria-label="Leaderboard">
+      <p className="camera-note">{leaderboard?.creditPolicy ?? 'Workout credit is counted once per training day. Historical totals follow this rule. Competition weeks start Monday at 00:00 UTC.'}</p>
       <header className="leaderboard-header">
         <button className="leaderboard-back" type="button" onClick={() => setScreen('quests')} aria-label="Back to quests"><Icon name="arrow" size={19}/></button>
         <h2>Leaderboard</h2>

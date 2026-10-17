@@ -1,0 +1,163 @@
+erDiagram
+    direction LR
+    users ||..o| profiles : "userId"
+    users ||..o| settings : "userId"
+    users ||..o| activity : "userId"
+    users ||..o| nutrition : "userId"
+    users ||..o| notifications : "userId"
+    users ||..o{ workout_sessions : "userId"
+    users ||..o{ progress_entries : "userId"
+    users ||..o{ coach_programs : "userId - application link"
+    users ||..o{ leaderboard_snapshots : "subjectId"
+    users ||..o{ safety_alert_events : "userId"
+    users ||..o{ sign_in_events : "userId"
+    users ||..o{ password_recovery_tokens : "userId"
+    workout_sessions |o..o{ safety_alert_events : "optional workoutSessionId - unverified link"
+
+    users {
+        ObjectId _id PK
+        string email UK
+        string name
+        string passwordHash
+        string role "user or admin"
+        boolean isActive
+        number failedLoginAttempts
+        Date lockoutUntil "nullable"
+    }
+    profiles {
+        ObjectId _id PK
+        ObjectId userId UK
+        string name
+        string age
+        string height
+        string heightUnit
+        string weight
+        string weightUnit
+        string gender
+        string activity
+        string goal
+        string targetWeight "optional"
+        string targetDate "optional"
+        string seriousness
+        string_array equipment
+        string_array days
+        string duration
+        string_array conditions
+        string healthNotes
+        string contactName
+        string contactPhone
+    }
+    settings {
+        ObjectId _id PK
+        ObjectId userId UK
+        Mixed values "preferences and nutrition targets"
+    }
+    activity {
+        ObjectId _id PK
+        ObjectId userId UK
+        Mixed state "timezone and legacy state"
+    }
+    nutrition {
+        ObjectId _id PK
+        ObjectId userId UK
+        MealEntry_array meals "embedded"
+        WaterEntry_array water "embedded"
+    }
+    notifications {
+        ObjectId _id PK
+        ObjectId userId UK
+        NotificationItem_array items "embedded"
+    }
+    workout_sessions {
+        ObjectId _id PK
+        ObjectId userId
+        string_array exerciseIds
+        Date startedAt
+        Date endedAt "optional"
+        Date pausedAt "optional"
+        number pausedSeconds
+        string status "active or completed"
+        number durationSeconds "optional"
+        WorkoutExercise_array exercises "embedded snapshots"
+        SetResult_array sets "embedded"
+        string_array appliedRecordingIds "server assigned source claims"
+        ExerciseResult_array exerciseResults "legacy totals"
+        number revision
+        string origin "planned, standalone, recorded-set"
+        string requestKey "optional compound unique key"
+        string requestHash "optional"
+        string completionHash "optional"
+        string programVersion "optional context hash"
+        number dayIndex "optional"
+        string scheduledDate "optional selected plan date"
+        string timezone "optional"
+        string activityDate "optional"
+        number creditPolicyVersion "optional"
+    }
+    progress_entries {
+        ObjectId _id PK
+        ObjectId userId
+        string metric "weight, waist, benchPress"
+        number value
+        string unit "kg, lb, cm, in"
+        Date measuredAt
+    }
+    coach_programs {
+        ObjectId _id PK
+        ObjectId userId "no Mongoose ref declaration"
+        string contextHash "compound unique with userId"
+        Mixed plan "embedded program snapshot"
+    }
+    leaderboard_snapshots {
+        ObjectId _id PK
+        ObjectId subjectId
+        string period
+        string boundaryKey
+        number rank
+        number points
+        number creditPolicyVersion "optional"
+    }
+    safety_alert_events {
+        ObjectId _id PK
+        ObjectId userId
+        string idempotencyKey "compound unique with userId"
+        string eventType "manual, inactivity, cancelled"
+        string status "pending, delivered, failed, cancelled"
+        string errorCode "optional"
+        string providerReference "optional"
+        Date occurredAt
+        ObjectId workoutSessionId "optional, no Mongoose ref"
+        string exerciseId "optional"
+        AlertLocation location "optional embedded object"
+        Date resolvedAt "optional"
+        boolean flagged
+    }
+    sign_in_events {
+        ObjectId _id PK
+        ObjectId userId
+        Date occurredAt
+        string source "login or register"
+    }
+    password_recovery_tokens {
+        ObjectId _id PK
+        ObjectId userId
+        string tokenHash UK
+        Date expiresAt "TTL index"
+        Date usedAt "nullable"
+    }
+    admin_exercises {
+        ObjectId _id PK
+        string name
+        string slug
+        string group
+        string status "draft or published"
+        string pose "missing, ready, training"
+        string targetMuscle
+        string equipment
+        string difficulty
+        string pictureUrl
+        string videoUrl
+        string_array instructions
+        string trackingStatus
+    }
+

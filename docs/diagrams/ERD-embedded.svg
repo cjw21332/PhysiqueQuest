@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2040" height="1340" viewBox="0 0 2040 1340">
+<rect width="100%" height="100%" fill="#f4f7fb"/>
+<g font-family="Arial, sans-serif">
+<polyline points="218,223 218,285 228,285 228,340" fill="none" stroke="#8297ac" stroke-width="2"/>
+<rect x="233" y="304" width="68.6" height="23" rx="4" fill="#f4f7fb"/>
+<text x="238" y="320" font-size="14" fill="#435a71">0..many</text>
+<polyline points="218,223 218,285 618,285 618,340" fill="none" stroke="#8297ac" stroke-width="2"/>
+<rect x="623" y="304" width="68.6" height="23" rx="4" fill="#f4f7fb"/>
+<text x="628" y="320" font-size="14" fill="#435a71">0..many</text>
+<polyline points="218,223 218,285 1008,285 1008,340" fill="none" stroke="#8297ac" stroke-width="2"/>
+<rect x="1013" y="304" width="68.6" height="23" rx="4" fill="#f4f7fb"/>
+<text x="1018" y="320" font-size="14" fill="#435a71">0..many</text>
+<polyline points="1420,223 1420,285 1425,285 1425,340" fill="none" stroke="#8297ac" stroke-width="2"/>
+<rect x="1430" y="304" width="68.6" height="23" rx="4" fill="#f4f7fb"/>
+<text x="1435" y="320" font-size="14" fill="#435a71">0..many</text>
+<polyline points="1420,223 1420,285 1815,285 1815,340" fill="none" stroke="#8297ac" stroke-width="2"/>
+<rect x="1820" y="304" width="68.6" height="23" rx="4" fill="#f4f7fb"/>
+<text x="1825" y="320" font-size="14" fill="#435a71">0..many</text>
+<polyline points="388,900 460,900" fill="none" stroke="#8297ac" stroke-width="2"/>
+<rect x="385" y="825" width="68.6" height="23" rx="4" fill="#f4f7fb"/>
+<text x="390" y="841" font-size="14" fill="#435a71">0..many</text>
+<polyline points="1440,900 1530,900" fill="none" stroke="#8297ac" stroke-width="2"/>
+<rect x="1447" y="865" width="45.2" height="23" rx="4" fill="#f4f7fb"/>
+<text x="1452" y="881" font-size="14" fill="#435a71">0..1</text>
+<rect x="48" y="145" width="340" height="78" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M57,145 H379 Q388,145 388,154 V185 H48 V154 Q48,145 57,145" fill="#244ea3"/>
+<text x="64" y="172" font-size="18" font-weight="bold" fill="white">workout_sessions</text>
+<text x="64" y="208" font-size="15" fill="#253e54">Parent collection</text>
+<rect x="48" y="340" width="360" height="198" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M57,340 H399 Q408,340 408,349 V380 H48 V349 Q48,340 57,340" fill="#176b80"/>
+<text x="64" y="367" font-size="18" font-weight="bold" fill="white">WorkoutExercise</text>
+<text x="64" y="403" font-size="15" fill="#253e54">exerciseId: string</text>
+<text x="64" y="427" font-size="15" fill="#253e54">name: string</text>
+<text x="64" y="451" font-size="15" fill="#253e54">equipment: string</text>
+<text x="64" y="475" font-size="15" fill="#253e54">prescription ?: string</text>
+<text x="64" y="499" font-size="15" fill="#253e54">sets: number</text>
+<text x="64" y="523" font-size="15" fill="#253e54">trackingPresetId ?: string</text>
+<rect x="438" y="340" width="360" height="390" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M447,340 H789 Q798,340 798,349 V380 H438 V349 Q438,340 447,340" fill="#176b80"/>
+<text x="454" y="367" font-size="18" font-weight="bold" fill="white">SetResult</text>
+<text x="454" y="403" font-size="15" fill="#253e54">setId: string</text>
+<text x="454" y="427" font-size="15" fill="#253e54">exerciseId: string</text>
+<text x="454" y="451" font-size="15" fill="#253e54">setIndex: number</text>
+<text x="454" y="475" font-size="15" fill="#253e54">reps: number</text>
+<text x="454" y="499" font-size="15" fill="#253e54">durationSeconds ?: number</text>
+<text x="454" y="523" font-size="15" fill="#253e54">loadKg ?: number</text>
+<text x="454" y="547" font-size="15" fill="#253e54">status: string</text>
+<text x="454" y="571" font-size="15" fill="#253e54">source: string</text>
+<text x="454" y="595" font-size="15" fill="#253e54">detectedReps ?: number</text>
+<text x="454" y="619" font-size="15" fill="#253e54">side ?: string</text>
+<text x="454" y="643" font-size="15" fill="#253e54">algorithmVersion ?: string</text>
+<text x="454" y="667" font-size="15" fill="#253e54">clipDurationSeconds ?: number</text>
+<text x="454" y="691" font-size="15" fill="#253e54">trackingPresetId ?: string</text>
+<text x="454" y="715" font-size="15" fill="#253e54">sourceRecordingId ?: string</text>
+<rect x="828" y="340" width="360" height="126" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M837,340 H1179 Q1188,340 1188,349 V380 H828 V349 Q828,340 837,340" fill="#176b80"/>
+<text x="844" y="367" font-size="18" font-weight="bold" fill="white">ExerciseResult</text>
+<text x="844" y="403" font-size="15" fill="#253e54">exerciseId: string</text>
+<text x="844" y="427" font-size="15" fill="#253e54">reps: number</text>
+<text x="844" y="451" font-size="15" fill="#253e54">loadKg ?: number</text>
+<rect x="1250" y="145" width="340" height="78" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1259,145 H1581 Q1590,145 1590,154 V185 H1250 V154 Q1250,145 1259,145" fill="#244ea3"/>
+<text x="1266" y="172" font-size="18" font-weight="bold" fill="white">nutrition</text>
+<text x="1266" y="208" font-size="15" fill="#253e54">Parent collection</text>
+<rect x="1250" y="340" width="350" height="414" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1259,340 H1591 Q1600,340 1600,349 V380 H1250 V349 Q1250,340 1259,340" fill="#176b80"/>
+<text x="1266" y="367" font-size="18" font-weight="bold" fill="white">MealEntry</text>
+<text x="1266" y="403" font-size="15" fill="#253e54">id: string</text>
+<text x="1266" y="427" font-size="15" fill="#253e54">name: string</text>
+<text x="1266" y="451" font-size="15" fill="#253e54">meal: string</text>
+<text x="1266" y="475" font-size="15" fill="#253e54">calories: number</text>
+<text x="1266" y="499" font-size="15" fill="#253e54">detail: string</text>
+<text x="1266" y="523" font-size="15" fill="#253e54">time: string</text>
+<text x="1266" y="547" font-size="15" fill="#253e54">source: string</text>
+<text x="1266" y="571" font-size="15" fill="#253e54">edited: boolean</text>
+<text x="1266" y="595" font-size="15" fill="#253e54">protein: number</text>
+<text x="1266" y="619" font-size="15" fill="#253e54">carbs: number</text>
+<text x="1266" y="643" font-size="15" fill="#253e54">fat: number</text>
+<text x="1266" y="667" font-size="15" fill="#253e54">date: string</text>
+<text x="1266" y="691" font-size="15" fill="#253e54">fdcId ?: number</text>
+<text x="1266" y="715" font-size="15" fill="#253e54">confidence ?: number</text>
+<text x="1266" y="739" font-size="15" fill="#253e54">estWeightG ?: number</text>
+<rect x="1640" y="340" width="350" height="102" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1649,340 H1981 Q1990,340 1990,349 V380 H1640 V349 Q1640,340 1649,340" fill="#176b80"/>
+<text x="1656" y="367" font-size="18" font-weight="bold" fill="white">WaterEntry</text>
+<text x="1656" y="403" font-size="15" fill="#253e54">date: string</text>
+<text x="1656" y="427" font-size="15" fill="#253e54">glasses: number</text>
+<rect x="48" y="860" width="340" height="78" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M57,860 H379 Q388,860 388,869 V900 H48 V869 Q48,860 57,860" fill="#244ea3"/>
+<text x="64" y="887" font-size="18" font-weight="bold" fill="white">notifications</text>
+<text x="64" y="923" font-size="15" fill="#253e54">Parent collection</text>
+<rect x="460" y="860" width="360" height="246" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M469,860 H811 Q820,860 820,869 V900 H460 V869 Q460,860 469,860" fill="#176b80"/>
+<text x="476" y="887" font-size="18" font-weight="bold" fill="white">NotificationItem</text>
+<text x="476" y="923" font-size="15" fill="#253e54">id: string</text>
+<text x="476" y="947" font-size="15" fill="#253e54">icon: string</text>
+<text x="476" y="971" font-size="15" fill="#253e54">title: string</text>
+<text x="476" y="995" font-size="15" fill="#253e54">subtitle: string</text>
+<text x="476" y="1019" font-size="15" fill="#253e54">body: string</text>
+<text x="476" y="1043" font-size="15" fill="#253e54">time: string</text>
+<text x="476" y="1067" font-size="15" fill="#253e54">group: string</text>
+<text x="476" y="1091" font-size="15" fill="#253e54">unread: boolean</text>
+<rect x="1100" y="860" width="340" height="78" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1109,860 H1431 Q1440,860 1440,869 V900 H1100 V869 Q1100,860 1109,860" fill="#244ea3"/>
+<text x="1116" y="887" font-size="18" font-weight="bold" fill="white">safety_alert_events</text>
+<text x="1116" y="923" font-size="15" fill="#253e54">Parent collection</text>
+<rect x="1530" y="860" width="360" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1539,860 H1881 Q1890,860 1890,869 V900 H1530 V869 Q1530,860 1539,860" fill="#176b80"/>
+<text x="1546" y="887" font-size="18" font-weight="bold" fill="white">AlertLocation</text>
+<text x="1546" y="923" font-size="15" fill="#253e54">lat: number</text>
+<text x="1546" y="947" font-size="15" fill="#253e54">lng: number</text>
+<text x="1546" y="971" font-size="15" fill="#253e54">accuracyMeters: number</text>
+<text x="1546" y="995" font-size="15" fill="#253e54">capturedAt: Date</text>
+<text x="48" y="48" font-size="30" fill="#15314b">PhysiqueQuest / Embedded data</text>
+<text x="48" y="82" font-size="16" fill="#52657a">Solid lines mean containment  |  Child boxes live inside parent documents; they are not separate collections</text>
+<text x="48" y="1220" font-size="17" fill="#52657a">SetResult.exerciseId matches an exercise snapshot within the same workout; string IDs are not catalog foreign keys.</text>
+<text x="48" y="1190" font-size="17" fill="#52657a">sourceRecordingId links an imported planned set to its original reviewed recording; no source video is stored.</text>
+<text x="48" y="1250" font-size="17" fill="#52657a">WorkoutExercise and SetResult are generic object arrays shaped by the workout contract. Other child objects have embedded schemas.</text>
+<text x="48" y="1280" font-size="17" fill="#52657a">No independent MongoDB _id on the child objects. ? marks optional or nullable fields. PK / UK constraints belong to parent collections.</text>
+</g></svg>

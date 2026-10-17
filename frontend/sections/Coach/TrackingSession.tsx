@@ -5,13 +5,14 @@ import { useCameraStream } from '../../hooks/useCameraStream';
 import { useRepTracking } from '../../hooks/useRepTracking';
 import { trackingExercises, trackingGuidance, type TrackingExercise, type TrackingSide } from '../../../shared/repCounter';
 
-export default function TrackingSession({ exercise, onFinish, onPause }: { exercise: TrackingExercise; onFinish: (seconds: number, reps: number) => Promise<void>; onPause: (paused: boolean) => Promise<void> }) {
+export default function TrackingSession({ exercise, onFinish, onPause }: { exercise: TrackingExercise; onFinish: (seconds: number, reps: number, endedAt: string) => Promise<void>; onPause: (paused: boolean) => Promise<void> }) {
   const kind = trackingExercises[exercise._id];
   const [requestId] = useState(() => globalThis.crypto?.randomUUID?.() ?? `pose-${Date.now()}-${Math.random()}`);
   const [side, setSide] = useState<TrackingSide>('left');
   const [paused, setPaused] = useState(false);
   const [visible, setVisible] = useState(true);
   const [review, setReview] = useState(false);
+  const [endedAt, setEndedAt] = useState<string | null>(null);
   const [count, setCount] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -33,8 +34,9 @@ export default function TrackingSession({ exercise, onFinish, onPause }: { exerc
   }, [intent]);
 
   const finish = async () => {
+    if (!endedAt || busy) return;
     setBusy(true); setError('');
-    try { await onFinish(seconds, count); }
+    try { await onFinish(seconds, count, endedAt); }
     catch (err) { setError(err instanceof Error ? err.message : 'Could not save this workout. Try again.'); }
     finally { setBusy(false); }
   };
@@ -61,11 +63,9 @@ export default function TrackingSession({ exercise, onFinish, onPause }: { exerc
         {camera.status !== 'on' && <button type="button" className="secondary" disabled={paused || !visible || camera.status === 'starting'} onClick={() => void camera.start()}>{camera.status === 'starting' ? 'Starting camera…' : 'Enable camera'}</button>}
         {camera.status === 'on' && !camera.nativePreview && <button type="button" className="secondary" onClick={camera.switchFacing}>Switch camera</button>}
         <button type="button" className="secondary" disabled={busy} onClick={() => void togglePause()}>{paused ? 'Resume' : 'Pause'}</button>
-        <button type="button" className="end-button" disabled={busy} onClick={async () => {
-          setBusy(true); setError('');
-          try { if (!paused) await onPause(true); setCount(tracking.reps); setReview(true); }
-          catch (err) { setError(err instanceof Error ? err.message : 'Could not finish the workout. Try again.'); }
-          finally { setBusy(false); }
+        <button type="button" className="end-button" disabled={busy} onClick={() => {
+          // Completion carries this timestamp, avoiding a separate pause write for review.
+          setEndedAt(new Date().toISOString()); setCount(tracking.reps); setError(''); setReview(true);
         }}>Finish and review</button>
       </div>
       <p className="live-notice">Prototype rep counting · counts may need correction. Camera frames stay on this device. Tracking pauses when the app is hidden.</p>

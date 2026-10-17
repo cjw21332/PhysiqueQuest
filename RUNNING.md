@@ -104,6 +104,11 @@ Review dependency upgrades against the Expo SDK compatibility requirements.
 
 ## Running the Application
 
+The connected workout flow stores individual exercise sets and restores sessions
+and reports through `/workouts/<id>`. Rebuild/restart both the main backend and
+frontend after this update; the frontend now uses new set, recorded-set, history
+detail and summary endpoints. See [connected feature rollout and verification](docs/COHESIVE_FUNCTIONS_IMPLEMENTED.md).
+
 You need to run all three components simultaneously in separate terminal windows. For Expo Go, all devices must be on the same Wi-Fi network. The Next.js and NestJS servers listen on the computer's network interfaces; the app uses the computer's LAN address for both the page (port 3000) and API (port 4000). MongoDB Atlas remains a cloud database and is reached by the backend, not by the phone.
 
 ### Terminal 1: Backend Server
@@ -141,6 +146,26 @@ npm run dev
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run linter
+
+#### Faster loading when testing in Expo Go
+
+For phone testing that does not need frontend hot reload, stop the frontend
+development server and run the following from the repository root:
+
+```powershell
+npm run build
+npm run start -- --hostname 0.0.0.0
+```
+
+Keep the backend and Expo Go server running as usual. This serves prebuilt pages
+on port 3000, avoiding Next.js development compilation when the phone opens a
+screen. Rebuild and restart this server after frontend changes.
+
+The mobile shell opens `/launch` directly and enables normal HTTP caching for
+reusable web assets. HTML and API responses still follow their own server cache
+headers. Expo Go's initial JavaScript bundling/download happens before this
+WebView loads and is separate from frontend startup; the first run can still
+take longer. Keep the phone and computer on the same reliable Wi-Fi network.
 
 ### Terminal 3: Mobile App (Optional)
 

@@ -1,19 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import type { Profile } from './types';
 import { Icon } from './icons';
 import { useProgress } from '../../hooks/useProgress';
 import { normalizeTrainingDays } from '../../lib/trainingDays';
 import { navigate } from '../../lib/navigation';
-import { api, type WorkoutSessionRecord } from '../../lib/api';
-
-const sampleMilestones = [
-  { title: '70 kg body weight', detail: 'Reached Oct 12', state: 'done' },
-  { title: 'Bench press 60 kg × 8', detail: 'Reached Nov 03', state: 'done' },
-  { title: '72 kg body weight', detail: 'In progress', state: 'current' },
-  { title: 'Bench press 70 kg × 8', detail: 'Upcoming', state: '' },
-];
+import { useWorkoutSummary } from '../../hooks/useWorkoutSummary';
+import { activityDate } from '../../../shared/workouts';
+import { convertMeasurement } from '../../../shared/measurements';
 
 function shortDate(value?: string) {
   if (!value) return 'Date unavailable';
@@ -25,34 +19,22 @@ function shortDate(value?: string) {
 
 export default function GoalsMilestones({ profile }: { profile: Profile }) {
   const { entries, loading, error, refresh } = useProgress('weight');
-  const [workouts, setWorkouts] = useState<WorkoutSessionRecord[]>([]);
-  const [workoutLoading, setWorkoutLoading] = useState(true);
-  const [workoutError, setWorkoutError] = useState('');
-  useEffect(() => {
-    let active = true;
-    api.getWorkouts().then(records => {
-      if (active) setWorkouts(records);
-    }).catch(loadError => {
-      if (active) setWorkoutError(loadError instanceof Error ? loadError.message : 'Could not load training progress.');
-    }).finally(() => {
-      if (active) setWorkoutLoading(false);
-    });
-    return () => { active = false; };
-  }, []);
+  const training = useWorkoutSummary();
+  const workoutLoading = training.loading, workoutError = training.error;
   const orderedEntries = [...entries].sort((a, b) =>
     new Date(b.measuredAt ?? b.date ?? 0).getTime() - new Date(a.measuredAt ?? a.date ?? 0).getTime(),
   );
   const latest = orderedEntries[0];
   const target = Number(profile.targetWeight);
   const start = Number(profile.weight);
-  const current = latest?.value ?? (start > 0 ? start : null);
-  const unit = latest?.unit ?? profile.weightUnit ?? 'kg';
+  const unit = profile.weightUnit || latest?.unit || 'kg';
+  const current = latest ? convertMeasurement(latest.value, latest.unit, unit) : (start > 0 ? start : null);
   const hasTarget = Number.isFinite(target) && target > 0;
   const canMeasureGoalProgress = current !== null && hasTarget && start > 0 && target !== start;
   const progress = canMeasureGoalProgress
     ? Math.min(100, Math.max(0, Math.round((current - start) / (target - start) * 100)))
     : null;
-  const goalReached = current !== null && hasTarget && Math.abs(current - target) < 0.05;
+  const goalReached = current !== null && hasTarget && (target < start ? current <= target : target > start ? current >= target : Math.abs(current - target) < 0.05);
   const days = normalizeTrainingDays(profile.days || []);
   const amountToTarget = current !== null && hasTarget ? Math.abs(target - current) : null;
   const targetDate = profile.targetDate
@@ -64,13 +46,12 @@ export default function GoalsMilestones({ profile }: { profile: Profile }) {
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
   weekStart.setHours(0, 0, 0, 0);
-  const workoutsThisWeek = workouts.filter(workout =>
-    workout.status === 'completed' && workout.endedAt && new Date(workout.startedAt) >= weekStart,
-  ).length;
+  const startDate = activityDate(weekStart, Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const today = activityDate(new Date(), Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const workoutsThisWeek = new Set((training.data?.trainingDates ?? []).filter(date => date >= startDate && date <= today)).size;
   const trainingProgress = days.length
     ? Math.min(100, Math.round(workoutsThisWeek / days.length * 100))
     : 0;
-  const useSampleMilestones = !loading && !error && orderedEntries.length === 0;
 
   return <div className="home-ref-subview home-ref-goals-page">
     <header className="section-page-head home-ref-page-head">
@@ -93,7 +74,7 @@ export default function GoalsMilestones({ profile }: { profile: Profile }) {
     </section>
 
     <section className="subsection home-ref-milestones" aria-labelledby="milestone-heading">
-      <div className="section-head"><h3 id="milestone-heading">Milestones</h3><span>{loading ? 'Loading' : error ? 'Unavailable' : useSampleMilestones ? '2 of 4 reached · sample plan' : `${orderedEntries.length} saved`}</span></div>
+      <div className="section-head"><h3 id="milestone-heading">Milestones</h3><span>{loading ? 'Loading' : error ? 'Unavailable' : `${orderedEntries.length} saved`}</span></div>
       {error && <div role="alert" className="scan-warning">{error}<button type="button" onClick={() => void refresh()}>Retry</button></div>}
       {loading ? <p role="status">Loading saved measurements…</p> : error ? null : orderedEntries.length > 0
         ? <div className="milestone-list home-ref-milestone-list">
@@ -106,12 +87,7 @@ export default function GoalsMilestones({ profile }: { profile: Profile }) {
             <div><b>Target · {target} {profile.weightUnit || unit}</b><small>{goalReached ? 'Goal reached' : 'Upcoming'}</small></div>
           </div>}
         </div>
-        : <div className="milestone-list home-ref-milestone-list" aria-label="Sample milestone plan">
-          {sampleMilestones.map(milestone => <div className={`milestone ${milestone.state}`} key={milestone.title}>
-            <span className="milestone-dot">{milestone.state === 'done' ? <Icon name="check" size={12}/> : milestone.state === 'current' ? <span aria-hidden="true">•</span> : null}</span>
-            <div><b>{milestone.title}</b><small>{milestone.state === 'current' && current !== null ? `In progress · ${Math.max(0, 72 - current).toFixed(1)} kg to go` : milestone.detail}</small></div>
-          </div>)}
-        </div>}
+        : <p>No measurements saved yet. Log your weight in Progress to track this goal.</p>}
     </section>
 
     <section className="subsection secondary-goals home-ref-secondary" aria-labelledby="secondary-goals-heading">

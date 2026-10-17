@@ -7,6 +7,7 @@ import { api } from '../../lib/api';
 import { PROFILE_STORAGE_KEY } from '../../lib/auth';
 import type { Profile } from '../Home/types';
 import AdminExerciseLibrary from './AdminExerciseLibrary';
+import ExerciseLibrary from '../Coach/ExerciseLibrary';
 import EngagementAnalytics from './EngagementAnalytics';
 import PersonalDataEdit from './PersonalDataEdit';
 import GoalsEdit from './GoalsEdit';
@@ -16,8 +17,10 @@ import EmergencyContactEdit from './EmergencyContactEdit';
 import { useSettings } from '../../hooks/useSettings';
 import { normalizeTrainingDays } from '../../lib/trainingDays';
 import ForgotPasswordFlow from '../Forgot Password/ForgotPasswordFlow';
+import NutritionTargetsEditor from './NutritionTargetsEditor';
+import { notifyDataChanged } from '../../hooks/useApiResource';
 
-type MeView = 'settings' | 'exercises' | 'engagement' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
+type MeView = 'settings' | 'exercises' | 'admin-exercises' | 'engagement' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
 
 function Switch({ label, checked, onChange, tone = 'green' }: { label: string; checked: boolean; onChange: () => void; tone?: 'green' | 'red' }) {
   return <button className={`me-switch ${tone} ${checked ? 'on' : ''}`} type="button" role="switch" aria-label={label} aria-checked={checked} onClick={onChange}><i/></button>;
@@ -39,6 +42,12 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const [notice, setNotice] = useState('');
   const [saveError, setSaveError] = useState('');
   const [level, setLevel] = useState<number | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    let active = true;
+    api.getAuthMe().then(user => { if (active) setIsAdmin(user.role === 'admin'); }).catch(() => { if (active) setIsAdmin(false); });
+    return () => { active = false; };
+  }, []);
   useEffect(() => { let active = true; api.getActivity().then(result => { if (active && Number.isFinite(result.state?.level)) setLevel(result.state.level); }).catch(() => {}); return () => { active = false; }; }, []);
   useEffect(() => { setCurrentProfile(profile); }, [profile]);
 
@@ -68,6 +77,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       setCurrentProfile(merged);
       localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged));
       window.dispatchEvent(new Event('physiquequest-profile-updated'));
+      notifyDataChanged('profile', 'coach-plan');
       setNotice(`${featureName} saved`);
       return true;
     } catch (error) {
@@ -83,15 +93,19 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   if (view === 'edit-emergency') return <EmergencyContactEdit profile={currentProfile} error={saveError} onBack={() => { setSaveError(''); setView('settings'); }} onSave={patch => saveProfile(patch, 'Emergency contact edit')} />;
 
   if (view === 'exercises') {
+    return <section className="coach-section coach-view-library"><div className="coach-scroll"><ExerciseLibrary onBack={() => setView('settings')} backLabel="Back to account settings"/></div><BottomNav/></section>;
+  }
+  if (view === 'admin-exercises' && isAdmin) {
     return <AdminExerciseLibrary onBack={() => setView('settings')} />;
   }
-  if (view === 'engagement') {
+  if (view === 'engagement' && isAdmin) {
     return <EngagementAnalytics preview onBack={() => setView('settings')} />;
   }
 
   return <section className="me-section me-reference" aria-label="Account and settings">
     <header className="me-header"><h2>Account &amp; settings</h2></header>
     <div className="me-scroll">
+      <NutritionTargetsEditor/>
       <div className="me-profile-summary">
         <span className="me-avatar me-reference-avatar" aria-hidden="true"/>
         <div className="me-profile-name"><b>{currentProfile.name || '—'}</b><small>{level !== null ? `Level ${level} · ` : ''}member since {memberSince}</small></div>
@@ -111,7 +125,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
         <SettingRow icon="phone" title="Emergency contact" detail={currentProfile.contactName || '—'} onClick={() => setView('edit-emergency')} danger/>
       </div>
       {(settingsError || saveError) && <p className="error" role="alert">{settingsError || saveError}</p>}
-      {settingsLoading ? <p className="hint" role="status">Loading saved settings…</p> : settingsError ? <button type="button" className="secondary" onClick={() => void retrySettings()}>Retry settings</button> : <><div className="me-setting-row"><span><b>Inactivity monitoring</b><small>Armed during every session</small></span><Switch label="Inactivity monitoring" checked={settings.inactivity} onChange={() => void toggle('inactivity')}/></div>
+      {settingsLoading ? <p className="hint" role="status">Loading saved settings…</p> : settingsError ? <button type="button" className="secondary" onClick={() => void retrySettings()}>Retry settings</button> : <><div className="me-setting-row"><span><b>Inactivity monitoring</b><small>{settings.inactivity ? 'Active during unpaused workouts' : 'Movement alerts are off'}</small></span><Switch label="Inactivity monitoring" checked={settings.inactivity} onChange={() => void toggle('inactivity')}/></div>
 
       <div className="me-divider"/>
       <section className="me-setting-block">
@@ -127,10 +141,13 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
       <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail={`Verified with a code sent to ${currentProfile.email}`} onClick={() => setPasswordOpen(true)}/></div>
-      <h3 className="me-group-title me-admin-title">Admin tools</h3><div className="me-list">
-        <SettingRow icon="exercise-books" title="Exercise library" detail="Publish exercises and pose templates" onClick={() => setView('exercises')}/>
-        <SettingRow icon="chart-bars" title="Engagement analytics" detail="Users, sessions, safety events" onClick={() => setView('engagement')}/>
+      <h3 className="me-group-title">Exercises</h3><div className="me-list">
+        <SettingRow icon="exercise-books" title="Exercise library" detail="Browse exercises and demonstrations" onClick={() => setView('exercises')}/>
       </div>
+      {isAdmin && <><h3 className="me-group-title me-admin-title">Admin tools</h3><div className="me-list">
+        <SettingRow icon="exercise-books" title="Manage exercises" detail="Publish exercises and pose templates" onClick={() => setView('admin-exercises')}/>
+        <SettingRow icon="chart-bars" title="Engagement analytics" detail="Users, sessions, safety events" onClick={() => setView('engagement')}/>
+      </div></>}
 
       <button className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
     </div>
@@ -139,3 +156,4 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     {notice && <div className="home-toast me-toast" role="status">{notice}</div>}
   </section>;
 }
+

@@ -43,10 +43,12 @@ test('the independent sample library stays reachable during loading, plan errors
     return module.exports;
   };
   const actualIcons = compile(icons, require);
+  const actualWorkouts = compile(await readFile(new URL('../../backend/src/workouts/workout-contract.ts', import.meta.url), 'utf8'), require);
   for (const state of [{ loading: true, plan: null, error: '' }, { loading: false, plan: null, error: 'Backend unavailable' }, { loading: false, error: '', plan: { days: [{ index: 0, name: 'Monday', label: 'M', title: 'Rest day', isWorkoutDay: false }] } }]) {
     const { default: CoachPlan } = compile(source, name => {
       if (name.endsWith('useCoachPlan')) return { useCoachPlan: () => ({ ...state, refresh: () => {} }) };
       if (name.endsWith('/icons')) return actualIcons;
+      if (name.endsWith('/shared/workouts')) return actualWorkouts;
       return require(name);
     });
     const html = renderToStaticMarkup(React.createElement(CoachPlan, { profile: {}, onStart: () => {}, onLibrary: () => {} }));

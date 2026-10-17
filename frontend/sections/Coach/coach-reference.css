@@ -93,7 +93,29 @@
 .coach-reference .home-bottom-nav button.active small { color: #111a2c; font-weight: 600; }
 .coach-reference .coach-plan-note { padding: 12px 0 0; color: #536176; font-size: 12px; line-height: 1.5; }
 .coach-reference .rest-day-message { margin-top: 0; background: #f4f7f4; }
+.recorded-counter { display: grid; gap: 14px; padding: 16px 0 24px; color: #111a2c; }
+.workout-set-editor { display: grid; gap: 12px; padding: 16px; border-radius: 12px; background: #fff; color: #111a2c; margin-block: 14px; }
+.workout-set-editor label { display: grid; gap: 6px; }
+.workout-set-editor input, .workout-set-editor select, .recorded-counter input[type=datetime-local] { width: 100%; min-width: 0; min-height: 44px; border: 1px solid #cbd5ce; border-radius: 8px; padding: 8px; font: inherit; }
+.workout-set-editor button { min-height: 44px; }
+.workout-set-editor details { display: grid; gap: 10px; }
+.workout-history { padding: 18px 20px 100px; background: #fff; position: relative; }
+.workout-history li { padding-block: 10px; }
+.workout-history a { color: #26743a; }
+.nutrition-target-editor { padding: 16px; background: #fff; border-radius: 12px; }
+.nutrition-target-editor form, .nutrition-target-editor label { display: grid; gap: 8px; }
+.nutrition-target-editor input { min-height: 44px; max-width: 100%; border: 1px solid #cbd5ce; border-radius: 8px; padding: 8px; }
+.recorded-counter video { width: 100%; max-height: 320px; background: #111827; border-radius: 14px; }
+.recorded-counter .recorded-file { overflow-wrap: anywhere; font-size: 14px; }
+.recorded-counter .camera-note { margin: 0; line-height: 1.5; }
+.recorded-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.recorded-options label, .recorded-reps { display: grid; gap: 7px; font-size: 13px; font-weight: 600; }
+.recorded-options select, .recorded-reps input { width: 100%; min-width: 0; min-height: 46px; padding: 9px; border: 1px solid #cbd5ce; border-radius: 9px; background: #fff; color: #111a2c; font: inherit; }
+.recorded-counter button { min-height: 46px; }
+.recorded-counter progress { width: 100%; accent-color: #26743a; }
+.recorded-counter :focus-visible { outline: 2px solid #26743a; outline-offset: 3px; }
 @media (max-width: 350px) {
+  .recorded-options { grid-template-columns: 1fr; }
   .coach-reference > .coach-scroll { padding-inline: 16px; }
   .coach-reference .coach-plan-header { width: calc(100% + 32px); margin-inline: -16px; padding-inline: 20px; }
   .coach-reference .exercise-item { gap: 9px; }
@@ -101,3 +123,32 @@
   .coach-reference .tracking-badge { padding-inline: 7px; font-size: 10px; }
   .coach-reference .start-button-container { padding-inline: 16px; }
 }
+/* Set actions use the same green as the coach plan; quiet borders separate rest from logging. */
+fieldset.workout-set-editor { min-width: 0; border: 1px solid #e0e8e1; }
+.set-entry-fields { display: grid; gap: 12px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.set-entry-fields:disabled { opacity: .55; }
+.set-start-prompt { padding: 16px; border-left: 3px solid #26743a; background: #f4f7f4; }
+.set-start-prompt strong { display: block; font-size: 17px; }
+.set-start-prompt p { margin: 8px 0 16px; font-size: 14px; line-height: 1.5; color: #526157; }
+.set-in-progress { margin: 0; color: #26743a; font-weight: 600; }
+.workout-set-editor .set-action, .recording-apply-button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 48px; padding: 12px 18px; border: 1px solid #26743a; border-radius: 10px; background: #26743a; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.workout-set-editor .set-action { width: 100%; }
+.workout-set-editor .set-action:hover:enabled, .recording-apply-button:hover:enabled { background: #1c5b2d; border-color: #1c5b2d; }
+.workout-set-editor button:disabled, .recording-apply-button:disabled { cursor: default; opacity: .5; }
+.workout-set-editor button:focus-visible, .workout-history button:focus-visible, .recording-apply-panel select:focus-visible, .session-controls button:focus-visible { outline: 3px solid #26743a; outline-offset: 3px; }
+.live-session .session-controls { position: sticky; top: 0; z-index: 4; display: flex; gap: 12px; margin: 0 0 12px; padding: 10px 0; background: #111827; }
+.live-session .session-controls button { flex: 1; min-height: 48px; padding: 12px; border-radius: 10px; display: inline-flex; justify-content: center; align-items: center; gap: 8px; font: inherit; font-weight: 600; }
+.live-session .session-controls .pause-button { color: #26743a; background: #f4f7f4; border: 1px solid #b6cbbb; }
+.live-session .session-controls button:disabled { opacity: .5; cursor: default; }
+.live-session .paused-banner { position: static; transform: none; margin-top: 12px; padding: 14px; border: 1px solid #b6cbbb; border-radius: 10px; background: #f4f7f4; color: #26743a; }
+.paused-banner span { display: block; margin-top: 5px; font-size: 13px; font-weight: 400; line-height: 1.5; }
+.workout-history-list { list-style: none; padding: 0; margin: 16px 0; }
+.workout-history-list > li { border-bottom: 1px solid #e0e8e1; padding: 18px 0; overflow-wrap: anywhere; }
+.workout-history-list > li > a { font-weight: 600; font-size: 14px; line-height: 1.6; text-underline-offset: 3px; }
+.recording-apply-panel { display: grid; gap: 12px; margin-top: 14px; padding: 16px; border: 1px solid #e0e8e1; border-radius: 12px; background: #f4f7f4; }
+.recording-apply-panel p, .recording-note { margin: 0; font-size: 13px; line-height: 1.5; color: #526157; }
+.recording-apply-panel label { display: grid; gap: 8px; font-size: 13px; font-weight: 600; }
+.recording-apply-panel select { width: 100%; min-width: 0; min-height: 48px; padding: 10px; border: 1px solid #b6cbbb; border-radius: 8px; background: #fff; color: #111a2c; font: inherit; }
+.recording-applied { display: flex; align-items: center; gap: 7px; color: #26743a; font-size: 13px; font-weight: 600; }
+.recording-note { margin-top: 10px; }
+@media (max-width: 420px) { .live-session .session-controls { flex-wrap: wrap; } .live-session .session-controls button { flex-basis: 100%; } }

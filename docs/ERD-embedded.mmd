@@ -1,0 +1,76 @@
+erDiagram
+    workout_sessions ||--o{ WorkoutExercise : "embeds exercises"
+    workout_sessions ||--o{ SetResult : "embeds sets"
+    workout_sessions ||--o{ ExerciseResult : "embeds legacy exerciseResults"
+    nutrition ||--o{ MealEntry : "embeds meals"
+    nutrition ||--o{ WaterEntry : "embeds water"
+    notifications ||--o{ NotificationItem : "embeds items"
+    safety_alert_events ||--o| AlertLocation : "embeds location"
+
+    WorkoutExercise {
+        string exerciseId
+        string name
+        string equipment
+        string prescription "optional"
+        number sets
+        string trackingPresetId "optional"
+    }
+    SetResult {
+        string setId "session-scoped identifier"
+        string exerciseId "matches an exercise in this session"
+        number setIndex
+        number reps "reviewed or manually entered"
+        number durationSeconds "optional"
+        number loadKg "optional"
+        string status "completed or skipped"
+        string source "manual or local-video"
+        number detectedReps "optional original estimate"
+        string side "optional left or right"
+        string algorithmVersion "optional"
+        number clipDurationSeconds "optional"
+        string trackingPresetId "optional"
+        string sourceRecordingId "optional original recording link"
+    }
+    ExerciseResult {
+        string exerciseId
+        number reps
+        number loadKg "optional"
+    }
+    MealEntry {
+        string id
+        string name
+        string meal
+        number calories
+        string detail
+        string time
+        string source
+        boolean edited
+        number protein
+        number carbs
+        number fat
+        string date
+        number fdcId "optional USDA identifier"
+        number confidence "optional"
+        number estWeightG "optional"
+    }
+    WaterEntry {
+        string date
+        number glasses
+    }
+    NotificationItem {
+        string id
+        string icon
+        string title
+        string subtitle
+        string body
+        string time
+        string group
+        boolean unread
+    }
+    AlertLocation {
+        number lat
+        number lng
+        number accuracyMeters
+        Date capturedAt
+    }
+

@@ -6,13 +6,14 @@ import { Settings } from '../settings/schemas/settings.schema.js';
 import { Nutrition } from '../nutrition/schemas/nutrition.schema.js';
 import { WorkoutSession } from '../workouts/schemas/workout-session.schema.js';
 import { LeaderboardSnapshot } from './schemas/leaderboard-snapshot.schema.js';
+import { workoutCreditFilter, WORKOUT_CREDIT_POINTS } from '../workouts/workout-contract.js';
 
 export type LeaderboardPeriod = 'week' | 'month' | 'all';
 
 const PERIODS: LeaderboardPeriod[] = ['week', 'month', 'all'];
 
 // Point values mirror the daily-mission rewards in ActivityService.
-const WORKOUT_POINTS = 100;
+const WORKOUT_POINTS = WORKOUT_CREDIT_POINTS;
 const MEAL_DAY_POINTS = 60;
 const WATER_DAY_POINTS = 40;
 
@@ -76,6 +77,8 @@ export class LeaderboardService {
 
     return {
       period,
+      creditPolicyVersion: 2,
+      creditPolicy: 'Workout credit is awarded once per training day. Historical totals use this rule too. Competition weeks start Monday at 00:00 UTC.',
       entries,
       self,
       context: above ? { previousName: above.name, pointsBehind: above.points - self.points } : null,
@@ -84,16 +87,22 @@ export class LeaderboardService {
 
   /** Sum of period points per user from completed workouts, meals, and water. */
   private async computePoints(start: Date | null): Promise<Map<string, number>> {
-    const workoutFilter = { status: 'completed' as const, ...(start ? { endedAt: { $gte: start } } : {}) };
     const [workouts, nutrition] = await Promise.all([
-      this.workouts.find(workoutFilter).select('userId endedAt').lean().exec(),
+      this.workouts.aggregate<{ userId: string; day: string }>([
+        { $match: { status: 'completed', endedAt: { $type: 'date' }, ...workoutCreditFilter } },
+        { $group: { _id: { userId: '$userId', day: { $ifNull: ['$activityDate', { $dateToString: { date: '$endedAt', format: '%Y-%m-%d', timezone: { $ifNull: ['$timezone', 'UTC'] } } }] } }, firstAt: { $min: '$endedAt' } } },
+        ...(start ? [{ $match: { firstAt: { $gte: start } } }] : []),
+        { $project: { _id: 0, userId: '$_id.userId', day: '$_id.day' } },
+      ]),
       this.nutrition.find({}).select('userId meals water').lean().exec(),
     ]);
 
     const points = new Map<string, number>();
     const add = (id: string, value: number) => points.set(id, (points.get(id) ?? 0) + value);
 
-    for (const workout of workouts as { userId: unknown }[]) add(String(workout.userId), WORKOUT_POINTS);
+    for (const workout of workouts) {
+      if (workout.day) add(String(workout.userId), WORKOUT_POINTS);
+    }
 
     const startDate = start ? start.toISOString().slice(0, 10) : '0000-00-00';
     for (const record of nutrition as { userId: unknown; meals?: { date: string }[]; water?: { date: string; glasses: number }[] }[]) {
@@ -127,7 +136,7 @@ export class LeaderboardService {
 
   /** Ranks captured for the most recent boundary before the current one. */
   private async previousRanks(period: LeaderboardPeriod, boundaryKey: string): Promise<Map<string, number>> {
-    const snapshot = await this.snapshots.find({ period, boundaryKey: { $lt: boundaryKey } }).sort({ boundaryKey: -1, rank: 1 }).limit(500).lean().exec();
+    const snapshot = await this.snapshots.find({ period, creditPolicyVersion: 2, boundaryKey: { $lt: boundaryKey } }).sort({ boundaryKey: -1, rank: 1 }).limit(500).lean().exec();
     if (!snapshot.length) return new Map();
     const latest = (snapshot[0] as { boundaryKey: string }).boundaryKey;
     return new Map(
@@ -145,7 +154,7 @@ export class LeaderboardService {
         .map(entry => ({
           updateOne: {
             filter: { period, boundaryKey, subjectId: new Types.ObjectId(entry.userId) },
-            update: { $set: { rank: entry.rank, points: entry.points } },
+            update: { $set: { rank: entry.rank, points: entry.points, creditPolicyVersion: 2 } },
             upsert: true,
           },
         })),

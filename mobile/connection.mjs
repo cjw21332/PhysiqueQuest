@@ -39,6 +39,15 @@ export function resolveFrontendUrl(configuredUrl, hostUri) {
   return `http://${hostname}:3000`;
 }
 
+/** Open the launch screen directly, while preserving explicitly configured routes.
+ * @param {string} frontendUrl @returns {string}
+ */
+export function resolveLaunchUrl(frontendUrl) {
+  const url = new URL(frontendUrl);
+  if (url.pathname === '/') url.pathname = '/launch';
+  return url.toString();
+}
+
 /** @param {string | undefined} configuredApiUrl @param {string} frontendUrl @returns {string | null} */
 export function resolveApiUrl(configuredApiUrl, frontendUrl) {
   let url;

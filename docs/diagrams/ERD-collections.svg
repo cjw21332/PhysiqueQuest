@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1660" height="1560" viewBox="0 0 1660 1560">
+<rect width="100%" height="100%" fill="#f4f7fb"/>
+<g font-family="Arial, sans-serif">
+<polyline points="625,665 490,665 490,230 398,230" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="396" y="194" width="115.39999999999999" height="23" rx="4" fill="#f4f7fb"/>
+<text x="401" y="210" font-size="14" fill="#435a71">1 user : 0..1</text>
+<polyline points="625,665 490,665 490,465 398,465" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="396" y="429" width="115.39999999999999" height="23" rx="4" fill="#f4f7fb"/>
+<text x="401" y="445" font-size="14" fill="#435a71">1 user : 0..1</text>
+<polyline points="625,665 490,665 490,700 398,700" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="396" y="664" width="115.39999999999999" height="23" rx="4" fill="#f4f7fb"/>
+<text x="401" y="680" font-size="14" fill="#435a71">1 user : 0..1</text>
+<polyline points="625,665 490,665 490,935 398,935" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="396" y="899" width="115.39999999999999" height="23" rx="4" fill="#f4f7fb"/>
+<text x="401" y="915" font-size="14" fill="#435a71">1 user : 0..1</text>
+<polyline points="625,665 490,665 490,1170 398,1170" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="396" y="1134" width="115.39999999999999" height="23" rx="4" fill="#f4f7fb"/>
+<text x="401" y="1150" font-size="14" fill="#435a71">1 user : 0..1</text>
+<polyline points="975,665 1080,665 1080,200 1160,200" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="979" y="164" width="138.8" height="23" rx="4" fill="#f4f7fb"/>
+<text x="984" y="180" font-size="14" fill="#435a71">1 user : 0..many</text>
+<polyline points="975,665 1080,665 1080,390 1160,390" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="979" y="354" width="138.8" height="23" rx="4" fill="#f4f7fb"/>
+<text x="984" y="370" font-size="14" fill="#435a71">1 user : 0..many</text>
+<polyline points="975,665 1080,665 1080,580 1160,580" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="979" y="544" width="154.4" height="23" rx="4" fill="#f4f7fb"/>
+<text x="984" y="560" font-size="14" fill="#435a71">1 user : 0..many *</text>
+<polyline points="975,665 1080,665 1080,770 1160,770" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="979" y="734" width="138.8" height="23" rx="4" fill="#f4f7fb"/>
+<text x="984" y="750" font-size="14" fill="#435a71">1 user : 0..many</text>
+<polyline points="975,665 1080,665 1080,960 1160,960" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="979" y="924" width="138.8" height="23" rx="4" fill="#f4f7fb"/>
+<text x="984" y="940" font-size="14" fill="#435a71">1 user : 0..many</text>
+<polyline points="975,665 1080,665 1080,1150 1160,1150" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="979" y="1114" width="138.8" height="23" rx="4" fill="#f4f7fb"/>
+<text x="984" y="1130" font-size="14" fill="#435a71">1 user : 0..many</text>
+<polyline points="975,665 1080,665 1080,1340 1160,1340" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="979" y="1304" width="138.8" height="23" rx="4" fill="#f4f7fb"/>
+<text x="984" y="1320" font-size="14" fill="#435a71">1 user : 0..many</text>
+<polyline points="1550,200 1600,200 1600,960 1550,960" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="1185" y="834" width="240.2" height="23" rx="4" fill="#f4f7fb"/>
+<text x="1190" y="850" font-size="14" fill="#435a71">0..1 session : 0..many alerts</text>
+<rect x="625" y="570" width="350" height="198" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M634,570 H966 Q975,570 975,579 V610 H625 V579 Q625,570 634,570" fill="#244ea3"/>
+<text x="641" y="597" font-size="18" font-weight="bold" fill="white">users</text>
+<text x="641" y="633" font-size="15" fill="#253e54">_id [PK]: ObjectId</text>
+<text x="641" y="657" font-size="15" fill="#253e54">email [UK]: string</text>
+<text x="641" y="681" font-size="15" fill="#253e54">name: string</text>
+<text x="641" y="705" font-size="15" fill="#253e54">role: user | admin</text>
+<text x="641" y="729" font-size="15" fill="#253e54">passwordHash: string</text>
+<text x="641" y="753" font-size="15" fill="#253e54">isActive: boolean</text>
+<rect x="48" y="155" width="350" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M57,155 H389 Q398,155 398,164 V195 H48 V164 Q48,155 57,155" fill="#176b80"/>
+<text x="64" y="182" font-size="18" font-weight="bold" fill="white">profiles</text>
+<text x="64" y="218" font-size="15" fill="#253e54">_id [PK]</text>
+<text x="64" y="242" font-size="15" fill="#253e54">userId [UK]</text>
+<text x="64" y="266" font-size="15" fill="#253e54">goal, equipment[], days[]</text>
+<text x="64" y="290" font-size="15" fill="#253e54">duration, contactName, contactPhone</text>
+<rect x="48" y="390" width="350" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M57,390 H389 Q398,390 398,399 V430 H48 V399 Q48,390 57,390" fill="#176b80"/>
+<text x="64" y="417" font-size="18" font-weight="bold" fill="white">settings</text>
+<text x="64" y="453" font-size="15" fill="#253e54">_id [PK]</text>
+<text x="64" y="477" font-size="15" fill="#253e54">userId [UK]</text>
+<text x="64" y="501" font-size="15" fill="#253e54">values: Mixed</text>
+<text x="64" y="525" font-size="15" fill="#253e54">  includes nutritionTargets</text>
+<rect x="48" y="625" width="350" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M57,625 H389 Q398,625 398,634 V665 H48 V634 Q48,625 57,625" fill="#176b80"/>
+<text x="64" y="652" font-size="18" font-weight="bold" fill="white">activity</text>
+<text x="64" y="688" font-size="15" fill="#253e54">_id [PK]</text>
+<text x="64" y="712" font-size="15" fill="#253e54">userId [UK]</text>
+<text x="64" y="736" font-size="15" fill="#253e54">state: Mixed</text>
+<text x="64" y="760" font-size="15" fill="#253e54">  includes timezone</text>
+<rect x="48" y="860" width="350" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M57,860 H389 Q398,860 398,869 V900 H48 V869 Q48,860 57,860" fill="#176b80"/>
+<text x="64" y="887" font-size="18" font-weight="bold" fill="white">nutrition</text>
+<text x="64" y="923" font-size="15" fill="#253e54">_id [PK]</text>
+<text x="64" y="947" font-size="15" fill="#253e54">userId [UK]</text>
+<text x="64" y="971" font-size="15" fill="#253e54">meals[]: embedded MealEntry</text>
+<text x="64" y="995" font-size="15" fill="#253e54">water[]: embedded WaterEntry</text>
+<rect x="48" y="1095" width="350" height="126" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M57,1095 H389 Q398,1095 398,1104 V1135 H48 V1104 Q48,1095 57,1095" fill="#176b80"/>
+<text x="64" y="1122" font-size="18" font-weight="bold" fill="white">notifications</text>
+<text x="64" y="1158" font-size="15" fill="#253e54">_id [PK]</text>
+<text x="64" y="1182" font-size="15" fill="#253e54">userId [UK]</text>
+<text x="64" y="1206" font-size="15" fill="#253e54">items[]: embedded NotificationItem</text>
+<rect x="1160" y="125" width="390" height="174" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1169,125 H1541 Q1550,125 1550,134 V165 H1160 V134 Q1160,125 1169,125" fill="#176b80"/>
+<text x="1176" y="152" font-size="18" font-weight="bold" fill="white">workout_sessions</text>
+<text x="1176" y="188" font-size="15" fill="#253e54">_id [PK], userId</text>
+<text x="1176" y="212" font-size="15" fill="#253e54">status, origin, revision</text>
+<text x="1176" y="236" font-size="15" fill="#253e54">exercises[], sets[], exerciseResults[]</text>
+<text x="1176" y="260" font-size="15" fill="#253e54">programVersion?, dayIndex?</text>
+<text x="1176" y="284" font-size="15" fill="#253e54">scheduledDate?, activityDate?</text>
+<rect x="1160" y="315" width="390" height="126" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1169,315 H1541 Q1550,315 1550,324 V355 H1160 V324 Q1160,315 1169,315" fill="#176b80"/>
+<text x="1176" y="342" font-size="18" font-weight="bold" fill="white">progress_entries</text>
+<text x="1176" y="378" font-size="15" fill="#253e54">_id [PK], userId</text>
+<text x="1176" y="402" font-size="15" fill="#253e54">metric, value, unit</text>
+<text x="1176" y="426" font-size="15" fill="#253e54">measuredAt: Date</text>
+<rect x="1160" y="505" width="390" height="126" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1169,505 H1541 Q1550,505 1550,514 V545 H1160 V514 Q1160,505 1169,505" fill="#176b80"/>
+<text x="1176" y="532" font-size="18" font-weight="bold" fill="white">coach_programs</text>
+<text x="1176" y="568" font-size="15" fill="#253e54">_id [PK], userId</text>
+<text x="1176" y="592" font-size="15" fill="#253e54">contextHash</text>
+<text x="1176" y="616" font-size="15" fill="#253e54">plan: Mixed</text>
+<rect x="1160" y="695" width="390" height="126" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1169,695 H1541 Q1550,695 1550,704 V735 H1160 V704 Q1160,695 1169,695" fill="#176b80"/>
+<text x="1176" y="722" font-size="18" font-weight="bold" fill="white">leaderboard_snapshots</text>
+<text x="1176" y="758" font-size="15" fill="#253e54">_id [PK], subjectId</text>
+<text x="1176" y="782" font-size="15" fill="#253e54">period, boundaryKey</text>
+<text x="1176" y="806" font-size="15" fill="#253e54">rank, points, creditPolicyVersion?</text>
+<rect x="1160" y="885" width="390" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1169,885 H1541 Q1550,885 1550,894 V925 H1160 V894 Q1160,885 1169,885" fill="#176b80"/>
+<text x="1176" y="912" font-size="18" font-weight="bold" fill="white">safety_alert_events</text>
+<text x="1176" y="948" font-size="15" fill="#253e54">_id [PK], userId</text>
+<text x="1176" y="972" font-size="15" fill="#253e54">idempotencyKey, eventType, status</text>
+<text x="1176" y="996" font-size="15" fill="#253e54">workoutSessionId?, exerciseId?</text>
+<text x="1176" y="1020" font-size="15" fill="#253e54">location?: embedded AlertLocation</text>
+<rect x="1160" y="1075" width="390" height="126" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1169,1075 H1541 Q1550,1075 1550,1084 V1115 H1160 V1084 Q1160,1075 1169,1075" fill="#176b80"/>
+<text x="1176" y="1102" font-size="18" font-weight="bold" fill="white">sign_in_events</text>
+<text x="1176" y="1138" font-size="15" fill="#253e54">_id [PK], userId</text>
+<text x="1176" y="1162" font-size="15" fill="#253e54">occurredAt: Date</text>
+<text x="1176" y="1186" font-size="15" fill="#253e54">source: login | register</text>
+<rect x="1160" y="1265" width="390" height="126" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M1169,1265 H1541 Q1550,1265 1550,1274 V1305 H1160 V1274 Q1160,1265 1169,1265" fill="#176b80"/>
+<text x="1176" y="1292" font-size="18" font-weight="bold" fill="white">password_recovery_tokens</text>
+<text x="1176" y="1328" font-size="15" fill="#253e54">_id [PK], userId</text>
+<text x="1176" y="1352" font-size="15" fill="#253e54">tokenHash [UK]</text>
+<text x="1176" y="1376" font-size="15" fill="#253e54">expiresAt [TTL], usedAt?</text>
+<rect x="625" y="1120" width="350" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M634,1120 H966 Q975,1120 975,1129 V1160 H625 V1129 Q625,1120 634,1120" fill="#655198"/>
+<text x="641" y="1147" font-size="18" font-weight="bold" fill="white">admin_exercises</text>
+<text x="641" y="1183" font-size="15" fill="#253e54">_id [PK]</text>
+<text x="641" y="1207" font-size="15" fill="#253e54">name, targetMuscle, equipment</text>
+<text x="641" y="1231" font-size="15" fill="#253e54">status, pose, trackingStatus</text>
+<text x="641" y="1255" font-size="15" fill="#253e54">Shared catalog; no userId</text>
+<text x="48" y="48" font-size="30" fill="#15314b">PhysiqueQuest / Collection relationships</text>
+<text x="48" y="82" font-size="16" fill="#52657a">14 MongoDB collections  |  Key fields shown  |  Full field definitions: docs/ERD.md</text>
+<text x="48" y="1450" font-size="16" fill="#52657a">Dashed lines: intended document associations; MongoDB does not enforce foreign keys.</text>
+<text x="48" y="1480" font-size="15" fill="#52657a">* coach_programs.userId has no Mongoose ref. Optional alert-to-workout links are not verified by the safety service.</text>
+<text x="48" y="1510" font-size="15" fill="#52657a">PK: document identity   UK: unique index   ?: optional or nullable   Compound keys and legacy-schema notes: docs/ERD.md</text>
+</g></svg>

@@ -4,7 +4,15 @@ import {
   normalizeFrontendUrl,
   resolveApiUrl,
   resolveFrontendUrl,
+  resolveLaunchUrl,
 } from './connection.mjs';
+
+test('opens launch directly at the app origin and preserves configured routes', () => {
+  assert.equal(resolveLaunchUrl('http://192.168.1.42:3000'), 'http://192.168.1.42:3000/launch');
+  assert.equal(resolveLaunchUrl('https://fitness.example.com/'), 'https://fitness.example.com/launch');
+  assert.equal(resolveLaunchUrl('https://fitness.example.com/login'), 'https://fitness.example.com/login');
+  assert.equal(resolveLaunchUrl('https://fitness.example.com/coach?tab=plan#session'), 'https://fitness.example.com/coach?tab=plan#session');
+});
 
 test('normalizes a manually entered IPv4 address without a scheme', () => {
   assert.equal(normalizeFrontendUrl(' 192.168.1.42:3000/ '), 'http://192.168.1.42:3000');

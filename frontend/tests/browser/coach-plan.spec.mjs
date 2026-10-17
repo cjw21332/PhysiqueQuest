@@ -18,6 +18,8 @@ test('reference Coach layout renders server prescriptions and starts the chosen 
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
     let json = {};
+    if (path.endsWith('/workouts') && request.method() === 'GET') json = [];
+    if (path.endsWith('/active')) json = null;
     if (path.endsWith('/profile')) json = { name: 'Test', equipment: ['Dumbbell'], duration: '45 min' };
     if (path.endsWith('/coach/plan')) json = plan;
     if (path.endsWith('/pose/status')) json = { available: false };

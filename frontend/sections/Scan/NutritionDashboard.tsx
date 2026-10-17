@@ -2,11 +2,9 @@
 
 import { Icon } from '../Home/icons';
 import CalorieProgress from '../Home/CalorieProgress';
-import { mealNames, nutritionTargets, type FoodEntry, type MealName } from './types';
+import { mealNames, type FoodEntry, type MealName } from './types';
 import { summarizeHistory } from './nutritionPresentation';
-
-const calorieTarget = nutritionTargets.calories;
-const macroTargets = { Protein: nutritionTargets.protein, Carbs: nutritionTargets.carbs, Fats: nutritionTargets.fats };
+import { useNutritionTargets } from '../../hooks/useNutritionTargets';
 
 export default function NutritionDashboard({
   meals,
@@ -25,6 +23,9 @@ export default function NutritionDashboard({
   onLogs: () => void;
   onHistory: () => void;
 }) {
+  const targets = useNutritionTargets();
+  const calorieTarget = targets.calories;
+  const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
   const calories = meals.reduce((sum, item) => sum + item.calories, 0);
   const protein = meals.reduce((sum, item) => sum + item.protein, 0);
   const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
@@ -101,7 +102,7 @@ export default function NutritionDashboard({
 }
 
 function MacroBar({ label, current, target }: { label: string; current: number; target: number }) {
-  const progress = Math.min(100, Math.max(0, (current / target) * 100));
+  const progress = target > 0 ? Math.min(100, Math.max(0, (current / target) * 100)) : 0;
   return (
     <div className="scan-dashboard-macro">
       <div><span>{label}</span><small>{Math.round(current)} / {target} g</small></div>

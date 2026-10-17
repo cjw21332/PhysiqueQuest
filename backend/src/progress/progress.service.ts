@@ -19,7 +19,7 @@ export class ProgressService {
   async list(userId: string, metric: string, limit = 90) {
     const filter: Record<string, unknown> = { userId: new Types.ObjectId(userId) };
     if (metric) filter.metric = metric;
-    return this.model.find(filter).sort({ measuredAt: 1 }).limit(Math.min(Math.max(limit, 1), 365));
+    return this.model.find(filter).sort({ measuredAt: -1 }).limit(Math.min(Math.max(limit, 1), 365));
   }
   async remove(userId: string, id: string) {
     if (!Types.ObjectId.isValid(id)) throw new NotFoundException('Measurement not found');

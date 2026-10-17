@@ -26,7 +26,7 @@ export default function BottomNav({ coachIcon = 'coach' }: { coachIcon?: string 
       {tabs.map(tab => (
         <button
           key={tab.label}
-          className={pathname === tab.path || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) || (tab.path === '/coach' && pathname === '/exercises') ? 'active' : ''}
+          className={pathname === tab.path || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) || (tab.path === '/coach' && (pathname === '/exercises' || pathname.startsWith('/workouts/'))) ? 'active' : ''}
           onClick={() => handleNavigation(tab.path)}
         >
           <span className="nav-icon">

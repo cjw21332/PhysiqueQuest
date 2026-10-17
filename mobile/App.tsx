@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
+import { normalizeFrontendUrl, resolveApiUrl, resolveFrontendUrl, resolveLaunchUrl } from './connection.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
 
@@ -47,7 +47,7 @@ function isNativeCameraContext(value: unknown): value is NativeCameraContext {
   if (context.tracking !== undefined) {
     const tracking = context.tracking as Partial<NativeTrackingOptions> | null;
     if (!tracking || typeof tracking !== 'object' || typeof tracking.requestId !== 'string' || tracking.requestId.length > 100 ||
-      !['squat', 'curl'].includes(tracking.kind ?? '') || !['left', 'right'].includes(tracking.side ?? '') || typeof tracking.active !== 'boolean') return false;
+      !['squat', 'curl', 'pushup'].includes(tracking.kind ?? '') || !['left', 'right'].includes(tracking.side ?? '') || typeof tracking.active !== 'boolean') return false;
   }
   return context.screen === 'live-session'
     && typeof context.exerciseName === 'string'
@@ -121,6 +121,7 @@ function AppContent() {
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_API_URL?: string } | undefined;
   const [address, setAddress] = useState(inferredAddress ?? '');
   const [loadedAddress, setLoadedAddress] = useState(inferredAddress);
+  const webSource = useMemo(() => loadedAddress ? { uri: resolveLaunchUrl(loadedAddress) } : undefined, [loadedAddress]);
   const apiUrl = useMemo(() => loadedAddress ? resolveApiUrl(process.env.EXPO_PUBLIC_API_URL ?? extra?.EXPO_PUBLIC_API_URL, loadedAddress) : null, [extra?.EXPO_PUBLIC_API_URL, loadedAddress]);
   const [error, setError] = useState(!inferredAddress);
   const [key, setKey] = useState(0);
@@ -270,14 +271,13 @@ function AppContent() {
   };
 
   const connect = () => {
-    const normalized = address.trim().replace(/\/$/, '');
+    const normalized = normalizeFrontendUrl(address);
     if (!normalized) {
       setError(true);
       return;
     }
-    const withProtocol = /^https?:\/\//i.test(normalized) ? normalized : `http://${normalized}`;
-    setAddress(withProtocol);
-    setLoadedAddress(withProtocol);
+    setAddress(normalized);
+    setLoadedAddress(normalized);
     setError(false);
     setBackendStatus('checking');
     setKey(c => c + 1);
@@ -295,7 +295,7 @@ function AppContent() {
       {loadedAddress ? <WebView
         ref={webRef}
         key={key}
-        source={{ uri: loadedAddress }}
+        source={webSource}
         style={StyleSheet.absoluteFill}
         containerStyle={styles.webContainer}
         originWhitelist={['*']}
@@ -309,7 +309,8 @@ function AppContent() {
         bounces={false}
         overScrollMode="never"
         scrollEnabled
-        cacheEnabled={false}
+        cacheEnabled
+        cacheMode="LOAD_DEFAULT"
         incognito={false}
         setBuiltInZoomControls={false}
         setDisplayZoomControls={false}

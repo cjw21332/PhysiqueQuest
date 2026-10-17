@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, type ScannedItem } from '../lib/api';
 import type { FoodEntry, MealName } from '../sections/Scan/types';
 import { formatLocalDate } from '../lib/localDate.mjs';
+import { accountScope, notifyDataChanged } from './useApiResource';
 
 type ServerNutrition = { meals: FoodEntry[]; water: { date: string; glasses: number }[] };
 type NutritionSnapshot = { meals: FoodEntry[]; water: number };
@@ -21,14 +22,16 @@ export function useNutrition() {
   const [error, setError] = useState('');
   const refreshInFlight = useRef<Promise<void> | null>(null);
   const revision = useRef(0);
+  const owner = useRef(accountScope());
 
   const applyState = useCallback((next: NutritionSnapshot) => {
+    if (accountScope() !== owner.current) return;
     setMeals(next.meals);
     setWaterState(next.water);
     setError('');
     setLoading(false);
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent<NutritionSnapshot>(NUTRITION_UPDATED_EVENT, { detail: next }));
+      window.dispatchEvent(new CustomEvent(NUTRITION_UPDATED_EVENT, { detail: { ...next, accountId: owner.current } }));
     }
   }, []);
 
@@ -59,8 +62,8 @@ export function useNutrition() {
   useEffect(() => {
     void refresh();
     const onNutritionUpdated = (event: Event) => {
-      const snapshot = (event as CustomEvent<NutritionSnapshot>).detail;
-      if (!snapshot) return;
+      const snapshot = (event as CustomEvent<NutritionSnapshot & { accountId: string }>).detail;
+      if (!snapshot || snapshot.accountId !== owner.current || accountScope() !== owner.current) return;
       revision.current += 1;
       setMeals(snapshot.meals);
       setWaterState(snapshot.water);
@@ -70,13 +73,16 @@ export function useNutrition() {
     const refreshWhenActive = () => {
       if (document.visibilityState === 'visible') void refresh();
     };
+    const clear = () => { revision.current += 1; setMeals([]); setWaterState(0); setLoading(false); };
     window.addEventListener(NUTRITION_UPDATED_EVENT, onNutritionUpdated);
     window.addEventListener('focus', refreshWhenActive);
     window.addEventListener('pageshow', refreshWhenActive);
+    window.addEventListener('physiquequest:session-cleared', clear);
     return () => {
       window.removeEventListener(NUTRITION_UPDATED_EVENT, onNutritionUpdated);
       window.removeEventListener('focus', refreshWhenActive);
       window.removeEventListener('pageshow', refreshWhenActive);
+      window.removeEventListener('physiquequest:session-cleared', clear);
     };
   }, [refresh]);
 
@@ -85,31 +91,37 @@ export function useNutrition() {
     revision.current += 1;
     const next = mapState(response);
     applyState(next);
+    notifyDataChanged('activity', 'leaderboard');
   }, [applyState]);
   const addMealsFromScan = useCallback(async (payload: { items: ScannedItem[]; meal: MealName }) => {
     const response = await api.addMealsFromScan({ ...payload, date: today(), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) });
     revision.current += 1;
     const next = mapState(response);
     applyState(next);
+    notifyDataChanged('activity', 'leaderboard');
   }, [applyState]);
   const updateMeal = useCallback(async (id: string, meal: Partial<FoodEntry>) => {
     const response = await api.updateMeal(id, meal);
     revision.current += 1;
     const next = mapState(response);
     applyState(next);
+    notifyDataChanged('activity', 'leaderboard');
   }, [applyState]);
   const deleteMeal = useCallback(async (id: string) => {
     const response = await api.deleteMeal(id);
     revision.current += 1;
     const next = mapState(response);
     applyState(next);
+    notifyDataChanged('activity', 'leaderboard');
   }, [applyState]);
   const setWater = useCallback(async (glasses: number) => {
     const response = await api.setWater({ date: today(), glasses });
     revision.current += 1;
     const next = mapState(response);
     applyState(next);
+    notifyDataChanged('activity', 'leaderboard');
   }, [applyState]);
 
   return { meals, water, loading, error, refresh, addMeal, addMealsFromScan, updateMeal, deleteMeal, setWater };
 }
+

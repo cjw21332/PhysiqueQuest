@@ -3,16 +3,17 @@ import { test, expect } from '@playwright/test';
 const exercise = { _id: 'api-press', slug: 'api-press', name: 'Backend seated press', targetMuscle: 'Shoulders', equipment: 'Dumbbells', trackingStatus: 'Manual', instructions: ['Keep feet planted.', 'Press overhead slowly.'], gifUrl: 'https://exercise.test/demo.gif', pose: 'missing', status: 'published', source: 'ExerciseDB V1' };
 const gif = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
 
-async function setup(page, catalog, detailHandler) {
+async function setup(page, catalog, detailHandler, role = 'user') {
   await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'test', token: 'test-token' })));
   await page.route('https://exercise.test/demo.gif', route => route.fulfill({ contentType: 'image/gif', body: gif }));
   await page.route('**/api/**', async route => {
     const request = route.request(), url = new URL(request.url());
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
+    if (url.pathname.endsWith('/auth/me')) return route.fulfill({ json: { id: 'test', role }, headers });
     if (url.pathname.endsWith('/exercises')) return catalog(route, url, headers);
     if (url.pathname.endsWith('/exercises/api-press')) return detailHandler ? detailHandler(route, headers) : route.fulfill({ json: { ...exercise, instructions: ['Keep feet planted.', 'Fresh detail: press overhead slowly.'] }, headers });
-    const json = url.pathname.endsWith('/profile') ? { name: 'Test', equipment: [] } : url.pathname.endsWith('/coach/plan') ? { days: [], weekLabel: 'Week' } : {};
+    const json = url.pathname.endsWith('/workouts') ? [] : url.pathname.endsWith('/active') ? null : url.pathname.endsWith('/profile') ? { name: 'Test', equipment: [] } : url.pathname.endsWith('/coach/plan') ? { days: [], weekLabel: 'Week' } : {};
     return route.fulfill({ json, headers });
   });
   await page.goto('/coach');
@@ -127,9 +128,9 @@ test('Me opens the backend admin catalog and saves muscle/equipment before refre
       return route.fulfill({ json: records.at(-1), headers });
     }
     return route.fulfill({ json: records, headers });
-  });
+  }, undefined, 'admin');
   await page.goto('/me');
-  await page.getByRole('button', { name: /Exercise library/ }).click();
+  await page.getByRole('button', { name: /Manage exercises/ }).click();
   await expect(page.getByText('Backend seated press', { exact: true })).toBeVisible();
   await expect(page.getByText('Sample data', { exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: /New/ }).click();
@@ -141,9 +142,9 @@ test('Me opens the backend admin catalog and saves muscle/equipment before refre
 });
 
 test('Me admin denial renders authorization error without sample exercises', async ({ page }) => {
-  await setup(page, (route, url, headers) => url.pathname.includes('/admin/') ? route.fulfill({ status: 403, json: { message: 'Forbidden' }, headers }) : route.fulfill({ json: { items: [], total: 0, page: 1, limit: 12, pages: 0 }, headers }));
+  await setup(page, (route, url, headers) => url.pathname.includes('/admin/') ? route.fulfill({ status: 403, json: { message: 'Forbidden' }, headers }) : route.fulfill({ json: { items: [], total: 0, page: 1, limit: 12, pages: 0 }, headers }), undefined, 'admin');
   await page.goto('/me');
-  await page.getByRole('button', { name: /Exercise library/ }).click();
+  await page.getByRole('button', { name: /Manage exercises/ }).click();
   await expect(page.locator('.admin-tools-screen').getByRole('alert')).toContainText('Admin access is required');
   await expect(page.getByText('Sample data', { exact: true })).toHaveCount(0);
 });

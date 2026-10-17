@@ -19,7 +19,7 @@ const components = async (file, react = React) => {
   const types = await load('sections/Scan/types.ts');
   const calorieProgress = await load('sections/Home/CalorieProgress.tsx');
   const foodNameSearch = await load('sections/Scan/FoodNameSearch.tsx', name => name === '../../lib/api' ? { api: {} } : require(name));
-  return load(`sections/Scan/${file}.tsx`, name => name === 'react' ? react : name === '../Home/icons' ? icons : name === './types' ? types : name === '../Home/CalorieProgress' ? calorieProgress : name === './FoodNameSearch' ? foodNameSearch : require(name));
+  return load(`sections/Scan/${file}.tsx`, name => name === 'react' ? react : name === '../Home/icons' ? icons : name === './types' ? types : name === '../../hooks/useNutritionTargets' ? { useNutritionTargets: () => types.nutritionTargets } : name === '../Home/CalorieProgress' ? calorieProgress : name === './FoodNameSearch' ? foodNameSearch : require(name));
 };
 
 test('shared Home calorie progress handles empty, partial, and exceeded targets', async () => {

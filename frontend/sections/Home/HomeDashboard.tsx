@@ -8,19 +8,15 @@ import { useCoachPlan } from '../../hooks/useCoachPlan';
 import { navigate } from '../../lib/navigation';
 import { formatLocalDate } from '../../lib/localDate.mjs';
 import type { Profile } from './types';
-import { nutritionTargets } from '../Scan/types';
-
-const macroTargets = {
-  Protein: nutritionTargets.protein,
-  Carbs: nutritionTargets.carbs,
-  Fats: nutritionTargets.fats,
-} as const;
+import { useNutritionTargets } from '../../hooks/useNutritionTargets';
 
 export default function HomeDashboard({ profile, onNotify }: {
   profile: Profile;
   onNotify: () => void;
   onAction?: (message: string) => void;
 }) {
+  const targets = useNutritionTargets();
+  const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
   const { activity, dailyMissions, loading: activityLoading, error: activityError } = useActivity();
   const { meals, water, loading: nutritionLoading, error: nutritionError } = useNutrition();
   const { plan, loading: planLoading, error: planError } = useCoachPlan();
@@ -86,7 +82,7 @@ export default function HomeDashboard({ profile, onNotify }: {
     <section className="content-section home-ref-section">
       <div className="section-title-row"><h3 className="section-title">Nutrition today</h3><button className="scan-link" onClick={() => navigate('/scan')}><Icon name="scan" size={12} />Scan meal</button></div>
       {nutritionError ? <p role="alert" className="error">{nutritionError}</p> : nutritionLoading ? <p role="status">Loading your nutrition…</p> : <div className="nutrition-overview home-ref-nutrition">
-        <CalorieProgress calories={totals.calories} target={nutritionTargets.calories}/>
+        <CalorieProgress calories={totals.calories} target={targets.calories}/>
         <div className="macros-list">
           {(Object.keys(macroTargets) as (keyof typeof macroTargets)[]).map(label => <MacroProgress key={label} label={label} value={totals[label]} target={macroTargets[label]} />)}
         </div>
