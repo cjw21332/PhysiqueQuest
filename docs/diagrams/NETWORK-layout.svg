@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1960" height="1210" viewBox="0 0 1960 1210">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 Z" fill="#52657a"/></marker></defs>
+<rect width="1960" height="1210" fill="#ffffff"/>
+<text x="40" y="50" font-family="Arial, sans-serif" font-size="30" fill="#15314b" font-weight="700">PhysiqueQuest / Android deployment network</text>
+<text x="40" y="84" font-family="Arial, sans-serif" font-size="17" fill="#15314b">Target topology for the installed Android release app. Example hosts and private service ports require deployment configuration.</text>
+<rect x="40" y="125" width="360" height="980" rx="15" fill="#f4f7fb" stroke="#c5d2df"/>
+<text x="60" y="157" font-family="Arial, sans-serif" font-size="17" fill="#15314b" font-weight="700">Android device</text>
+<rect x="450" y="125" width="820" height="980" rx="15" fill="#f4f7fb" stroke="#c5d2df"/>
+<text x="470" y="157" font-family="Arial, sans-serif" font-size="17" fill="#15314b" font-weight="700">Application hosting</text>
+<rect x="1450" y="125" width="470" height="980" rx="15" fill="#f4f7fb" stroke="#c5d2df"/>
+<text x="1470" y="157" font-family="Arial, sans-serif" font-size="17" fill="#15314b" font-weight="700">Database / providers</text>
+<polyline points="370,240 480,240" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="375" y="209" width="82" height="22" fill="#f4f7fb"/>
+<text x="380" y="225" font-family="Arial, sans-serif" font-size="14" fill="#15314b">HTTPS 443</text>
+<polyline points="730,235 850,235" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="745" y="203" width="74" height="22" fill="#f4f7fb"/>
+<text x="750" y="219" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Web host</text>
+<polyline points="730,280 790,280 790,510 850,510" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="755" y="394" width="74" height="22" fill="#f4f7fb"/>
+<text x="760" y="410" font-family="Arial, sans-serif" font-size="14" fill="#15314b">API host</text>
+<polyline points="220,315 220,450" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="230" y="379" width="146" height="22" fill="#f4f7fb"/>
+<text x="235" y="395" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Device processing</text>
+<polyline points="1230,510 1490,510" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1260" y="476" width="178" height="22" fill="#f4f7fb"/>
+<text x="1265" y="492" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Database driver / TLS</text>
+<polyline points="1230,545 1320,545 1320,720 1490,720" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1330" y="614" width="162" height="22" fill="#f4f7fb"/>
+<text x="1335" y="630" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Library + new plans</text>
+<polyline points="370,280 425,280 425,365 1415,365 1415,250 1490,250" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="895" y="334" width="218" height="22" fill="#f4f7fb"/>
+<text x="900" y="350" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Direct HTTPS media request</text>
+<polyline points="1230,565 1360,565 1360,990 1490,990" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<rect x="1365" y="889" width="106" height="22" fill="#f4f7fb"/>
+<text x="1370" y="905" font-family="Arial, sans-serif" font-size="14" fill="#15314b">On food scan</text>
+<polyline points="850,550 810,550 810,900 1040,900 1040,930" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<rect x="855" y="869" width="130" height="22" fill="#f4f7fb"/>
+<text x="860" y="885" font-family="Arial, sans-serif" font-size="14" fill="#15314b">When configured</text>
+<polyline points="70,925 55,925 55,250 70,250" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<rect x="75" y="794" width="138" height="22" fill="#f4f7fb"/>
+<text x="80" y="810" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Install / update</text>
+<rect x="70" y="190" width="300" height="125" rx="10" fill="#fff" stroke="#26743a" stroke-width="2"/>
+<text x="85" y="218" font-family="Arial, sans-serif" font-size="18" fill="#26743a" font-weight="700">Installed Android app</text>
+<text x="85" y="244" font-family="Arial, sans-serif" font-size="14" fill="#15314b">com.physiquequest.app</text>
+<text x="85" y="267" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Bundled native shell + WebView</text>
+<text x="85" y="290" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Internet via Wi-Fi or mobile data</text>
+<rect x="70" y="450" width="300" height="155" rx="10" fill="#fff" stroke="#26743a" stroke-width="2"/>
+<text x="85" y="478" font-family="Arial, sans-serif" font-size="18" fill="#26743a" font-weight="700">On-device rep counting</text>
+<text x="85" y="504" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Video decoding + pose worker</text>
+<text x="85" y="527" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Model / WASM from hosted web</text>
+<text x="85" y="550" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Frames stay on the device</text>
+<text x="85" y="573" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Reviewed results go to the API</text>
+<rect x="70" y="860" width="300" height="135" rx="10" fill="#fff" stroke="#244ea3" stroke-width="2"/>
+<text x="85" y="888" font-family="Arial, sans-serif" font-size="18" fill="#244ea3" font-weight="700">Installation / app updates</text>
+<text x="85" y="914" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Google Play distribution</text>
+<text x="85" y="937" font-family="Arial, sans-serif" font-size="14" fill="#15314b">or a signed release APK</text>
+<text x="85" y="960" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Separate from runtime requests</text>
+<rect x="480" y="190" width="250" height="150" rx="10" fill="#fff" stroke="#244ea3" stroke-width="2"/>
+<text x="495" y="218" font-family="Arial, sans-serif" font-size="18" fill="#244ea3" font-weight="700">HTTPS entry / proxy</text>
+<text x="495" y="244" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Public DNS + TLS: TCP 443</text>
+<text x="495" y="267" font-family="Arial, sans-serif" font-size="14" fill="#15314b">App + shared API hosts</text>
+<text x="495" y="290" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Routes to private services</text>
+<text x="495" y="313" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Example domains in document</text>
+<rect x="850" y="190" width="380" height="125" rx="10" fill="#fff" stroke="#244ea3" stroke-width="2"/>
+<text x="865" y="218" font-family="Arial, sans-serif" font-size="18" fill="#244ea3" font-weight="700">Hosted Next.js frontend</text>
+<text x="865" y="244" font-family="Arial, sans-serif" font-size="14" fill="#15314b">app.physiquequest.example</text>
+<text x="865" y="267" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Pages, JS, local model / WASM assets</text>
+<text x="865" y="290" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Example internal port: 3000</text>
+<rect x="850" y="450" width="380" height="125" rx="10" fill="#fff" stroke="#244ea3" stroke-width="2"/>
+<text x="865" y="478" font-family="Arial, sans-serif" font-size="18" fill="#244ea3" font-weight="700">Hosted shared NestJS API</text>
+<text x="865" y="504" font-family="Arial, sans-serif" font-size="14" fill="#15314b">api.physiquequest.example/api</text>
+<text x="865" y="527" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Public library + JWT user features</text>
+<text x="865" y="550" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Example internal port: 4000</text>
+<rect x="1490" y="450" width="400" height="125" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1505" y="478" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">MongoDB Atlas</text>
+<text x="1505" y="504" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Backend-only authenticated connection</text>
+<text x="1505" y="527" font-family="Arial, sans-serif" font-size="14" fill="#15314b">TLS / database network access controls</text>
+<text x="1505" y="550" font-family="Arial, sans-serif" font-size="14" fill="#15314b">15 active application collections</text>
+<rect x="1490" y="700" width="400" height="125" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1505" y="728" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">ExerciseDB API</text>
+<text x="1505" y="754" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Exercise metadata and GIF URLs</text>
+<text x="1505" y="777" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Shared by library + saved-plan generation</text>
+<text x="1505" y="800" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Outbound HTTPS</text>
+<rect x="1490" y="190" width="400" height="125" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1505" y="218" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">Exercise media host / CDN</text>
+<text x="1505" y="244" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Android WebView fetches GIFs directly</text>
+<text x="1505" y="267" font-family="Arial, sans-serif" font-size="14" fill="#15314b">HTTPS URL supplied by catalog</text>
+<text x="1505" y="290" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Not a separate project database</text>
+<rect x="1490" y="930" width="400" height="125" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1505" y="958" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">Food-scan providers</text>
+<text x="1505" y="984" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Gemini identification + USDA nutrients</text>
+<text x="1505" y="1007" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Food images go through the account API</text>
+<text x="1505" y="1030" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Provider keys remain on the server</text>
+<rect x="850" y="930" width="380" height="125" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="865" y="958" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">Configured delivery providers</text>
+<text x="865" y="984" font-family="Arial, sans-serif" font-size="14" fill="#15314b">EmailJS or custom email endpoint</text>
+<text x="865" y="1007" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Safety-alert delivery endpoint</text>
+<text x="865" y="1030" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Pose processing stays on-device</text>
+<text x="40" y="1140" font-family="Arial, sans-serif" font-size="16" fill="#15314b">Solid arrows: runtime request paths. Dashed arrows: installation or feature-dependent paths. All public app requests use HTTPS.</text>
+<text x="40" y="1175" font-family="Arial, sans-serif" font-size="16" fill="#15314b">The release app needs no Expo Go or Metro server. The existing WebView design still requires the hosted frontend and APIs.</text></svg>

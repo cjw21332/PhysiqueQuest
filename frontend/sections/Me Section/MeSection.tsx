@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import { api } from '../../lib/api';
-import { PROFILE_STORAGE_KEY } from '../../lib/auth';
+import { PROFILE_STORAGE_KEY, logout } from '../../lib/auth';
+import { navigate } from '../../lib/navigation';
 import type { Profile } from '../Home/types';
 import AdminExerciseLibrary from './AdminExerciseLibrary';
 import ExerciseLibrary from '../Coach/ExerciseLibrary';
@@ -99,7 +100,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     return <AdminExerciseLibrary onBack={() => setView('settings')} />;
   }
   if (view === 'engagement' && isAdmin) {
-    return <EngagementAnalytics preview onBack={() => setView('settings')} />;
+    return <EngagementAnalytics onBack={() => setView('settings')} />;
   }
 
   return <section className="me-section me-reference" aria-label="Account and settings">
@@ -140,7 +141,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <h3 className="me-group-title me-privacy-title">Privacy</h3>
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
-      <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail={`Verified with a code sent to ${currentProfile.email}`} onClick={() => setPasswordOpen(true)}/></div>
+      <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail="Verified with a code sent to your registered email" onClick={() => setPasswordOpen(true)}/></div>
       <h3 className="me-group-title">Exercises</h3><div className="me-list">
         <SettingRow icon="exercise-books" title="Exercise library" detail="Browse exercises and demonstrations" onClick={() => setView('exercises')}/>
       </div>
@@ -152,7 +153,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <button className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
     </div>
     <BottomNav />
-    {passwordOpen && <ForgotPasswordFlow onClose={() => setPasswordOpen(false)} onSuccess={() => { setPasswordOpen(false); setNotice('Password updated. Sign in again with your new password.'); onLogoutRequest?.(); }}/>}
+    {passwordOpen && <ForgotPasswordFlow mode="change" onClose={() => setPasswordOpen(false)} onSuccess={() => { setPasswordOpen(false); logout(); navigate('/login'); }}/>}
     {notice && <div className="home-toast me-toast" role="status">{notice}</div>}
   </section>;
 }

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-const OTP_VALIDITY_MINUTES = 30;
+import { RECOVERY_CODE_VALIDITY_MINUTES as OTP_VALIDITY_MINUTES } from '../common/recovery-policy.js';
 
 export type EmailDeliveryFailureCode =
   | 'EMAIL_NOT_CONFIGURED'

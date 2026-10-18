@@ -107,8 +107,8 @@ class Page:
 
 main_fields = fields('ERD.mmd')
 p = Page('1 Collections', 1660, 1560, 'PhysiqueQuest / Collection relationships',
-         '14 MongoDB collections  |  Key fields shown  |  Full field definitions: docs/ERD.md')
-p.box('users', 625, 570, 'users', ['_id [PK]: ObjectId', 'email [UK]: string', 'name: string', 'role: user | admin', 'passwordHash: string', 'isActive: boolean'], 350, '#244ea3')
+         '15 MongoDB collections  |  Key fields shown  |  Full field definitions: docs/ERD.md')
+p.box('users', 625, 570, 'users', ['_id [PK]: ObjectId', 'email [UK]: string', 'name: string', 'role: user | admin', 'passwordHash: string', 'sessionVersion: number', 'isActive: boolean'], 350, '#244ea3')
 left = ['profiles', 'settings', 'activity', 'nutrition', 'notifications']
 left_rows = [['_id [PK]', 'userId [UK]', 'goal, equipment[], days[]', 'duration, contactName, contactPhone'],
              ['_id [PK]', 'userId [UK]', 'values: Mixed', '  includes nutritionTargets'],
@@ -126,7 +126,7 @@ right_rows = [['_id [PK], userId', 'status, origin, revision', 'exercises[], set
               ['_id [PK], subjectId', 'period, boundaryKey', 'rank, points, creditPolicyVersion?'],
               ['_id [PK], userId', 'idempotencyKey, eventType, status', 'workoutSessionId?, exerciseId?', 'location?: embedded AlertLocation'],
               ['_id [PK], userId', 'occurredAt: Date', 'source: login | register'],
-              ['_id [PK], userId', 'tokenHash [UK]', 'expiresAt [TTL], usedAt?']]
+              ['_id [PK], userId', 'requestId [UK], tokenHash [UK]', 'attempts, verifiedAt?', 'grantHash? [UK], grantExpiresAt?', 'expiresAt [TTL], usedAt?']]
 for index, (key, rows) in enumerate(zip(right, right_rows)):
     y = 125 + index * 190
     p.box(key, 1160, y, key, rows, 390)
@@ -135,6 +135,7 @@ for index, (key, rows) in enumerate(zip(right, right_rows)):
         label += ' *'
     p.edge('users', key, [(975, 665), (1080, 665), (1080, y+75), (1160, y+75)], label, 984, y+55)
 p.box('admin_exercises', 625, 1120, 'admin_exercises', ['_id [PK]', 'name, targetMuscle, equipment', 'status, pose, trackingStatus', 'Shared catalog; no userId'], 350, '#655198')
+p.box('auth_rate_limits', 625, 900, 'auth_rate_limits', ['_id [PK]: hashed string', 'hits: number', 'expiresAt [TTL]: Date', 'Shared buckets; no user reference'], 350, '#655198')
 p.edge('workout_sessions', 'safety_alert_events', [(1550, 200), (1600, 200), (1600, 960), (1550, 960)], '0..1 session : 0..many alerts', 1190, 850)
 p.text(48, 1450, 'Dashed lines: intended document associations; MongoDB does not enforce foreign keys.', 16)
 p.text(48, 1480, '* coach_programs.userId has no Mongoose ref. Optional alert-to-workout links are not verified by the safety service.', 15)
@@ -168,7 +169,7 @@ for page, filename in [(p, 'ERD-collections.svg'), (q, 'ERD-embedded.svg')]:
     page.drawio(document)
 ET.indent(document)
 ET.ElementTree(document).write(OUTPUT / 'PhysiqueQuest-ERD.drawio', encoding='utf-8', xml_declaration=True)
-assert len(p.nodes) == len(main_fields) == 14
+assert len(p.nodes) == len(main_fields) == 15
 assert len(q.nodes) == len(embedded) + 4 == 11
 for path in OUTPUT.iterdir():
     if path.suffix in {'.svg', '.drawio'}:

@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Network layout" id="network">
+    <mxGraphModel page="1" pageWidth="1860" pageHeight="1110" grid="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="phone" value="&lt;b&gt;Phone / Expo Go&lt;/b&gt;&lt;br&gt;&lt;br&gt;Native shell + Next.js WebView&lt;br&gt;Camera, motion and location bridge" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="75" y="190" width="270" height="115" />
+        </mxCell>
+        <mxCell id="browser" value="&lt;b&gt;Desktop browser&lt;/b&gt;&lt;br&gt;&lt;br&gt;Same Next.js frontend&lt;br&gt;No Expo shell required" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="75" y="355" width="270" height="100" />
+        </mxCell>
+        <mxCell id="local" value="&lt;b&gt;Local rep counter&lt;/b&gt;&lt;br&gt;&lt;br&gt;Device CPU + Web Worker&lt;br&gt;Model / WASM from frontend&lt;br&gt;Video frames stay on device&lt;br&gt;Only reviewed results are saved" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="75" y="560" width="270" height="155" />
+        </mxCell>
+        <mxCell id="wifi" value="&lt;b&gt;Private Wi-Fi / LAN&lt;/b&gt;&lt;br&gt;&lt;br&gt;Phone and computer share LAN&lt;br&gt;Example host: 192.168.1.10" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="425" y="190" width="230" height="115" />
+        </mxCell>
+        <mxCell id="web" value="&lt;b&gt;Next.js frontend&lt;/b&gt;&lt;br&gt;&lt;br&gt;TCP 3000: pages and assets&lt;br&gt;Runs on development computer" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="765" y="190" width="300" height="115" />
+        </mxCell>
+        <mxCell id="api" value="&lt;b&gt;Shared NestJS API&lt;/b&gt;&lt;br&gt;&lt;br&gt;TCP 4000 /api&lt;br&gt;Public library + private accounts&lt;br&gt;Coach / workouts / safety" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="765" y="430" width="300" height="125" />
+        </mxCell>
+        <mxCell id="metro" value="&lt;b&gt;Expo Metro&lt;/b&gt;&lt;br&gt;&lt;br&gt;Usually TCP 8081&lt;br&gt;Development bundle only" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="425" y="835" width="230" height="115" />
+        </mxCell>
+        <mxCell id="mongo" value="&lt;b&gt;MongoDB Atlas&lt;/b&gt;&lt;br&gt;&lt;br&gt;Database reached by account API only&lt;br&gt;MONGODB_URI controls host, TLS and port&lt;br&gt;15 active application collections" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="1225" y="430" width="555" height="125" />
+        </mxCell>
+        <mxCell id="exercise" value="&lt;b&gt;ExerciseDB API&lt;/b&gt;&lt;br&gt;&lt;br&gt;Exercise metadata, instructions and GIF URLs&lt;br&gt;One shared API provider + request queue" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="1225" y="660" width="555" height="115" />
+        </mxCell>
+        <mxCell id="gif" value="&lt;b&gt;Exercise media host / CDN&lt;/b&gt;&lt;br&gt;&lt;br&gt;Browser or WebView loads GIFs directly&lt;br&gt;Host is supplied by the catalog response" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="1225" y="190" width="555" height="115" />
+        </mxCell>
+        <mxCell id="food" value="&lt;b&gt;Food-scan providers&lt;/b&gt;&lt;br&gt;&lt;br&gt;Gemini: identify food image&lt;br&gt;USDA: nutrient lookup&lt;br&gt;Backend credentials required" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="1225" y="835" width="265" height="135" />
+        </mxCell>
+        <mxCell id="optional" value="&lt;b&gt;Configured providers&lt;/b&gt;&lt;br&gt;&lt;br&gt;EmailJS / custom email&lt;br&gt;Alert-delivery endpoint&lt;br&gt;Pose stays on-device" vertex="1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#26743a;fontSize=15;fontFamily=Arial;align=left;spacing=14;">
+          <mxGeometry as="geometry" x="1520" y="835" width="260" height="135" />
+        </mxCell>
+        <mxCell id="edge0" value="LAN" edge="1" parent="1" source="phone" target="wifi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge1" value="LAN" edge="1" parent="1" source="browser" target="wifi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="385" y="405" />
+              <mxPoint x="385" y="275" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge2" value="3000" edge="1" parent="1" source="wifi" target="web" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge3" value="4000 /api" edge="1" parent="1" source="wifi" target="api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="705" y="255" />
+              <mxPoint x="705" y="485" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge4" value="Device processing" edge="1" parent="1" source="phone" target="local" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="60" y="270" />
+              <mxPoint x="60" y="635" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge5" value="DB connection" edge="1" parent="1" source="api" target="mongo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge6" value="Library + new plans" edge="1" parent="1" source="api" target="exercise" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1130" y="525" />
+              <mxPoint x="1130" y="685" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge7" value="Direct client GIF request" edge="1" parent="1" source="browser" target="gif" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="365" y="390" />
+              <mxPoint x="365" y="335" />
+              <mxPoint x="1140" y="335" />
+              <mxPoint x="1140" y="247" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8" value="On food scan" edge="1" parent="1" source="api" target="food" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;dashed=1;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1160" y="540" />
+              <mxPoint x="1160" y="800" />
+              <mxPoint x="1355" y="800" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9" value="When configured" edge="1" parent="1" source="api" target="optional" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;dashed=1;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1195" y="555" />
+              <mxPoint x="1195" y="790" />
+              <mxPoint x="1650" y="790" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10" value="Expo bundle" edge="1" parent="1" source="metro" target="phone" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=14;labelBackgroundColor=#ffffff;dashed=1;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="375" y="890" />
+              <mxPoint x="375" y="325" />
+              <mxPoint x="290" y="325" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -3,7 +3,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Icon } from '../Home/icons';
 import type { Profile } from '../Home/types';
-import { formatPhoneNumber, unformatPhoneNumber } from '../../lib/phoneFormatter';
+import { formatPhoneNumber } from '../../lib/phoneFormatter';
 import { normalizeTrainingDays, TRAINING_DAYS } from '../../lib/trainingDays';
 
 type CalibrationData = {

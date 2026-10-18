@@ -55,7 +55,7 @@ test('all five reference editors render saved profile values with shared header 
 test('every profile editor stays open after a rejected save and returns only after confirmation', async () => {
   for (const editor of editors) {
     const state = []; let cursor = 0; let returned = 0; let confirmed = false; let patch;
-    const react = { ...React, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; }, useMemo(fn) { return fn(); } };
+    const react = { ...React, useRef(initial) { const index = cursor++; if (!(index in state)) state[index] = { current: initial }; return state[index]; }, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; }, useMemo(fn) { return fn(); } };
     const Component = loader(react)(editor).default;
     const render = () => { cursor = 0; return Component({ profile, onBack() { returned++; }, async onSave(value) { patch = value; return confirmed; } }); };
     await render().props.onSave();
@@ -113,7 +113,7 @@ test('admin mock catalog and analytics match the supplied reference', async () =
   assert.match(catalog, /Bulgarian split squat/);
   assert.match(catalog, /Kettlebell swing/);
   assert.match(catalog, /Sample data/);
-  assert.doesNotMatch(catalog, /Delete|Unpublish/);
+  assert.match(catalog, /Edit|Delete/);
   const analytics = renderToStaticMarkup(React.createElement(load('EngagementAnalytics').default, { preview: true, onBack() {} }));
   assert.match(analytics, /1,284/);
   assert.match(analytics, /Cancelled in countdown/);
@@ -122,7 +122,7 @@ test('admin mock catalog and analytics match the supplied reference', async () =
 
 test('New exercise form validates, saves locally in preview mode and Cancel returns to the list', async () => {
   const state = []; let cursor = 0; let returned = 0;
-  const react = { ...React, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; }, useMemo(fn) { return fn(); }, useCallback(fn) { return fn; }, useEffect() {} };
+  const react = { ...React, useRef(initial) { const index = cursor++; if (!(index in state)) state[index] = { current: initial }; return state[index]; }, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; }, useMemo(fn) { return fn(); }, useCallback(fn) { return fn; }, useEffect() {} };
   const Component = loader(react)('AdminExerciseLibrary').default;
   const render = () => { cursor = 0; return Component({ preview: true, onBack() { returned++; } }); };
   const nodes = (node, predicate) => {
@@ -158,7 +158,7 @@ test('explicit admin previews make no API requests, while denied live requests n
   for (const editor of ['AdminExerciseLibrary', 'EngagementAnalytics']) {
     for (const preview of [true, false]) {
       const state = []; let cursor = 0; let effects = []; let calls = 0;
-      const react = { ...React, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; }, useMemo(fn) { return fn(); }, useCallback(fn) { return fn; }, useEffect(fn) { effects.push(fn); } };
+      const react = { ...React, useRef(initial) { const index = cursor++; if (!(index in state)) state[index] = { current: initial }; return state[index]; }, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; }, useMemo(fn) { return fn(); }, useCallback(fn) { return fn; }, useEffect(fn) { effects.push(fn); } };
       const reject = async () => { calls++; const error = new Error('Not authorized'); error.statusCode = 403; throw error; };
       const Component = loader(react, { getAdminExercises: reject, getAdminAnalytics: reject })(editor).default;
       const render = () => { cursor = 0; effects = []; return Component({ preview, onBack() {} }); };

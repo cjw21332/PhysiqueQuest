@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1860" height="1110" viewBox="0 0 1860 1110">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 Z" fill="#52657a"/></marker></defs>
+<rect width="1860" height="1110" fill="#ffffff"/>
+<text x="40" y="50" font-family="Arial, sans-serif" font-size="30" fill="#15314b" font-weight="700">PhysiqueQuest v2.7.4 / Network layout</text>
+<text x="40" y="84" font-family="Arial, sans-serif" font-size="17" fill="#15314b">Current LAN development architecture. Cloud services are outbound dependencies; this is not a live network scan.</text>
+<rect x="40" y="125" width="1060" height="885" rx="15" fill="#f4f7fb" stroke="#c5d2df"/>
+<text x="60" y="157" font-family="Arial, sans-serif" font-size="17" fill="#15314b" font-weight="700">Local private network — phone, browser and development computer</text>
+<rect x="1185" y="125" width="635" height="885" rx="15" fill="#f4f7fb" stroke="#c5d2df"/>
+<text x="1205" y="157" font-family="Arial, sans-serif" font-size="17" fill="#15314b" font-weight="700">Internet / external services</text>
+<polyline points="345,247 425,247" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="362" y="216" width="34" height="22" fill="#f4f7fb"/>
+<text x="367" y="232" font-family="Arial, sans-serif" font-size="14" fill="#15314b">LAN</text>
+<polyline points="345,405 385,405 385,275 425,275" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="347" y="325" width="34" height="22" fill="#f4f7fb"/>
+<text x="352" y="341" font-family="Arial, sans-serif" font-size="14" fill="#15314b">LAN</text>
+<polyline points="655,225 765,225" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="688" y="194" width="42" height="22" fill="#f4f7fb"/>
+<text x="693" y="210" font-family="Arial, sans-serif" font-size="14" fill="#15314b">3000</text>
+<polyline points="655,255 705,255 705,485 765,485" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="669" y="372" width="82" height="22" fill="#f4f7fb"/>
+<text x="674" y="388" font-family="Arial, sans-serif" font-size="14" fill="#15314b">4000 /api</text>
+<polyline points="75,270 60,270 60,635 75,635" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="85" y="499" width="146" height="22" fill="#f4f7fb"/>
+<text x="90" y="515" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Device processing</text>
+<polyline points="1065,482 1225,482" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1078" y="450" width="114" height="22" fill="#f4f7fb"/>
+<text x="1083" y="466" font-family="Arial, sans-serif" font-size="14" fill="#15314b">DB connection</text>
+<polyline points="1065,525 1130,525 1130,685 1225,685" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1070" y="574" width="162" height="22" fill="#f4f7fb"/>
+<text x="1075" y="590" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Library + new plans</text>
+<polyline points="345,390 365,390 365,335 1140,335 1140,247 1225,247" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="775" y="309" width="210" height="22" fill="#f4f7fb"/>
+<text x="780" y="325" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Direct client GIF request</text>
+<polyline points="1065,540 1160,540 1160,800 1355,800 1355,835" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<rect x="1045" y="772" width="106" height="22" fill="#f4f7fb"/>
+<text x="1050" y="788" font-family="Arial, sans-serif" font-size="14" fill="#15314b">On food scan</text>
+<polyline points="980,555 1195,555 1195,790 1650,790 1650,835" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<rect x="1450" y="799" width="130" height="22" fill="#f4f7fb"/>
+<text x="1455" y="815" font-family="Arial, sans-serif" font-size="14" fill="#15314b">When configured</text>
+<polyline points="425,890 375,890 375,325 290,325 290,305" fill="none" stroke="#52657a" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<rect x="380" y="789" width="98" height="22" fill="#f4f7fb"/>
+<text x="385" y="805" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Expo bundle</text>
+<rect x="75" y="190" width="270" height="115" rx="10" fill="#fff" stroke="#26743a" stroke-width="2"/>
+<text x="90" y="218" font-family="Arial, sans-serif" font-size="18" fill="#26743a" font-weight="700">Phone / Expo Go</text>
+<text x="90" y="244" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Native shell + Next.js WebView</text>
+<text x="90" y="267" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Camera, motion and location bridge</text>
+<rect x="75" y="355" width="270" height="100" rx="10" fill="#fff" stroke="#26743a" stroke-width="2"/>
+<text x="90" y="383" font-family="Arial, sans-serif" font-size="18" fill="#26743a" font-weight="700">Desktop browser</text>
+<text x="90" y="409" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Same Next.js frontend</text>
+<text x="90" y="432" font-family="Arial, sans-serif" font-size="14" fill="#15314b">No Expo shell required</text>
+<rect x="75" y="560" width="270" height="155" rx="10" fill="#fff" stroke="#26743a" stroke-width="2"/>
+<text x="90" y="588" font-family="Arial, sans-serif" font-size="18" fill="#26743a" font-weight="700">Local rep counter</text>
+<text x="90" y="614" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Device CPU + Web Worker</text>
+<text x="90" y="637" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Model / WASM from frontend</text>
+<text x="90" y="660" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Video frames stay on device</text>
+<text x="90" y="683" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Only reviewed results are saved</text>
+<rect x="425" y="190" width="230" height="115" rx="10" fill="#fff" stroke="#244ea3" stroke-width="2"/>
+<text x="440" y="218" font-family="Arial, sans-serif" font-size="18" fill="#244ea3" font-weight="700">Private Wi-Fi / LAN</text>
+<text x="440" y="244" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Phone and computer share LAN</text>
+<text x="440" y="267" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Example host: 192.168.1.10</text>
+<rect x="765" y="190" width="300" height="115" rx="10" fill="#fff" stroke="#244ea3" stroke-width="2"/>
+<text x="780" y="218" font-family="Arial, sans-serif" font-size="18" fill="#244ea3" font-weight="700">Next.js frontend</text>
+<text x="780" y="244" font-family="Arial, sans-serif" font-size="14" fill="#15314b">TCP 3000: pages and assets</text>
+<text x="780" y="267" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Runs on development computer</text>
+<rect x="765" y="430" width="300" height="125" rx="10" fill="#fff" stroke="#244ea3" stroke-width="2"/>
+<text x="780" y="458" font-family="Arial, sans-serif" font-size="18" fill="#244ea3" font-weight="700">Shared NestJS API</text>
+<text x="780" y="484" font-family="Arial, sans-serif" font-size="14" fill="#15314b">TCP 4000 /api</text>
+<text x="780" y="507" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Public library + private accounts</text>
+<text x="780" y="530" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Coach / workouts / safety</text>
+<rect x="425" y="835" width="230" height="115" rx="10" fill="#fff" stroke="#244ea3" stroke-width="2"/>
+<text x="440" y="863" font-family="Arial, sans-serif" font-size="18" fill="#244ea3" font-weight="700">Expo Metro</text>
+<text x="440" y="889" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Usually TCP 8081</text>
+<text x="440" y="912" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Development bundle only</text>
+<rect x="1225" y="430" width="555" height="125" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1240" y="458" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">MongoDB Atlas</text>
+<text x="1240" y="484" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Database reached by account API only</text>
+<text x="1240" y="507" font-family="Arial, sans-serif" font-size="14" fill="#15314b">MONGODB_URI controls host, TLS and port</text>
+<text x="1240" y="530" font-family="Arial, sans-serif" font-size="14" fill="#15314b">15 active application collections</text>
+<rect x="1225" y="660" width="555" height="115" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1240" y="688" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">ExerciseDB API</text>
+<text x="1240" y="714" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Exercise metadata, instructions and GIF URLs</text>
+<text x="1240" y="737" font-family="Arial, sans-serif" font-size="14" fill="#15314b">One shared API provider + request queue</text>
+<rect x="1225" y="190" width="555" height="115" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1240" y="218" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">Exercise media host / CDN</text>
+<text x="1240" y="244" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Browser or WebView loads GIFs directly</text>
+<text x="1240" y="267" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Host is supplied by the catalog response</text>
+<rect x="1225" y="835" width="265" height="135" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1240" y="863" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">Food-scan providers</text>
+<text x="1240" y="889" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Gemini: identify food image</text>
+<text x="1240" y="912" font-family="Arial, sans-serif" font-size="14" fill="#15314b">USDA: nutrient lookup</text>
+<text x="1240" y="935" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Backend credentials required</text>
+<rect x="1520" y="835" width="260" height="135" rx="10" fill="#fff" stroke="#176b80" stroke-width="2"/>
+<text x="1535" y="863" font-family="Arial, sans-serif" font-size="18" fill="#176b80" font-weight="700">Configured providers</text>
+<text x="1535" y="889" font-family="Arial, sans-serif" font-size="14" fill="#15314b">EmailJS / custom email</text>
+<text x="1535" y="912" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Alert-delivery endpoint</text>
+<text x="1535" y="935" font-family="Arial, sans-serif" font-size="14" fill="#15314b">Pose stays on-device</text>
+<text x="40" y="1045" font-family="Arial, sans-serif" font-size="16" fill="#15314b">Solid arrows: request/data paths. Dashed arrows: development-only or feature/configuration-dependent paths.</text>
+<text x="40" y="1075" font-family="Arial, sans-serif" font-size="16" fill="#15314b">The router is a network path, not an API proxy. GIF requests execute on the client after metadata is returned.</text></svg>

@@ -3,7 +3,7 @@ import { Asset } from 'expo-asset';
 import { useEffect, useRef, useState } from 'react';
 import { AppState, Text, View, type ViewStyle } from 'react-native';
 import type { PoseCameraViewProps, PoseFrame, PosePerformanceMetrics } from 'expo-mediapipe-pose';
-import { jointIndices, type TrackingKind, type TrackingSide } from '../shared/repCounter';
+import { selectTrackingFrame, type TrackingKind, type TrackingSide } from '../shared/repCounter';
 
 export type NativeTrackingOptions = { requestId: string; kind: TrackingKind; side: TrackingSide; active: boolean };
 export const nativePoseAvailable = !isRunningInExpoGo() && !!requireOptionalNativeModule('ExpoMediaPipePose');
@@ -44,10 +44,10 @@ export default function NativeTrackingCamera({ options, facing, style, emit, rea
       setFailed(true); send({ type: 'error', message: 'Camera tracking paused because the phone is too warm. Count reps manually or let it cool down.' }); return;
     }
     if (data.thermalState === 'serious' || data.inferenceDurationMs > 80) setLimit(5);
-    send({ type: 'frame', frame: {
-      joints: frame.landmarks.length ? jointIndices(options.kind, options.side).map(index => frame.landmarks[index]) : [],
+    send({ type: 'frame', frame: selectTrackingFrame({
+      joints: frame.landmarks, worldJoints: frame.worldLandmarks,
       aspect: data.width / data.height, timestamp: performance.now(),
-    } });
+    }, options.kind, options.side) });
   };
   const metrics = (data: PosePerformanceMetrics) => send({ type: 'metrics', fps: data.inferenceFps });
   if (!PoseCamera || !modelPath || failed) return <View style={style}><Text>{failed ? 'Camera tracking unavailable. Use manual counting.' : 'Loading camera tracking…'}</Text></View>;

@@ -7,7 +7,7 @@ class CoachService extends SavedCoachService { constructor(profiles: any, settin
 const USER = '507f1f77bcf86cd799439011';
 
 const exercisesModel = (rows: unknown[]) =>
-  ({ getForPlan: vi.fn(async () => rows.map((row: any) => ({ group: 'General', targetMuscle: '', equipment: '', pose: 'missing', instructions: [], ...row, pose: 'missing' }))) }) as any;
+  ({ getForPlan: vi.fn(async () => rows.map((row: any) => ({ group: 'General', targetMuscle: '', equipment: '', instructions: [], ...row, pose: 'missing' }))) }) as any;
 
 const profileModel = (profile: unknown) =>
   ({ findOne: vi.fn(() => ({ lean: () => ({ exec: async () => profile }) })) }) as any;

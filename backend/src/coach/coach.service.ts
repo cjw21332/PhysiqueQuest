@@ -36,10 +36,10 @@ export class CoachService {
     if (pending) return pending;
     const generation = (async (): Promise<Program> => {
       const library = (await this.exercises.getForPlan(equipment, profile.goal)).map(row => ({ ...row, id: row._id }));
-      const plan = { ...new CoachPlanner().build(context, library), source: 'ExerciseDB V1' };
+      const plan = { ...new CoachPlanner().build(context, library), source: library.some(row => row.source === 'PhysiqueQuest') ? 'ExerciseDB V1 + PhysiqueQuest' : 'ExerciseDB V1' };
       if (!plan.libraryReady || !plan.days.some(day => day.exercises.length)) return plan;
       // Persist the user's program, not provider media. Details/GIFs are refreshed on opening the library.
-      const snapshot = { ...plan, days: plan.days.map(day => ({ ...day, exercises: day.exercises.map(({ gifUrl, ...exercise }) => exercise) })) };
+      const snapshot = { ...plan, days: plan.days.map(day => ({ ...day, exercises: day.exercises.map(({ gifUrl: _gifUrl, ...exercise }) => exercise) })) };
       const stored = await this.programs.findOneAndUpdate(filter, { $setOnInsert: { ...filter, plan: snapshot } }, { upsert: true, new: true, runValidators: true }).lean().exec();
       return { ...stored!.plan, weekLabel: schedule.weekLabel, programVersion: contextHash } as Program;
     })();

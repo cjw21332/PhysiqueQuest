@@ -1,5 +1,5 @@
 import { FilesetResolver, PoseLandmarker } from '@mediapipe/tasks-vision';
-import { jointIndices, type TrackingKind, type TrackingSide } from '../../shared/repCounter';
+import { selectTrackingFrame, type TrackingKind, type TrackingSide } from '../../shared/repCounter';
 
 type Command = { type: 'init'; baseUrl: string } | { type: 'frame'; bitmap: ImageBitmap; timestamp: number; kind: TrackingKind | 'auto'; side: TrackingSide };
 const scope = self as unknown as { onmessage: ((event: MessageEvent<Command>) => void) | null; postMessage: (data: unknown) => void };
@@ -25,10 +25,10 @@ scope.onmessage = async event => {
     const start = performance.now();
     const result = detector.detectForVideo(command.bitmap, command.timestamp);
     const landmarks = result.landmarks[0] ?? [];
-    scope.postMessage({ type: 'frame', frame: {
-      joints: command.kind === 'auto' ? landmarks : landmarks.length ? jointIndices(command.kind, command.side).map(index => landmarks[index]) : [],
+    scope.postMessage({ type: 'frame', frame: selectTrackingFrame({
+      joints: landmarks, worldJoints: result.worldLandmarks[0],
       aspect: command.bitmap.width / command.bitmap.height, timestamp: command.timestamp,
-    }, durationMs: performance.now() - start });
+    }, command.kind, command.side), durationMs: performance.now() - start });
   } catch { scope.postMessage({ type: 'error', message: 'Camera tracking stopped. Try restarting it or count reps manually.' }); }
   finally { command.bitmap.close(); }
 };

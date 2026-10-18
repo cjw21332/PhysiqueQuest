@@ -1,4 +1,4 @@
-import { createExerciseIdentifier, createRepCounter, trackingAngle, type TrackingFrame, type TrackingKind, type TrackingSide } from '../../shared/repCounter';
+import { createExerciseIdentifier, createLearnedExerciseIdentifier, createRepCounter, trackingAngle, type PosePhaseClassifier, type TrackingFrame, type TrackingKind, type TrackingSide } from '../../shared/repCounter';
 
 function cancelled() { return new DOMException('Counting cancelled.', 'AbortError'); }
 
@@ -78,10 +78,10 @@ export async function analyzeRecordedVideo(video: HTMLVideoElement, kind: Tracki
   return counter.snapshot().reps;
 }
 
-export async function identifyRecordedVideo(video: HTMLVideoElement, signal: AbortSignal, progress: (percent: number) => void) {
-  const identifier = createExerciseIdentifier();
+export async function identifyRecordedVideo(video: HTMLVideoElement, signal: AbortSignal, progress: (percent: number) => void, classifier?: PosePhaseClassifier) {
+  const identifier = classifier ? createLearnedExerciseIdentifier(classifier) : createExerciseIdentifier();
   await visitRecordedFrames(video, 'auto', 'left', signal, progress, frame => identifier.update(frame));
   const result = identifier.result();
-  if (!result) throw new Error('Could not identify one supported exercise. Use a single side-on squat, biceps curl or floor push-up clip, or select the exercise and enter reps manually.');
+  if (!result) throw new Error('Could not identify one supported exercise. Use a single squat, biceps curl, floor push-up, overhead press or lateral raise clip with the required joints visible, or select the exercise and count locally or enter reps manually.');
   return result;
 }

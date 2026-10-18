@@ -88,3 +88,41 @@ describe('leaderboard', () => {
     expect(result.self.points).toBe(100);
   });
 });
+
+
+describe('leaderboard read efficiency', () => {
+  it('keeps points, privacy and rank while loading only scoring fields', async () => {
+    const selections: string[] = [];
+    const nutrition = { find: vi.fn(() => ({ select: (fields: string) => {
+      selections.push(fields);
+      return { lean: () => ({ exec: async () => [{ userId: A, meals: [1, 2, 3].map(() => ({ date: '2099-01-01' })), water: [{ date: '2099-01-01', glasses: 8 }] }] }) };
+    } })) };
+    const settings = { find: vi.fn(() => ({ select: (fields: string) => {
+      selections.push(fields);
+      return { lean: () => ({ exec: async () => [{ userId: B, values: { showLeaderboard: false } }] }) };
+    } })) };
+    const users = findModel([{ _id: A, name: 'Ana' }, { _id: B, name: 'Ben' }]);
+    const service = new LeaderboardService(snapshots(), users, settings as any, nutrition as any, { aggregate: vi.fn(async () => [{ userId: A, day: '2099-01-01' }, { userId: B, day: '2099-01-01' }]) } as any);
+    const result = await service.get(A, 'all');
+    expect(result.self).toMatchObject({ userId: A, rank: 1, points: 200 });
+    expect(result.entries.map(entry => entry.userId)).toEqual([A]);
+    expect(selections).toContain('userId meals.date water.date water.glasses');
+    expect(selections).toContain('userId values.showLeaderboard');
+    expect(settings.find).toHaveBeenCalledWith({ 'values.showLeaderboard': false });
+    const requestedIds = users.find.mock.calls[0][0]._id.$in.map(String);
+    expect(requestedIds.sort()).toEqual([A, B]); // Caller already in points: no duplicate identifier.
+  });
+
+  it('starts privacy and history reads while the scoring read is pending', async () => {
+    const service = build();
+    let finish!: (value: Map<string, number>) => void;
+    vi.spyOn(service as any, 'computePoints').mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+    const hidden = vi.spyOn(service as any, 'hiddenUsers').mockResolvedValue(new Set());
+    const previous = vi.spyOn(service as any, 'previousRanks').mockResolvedValue(new Map());
+    const request = service.get(A, 'all');
+    expect(hidden).toHaveBeenCalledOnce();
+    expect(previous).toHaveBeenCalledOnce();
+    finish(new Map());
+    expect((await request).self).toMatchObject({ userId: A, points: 0, rank: 1 });
+  });
+});

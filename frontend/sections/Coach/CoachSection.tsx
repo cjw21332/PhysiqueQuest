@@ -21,7 +21,7 @@ import { useCoachPlan } from '../../hooks/useCoachPlan';
 
 type View = 'plan' | 'library' | 'camera';
 
-export default function CoachSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
+export default function CoachSection({ profile, onLogoutRequest: _onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const [view, setView] = useState<View>('plan');
   const [sessionExercises, setSessionExercises] = useState<CoachExercise[]>([]);
   const [actionError, setActionError] = useState('');

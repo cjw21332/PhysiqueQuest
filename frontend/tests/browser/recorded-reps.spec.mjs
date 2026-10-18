@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { movementFrame, wholeMovementFrame } from '../fixtures/rep-frames.mjs';
 
 async function openUpload(page, failCompletion = false, automatic = false) {
   const writes = [];
@@ -51,23 +52,25 @@ async function openUpload(page, failCompletion = false, automatic = false) {
   return writes;
 }
 
-for (const exerciseId of ['camera-squat', 'camera-pushup']) test(`counts ${exerciseId} locally, reviews corrected reps, and saves only results`, async ({ page }) => {
-  await page.addInitScript(() => {
+for (const exerciseId of ['camera-squat', 'camera-pushup', 'camera-shoulderpress', 'camera-lateralraise', 'camera-knee-pushup', 'camera-wall-pushup', 'camera-row', 'camera-triceps-extension', 'camera-hiphinge', 'camera-bridge', 'camera-lunge']) test(`counts ${exerciseId} locally, reviews corrected reps, and saves only results`, async ({ page }) => {
+  const kind = { 'camera-shoulderpress': 'shoulderpress', 'camera-lateralraise': 'lateralraise', 'camera-knee-pushup': 'kneepushup', 'camera-wall-pushup': 'wallpushup', 'camera-row': 'row', 'camera-triceps-extension': 'tricepsextension', 'camera-hiphinge': 'hiphinge', 'camera-bridge': 'bridge', 'camera-lunge': 'lunge' }[exerciseId];
+  const frames = kind ? Array.from({ length: 30 }, (_, index) => movementFrame(kind, index < 6 || index >= 13 ? 180 : 90, index * 100 + 1)) : null;
+  await page.addInitScript(({ frames }) => {
     window.Worker = class extends EventTarget {
       postMessage(command) {
         const time = command.timestamp ?? 0;
         const angle = time < 600 || time >= 1300 ? 180 : 90;
         const radians = angle * Math.PI / 180;
-        const frame = { timestamp: time, aspect: 1, joints: [{ x: 0.5, y: 0.3, visibility: 1 }, { x: 0.5, y: 0.5, visibility: 1 }, { x: 0.5 + 0.2 * Math.sin(radians), y: 0.5 - 0.2 * Math.cos(radians), visibility: 1 }] };
-        if (command.kind === 'pushup') frame.joints.push({ x: 0.65, y: 0.3, visibility: 1 }, { x: 0.9, y: 0.3, visibility: 1 });
+        const frame = frames ? frames[Math.min(frames.length - 1, Math.floor(time / 100))] : { timestamp: time, aspect: 1, joints: [{ x: 0.5, y: 0.3, visibility: 1 }, { x: 0.5, y: 0.5, visibility: 1 }, { x: 0.5 + 0.2 * Math.sin(radians), y: 0.5 - 0.2 * Math.cos(radians), visibility: 1 }] };
+        if (!frames && command.kind === 'pushup') frame.joints.push({ x: 0.65, y: 0.3, visibility: 1 }, { x: 0.9, y: 0.3, visibility: 1 });
         command.bitmap?.close();
         setTimeout(() => this.dispatchEvent(new MessageEvent('message', { data: command.type === 'init' ? { type: 'ready' } : { type: 'frame', frame } })), 0);
       }
       terminate() {}
     };
-  });
+  }, { frames });
   const writes = await openUpload(page);
-  await expect(page.getByRole('combobox', { name: 'Exercise', exact: true }).locator('option')).toHaveCount(8);
+  await expect(page.getByRole('combobox', { name: 'Exercise', exact: true }).locator('option')).toHaveCount(28);
   for (const name of ['Goblet squat', 'Sumo squat', 'Hammer curl', 'Seated biceps curl', 'Push-up']) {
     await expect(page.getByRole('option', { name, exact: true })).toHaveCount(1);
   }
@@ -140,8 +143,9 @@ test('an undecodable clip still supports manual duration and reps without starti
   expect(writes[0].data.result).toMatchObject({ source: 'manual', reps: 6, clipDurationSeconds: 20 });
 });
 
-for (const kind of ['squat', 'curl', 'pushup']) test(`automatically identifies ${kind}, counts once per frame and names the reviewed entry`, async ({ page }) => {
-  await page.addInitScript(({ kind }) => {
+for (const kind of ['squat', 'curl', 'pushup', 'shoulderpress', 'lateralraise']) test(`automatically identifies ${kind}, counts once per frame and names the reviewed entry`, async ({ page }) => {
+  const frames = ['shoulderpress', 'lateralraise'].includes(kind) ? Array.from({ length: 30 }, (_, index) => wholeMovementFrame(kind, index < 6 || index >= 13 ? 180 : 90, index * 100 + 1, 'right')) : null;
+  await page.addInitScript(({ kind, frames }) => {
     window.inferenceCalls = 0;
     window.Worker = class extends EventTarget {
       postMessage(command) {
@@ -165,13 +169,14 @@ for (const kind of ['squat', 'curl', 'pushup']) test(`automatically identifies $
         }
         if (command.type === 'frame') window.inferenceCalls++;
         command.bitmap?.close();
-        setTimeout(() => this.dispatchEvent(new MessageEvent('message', { data: command.type === 'init' ? { type: 'ready' } : { type: 'frame', frame: { joints, timestamp, aspect: 1 } } })), 0);
+        const frame = frames ? frames[Math.min(frames.length - 1, Math.floor(timestamp / 100))] : { joints, timestamp, aspect: 1 };
+        setTimeout(() => this.dispatchEvent(new MessageEvent('message', { data: command.type === 'init' ? { type: 'ready' } : { type: 'frame', frame } })), 0);
       }
       terminate() { window.workerTerminated = true; }
     };
-  }, { kind });
+  }, { kind, frames });
   const writes = await openUpload(page, false, true);
-  const name = { squat: 'Squat', curl: 'Biceps curl', pushup: 'Push-up' }[kind];
+  const name = { squat: 'Squat', curl: 'Biceps curl', pushup: 'Push-up', shoulderpress: 'Overhead press', lateralraise: 'Lateral raise' }[kind];
   await expect(page.getByText(`Suggested movement: ${name}. Review the exercise and reps before saving.`)).toBeVisible();
   await expect(page.getByRole('heading', { name: `${name} · 1 rep`, exact: true })).toBeVisible();
   await expect(page.getByRole('spinbutton', { name: 'Reviewed reps' })).toHaveValue('1');
@@ -189,7 +194,7 @@ for (const kind of ['squat', 'curl', 'pushup']) test(`automatically identifies $
   expect(writes[0].data.result.exerciseId).toBe(`movement-${kind}`);
   expect(writes[0].data.result.trackingPresetId).toBe(kind === 'pushup' ? 'camera-pushup' : `camera-${kind}`);
   expect(writes[0].data.exercise.equipment).toBe(kind === 'pushup' ? 'Bodyweight' : '');
-  expect(writes[0].data.result).toMatchObject({ reps: 8, detectedReps: 1, side: 'right', source: 'local-video', algorithmVersion: 'movement-rules-v1/rep-counter-v2' });
+  expect(writes[0].data.result).toMatchObject({ reps: 8, detectedReps: 1, side: 'right', source: 'local-video', algorithmVersion: 'movement-rules-v3/rep-counter-v5' });
   expect(writes[0].data).not.toHaveProperty('mediaBase64');
   await page.goto('/coach');
   await expect(page.getByRole('link', { name: new RegExp(`${name} · 8 reps`) })).toBeVisible();

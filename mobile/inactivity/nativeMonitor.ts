@@ -18,12 +18,13 @@ type Callbacks = {
 
 /** Returns a fix within the timeout, or null when permission is denied or the fix is too slow. */
 export async function captureLocation(): Promise<LocationFix | null> {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   try {
     const permission = await Location.requestForegroundPermissionsAsync();
     if (permission.status !== 'granted') return null;
     const fix = await Promise.race([
       Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
-      new Promise<null>(resolve => setTimeout(() => resolve(null), LOCATION_TIMEOUT_MS)),
+      new Promise<null>(resolve => { timeout = setTimeout(() => resolve(null), LOCATION_TIMEOUT_MS); }),
     ]);
     if (!fix) return null;
     return {
@@ -34,10 +35,14 @@ export async function captureLocation(): Promise<LocationFix | null> {
     };
   } catch {
     return null;
+  } finally {
+    if (timeout) clearTimeout(timeout);
   }
 }
 
 export function createNativeMonitor({ onEvent }: Callbacks) {
+  let generation = 0;
+  let awakeTag: string | null = null;
   let machine: ReturnType<typeof createInactivityMachine> | null = null;
   let detector = createMovementDetector();
   let sensorSub: { remove: () => void } | null = null;
@@ -48,7 +53,8 @@ export function createNativeMonitor({ onEvent }: Callbacks) {
     for (const event of machine.drain()) {
       if (event.type === 'alarm') {
         // Location is captured while the app is in the foreground, then the alarm is reported with it.
-        void captureLocation().then(location => onEvent({ type: 'alarm', location }));
+        const run = generation;
+        void captureLocation().then(location => { if (run === generation && machine) onEvent({ type: 'alarm', location }); });
       } else {
         onEvent(event);
       }
@@ -62,18 +68,27 @@ export function createNativeMonitor({ onEvent }: Callbacks) {
 
   return {
     async start(thresholdMs: number) {
+      const run = ++generation;
       stopSensor();
+      if (tickTimer) clearInterval(tickTimer);
+      tickTimer = null;
+      if (awakeTag) deactivateKeepAwake(awakeTag);
+      const tag = `physiquequest-monitor:${run}`;
+      awakeTag = tag;
       machine = createInactivityMachine({ thresholdMs });
       detector = createMovementDetector();
       machine.start(Date.now());
-      await activateKeepAwakeAsync();
+      await activateKeepAwakeAsync(tag).catch(() => undefined);
+      if (run !== generation) { deactivateKeepAwake(tag); return; }
 
-      const available = await Accelerometer.isAvailableAsync();
+      const available = await Accelerometer.isAvailableAsync().catch(() => false);
+      if (run !== generation) { deactivateKeepAwake(tag); return; }
       onEvent({ type: 'motion-status', available });
-      if (!available) return;
+      if (!available) { deactivateKeepAwake(tag); return; }
 
       Accelerometer.setUpdateInterval(SAMPLE_INTERVAL_MS);
       sensorSub = Accelerometer.addListener(sample => {
+        if (run !== generation) return;
         if (detector.sample(sample)) machine?.movement(Date.now());
       });
       tickTimer = setInterval(() => {
@@ -100,11 +115,13 @@ export function createNativeMonitor({ onEvent }: Callbacks) {
     },
 
     stop() {
+      generation++;
       stopSensor();
       if (tickTimer) clearInterval(tickTimer);
       tickTimer = null;
       machine = null;
-      deactivateKeepAwake();
+      if (awakeTag) deactivateKeepAwake(awakeTag);
+      awakeTag = null;
     },
   };
 }

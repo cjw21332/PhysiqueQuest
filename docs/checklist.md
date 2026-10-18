@@ -1,3 +1,5 @@
+> Current architecture update, October 18, 2026: library browsing and Coach preview routes now share the main API on port 4000. The separate port-4050 service has been removed. Older independent-service entries below are historical; see [combined API](COMBINED_API.md).
+
 # PhysiqueQuest — Frontend, Backend, and End-to-End Checklist
 
 > **Audit date:** October 15, 2026

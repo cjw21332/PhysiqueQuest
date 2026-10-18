@@ -9,13 +9,14 @@ import { User, UserSchema } from './schemas/user.schema.js';
 import { SignInEvent, SignInEventSchema } from './schemas/sign-in-event.schema.js';
 import { JwtStrategy } from './jwt.strategy.js';
 import type { SignOptions } from 'jsonwebtoken';
+import { AuthRateLimit, AuthRateLimitSchema } from './auth-rate-limit.schema.js';
 import { RecoveryToken, RecoveryTokenSchema } from './recovery-token.schema.js';
 import { PasswordRecoveryService } from './password-recovery.service.js';
 import { EmailDeliveryProvider } from '../providers/email-delivery.provider.js';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: RecoveryToken.name, schema: RecoveryTokenSchema }, { name: SignInEvent.name, schema: SignInEventSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: AuthRateLimit.name, schema: AuthRateLimitSchema }, { name: RecoveryToken.name, schema: RecoveryTokenSchema }, { name: SignInEvent.name, schema: SignInEventSchema }]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

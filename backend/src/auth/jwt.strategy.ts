@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
@@ -19,6 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     const user = await this.authService.validateUser(payload.sub);
-    return { userId: payload.sub, email: payload.email, role: user.role ?? 'user' };
+    if ((payload.sessionVersion ?? 0) !== (user.sessionVersion ?? 0)) throw new UnauthorizedException('Session expired. Sign in again.');
+    return { userId: payload.sub, email: user.email, role: user.role ?? 'user' };
   }
 }

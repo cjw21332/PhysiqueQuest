@@ -2,10 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
+import { movementFrame } from './fixtures/rep-frames.mjs';
 
 const source = await readFile(new URL('../../shared/repCounter.ts', import.meta.url), 'utf8');
 const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
-const { createRepCounter, jointAngle, trackingExercises, trackingPresets, jointIndices } = await import(`data:text/javascript;base64,${Buffer.from(output).toString('base64')}`);
+const { createRepCounter, jointAngle, trackingAngle, trackingExercises, trackingPresets, jointIndices } = await import(`data:text/javascript;base64,${Buffer.from(output).toString('base64')}`);
 const frame = (angle, timestamp, aspect = 1) => {
   const radians = angle * Math.PI / 180;
   return { timestamp, aspect, joints: [{ x: 0.5, y: 0.3, visibility: 1 }, { x: 0.5, y: 0.5, visibility: 1 }, { x: 0.5 + 0.2 * Math.sin(radians) / aspect, y: 0.5 - 0.2 * Math.cos(radians), visibility: 1 }] };
@@ -70,17 +71,81 @@ test('joint geometry respects portrait/landscape aspect and rejects invalid conf
   assert.equal(trackingExercises['camera-curl'], 'curl');
 });
 
-test('all seven selectable exercises have distinct IDs and use the correct movement rule', () => {
-  const expected = { 'camera-squat': 'squat', 'camera-curl': 'curl', 'camera-goblet-squat': 'squat', 'camera-sumo-squat': 'squat', 'camera-hammer-curl': 'curl', 'camera-seated-curl': 'curl', 'camera-pushup': 'pushup' };
+test('all twenty-seven selectable exercises have distinct IDs and use the correct movement rule', () => {
+  const expected = { 'camera-squat': 'squat', 'camera-curl': 'curl', 'camera-goblet-squat': 'squat', 'camera-sumo-squat': 'squat', 'camera-hammer-curl': 'curl', 'camera-seated-curl': 'curl', 'camera-pushup': 'pushup', 'camera-shoulderpress': 'shoulderpress', 'camera-seated-shoulderpress': 'shoulderpress', 'camera-lateralraise': 'lateralraise', 'camera-band-lateralraise': 'lateralraise', 'camera-knee-pushup': 'kneepushup', 'camera-wall-pushup': 'wallpushup', 'camera-close-grip-pushup': 'pushup' };
+  Object.assign(expected, { 'camera-row': 'row', 'camera-single-arm-row': 'row', 'camera-triceps-extension': 'tricepsextension', 'camera-band-curl': 'curl', 'camera-barbell-curl': 'curl', 'camera-kettlebell-goblet-squat': 'squat' });
+  Object.assign(expected, { 'camera-hiphinge': 'hiphinge', 'camera-dumbbell-rdl': 'hiphinge', 'camera-barbell-rdl': 'hiphinge', 'camera-bridge': 'bridge', 'camera-dumbbell-bridge': 'bridge', 'camera-lunge': 'lunge', 'camera-dumbbell-lunge': 'lunge' });
   assert.deepEqual(trackingExercises, expected);
   assert.deepEqual(trackingPresets.map(item => item._id).sort(), Object.keys(expected).sort());
   for (const kind of Object.values(expected)) {
     const counter = createRepCounter(kind);
-    replay(counter, [180, kind === 'curl' ? 45 : 90, 180], 0, kind === 'pushup' ? pushupFrame : frame);
+    replay(counter, [180, kind === 'curl' ? 45 : 90, 180], 0, kind === 'pushup' ? pushupFrame : ['squat', 'curl'].includes(kind) ? frame : (angle, time) => movementFrame(kind, angle, time));
     assert.equal(counter.snapshot().reps, 1);
   }
   assert.deepEqual(jointIndices('pushup', 'left'), [11, 13, 15, 23, 27]);
   assert.deepEqual(jointIndices('pushup', 'right'), [12, 14, 16, 24, 28]);
+});
+
+for (const kind of ['shoulderpress', 'lateralraise', 'kneepushup', 'wallpushup', 'row', 'tricepsextension', 'hiphinge', 'bridge', 'lunge']) {
+  test(`${kind} counts full cycles, rejects partial motion and preserves counts across resets`, () => {
+    for (const aspect of [.5, 1, 2]) {
+      const counter = createRepCounter(kind);
+      const make = (angle, time) => movementFrame(kind, angle, time, aspect);
+      let end = replay(counter, [90, 180, 130, 180, 90, 180], 0, make);
+      assert.equal(counter.snapshot().reps, 1, `${kind} aspect ${aspect}`);
+      end = replay(counter, [90], end, make);
+      counter.resetMotion();
+      replay(counter, [180], end, make);
+      assert.equal(counter.snapshot().reps, 1);
+    }
+  });
+  test(`${kind} discards unfinished reps after joint loss, confidence loss, stale or duplicate frames`, () => {
+    for (const fault of ['missing', 'confidence', 'stale', 'duplicate']) {
+      const counter = createRepCounter(kind), make = (angle, time) => movementFrame(kind, angle, time);
+      const end = replay(counter, [180, 90], 0, make);
+      if (fault === 'duplicate') {
+        replay(counter, [180], 0, make); assert.equal(counter.snapshot().reps, 0); continue;
+      }
+      const bad = make(90, end);
+      if (fault === 'missing') bad.joints[0] = undefined;
+      if (fault === 'confidence') bad.joints.at(-1).visibility = .1;
+      if (fault !== 'stale') counter.update(bad);
+      replay(counter, [180], end + (fault === 'stale' ? 1000 : 100), make);
+      assert.equal(counter.snapshot().reps, 0, `${kind} ${fault}`);
+    }
+  });
+}
+test('posture gates separate raises, presses, wall and floor push-ups', () => {
+  const arm = movementFrame('shoulderpress', 90);
+  arm.joints[2].y = .65; arm.joints[3].y = .55;
+  assert.equal(trackingAngle(arm, 'shoulderpress'), null);
+  const extension = movementFrame('shoulderpress', 180);
+  extension.joints[3] = { ...extension.joints[3], x: extension.joints[2].x + .13, y: extension.joints[2].y };
+  assert.equal(trackingAngle(extension, 'shoulderpress'), null); // Overhead triceps bend, with upper arm held up.
+  const raise = movementFrame('lateralraise', 90);
+  raise.joints[3] = { ...raise.joints[3], x: raise.joints[2].x, y: .27 };
+  assert.equal(trackingAngle(raise, 'lateralraise'), null);
+  assert.equal(trackingAngle(movementFrame('wallpushup', 90), 'pushup'), null);
+  assert.equal(trackingAngle(movementFrame('kneepushup', 90), 'wallpushup'), null);
+  assert.deepEqual(jointIndices('kneepushup', 'right'), [12, 14, 16, 24, 26]);
+  assert.deepEqual(jointIndices('lateralraise', 'left'), [23, 11, 13, 15]);
+});
+
+test('rows reject upright curls and lost knees; triceps extensions reject shoulder presses', () => {
+  const upright = movementFrame('row', 90);
+  upright.joints[1] = { ...upright.joints[1], x: upright.joints[0].x, y: .1 };
+  assert.equal(trackingAngle(upright, 'row'), null);
+  const floor = movementFrame('row', 90);
+  floor.joints[4].y = floor.joints[0].y;
+  assert.equal(trackingAngle(floor, 'row'), null);
+  for (const joint of [0, 1, 2, 3, 4]) {
+    const hidden = movementFrame('row', 90); hidden.joints[joint].visibility = .1;
+    assert.equal(trackingAngle(hidden, 'row'), null);
+  }
+  assert.equal(trackingAngle(movementFrame('shoulderpress', 90), 'tricepsextension'), null);
+  assert.equal(trackingAngle(movementFrame('tricepsextension', 90), 'shoulderpress'), null);
+  assert.deepEqual(jointIndices('row', 'right'), [24, 12, 14, 16, 26]);
+  assert.deepEqual(jointIndices('tricepsextension', 'left'), [23, 11, 13, 15]);
 });
 
 test('push-ups require a complete top-bottom-top cycle and reject shallow movement', () => {

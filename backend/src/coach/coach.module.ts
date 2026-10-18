@@ -6,10 +6,12 @@ import { ExerciseDbModule } from '../exercises/exercisedb.module.js';
 import { CoachController } from './coach.controller.js';
 import { CoachService } from './coach.service.js';
 import { CoachProgram, CoachProgramSchema } from './coach-program.schema.js';
+import { CoachPreviewModule } from './coach-preview.module.js';
 
 @Module({
   imports: [
     ExerciseDbModule,
+    CoachPreviewModule,
     MongooseModule.forFeature([
       { name: Profile.name, schema: ProfileSchema },
       { name: Settings.name, schema: SettingsSchema },

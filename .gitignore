@@ -12,3 +12,13 @@ frontend/playwright-report/
 .env
 .env.*
 !.env.example
+.venv-pose/
+__pycache__/
+*.pyc
+artifacts/audit-*.json
+artifacts/remediation-*-audit.json
+# RepDB permits in-app use; generated catalog data must not be republished in Git or as an API.
+frontend/.generated/
+artifacts/pose-*.json
+# Qualcomm research inputs, annotations, landmarks and reports stay local.
+research-data/

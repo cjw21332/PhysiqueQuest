@@ -1,0 +1,29 @@
+flowchart LR
+    subgraph device[User device]
+        phone[Expo Go native shell]
+        client[Next.js page in WebView or browser]
+        counter[Local video decoding and pose worker]
+        phone -->|Native camera / sensors / messages| client
+        client -->|Video frames on device| counter
+        counter -->|Reviewed reps and exercise suggestion| client
+    end
+    subgraph host[Development computer on the same LAN]
+        metro[Expo Metro: usually 8081]
+        web[Next.js frontend: 3000]
+        api[Shared NestJS API: 4000 /api]
+    end
+    subgraph external[Internet dependencies]
+        db[(MongoDB Atlas: 15 collections)]
+        exercise[ExerciseDB API]
+        media[GIF media host / CDN]
+        food[Gemini and USDA]
+        optional[Configured email and alert providers]
+    end
+    metro -. Development bundle .-> phone
+    client -->|Pages, JS, local model and WASM| web
+    client -->|JSON and JWT for protected routes| api
+    client -->|Direct GIF requests| media
+    api -->|Mongoose database connection| db
+    api -->|Exercise browsing and new saved programs| exercise
+    api -. Food photo analysis and nutrient lookup .-> food
+    api -. Feature enabled and configured .-> optional

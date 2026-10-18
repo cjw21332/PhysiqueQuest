@@ -1,6 +1,5 @@
-import { BadRequestException, Body, Controller, Get, Module, Param, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Module, Post } from '@nestjs/common';
 import { z } from 'zod';
-import { ConfigModule } from '@nestjs/config';
 import { ExerciseDbModule } from '../exercises/exercisedb.module.js';
 import { ExerciseDbService, SOURCE } from '../exercises/exercisedb.service.js';
 import { CoachPlanner } from './coach-planner.js';
@@ -35,29 +34,17 @@ const profileSchema = z.object({
 }).strict();
 
 @Controller('coach')
-export class StandaloneCoachController {
+export class CoachPreviewController {
   constructor(private readonly catalog: ExerciseDbService) {}
-  @Get('status')
-  status() { return { status: 'ready', source: SOURCE, persistence: 'stateless', media: 'GIF', attribution: 'ExerciseDB by AscendAPI — https://oss.exercisedb.dev', coverageNote: 'Plans use a bounded live catalog selection. Availability depends on ExerciseDB.' }; }
   @Post('plan')
   async plan(@Body() body: unknown) {
     const parsed = z.object({ profile: profileSchema }).strict().safeParse(body);
     if (!parsed.success) throw new BadRequestException({ message: 'Invalid program context', errors: parsed.error.flatten() });
     const rows = await this.catalog.getForPlan(parsed.data.profile.equipment, parsed.data.profile.goal);
-    return { ...new CoachPlanner().build(parsed.data.profile, rows.map(row => ({ ...row, id: row._id }))), source: SOURCE, coverageNote: 'Plan generated from a bounded live ExerciseDB selection.' };
+    return { ...new CoachPlanner().build(parsed.data.profile, rows.map(row => ({ ...row, id: row._id }))), source: rows.some(row => row.source === 'PhysiqueQuest') ? `${SOURCE} + PhysiqueQuest` : SOURCE, coverageNote: 'Plan generated from a bounded ExerciseDB selection and available PhysiqueQuest manual exercises.' };
   }
 }
 
-@Controller('exercises')
-export class StandaloneExercisesController {
-  constructor(private readonly catalog: ExerciseDbService) {}
-  @Get()
-  list(@Query() query: { search?: string; muscle?: string; equipment?: string; page?: string; limit?: string }) {
-    return this.catalog.findAll({ ...query, page: Number(query.page ?? 1), limit: Number(query.limit ?? 12) });
-  }
-  @Get(':id')
-  detail(@Param('id') id: string) { return this.catalog.findBySlug(id); }
-}
-
-@Module({ imports: [ConfigModule.forRoot(), ExerciseDbModule], controllers: [StandaloneCoachController, StandaloneExercisesController] })
-export class StandaloneCoachModule {}
+// Compatibility preview route lives inside the main API and shares its provider singleton.
+@Module({ imports: [ExerciseDbModule], controllers: [CoachPreviewController] })
+export class CoachPreviewModule {}

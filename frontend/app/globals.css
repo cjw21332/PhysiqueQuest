@@ -8630,3 +8630,8 @@ textarea:focus {
 .admin-reference .emergency-event-row strong { font-size: 16px; font-weight: 600; }
 
 .nutrition-target-editor{padding:16px;background:#fff;border-radius:12px}.nutrition-target-editor form,.nutrition-target-editor label{display:grid;gap:8px}.nutrition-target-editor input{min-height:44px;max-width:100%;border:1px solid #cbd5ce;border-radius:8px;padding:8px}
+
+.admin-exercise-row .admin-row-actions { grid-column: 1 / -1; display: flex; gap: 12px; padding-top: 10px; }
+.admin-row-actions button { min-height: 44px; padding: 8px 14px; }
+.admin-delete-confirm { grid-column: 1 / -1; padding: 14px; background: #f4f7f4; border: 1px solid #cbd5ce; border-radius: 10px; line-height: 1.5; }
+.admin-delete-confirm button { margin: 8px 8px 0 0; min-height: 44px; }

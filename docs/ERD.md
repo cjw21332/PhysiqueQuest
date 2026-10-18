@@ -14,7 +14,7 @@ The collection image shows key fields for readability; the definitions below pro
 
 ## Collection relationships
 
-There are **14 active collections**. MongoDB references are not database-enforced foreign keys. `PK` means MongoDB document identity; `UK` means a declared unique index. Relationship lines show intended ownership. A user may have no document yet in an optional one-per-user collection.
+There are **15 active collections**. MongoDB references are not database-enforced foreign keys. `PK` means MongoDB document identity; `UK` means a declared unique index. Relationship lines show intended ownership. A user may have no document yet in an optional one-per-user collection.
 
 ```mermaid
 erDiagram
@@ -38,6 +38,7 @@ erDiagram
         string email UK
         string name
         string passwordHash
+        number sessionVersion "JWT revocation version"
         string role "user or admin"
         boolean isActive
         number failedLoginAttempts
@@ -161,8 +162,18 @@ erDiagram
         ObjectId _id PK
         ObjectId userId
         string tokenHash UK
+        string requestId UK "optional legacy; required for new requests"
+        number attempts
+        Date verifiedAt "nullable"
+        string grantHash UK "optional"
+        Date grantExpiresAt "optional"
         Date expiresAt "TTL index"
         Date usedAt "nullable"
+    }
+    auth_rate_limits {
+        string _id PK "hashed bucket or cooldown key"
+        number hits
+        Date expiresAt "TTL index"
     }
     admin_exercises {
         ObjectId _id PK
@@ -279,7 +290,7 @@ erDiagram
 | `workout_sessions` | `(userId, requestKey)` where `requestKey` is a string; `(userId, appliedRecordingIds element)` where the array contains strings, a unique multikey index |
 | `leaderboard_snapshots` | `(period, boundaryKey, subjectId)` |
 | `safety_alert_events` | `(userId, idempotencyKey)` |
-| `password_recovery_tokens` | `tokenHash`; `expiresAt` also has an expiry index |
+| `password_recovery_tokens` | `tokenHash`; partial unique `requestId` and `grantHash` string indexes; `expiresAt` TTL |
 | `progress_entries`, `sign_in_events`, `admin_exercises` | No additional unique constraint declared |
 
 These are schema-declared constraints; this document does not verify whether an existing deployment has created every index. Recovery-token expiry uses MongoDB TTL cleanup, which is asynchronous.
@@ -313,3 +324,11 @@ These are schema-declared constraints; this document does not verify whether an 
 | Admin exercise catalog | `backend/src/exercises/schemas/exercise.schema.ts` |
 
 Summary: users own personal settings, logs, and histories; workouts embed their exercise snapshots and set results; nutrition embeds meals and water; the exercise catalog is shared. Logical associations are documented separately from declared Mongoose references.
+
+## Related documentation
+
+See the [data dictionary](DATA_DICTIONARY.md) for field types, defaults, constraints, and explanations, and the [network layout](NETWORK_LAYOUT.md) for ports, services, and request flows.
+
+## Recovery hardening (October 18)
+
+`users.sessionVersion` revokes earlier JWTs after a reset. Recovery requests bind codes to a random request ID, cap guesses, and issue a short-lived single-use grant. Grant consumption, password change and version increment share a MongoDB transaction. `auth_rate_limits` has hashed string keys and a TTL expiry, without a user reference or timestamps. It is the fifteenth collection. Deploy on a replica set/Atlas and verify indexes before enabling the new recovery flow.

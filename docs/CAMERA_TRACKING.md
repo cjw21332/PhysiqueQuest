@@ -5,16 +5,18 @@
 From Camera check, choose **Upload video**, then select an MP4 or MOV up to 20 MB
 and 2 minutes long. **Scan automatically when video opens** is enabled by default.
 The app analyzes the clip once, checks both sides, and suggests a generic **Squat**,
-**Biceps curl**, or **Push-up** plus its repetition count. Review/correct the result
+**Biceps curl**, **Push-up**, **Overhead press**, or **Lateral raise** plus its repetition count. Review/correct the result
 before saving. Saved recording titles in the preview, history and report use the
 reviewed exercise and count, for example **Push-up · 12 reps**. The original local
 video filename is retained; the app does not rename or upload the source file.
 
 Turn off automatic scanning before selecting a file for manual logging. You can
-also correct the exercise after scanning. Manual counting supports **Bodyweight
-squat**, **Goblet squat**, **Sumo squat**, **Standing biceps curl**, **Hammer curl**,
-**Seated biceps curl**, or **Push-up** with an explicitly selected camera-facing
-side. Choose **Count reps locally** to count using that selected rule.
+also correct the exercise after scanning. Selecting a counting rule yourself supports
+27 presets: the squat, curl, push-up, press, raise, row and triceps-extension choices, plus bodyweight hip hinges, dumbbell/barbell Romanian deadlifts, bodyweight/dumbbell glute bridges, and bodyweight/dumbbell stationary lunges. See the [configurable movement registry](CONFIGURABLE_COUNTER.md).
+Choose a visible side and **Count reps locally**. Hip hinges, bridges, stationary lunges, rows, overhead triceps extensions, knee/wall push-ups and variations
+require explicit selection; automatic suggestions do not identify every variation.
+
+New movement families use estimated world-coordinate angles when available, with image visibility/posture gates. Missing world output uses image measurement; changes between spaces reset unfinished motion. Existing movement families retain their prior image measurements.
 
 The browser/WebView
 decodes frames in order at 100 ms video-time intervals and uses the same local
@@ -28,29 +30,32 @@ Identification uses experimental movement rules on the existing model's full
 33-landmark output, not a newly trained classifier. MediaPipe supplies body
 landmarks rather than exercise labels; see the [official pose landmarker
 guide](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker).
-Six small counters (three movement families, two sides) consume the same pose
+Ten small counters (five movement families, two sides) consume the same pose
 inference per sampled frame. No second model, backend inference, extra video pass,
 or per-frame database write is introduced. Landmark frames are discarded as they
 are processed; only reviewed results are persisted.
 
-Use one person performing one supported exercise per clip, side-on, with their
-full body visible. Identification requires at least one completed repetition,
+Use one person performing one supported exercise per clip, with the required
+joints visible. Squats/curls/floor push-ups need a side view. Lateral-raise
+identification requires both shoulders visible from the front; overhead presses
+need the hip, shoulder, elbow and wrist visible from the front or a slight angle. Identification requires at least one completed repetition,
 at least ten eligible frames and eligible tracking in at least half the sampled
 frames. These are implementation thresholds, not measured confidence scores or
 accuracy statistics. Static poses, partial repetitions, insufficient visibility,
 and competing completed movement-family cycles yield no automatic label. The
 user must select an exercise before an unidentified clip can be saved.
 
-The app does not distinguish squat/curl variations or recognize equipment from
-landmarks. Automatically identified squats and curls therefore retain generic
+The app does not distinguish exercise variations or recognize equipment from
+landmarks. Automatically identified squats, curls, presses and raises retain generic
 names and empty equipment until a user explicitly selects a preset. It does not
 split multi-exercise videos into separate entries, identify arbitrary catalog
 exercises, assess form, or calculate calories. Real exercise videos and physical
 phones still need validation; synthetic geometry tests are not an accuracy study.
-Automatic results carry `movement-rules-v1/rep-counter-v2`; manual-rule counting
-retains `rep-counter-v2`. Detected and reviewed rep counts remain separate.
-Generic detected movements use `movement-squat`, `movement-curl`, and
-`movement-pushup` identities, with the counting preset stored separately. This
+Automatic results carry `movement-rules-v3/rep-counter-v5`; manual-rule counting
+uses `rep-counter-v5`. Detected and reviewed rep counts remain separate.
+Generic detected movements use `movement-squat`, `movement-curl`,
+`movement-pushup`, `movement-shoulderpress`, and `movement-lateralraise` identities,
+with the counting preset stored separately. This
 keeps an uncertain variation from being merged into a specifically selected
 exercise's personal records.
 
@@ -85,19 +90,18 @@ Squat and curl variations reuse their existing movement rules with separate IDs
 and filming guidance. Push-ups use elbow bending (at most 100°) and extension
 (at least 155°), plus visible shoulder/hip/ankle alignment and a near-horizontal
 body to reject standing arm bends. Film standard floor push-ups from a level,
-side-on camera; knee and incline push-ups are not supported. These checks only
-gate counting and are not validated assessments of technique. All seven choices
-reuse the existing model and frame limits, with no additional backend inference.
+side-on camera. Knee push-ups use the knee as the body support landmark; wall
+push-ups require an upright body and hands forward near shoulder height. Incline
+push-ups do not have a dedicated rule. Presses require elbow extension overhead
+and bending near shoulder level; lateral raises use shoulder elevation with a
+mostly extended elbow. These checks gate counting and do not assess technique.
+Row rules require a hinged torso and visible knee; triceps-extension rules require
+the upper arm overhead throughout the cycle. All twenty-seven choices reuse the same model and frame limits, without backend inference.
 
-Open **AI Coach** and choose **Bodyweight squat** or **Standing biceps curl** under
-**Camera rep counting · beta**. Select the side facing the camera, then enable the
-camera. Position the required joints as directed. After finishing, review/correct
-the count and save the workout. The starter exercises are local presets and do
-not depend on an external catalog. These rules are experimental rather than
-validated exercise-form assessments:
-
-- `camera-squat`: Bodyweight squat; hip/knee/ankle movement.
-- `camera-curl`: Standing biceps curl; shoulder/elbow/wrist movement, one arm at a time.
+Live camera beta entry points remain hidden. The shared counter and native bridge
+support the added kinds for a future validated camera rollout; this change does
+not re-enable those hidden screens. Uploaded-video counting is the accessible
+workflow. See [counter expansion and verification](REP_COUNTER_EXPANSION.md).
 
 ## Browser
 
@@ -116,7 +120,7 @@ the camera again. Model/camera failures retain the manual review/save path.
 
 The app integrates `expo-mediapipe-pose` 0.3.0, targeting the existing Expo 57 /
 React Native 0.86 versions. Native capture/inference stays on the device; only
-selected joints (three for squats/curls, five for push-ups), their confidence,
+selected joints (three for squats/curls, four for presses/raises/triceps extensions/hinges/bridges, five for push-ups/rows, six for stationary lunges), their confidence,
 aspect ratio and timestamps cross the
 WebView bridge. Native tracking uses the same shared counter as the browser.
 It starts at 10 inferences/second, disables segmentation and skeleton overlays,

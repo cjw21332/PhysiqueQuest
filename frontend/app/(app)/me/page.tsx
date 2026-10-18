@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import MeSection from '../../../sections/Me Section/MeSection';
 import LogoutModal from '../../../components/LogoutModal';
-import { getCurrentUser, logout } from '../../../lib/auth';
+import { logout } from '../../../lib/auth';
 import { useCurrentProfile } from '../../../hooks/useCurrentProfile';
 import ProfileLoadState from '../../../components/ProfileLoadState';
 import { navigate } from '../../../lib/navigation';

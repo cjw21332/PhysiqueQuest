@@ -19,7 +19,7 @@ import { formatLocalDate } from '../../lib/localDate.mjs';
 
 type View = 'nutrition' | 'review' | 'add' | 'logs' | 'history' | 'edit';
 type ScanStatus = 'loading' | 'ready' | 'error';
-export default function ScanSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
+export default function ScanSection({ profile: _profile, onLogoutRequest: _onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const [view,setView]=useState<View>('nutrition');
   const contentRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{contentRef.current?.scrollTo(0,0);},[view]);

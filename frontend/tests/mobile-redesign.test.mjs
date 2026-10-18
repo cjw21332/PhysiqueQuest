@@ -51,7 +51,7 @@ test('notifications pin real safety alerts and preserve truthful actions', async
   assert.match(file, /Safety notice · pinned/);
   assert.match(file, /Mark as read/);
   assert.match(file, /notification-unread-label/);
-  assert.match(file, /aria-label=\{\`\$\{group\} notifications\`\}/);
+  assert.match(file, /aria-label=\{`\$\{group\} notifications`\}/);
   assert.match(styles, /\.home-notifications \.notification-safety-card/);
   assert.match(styles, /\.home-notifications \.notification-item\.unread/);
 });

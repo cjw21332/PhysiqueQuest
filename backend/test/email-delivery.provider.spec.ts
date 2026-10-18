@@ -37,7 +37,7 @@ describe('EmailDeliveryProvider', () => {
         template_params: {
           email: 'member@example.com',
           passcode: '123456',
-          time: '30 minutes',
+          time: '10 minutes',
         },
       }),
     }));
@@ -69,7 +69,7 @@ describe('EmailDeliveryProvider', () => {
         template: 'password-reset',
         to: 'member@example.com',
         token: '123456',
-        expiresInMinutes: 30,
+        expiresInMinutes: 10,
       }),
     }));
   });

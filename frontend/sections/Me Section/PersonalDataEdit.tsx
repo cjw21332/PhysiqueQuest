@@ -2,7 +2,6 @@
 import { useState, useMemo } from 'react';
 import type { Profile } from '../Home/types';
 import MeEditLayout from './MeEditLayout';
-import { Icon } from '../Home/icons';
 
 type Props = {
   profile: Profile;

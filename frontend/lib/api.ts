@@ -1,15 +1,6 @@
 // API client configuration
 import { clearAuthSession } from './session';
 import { resolveApiBaseUrl } from './apiBaseUrl.mjs';
-import { resolveCoachBaseUrl } from './coachBaseUrl.mjs';
-
-export function getCoachApiBaseUrl() {
-  let runtime: string | undefined;
-  try { if (typeof window !== 'undefined') runtime = localStorage.getItem('physiquequest-runtime-coach-url') ?? undefined; } catch { /* Optional runtime override. */ }
-  const base = resolveCoachBaseUrl(process.env.NEXT_PUBLIC_COACH_API_URL, runtime, typeof window === 'undefined' ? undefined : window.location);
-  if (!base) throw new Error('The AI Coach service address is invalid. Check the app connection settings.');
-  return base;
-}
 
 export function getApiBaseUrl() {
   let runtimeApiUrl: string | undefined;
@@ -58,6 +49,7 @@ export interface ExerciseRecord {
   difficulty?: string; pictureUrl?: string; videoUrl?: string; instructions?: string[];
   trackingStatus?: string; pose?: 'missing' | 'ready' | 'training';
   gifUrl?: string; description?: string; checks?: string[]; recommended?: string; source?: string;
+  illustrations?: { label: string; url: string }[];
 }
 export interface ExerciseCatalog { items: ExerciseRecord[]; total: number; page: number; limit: number; pages: number; source?: string; coverageNote?: string; }
 export interface ProgressRecord { _id: string; metric: 'weight' | 'waist' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
@@ -401,9 +393,12 @@ class ApiClient {
   async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }
 
   async getAuthMe() { return this.request<{ id: string; email: string; role: 'user' | 'admin' }>('/auth/me'); }
-  async requestPasswordReset(email: string) { return this.request<{ accepted: boolean; delivery: 'queued' | 'unavailable'; code?: string; reason?: string }>('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }); }
-  async verifyPasswordResetCode(code: string) { return this.request<{ verified: boolean }>('/auth/password-reset/verify', { method: 'POST', body: JSON.stringify({ code }) }); }
-  async confirmPasswordReset(data: { code: string; password: string }) { return this.request<{ updated: boolean }>('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify(data) }); }
+  async requestPasswordReset(email: string) { return this.request<{ accepted: boolean; requestId: string; delivery: 'queued' | 'unavailable'; code?: string; reason?: string }>('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }); }
+  async verifyPasswordResetCode(requestId: string, code: string) { return this.request<{ verified: boolean; resetToken: string }>('/auth/password-reset/verify', { method: 'POST', body: JSON.stringify({ requestId, code }) }); }
+  async confirmPasswordReset(data: { resetToken: string; password: string }) { return this.request<{ updated: boolean }>('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify(data) }); }
+  async requestPasswordChange() { return this.request<{ accepted: boolean; requestId: string; email: string; delivery: 'queued' | 'unavailable'; reason?: string }>('/auth/password-change/request', { method: 'POST', body: '{}' }); }
+  async verifyPasswordChange(requestId: string, code: string) { return this.request<{ verified: boolean; resetToken: string }>('/auth/password-change/verify', { method: 'POST', body: JSON.stringify({ requestId, code }) }); }
+  async confirmPasswordChange(data: { resetToken: string; password: string }) { return this.request<{ updated: boolean }>('/auth/password-change/confirm', { method: 'POST', body: JSON.stringify(data) }); }
 
   async getProgress(metric: string, limit = 90) { return this.request<any>(`/progress?metric=${encodeURIComponent(metric)}&limit=${limit}`); }
   async addProgress(data: any) { return this.request<any>('/progress', { method: 'POST', body: JSON.stringify(data) }); }
@@ -450,19 +445,20 @@ class ApiClient {
     return this.request<AdminAlertRow[]>(`/admin/alerts?${qs.toString()}`);
   }
 
-  async getExercises(query?: { search?: string; muscle?: string; equipment?: string; page?: number; limit?: number }) {
+  async getExercises(query?: { source?: string; search?: string; muscle?: string; equipment?: string; page?: number; limit?: number }) {
     const qs = new URLSearchParams();
+    if (query?.source) qs.set('source', query.source);
     if (query?.search) qs.set('search', query.search);
     if (query?.muscle) qs.set('muscle', query.muscle);
     if (query?.equipment) qs.set('equipment', query.equipment);
     if (query?.page) qs.set('page', String(query.page));
     qs.set('limit', String(query?.limit ?? 12));
-    return this.request<ExerciseCatalog>(`/exercises?${qs.toString()}`, { timeoutMs: 60_000 }, getCoachApiBaseUrl());
+    return this.request<ExerciseCatalog>(`/exercises?${qs.toString()}`, { timeoutMs: 60_000 });
   }
-  async getExercise(slug: string) { return this.request<ExerciseRecord>(`/exercises/${encodeURIComponent(slug)}`, { timeoutMs: 30_000 }, getCoachApiBaseUrl()); }
+  async getExercise(slug: string) { return this.request<ExerciseRecord>(`/exercises/${encodeURIComponent(slug)}`, { timeoutMs: 30_000 }); }
   async getIndependentCoachPlan(profile: Record<string, unknown>) {
     const { goal, days, duration, equipment, conditions, createdAt } = profile;
-    return this.request<CoachPlanRecord>('/coach/plan', { method: 'POST', timeoutMs: 60_000, body: JSON.stringify({ profile: { goal, days, duration, equipment, conditions, createdAt } }) }, getCoachApiBaseUrl());
+    return this.request<CoachPlanRecord>('/coach/plan', { method: 'POST', timeoutMs: 60_000, body: JSON.stringify({ profile: { goal, days, duration, equipment, conditions, createdAt } }) });
   }
 
   // Food scanning

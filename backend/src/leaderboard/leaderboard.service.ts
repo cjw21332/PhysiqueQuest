@@ -44,9 +44,12 @@ export class LeaderboardService {
     const start = this.periodStart(period, now);
     const boundaryKey = this.boundaryKey(period, start);
 
-    const points = await this.computePoints(start);
+    const [points, hidden, previous] = await Promise.all([
+      this.computePoints(start),
+      this.hiddenUsers(),
+      this.previousRanks(period, boundaryKey),
+    ]);
     const names = await this.names([...points.keys(), userId]);
-    const hidden = await this.hiddenUsers();
 
     const ranked = [...points.entries()]
       .map(([id, value]) => ({ userId: id, name: names.get(id) ?? 'Athlete', points: value }))
@@ -57,7 +60,6 @@ export class LeaderboardService {
       ranked.push({ userId, name: names.get(userId) ?? 'You', points: 0, rank: ranked.length + 1 });
     }
 
-    const previous = await this.previousRanks(period, boundaryKey);
     const toStanding = (entry: { userId: string; name: string; points: number; rank: number }): Standing => {
       const priorRank = previous.get(entry.userId);
       const movement = priorRank === undefined || priorRank === entry.rank ? 'same' : priorRank - entry.rank;
@@ -94,7 +96,7 @@ export class LeaderboardService {
         ...(start ? [{ $match: { firstAt: { $gte: start } } }] : []),
         { $project: { _id: 0, userId: '$_id.userId', day: '$_id.day' } },
       ]),
-      this.nutrition.find({}).select('userId meals water').lean().exec(),
+      this.nutrition.find({}).select('userId meals.date water.date water.glasses').lean().exec(),
     ]);
 
     const points = new Map<string, number>();
@@ -118,7 +120,7 @@ export class LeaderboardService {
   }
 
   private async names(ids: string[]): Promise<Map<string, string>> {
-    const valid = ids.filter(id => Types.ObjectId.isValid(id));
+    const valid = [...new Set(ids.filter(id => Types.ObjectId.isValid(id)))];
     if (!valid.length) return new Map();
     const users = await this.users.find({ _id: { $in: valid.map(id => new Types.ObjectId(id)) } }).select('name').lean().exec();
     return new Map((users as { _id: unknown; name?: string }[]).map(user => [String(user._id), user.name ?? 'Athlete']));
@@ -126,7 +128,7 @@ export class LeaderboardService {
 
   /** Users who turned off leaderboard visibility in privacy settings. */
   private async hiddenUsers(): Promise<Set<string>> {
-    const records = await this.settings.find({}).select('userId values').lean().exec();
+    const records = await this.settings.find({ 'values.showLeaderboard': false }).select('userId values.showLeaderboard').lean().exec();
     return new Set(
       (records as { userId: unknown; values?: Record<string, unknown> }[])
         .filter(record => record.values?.showLeaderboard === false)

@@ -4,13 +4,16 @@ import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent, type 
 import { api } from '../../lib/api';
 
 type Step = 'reset' | 'verify' | 'password' | 'success';
-type Props = { onClose: () => void; onSuccess: () => void };
+type Props = { onClose: () => void; onSuccess: () => void; mode?: 'recovery' | 'change' };
 const OTP_LENGTH = 6;
 const RESEND_DELAY = 60;
 
-export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
+export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'recovery' }: Props) {
+  const changingPassword = mode === 'change';
   const [step, setStep] = useState<Step>('reset');
   const [email, setEmail] = useState('');
+  const [requestId, setRequestId] = useState('');
+  const [resetToken, setResetToken] = useState('');
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,6 +23,21 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const codeInputs = useRef<Array<HTMLInputElement | null>>([]);
+
+  useEffect(() => {
+    if (!changingPassword) return;
+    let active = true;
+    api.getAuthMe().then(user => { if (active) setEmail(user.email); })
+      .catch(err => { if (active) setError(err instanceof Error ? err.message : 'Could not load your account email. Close this window and try again.'); });
+    return () => { active = false; };
+  }, [changingPassword]);
+
+  const sendCode = async () => {
+    if (!changingPassword) return api.requestPasswordReset(email.trim());
+    const response = await api.requestPasswordChange();
+    setEmail(response.email);
+    return { ...response, code: undefined };
+  };
 
   useEffect(() => {
     if (step !== 'verify' || resendSeconds === 0) return;
@@ -32,11 +50,13 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     setBusy(true);
     setError('');
     try {
-      const response = await api.requestPasswordReset(email.trim());
+      const response = await sendCode();
       if (response.delivery === 'unavailable' && !response.code) {
         setError(response.reason ?? 'Password reset email is unavailable. Please contact support or try again later.');
         return;
       }
+      setRequestId(response.requestId);
+      setResetToken('');
       setCode(response.delivery === 'unavailable' && response.code ? response.code : '');
       setResendSeconds(RESEND_DELAY);
       setStep('verify');
@@ -52,11 +72,13 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     setBusy(true);
     setError('');
     try {
-      const response = await api.requestPasswordReset(email.trim());
+      const response = await sendCode();
       if (response.delivery === 'unavailable' && !response.code) {
         setError(response.reason ?? 'Password reset email is unavailable. Please contact support or try again later.');
         return;
       }
+      setRequestId(response.requestId);
+      setResetToken('');
       setCode(response.delivery === 'unavailable' && response.code ? response.code : '');
       setResendSeconds(RESEND_DELAY);
     } catch (err) {
@@ -75,7 +97,9 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     }
     setBusy(true);
     try {
-      await api.verifyPasswordResetCode(code);
+      const verified = changingPassword ? await api.verifyPasswordChange(requestId, code) : await api.verifyPasswordResetCode(requestId, code);
+      setResetToken(verified.resetToken);
+      setCode('');
       setStep('password');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That verification code is invalid or expired.');
@@ -127,7 +151,9 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     }
     setBusy(true);
     try {
-      await api.confirmPasswordReset({ code: code.trim(), password });
+      if (changingPassword) await api.confirmPasswordChange({ resetToken, password });
+      else await api.confirmPasswordReset({ resetToken, password });
+      setResetToken('');
       setStep('success');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update the password.');
@@ -140,23 +166,23 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
 
   return <div className="forgot-password-overlay">
     {step === 'verify' && <div className="forgot-password-modal forgot-password-modal-background" aria-hidden="true" inert>
-      <div className="modal-header"><h3>Reset your password</h3><span className="close-btn">×</span></div>
+      <div className="modal-header"><h3>{changingPassword ? 'Change your password' : 'Reset your password'}</h3><span className="close-btn">×</span></div>
       <div className="modal-body">
-        <p className="modal-description">Enter the email address you signed up with and we’ll send you a verification code to reset your password.</p>
+        <p className="modal-description">{changingPassword ? 'We’ll send a verification code to your registered account email.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
         <label className="forgot-field"><span>Email address</span><input type="email" value={email} readOnly /></label>
       </div>
       <div className="modal-footer"><button className="btn-primary" disabled>Send OTP Verification</button></div>
     </div>}
     <div className={`forgot-password-modal${step === 'verify' ? ' forgot-password-modal-otp' : ''}`}>
     {step === 'reset' && <>
-      <div className="modal-header"><h3>Reset your password</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>{changingPassword ? 'Change your password' : 'Reset your password'}</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
       <form onSubmit={event => void requestCode(event)}>
         <div className="modal-body">
-          <p className="modal-description">Enter the email address you signed up with and we’ll send you a verification code to reset your password.</p>
-          <label className="forgot-field"><span>Email address</span><input type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} placeholder="you@email.com" /></label>
+          <p className="modal-description">{changingPassword ? 'We’ll send a verification code to your registered account email.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
+          <label className="forgot-field"><span>Email address</span><input type="email" autoComplete="email" required readOnly={changingPassword} value={email} onChange={event => setEmail(event.target.value)} placeholder={changingPassword ? 'Loading account email…' : 'you@email.com'} /></label>
           {error && <p className="error-hint" role="alert">{error}</p>}
         </div>
-        <div className="modal-footer"><button className="btn-primary" disabled={busy}>{busy ? 'Sending…' : 'Send OTP Verification'}</button></div>
+        <div className="modal-footer"><button className="btn-primary" disabled={busy || (changingPassword && !email)}>{busy ? 'Sending…' : 'Send OTP Verification'}</button></div>
       </form>
     </>}
 

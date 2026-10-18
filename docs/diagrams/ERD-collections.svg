@@ -40,7 +40,7 @@
 <polyline points="1550,200 1600,200 1600,960 1550,960" fill="none" stroke="#8297ac" stroke-width="2" stroke-dasharray="6 5"/>
 <rect x="1185" y="834" width="240.2" height="23" rx="4" fill="#f4f7fb"/>
 <text x="1190" y="850" font-size="14" fill="#435a71">0..1 session : 0..many alerts</text>
-<rect x="625" y="570" width="350" height="198" rx="9" fill="white" stroke="#c7d4e1"/>
+<rect x="625" y="570" width="350" height="222" rx="9" fill="white" stroke="#c7d4e1"/>
 <path d="M634,570 H966 Q975,570 975,579 V610 H625 V579 Q625,570 634,570" fill="#244ea3"/>
 <text x="641" y="597" font-size="18" font-weight="bold" fill="white">users</text>
 <text x="641" y="633" font-size="15" fill="#253e54">_id [PK]: ObjectId</text>
@@ -48,7 +48,8 @@
 <text x="641" y="681" font-size="15" fill="#253e54">name: string</text>
 <text x="641" y="705" font-size="15" fill="#253e54">role: user | admin</text>
 <text x="641" y="729" font-size="15" fill="#253e54">passwordHash: string</text>
-<text x="641" y="753" font-size="15" fill="#253e54">isActive: boolean</text>
+<text x="641" y="753" font-size="15" fill="#253e54">sessionVersion: number</text>
+<text x="641" y="777" font-size="15" fill="#253e54">isActive: boolean</text>
 <rect x="48" y="155" width="350" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
 <path d="M57,155 H389 Q398,155 398,164 V195 H48 V164 Q48,155 57,155" fill="#176b80"/>
 <text x="64" y="182" font-size="18" font-weight="bold" fill="white">profiles</text>
@@ -122,12 +123,14 @@
 <text x="1176" y="1138" font-size="15" fill="#253e54">_id [PK], userId</text>
 <text x="1176" y="1162" font-size="15" fill="#253e54">occurredAt: Date</text>
 <text x="1176" y="1186" font-size="15" fill="#253e54">source: login | register</text>
-<rect x="1160" y="1265" width="390" height="126" rx="9" fill="white" stroke="#c7d4e1"/>
+<rect x="1160" y="1265" width="390" height="174" rx="9" fill="white" stroke="#c7d4e1"/>
 <path d="M1169,1265 H1541 Q1550,1265 1550,1274 V1305 H1160 V1274 Q1160,1265 1169,1265" fill="#176b80"/>
 <text x="1176" y="1292" font-size="18" font-weight="bold" fill="white">password_recovery_tokens</text>
 <text x="1176" y="1328" font-size="15" fill="#253e54">_id [PK], userId</text>
-<text x="1176" y="1352" font-size="15" fill="#253e54">tokenHash [UK]</text>
-<text x="1176" y="1376" font-size="15" fill="#253e54">expiresAt [TTL], usedAt?</text>
+<text x="1176" y="1352" font-size="15" fill="#253e54">requestId [UK], tokenHash [UK]</text>
+<text x="1176" y="1376" font-size="15" fill="#253e54">attempts, verifiedAt?</text>
+<text x="1176" y="1400" font-size="15" fill="#253e54">grantHash? [UK], grantExpiresAt?</text>
+<text x="1176" y="1424" font-size="15" fill="#253e54">expiresAt [TTL], usedAt?</text>
 <rect x="625" y="1120" width="350" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
 <path d="M634,1120 H966 Q975,1120 975,1129 V1160 H625 V1129 Q625,1120 634,1120" fill="#655198"/>
 <text x="641" y="1147" font-size="18" font-weight="bold" fill="white">admin_exercises</text>
@@ -135,8 +138,15 @@
 <text x="641" y="1207" font-size="15" fill="#253e54">name, targetMuscle, equipment</text>
 <text x="641" y="1231" font-size="15" fill="#253e54">status, pose, trackingStatus</text>
 <text x="641" y="1255" font-size="15" fill="#253e54">Shared catalog; no userId</text>
+<rect x="625" y="900" width="350" height="150" rx="9" fill="white" stroke="#c7d4e1"/>
+<path d="M634,900 H966 Q975,900 975,909 V940 H625 V909 Q625,900 634,900" fill="#655198"/>
+<text x="641" y="927" font-size="18" font-weight="bold" fill="white">auth_rate_limits</text>
+<text x="641" y="963" font-size="15" fill="#253e54">_id [PK]: hashed string</text>
+<text x="641" y="987" font-size="15" fill="#253e54">hits: number</text>
+<text x="641" y="1011" font-size="15" fill="#253e54">expiresAt [TTL]: Date</text>
+<text x="641" y="1035" font-size="15" fill="#253e54">Shared buckets; no user reference</text>
 <text x="48" y="48" font-size="30" fill="#15314b">PhysiqueQuest / Collection relationships</text>
-<text x="48" y="82" font-size="16" fill="#52657a">14 MongoDB collections  |  Key fields shown  |  Full field definitions: docs/ERD.md</text>
+<text x="48" y="82" font-size="16" fill="#52657a">15 MongoDB collections  |  Key fields shown  |  Full field definitions: docs/ERD.md</text>
 <text x="48" y="1450" font-size="16" fill="#52657a">Dashed lines: intended document associations; MongoDB does not enforce foreign keys.</text>
 <text x="48" y="1480" font-size="15" fill="#52657a">* coach_programs.userId has no Mongoose ref. Optional alert-to-workout links are not verified by the safety service.</text>
 <text x="48" y="1510" font-size="15" fill="#52657a">PK: document identity   UK: unique index   ?: optional or nullable   Compound keys and legacy-schema notes: docs/ERD.md</text>

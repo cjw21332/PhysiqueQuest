@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
+import { wholeMovementFrame } from './fixtures/rep-frames.mjs';
 
 async function moduleAt(path) {
   const source = await readFile(new URL(path, import.meta.url), 'utf8');
@@ -10,6 +11,41 @@ async function moduleAt(path) {
 }
 const { createExerciseIdentifier } = await moduleAt('../../shared/repCounter.ts');
 const { workoutLabel } = await moduleAt('../lib/workoutLabel.ts');
+
+for (const kind of ['row', 'tricepsextension', 'hiphinge', 'bridge', 'lunge']) for (const side of ['left', 'right']) {
+  test(`selected-only ${kind} from ${side} is not automatically mislabeled as an existing movement`, () => {
+    const identifier = createExerciseIdentifier(); let time = 0;
+    for (const angle of [180, 90, 180, 90, 180]) for (let i = 0; i < 6; i++) {
+      identifier.update(wholeMovementFrame(kind, angle, time, side)); time += 100;
+    }
+    assert.equal(identifier.result(), null);
+  });
+}
+
+for (const kind of ['shoulderpress', 'lateralraise']) for (const side of ['left', 'right']) {
+  test(`identifies ${kind} from ${side} without calling it a curl or squat`, () => {
+    const identifier = createExerciseIdentifier(); let time = 0;
+    for (const angle of [180, 90, 180, 90, 180]) for (let i = 0; i < 6; i++) {
+      identifier.update(wholeMovementFrame(kind, angle, time, side)); time += 100;
+    }
+    assert.equal(identifier.result()?.kind, kind);
+    assert.equal(identifier.result()?.reps, 2);
+    assert.equal(identifier.result()?.trackingPresetId, `camera-${kind}`);
+    assert.equal(identifier.result()?.equipment, '');
+  });
+}
+test('automatic lateral-raise labels require both shoulders and a front view', () => {
+  for (const fault of ['missing', 'side-on']) {
+    const identifier = createExerciseIdentifier(); let time = 0;
+    for (const angle of [180, 90, 180]) for (let i = 0; i < 6; i++) {
+      const frame = wholeMovementFrame('lateralraise', angle, time);
+      if (fault === 'missing') frame.joints[12].visibility = .1;
+      else frame.joints[12].x = frame.joints[11].x + .01;
+      identifier.update(frame); time += 100;
+    }
+    assert.equal(identifier.result(), null);
+  }
+});
 
 function frame(kind, angle, timestamp, side = 'left', aspect = 1) {
   const point = (x, y) => ({ x: x / aspect, y, visibility: 1, presence: 1 });

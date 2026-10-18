@@ -8,7 +8,7 @@ import type { Profile } from './types';
 
 type View = 'dashboard' | 'notifications';
 
-export default function HomeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
+export default function HomeSection({ profile, onLogoutRequest: _onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const [view, setView] = useState<View>('dashboard');
   const [message, setMessage] = useState('');
   const open = (next: View) => { setView(next); setMessage(''); };

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api, type ExerciseCatalog, type ExerciseRecord } from '../../lib/api';
 import { Icon } from '../Home/icons';
+import { getRepDbExercise, getRepDbExercises } from '../../lib/repdb';
 import './libraryreference.css';
 
 const muscles = ['All', 'Chest', 'Back', 'Legs', 'Core', 'Shoulders', 'Arms'];
@@ -11,6 +12,7 @@ const metadata = (item: ExerciseRecord) => [item.targetMuscle || item.group, ite
 
 export default function ExerciseLibrary({ onBack, selectedEquipment = [], backLabel = 'Back to AI Coach' }: { onBack: () => void; selectedEquipment?: string[]; backLabel?: string }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [source, setSource] = useState('exercisedb');
   const [selectedMuscle, setSelectedMuscle] = useState('All');
   const [equipment, setEquipment] = useState(() => selectedEquipment.length === 1 ? equipmentOptions.find(option => option.toLowerCase().replace(/s$/, '') === selectedEquipment[0].toLowerCase().replace(/s$/, '')) || 'Any equipment' : 'Any equipment');
   const [page, setPage] = useState(1);
@@ -20,6 +22,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], backLa
   const [retry, setRetry] = useState(0);
   const [selected, setSelected] = useState<ExerciseRecord | null>(null);
   const [mediaError, setMediaError] = useState(false);
+  const [illustration, setIllustration] = useState(0);
   const [detail, setDetail] = useState<ExerciseRecord | null>(null);
   const [detailError, setDetailError] = useState('');
   const [detailRetry, setDetailRetry] = useState(0);
@@ -35,14 +38,15 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], backLa
     setLoading(true); setError(''); setCatalog(null);
     const timer = window.setTimeout(async () => {
       try {
-        const result = await api.getExercises({ search: searchTerm.trim() || undefined, muscle: selectedMuscle === 'All' ? undefined : selectedMuscle, equipment: equipment === 'Any equipment' ? undefined : equipment, page, limit: 12 });
+        const query = { source: source === 'physiquequest' ? source : undefined, search: searchTerm.trim() || undefined, muscle: selectedMuscle === 'All' ? undefined : selectedMuscle, equipment: equipment === 'Any equipment' ? undefined : equipment, page, limit: 12 };
+        const result = await (source === 'repdb' ? getRepDbExercises(query) : api.getExercises(query));
         if (current) setCatalog(result);
       } catch (err) {
         if (current) setError(err instanceof Error ? err.message : 'Could not load exercises.');
       } finally { if (current) setLoading(false); }
     }, 250);
     return () => { current = false; window.clearTimeout(timer); };
-  }, [searchTerm, selectedMuscle, equipment, page, retry]);
+  }, [source, searchTerm, selectedMuscle, equipment, page, retry]);
 
   useEffect(() => {
     if (!selected) return;
@@ -54,8 +58,8 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], backLa
   useEffect(() => {
     if (!selected) return;
     let current = true;
-    setDetail(null); setDetailError(''); setMediaError(false); setPlaying(false); setFrameReady(false);
-    api.getExercise(selected._id).then(record => { if (current) setDetail(record); }).catch(err => { if (current) setDetailError(err instanceof Error ? err.message : 'Could not load exercise details.'); });
+    setDetail(null); setDetailError(''); setMediaError(false); setPlaying(false); setFrameReady(false); setIllustration(0);
+    (selected.source === 'RepDB' ? getRepDbExercise(selected._id) : api.getExercise(selected._id)).then(record => { if (current) setDetail(record); }).catch(err => { if (current) setDetailError(err instanceof Error ? err.message : 'Could not load exercise details.'); });
     return () => { current = false; };
   }, [selected, detailRetry]);
 
@@ -75,6 +79,11 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], backLa
       <button className="coach-back" onClick={onBack} aria-label={backLabel}><Icon name="arrow" size={20}/></button>
       <h2>Exercise library</h2>
     </header>
+    <div className="filter-row" role="group" aria-label="Exercise source">
+      <button type="button" aria-pressed={source === 'exercisedb'} onClick={() => { setSource('exercisedb'); setPage(1); }}>ExerciseDB demos</button>
+      <button type="button" aria-pressed={source === 'physiquequest'} onClick={() => { setSource('physiquequest'); setPage(1); }}>PhysiqueQuest exercises</button>
+      <button type="button" aria-pressed={source === 'repdb'} onClick={() => { setSource('repdb'); setPage(1); }}>RepDB guides</button>
+    </div>
     <label className="library-search">
       <Icon name="search" size={19}/>
       <input type="search" aria-label="Search Exercise" placeholder="Search Exercise" value={searchTerm} onChange={event => { setSearchTerm(event.target.value); setPage(1); }}/>
@@ -100,7 +109,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], backLa
       </div>
       {catalog.pages > 1 && <nav className="library-caption" aria-label="Exercise pages"><button type="button" className="secondary" disabled={page <= 1} onClick={() => setPage(value => value - 1)}>Previous page</button><span>Page {page} of {catalog.pages}</span><button type="button" className="secondary" disabled={page >= catalog.pages} onClick={() => setPage(value => value + 1)}>Next page</button></nav>}
       {catalog.coverageNote && <p className="library-preview-note">{catalog.coverageNote}</p>}
-      <p className="library-preview-note">Exercise data by <a href="https://ascendapi.com" target="_blank" rel="noreferrer">AscendAPI</a>.</p>
+      <p className="library-preview-note">{source === 'repdb' ? <>Exercise data by <a href="https://repdb.co" target="_blank" rel="noreferrer">RepDB (repdb.co)</a>.</> : source === 'physiquequest' ? 'PhysiqueQuest written guides' : <>Exercise data by <a href="https://ascendapi.com" target="_blank" rel="noreferrer">AscendAPI</a>.</>}</p>
     </>}
     {selected && <dialog ref={dialogRef} className="library-dialog" aria-labelledby="library-exercise-title" onCancel={() => setSelected(null)} onClick={event => { if (event.target === event.currentTarget) setSelected(null); }}>
       <article className="exercise-sheet library-exercise-sheet">
@@ -109,18 +118,19 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], backLa
         {detailError && <div role="alert" className="empty-library"><p>{detailError}</p><button className="secondary" onClick={() => setDetailRetry(value => value + 1)}>Retry details</button></div>}
         {detail && <>
           <div className="library-demo">
-            {detail.gifUrl && !mediaError ? <>
+            {!!detail.illustrations?.length && !mediaError ? <img src={detail.illustrations[illustration]?.url} alt={`${detail.name} — ${detail.illustrations[illustration]?.label}`} loading="lazy" onError={() => setMediaError(true)}/> : detail.gifUrl && !mediaError ? <>
               <img ref={imageRef} src={detail.gifUrl} alt={`Exercise demonstration - ${detail.name}`} style={{ visibility: playing || !frameReady ? 'visible' : 'hidden' }} onLoad={freezeFrame} onError={() => { setMediaError(true); setPlaying(false); }}/>
               <canvas ref={canvasRef} aria-hidden="true" style={{ visibility: !playing && frameReady ? 'visible' : 'hidden' }}/>
               <button type="button" className={`library-demo-toggle ${playing ? 'is-playing' : ''}`} aria-label={playing ? 'Pause exercise demonstration' : 'Play exercise demonstration'} onClick={() => { if (playing) freezeFrame(); setPlaying(value => !value); }}>{playing ? <span aria-hidden="true">Ⅱ</span> : <Icon name="play" size={22}/>}</button>
-            </> : <span className="library-video-unavailable"><Icon name="library-dumbbells" size={40}/><small>{mediaError ? 'Could not load this demonstration.' : 'No demonstration available'}</small></span>}
+            </> : <span className="library-video-unavailable"><Icon name="library-dumbbells" size={40}/><small>{mediaError ? detail.source === 'RepDB' ? 'Could not load this illustration.' : 'Could not load this demonstration.' : 'No demonstration available'}</small></span>}
           </div>
-          {mediaError && <button type="button" className="secondary library-media-retry" onClick={() => setDetailRetry(value => value + 1)}>Retry demonstration</button>}
+          {!!detail.illustrations?.length && <div className="filter-row" role="group" aria-label="Exercise illustrations">{detail.illustrations.map((item, index) => <button type="button" key={item.url} aria-pressed={illustration === index} onClick={() => { setIllustration(index); setMediaError(false); }}>{item.label}</button>)}</div>}
+          {mediaError && <button type="button" className="secondary library-media-retry" onClick={() => setDetailRetry(value => value + 1)}>{detail.source === 'RepDB' ? 'Retry illustration' : 'Retry demonstration'}</button>}
           <div className="library-recommendation">{detail.recommended && <span>Recommended <b>{detail.recommended}</b></span>}<span className="library-manual-label">Manual tracking</span></div>
           {detail.description && <p className="library-description">{detail.description}</p>}
-          <section className="library-instructions"><h4>How to do it</h4>{detail.instructions?.length ? <ol>{detail.instructions.map((step, index) => <li key={index}><span>{index + 1}</span><p>{step.replace(/^Step\s*\d+\s*[:.\-]?\s*/i, '')}</p></li>)}</ol> : <p>No instructions are available for this exercise.</p>}</section>
+          <section className="library-instructions"><h4>How to do it</h4>{detail.instructions?.length ? <ol>{detail.instructions.map((step, index) => <li key={index}><span>{index + 1}</span><p>{step.replace(/^Step\s*\d+\s*[:.-]?\s*/i, '')}</p></li>)}</ol> : <p>No instructions are available for this exercise.</p>}</section>
           {!!detail.checks?.length && <section className="library-form-checks"><h4>Form cues</h4><ul>{detail.checks.map((cue, index) => <li key={index}>{cue}</li>)}</ul></section>}
-          <p className="library-preview-note">Exercise data by <a href="https://ascendapi.com" target="_blank" rel="noreferrer">AscendAPI</a>.</p>
+          <p className="library-preview-note">{detail.source === 'RepDB' ? <>Exercise data by <a href="https://repdb.co" target="_blank" rel="noreferrer">RepDB (repdb.co)</a>. Still illustrations; manual logging.</> : detail.source === 'PhysiqueQuest' ? 'PhysiqueQuest exercise · written guide · manual logging' : <>Exercise data by <a href="https://ascendapi.com" target="_blank" rel="noreferrer">AscendAPI</a>.</>}</p>
         </>}
       </article>
     </dialog>}

@@ -2,8 +2,8 @@ import Constants from 'expo-constants';
 import { Camera, CameraView } from 'expo-camera';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { Platform } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState, Share, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
@@ -21,6 +21,7 @@ import { WebView } from 'react-native-webview';
 import { normalizeFrontendUrl, resolveApiUrl, resolveFrontendUrl, resolveLaunchUrl } from './connection.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
+import { trackingKinds } from '../shared/repCounter';
 
 declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string } };
 
@@ -47,7 +48,7 @@ function isNativeCameraContext(value: unknown): value is NativeCameraContext {
   if (context.tracking !== undefined) {
     const tracking = context.tracking as Partial<NativeTrackingOptions> | null;
     if (!tracking || typeof tracking !== 'object' || typeof tracking.requestId !== 'string' || tracking.requestId.length > 100 ||
-      !['squat', 'curl', 'pushup'].includes(tracking.kind ?? '') || !['left', 'right'].includes(tracking.side ?? '') || typeof tracking.active !== 'boolean') return false;
+      !trackingKinds.some(kind => kind === tracking.kind) || !['left', 'right'].includes(tracking.side ?? '') || typeof tracking.active !== 'boolean') return false;
   }
   return context.screen === 'live-session'
     && typeof context.exerciseName === 'string'
@@ -141,6 +142,18 @@ function AppContent() {
       },
     });
   }
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', state => {
+      if (state !== 'active') {
+        monitor.current?.stop();
+        cameraRequestId.current += 1;
+        setCameraPreview(null);
+        webRef.current?.injectJavaScript(buildInactivityScript({ type: 'monitoring-paused' }));
+      }
+    });
+    return () => { subscription.remove(); monitor.current?.stop(); };
+  }, []);
 
   const insetScript = useMemo(
     () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }, apiUrl ?? 'invalid-api-address'),
@@ -334,6 +347,7 @@ function AppContent() {
           try {
             const message = JSON.parse(e.nativeEvent.data) as {
               type?: string;
+              text?: string;
               ok?: boolean;
               frame?: CameraFrame;
               facing?: 'back' | 'front';
@@ -397,7 +411,7 @@ function AppContent() {
                 stopNativeCamera();
               }
               const payload = JSON.parse(e.nativeEvent.data) as { type: string; thresholdMs?: number };
-              if (payload.type === 'inactivity-start') void native.start(payload.thresholdMs ?? 45_000);
+              if (payload.type === 'inactivity-start') { if (AppState.currentState === 'active') void native.start(payload.thresholdMs ?? 45_000); else webRef.current?.injectJavaScript(buildInactivityScript({ type: 'monitoring-paused' })); }
               if (payload.type === 'inactivity-stop') native.stop();
               if (payload.type === 'inactivity-im-okay') native.imOkay();
               if (payload.type === 'inactivity-hold-stop') native.holdStop();

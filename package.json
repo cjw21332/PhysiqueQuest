@@ -7,8 +7,6 @@
     "expo": "npm run start --workspace mobile",
     "build": "npm run build --workspace frontend",
     "start": "npm run start --workspace frontend --",
-    "coach": "npm --prefix backend run start:coach",
-    "coach:dev": "npm --prefix backend run start:coach:dev",
     "seed": "npm --prefix backend run seed:exercises"
   },
   "devDependencies": {
@@ -17,5 +15,8 @@
   "workspaces": [
     "frontend",
     "mobile"
-  ]
+  ],
+  "overrides": {
+    "source-map-js": "1.2.2"
+  }
 }

@@ -1,12 +1,13 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { commonMovementScore } from '../coach/movement-curation.js';
+import { curatedDetail, curatedExercises, exerciseNameKey, findCurated } from './curated-catalog.js';
 
 export const SOURCE = 'ExerciseDB V1';
 const PARTS: Record<string, string[]> = { Chest: ['chest'], Back: ['back'], Legs: ['upper legs', 'lower legs'], Core: ['waist'], Shoulders: ['shoulders'], Arms: ['upper arms', 'lower arms'], Cardio: ['cardio'] };
 const EQUIPMENT: Record<string, string[]> = { Dumbbells: ['dumbbell'], Barbell: ['barbell', 'olympic barbell', 'EZ bar', 'trap bar'], Bodyweight: ['bodyweight'], 'Resistance bands': ['resistance band'], Cable: ['cable'], Machine: ['leverage machine', 'smith machine', 'sled machine', 'elliptical machine', 'stepmill machine', 'stationary bike'], Kettlebell: ['kettlebell'] };
 type RawExercise = { exerciseId: string; name: string; gifUrl: string; bodyParts: string[]; equipments: string[]; targetMuscles: string[]; secondaryMuscles: string[]; instructions: string[] };
 type Envelope = { success: boolean; data: RawExercise[] | RawExercise; meta?: { total?: number; hasNextPage?: boolean; nextCursor?: string } };
-export type CatalogQuery = { search?: string; muscle?: string; equipment?: string; page?: number; limit?: number };
+export type CatalogQuery = { source?: string; search?: string; muscle?: string; equipment?: string; page?: number; limit?: number };
 const words = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean);
 function closeWord(query: string, candidate: string): boolean {
   if (candidate.includes(query)) return true;
@@ -65,6 +66,7 @@ export class ExerciseDbService {
   }
 
   async findAll(query: CatalogQuery = {}, pageBudget = 4, deadline = Date.now() + 20000) {
+    if (query.source === 'physiquequest') return findCurated(query);
     const page = Number.isFinite(query.page) ? Math.min(9, Math.max(1, Math.floor(query.page!))) : 1;
     const limit = Number.isFinite(query.limit) ? Math.min(100, Math.max(1, Math.floor(query.limit!))) : 12;
     const search = query.search?.trim().slice(0, 100) ?? '';
@@ -114,6 +116,7 @@ export class ExerciseDbService {
   }
 
   async findBySlug(id: string) {
+    if (id.startsWith('pq-')) return curatedDetail(id);
     if (!/^[a-zA-Z0-9_-]{1,80}$/.test(id.trim())) throw new NotFoundException('Exercise not found');
     return normalizeExercise((await this.request(`/exercises/${encodeURIComponent(id.trim())}`)).data as RawExercise);
   }
@@ -125,7 +128,10 @@ export class ExerciseDbService {
     const allowed = equipment.includes('Full gym') || !equipment.length ? undefined : [...new Set([...equipment.flatMap(value => this.equipmentAliases(value)), 'bodyweight'])].join(',');
     // At most fourteen live category pages, with cardio only for endurance.
     for (const muscle of groups) records.push(...(await this.findAll({ muscle, equipment: allowed, limit: 100 }, 2, deadline)).items);
-    return [...new Map(records.map(row => [row._id, row])).values()];
+    const names = new Set(records.map(row => exerciseNameKey(row.name)));
+    const local = curatedExercises().filter(row => !names.has(exerciseNameKey(row.name))
+      && (!allowed || this.equipmentAliases(row.equipment).some(alias => allowed.split(',').includes(alias))));
+    return [...new Map([...records, ...local].map(row => [row._id, row])).values()];
   }
 
   private equipmentAliases(value: string): string[] {

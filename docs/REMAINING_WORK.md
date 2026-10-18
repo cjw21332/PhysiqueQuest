@@ -1,6 +1,10 @@
 # PhysiqueQuest remaining-work checklist
 
+> Latest implementation and verification: [October 18 remediation results](REMEDIATION_2026-10-18.md). Earlier audit findings below describe the baseline and are superseded where explicitly closed in that report.
+
 Reviewed October 17, 2026, against the supplied v2.7.3 folder.
+
+> Historical checklist: several workout and state-connection items below were implemented after this review. Use the [October 18 functionality audit](FUNCTIONAL_AUDIT_2026-10-18.md) for current verification results and unresolved gaps.
 
 ## Assessment
 
@@ -80,7 +84,7 @@ Use a dedicated staging account and controlled emergency test contact. Record de
 - [ ] **Review exposed provider usage limits.** The standalone catalog/preview API is unauthenticated and calls a rate-limited upstream. Define deployment throttling and request budgets so public usage cannot exhaust access needed by account program generation. Existing provider pacing/deduplication is useful but is not a deployment admission policy.
 - [ ] **Decide account-data retention and deletion behavior.** Logout intentionally keeps the profile cache, and no complete account-deletion UI/API was found. For release, define cache clearing on shared devices, account deletion/export requirements, and removal/retention of health, meal, location, workout, and recovery records. These are product/release decisions, not verified compliance findings.
 - [ ] **Audit dependencies and pin the supported runtime.** No fresh vulnerability audit was run. Installed Next.js requires Node >=20.9.0 and NestJS core requires Node >=20, contradicting RUNNING.md's “Node v18 or higher” guidance. Establish the full Node/Expo toolchain requirements, add a runtime pin, and update setup instructions; assess upgrades without forced incompatible Expo changes.
-- [ ] **Reconcile documentation.** Update startup instructions to consistently include port 4050 for the full Coach experience. Correct older claims that the public library uses seeded records or automatic tracking is reachable. Keep current status distinct from historical release evidence and refresh checklist totals only when the corresponding criterion is demonstrated.
+- [ ] **Reconcile documentation.** Current update: startup and Render configuration now use the shared main API on port 4000; the separate port-4050 service has been removed (see COMBINED_API.md). Correct older claims that the public library uses seeded records or automatic tracking is reachable. Keep current status distinct from historical release evidence and refresh checklist totals only when the corresponding criterion is demonstrated.
 - [ ] **Resolve external-data release requirements.** The repository documents ExerciseDB's free access as non-commercial/personal/educational and requiring attribution. Confirm the intended release fits the provider arrangement, or secure suitable access before a commercial release. This audit did not independently verify current provider terms.
 
 ## Suggested execution order

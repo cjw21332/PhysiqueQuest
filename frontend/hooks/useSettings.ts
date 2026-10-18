@@ -15,5 +15,5 @@ export function useSettings() {
     try { await api.updateSettings(patch); notifyDataChanged('settings'); }
     catch (err) { setError(err instanceof Error ? err.message : 'Could not save settings.'); throw err; }
   }, []);
-  return { settings: { ...defaults, ...(resource.data?.values ?? {}) }, loading: resource.loading, error: error || resource.error, updateSettings, retry: resource.refresh };
+  return { settings: { ...defaults, ...resource.data?.values }, loading: resource.loading, error: error || resource.error, updateSettings, retry: resource.refresh };
 }

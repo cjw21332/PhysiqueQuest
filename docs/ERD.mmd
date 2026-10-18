@@ -19,6 +19,7 @@ erDiagram
         string email UK
         string name
         string passwordHash
+        number sessionVersion "JWT revocation version"
         string role "user or admin"
         boolean isActive
         number failedLoginAttempts
@@ -142,8 +143,18 @@ erDiagram
         ObjectId _id PK
         ObjectId userId
         string tokenHash UK
+        string requestId UK "optional legacy; required for new requests"
+        number attempts
+        Date verifiedAt "nullable"
+        string grantHash UK "optional"
+        Date grantExpiresAt "optional"
         Date expiresAt "TTL index"
         Date usedAt "nullable"
+    }
+    auth_rate_limits {
+        string _id PK "hashed bucket or cooldown key"
+        number hits
+        Date expiresAt "TTL index"
     }
     admin_exercises {
         ObjectId _id PK

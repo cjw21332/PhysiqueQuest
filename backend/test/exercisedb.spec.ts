@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ExerciseDbService } from '../src/exercises/exercisedb.service.js';
-import { StandaloneCoachController } from '../src/coach/standalone-coach.module.js';
+import { CoachPreviewController } from '../src/coach/coach-preview.module.js';
 
 const row = (id = 'real-id', name = 'dumbbell bench press') => ({ exerciseId: id, name, gifUrl: `https://static.exercisedb.dev/media/${id}.gif`, bodyParts: ['chest'], equipments: ['dumbbell'], targetMuscles: ['pectorals'], secondaryMuscles: ['triceps'], instructions: ['Step:1 Keep your feet on the floor.'] });
 const response = (data: unknown, meta?: unknown) => new Response(JSON.stringify({ success: true, data, meta }), { status: 200 });
@@ -52,12 +52,11 @@ describe('ExerciseDB live adapter contract', () => {
     await expect(new ExerciseDbService().findAll()).rejects.toMatchObject({ status: 502 });
   });
 
-  it('validates standalone program context before any remote lookup', async () => {
+  it('validates preview program context before any remote lookup', async () => {
     const getForPlan = vi.fn();
-    const controller = new StandaloneCoachController({ getForPlan } as any);
+    const controller = new CoachPreviewController({ getForPlan } as any);
     await expect(controller.plan({ profile: { goal: 'nonsense' } })).rejects.toMatchObject({ status: 400 });
     expect(getForPlan).not.toHaveBeenCalled();
-    expect(controller.status()).toMatchObject({ status: 'ready', persistence: 'stateless', source: 'ExerciseDB V1' });
   });
 
   it('deduplicates concurrent requests then discards results after completion', async () => {

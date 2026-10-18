@@ -1,0 +1,36 @@
+# Staging blueprint. Public URLs and Atlas credentials must be supplied in Render.
+# No service is created by saving this file. Choose an always-on plan before production safety delivery.
+services:
+  - type: web
+    name: physiquequest-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /api
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+  - type: web
+    name: physiquequest-web
+    runtime: node
+    plan: free
+    buildCommand: npm ci --workspace frontend --include=dev --include-workspace-root=false && npm run build --workspace frontend
+    startCommand: npm run start -- --hostname 0.0.0.0 --port $PORT
+    healthCheckPath: /launch
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        sync: false

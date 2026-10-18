@@ -3,6 +3,72 @@ import { test, expect } from '@playwright/test';
 const exercise = { _id: 'api-press', slug: 'api-press', name: 'Backend seated press', targetMuscle: 'Shoulders', equipment: 'Dumbbells', trackingStatus: 'Manual', instructions: ['Keep feet planted.', 'Press overhead slowly.'], gifUrl: 'https://exercise.test/demo.gif', pose: 'missing', status: 'published', source: 'ExerciseDB V1' };
 const gif = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
 
+test('library list/detail use the account API origin and ignore stale separate-service settings', async ({ page }) => {
+  const requests = [];
+  await page.addInitScript(() => localStorage.setItem('physiquequest-runtime-coach-url', 'http://obsolete-library.invalid:4050/api'));
+  page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/api/')) requests.push(new URL(request.url())); });
+  await setup(page, (route, _url, headers) => route.fulfill({ headers, json: { items: [exercise], total: 1, page: 1, limit: 12, pages: 1 } }));
+  await page.getByRole('button', { name: /Backend seated press/ }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect.poll(() => requests.some(url => url.pathname.endsWith('/exercises/api-press'))).toBe(true);
+  const account = requests.find(url => url.pathname.endsWith('/coach/plan'));
+  expect(account).toBeTruthy();
+  const library = requests.filter(url => /\/exercises(?:\/|$)/.test(url.pathname));
+  expect(library.length).toBeGreaterThanOrEqual(2);
+  expect(library.every(url => url.origin === account.origin)).toBe(true);
+  expect(requests.some(url => url.port === '4050')).toBe(false);
+});
+
+test('RepDB guides browse the pinned in-app catalog with attribution and still illustrations', async ({ page }) => {
+  let providerRequests = 0;
+  await setup(page, (route, url, headers) => { providerRequests++; return route.fulfill({ json: { items: [], total: 0, page: 1, limit: 12, pages: 0 }, headers }); });
+  await page.route('https://huggingface.co/**/images/flat/**', route => route.fulfill({ contentType: 'image/gif', body: gif }));
+  await page.getByRole('button', { name: 'RepDB guides', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: '609 results' })).toBeVisible();
+  const reads = providerRequests;
+  await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('ab wheel rollout');
+  await page.getByRole('button', { name: /Ab Wheel Rollout/ }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('link', { name: 'RepDB (repdb.co)', exact: true })).toBeVisible();
+  await expect(dialog.getByRole('img', { name: 'Ab Wheel Rollout — Start position', exact: true })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Peak position', exact: true }).click();
+  await expect(dialog.getByRole('img', { name: 'Ab Wheel Rollout — Peak position', exact: true })).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Play exercise demonstration' })).toHaveCount(0);
+  await page.setViewportSize({ width: 320, height: 844 });
+  expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Close exercise details' }).click();
+  await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('');
+  await page.getByRole('button', { name: 'Bodyweight', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Next page', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: 'Next page', exact: true }).click();
+  await expect(page.getByText('Page 2 of', { exact: false })).toBeVisible();
+  expect(providerRequests).toBe(reads);
+});
+
+test('PhysiqueQuest source browses added exercises, filters and opens honest manual guides', async ({ page }) => {
+  const local = { ...exercise, _id: 'pq-wall-push-up', name: 'Wall push-up', source: 'PhysiqueQuest', targetMuscle: 'Chest', equipment: 'Bodyweight', gifUrl: '', instructions: ['Place your palms on a solid wall.', 'Press away with your trunk aligned.'] };
+  const queries = [];
+  await setup(page, (route, url, headers) => {
+    queries.push(Object.fromEntries(url.searchParams));
+    return route.fulfill({ headers, json: { items: url.searchParams.get('source') === 'physiquequest' ? [local] : [exercise], total: 1, page: 1, limit: 12, pages: 1 } });
+  });
+  await page.route('**/api/exercises/pq-wall-push-up', route => route.fulfill({ headers: { 'access-control-allow-origin': '*' }, json: local }));
+  await page.getByRole('button', { name: 'PhysiqueQuest exercises', exact: true }).click();
+  await expect(page.getByRole('button', { name: /Wall push-up/ })).toBeVisible();
+  await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('push-up');
+  await page.getByRole('button', { name: 'Bodyweight', exact: true }).click();
+  await expect.poll(() => queries.at(-1)?.equipment).toBe('Bodyweight');
+  expect(queries.at(-1).source).toBe('physiquequest');
+  expect(queries.at(-1).search).toBe('push-up');
+  await page.getByRole('button', { name: /Wall push-up/ }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Place your palms on a solid wall.')).toBeVisible();
+  await expect(dialog.getByText('No demonstration available')).toBeVisible();
+  await expect(dialog.getByText('Manual tracking', { exact: true })).toBeVisible();
+  await expect(dialog.getByText(/PhysiqueQuest exercise · written guide/)).toBeVisible();
+  await expect(dialog.getByRole('link', { name: 'AscendAPI' })).toHaveCount(0);
+});
+
 async function setup(page, catalog, detailHandler, role = 'user') {
   await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'test', token: 'test-token' })));
   await page.route('https://exercise.test/demo.gif', route => route.fulfill({ contentType: 'image/gif', body: gif }));

@@ -1,5 +1,5 @@
 import { api, ApiRequestError } from './api';
-import { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './session';
+import { AUTH_STORAGE_KEY, clearAuthSession } from './session';
 
 // Authentication utilities
 export interface User {

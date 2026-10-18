@@ -7,7 +7,7 @@ import { operationKey } from '../../lib/operationKey';
 import type { SetResult, WorkoutExercise } from '../../../shared/workouts';
 import { accountScope, notifyDataChanged } from '../../hooks/useApiResource';
 import type { WorkoutSessionRecord } from '../../lib/api';
-import { trackingExercises, trackingGuidance, trackingPresets, type TrackingSide } from '../../../shared/repCounter';
+import { IDENTIFIER_VERSION, REP_COUNTER_VERSION, trackingExercises, trackingGuidance, trackingPresets, type TrackingSide } from '../../../shared/repCounter';
 
 export default function RecordedRepCounter({ file, onSaved, onChooseAnother, attachment, autoScan = true }: { file: File; onSaved?: (workout: WorkoutSessionRecord) => void; onChooseAnother: () => void; autoScan?: boolean; attachment?: { exercise: WorkoutExercise; setIndex: number; presetId: string; onReviewed: (result: SetResult) => Promise<void> } }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -19,6 +19,7 @@ export default function RecordedRepCounter({ file, onSaved, onChooseAnother, att
   const [exerciseId, setExerciseId] = useState(attachment?.presetId ?? (autoScan ? '' : trackingPresets[0]._id));
   const [autoIdentify, setAutoIdentify] = useState(!attachment && autoScan);
   const [identifiedName, setIdentifiedName] = useState('');
+  const [identificationVersion, setIdentificationVersion] = useState(IDENTIFIER_VERSION);
   const [identifiedExerciseId, setIdentifiedExerciseId] = useState('');
   const [side, setSide] = useState<TrackingSide>('left');
   const [reps, setReps] = useState(0);
@@ -52,7 +53,7 @@ export default function RecordedRepCounter({ file, onSaved, onChooseAnother, att
     try {
       if (autoIdentify) {
         const result = await identifyRecordedVideo(videoRef.current, controller.signal, setProgress);
-        setExerciseId(result.trackingPresetId); setIdentifiedName(result.name); setIdentifiedExerciseId(result.exerciseId); setSide(result.side);
+        setExerciseId(result.trackingPresetId); setIdentifiedName(result.name); setIdentifiedExerciseId(result.exerciseId); setSide(result.side); setIdentificationVersion(result.identifierVersion ?? IDENTIFIER_VERSION);
         setReps(result.reps); setDetectedReps(result.reps);
       } else {
         const value = await analyzeRecordedVideo(videoRef.current, kind, side, controller.signal, setProgress);
@@ -74,7 +75,7 @@ export default function RecordedRepCounter({ file, onSaved, onChooseAnother, att
     savingRef.current = true; setSaving(true); setError('');
     try {
       const savedExerciseId = attachment?.exercise.exerciseId ?? (identifiedExerciseId || exerciseId);
-      const result: SetResult = { setId: `${savedExerciseId}:${attachment?.setIndex ?? 0}`, exerciseId: savedExerciseId, setIndex: attachment?.setIndex ?? 0, reps, status: 'completed', source: counted ? 'local-video' : 'manual', clipDurationSeconds: duration, ...(counted ? { detectedReps, side, algorithmVersion: identifiedName ? 'movement-rules-v1/rep-counter-v2' : 'rep-counter-v2', trackingPresetId: exerciseId } : {}) };
+      const result: SetResult = { setId: `${savedExerciseId}:${attachment?.setIndex ?? 0}`, exerciseId: savedExerciseId, setIndex: attachment?.setIndex ?? 0, reps, status: 'completed', source: counted ? 'local-video' : 'manual', clipDurationSeconds: duration, ...(counted ? { detectedReps, side, algorithmVersion: identifiedName ? `${identificationVersion}/${REP_COUNTER_VERSION}` : REP_COUNTER_VERSION, trackingPresetId: exerciseId } : {}) };
       if (attachment) { await attachment.onReviewed(result); return; }
       if (!pending.current) {
         pending.current = { requestKey: operationKey(), exercise: { exerciseId: savedExerciseId, name: identifiedName || exercise?.name || exerciseId, equipment: identifiedName && kind !== 'pushup' ? '' : exercise?.equipment ?? '', sets: 1 }, result, performedAt: new Date(performedAt).toISOString(), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' };
@@ -98,7 +99,7 @@ export default function RecordedRepCounter({ file, onSaved, onChooseAnother, att
     {duration > 120 && <p role="alert" className="error">Choose a video up to 2 minutes long.</p>}
     {decodeFailed && <label>Clip length in seconds (manual logging)<input aria-label="Manual clip length" type="number" min={1} max={120} value={duration || ''} disabled={locked} onChange={event => setDuration(Math.max(0, Math.min(120, Number(event.target.value) || 0)))}/></label>}
     {!attachment && <label><input type="checkbox" checked={autoIdentify} disabled={locked} onChange={event => { setAutoIdentify(event.target.checked); autoStarted.current = false; setCounted(false); setReps(0); setIdentifiedName(''); setIdentifiedExerciseId(''); setExerciseId(''); }}/>Identify exercise automatically</label>}
-    {!attachment && <p className="camera-note">Automatic suggestions support one squat, biceps curl or floor push-up exercise per clip. Variations and equipment need your confirmation.</p>}
+    {!attachment && <p className="camera-note">Automatic suggestions support one squat, biceps curl, floor push-up, overhead press or lateral raise exercise per clip. Select rows, overhead triceps extensions, knee/wall push-ups and other variations yourself, then count locally. Equipment needs your confirmation.</p>}
     {identifiedName && <p role="status">Suggested movement: {identifiedName}. Review the exercise and reps before saving.</p>}
     <div className="recorded-options">
       <label>Exercise<select value={exerciseId} disabled={locked || !!attachment} onChange={event => { setExerciseId(event.target.value); setAutoIdentify(false); setIdentifiedName(''); setIdentifiedExerciseId(''); setCounted(false); setDetectedReps(undefined); setReps(0); setError(''); }}>

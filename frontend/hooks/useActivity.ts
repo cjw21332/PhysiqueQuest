@@ -10,5 +10,5 @@ const empty: ActivityResponse = { state: { timezone: 'UTC', questProgress: { wor
 export function useActivity() {
   const resource = useApiResource<ActivityResponse>('activity', () => api.getActivity());
   const result = resource.data;
-  return { activity: { ...empty.state, ...(result?.state ?? {}) }, dailyMissions: result?.dailyMissions ?? [], badges: result?.badges ?? [], loading: resource.loading, error: resource.error, refresh: resource.refresh };
+  return { activity: { ...empty.state, ...result?.state }, dailyMissions: result?.dailyMissions ?? [], badges: result?.badges ?? [], loading: resource.loading, error: resource.error, refresh: resource.refresh };
 }

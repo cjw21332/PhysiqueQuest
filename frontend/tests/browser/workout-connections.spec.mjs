@@ -52,6 +52,12 @@ test('logs every exercise, restores drafts and saved results, then updates weekl
   await page.evaluate(() => window.dispatchEvent(new CustomEvent('physiquequest-inactivity', { detail: { type: 'countdown-started' } })));
   await expect(page.getByRole('heading', { name: 'Exercise 1 of 3' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue session', exact: true }).click();
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent('physiquequest-inactivity', { detail: { type: 'monitoring-paused' } })));
+  await expect(page.getByText('Safety monitoring paused', { exact: true })).toBeVisible();
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent('physiquequest-inactivity', { detail: { type: 'countdown-started' } })));
+  await expect(page.getByRole('heading', { name: 'Exercise 1 of 3' })).toBeVisible();
+  await page.getByRole('button', { name: 'Resume monitoring', exact: true }).click();
+  await expect(page.getByText('Safety monitoring paused', { exact: true })).toHaveCount(0);
   await page.getByRole('spinbutton', { name: 'Set reps', exact: true }).fill('8');
   await page.getByRole('spinbutton', { name: 'Set load in kg', exact: true }).fill('20');
   await page.getByRole('button', { name: 'Done set', exact: true }).click();

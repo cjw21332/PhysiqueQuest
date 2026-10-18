@@ -25,11 +25,13 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+PhysiqueQuest runs one shared API process on port 4000 for accounts, workouts, Coach and exercise browsing. Public catalog routes and stateless previews coexist with authenticated user programs and administrator-only management. Start it with `npm run start:dev`; no separate Coach/library process is required. See [combined API architecture](../docs/COMBINED_API.md).
+
 ## Food scanning
 
 `POST /api/nutrition/scan` runs a photo of a meal through a vision model to
 identify the food, then prices each identified item against USDA FoodData
-Central. All three scanner routes require a valid JWT, like the rest of the API.
+Central. All three scanner routes require a valid JWT.
 
 | Route | Purpose |
 | --- | --- |

@@ -8,7 +8,7 @@ it('catalog import preserves existing records and does not duplicate a second ru
   } };
   await seedCatalog(model);
   await seedCatalog(model);
-  expect(records.size).toBe(20);
+  expect(records.size).toBe(50);
   expect(records.get('Dumbbell bench press')).toEqual({ name: 'Dumbbell bench press', status: 'draft', instructions: ['Administrator instructions'] });
   expect(records.get('Goblet squat')).toMatchObject({ slug: 'goblet-squat', status: 'published', pose: 'missing', equipment: 'Dumbbell', trackingStatus: 'Manual', videoUrl: '' });
 });

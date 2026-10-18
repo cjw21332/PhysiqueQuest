@@ -18,7 +18,7 @@ export default function HomeDashboard({ profile, onNotify }: {
   const targets = useNutritionTargets();
   const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
   const { activity, dailyMissions, loading: activityLoading, error: activityError } = useActivity();
-  const { meals, water, loading: nutritionLoading, error: nutritionError } = useNutrition();
+  const { meals, loading: nutritionLoading, error: nutritionError } = useNutrition();
   const { plan, loading: planLoading, error: planError } = useCoachPlan();
   const now = new Date();
   const today = formatLocalDate(now);

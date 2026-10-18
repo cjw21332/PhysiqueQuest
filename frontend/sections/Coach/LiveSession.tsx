@@ -13,6 +13,7 @@ type NativeEvent =
   | { type: 'cancelled'; reason: 'movement' | 'im-okay' }
   | { type: 'alarm'; location: { lat: number; lng: number; accuracyMeters: number; capturedAt: string } | null }
   | { type: 'stopped' }
+  | { type: 'monitoring-paused' }
   | { type: 'motion-status'; available: boolean };
 
 type Phase = 'active' | 'countdown' | 'alarm';
@@ -47,8 +48,9 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   const [seconds, setSeconds] = useState(initialSeconds);
   const [paused, setPaused] = useState(initialPaused);
   useEffect(() => setPaused(initialPaused), [initialPaused]);
-  const monitorEnabledRef = useRef(inactivityEnabled && !paused);
-  monitorEnabledRef.current = inactivityEnabled && !paused;
+  const [monitoringPaused, setMonitoringPaused] = useState(false);
+  const monitorEnabledRef = useRef(inactivityEnabled && !paused && !monitoringPaused);
+  monitorEnabledRef.current = inactivityEnabled && !paused && !monitoringPaused;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [phase, setPhase] = useState<Phase>('active');
@@ -105,15 +107,16 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   }, []);
 
   useEffect(() => {
-    if (paused || phase !== 'active') camera.stop();
+    if (paused || phase !== 'active' || (monitoringPaused && inactivityEnabled)) camera.stop();
     else if (camera.shouldAutoStart && camera.status === 'idle') void camera.start();
-  }, [camera.start, camera.status, camera.stop, camera.shouldAutoStart, phase, paused]);
+  }, [camera.start, camera.status, camera.stop, camera.shouldAutoStart, phase, paused, monitoringPaused, inactivityEnabled]);
 
   // Native host events arrive through the WebView bridge.
   useEffect(() => {
     const onNative = (event: Event) => {
       const detail = (event as CustomEvent<NativeEvent>).detail;
       if (!detail) return;
+      if (detail.type === 'monitoring-paused') { setMonitoringPaused(true); if (phaseRef.current === 'countdown') changePhase('active'); return; }
       if ((detail.type === 'countdown-started' || detail.type === 'alarm') && !monitorEnabledRef.current) return;
       if (detail.type === 'motion-status') setMotionAvailable(detail.available);
       if (detail.type === 'countdown-started' && phaseRef.current === 'active') {
@@ -137,7 +140,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
 
   // Start the host's inactivity monitor when the session mounts; stop it on unmount.
   useEffect(() => {
-    if (!inactivityEnabled || paused) { postToHost({ type: 'inactivity-stop' }); return; }
+    if (!inactivityEnabled || paused || monitoringPaused) { postToHost({ type: 'inactivity-stop' }); return; }
     postToHost({ type: 'inactivity-start', thresholdMs: thresholdSeconds * 1000 });
     postToHost({ type: 'inactivity-request-motion-status' });
     return () => {
@@ -145,7 +148,13 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       stopSound();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [thresholdSeconds, inactivityEnabled, paused]);
+  }, [thresholdSeconds, inactivityEnabled, paused, monitoringPaused]);
+
+  useEffect(() => {
+    const hidden = () => { if (document.hidden) { setMonitoringPaused(true); camera.stop(); if (phaseRef.current === 'countdown') changePhase('active'); } };
+    document.addEventListener('visibilitychange', hidden);
+    return () => document.removeEventListener('visibilitychange', hidden);
+  }, [camera.stop]);
 
   const playSound = () => startAlarm(alarmVolume);
   const stopSound = () => stopAlarm();
@@ -296,7 +305,8 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
           {camera.message && <p role="alert">{camera.message}</p>}
         </div>
       )}
-      <p className="live-notice" role="note">Keep the app open and the screen on during your workout. Detection pauses when the phone is locked.</p>
+      <p className="live-notice" role="note">Safety monitoring works only while this app is in the foreground with the screen on. It pauses when you switch apps or lock the phone.</p>
+      {monitoringPaused && inactivityEnabled && <div className="paused-banner" role="status"><strong>Safety monitoring paused</strong><span>The app was in the background or locked. Return to the workout before resuming monitoring.</span><button type="button" className="secondary" disabled={paused || busy} onClick={() => setMonitoringPaused(false)}>Resume monitoring</button></div>}
       {children}
       {inactivityEnabled && motionAvailable === false && <p className="scan-warning" role="status">Movement detection needs the phone app with an accelerometer. Countdown is off on this device.</p>}
       <div className="session-progress-label"><span>Elapsed time</span><b>{time}</b></div>

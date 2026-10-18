@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, type AdminAnalyticsRecord } from '../../lib/api';
 import { Icon } from '../Home/icons';
 import { analyticsPreview, analyticsCsv } from './adminPreview';
@@ -11,14 +11,16 @@ export default function EngagementAnalytics({ onBack, preview = false }: { onBac
   const [data, setData] = useState<AdminAnalyticsRecord | null>(null);
   const [loading, setLoading] = useState(!preview);
   const [error, setError] = useState('');
+  const requestVersion = useRef(0);
   const refresh = useCallback(async () => {
     if (preview) return;
+    const version = ++requestVersion.current;
     setLoading(true); setError('');
-    try { setData(await api.getAdminAnalytics(range)); }
-    catch (err) { setError(err instanceof Error ? err.message : 'Could not load analytics.'); }
-    finally { setLoading(false); }
+    try { const next = await api.getAdminAnalytics(range); if (version === requestVersion.current) setData(next); }
+    catch (err) { if (version === requestVersion.current) setError(err instanceof Error ? err.message : 'Could not load analytics.'); }
+    finally { if (version === requestVersion.current) setLoading(false); }
   }, [range, preview]);
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => { void refresh(); return () => { requestVersion.current++; }; }, [refresh]);
   const sample = preview ? analyticsPreview(range) : null;
   const shown = sample ?? data;
   const eventRows: [string, string, number][] = sample ? [['Triggered alarms', `Last ${range} days`, sample.emergencyEvents.total], ['Cancelled in countdown', 'False positives', sample.cancelled], ['Contact notified', 'Alert delivered', sample.emergencyEvents.delivered]] : data ? [['Triggered alarms', `Last ${range} days`, data.emergencyEvents.total], ['Contact notified', 'Provider confirmed', data.emergencyEvents.delivered], ['Not delivered', `Last ${range} days`, data.emergencyEvents.failed], ['Pending', `Last ${range} days`, data.emergencyEvents.pending]] : [];

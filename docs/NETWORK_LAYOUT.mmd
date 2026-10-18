@@ -1,0 +1,30 @@
+flowchart LR
+    subgraph android[Installed Android release app]
+        shell[Bundled native shell and device bridge]
+        view[WebView loads hosted Next.js interface]
+        local[On-device video decoding and pose worker]
+        shell --> view
+        view -->|Local video frames| local
+        local -->|Reviewed count and exercise suggestion| view
+    end
+    internet[Internet over Wi-Fi or mobile data]
+    edge[Public HTTPS entry - DNS and TLS on port 443]
+    subgraph hosting[Hosted application services]
+        web[Next.js frontend - private port 3000]
+        api[Shared NestJS API - private port 4000]
+    end
+    db[(MongoDB Atlas - backend access only)]
+    exercise[ExerciseDB API]
+    media[Exercise GIF host or CDN]
+    food[Gemini and USDA]
+    optional[Configured email and alert providers]
+    install[Google Play or signed release APK]
+    install -. Installation and app updates .-> shell
+    view --> internet -->|HTTPS 443| edge
+    edge -->|app host - pages and assets| web
+    edge -->|api host - library and protected user routes| api
+    view -->|Direct HTTPS GIF requests| media
+    api -->|Authenticated database connection with TLS| db
+    api -->|Exercise browsing and new saved programs| exercise
+    api -. Food image and nutrient requests .-> food
+    api -. Feature enabled and provider configured .-> optional

@@ -1,4 +1,5 @@
 'use client';
+import { shareWorkout } from '../../../../lib/shareWorkout';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { api, type WorkoutSessionRecord } from '../../../../lib/api';
@@ -65,21 +66,7 @@ export default function WorkoutDetail() {
                 workout={workout}
                 onBack={() => navigate('/coach')}
                 onHome={() => navigate('/home')}
-                onShare={async () => {
-                  const text = `${workout.exercises?.map((exercise) => exercise.name).join(', ') || 'Workout'}: ${workout.sets?.filter((set) => set.status === 'completed').length ?? 0} sets completed.`;
-                  if (navigator.share)
-                    await navigator
-                      .share({ title: 'PhysiqueQuest workout', text })
-                      .catch(() => {});
-                  else if (navigator.clipboard) {
-                    try {
-                      await navigator.clipboard.writeText(text);
-                      setNotice('Workout summary copied.');
-                    } catch {
-                      setNotice('Sharing is unavailable on this device.');
-                    }
-                  } else setNotice('Sharing is unavailable on this device.');
-                }}
+                onShare={async () => { setNotice(await shareWorkout(workout)); }}
               />
             ) : profileError ? (
               <p role="alert">
