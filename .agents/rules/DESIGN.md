@@ -4,7 +4,7 @@ description: PhysiqueQuest visual and responsive design system for the Next.js w
 
 # PhysiqueQuest Design System (2026-10-19 · cached startup, dark palette and scrollbar-free launch)
 
-**Launch scrollbar follow-up (October 19, 2026):** The landing page uses the shared `pq-scrollbar--hidden` utility. Keep its scrollbar hidden while retaining overflow scrolling so readiness details and both account actions remain reachable on short screens. Other pages retain their shared scrollbar styling.
+**Launch scrolling follow-up (October 19, 2026):** The landing page is non-scrollable (`overflow: clip`). Its compact short-screen layout keeps the brand, readiness details and both account actions inside the viewport, with 44px account buttons. Do not restore overflow scrolling or merely hide its scrollbar. Other pages retain their shared scrollbar styling.
 
 **Cached mobile loading (October 19, 2026):** The signed-in shell can display last-confirmed profile, nutrition, missions and Coach data during background refreshes. Keep the shared cache notice and its Refresh control visible; background failures retain saved content with an explicit connection notice. First loads without cached data retain error/retry/loading screens. Cached views do not authorize offline saves. The notice takes space in the signed-in flex layout so it does not hide the bottom navigation.
 
