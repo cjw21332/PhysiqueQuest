@@ -2,7 +2,9 @@
 description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the approved dark theme, preserved component layouts, responsive rules, and system-wide dark behavior. The web app is the design source for the native WebView.
 ---
 
-# PhysiqueQuest Design System (2026-10-19 · cached startup, dark palette and OTP email reference)
+# PhysiqueQuest Design System (2026-10-19 · cached startup, dark palette and scrollbar-free launch)
+
+**Launch scrollbar follow-up (October 19, 2026):** The landing page uses the shared `pq-scrollbar--hidden` utility. Keep its scrollbar hidden while retaining overflow scrolling so readiness details and both account actions remain reachable on short screens. Other pages retain their shared scrollbar styling.
 
 **Cached mobile loading (October 19, 2026):** The signed-in shell can display last-confirmed profile, nutrition, missions and Coach data during background refreshes. Keep the shared cache notice and its Refresh control visible; background failures retain saved content with an explicit connection notice. First loads without cached data retain error/retry/loading screens. Cached views do not authorize offline saves. The notice takes space in the signed-in flex layout so it does not hide the bottom navigation.
 

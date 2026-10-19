@@ -101,7 +101,7 @@ export default function LaunchPage() {
   return (
     <main className="scene">
       <div className="app-shell">
-        <section className="launch screen-enter">
+        <section className="launch screen-enter pq-scrollbar--hidden">
           <div className="launch-brand"><span className="launch-logo"><img src="/logo.jpg" alt="PhysiqueQuest logo" className="brand-logo" /></span><h1>PhysiqueQuest</h1><p className="subtitle">AI-assisted, gamified fitness coaching that watches your form.</p></div>
           <div className="launch-spacer" />
           <div className="readiness">

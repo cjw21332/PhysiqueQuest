@@ -34,6 +34,13 @@ test('dark reference onboarding preserves registration, calibration, scrolling, 
   await expect(page.locator('.launch')).toHaveCSS('background-color', 'rgb(11, 15, 21)');
   await expectReferenceLayout(page, ['.launch', '.launch-brand', '.brand-logo', '.readiness', '.launch-actions']);
   await capture(page, testInfo, '01-launch');
+  for (const size of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(size);
+    await expect(page.locator('.launch')).toHaveCSS('scrollbar-width', 'none');
+    await page.locator('.launch').evaluate(el => { el.scrollTop = el.scrollHeight; });
+    await expect(page.getByRole('link', { name: 'I already have an account', exact: true })).toBeInViewport();
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('link', { name: 'Get started', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible();
   await expectReferenceLayout(page, ['.auth-screen', '.auth-body', '.auth-heading', '.segmented', '.auth-footer']);
