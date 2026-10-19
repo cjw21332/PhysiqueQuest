@@ -121,7 +121,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
           {([30, 45, 60] as const).map(value => <button key={value} className={settings.threshold === value ? 'selected' : ''} onClick={() => { void updateSettings({ threshold: value }).catch(error => setSaveError(error instanceof Error ? error.message : 'Could not save threshold.')); }}>{value} s</button>)}
         </div>
       </section>
-      <div className="me-setting-row"><span><b>Maximum alarm volume</b><small>Best effort at your device's available volume</small></span><Switch label="Maximum alarm volume" checked={settings.alarmVolume} onChange={() => void toggle('alarmVolume')}/></div>
+      <div className="me-setting-row"><span><b>Emergency alarm volume</b><small>Maximum volume in the Android app. Device volume applies on iOS, web, and Expo Go; system restrictions may limit sound.</small></span></div>
 
       <h3 className="me-group-title me-privacy-title">Privacy</h3>
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}
@@ -135,7 +135,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <button className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
     </div>
     <BottomNav />
-    {passwordOpen && <ForgotPasswordFlow onClose={() => setPasswordOpen(false)} onSuccess={() => { setPasswordOpen(false); setNotice('Password updated. Sign in again with your new password.'); onLogoutRequest?.(); }}/>}
+    {passwordOpen && <ForgotPasswordFlow mode="change" accountEmail={currentProfile.email} onClose={() => setPasswordOpen(false)} onSuccess={() => { setPasswordOpen(false); setNotice('Password updated. Sign in again with your new password.'); onLogoutRequest?.(); }}/>}
     {notice && <div className="home-toast me-toast" role="status">{notice}</div>}
   </section>;
 }

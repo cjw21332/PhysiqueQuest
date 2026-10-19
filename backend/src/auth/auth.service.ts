@@ -50,7 +50,7 @@ export class AuthService {
     });
 
     // Generate JWT token
-    const payload = { sub: user._id.toString(), email: user.email };
+    const payload = { sub: user._id.toString(), email: user.email, sessionVersion: user.sessionVersion ?? 0 };
     const access_token = this.jwtService.sign(payload);
     this.recordSignIn(user._id.toString(), 'register');
 
@@ -107,7 +107,7 @@ export class AuthService {
     await this.userModel.updateOne({ _id: user._id }, { $set: { failedLoginAttempts: 0, lockoutUntil: null } });
 
     // Generate JWT token
-    const payload = { sub: user._id.toString(), email: user.email };
+    const payload = { sub: user._id.toString(), email: user.email, sessionVersion: user.sessionVersion ?? 0 };
     const access_token = this.jwtService.sign(payload);
     this.recordSignIn(user._id.toString(), 'login');
 

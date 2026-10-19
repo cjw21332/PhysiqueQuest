@@ -1,0 +1,37 @@
+/* Dark is the default, independent of the operating system's theme. */
+:root {
+  color-scheme: dark;
+  --ink: #f8fafc;
+  --muted: #94a3b8;
+  --green: #22c55e;
+  --green-dark: #22c55e;
+  --green-light: #143b26;
+  --green-alt: #22c55e;
+  --line: #273444;
+  --soft: #161d27;
+  --surface: #0b0f15;
+  --bg: #0b0f15;
+  --bg-secondary: #161d27;
+  --bg-tertiary: #212b3b;
+  --text-secondary: #94a3b8;
+  --focus-ring: #4ade8065;
+  --orange-light: #480909;
+  --orange-mid: #f87171;
+  --orange-dark: #f87171;
+  --red-light: #480909;
+  --red-line: #f87171;
+  --red-dark: #f87171;
+  --blue-light: #161d27;
+  --blue-dark: #94a3b8;
+  --gray-light: #161d27;
+  --gray-mid: #64748b;
+  --gray-dark: #94a3b8;
+}
+
+html, body { background: var(--bg); }
+
+/* Fallback routes inherit the same dark tokens as the named section scopes. */
+.system-dark-theme {
+  height: 100%;
+  color: var(--ink);
+}

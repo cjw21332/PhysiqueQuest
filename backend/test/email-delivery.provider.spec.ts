@@ -25,7 +25,7 @@ describe('EmailDeliveryProvider', () => {
     const provider = createProvider(emailJsSettings);
 
     expect(provider.isAvailable()).toBe(true);
-    await expect(provider.sendPasswordReset('member@example.com', '123456')).resolves.toEqual({ ok: true });
+    await expect(provider.sendPasswordReset('member@example.com', '123456', '  Toji Fushiguro  ')).resolves.toEqual({ ok: true });
     expect(fetch).toHaveBeenCalledWith('https://api.emailjs.com/api/v1.0/email/send', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,10 +37,24 @@ describe('EmailDeliveryProvider', () => {
         template_params: {
           email: 'member@example.com',
           passcode: '123456',
-          time: '30 minutes',
+          time: '10 minutes',
+          name: 'Toji',
         },
       }),
     }));
+  });
+
+  it.each([
+    ['Mary-Jane Watson', 'Mary-Jane'],
+    ['Toji', 'Toji'],
+    ['Ana\tMaria Santos', 'Ana'],
+    ['   ', 'there'],
+  ])('uses a first-name greeting for %j', async (name, expected) => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response(null, { status: 200 }));
+    vi.stubGlobal('fetch', fetch);
+    await createProvider(emailJsSettings).sendPasswordReset('member@example.com', '123456', name);
+    const payload = JSON.parse(String(fetch.mock.calls[0][1]?.body));
+    expect(payload.template_params.name).toBe(expected);
   });
 
   it('does not require a private key when the EmailJS public key is configured', () => {
@@ -69,7 +83,7 @@ describe('EmailDeliveryProvider', () => {
         template: 'password-reset',
         to: 'member@example.com',
         token: '123456',
-        expiresInMinutes: 30,
+        expiresInMinutes: 10,
       }),
     }));
   });

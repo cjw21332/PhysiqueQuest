@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
 
 export type UserSettings = { inactivity: boolean; alarmVolume: boolean; showLeaderboard: boolean; threshold: 30 | 45 | 60 };
-const defaults: UserSettings = { inactivity: true, alarmVolume: true, showLeaderboard: true, threshold: 45 };
+const defaults: UserSettings = { inactivity: true, alarmVolume: true, showLeaderboard: true, threshold: 30 };
 
 export function useSettings() {
   const [settings, setSettings] = useState<UserSettings>(defaults);

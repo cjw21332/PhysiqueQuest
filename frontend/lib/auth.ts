@@ -58,7 +58,7 @@ export async function login(email: string, password: string): Promise<User> {
 
 export function logout() {
   clearAuthSession();
-  // Keep profile data for convenience when user logs back in
+  // The bounded device snapshot is restored only for the same authenticated account.
 }
 
 export function getCurrentUser(): User | null {

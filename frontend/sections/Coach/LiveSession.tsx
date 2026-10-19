@@ -11,7 +11,8 @@ import { COUNTDOWN_SECONDS } from '../../lib/inactivityConstants.mjs';
 type NativeEvent =
   | { type: 'countdown-started' }
   | { type: 'cancelled'; reason: 'movement' | 'im-okay' }
-  | { type: 'alarm'; location: { lat: number; lng: number; accuracyMeters: number; capturedAt: string } | null }
+  | { type: 'alarm-started'; nativeAudio: boolean }
+  | { type: 'alarm'; location: { lat: number; lng: number; accuracyMeters: number; capturedAt: string } | null; nativeAudio?: boolean }
   | { type: 'stopped' }
   | { type: 'motion-status'; available: boolean };
 
@@ -116,7 +117,13 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         changePhase('active');
         void api.sendInactivityEvent({ idempotencyKey: newKey(), eventType: 'cancelled', workoutSessionId: workoutId }).catch(() => undefined);
       }
-      if (detail.type === 'alarm' && phaseRef.current === 'countdown') void raiseAlarm(detail.location);
+      // The host owns the transition: a cancellation tap may arrive after its
+      // countdown expires. Always reveal the stop control once sound starts.
+      if (detail.type === 'alarm-started' && phaseRef.current !== 'alarm') beginAlarm(detail.nativeAudio);
+      if (detail.type === 'alarm') {
+        if (phaseRef.current !== 'alarm') beginAlarm(detail.nativeAudio);
+        void raiseAlarm(detail.location);
+      }
       if (detail.type === 'stopped') stopSound();
     };
     window.addEventListener('physiquequest-inactivity', onNative);
@@ -139,11 +146,14 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   const playSound = () => startAlarm();
   const stopSound = () => stopAlarm();
 
-  async function raiseAlarm(location: Extract<NativeEvent, { type: 'alarm' }>['location']) {
+  function beginAlarm(nativeAudio = false) {
     alarmStopRequested.current = false;
-    playSound();
+    if (!nativeAudio) playSound();
     changePhase('alarm');
     setRecordedAt(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
+  }
+
+  async function raiseAlarm(location: Extract<NativeEvent, { type: 'alarm' }>['location']) {
     const key = newKey();
     try {
       const record = await api.sendInactivityEvent({

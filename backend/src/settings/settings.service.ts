@@ -9,16 +9,11 @@ export class SettingsService {
   constructor(@InjectModel(Settings.name) private readonly model: Model<Settings>) {}
 
   async get(userId: string) {
-    return this.model.findOneAndUpdate(
-      { userId: new Types.ObjectId(userId) },
-      { $setOnInsert: { userId: new Types.ObjectId(userId), values: {} } },
-      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
-    );
+    return await this.model.findOne({ userId: new Types.ObjectId(userId) }).exec() ?? { values: {} };
   }
 
   async update(userId: string, dto: UpdateSettingsDto) {
-    const current = await this.get(userId);
-    current.values = { ...current.values, ...dto.values };
-    return current.save();
+    const patch = Object.fromEntries(Object.entries(dto.values).map(([key, value]) => [`values.${key}`, value]));
+    return this.model.findOneAndUpdate({ userId: new Types.ObjectId(userId) }, { $set: patch }, { upsert: true, returnDocument: 'after', runValidators: true, setDefaultsOnInsert: true });
   }
 }

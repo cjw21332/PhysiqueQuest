@@ -4,7 +4,7 @@ description: Mandatory governing rules for all PhysiqueQuest work. Establishes t
 
 # PhysiqueQuest General Rules
 
-These rules apply to every change, review, test, documentation update, and delivery in this repository. They are mandatory and take precedence over convenience or speed. Follow the three domain rule documents together with this General Rule.
+These rules apply to every change, review, test, documentation update, and delivery in this repository. They are mandatory and take precedence over convenience or speed. Follow the applicable domain rule documents together with this General Rule.
 
 ## 1. Required Rule Documents
 
@@ -14,14 +14,22 @@ Before changing code or making decisions, read this document and the relevant do
 |:--|:--|
 | [`DESIGN.md`](./DESIGN.md) | **Frontend:** visual design, interaction, responsive behavior, accessibility, and how API states are represented in the UI. |
 | [`DATABASE.md`](./DATABASE.md) | **Backend/data:** persistence, API/data contracts, database modeling, security, and backend data ownership. |
+| [`backend.md`](./backend.md) | **Backend/mobile loading:** device snapshots, parallel reads, invalidation, service startup and verification. |
 | [`PROCEDURES.md`](./PROCEDURES.md) | **Architecture and engineering process:** repository structure, cross-layer boundaries, implementation workflow, testing, and safe change procedures. |
 
 All three documents are mandatory, not optional suggestions. The General Rule defines shared governance; the domain documents define their respective technical details. If documentation conflicts with implemented behavior, verify the code and tests, then correct the stale documentation rather than bending working code to an outdated rule. Never use this conflict rule to bypass security or an explicit user constraint.
 
 ## 2. Protect Project Constraints and User Work
 
+- All frontend routes, dialogs and native host surfaces now use DESIGN.md's exact system-wide dark palette. Keep one authoritative token set in theme.css; do not reintroduce light route fallbacks or per-section color copies. Theme updates preserve existing geometry, typography and application flows.
+
+- The approved Quests/account dark references authorize scoped presentation changes, including the five profile editors. Preserve runtime rankings, badges, profile values, safety settings and all existing navigation/save/discard behavior; screenshot examples do not authorize new penalty rules or fabricated records.
+
+- The October 19 Nutrition and safety references authorize visual layout/type changes only. Keep the original navigation, API requests, validation, countdown timing, alarm audio, hold-to-stop behavior and admin permissions. Preserve truthful runtime text where screenshot examples would claim unverified delivery or device capabilities.
+
 - Follow the repository's `AGENTS.md`, this rule set, and package-specific instructions. Preserve the monorepo boundaries and existing architectural choices.
 - Inspect files before editing. Make focused changes, preserve unrelated user work, and do not discard or overwrite unrequested changes.
+- Theme changes preserve the established layouts, typography, button placement, navigation, validation and data behavior unless the user explicitly requests a redesign. Dark mode is the approved default; retain its palette while restoring missing Back, Clear, Close, edit and completion controls. A screenshot reference is visual guidance, not authorization to remove working actions or replace API data with examples. Apply this rule across sections, including future theme passes.
 - Keep credentials, tokens, environment files, and other secrets out of source, logs, reports, commits, and tool output. Respect `.gitignore`; do not force-add ignored files.
 - Do not add dependencies, alter project structure, or introduce new frameworks without the required approval.
 - Make errors visible and actionable. Do not silently replace failed API or persistence behavior with fabricated success or user data.

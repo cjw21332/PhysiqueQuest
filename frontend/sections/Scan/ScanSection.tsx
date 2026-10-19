@@ -145,7 +145,7 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
       </section>
     </div>}
     <div ref={contentRef} className="scan-content">
-    {loading && view === 'nutrition' ? <div className="profile-load-state" role="status"><h2>Loading nutrition…</h2><p>Connecting to your saved nutrition log.</p></div> : <>
+    {loading && view === 'nutrition' ? <div className="profile-load-state" role="status" aria-label="Loading nutrition" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div> : <>
     {(error || actionError) && <p className="error" role="alert">{actionError || error}</p>}
     {preview && (view!=='review'||sampleReview) && <p className="scan-preview-label">Sample preview · not your saved nutrition data</p>}
     {notice&&<p className="scan-preview-notice" role="status">{notice}</p>}

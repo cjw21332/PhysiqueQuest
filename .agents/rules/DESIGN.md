@@ -1,8 +1,12 @@
 ---
-description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the light-theme interface, component library, responsive rules, and extension patterns. The web app is the design source; the Expo app displays it in a native WebView with device capabilities (safe-area insets, camera, file inputs).
+description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the approved dark theme, preserved component layouts, responsive rules, and system-wide dark behavior. The web app is the design source for the native WebView.
 ---
 
-# PhysiqueQuest Design System (2026-10-14)
+# PhysiqueQuest Design System (2026-10-19 · cached startup, dark palette and OTP email reference)
+
+**Cached mobile loading (October 19, 2026):** The signed-in shell can display last-confirmed profile, nutrition, missions and Coach data during background refreshes. Keep the shared cache notice and its Refresh control visible; background failures retain saved content with an explicit connection notice. First loads without cached data retain error/retry/loading screens. Cached views do not authorize offline saves. The notice takes space in the signed-in flex layout so it does not hide the bottom navigation.
+
+**Section-switch follow-up (October 19, 2026):** Home/Coach/Scan/Quests/Me switch through the client router, keeping the app and cache alive. Restore saved resources before paint so tab changes do not flash profile/section interstitials. Cold profile, Coach, nutrition and quest loads use quiet, non-animated, accessible placeholders instead of large loading messages. Preserve actual failure messages and Retry. Disable the Next.js development badge because it overlaps the Me tab on mobile; compile/runtime errors remain surfaced.
 
 This document specifies the current PhysiqueQuest product interface, design tokens, component patterns, responsive behavior, and rules for extending the system consistently. It describes the current codebase rather than asserting a product release version. Update this document when adding new UI patterns or making significant design decisions.
 
@@ -11,12 +15,18 @@ This document specifies the current PhysiqueQuest product interface, design toke
 ## 1. Product Architecture & Navigation
 
 ### Non-Negotiable System Design Rules
-- Keep all frontend styles in `frontend/app/globals.css`; scope new rules to the relevant component instead of creating stylesheets or CSS modules.
-- Reuse the established light palette and CSS custom properties. Do not introduce new palette tokens, UI frameworks, component kits, or icon packages without approval.
+
+**Quests and account reference pass (October 19, 2026):** `/quests` and `/me` use `account-dark-theme`, the default dark tokens, bundled Inter and a centered 440px mobile frame. Quests, Leaderboard, Account & settings and all five profile editors retain their original actions and data. Use dark input/card surfaces, green selected controls and a fixed-height footer outside the editor scroll region. Keep Back/Discard/Save, settings persistence, leaderboard period/privacy handling and truthful safety copy. Screenshot penalty/freeze examples are not implemented business rules and must not be presented as account facts.
+
+**Latest approved visual scope (October 19, 2026):** The supplied dark references explicitly authorize layout and typography updates for Nutrition, Review estimate, Today's log, inactivity countdown and emergency alarm. Nutrition uses a centered 440px frame, bundled Inter, a 110px calorie ring (92px on narrow phones), dark surfaces and green actions. Calorie values display full numbers and kcal targets; calculations remain unchanged. Emergency panels now use the shared slate `#161D27`, deep red `#480909`, and coral `#F87171` tokens. This explicit request supersedes older system-font and width restrictions for these screens. Preserve Back, Retake, manual entry, exclusion/portion selection, save/edit/history/water actions and all safety callbacks. Delivery status, contact, time and nutrition values come from existing data; never copy screenshot examples into live records or promise unsupported maximum device volume. Admin logs remain permission-gated.
+
+- Keep layout/component styles and new scoped color overrides in `frontend/app/globals.css`; do not create competing redesign stylesheets or CSS modules. The existing `theme.css` token definitions and `scrollbars.css` utilities are intentional shared imports.
+- Reuse the approved dark palette and existing CSS custom properties on migrated pages. Every route, modal, loading/error state and native WebView surface uses the same dark palette independently of OS preference; do not add a light fallback. Do not introduce UI frameworks, component kits, or icon packages without approval.
+- **Theme-only policy:** Unless a request explicitly calls for typography changes, keep the original layouts, font families/sizes, responsive widths, scroll ownership, form sections, button placement and flow. Restore missing controls instead of hiding them to match a screenshot. Launch, login/register, calibration, Home, goals, progress, notifications, Coach and the exercise library now follow this policy. Scan has a specifically requested readability pass for text colors and sizes; it keeps the system font stack and existing layout/flow. The separately requested launch top/bottom spacing and shared dark scrollbar remain in effect.
 - Treat the web app as the UI source for both browsers and the Expo WebView. Design mobile-first, account for safe-area insets, and preserve the established 390px, 700px, and 740px responsive breakpoints.
 - Use the shared `Icon` registry, existing React state and API-backed persistence patterns, and the established five-tab navigation.
 - Keep backend-backed screens truthful: render real API data and explicit loading, empty, and error/retry states. If the user explicitly requests a temporary sample preview, identify it as sample content, use it only after a successful empty response (never mask loading or API errors), and keep sample-only actions local.
-- Coach Exercise Library and the explicitly requested Me admin catalog/New exercise/analytics previews use separate local fixtures, never API-error fallbacks. Me opens the admin components with `preview` explicitly enabled; their default API mode and the public library's integration are preserved. Mock admin actions make no provider or persistence writes, and mock data is labeled in the admin screens.
+- Coach Exercise Library uses live catalog/detail/GIF requests with explicit loading, empty and retry states. The requested Me admin catalog/New exercise/analytics previews use separate local fixtures, never API-error fallbacks. Me opens those admin components with `preview` explicitly enabled; their default API mode and administrator authorization are preserved. Mock admin actions make no provider or persistence writes and are labeled in the admin screens.
 - Preserve accessible names, visible keyboard focus, and 44px minimum touch targets for interactive controls. Respect reduced-motion preferences.
 
 ### App Structure
@@ -38,9 +48,9 @@ PhysiqueQuest is a mobile-first fitness and nutrition prototype. The Next.js web
 
 ### Navigation Behavior
 - **Mock admin entry visibility:** Exercise Library and Engagement analytics appear below Change password in Me for every signed-in account while they open explicit local previews. Backend administrator authorization remains unchanged; exposing these mock links grants no access to live administrator data or writes.
-- **Me reference screens:** Account & Settings and its five profile editors use the supplied white surface, green chips/switches, icon rows, quiet input borders, and shared back/title and save/discard layout. Render saved profile/settings values; retain role-gated admin tools and honest alarm-volume wording. Editors preserve saved measurement units, keep failed saves open, and hide the tab bar. Reference avatar artwork is decorative. Sample-profile mode, manual alert testing, and the alert-log menu row were removed at the user's request; profile/settings/security/logout retain API behavior. Only the three requested admin pages display mock data.
+- **Me reference screens:** Account & Settings and its five profile editors use dark surfaces and green chips/switches, icon rows, quiet input borders, and shared back/title and save/discard layout. Render saved profile/settings values; retain role-gated admin tools and honest alarm-volume wording. Editors preserve saved measurement units, keep failed saves open, and hide the tab bar. Reference avatar artwork is decorative. Sample-profile mode, manual alert testing, and the alert-log menu row were removed at the user's request; profile/settings/security/logout retain API behavior. Only the three requested admin pages display mock data.
 - **Nutrition calorie display:** Home Nutrition today, Today's Log, and the Scan overview reuse `Home/CalorieProgress.tsx` and its shared ring sizing/type styles, including the empty track and clamped fill. Edit Meal food names use debounced backend USDA suggestions with loading, empty, and retry states. Selecting a suggestion updates its name/reference; nutrition values remain available for user review rather than being replaced without a portion calculation.
-- **Today's Log meal rows:** Show the original input source (Scanned or Manual), an edited marker when applicable, and the original device-local logging time last. Empty meal categories show "No logged yet". Logged food buttons open the shared Scan-themed editor; a multi-food meal offers a food selector. Cancel keeps the existing data, and failed saves remain in the editor for retry.
+- **Today's Log meal rows:** Show the original input source (Scanned or Manual), an edited marker when applicable, and the original device-local logging time last. Empty meal categories show "Not logged yet". Logged food buttons open the shared Scan-themed editor; a multi-food meal offers a food selector. Cancel keeps the existing data, and failed saves remain in the editor for retry.
 - **Nested-page headers:** Place the back icon immediately before the page title in both markup and visual order. Keep secondary actions such as History, Retake, and Share at the trailing edge; do not move the back control after the title with CSS ordering.
 - **Main tab bar** (five tabs): Positioned above device system-navigation on main section screens (Home, Coach, Scan, Quests, Me)
 - **Nested/detail flows**: Usually hide the tab bar to reclaim screen space; Today’s Log is an intentional exception and retains it. Provide a clear back button or completion action to parent. Includes:
@@ -70,36 +80,41 @@ The web app is the product surface; the NestJS API supplies the data behind it. 
 
 ### Color Palette
 
-Core colors are CSS custom properties in `frontend/app/globals.css`. Reuse these for all new UI; do not introduce new palette variables without approval.
+**System-wide dark palette (October 19, 2026):** All screens use these exact colors. The admin reference originally established the palette; it now governs launch/auth/onboarding, Home, Coach, Scan, Quests, Me, public exercise library, dialogs, loading/error states and native connection/camera overlays. Exercise Library admin, its inline New exercise form, and Engagement analytics use `.admin-reference`, bundled Inter and a centered 440px frame. Keep the existing Back actions, 44px touch targets, sample labels, real API states and every search/filter/create/cancel/range/export callback. The supplied phone bezel and OS status bar are reference framing, not app content. Match the supplied content without fabricating live records.
 
-| Token | Value | Use Case |
+| Role | Exact value | Existing token / application |
 |:--|:--|:--|
-| `--ink` | #192233 | Primary text, headings, icons, primary interactive elements |
-| `--muted` | #627087 | Secondary text, captions, hints, disabled states |
-| `--bg` | #f4f6f3 | Page/section backgrounds, subtle fill areas |
-| `--surface` | #fff | Main content areas, cards, input fields, control surfaces |
-| `--soft` | #f4f7f4 | Quiet/inactive surfaces, subtle fills, unselected controls |
-| `--line` | #e8ede9 | Borders, dividers, separators, input focus states |
-| `--green` | #7ee582 | Primary actions, progress indicators, success states, selected controls |
-| `--green-dark` | #167336 | Text on green surfaces, secondary brand accents, dark mode alternative |
-| `--green-light` | #eefaf0 | Tinted green surfaces (brand mark, colored cards) |
-| `--green-alt` | #80e687 | Alternate green used in existing components; prefer `--green` for new work |
-| `--bg-secondary` | #f4f7f4 | Secondary page fill (same value as `--soft`) |
-| `--bg-tertiary` | #f9faf9 | Tertiary fill for subtle layering |
-| `--text-secondary` | #344256 | Secondary body text between `--ink` and `--muted` |
-| `--focus-ring` | #7ee58265 | Translucent green focus/outline fill |
-| `--orange-light` / `--orange-mid` / `--orange-dark` | #fff5e5 / #ed641e / #bc4d13 | Warning surfaces and text |
-| `--red-light` / `--red-line` / `--red-dark` | #fff0f0 / #f8d7d7 / #e4433a | Error surfaces, borders, and text |
-| `--blue-light` / `--blue-dark` | #f0f9ff / #176a30 | Information surfaces (note: `--blue-dark` holds a green value; treat its name as legacy) |
-| `--gray-light` / `--gray-mid` / `--gray-dark` | #f3f6f4 / #8793a1 / #536071 | Neutral utility grays |
+| Background primary | `#0B0F15` | `--surface`, `--bg`; canvas |
+| Surface card | `#161D27` | `--soft`; inputs and inactive chips |
+| Surface elevated | `#212B3B` | `--bg-tertiary`; elevated slate |
+| Border / outline | `#273444` | `--line`; borders, dividers, disabled fill |
+| Primary accent | `#22C55E` | `--green`, `--green-dark`; actions and selection |
+| Accent light | `#4ADE80` | hover and keyboard focus |
+| Warning / required | `#F87171` | missing/training pose and errors; pair with text |
+| Text primary | `#F8FAFC` | `--ink` |
+| Text secondary | `#94A3B8` | `--muted`, `--text-secondary` |
+| Text muted | `#64748B` | placeholders and disabled labels |
 
-These extended tokens are declared in `frontend/app/globals.css` `:root` and are the only palette variables to use. Do not add new palette variables without approval.
+Use deep green `#143B26` for the New exercise panel, published badges and earlier retention bars; use the primary accent for the latest bar. Selected green controls use background-primary text. Muted text is for nonessential hints, not primary readable copy. These exact tokens are defined once in `frontend/app/theme.css` and inherited by all section scopes; there are no per-section palette copies or light-theme overrides. Existing layouts, type scales, actions and persistence stay unchanged. Photos, logos, GIFs and camera imagery retain their own colors. Native configuration defaults to dark with light status/navigation indicators on every route, including Scan, Quests and Me.
 
-**Semantic Colors** (already in stylesheet, use instead of defining new ones):
-- Error/danger: `#e53935` / `#bd3030` (red tones)
-- Warning: `#b45e15` / `#ed641e` (orange/amber)
-- Success: `--green` and `--green-dark`
-- Information: Blue tones (use sparingly, not primary brand color)
+**Current default:** `frontend/app/layout.tsx` sets `data-theme="dark"`, dark color-scheme and browser theme color `#0B0F15`. `theme.css` is imported after `globals.css` and supplies the authoritative palette. Named section wrappers retain their layout and scoped presentation; the fallback wrapper is `system-dark-theme`, never a light theme. `scrollbars.css` uses the same background/border/muted tokens. Use the existing CSS custom properties for all future UI.
+
+| Token | Value | Use |
+|:--|:--|:--|
+| `--surface`, `--bg` | `#0B0F15` | Page canvas; text/icons on bright green or coral actions |
+| `--soft`, `--bg-secondary`, `--gray-light`, `--blue-light` | `#161D27` | Cards, inputs, inactive controls and footers |
+| `--bg-tertiary` | `#212B3B` | Elevated and hovered secondary surfaces |
+| `--line` | `#273444` | Borders, dividers and disabled fills |
+| `--ink` | `#F8FAFC` | Primary copy and icons |
+| `--muted`, `--text-secondary`, `--gray-dark`, `--blue-dark` | `#94A3B8` | Secondary copy and inactive labels |
+| `--gray-mid` | `#64748B` | Disabled/nonessential muted hints |
+| `--green`, `--green-dark`, `--green-alt` | `#22C55E` | Primary actions, selected controls and progress |
+| `--green-light` | `#143B26` | Green-tinted panels and earlier chart bars |
+| `--focus-ring` | `#4ADE8065` | Translucent focus halo; solid focus/primary hover uses `#4ADE80` |
+| `--red-dark`, `--red-line`, `--orange-mid`, `--orange-dark` | `#F87171` | Error, warning, required and destructive states, paired with text |
+| `--red-light`, `--orange-light` | `#480909` | Error/warning and emergency surfaces |
+
+The orange/blue/gray names are retained aliases used by existing components, not additional palettes. Do not copy old light hex values from earlier base rules. Black/translucent black is reserved for backdrops; camera overlay surfaces may use the approved slate with alpha for visibility over video.
 
 **Color Usage Rules:**
 - Use `--ink` for all primary text and interactive labels
@@ -107,7 +122,7 @@ These extended tokens are declared in `frontend/app/globals.css` `:root` and are
 - Use `--surface` and `--soft` for depth and layering, never both at same visual level
 - Use `--green` for all primary CTAs and progress states
 - Status colors (error, warning) must pair with icons or text labels, never color alone
-- Avoid using the dark live-workout view (#111827) elsewhere without explicit product approval
+- Use the approved dark surfaces on migrated screens; keep the existing semantic warning and danger colors readable against them.
 
 ### Typography System
 
@@ -115,7 +130,7 @@ These extended tokens are declared in `frontend/app/globals.css` `:root` and are
 ```css
 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif
 ```
-System fonts only. Do not add web fonts or custom typefaces.
+Approved reference screens use bundled Inter (`/fonts/Inter-Variable.ttf`), including Nutrition/Scan, Home and Coach. Other screens retain their existing font stack. Do not introduce additional typefaces without a specific request.
 
 **Type Scale & Weight Hierarchy:**
 
@@ -141,28 +156,28 @@ System fonts only. Do not add web fonts or custom typefaces.
 
 | Element | Font Size | Weight | Color | Usage |
 |:--|:--|:--|:--|:--|
-| Step indicator | 12px | 400 (regular) | --green-dark (#167336) | "Step 1 of 4 · Calibration" |
-| Section heading (h2) | clamp(19px, 5vw, 24px) | 600 (semibold) | --ink (#192233) | "Personal data", "What are you training for?" |
+| Step indicator | 12px | 400 (regular) | --green-dark (#22C55E) | "Step 1 of 4 · Calibration" |
+| Section heading (h2) | clamp(19px, 5vw, 24px) | 600 (semibold) | --ink (#F8FAFC) | "Personal data", "What are you training for?" |
 | Description text | clamp(13px, 2.5vw, 16px) | 400 (regular) | --muted (#627087) | Subtitle under section heading |
-| Section labels | 14-15px | 600 (semibold) | --ink (#192233) | "Basic information", "Equipment available", "Training days" |
-| Field labels | 13-14px | 600 (semibold) | --ink (#192233) | "Age", "Height", "Weight", "Gender" |
-| Input text | 14-16px | 400 (regular) | --ink (#192233) | User-entered values |
+| Section labels | 14-15px | 600 (semibold) | --ink (#F8FAFC) | "Basic information", "Equipment available", "Training days" |
+| Field labels | 13-14px | 600 (semibold) | --ink (#F8FAFC) | "Age", "Height", "Weight", "Gender" |
+| Input text | 14-16px | 400 (regular) | --ink (#F8FAFC) | User-entered values |
 | Unit suffixes | 11-13px | 400 (regular) | --muted (#627087) | "yrs", "cm", "kg" within inputs |
 | Optional labels | 11-12px | 400 (regular) | --muted (#627087) | "Optional" badges |
-| Required labels | 11-12px | 400 (regular) | #e53935 (red) | "Required" badges |
+| Required labels | 11-12px | 400 (regular) | #F87171 (red) | "Required" badges |
 | BMI display | 13-14px | 400 (regular) | --muted (#627087) | "BMI 23.2" |
-| Button labels (selected) | 14-15px | 600 (semibold) | --green-dark (#167336) | Selected choice buttons |
-| Button labels (unselected) | 14-15px | 400 (regular) | --ink (#192233) | Unselected choice buttons |
-| Goal card titles | 14-15px | 600 (semibold) | --ink (#192233) | "Weight loss", "Build muscle" |
+| Button labels (selected) | 14-15px | 600 (semibold) | --surface (#0B0F15) | Selected choice buttons |
+| Button labels (unselected) | 14-15px | 400 (regular) | --ink (#F8FAFC) | Unselected choice buttons |
+| Goal card titles | 14-15px | 600 (semibold) | --ink (#F8FAFC) | "Weight loss", "Build muscle" |
 | Goal card details | 12-13px | 400 (regular) | --muted (#627087) | "Calorie deficit + conditioning" |
 | Microcopy/helper text | 12-13px | 400 (regular) | --muted (#627087) | Activity descriptions |
-| Primary button text | clamp(14px, 2.5vw, 17px) | 600 (semibold) | --green-dark (#167336) | "Next: Goals →", "Finish & build my plan →" |
+| Primary button text | clamp(14px, 2.5vw, 17px) | 600 (semibold) | --surface (#0B0F15) | "Next: Goals →", "Finish & build my plan →" |
 | Back button | 13px | 400 (regular) | --muted (#627087) | "Back" in step header |
 | Clear button | 12px | 400 (regular) | --muted (#627087) | "Clear" inline section buttons |
 | Day buttons | 14-16px | 600 (semibold) when selected | --green-dark or --ink | "M", "T", "W" training day buttons |
-| Checkbox labels | 14px | 400 (regular) | --ink (#192233) | Condition checkboxes, equipment options |
+| Checkbox labels | 14px | 400 (regular) | --ink (#F8FAFC) | Condition checkboxes, equipment options |
 | Placeholder text | 13-14px | 400 (regular) | --muted (#627087) | Textarea placeholders |
-| Safety note | 12-13px | 400 (regular) | --ink (#192233) | Emergency contact info boxes |
+| Safety note | 12-13px | 400 (regular) | --ink (#F8FAFC) | Emergency contact info boxes |
 | Password requirements title | 12px | 400 (regular) | --muted (#627087) | "Password must contain:" |
 | Password requirements list | 13px | 400 (regular) | --muted (unmet) / --green-dark (met) | Individual password requirements with checkmarks |
 
@@ -276,8 +291,8 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 ### Button & Control Styles
 
 **Primary Action Button** (`.primary`):
-- Background: `var(--green)` (#7ee582)
-- Text: `#0d2212` (dark green-black, hard-coded in `.primary`)
+- Background: `var(--green)` (#22C55E)
+- Text: `var(--surface)` (#0B0F15)
 - Min height: `clamp(48px, 8vh, 62px)` (touch-safe)
 - Border radius: `clamp(10px, 2vw, 15px)`
 - Font: `clamp(13px, 2vw, 16px)`, weight 700
@@ -287,42 +302,42 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 - Disabled: `opacity: 0.6`, no transform or shadow
 
 **Secondary Action Button** (`.secondary`):
-- Background: White
-- Border: 1px `var(--line)` (#e8ede9)
-- Text: `var(--ink)` (#192233)
+- Background: `var(--soft)`
+- Border: 1px `var(--line)` (#273444)
+- Text: `var(--ink)` (#F8FAFC)
 - Min height: `clamp(48px, 8vh, 62px)`
 - Use for: Alternatives, "Cancel", "Back", optional actions
-- Hover state: `filter: brightness(.98)`, `translateY(-2px)`, background `#fafbfa`, soft shadow
+- Hover state: `filter: brightness(.98)`, `translateY(-2px)`, background `var(--bg-tertiary)`, soft shadow
 - Active state: `transform: scale(0.96)`
 
 **Link Button** (text-only):
 - Background: transparent
-- Text: `var(--green-dark)` (#167336)
+- Text: `var(--green-dark)` (#22C55E)
 - Font weight: 600
 - Use for: Navigation, secondary actions, "View All", "Edit"
 - Hover state: `opacity: 0.8`
 
 **Input Fields** (`.input-wrap`):
-- Border: 1px `var(--line)` (#e8ede9)
+- Border: 1px `var(--line)` (#273444)
 - Border radius: `11px`
 - Min height: 44px
 - Padding: `0 12px`
-- Focus state: `.focus-within:focus-within` applies `outline: 2px solid #7ee58265` + `border-color: #70cf75`
-- Placeholder: `#a1aaba` (hard-coded in `globals.css`)
+- Focus state: `.focus-within:focus-within` applies `outline: 2px solid #4ade8065` + `border-color: #22C55E`
+- Placeholder: `#64748B` (hard-coded in `globals.css`)
 - All inputs use system font stack, 13–16px, inherit font properties
 
 **Form Field Labels:**
 - Font size: 12–14px
 - Font weight: 600
 - Margin bottom: 7px
-- Color: `var(--ink)` (#192233)
-- Required indicator: Red (#d63737), font-weight 600
+- Color: `var(--ink)` (#F8FAFC)
+- Required indicator: Red (#F87171), font-weight 600
 - Optional label: `var(--muted)`, 11–12px
 
 ### Card & Surface Components
 
 **Standard Card** (`.mission-card`, `.journey-card`):
-- Background: `var(--surface)` (#fff)
+- Background: `var(--surface)` (#0B0F15)
 - Border: None (or 1px `var(--line)`)
 - Border radius: `clamp(10px, 2vw, 14px)`
 - Padding: `clamp(11px, 2.2vw, 16px)`
@@ -330,17 +345,17 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 - Hover state: Slight scale (0.98) or shadow lift on interactive cards
 
 **Colored Card** (`.goal-card`, `.level-card`):
-- Background: Light tint (e.g., `#effaf0` for green theme)
+- Background: Dark green tint (e.g., `#143B26` for green theme)
 - Border: 1px light border or none
 - Border radius: Same as standard cards
 - Use for: Goals, milestones, achievements, themed sections
 
 **Progress Bar** (`.progress-bar-fill`):
 - Height: `clamp(5px, 1vh, 7px)`
-- Background: `var(--green)` (#7ee582)
+- Background: `var(--green)` (#22C55E)
 - Border radius: `clamp(4px, 0.8vw, 6px)` (match rounded ends)
 - Transition: `width 0.3s` (smooth animation)
-- Container background: `var(--soft)` or `#eef0ee`
+- Container background: `var(--soft)` or `#273444`
 
 ### Icon Usage
 
@@ -365,11 +380,11 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 **Focus Visible State:**
 ```css
 .focus-ring:focus-visible {
-  outline: 2px solid #7ee582; /* --green */
+  outline: 2px solid #22C55E; /* --green */
   outline-offset: 2px;
 }
 ```
-- Components also set their own focus outlines; `.eye:focus-visible` and `.input-wrap select:focus-visible` use `#7ee582`, and `.eye-toggle:focus-visible` uses `var(--green-dark)`
+- Components also set their own focus outlines; `.eye:focus-visible` and `.input-wrap select:focus-visible` use `#22C55E`, and `.eye-toggle:focus-visible` uses `var(--green-dark)`
 - Never remove default focus indicators without providing a replacement
 - Focus ring must be visible on all interactive elements
 
@@ -424,7 +439,7 @@ Do not raise page controls above a modal layer to solve clipping issues; fix the
 - Dismissible: Keyboard (Escape) and touch (backdrop click)
 
 **Modal Dialog:**
-- Background: `var(--surface)` (#fff)
+- Background: `var(--surface)` (#0B0F15)
 - Border radius: `clamp(14px, 2.5vw, 20px)`
 - Padding: `clamp(20px, 4vw, 24px)`
 - Max width: `min(100%, 340–440px)`
@@ -439,13 +454,19 @@ Do not raise page controls above a modal layer to solve clipping issues; fix the
 
 ## 7. Design System Maintenance
 
+**OTP email reference (October 19, 2026):** `backend/email-templates/otp.html` is the prepared EmailJS source, activated separately in the provider dashboard. This explicit email reference uses green `#86E08B`, navy `#0F172A` and inset `#0B0F15`; it does not change the web app palette. Preserve the centered logo/brand and ONE-TIME PASSWORD header, greeting, inset copyable six-digit code, clear expiry, safety copy and green footer. Use email-compatible inline table styles, Arial/Helvetica fallback and a 708px maximum width with a narrow-phone adjustment. Embed the existing system icon using a static EmailJS attachment CID. Name/code/time remain escaped dynamic variables; expiry comes from the backend's shared 10-minute policy. Do not put the code in subject/preheader, include placeholder-company text or claim a branded From address without provider authorization. Local previews do not prove an activated template or delivered inbox appearance.
+
+**October 19, 2026 palette completion:** Promoted the supplied exact palette to the root theme, removed the light fallback and per-section token duplication, and aligned existing dark screens, shared controls, dialogs, warnings, scrollbars, native connection/camera overlays and system indicators. This is a color-only pass: preserve dimensions, typography, navigation, validation and data behavior. Browser palette checks cover visible text, surfaces, icons and borders across the main journeys and shared overlays.
+
+**October 19, 2026 restoration:** Kept the approved dark palette and dark scrollbars while restoring the original launch/auth/onboarding and Home/goals/progress/notification layouts. Calibration again exposes its Back/Clear actions; Progress again exposes Add measurement in its header and history beside the trend; nested Home pages again show their return buttons. Theme-only changes must preserve these controls, validation, saved values, API actions and responsive layout. The previous standalone onboarding/journey/Coach redesign stylesheets are no longer imported or present.
+
 ### Stylesheet Structure
 
-**October 14, 2026:** Coach Exercise Library now follows the supplied compact list and white video-detail sheet. The library keeps bottom navigation; its native modal dialog covers navigation while open, contains keyboard focus, closes with Escape/backdrop/close, and restores focus to its opener. The original safe-area aliases now remain authoritative instead of being overridden by duplicate declarations.
+**October 14, 2026:** Coach Exercise Library now follows the supplied compact list and dark exercise-detail sheet. The library keeps bottom navigation; its native modal dialog covers navigation while open, contains keyboard focus, closes with Escape/backdrop/close, and restores focus to its opener. The original safe-area aliases now remain authoritative instead of being overridden by duplicate declarations.
 
 **October 14, 2026 — Scan:** Nutrition, Review Estimate, Today’s Log, Add Food, and Food History follow the supplied mobile references using shared palette/system typography and scoped styles. The existing API client and nutrition hook remain the live data path. A labeled, local reference preview is eligible only after a successful response with no meals and no recorded water; it persists across internal navigation and background refresh without replacing errors or real records. Sample manual/scan saves and water updates never call persistence APIs. Camera/upload always use backend analysis; the photo-source chooser offers a separate, explicit sample-estimate action.
 
-All active web styles live in `frontend/app/globals.css`. This file is imported by the root layout.
+Layout/component styles and scoped theme colors live in `frontend/app/globals.css`, imported by the root layout. `theme.css` supplies the approved single system-wide dark token set; `scrollbars.css` supplies the shared dark scrollbar and reusable `pq-scrollbar` utilities. The separate onboarding, journey and Coach redesign stylesheets have been removed so they cannot override the original layouts.
 
 **File Organization:**
 1. CSS custom properties (`:root { ... }`)
@@ -465,7 +486,7 @@ All active web styles live in `frontend/app/globals.css`. This file is imported 
 - Prefer targeted, component-scoped rules placed near their relevant sections
 - Clearly label responsive overrides (e.g., `/* ─── Tablet (≥700px) ─── */`)
 - Do not rewrite the full stylesheet or add competing stylesheets
-- Keep the existing light palette, shared content frame, safe-area aliases, and section scroll behavior consistent
+- Keep the approved theme colors, original shared content frame, safe-area aliases and section scroll behavior consistent.
 
 **When to Use `clamp()`:**
 Use `clamp()` for responsive sizing instead of breakpoint-based rules:
@@ -555,17 +576,19 @@ Before committing any UI changes, verify:
 - **Data states**: Retain the API-backed loading and error/retry states. When no live records are returned successfully, show the requested screenshot-matched sample preview with an explicit sample label; its read actions are local and never sent to the backend. For live records, individual mark-read and mark-all-read remain API-backed. Keep the Home bottom navigation and safe-area spacing intact.
 
 ### Coach (Training)
-- **Exercise Library sample preview**: Default to All muscles and Dumbbells, displaying the six supplied exercises in reference order. Use two horizontally scrollable filter rows with pill surfaces inside 44px touch targets, a search icon/input, result count, muted sample label, compact thumbnail rows, and AI tracked/Caution badges. Search and filters are local and combine; Any equipment removes the equipment restriction.
-- **Exercise details**: White bottom sheet on phones, centered dialog at 700px and wider. Title and metadata precede the video preview, recommendation and form-tracking label, numbered instructions, and green check-circle form cues. The bench-press poster displays the media area of the unchanged supplied reference; other exercises state that video is coming soon. Play controls explicitly report that playback is not connected. No autoplay, fabricated AI analysis, or plan-saving action. Keep the sample/AI-unavailable note visible in the sheet.
+- **Current theme policy (October 19, 2026):** Coach and the public exercise library use `coach-dark-theme`. Preserve the established layouts, type sizes, content widths, modal presentation, callbacks, and bottom-navigation visibility; apply dark colors only. Palette overrides live at the end of `frontend/app/globals.css`. Do not reuse the Home reference redesign wrapper on Coach or hide/reorder its back buttons. Nested Library, Camera check, and Workout report place the back button immediately before their title and return to the plan; live sessions retain Pause/Resume and End session. Inactivity countdown uses a charcoal-blue surface with a coral timer; the active emergency state uses a deep red field with dark contact/log/control surfaces. Keep the existing countdown, delivery status, hold-to-stop, resolution, and log behavior.
+- **Current data implementation:** The saved weekly program and workout records remain API-backed. `ExerciseLibrary.tsx` now fetches the live catalog/detail/GIF endpoints, with search, filters, pagination and explicit failure/retry states. Do not restore fixtures or remove live playback as part of a theme change. Exercise details retain the established bottom-sheet layout and close action.
+- **Exercise library**: Preserve the established search, horizontally scrollable muscle/equipment filters, result count, pagination and compact rows. Filters combine in API requests; default equipment follows the saved profile when exactly one supported option exists. Retain loading/error/retry/empty states and provider attribution. Do not restore the historical six-exercise fixture.
+- **Exercise details**: Preserve the existing dark bottom sheet, title, metadata, GIF preview/play-pause control, recommendation, manual-tracking label, numbered instructions and available form cues. Keep native dialog focus containment, Escape/Close dismissal and focus restoration. Missing media/details have explicit unavailable/retry states; the presentation must not imply that manual tracking is connected AI analysis.
 - **Header**: Section title + back button (if nested)
 - **Week View**: Grid of 7 day buttons with indicator dots, selected day highlighted green
 - **Exercise List**: Numbered items with title, time, tracking tag (manual/automatic/caution)
 - **Camera Preview**: Live video with pose frame, person overlay, distance indicator
-- **Session View**: Dark background (#111827), form score badge, rep counter, exercise label
+- **Session View**: Dark background (#0B0F15), form score badge, rep counter, exercise label
 - **Live Controls**: Pause/End buttons, session progress bar
 
 ### Scan (Nutrition)
-- **Reference presentation**: Compact sticky headers, a full green calorie-summary ring, macro tracks, rounded green scan CTA, thin meal dividers, and More links. Use the camera icon for scanning, shared glass icons for water, and shared bar-chart icons for history. Keep touch areas at least 44px; water displays eight glasses across standard phones and wraps to four columns on the narrowest phones.
+- **Reference presentation**: Compact sticky headers, a full green calorie-summary ring, macro tracks, rounded green scan CTA, thin meal dividers, and More links. The `.scan-reference` scope uses the approved dark palette and system font stack while preserving each screen's layout, data, and controls. Use 20–23px screen titles, 16px section headings, 14px body/control text, and 12px minimum supporting text where space permits; dense chart labels may be 11px. Use the camera icon for scanning, shared glass icons for water, and shared bar-chart icons for history. Keep touch areas at least 44px; water displays eight glasses across standard phones and wraps to four columns on the narrowest phones.
 - **Review Estimate**: Detected photo/items precede confidence badges and low-confidence guidance, Meal and Portion size pills, and the bordered macro table. Excluding an item or changing portions updates totals and the existing scan-save payload. Retain loading/time-limit progress, explicit errors/retry, unmatched-item exclusions, and degraded-result notices. Edit manually opens Add Food; the sticky footer keeps the save action disabled until matched items exist and while saving.
 - **Add Food**: Meal pills, search, recent suggestions, radio-style results, quantity/unit controls, calculated nutrition, and a sticky Save to [meal] footer. Live search/detail/save remain API-backed. Convert the quantity when switching grams/servings so the actual portion stays the same. Disable save for invalid/incomplete/pending data and show failures without implying persistence.
 - **Food History**: 7/30/90-day period pills, average daily intake over days with records, target comparison, calorie bars with target line, energy-based macro percentages, and expandable daily records. Derive live summaries from returned meals; the labeled preview uses the shared local fixtures. Retain bottom navigation on history and Today’s Log; Review Estimate and Add Food hide it.
@@ -580,10 +603,10 @@ Before committing any UI changes, verify:
 - **Streak Calendar**: 7×1 or 7×4 grid of daily squares (active/freeze/today states)
 - **Mission Items**: 2-column grid layout on desktop/tablet, stacked on mobile
   - **Incomplete missions**: Icon with NO background (transparent), title, progress bar, points in orange text
-  - **Completed missions**: Icon with green background (#7ee582) + white checkmark overlay, full card styling, progress bar filled green
-  - Card styling: White background, subtle border, thin shadow
+  - **Completed missions**: Icon with green background (#22C55E) + white checkmark overlay, full card styling, progress bar filled green
+  - Card styling: Dark surface, subtle border, thin shadow
   - Hover state: Slight lift (translateY), enhanced shadow
-  - Progress bars: Light container (#eef0ee), green fill (#80e687), smooth animation on update
+  - Progress bars: Light container (#273444), green fill (#22C55E), smooth animation on update
 - **Badges Section**: 4-column grid, locked/earned states with lock indicator
 - **Penalty Warning**: Orange/yellow background, warning icon, explanation text
 
@@ -606,7 +629,7 @@ Step 1 of calibration provides unit selectors for height (cm or ft/in), weight (
 - Border radius: `9px`
 - Padding: `2px`
 - Inactive option: transparent background, muted text
-- Active option: white background, green text (#167336), box-shadow, font-weight 700
+- Active option: elevated slate background, primary text (#F8FAFC), box-shadow, font-weight 700
 - Smooth transition on state change
 
 **Height Input (Dual Fields for Imperial):**
@@ -638,7 +661,7 @@ Step 1 of calibration provides unit selectors for height (cm or ft/in), weight (
 - Sticky positioning: Button stays in view at bottom, scroll content has trailing space
 
 **Form Validation:**
-- Inline feedback: Error text below field (12px, red #bd3030)
+- Inline feedback: Error text below field (12px, red #F87171)
 - Required indicator: "Required" badge in red on labels
 - Success state: Green check or highlight (not just green border)
 - Disabled state: Reduced opacity (0.5), `pointer-events: none`

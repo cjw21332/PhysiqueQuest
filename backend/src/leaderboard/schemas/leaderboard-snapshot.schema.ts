@@ -9,6 +9,7 @@ import { Schema as MongooseSchema, Types } from 'mongoose';
  */
 @Schema({ timestamps: true, collection: 'leaderboard_snapshots' })
 export class LeaderboardSnapshot {
+  @Prop() creditPolicyVersion?: number;
   @Prop({ required: true })
   period: string;
 

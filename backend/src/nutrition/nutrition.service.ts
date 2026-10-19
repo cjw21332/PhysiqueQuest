@@ -9,6 +9,10 @@ import { Nutrition, type NutritionDocument } from './schemas/nutrition.schema.js
 export class NutritionService {
   constructor(@InjectModel(Nutrition.name) private readonly model: Model<Nutrition>) {}
 
+  async read(userId: string) {
+    return await this.model.findOne({ userId: new Types.ObjectId(userId) }).lean().exec() ?? { meals: [], water: [] };
+  }
+
   async get(userId: string): Promise<NutritionDocument> {
     return this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },

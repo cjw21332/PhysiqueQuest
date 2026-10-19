@@ -44,7 +44,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
   const nextLevelExp = activity.nextLevelExp;
   const expProgress = nextLevelExp ? Math.min(currentExp / nextLevelExp * 100, 100) : 0;
 
-  if (loading) return <section className="quest-section"><div className="profile-load-state" role="status"><h2>Loading quests…</h2></div><BottomNav /></section>;
+  if (loading) return <section className="quest-section"><header className="quest-v2-header"><h2>Quests</h2></header><div className="profile-load-state" role="status" aria-label="Loading quests" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div><BottomNav /></section>;
   if (error) return <section className="quest-section"><div className="profile-load-state" role="alert"><h2>Could not load quests</h2><p>{error}</p><button onClick={() => void refresh()}>Try again</button></div><BottomNav /></section>;
 
   if (screen === 'leaderboard') {

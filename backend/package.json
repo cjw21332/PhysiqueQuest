@@ -12,11 +12,11 @@
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
+    "start:dev": "nest start --path tsconfig.dev.json --watch",
+    "start:debug": "nest start --path tsconfig.dev.json --debug --watch",
     "start:prod": "node ./dist/main.js",
     "start:coach": "node ./dist/coach-main.js",
-    "start:coach:dev": "nest start --entryFile coach-main --watch",
+    "start:coach:dev": "nest start --path tsconfig.coach.json --entryFile coach-main --watch",
     "lint": "oxlint src/ test/",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -61,5 +61,8 @@
     "typescript": "^6.0.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.1.2"
+  },
+  "overrides": {
+    "tmp": "0.2.7"
   }
 }

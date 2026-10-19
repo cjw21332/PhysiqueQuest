@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import { Camera, CameraView } from 'expo-camera';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
@@ -132,7 +132,7 @@ function AppContent() {
   if (!monitor.current) {
     monitor.current = createNativeMonitor({
       onEvent: detail => {
-        if (detail.type === 'countdown-started' || detail.type === 'alarm' || detail.type === 'stopped') {
+        if (detail.type === 'countdown-started' || detail.type === 'alarm-started' || detail.type === 'alarm' || detail.type === 'stopped') {
           cameraRequestId.current += 1;
           setCameraPreview(null);
         }
@@ -140,6 +140,8 @@ function AppContent() {
       },
     });
   }
+
+  useEffect(() => () => monitor.current?.stop(), []);
 
   const insetScript = useMemo(
     () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }, apiUrl ?? 'invalid-api-address'),
@@ -291,7 +293,7 @@ function AppContent() {
 
   return (
     <View style={styles.root}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
+      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
       {loadedAddress ? <WebView
         ref={webRef}
         key={key}
@@ -309,6 +311,9 @@ function AppContent() {
         bounces={false}
         overScrollMode="never"
         scrollEnabled
+        showsVerticalScrollIndicator
+        showsHorizontalScrollIndicator
+        indicatorStyle="white"
         cacheEnabled={false}
         incognito={false}
         setBuiltInZoomControls={false}
@@ -317,11 +322,12 @@ function AppContent() {
         textZoom={100}
         renderLoading={() => (
           <View style={[styles.loading, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
-            <ActivityIndicator size="large" color="#26743a" />
+            <ActivityIndicator size="large" color="#22c55e" />
             <Text style={[styles.loadingText, { fontSize: bodySize }]}>Opening PhysiqueQuest…</Text>
           </View>
         )}
         onError={(e) => {
+          monitor.current?.stop();
           console.error('WebView error:', e.nativeEvent);
           setError(true);
         }}
@@ -396,7 +402,7 @@ function AppContent() {
                 stopNativeCamera();
               }
               const payload = JSON.parse(e.nativeEvent.data) as { type: string; thresholdMs?: number };
-              if (payload.type === 'inactivity-start') void native.start(payload.thresholdMs ?? 45_000);
+              if (payload.type === 'inactivity-start') void native.start(payload.thresholdMs ?? 30_000);
               if (payload.type === 'inactivity-stop') native.stop();
               if (payload.type === 'inactivity-im-okay') native.imOkay();
               if (payload.type === 'inactivity-hold-stop') native.holdStop();
@@ -407,6 +413,7 @@ function AppContent() {
           }
         }}
         onLoadStart={() => {
+          monitor.current?.stop();
           console.log('WebView load started:', loadedAddress);
         }}
         onLoadEnd={(e) => {
@@ -416,6 +423,7 @@ function AppContent() {
           void publishReadiness();
         }}
         onContentProcessDidTerminate={() => {
+          monitor.current?.stop();
           console.error('WebView process terminated');
           setError(true);
         }}
@@ -591,8 +599,8 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f4f6f3' },
-  webContainer: { flex: 1, backgroundColor: '#f4f6f3' },
+  root: { flex: 1, backgroundColor: '#0b0f15' },
+  webContainer: { flex: 1, backgroundColor: '#0b0f15' },
   nativeCameraPreview: {
     position: 'absolute',
     zIndex: 10,
@@ -616,11 +624,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 11,
     borderWidth: 1,
-    borderColor: '#ffffff9e',
+    borderColor: '#273444',
     borderRadius: 18,
-    backgroundColor: '#192233c7',
+    backgroundColor: '#161d27ee',
   },
-  nativeCameraFacingText: { color: '#fff', fontSize: 11, fontWeight: '600' },
+  nativeCameraFacingText: { color: '#f8fafc', fontSize: 11, fontWeight: '600' },
   nativeCameraFrame: {
     position: 'absolute',
     top: '8%',
@@ -633,7 +641,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 16,
     height: 16,
-    borderColor: '#9cf2a2',
+    borderColor: '#22c55e',
   },
   nativeCameraCornerTL: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2, borderTopLeftRadius: 10 },
   nativeCameraCornerTR: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2, borderTopRightRadius: 10 },
@@ -649,10 +657,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: '#fff',
+    backgroundColor: '#161d27',
   },
-  nativeCameraDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#7ee582' },
-  nativeCameraDistanceText: { color: '#192233', fontSize: 12 },
+  nativeCameraDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#22c55e' },
+  nativeCameraDistanceText: { color: '#f8fafc', fontSize: 12 },
   nativeCameraFormBadge: {
     position: 'absolute',
     top: 12,
@@ -660,9 +668,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 5,
     borderRadius: 8,
-    backgroundColor: '#111827cc',
+    backgroundColor: '#161d27ee',
   },
-  nativeCameraFormText: { color: '#f4f7fb', fontSize: 11 },
+  nativeCameraFormText: { color: '#f8fafc', fontSize: 11 },
   nativeCameraTimeCard: {
     position: 'absolute',
     bottom: 12,
@@ -671,7 +679,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#161d27',
   },
   nativeCameraExercise: {
     position: 'absolute',
@@ -683,11 +691,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
-    backgroundColor: '#111827cc',
+    backgroundColor: '#161d27ee',
   },
-  nativeCameraSmallText: { color: '#627087', fontSize: 11 },
-  nativeCameraTimeText: { color: '#192233', fontSize: 22, fontVariant: ['tabular-nums'] },
-  nativeCameraExerciseText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  nativeCameraSmallText: { color: '#94a3b8', fontSize: 11 },
+  nativeCameraTimeText: { color: '#f8fafc', fontSize: 22, fontVariant: ['tabular-nums'] },
+  nativeCameraExerciseText: { color: '#f8fafc', fontSize: 13, fontWeight: '700' },
   loading: {
     position: 'absolute',
     top: 0,
@@ -697,9 +705,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    backgroundColor: '#f4f6f3',
+    backgroundColor: '#0b0f15',
   },
-  loadingText: { color: '#536176', textAlign: 'center' },
+  loadingText: { color: '#94a3b8', textAlign: 'center' },
   errorOverlay: {
     position: 'absolute',
     top: 0,
@@ -708,53 +716,53 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f4f6f3',
+    backgroundColor: '#0b0f15',
   },
-  errorCard: { width: '100%', backgroundColor: '#fff' },
-  title: { marginBottom: 10, color: '#192233', fontWeight: '700' },
-  body: { color: '#536176' },
-  code: { color: '#192233', fontWeight: '700' },
-  label: { marginTop: 20, marginBottom: 6, color: '#192233', fontWeight: '600' },
+  errorCard: { width: '100%', backgroundColor: '#161d27' },
+  title: { marginBottom: 10, color: '#f8fafc', fontWeight: '700' },
+  body: { color: '#94a3b8' },
+  code: { color: '#f8fafc', fontWeight: '700' },
+  label: { marginTop: 20, marginBottom: 6, color: '#f8fafc', fontWeight: '600' },
   input: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#dce4dc',
-    color: '#192233',
+    borderColor: '#273444',
+    color: '#f8fafc',
   },
   button: {
     marginTop: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
-    backgroundColor: '#7ee582',
+    backgroundColor: '#22c55e',
   },
-  buttonText: { color: '#173c1f', fontWeight: '700' },
-  hint: { marginTop: 12, color: '#718096' },
+  buttonText: { color: '#0b0f15', fontWeight: '700' },
+  hint: { marginTop: 12, color: '#94a3b8' },
   backendBanner: {
     position: 'absolute',
     minHeight: 44,
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 12,
-    backgroundColor: '#fff4d6',
+    backgroundColor: '#480909',
     borderWidth: 1,
-    borderColor: '#f0d28a',
+    borderColor: '#f87171',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
   },
-  backendBannerText: { flex: 1, color: '#624b16', fontSize: 12, fontWeight: '600' },
-  retryText: { color: '#26743a', fontSize: 12, fontWeight: '700' },
+  backendBannerText: { flex: 1, color: '#f87171', fontSize: 12, fontWeight: '600' },
+  retryText: { color: '#22c55e', fontSize: 12, fontWeight: '700' },
   permissionBanner: {
     position: 'absolute',
     minHeight: 40,
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 12,
-    backgroundColor: '#ffe4e4',
+    backgroundColor: '#480909',
     borderWidth: 1,
-    borderColor: '#efb3b3',
+    borderColor: '#f87171',
   },
-  permissionText: { color: '#7b2525', fontSize: 12, fontWeight: '600' },
+  permissionText: { color: '#f87171', fontSize: 12, fontWeight: '600' },
 });

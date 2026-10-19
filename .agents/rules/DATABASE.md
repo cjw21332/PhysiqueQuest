@@ -4,6 +4,8 @@ description: Database and backend data rules for PhysiqueQuest. Follow when desi
 
 # PhysiqueQuest Database and Backend Rules
 
+**Device-cache update (October 19, 2026):** Successful profile, nutrition, quest/activity and Coach responses are cached for presentation in the versioned, bounded `physiquequest-device-cache-v1` browser snapshot. It belongs to the last account/API server, expires after seven days (missions expire daily), and is refreshed through authenticated parallel reads. Confirmed writes replace/invalidate dependent snapshots. This supersedes older profile-only cache descriptions below; MongoDB and server-side authorization remain authoritative, and offline writes are not implemented. See [backend.md](./backend.md).
+
 This document is the source of truth for persistence and data-service decisions. It applies to the web app, Expo WebView host, backend APIs, background workers, and any future microservices, regardless of implementation language.
 
 **Mandatory governing rules:** Follow [GENERAL.md](./GENERAL.md) together with this backend and persistence guide. [DESIGN.md](./DESIGN.md) governs frontend design; [PROCEDURES.md](./PROCEDURES.md) governs architecture and engineering workflow.
@@ -118,8 +120,8 @@ Current login and password-recovery behavior:
 
 - **Password Recovery:** Fully implemented
   - `POST /api/auth/password-reset/request` and `POST /api/auth/password-reset/confirm`
-  - `password_recovery_tokens` collection stores SHA-256 hashes of one-time tokens (never plaintext), with expiry and one-time use
-  - Delivery is via an external `EMAIL_DELIVERY_URL` endpoint; when unconfigured, `request` returns `{ accepted: true, delivery: "unavailable" }` without error
+  - `password_recovery_tokens` stores HMAC-SHA-256 request-bound code hashes and SHA-256 reset-grant hashes (never plaintext), with expiry and one-time use
+  - Delivery prefers EmailJS when its service/template/public keys are configured; the legacy `EMAIL_DELIVERY_URL` endpoint remains a fallback. EmailJS receives the first part of the stored account name for the OTP greeting in addition to email/code/shared expiry. The configured template uses the public Cloudinary logo. A send key does not prove inbox delivery or authorize a different From domain. Production requests return a neutral queued response; development diagnostics may report delivery as unavailable.
   - Responses are neutral about whether an email is registered
 
 Target backend flow when remote registration is implemented:

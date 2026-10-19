@@ -10,7 +10,7 @@ import CameraCheck from './CameraCheck';
 import LiveSession from './LiveSession';
 import WorkoutReport from './WorkoutReport';
 import BottomNav from '../Home/BottomNav';
-import { navigate } from '../../lib/navigation';
+import { useRouter } from 'next/navigation';
 import { useWorkouts } from '../../hooks/useWorkouts';
 import { useSettings } from '../../hooks/useSettings';
 import { primeAlarmAudio } from '../../lib/alarmAudio';
@@ -19,8 +19,10 @@ import type { WorkoutSessionRecord, CoachExercise } from '../../lib/api';
 type View = 'plan' | 'library' | 'camera' | 'session' | 'report';
 
 export default function CoachSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
+  const { push: navigate } = useRouter();
   const [view, setView] = useState<View>('plan');
   const [sessionExercises, setSessionExercises] = useState<CoachExercise[]>([]);
+  const [sessionTitle, setSessionTitle] = useState('Workout session');
   const [workout, setWorkout] = useState<WorkoutSessionRecord | null>(null);
   const [actionError, setActionError] = useState('');
   const { startWorkout, setPaused, completeWorkout } = useWorkouts();
@@ -33,14 +35,14 @@ export default function CoachSection({ profile, onLogoutRequest }: { profile: Pr
     <section className={`coach-section coach-view-${view} ${view === 'plan' ? 'coach-reference' : ''}`}>
       <div className="coach-scroll">
         {view === 'plan' && <>
-          <CoachPlan profile={profile} onStart={selected => { setSessionExercises(selected); setView('camera'); }} onLibrary={() => setView('library')}/>
+          <CoachPlan profile={profile} onStart={(selected, title) => { setSessionExercises(selected); setSessionTitle(title || 'Workout session'); setView('camera'); }} onLibrary={() => setView('library')}/>
         </>}
         {view === 'library' && <>
           <ExerciseLibrary selectedEquipment={profile.equipment ?? []} onBack={() => setView('plan')}/>
         </>}
         {view === 'camera' && <CameraCheck onBack={() => setView('plan')} onStart={async () => { setActionError(''); try { if (!sessionExercises.length) throw new Error('Select a program with available exercises first.'); primeAlarmAudio(); const created = await startWorkout(sessionExercises.map(exercise => exercise.exerciseId)); setWorkout(created); setView('session'); } catch (err) { setActionError(err instanceof Error ? err.message : 'Could not start workout.'); } }}/>}
         {view === 'session' && workout && sessionExercises[0] && <LiveSession exercise={sessionExercises[0]} workoutId={workout._id} thresholdSeconds={settings.threshold} contactName={profile.contactName ?? ''} contactPhone={profile.contactPhone ?? ''} onPause={async paused => { await setPaused(workout._id, paused); }} onEnd={async seconds => { const saved = await completeWorkout(workout._id, seconds); setWorkout(saved); setView('report'); }}/> }
-        {view === 'report' && workout && <WorkoutReport workout={workout} onBack={() => setView('plan')} onHome={goHome} onShare={() => say('Sharing is not available in this Expo Go session.')}/>}
+        {view === 'report' && workout && <WorkoutReport workout={workout} title={sessionTitle} exercises={sessionExercises} onBack={() => setView('plan')} onHome={goHome} onShare={() => say('Sharing is not available in this Expo Go session.')}/>}
       </div>
       {(view === 'plan' || view === 'library') && <BottomNav coachIcon="coach-wand" />}
       {actionError && <div className="scan-warning" role="alert">{actionError}</div>}

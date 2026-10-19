@@ -5,19 +5,13 @@ import { NutritionService } from '../nutrition/nutrition.service.js';
 import { WorkoutsService } from '../workouts/workouts.service.js';
 import { UpdateActivityDto } from './dto/activity.dto.js';
 import { Activity } from './schemas/activity.schema.js';
+import { activityDate, earnsWorkoutCredit } from '../workouts/workout-contract.js';
 
 const missionRules = [
   { key: 'workout', title: 'Complete one workout', target: 1, points: 100 },
   { key: 'meals', title: 'Log 3 meals', target: 3, points: 60 },
   { key: 'water', title: 'Drink 8 glasses of water', target: 8, points: 40 },
 ] as const;
-const dateFormatter = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'UTC',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit'
-});
-
 const zoneDate = (date: Date, timezone: string) => {
   const formatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: timezone,
@@ -46,22 +40,21 @@ export class ActivityService {
     );
   }
 
-  async get(userId: string) {
-    const [record, nutrition, workouts] = await Promise.all([
-      this.userState(userId), this.nutrition.get(userId), this.workouts.list(userId, 100),
-    ]);
-    const timezone = resolveTimezone(record.state?.timezone);
+  async get(userId: string, requestedTimezone?: string) {
+    const record = await this.model.findOne({ userId: new Types.ObjectId(userId) }).exec();
+    const timezone = resolveTimezone(requestedTimezone ?? record?.state?.timezone);
+    const [nutrition, workouts] = await Promise.all([this.nutrition.read(userId), this.workouts.creditHistory(userId, timezone)]);
     const today = zoneDate(new Date(), timezone);
 
     const mealDates = nutrition.meals.map(meal => meal.date).filter((date): date is string => typeof date === 'string');
     const waterByDate = new Map(nutrition.water.map(entry => [entry.date, entry.glasses]));
-    const completedWorkouts = workouts.filter(workout => workout.status === 'completed' && workout.endedAt);
+    const completedWorkouts = workouts.filter(workout => earnsWorkoutCredit(workout) && workout.endedAt);
 
     const todayStats = computeTodayStats(nutrition, completedWorkouts, waterByDate, today, timezone);
     const dailyMissions = buildDailyMissions(todayStats);
 
     const allMeals = buildMealCountMap(mealDates);
-    const allWorkoutDates = new Set(completedWorkouts.map(workout => zoneDate(new Date(workout.endedAt!), timezone)));
+    const allWorkoutDates = new Set(completedWorkouts.map(workout => workout.activityDate || activityDate(workout.endedAt!, timezone)));
     const activityDates = buildActivityDates(mealDates, nutrition.water, allWorkoutDates);
 
     const dayStreak = computeStreak(activityDates, today);
@@ -113,7 +106,7 @@ function computeTodayStats(nutrition: any, completedWorkouts: any[], waterByDate
   return {
     meals: nutrition.meals.filter((m: any) => m.date === today).length,
     water: waterByDate.get(today) ?? 0,
-    workouts: completedWorkouts.filter(w => zoneDate(new Date(w.endedAt!), timezone) === today).length,
+    workouts: completedWorkouts.filter(w => (w.activityDate || activityDate(w.endedAt!, w.timezone ?? timezone)) === today).length,
   };
 }
 

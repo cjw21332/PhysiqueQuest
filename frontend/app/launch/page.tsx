@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { Icon } from '../../sections/Home/icons';
+import { deviceOsStatus } from '../../lib/deviceReadiness.mjs';
 
 type CameraPermission = 'granted' | 'denied' | 'prompt' | 'unavailable';
 type DeviceReadiness = {
@@ -64,7 +66,8 @@ export default function LaunchPage() {
     return () => window.removeEventListener('physiquequest-device-readiness', onReadiness);
   }, []);
 
-  const readyCount = useMemo(() => [Boolean(readiness.osVersion), readiness.wifiConnected, readiness.cameraPermission === 'granted'].filter(Boolean).length, [readiness]);
+  const osStatus = deviceOsStatus(readiness.platform, readiness.osVersion);
+  const readyCount = useMemo(() => [deviceOsStatus(readiness.platform, readiness.osVersion).ready, readiness.wifiConnected, readiness.cameraPermission === 'granted'].filter(Boolean).length, [readiness]);
 
   const requestCameraPermission = async () => {
     setCameraRequesting(true);
@@ -99,14 +102,14 @@ export default function LaunchPage() {
     <main className="scene">
       <div className="app-shell">
         <section className="launch screen-enter">
-          <div className="launch-brand"><img src="/physiquequest-icon.png" alt="PhysiqueQuest logo" className="brand-logo" /><h1>PhysiqueQuest</h1><p className="subtitle">AI-assisted, gamified fitness coaching that watches your form.</p></div>
+          <div className="launch-brand"><span className="launch-logo"><img src="/logo.jpg" alt="PhysiqueQuest logo" className="brand-logo" /></span><h1>PhysiqueQuest</h1><p className="subtitle">AI-assisted, gamified fitness coaching that watches your form.</p></div>
           <div className="launch-spacer" />
           <div className="readiness">
             <div className="readiness-head"><b>Device readiness</b><span>{readyCount} of 3 ready</span></div>
-            <ReadinessRow ready={Boolean(readiness.osVersion)} title="Device OS version" detail={deviceLabel} />
-            <ReadinessRow ready={readiness.wifiConnected} title="Wi-Fi connection" detail={networkLabel} />
+            <ReadinessRow ready={osStatus.ready} title={osStatus.title} detail={deviceLabel} />
+            <ReadinessRow ready={readiness.wifiConnected} title="High-speed Wi-Fi" detail={networkLabel} />
             <div className="ready-row">
-              <b className={readiness.cameraPermission === 'granted' ? 'ready-icon' : 'camera-icon'}>{readiness.cameraPermission === 'granted' ? '✓' : '◎'}</b>
+              <b className={readiness.cameraPermission === 'granted' ? 'ready-icon' : 'camera-icon'}>{readiness.cameraPermission === 'granted' ? <Icon name="check" size={17}/> : <Icon name="camera" size={16}/>}</b>
               <p>Camera permission<small>{cameraLabel}</small></p>
               {readiness.cameraPermission !== 'granted' && <button className="allow" disabled={cameraRequesting} onClick={requestCameraPermission}>{cameraRequesting ? 'Waiting…' : 'Allow'}</button>}
             </div>
@@ -120,5 +123,5 @@ export default function LaunchPage() {
 }
 
 function ReadinessRow({ ready, title, detail }: { ready: boolean; title: string; detail: string }) {
-  return <div className="ready-row"><b className={ready ? 'ready-icon' : 'camera-icon'}>{ready ? '✓' : '!'}</b><p>{title}<small>{detail}</small></p></div>;
+  return <div className="ready-row"><b className={ready ? 'ready-icon' : 'camera-icon'}>{ready ? <Icon name="check" size={17}/> : '!'}</b><p>{title}<small>{detail}</small></p></div>;
 }

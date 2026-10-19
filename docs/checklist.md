@@ -11,6 +11,32 @@
 
 This checklist separates what is implemented in the frontend, what is implemented and tested in the backend, and what has actually been demonstrated as a complete user journey using genuine account data.
 
+### Section switching without loading interstitials — October 19, 2026
+
+Main tabs and signed-in section shortcuts now use the Next.js client router instead of reloading the whole document. BottomNav prefetches its five routes and ignores same-tab clicks. Cached resources restore before paint, eliminating the initial empty-state flash on cached transitions. Cold Profile/Coach/Scan/Quests loads use quiet accessible placeholders; real errors and Retry remain. Disabled the development badge that was intercepting Me-tab taps. Frontend production build passed. Cache/navigation/Coach browser checks: 8/8, including all 25 ordered main-tab pairs with no document reload, loading-text flash or page error; existing journey checks: 6/6. Frontend Node tests: 113/114, with the previously recorded unrelated meal-edit wording assertion unchanged. No physical WebView/back-button test or backend change was made. See PROGRESS-42.md.
+
+### Cached mobile startup — October 19, 2026
+
+Profile, Nutrition, Activity/Quests and saved Coach plans now restore a bounded account/API-scoped device snapshot and refresh concurrently through the existing authenticated APIs. Home derives its cached summary from these resources. Responses update independently, duplicate reads share requests, confirmed writes replace/invalidate dependent snapshots, and logout/401/account switching prevent reuse in another session. Cache notices distinguish saved data and refresh failures; no offline writes or new database copies were introduced. Coach profile/settings reads now run concurrently, and opening Quests uses GET instead of persisting timezone on each load. Added `.agents/rules/backend.md` for future backend/mobile work. Backend: 372/372 tests, build and lint passed. Frontend build passed; cache/Coach browser checks 7/7 and existing journey checks 6/6 passed with mocked APIs, including 320/390/768/1440 widths. Frontend Node suite: 113/114; the previously documented meal-edit wording assertion still expects “No logged yet” instead of “Not logged yet”. API/standalone Coach responded on ports 4000/4050. No physical-device benchmark or new genuine-account persistence journey was performed; live-integration marks remain unchanged. See PROGRESS-41.md.
+
+### OTP email reference prepared — October 19, 2026
+
+Prepared backend/email-templates/otp.html with the supplied green-header/navy-body layout, embedded system-logo CID, copyable six-digit code, stored account-name greeting, shared 10-minute expiry and corrected safety/footer copy. Backend EmailJS parameters now include the account name on reset and signed-in password-change requests. Backend build and all 366 tests passed; synthetic desktop (740px) and narrow-phone (320px) previews passed image/placeholder/overflow checks and were visually inspected. The live template is managed in EmailJS and has not been replaced: dashboard sign-in, HTML save and static logo attachment setup remain required. No live OTP or inbox verification was performed. A noreply@physiquequest.com sender also requires authorization by the connected provider. No delivery/completion marks changed. See PROGRESS-40.md.
+
+### System-wide dark palette completion — October 19, 2026
+
+All frontend routes now inherit the exact DESIGN.md palette from theme.css, including the fallback route wrapper. Existing dark screens, shared dialogs/controls, semantic warnings, scrollbars, native loading/reconnection/camera surfaces and status/navigation indicators were aligned without changing layout, typography, persistence or navigation. The production build, mobile TypeScript check and mobile Node tests passed. All 14 combined mocked-browser checks passed, including rendered text/surface/icon/border palette checks, onboarding, account editors, Coach lifecycle, Scan, admin controls, recovery stages, logout, photo chooser, public library and profile errors. Overlay checks were rerun with animations disabled and passed (2/2). Full frontend Node suite: 104/105; the existing meal-edit assertion expects “No logged yet” while the current Today’s Log renders “Not logged yet”. No physical-device, native export, live-service or deployment verification was performed; completion marks and totals are unchanged. See PROGRESS-39.md.
+
+### Scan and safety dark theme — October 19, 2026
+
+Applied dark colors to the Scan nutrition overview, review estimate, and daily log, plus the Coach inactivity countdown and emergency alarm, following the supplied references. Existing typography, layout, copy, data sources, and actions were preserved. Frontend Node tests, the production build, and mocked-API browser checks for Scan/dashboard/review/log and the safety color selectors pass. No physical-device safety flow, live nutrition/provider request, or persisted-data journey was tested. Checklist live-integration marks remain unchanged.
+
+### Coach theme restoration — October 19, 2026
+
+Follow-up across launch, login/register, calibration, Home, goals, progress and notifications: original layouts and controls restored with the approved dark colors retained. Onboarding Back/Clear and validation, password visibility and recovery dismissal, Home return buttons, Progress measurement save/delete/history, and notification read actions are covered by browser checks with mocked APIs. Layout comparisons cover original dimensions/type and responsive checks span 320/390/768/1440 widths. Frontend Node tests and production build pass; Coach's 12 browser regression tests also pass. Updated DESIGN.md, GENERAL.md and PROCEDURES.md with the theme-only policy. No new live-service/device evidence or checklist status changes are claimed.
+
+Restored the pre-theme Coach plan/library/camera/upload/report components and their established layouts, with an isolated dark palette in `globals.css`. Library, Camera check and Report back controls precede their titles and return to the plan. Browser checks with mocked APIs cover those return paths, modal dismissal, search, playback, camera readiness, pause/resume and completion; geometry comparisons verify that applying the theme preserves the original screen dimensions and typography. Frontend Node tests and the production build pass. This is browser/build evidence only; it does not establish physical-device camera/alarm behavior or a new live database round trip. Existing end-to-end status marks remain unchanged.
+
 ### Current Coach / ExerciseDB V1 verification — October 15, 2026
 
 Latest persistence update: the Coach screen now reads authenticated `GET /api/coach/plan` on the main backend. Per-user versions are stored in `coach_programs` with daily exercise IDs, order and prescriptions; unchanged preferences reuse them across reloads and process restarts without ExerciseDB calls. Goal, days, equipment, duration and health changes select a new version. Catalog/detail/GIF browsing remains independent on port 4050. This supersedes earlier descriptions of the screen calling the stateless provider planner directly.
@@ -84,6 +110,8 @@ Camera rep counts are prototype motion counts, not provider-backed form scores o
 - **Verification:** Frontend production build passed and all frontend tests passed (67/67). These checks cover the sample fallback and interactions but do not verify a live notification round trip. Earlier backend test/build results do not validate this frontend change.
 - **Checklist impact:** Notifications frontend/API wiring stays marked implemented; the joint notification workflow remains unchecked until real notification records and persisted read-state changes are verified using a safe live test account. Sample preview behavior is not end-to-end evidence.
 - **Sign-in event index:** Removed the duplicate `occurredAt` index declaration from the Mongoose property metadata while retaining the explicit query index. A schema regression test verifies that the single-field index is declared once.
+
+**Admin dark references — October 19, 2026:** Admin Exercise Library, inline New exercise, and Engagement now use the exact supplied dark palette with bundled Inter and a centered 440px frame. Only scoped CSS changed; catalog API mode, analytics preview, authorization and callbacks are preserved. DESIGN.md records the palette for staged migration. Production build, focused admin tests and a mocked browser check passed (search, form validation/toggle/cancel, ranges, CSV export, Back; analytics overflow checked at 320×568, 390×667, 768×1024 and 1440×900). The full frontend suite passed 104/105; the unrelated meal-edit assertion expects “No logged yet” but current Today’s Log renders “Not logged yet”. No deployment/device verification or checklist status changes.
 
 ### Exercise Library presentation update — October 14, 2026
 
@@ -470,3 +498,15 @@ Automated tests cover these code paths. These checks do not demonstrate a live d
 ## Remaining live verification plan
 
 Run the joint section against a **safe staging/test deployment**, not an unapproved production database. Use a dedicated test account and test emergency contact. For each unchecked item, record the run date, frontend build/deployment, API environment, test-account identifier (non-sensitive), observed persisted result, and any provider/device versions. Only then change `[❌]` to `[✅]`, update dates and all six progress elements, and revise the README summary if needed.
+
+### Nutrition and safety reference presentation — October 19, 2026
+
+### Quests and account dark references — October 19, 2026
+
+Quests, Leaderboard, Account & settings and the five profile editors now use dark reference styling with their original flows. Mocked browser checks cover editor navigation, discard/save controls and leaderboard periods/Back; production build checked. Live database writes and physical-device rendering were not verified. See PROGRESS-37.md.
+
+The latest visual pass uses Inter, the compact mobile frame, full calorie labels, and reference emergency panels. Existing navigation, meal/water persistence, countdown and alarm handling are preserved. See ProgressReports/PROGRESS-36.md for build, browser and unit-test evidence. No live-integration checklist status changed.
+
+### v3.1.0 release review — October 19, 2026
+
+Reviewed the accumulated backend, frontend and native-host changes. Fresh checks passed: backend 372 unit tests, 3 integration tests (including isolated MongoDB recovery transactions), lint/build; frontend 114 tests/build; browser theme 14, Coach 13 and cache/navigation 8; mobile 28 tests, TypeScript and Android/iOS exports. Corrected two stale test scenarios, browser executable detection and OTP/recovery documentation; generated TypeScript metadata is no longer tracked. Physical-device, live inbox/sender-domain, emergency-provider and complete deployed account-journey criteria remain unverified and retain their existing status. See [PROGRESS-43](../ProgressReports/PROGRESS-43.md) for scope, final production-browser results and limitations.

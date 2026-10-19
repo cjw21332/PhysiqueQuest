@@ -4,14 +4,16 @@ import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent, type 
 import { api } from '../../lib/api';
 
 type Step = 'reset' | 'verify' | 'password' | 'success';
-type Props = { onClose: () => void; onSuccess: () => void };
+type Props = { onClose: () => void; onSuccess: () => void; mode?: 'reset' | 'change'; accountEmail?: string };
 const OTP_LENGTH = 6;
 const RESEND_DELAY = 60;
 
-export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
+export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset', accountEmail }: Props) {
   const [step, setStep] = useState<Step>('reset');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(accountEmail ?? '');
   const [code, setCode] = useState('');
+  const [requestId, setRequestId] = useState('');
+  const [resetToken, setResetToken] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,11 +34,16 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     setBusy(true);
     setError('');
     try {
-      const response = await api.requestPasswordReset(email.trim());
+      const response = mode === 'change'
+        ? await api.requestPasswordChange()
+        : await api.requestPasswordReset(email.trim());
       if (response.delivery === 'unavailable' && !response.code) {
-        setError(response.reason ?? 'Password reset email is unavailable. Please contact support or try again later.');
+        setError(response.reason ?? 'Verification email is unavailable. Please contact support or try again later.');
         return;
       }
+      setRequestId(response.requestId);
+      setResetToken('');
+      if (response.email) setEmail(response.email);
       setCode(response.delivery === 'unavailable' && response.code ? response.code : '');
       setResendSeconds(RESEND_DELAY);
       setStep('verify');
@@ -52,11 +59,16 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     setBusy(true);
     setError('');
     try {
-      const response = await api.requestPasswordReset(email.trim());
+      const response = mode === 'change'
+        ? await api.requestPasswordChange()
+        : await api.requestPasswordReset(email.trim());
       if (response.delivery === 'unavailable' && !response.code) {
-        setError(response.reason ?? 'Password reset email is unavailable. Please contact support or try again later.');
+        setError(response.reason ?? 'Verification email is unavailable. Please contact support or try again later.');
         return;
       }
+      setRequestId(response.requestId);
+      setResetToken('');
+      if (response.email) setEmail(response.email);
       setCode(response.delivery === 'unavailable' && response.code ? response.code : '');
       setResendSeconds(RESEND_DELAY);
     } catch (err) {
@@ -75,7 +87,11 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     }
     setBusy(true);
     try {
-      await api.verifyPasswordResetCode(code);
+      if (!requestId) throw new Error('Request a new verification code before continuing.');
+      const result = mode === 'change'
+        ? await api.verifyPasswordChange(requestId, code)
+        : await api.verifyPasswordResetCode(requestId, code);
+      setResetToken(result.resetToken);
       setStep('password');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That verification code is invalid or expired.');
@@ -127,7 +143,10 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     }
     setBusy(true);
     try {
-      await api.confirmPasswordReset({ code: code.trim(), password });
+      if (!resetToken) throw new Error('Verify your code again before updating the password.');
+      const passwordData = { resetToken, password };
+      if (mode === 'change') await api.confirmPasswordChange(passwordData);
+      else await api.confirmPasswordReset(passwordData);
       setStep('success');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update the password.');
@@ -140,23 +159,25 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
 
   return <div className="forgot-password-overlay">
     {step === 'verify' && <div className="forgot-password-modal forgot-password-modal-background" aria-hidden="true" inert>
-      <div className="modal-header"><h3>Reset your password</h3><span className="close-btn">×</span></div>
+      <div className="modal-header"><h3>{mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><span className="close-btn">×</span></div>
       <div className="modal-body">
-        <p className="modal-description">Enter the email address you signed up with and we’ll send you a verification code to reset your password.</p>
+        <p className="modal-description">{mode === 'change' ? 'Enter the verification code sent to your account email to change your password.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
         <label className="forgot-field"><span>Email address</span><input type="email" value={email} readOnly /></label>
       </div>
       <div className="modal-footer"><button className="btn-primary" disabled>Send OTP Verification</button></div>
     </div>}
     <div className={`forgot-password-modal${step === 'verify' ? ' forgot-password-modal-otp' : ''}`}>
     {step === 'reset' && <>
-      <div className="modal-header"><h3>Reset your password</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>{mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
       <form onSubmit={event => void requestCode(event)}>
         <div className="modal-body">
-          <p className="modal-description">Enter the email address you signed up with and we’ll send you a verification code to reset your password.</p>
-          <label className="forgot-field"><span>Email address</span><input type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} placeholder="you@email.com" /></label>
+          <p className="modal-description">{mode === 'change' ? 'We’ll send a verification code to the email address on your signed-in account.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
+          {mode === 'change'
+            ? <label className="forgot-field"><span>Account email</span><input type="email" value={email} readOnly /></label>
+            : <label className="forgot-field"><span>Email address</span><input type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} placeholder="you@email.com" /></label>}
           {error && <p className="error-hint" role="alert">{error}</p>}
         </div>
-        <div className="modal-footer"><button className="btn-primary" disabled={busy}>{busy ? 'Sending…' : 'Send OTP Verification'}</button></div>
+        <div className="modal-footer"><button className="btn-primary" disabled={busy}>{busy ? 'Sending…' : mode === 'change' ? 'Send Verification Code' : 'Send OTP Verification'}</button></div>
       </form>
     </>}
 
@@ -195,7 +216,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess }: Props) {
     </>}
 
     {step === 'password' && <>
-      <div className="modal-header"><h3>Create new password</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>{mode === 'change' ? 'Set new password' : 'Create new password'}</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
       <form onSubmit={event => void confirm(event)}>
         <div className="modal-body">
           <p className="modal-description">Your identity is verified. Please provide a strong new password.</p>

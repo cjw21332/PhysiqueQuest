@@ -32,7 +32,7 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
       </header>
 
       <section className="target-log-summary" aria-label="Today's calories and nutrition targets">
-        <CalorieProgress calories={calories} target={nutritionTargets.calories}/>
+        <CalorieProgress calories={calories} target={nutritionTargets.calories} detailed/>
 
         <div className="target-log-macros">
           <p className="target-log-remaining">
@@ -61,7 +61,7 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
                 {entries.length ? <button type="button" className="target-log-meal-copy target-log-meal-edit" onClick={() => onEdit(entries)} aria-label={`Edit ${meal}: ${names}`}>
                   <p><strong>{meal}</strong>{names && <> · {names}</>} <Icon name="edit" size={13}/></p>
                   <small>{times}</small>
-                </button> : <div className="target-log-meal-copy"><p><strong>{meal}</strong></p><small>No logged yet</small></div>}
+                </button> : <div className="target-log-meal-copy"><p><strong>{meal}</strong></p><small>Not logged yet</small></div>}
                 {entries.length
                   ? <strong className="target-log-meal-calories">{Math.round(total).toLocaleString()} kcal</strong>
                   : <button

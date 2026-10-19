@@ -7,7 +7,7 @@ class CoachService extends SavedCoachService { constructor(profiles: any, settin
 const USER = '507f1f77bcf86cd799439011';
 
 const exercisesModel = (rows: unknown[]) =>
-  ({ getForPlan: vi.fn(async () => rows.map((row: any) => ({ group: 'General', targetMuscle: '', equipment: '', pose: 'missing', instructions: [], ...row, pose: 'missing' }))) }) as any;
+  ({ getForPlan: vi.fn(async () => rows.map((row: any) => ({ group: 'General', targetMuscle: '', equipment: '', instructions: [], ...row, pose: 'missing' }))) }) as any;
 
 const profileModel = (profile: unknown) =>
   ({ findOne: vi.fn(() => ({ lean: () => ({ exec: async () => profile }) })) }) as any;
@@ -27,6 +27,16 @@ const profile = {
 };
 
 describe('coach plan', () => {
+  it('starts independent settings and profile reads together', async () => {
+    let finishProfile!: (value: unknown) => void;
+    const profiles = { findOne: () => ({ lean: () => ({ exec: () => new Promise(resolve => { finishProfile = resolve; }) }) }) };
+    const settings = settingsModel();
+    const service = new CoachService(profiles, settings, exercisesModel([]));
+    const reading = service.getPlan(USER);
+    expect(settings.findOne).toHaveBeenCalledTimes(1);
+    finishProfile(profile);
+    await reading;
+  });
   it('builds a scheduled week from the published library for the profile equipment', async () => {
     const rows = library([
       { name: 'Dumbbell bench press', group: 'Chest', targetMuscle: 'chest', equipment: 'Dumbbells', pose: 'ready' },

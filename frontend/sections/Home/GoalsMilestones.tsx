@@ -5,7 +5,7 @@ import type { Profile } from './types';
 import { Icon } from './icons';
 import { useProgress } from '../../hooks/useProgress';
 import { normalizeTrainingDays } from '../../lib/trainingDays';
-import { navigate } from '../../lib/navigation';
+import { useRouter } from 'next/navigation';
 import { api, type WorkoutSessionRecord } from '../../lib/api';
 
 const sampleMilestones = [
@@ -24,6 +24,7 @@ function shortDate(value?: string) {
 }
 
 export default function GoalsMilestones({ profile }: { profile: Profile }) {
+  const { push: navigate } = useRouter();
   const { entries, loading, error, refresh } = useProgress('weight');
   const [workouts, setWorkouts] = useState<WorkoutSessionRecord[]>([]);
   const [workoutLoading, setWorkoutLoading] = useState(true);

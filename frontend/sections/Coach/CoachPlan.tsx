@@ -6,12 +6,12 @@ import type { Profile } from '../Home/types';
 import { useCoachPlan } from '../../hooks/useCoachPlan';
 import type { CoachExercise } from '../../lib/api';
 
-export default function CoachPlan({ profile, onStart, onLibrary }: { profile: Profile; onStart: (exercises: CoachExercise[]) => void; onLibrary: () => void }) {
+export default function CoachPlan({ profile, onStart, onLibrary }: { profile: Profile; onStart: (exercises: CoachExercise[], title?: string) => void; onLibrary: () => void }) {
   const { plan, loading, error, refresh } = useCoachPlan(profile as unknown as Record<string, unknown>);
   const [selectedDay, setSelectedDay] = useState(() => (new Date().getDay() + 6) % 7);
   const libraryLink = <button className="library-link-card" onClick={onLibrary}><div className="library-icon"><Icon name="book-open" size={18} /></div><div className="library-info"><div className="library-title">Exercise library</div><div className="library-subtitle">Demos and form guides</div></div><Icon name="arrow" size={16} /></button>;
 
-  if (loading) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="status"><h2>Building your plan…</h2></div>{libraryLink}</div>;
+  if (loading) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="status" aria-label="Loading plan" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div>{libraryLink}</div>;
   if (error || !plan) return <div className="coach-plan"><header className="coach-plan-header"><h2 className="coach-title">AI Coach</h2></header><div className="profile-load-state" role="alert"><h2>Could not load your plan</h2><p>{error || 'Your profile is required to build a plan.'}</p><button onClick={() => void refresh()}>Try again</button></div>{libraryLink}</div>;
 
   const currentDay = plan.days[selectedDay] ?? plan.days[0];
@@ -31,7 +31,7 @@ export default function CoachPlan({ profile, onStart, onLibrary }: { profile: Pr
         {!!todayExercises.length && currentDay.availabilityNote && <p className="coach-plan-note">{currentDay.availabilityNote}</p>}
       </>}
       {libraryLink}
-      <div className="start-button-container"><button className="start-session-btn" disabled={!todayExercises.length} onClick={() => onStart(todayExercises)}><Icon name="play" size={18} />Start session</button></div>
+      <div className="start-button-container"><button className="start-session-btn" disabled={!todayExercises.length} onClick={() => onStart(todayExercises, currentDay.title)}><Icon name="play" size={18} />Start session</button></div>
     </> : <><div className="rest-day-message"><h3>{currentDay?.title ?? 'Rest day'}</h3><p>No workout scheduled for this day. Rest and recover!</p></div>{libraryLink}</>}
   </div>;
 }

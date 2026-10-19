@@ -24,7 +24,7 @@ export function primeAlarmAudio(): void {
 export function startAlarm(): void {
   if (!engine) return;
   void engine.ctx.resume();
-  engine.gain.gain.value = 0.6;
+  engine.gain.gain.value = 1;
 }
 
 export function stopAlarm(): void {

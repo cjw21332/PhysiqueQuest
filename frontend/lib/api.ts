@@ -2,6 +2,25 @@
 import { clearAuthSession } from './session';
 import { resolveApiBaseUrl } from './apiBaseUrl.mjs';
 import { resolveCoachBaseUrl } from './coachBaseUrl.mjs';
+import { createDeviceCache } from './deviceCache.mjs';
+
+export const deviceCache = createDeviceCache({
+  context: () => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const user = JSON.parse(localStorage.getItem('physiquequest-auth') ?? 'null');
+      return user?.id && user?.token ? { scope: `${getApiBaseUrl()}:${user.id}`, session: user.token } : null;
+    } catch { return null; }
+  },
+  storage: () => typeof window === 'undefined' ? undefined : window.localStorage,
+  validate: (key, data) => {
+    if (!data || typeof data !== 'object') return false;
+    if (key === 'profile') return typeof data.name === 'string';
+    if (key === 'coach') return Array.isArray(data.days) && data.days.every((day: any) => day && Array.isArray(day.exercises));
+    if (key === 'nutrition') return Array.isArray(data.meals) && Array.isArray(data.water);
+    return data.state && typeof data.state === 'object' && Array.isArray(data.dailyMissions);
+  },
+});
 
 export function getCoachApiBaseUrl() {
   let runtime: string | undefined;
@@ -61,7 +80,7 @@ export interface ExerciseRecord {
 }
 export interface ExerciseCatalog { items: ExerciseRecord[]; total: number; page: number; limit: number; pages: number; source?: string; coverageNote?: string; }
 export interface ProgressRecord { _id: string; metric: 'weight' | 'waist' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
-export interface WorkoutSessionRecord { _id: string; exerciseIds: string[]; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; }
+export interface WorkoutSessionRecord { _id: string; exerciseIds: string[]; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: { exerciseId: string; reps: number; loadKg?: number; status: 'completed' | 'skipped' }[]; }
 export type AlertRecord = {
   _id?: string;
   id?: string;
@@ -246,13 +265,23 @@ export class ApiTimeoutError extends Error {
   }
 }
 
+export interface PasswordRecoveryRequest {
+  accepted: boolean;
+  requestId: string;
+  delivery: 'queued' | 'unavailable';
+  email?: string;
+  code?: string;
+  reason?: string;
+}
+
 class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestOptions = {},
     baseUrl?: string
   ): Promise<T> {
-    const url = `${baseUrl ?? getApiBaseUrl()}${endpoint}`;
+    const requestBaseUrl = baseUrl ?? getApiBaseUrl();
+    const url = `${requestBaseUrl}${endpoint}`;
 
     const { timeoutMs, ...init } = options;
     const config: RequestInit = {
@@ -291,7 +320,7 @@ class ApiClient {
 
       if (!response.ok) {
         const error = readErrorBody(await response.json().catch(() => null));
-        if (response.status === 401) clearAuthSession();
+        if (response.status === 401 && token === this.getToken() && requestBaseUrl === (baseUrl ?? getApiBaseUrl())) clearAuthSession();
         const raw = error.message;
         const message =
           (Array.isArray(raw) ? raw.join(', ') : raw?.trim()) ||
@@ -299,7 +328,21 @@ class ApiClient {
         throw new ApiRequestError(message, response.status, error.code);
       }
 
-      return await response.json();
+      const result = await response.json();
+      if (token && token === this.getToken() && requestBaseUrl === (baseUrl ?? getApiBaseUrl()) && config.method && config.method !== 'GET') {
+        if (endpoint === '/profile') {
+          if (config.method === 'DELETE') deviceCache.invalidate('profile');
+          else deviceCache.publish('profile', result);
+          deviceCache.invalidate('coach');
+        }
+        if (endpoint === '/nutrition/water' || /^\/nutrition\/meals(?:\/|$)/.test(endpoint)) {
+          deviceCache.publish('nutrition', result);
+          deviceCache.invalidate('activity');
+        }
+        if (endpoint.startsWith('/workouts')) deviceCache.invalidate('activity');
+        if (endpoint === '/settings') deviceCache.invalidate('coach');
+      }
+      return result;
     } catch (error) {
       // HTTP rejections are expected application responses (for example, an
       // already-registered email). Keep those for the caller to handle without
@@ -361,10 +404,11 @@ class ApiClient {
     });
   }
 
-  async getProfile() {
-    return this.request<any>('/profile', {
+  async getProfile(force = false) {
+    return deviceCache.fetch('profile', () => this.request<any>('/profile', {
       method: 'GET',
-    });
+      timeoutMs: 15_000,
+    }), force);
   }
 
   async updateProfile(data: unknown) {
@@ -374,25 +418,64 @@ class ApiClient {
     });
   }
 
-  async getNutrition() { return this.request<any>('/nutrition'); }
+  async getNutrition(force = false) { return deviceCache.fetch('nutrition', () => this.request<any>('/nutrition', { timeoutMs: 15_000 }), force); }
   async addMeal(data: unknown) { return this.request<any>('/nutrition/meals', { method: 'POST', body: JSON.stringify(data) }); }
   async updateMeal(id: string, data: unknown) { return this.request<any>(`/nutrition/meals/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(data) }); }
   async deleteMeal(id: string) { return this.request<any>(`/nutrition/meals/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
   async setWater(data: { date: string; glasses: number }) { return this.request<any>('/nutrition/water', { method: 'PUT', body: JSON.stringify(data) }); }
   async getSettings() { return this.request<any>('/settings'); }
   async updateSettings(values: Record<string, unknown>) { return this.request<any>('/settings', { method: 'PUT', body: JSON.stringify({ values }) }); }
-  async getActivity() { return this.request<any>('/activity/state'); }
+  async getActivity(force = false) {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    return deviceCache.fetch('activity', () => this.request<any>(`/activity/state?timezone=${encodeURIComponent(timezone)}`, { timeoutMs: 15_000 }), force);
+  }
   async updateActivity(state: Record<string, unknown>) { return this.request<any>('/activity/state', { method: 'PUT', body: JSON.stringify({ state }) }); }
   async getLeaderboard(period: LeaderboardPeriod = 'week') { return this.request<LeaderboardRecord>(`/leaderboard?period=${encodeURIComponent(period)}`); }
-  async getCoachPlan() { return this.request<CoachPlanRecord>('/coach/plan'); }
+  async getCoachPlan(force = false) { return deviceCache.fetch('coach', () => this.request<CoachPlanRecord>('/coach/plan', { timeoutMs: 30_000 }), force); }
+  async preloadAppData(force = false) {
+    return Promise.allSettled([this.getProfile(force), this.getNutrition(force), this.getActivity(force), this.getCoachPlan(force)]);
+  }
   async getNotifications() { return this.request<any>('/notifications'); }
   async markNotification(id: string, unread: boolean) { return this.request<any>(`/notifications/${encodeURIComponent(id)}/read`, { method: 'PATCH', body: JSON.stringify({ unread }) }); }
   async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }
 
   async getAuthMe() { return this.request<{ id: string; email: string; role: 'user' | 'admin' }>('/auth/me'); }
-  async requestPasswordReset(email: string) { return this.request<{ accepted: boolean; delivery: 'queued' | 'unavailable'; code?: string; reason?: string }>('/auth/password-reset/request', { method: 'POST', body: JSON.stringify({ email }) }); }
-  async verifyPasswordResetCode(code: string) { return this.request<{ verified: boolean }>('/auth/password-reset/verify', { method: 'POST', body: JSON.stringify({ code }) }); }
-  async confirmPasswordReset(data: { code: string; password: string }) { return this.request<{ updated: boolean }>('/auth/password-reset/confirm', { method: 'POST', body: JSON.stringify(data) }); }
+  async requestPasswordReset(email: string) {
+    return this.request<PasswordRecoveryRequest>('/auth/password-reset/request', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+  async verifyPasswordResetCode(requestId: string, code: string) {
+    return this.request<{ verified: boolean; resetToken: string }>('/auth/password-reset/verify', {
+      method: 'POST',
+      body: JSON.stringify({ requestId, code }),
+    });
+  }
+  async confirmPasswordReset(data: { resetToken: string; password: string }) {
+    return this.request<{ updated: boolean }>('/auth/password-reset/confirm', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+  async requestPasswordChange() {
+    return this.request<PasswordRecoveryRequest>('/auth/password-change/request', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  }
+  async verifyPasswordChange(requestId: string, code: string) {
+    return this.request<{ verified: boolean; resetToken: string }>('/auth/password-change/verify', {
+      method: 'POST',
+      body: JSON.stringify({ requestId, code }),
+    });
+  }
+  async confirmPasswordChange(data: { resetToken: string; password: string }) {
+    return this.request<{ updated: boolean }>('/auth/password-change/confirm', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
 
   async getProgress(metric: string, limit = 90) { return this.request<any>(`/progress?metric=${encodeURIComponent(metric)}&limit=${limit}`); }
   async addProgress(data: any) { return this.request<any>('/progress', { method: 'POST', body: JSON.stringify(data) }); }

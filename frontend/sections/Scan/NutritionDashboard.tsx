@@ -41,7 +41,7 @@ export default function NutritionDashboard({
       </header>
 
       <section className="scan-dashboard-summary" aria-label="Today's nutrition">
-        <CalorieProgress calories={calories} target={calorieTarget}/>
+        <CalorieProgress calories={calories} target={calorieTarget} detailed/>
 
         <div className="scan-dashboard-macros">
           <p className="scan-calories-remaining">

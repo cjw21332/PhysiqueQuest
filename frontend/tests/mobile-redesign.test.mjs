@@ -150,7 +150,7 @@ test('native wrapper reports backend connectivity and can retry it', async () =>
 test('launch readiness renders live device, network, and camera state', async () => {
   const file = await source('app/launch/page.tsx');
   assert.match(file, /DeviceReadiness/);
-  assert.match(file, /Device OS version/);
+  assert.match(file, /deviceOsStatus/);
   assert.match(file, /Wi-Fi/);
   assert.match(file, /Camera permission/);
   assert.doesNotMatch(file, /Android 14 detected/);
@@ -237,7 +237,7 @@ test('safety phases replace the session, cancel stale phases, and restore the se
   const css = await source('app/globals.css');
   const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
   assert.match(live, /phaseRef\.current === 'active'/);
-  assert.match(live, /phaseRef\.current === 'countdown'/);
+  // Alarm transitions and late cancellations are exercised by emergency-session.test.mjs.
   assert.match(live, /detail\.type === 'countdown-started'[\s\S]*?camera\.stop\(\)/);
   assert.match(live, /camera\.shouldAutoStart && camera\.status === 'idle'/);
   assert.match(live, /!\s*camera\.nativePreview\s*&&\s*<>\s*<span className="form-score"/);
@@ -276,7 +276,7 @@ test('live inactivity countdown and alarm have connected safety UI and persisten
   assert.match(styles, /\.coach-view-session \.emergency-alarm/);
 });
 
-test('authenticated navigation uses full document navigation in WebView', async () => {
+test('auth boundaries reload the document while signed-in tabs use client navigation', async () => {
   const navigation = await source('lib/navigation.ts');
   const login = await source('app/(auth)/login/page.tsx');
   const register = await source('app/(auth)/register/page.tsx');
@@ -284,7 +284,8 @@ test('authenticated navigation uses full document navigation in WebView', async 
   assert.match(navigation, /window\.location\.assign/);
   assert.match(login, /navigate\('\/home'\)/);
   assert.match(register, /navigate\('\/home'\)/);
-  assert.doesNotMatch(bottomNav, /router\.push\(path\)/);
+  assert.match(bottomNav, /router\.push\(path\)/);
+  assert.match(bottomNav, /router\.prefetch\(tab\.path\)/);
 });
 
 test('scan errors keep the backend message instead of a generic fallback', async () => {

@@ -25,11 +25,13 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+The main API runs on port 4000 for accounts, workouts, and saved Coach plans. The current frontend uses the independent Coach service on port 4050 for public ExerciseDB library requests and stateless plan previews. Start both with `npm run start:dev` and `npm run start:coach:dev` from `backend/` (or build, then use `npm run start:coach` for the Coach service). Both processes use shared backend source modules; only the main API connects to MongoDB.
+
 ## Food scanning
 
 `POST /api/nutrition/scan` runs a photo of a meal through a vision model to
 identify the food, then prices each identified item against USDA FoodData
-Central. All three scanner routes require a valid JWT, like the rest of the API.
+Central. All three scanner routes require a valid JWT.
 
 | Route | Purpose |
 | --- | --- |
@@ -191,7 +193,7 @@ The user must sign in again before the app shows the admin tools. To revoke acce
 
 ## Password reset email
 
-Password reset codes are cryptographically random, one-time, expire after 30 minutes, and are stored only as hashes. To send them through EmailJS, set `SERVICE_ID`, `TEMPLATE_ID`, and `PUBLIC_KEY` in `backend/.env`; the `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, and `EMAILJS_PUBLIC_KEY` names are also accepted. `EMAILJS_PRIVATE_KEY` is optional. The EmailJS template must use `{{email}}`, `{{passcode}}`, and `{{time}}` parameters. During development, `GET /api/auth/password-reset/status` reports which settings are present without returning their values; delivery errors include provider details outside production. If EmailJS is not configured, the existing delivery endpoint remains available by setting both `EMAIL_DELIVERY_URL` and `EMAIL_DELIVERY_API_KEY`; it receives `{ template: "password-reset", to, token, expiresInMinutes }` and must return a successful response only after accepting delivery. EmailJS credentials, delivery endpoint credentials, and reset codes must never be put in frontend or Expo environment variables.
+Password reset codes are cryptographically random, one-time, expire after 10 minutes, and are stored only as hashes. To send them through EmailJS, set `SERVICE_ID`, `TEMPLATE_ID`, and `PUBLIC_KEY` in `backend/.env`; the `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, and `EMAILJS_PUBLIC_KEY` names are also accepted. `EMAILJS_PRIVATE_KEY` is optional. The EmailJS template receives `{{email}}`, `{{name}}`, `{{passcode}}`, and `{{time}}`. See [the OTP template setup](email-templates/README.md) for the prepared reference layout, embedded logo, template fields and sender requirements. The live EmailJS template must be updated separately; send credentials alone do not change its content. During development, `GET /api/auth/password-reset/status` reports which settings are present without returning their values; delivery errors include provider details outside production. If EmailJS is not configured, the existing delivery endpoint remains available by setting both `EMAIL_DELIVERY_URL` and `EMAIL_DELIVERY_API_KEY`; it receives `{ template: "password-reset", to, token, expiresInMinutes }` and must return a successful response only after accepting delivery. EmailJS credentials, delivery endpoint credentials, and reset codes must never be put in frontend or Expo environment variables.
 
 Emergency alert delivery and pose analysis also stay unavailable until their corresponding `ALERT_DELIVERY_URL`/`ALERT_DELIVERY_API_KEY` or `POSE_ANALYSIS_URL`/`POSE_ANALYSIS_API_KEY` pair is configured. Alert delivery must return HTTP success only after accepting the idempotency key. Pose analysis accepts base64 video/image metadata on the backend and expects `{ "analysis": { ... } }` in the provider response. Credentials are read only by the backend.
 

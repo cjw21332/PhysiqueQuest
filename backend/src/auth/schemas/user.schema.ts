@@ -14,6 +14,9 @@ export class User {
   @Prop({ required: true, select: false })
   passwordHash: string;
 
+  @Prop({ default: 0, min: 0 })
+  sessionVersion: number;
+
   @Prop({ default: true })
   isActive: boolean;
 

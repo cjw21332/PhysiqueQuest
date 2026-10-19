@@ -149,7 +149,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
             ) : (
               <>
                 <span className="upload-icon">
-                  <Icon name="trend" size={24}/>
+                  <Icon name="upload" size={24}/>
                 </span>
                 <b>Upload a recorded set</b>
                 <p>MP4 or MOV, up to 2 minutes. Film from the side with your full body visible.</p>

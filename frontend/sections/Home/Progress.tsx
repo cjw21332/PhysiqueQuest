@@ -5,7 +5,7 @@ import { useProgress } from '../../hooks/useProgress';
 import type { ProgressRecord, WorkoutSessionRecord } from '../../lib/api';
 import { api } from '../../lib/api';
 import { Icon } from './icons';
-import { navigate } from '../../lib/navigation';
+import { useRouter } from 'next/navigation';
 
 const choices: { metric: ProgressRecord['metric']; label: string; unit: ProgressRecord['unit'] }[] = [
   { metric: 'weight', label: 'Weight', unit: 'kg' },
@@ -59,6 +59,7 @@ function personalRecords(workouts: WorkoutSessionRecord[]) {
 }
 
 export default function Progress() {
+  const { push: navigate } = useRouter();
   const [metric, setMetric] = useState<ProgressRecord['metric']>('weight');
   const [value, setValue] = useState('');
   const [saving, setSaving] = useState(false);
@@ -158,20 +159,14 @@ export default function Progress() {
         </div>
         {chartEntries.length ? <div className="home-ref-chart" role="img" aria-label={`${selected.label} values from ${shortDate(chartEntries[0]?.measuredAt ?? chartEntries[0]?.date)} to ${shortDate(chartEntries.at(-1)?.measuredAt ?? chartEntries.at(-1)?.date)}`}>
           {chartEntries.map((entry, index) => {
-            const barHeight = range > 0 ? 22 + ((entry.value - Math.min(...chartEntries.map(item => item.value)))/range) * 70 : 58;
+            const barHeight = range > 0 ? 42 + ((entry.value - Math.min(...chartEntries.map(item => item.value)))/range) * 50 : 58;
             return <div className="home-ref-chart-column" key={entry._id}>
               <span className={index === chartEntries.length - 1 ? 'latest' : ''} style={{ height: `${barHeight}%` }} />
-              <small>{`W${index + 1}`}</small>
+              <small>{index % 2 === 0 || index === chartEntries.length - 1 ? `W${index + 1}` : ''}</small>
             </div>;
           })}
         </div> : <div className="home-ref-chart-empty">Log your first {selected.label.toLowerCase()} to start a trend.</div>}
-        {!!entries.length && <details className="home-ref-history">
-          <summary>{selected.label} history ({entries.length})</summary>
-          <div className="history-records">{[...sortedEntries].reverse().map(entry => <div className="history-entry" key={entry._id}>
-            <span><b>{formatValue(entry.value)} {entry.unit}</b><small>{entry.measuredAt ? new Date(entry.measuredAt).toLocaleString() : shortDate(entry.date)}</small></span>
-            <button type="button" aria-label={`Delete ${entry.value} ${entry.unit} measurement`} onClick={() => void remove(entry._id)}>Delete</button>
-          </div>)}</div>
-        </details>}
+
       </section>}
 
       {showEntryForm && <form onSubmit={event => void submit(event)} className="progress-entry-form home-ref-entry-form">
@@ -190,7 +185,7 @@ export default function Progress() {
           const date = 'date' in record ? record.date : '';
           const detail = 'value' in record ? record.value : `${formatValue(record.load)} kg`;
           return <article className="home-ref-record home-ref-personal-record" key={record.label}>
-            <span className="record-icon"><Icon name="dumbbell" size={16}/></span>
+            <span className="record-icon"><Icon name="trophy" size={16}/></span>
             <span className="home-ref-record-copy"><b>{record.label}</b><small>{date}</small></span>
             <strong>{detail}</strong>
           </article>;
@@ -203,13 +198,13 @@ export default function Progress() {
         <h3 id="form-accuracy-heading">Form accuracy</h3>
         <span>8 weeks <span className="home-ref-sample-label">Sample</span></span>
       </div>
-      <div className="home-ref-accuracy-chart" role="img" aria-label="Sample form accuracy trend improves from 35 percent in week one to 88 percent in week eight">
+      <div className="home-ref-accuracy-card"><div className="home-ref-accuracy-chart" role="img" aria-label="Sample form accuracy trend improves from 35 percent in week one to 88 percent in week eight">
         {sampleFormScores.map((score, index) => <div className="home-ref-accuracy-column" key={index}>
           <span className={index === sampleFormScores.length - 1 ? 'latest' : ''} style={{ height: `${score}%` }} />
           <small>{index === 0 ? 'W1' : index === 2 ? 'W3' : index === 4 ? 'W5' : index === 6 ? 'W7' : index === 7 ? 'W8' : ''}</small>
         </div>)}
       </div>
-      <p>Average form score improved from <b>58%</b> to <b>88%</b>.</p>
+      <p>Average form score improved from <b>58%</b> to <b>88%</b>.</p></div>
     </section>
 
     <section className="subsection home-ref-sessions" aria-labelledby="recent-sessions-heading">
@@ -227,5 +222,12 @@ export default function Progress() {
           <span className="home-ref-session-detail">{workout.exerciseIds.length} exercises{workout.durationSeconds === undefined ? '' : ` · ${Math.round(workout.durationSeconds / 60)} min`}<Icon name="arrow" size={13}/></span>
         </article>)}</div>}
     </section>
+        {!!entries.length && <details className="home-ref-history">
+          <summary>{selected.label} history ({entries.length})</summary>
+          <div className="history-records">{[...sortedEntries].reverse().map(entry => <div className="history-entry" key={entry._id}>
+            <span><b>{formatValue(entry.value)} {entry.unit}</b><small>{entry.measuredAt ? new Date(entry.measuredAt).toLocaleString() : shortDate(entry.date)}</small></span>
+            <button type="button" aria-label={`Delete ${entry.value} ${entry.unit} measurement`} onClick={() => void remove(entry._id)}>Delete</button>
+          </div>)}</div>
+        </details>}
   </div>;
 }

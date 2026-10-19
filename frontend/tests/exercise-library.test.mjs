@@ -52,6 +52,6 @@ test('the independent sample library stays reachable during loading, plan errors
     const html = renderToStaticMarkup(React.createElement(CoachPlan, { profile: {}, onStart: () => {}, onLibrary: () => {} }));
     assert.match(html, /<button[^>]*class="library-link-card"[^>]*>/);
     assert.match(html, /Exercise library/);
-    assert.match(html, state.loading ? /Building your plan/ : state.plan ? /Rest day/ : /Backend unavailable/);
+    assert.match(html, state.loading ? /aria-busy="true"/ : state.plan ? /Rest day/ : /Backend unavailable/);
   }
 });

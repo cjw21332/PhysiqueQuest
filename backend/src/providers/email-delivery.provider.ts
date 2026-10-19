@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-const OTP_VALIDITY_MINUTES = 30;
+import { RECOVERY_CODE_VALIDITY_MINUTES as OTP_VALIDITY_MINUTES } from '../common/recovery-policy.js';
 
 export type EmailDeliveryFailureCode =
   | 'EMAIL_NOT_CONFIGURED'
@@ -57,12 +57,12 @@ export class EmailDeliveryProvider {
       || Boolean(this.config.get<string>('EMAIL_DELIVERY_URL') && this.config.get<string>('EMAIL_DELIVERY_API_KEY'));
   }
 
-  async sendPasswordReset(email: string, token: string): Promise<EmailDeliveryResult> {
+  async sendPasswordReset(email: string, token: string, name = 'there'): Promise<EmailDeliveryResult> {
     const serviceId = this.serviceId();
     const templateId = this.templateId();
     const publicKey = this.publicKey();
     if (serviceId && templateId && publicKey) {
-      return this.sendWithEmailJs(email, token, serviceId, templateId, publicKey);
+      return this.sendWithEmailJs(email, token, serviceId, templateId, publicKey, name);
     }
 
     const endpoint = this.config.get<string>('EMAIL_DELIVERY_URL');
@@ -82,6 +82,7 @@ export class EmailDeliveryProvider {
     serviceId: string,
     templateId: string,
     publicKey: string,
+    name: string,
   ): Promise<EmailDeliveryResult> {
     const privateKey = this.config.get<string>('EMAILJS_PRIVATE_KEY');
     try {
@@ -97,6 +98,7 @@ export class EmailDeliveryProvider {
             email,
             passcode: token,
             time: `${OTP_VALIDITY_MINUTES} minutes`,
+            name: name.trim().split(/\s+/)[0] || 'there',
           },
         }),
         signal: AbortSignal.timeout(10_000),

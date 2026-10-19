@@ -80,7 +80,7 @@ test('today log displays source, edited flag and original time, with an edit act
   assert.match(html, /Scanned · 07:20/);
   assert.match(html, /Scanned · edited · 12:40/);
   assert.match(html, /Manual · 15:10/);
-  assert.match(html, /No logged yet/);
+  assert.match(html, /Not logged yet/);
   assert.match(html, /aria-label="Edit Breakfast: Oats and eggs"/);
   assert.doesNotMatch(html, /aria-label="Edit Dinner/);
 });

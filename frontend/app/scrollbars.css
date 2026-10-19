@@ -1,0 +1,47 @@
+/* Shared scrollbar tokens can be overridden on any scroll container. */
+:root {
+  --pq-scrollbar-size: 6px;
+  --pq-scrollbar-track: #0b0f15;
+  --pq-scrollbar-thumb: #273444;
+  --pq-scrollbar-hover: #64748b;
+  --pq-scrollbar-active: #94a3b8;
+  scrollbar-color: var(--pq-scrollbar-thumb) var(--pq-scrollbar-track);
+  scrollbar-width: thin;
+}
+
+/* This theme policy replaces older per-screen light scrollbar colors.
+   Existing intentionally hidden filter-strip scrollbars remain hidden. */
+:root :is(body, body *) {
+  scrollbar-color: var(--pq-scrollbar-thumb) var(--pq-scrollbar-track) !important;
+}
+:where(body, body *) { scrollbar-width: thin; }
+
+:root :is(body, body *)::-webkit-scrollbar {
+  width: var(--pq-scrollbar-size);
+  height: var(--pq-scrollbar-size);
+}
+:root :is(body, body *)::-webkit-scrollbar-track,
+:root :is(body, body *)::-webkit-scrollbar-corner {
+  background: var(--pq-scrollbar-track);
+}
+:root :is(body, body *)::-webkit-scrollbar-thumb {
+  min-height: 32px;
+  min-width: 32px;
+  border: 1px solid var(--pq-scrollbar-track);
+  border-radius: 999px;
+  background: var(--pq-scrollbar-thumb);
+  background-clip: padding-box;
+}
+:root :is(body, body *)::-webkit-scrollbar-thumb:hover { background-color: var(--pq-scrollbar-hover); }
+:root :is(body, body *)::-webkit-scrollbar-thumb:active { background-color: var(--pq-scrollbar-active); }
+:root :is(body, body *)::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+
+/* Opt in from any existing or future screen, including previously hidden areas. */
+:root .pq-scrollbar { scrollbar-width: thin !important; }
+:root .pq-scrollbar::-webkit-scrollbar { display: block; }
+:root .pq-scrollbar--hidden { scrollbar-width: none !important; }
+:root .pq-scrollbar--hidden::-webkit-scrollbar { display: none; }
+
+@media (forced-colors: active) {
+  :root, :root :is(body, body *) { scrollbar-color: auto !important; }
+}

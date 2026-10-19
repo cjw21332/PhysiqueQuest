@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Icon } from '../Home/icons';
 import type { Profile } from '../Home/types';
 import { formatPhoneNumber, unformatPhoneNumber } from '../../lib/phoneFormatter';
@@ -43,11 +43,11 @@ const initialData: CalibrationData = {
 };
 
 const goalOptions = [
-  { title: 'Weight loss', detail: 'Calorie deficit + conditioning', icon: 'trend' },
+  { title: 'Weight loss', detail: 'Calorie deficit + conditioning', icon: 'weight-loss' },
   { title: 'Build muscle', detail: 'Hypertrophy split, higher protein', icon: 'dumbbell' },
-  { title: 'Strength', detail: 'Low reps, progressive overload', icon: 'health' },
-  { title: 'Endurance', detail: 'Circuit and interval focus', icon: 'clock' },
-  { title: 'General fitness', detail: 'Balanced weekly plan', icon: 'target' },
+  { title: 'Strength', detail: 'Low reps, progressive overload', icon: 'strength' },
+  { title: 'Endurance', detail: 'Circuit and interval focus', icon: 'pulse' },
+  { title: 'General fitness', detail: 'Balanced weekly plan', icon: 'health' },
 ];
 const equipmentOptions = ['Bodyweight only', 'Dumbbells', 'Resistance bands', 'Full gym'];
 const activityOptions = ['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete'];
@@ -62,6 +62,8 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
   const [step, setStep] = useState(1);
   const [data, setData] = useState<CalibrationData>(initialData);
   const [error, setError] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); }, [step]);
 
   const bmi = useMemo(() => {
     const heightMeters = heightInMeters(data.height, data.heightInches, data.heightUnit);
@@ -180,6 +182,8 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
       <div className="progress" role="img" aria-label={`Step ${step} of 4`}>
         {stepTitles.map((title, index) => <i key={title} className={index < step ? 'filled' : ''} />)}
       </div>
+      <form className="calibration-form" onSubmit={submitStep}>
+        <div className="calibration-scroll" ref={scrollRef}>
       <div className="wizard-heading">
         <div className="step-header">
           <small>Step {step} of 4 · Calibration</small>
@@ -194,7 +198,6 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
         <p>{step === 1 ? 'Used to size your plan and daily calorie targets.' : step === 2 ? 'Pick one primary goal. You can change it later.' : step === 3 ? 'Your plan is built around what you actually have.' : 'Keeps unsafe exercises out of your plan.'}</p>
       </div>
 
-      <form className="calibration-form" onSubmit={submitStep}>
         <div className="step-content">
           {step === 1 && <>
             <div className="section-header">
@@ -248,7 +251,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
             <div className="goal-list">
               {goalOptions.map((option) => (
                 <button type="button" key={option.title} className={`goal-card ${data.goal === option.title ? 'chosen' : ''}`} aria-pressed={data.goal === option.title} onClick={() => setField('goal', option.title)}>
-                  <span className="goal-icon"><Icon name={option.icon} size={20} /></span>
+                  <span className={`goal-icon goal-icon-${option.icon}`}><Icon name={option.icon} size={20} /></span>
                   <span className="goal-copy"><b>{option.title}</b><small>{option.detail}</small></span>
                   <span className={`radio ${data.goal === option.title ? 'checked' : ''}`} aria-hidden="true" />
                 </button>
@@ -283,7 +286,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
               <div className="day-grid">
                 {TRAINING_DAYS.map((day, index) => {
                   const selected = data.days.includes(day.legacyId);
-                  return <button type="button" key={day.value} className={`day ${selected ? 'active' : ''}`} aria-label={`${day.value}${selected ? ', selected' : ''}`} aria-pressed={selected} onClick={() => toggleDay(index)}>{day.label}</button>;
+                  return <button type="button" key={day.value} className={`day ${selected ? 'active' : ''}`} aria-label={`${day.value}${selected ? ', selected' : ''}`} aria-pressed={selected} onClick={() => toggleDay(index)}>{day.value.charAt(0)}</button>;
                 })}
               </div>
             </div>
@@ -293,7 +296,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
             </div>
             <ChoiceGroup label="Session duration" options={['20 min', '30 min', '45 min', '60 min']} value={data.duration} onChange={(value) => setField('duration', value)} />
             <div className="placement-card">
-              <span className="phone-icon"><Icon name="phone" size={18} /></span>
+              <span className="phone-icon"><Icon name="smartphone" size={18} /></span>
               <div><b>Phone placement for form tracking</b><p>Prop your phone at waist height, 2.5–3.0 m away, so your full body stays in frame.</p></div>
               <label className="placement-check"><input type="checkbox" checked={data.placementConfirmed} onChange={(event) => setField('placementConfirmed', event.target.checked)} />I can place my phone 2.5–3.0 m away</label>
             </div>
@@ -314,12 +317,13 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
             </div>
             <div className="choice-group emergency">
               <div className="group-title"><b>Emergency contact</b><small className="required">Required</small></div>
-              <div className="safety-note"><span><Icon name="shield" size={16} /></span><p>Emergency contact information is saved with your profile. Safety alerts are not connected in this prototype.</p></div>
+              <div className="safety-note"><span><Icon name="shield" size={16} /></span><p>Emergency contact information is saved with your profile. Alerts depend on device permissions and the configured delivery service.</p></div>
               <label className="field"><span>Name</span><div className="input-wrap"><input value={data.contactName} onChange={(event) => setField('contactName', event.target.value)} autoComplete="name" maxLength={100} /></div></label>
               <label className="field"><span>Mobile number</span><div className="input-wrap"><input type="tel" value={data.contactPhone} onChange={(event) => setField('contactPhone', formatPhoneNumber(event.target.value))} autoComplete="tel" placeholder="0999 999 9999" maxLength={13} /></div></label>
             </div>
           </>}
           {(error || submitError) && <p className="error" role="alert">{error || submitError}</p>}
+        </div>
         </div>
 
         <footer className="wizard-footer calibration-footer">

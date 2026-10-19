@@ -13,7 +13,7 @@ description: >-
 
 PhysiqueQuest has two root npm workspaces plus a separately managed backend service:
 
-- frontend/ is the Next.js 16 App Router web app. React and TypeScript are used for UI and behavior; all active global styles are in frontend/app/globals.css.
+- frontend/ is the Next.js 16 App Router web app. React and TypeScript are used for UI and behavior; layout/component styles and scoped theme colors are in frontend/app/globals.css. The root layout also imports theme.css for the single system-wide dark palette and scrollbars.css for shared scrollbar utilities.
 - mobile/ is an Expo 57 app that hosts the web app in a React Native WebView and passes native safe-area insets into CSS.
 - backend/ contains the NestJS API with JWT authentication, protected profile endpoints, and MongoDB/Mongoose models. It is not a root npm workspace; install and run its package from `backend/`. Model/API code does not prove that a configured remote database is reachable.
 - Nutrition, workout, quest, notification, progress, settings, and profile data have backend API/model implementations. Client-only keys include the JWT, a non-authoritative profile cache, recent-food suggestions, and an optional API URL override.
@@ -41,10 +41,10 @@ The five signed-in tabs are Home, Coach, Scan, Quests, and Me. Quests has its ow
 ### Current implementation and prototype boundaries
 
 - Registration and login call the backend auth endpoints and store a JWT in localStorage. Registration submits the profile after onboarding; authenticated profile pages retrieve it from the backend and cache the response locally. The profile cache is not an offline source of truth.
-- Password reset has request, verify, and confirm endpoints with hashed, expiring, one-time codes. Email delivery requires `EMAIL_DELIVERY_URL` and `EMAIL_DELIVERY_API_KEY`; a no-email code response is restricted to development and must never be exposed in production.
+- Password reset has request, verify, and confirm endpoints with hashed, expiring, one-time codes. EmailJS uses backend-only service/template/public keys (and an optional private key); `EMAIL_DELIVERY_URL` plus `EMAIL_DELIVERY_API_KEY` is the legacy fallback. The provider supplies email, stored account name, passcode and shared 10-minute expiry to the prepared template in backend/email-templates/otp.html. The configured EmailJS template uses that HTML and the public Cloudinary logo; send API keys cannot update the saved provider template or verify a sender domain. A no-email code response is restricted to development and must never be exposed in production.
 - Nutrition (meals, water, food search, and saved scan results), workouts, progress, quests/streaks, notifications, and settings use backend API endpoints and MongoDB/Mongoose models. The recent-food picks, JWT, profile cache, and optional API URL override are client-side only; they are not authoritative copies of server data.
 - Meal-photo selection opens the review screen immediately, then sends the image to the authenticated backend scan endpoint. The user reviews and saves matched scan items; scanning alone does not create a meal.
-- Coach Exercise Library is an explicitly requested local sample preview using `libraryPreview.ts`, with six screenshot-matched exercises and local search/filter/detail actions. It is not a fallback for API errors and writes no workout data. The separate public `/exercises` route and admin library remain API-backed. Camera permission and local video selection can use device inputs, but unconfigured form tracking and exercise video previews must not be described as connected AI or real playback. Workout records use the backend; uploaded video is handled locally in the WebView flow.
+- Coach Exercise Library and public `/exercises` use API-backed search/filter/pagination, detail loading and animated GIF demonstrations. They show explicit errors and unavailable media rather than fixture fallbacks. Camera permission and local video selection use device inputs; readiness and pose analysis depend on provider availability and must not fabricate results. Workout records use the backend; selected video is previewed locally before an explicit analysis request.
 - The client calls the NestJS API; the API is configured for MongoDB through server-side environment settings. Expo Go loads the frontend from the development computer and derives the API host from that page's LAN hostname. The phone and computer must share a reachable network; clients never connect directly to MongoDB.
 
 ## 2. Run and Build
@@ -124,6 +124,16 @@ Do not create routes under frontend/app/frontend/. That directory contains a leg
 
 ## 6. Procedure: Style or Repair a Responsive Screen
 
+**System-wide palette completion (October 19, 2026):** Use the exact shared tokens in theme.css and DESIGN.md on every page and overlay. Section wrappers no longer redefine colors; system-dark-theme replaces the light fallback. Keep all layout/type/flow code intact. Native loading, reconnection, permission/backend banners and camera overlays match the same palette; status/navigation indicators remain light on every dark route. Run the combined mocked browser checks with `npx playwright test --config playwright.theme.config.mjs` from frontend, plus the production build and relevant frontend/mobile tests. Palette checks inspect rendered copy, surfaces, icon color and borders, independently of OS theme. Physical-device appearance still needs device verification.
+
+**Quests/account migration:** These routes now use `account-dark-theme` rather than the legacy light palette. Styling stays in globals.css. Validate all five editors, footer visibility, disabled/dirty state, discard/save, narrow-screen overflow and leaderboard tab/Back actions with mocked APIs. Keep the existing profile/settings services and safety behavior unchanged. This supersedes older statements that Quests and Me remain on the legacy palette.
+
+**Latest Nutrition/safety reference pass (October 19, 2026):** Scan is dark and uses the explicitly requested reference typography/layout in scoped globals.css rules. This supersedes the older legacy-Scan and system-font restrictions below. Keep every original view transition and callback. For safety screens, change presentation only; preserve inactivity thresholds, countdown constants, alarm/native-volume code, delivery handling, hold duration and log authorization. Verify Nutrition, review, daily log, add/edit/history, narrow-width overflow, safety colors and existing safety/scan unit tests. Inspect screenshots for text contrast and run the production build. Mocked browser checks do not prove physical-device or live-provider behavior.
+
+**Theme-only restoration policy (October 19, 2026):** Dark mode remains the default. For launch, login/register, calibration, Home, goals, progress and notifications, preserve the original layout and flow just as for Coach. Keep onboarding Back/Clear controls, unit selectors, placement validation and profile submission; keep Progress's Add measurement action in its header and measurement history beside its trend; keep Home return buttons before nested titles, notification read actions and the five-tab navigation. Auth password visibility, account feedback and recovery Close controls retain their callbacks. Keep the separately requested launch spacing and shared dark scrollbar. Theme changes must not remove functionality, move sections, change type scales or constrain the original responsive widths. All sections now inherit the shared dark palette; the system-wide color pass supersedes earlier staged legacy exceptions.
+
+Validate a theme pass by comparing dimensions, typography and control order with the original layout, then test Back/Clear/Close/edit/save behavior with mocked APIs at narrow phone, standard phone, tablet and desktop sizes. Preserve loading/error/retry and validation states. Screenshots verify appearance; browser/build evidence does not prove a live database/provider or physical-device workflow. Do not add separate redesign stylesheets; use scoped palette rules in globals.css and the existing token/scrollbar files.
+
 1. Reproduce the affected screen and read every definition of the relevant selectors in frontend/app/globals.css. The file has older base styles and later override layers.
 2. Use Home as the reference for the shared signed-in content frame. Preserve --content-max and --content-gutter instead of adding route-specific outer widths.
 3. Start with a narrow portrait layout, then ensure it adapts to short screens, landscape, tablet, laptop, and desktop. Use clamp(), minmax(0, 1fr), min-width: 0, wrapping, and local horizontal scrolling for chips where needed.
@@ -151,13 +161,15 @@ Do not create routes under frontend/app/frontend/. That directory contains a leg
 
 ## 8. Procedure: Update Coach Exercises or Workout Flows
 
-- Workout exercise records live in frontend/sections/Coach/exercises.ts. The separate, explicitly labeled Coach library sample catalog, filter choices, instructions, and form cues live in frontend/sections/Coach/libraryPreview.ts; do not change the workout catalog just to match library preview content.
-- The Coach library retains BottomNav; exercise details use a native modal dialog above it. Search/filter/open/close remain local, and playback controls explain the unavailable video service. Temporary UI verification routes must be removed before delivery.
-- The sample library entry remains available on rest days and while the weekly plan loads or fails; preserve the plan's actual loading/error messages and retry control.
+**October 19, 2026 clarification:** Preserve the existing Coach layouts and view callbacks when changing themes. The `coach-dark-theme` wrapper applies color overrides from `globals.css`; it must not inherit the Home redesign's widths, spacing, fonts or hidden-back-button rules. The current Exercise Library uses API-backed catalog/detail/GIF requests. Plan, library, camera/upload, session and report retain their original control placement. Back buttons precede nested page titles; Library/Camera/Report return to the plan, and End session completes the active workout before the report opens. Theme work must preserve camera, upload, workout persistence, pause/resume, and inactivity-alarm behavior.
+
+- `useCoachPlan` retrieves the saved account program; `ExerciseLibrary.tsx` requests the catalog and exercise details through the existing API client. Preserve the saved program's exercise IDs/prescriptions, catalog filter defaults, pagination and provider attribution.
+- The Coach library retains BottomNav; exercise details use a native modal dialog above it. Search/filter requests, detail loading and GIF play/pause preserve their current behavior. Keep Close/Escape dismissal and focus restoration. Temporary UI verification routes must be removed before delivery.
+- The library entry remains available on rest days and while the weekly plan loads or fails; preserve the plan's actual loading/error messages and retry control.
 - CoachSection.tsx owns internal view state; its current flow is plan -> library or camera -> live session -> workout report.
 - Exercise tags are AI tracked, Manual, and Caution. These are labels in the prototype and do not imply real model tracking.
 - Use the supplied callbacks to return to the plan or finish a workout. Do not create a parallel route for an internal Coach view unless the product structure changes.
-- Camera preview and video selection can use device inputs. Readiness results, form scores, and live workout feedback are demo behavior; no AI analysis service is connected.
+- Camera preview and video selection use device inputs. Readiness checks use the configured pose service when available; missing analysis stays explicitly unavailable. Theme changes do not alter provider requests or enable hidden camera-counting previews.
 
 ## 9. Procedure: Update Persistence or Authentication
 
@@ -175,17 +187,23 @@ Ephemeral client-side state that is NOT persisted (in-memory or event-driven):
 | State | Owner |
 |:--|:--|
 | physiquequest-device-readiness | Custom event published by mobile/App.tsx; consumed by launch/page.tsx |
-| physiquequest-nutrition-updated | Custom event fired after a meal/water change; consumed by useNutrition |
-| physiquequest-profile-updated | Custom event fired after a profile update; consumed by useCurrentProfile |
+| deviceCache subscribers | Shared confirmed-response updates consumed by useAppResource/useNutrition/useActivity/useCoachPlan/useCurrentProfile |
+| physiquequest:session-ended | Logout/401 event; clears visible resources and redirects the signed-in layout |
 
 Rules:
 
 - Guard browser-only storage access from server rendering and catch malformed JSON where practical.
 - Never store passwords or secrets in localStorage.
 - Route auth checks use the shared functions in frontend/lib/auth.ts.
-- Logout removes the auth key and leaves the profile cache intact. Protected pages must still obtain profile data from the API using the bearer token.
+- Logout removes the auth key and legacy unscoped profile key. The versioned device snapshot can be restored after a subsequent login to the same account/API server; protected API requests still require a bearer token.
 - Do not store passwords in localStorage or describe the profile cache as authoritative or an offline mode. Nutrition, workout, quest, notification, progress, and settings data are served by the backend API and are not local-only features.
 - When the backend updates data, prefer a custom event or hook refresher over writing a parallel local copy that could diverge from the server.
+
+### Cached startup data
+
+Main tabs and signed-in section shortcuts/back actions use `useRouter().push`; BottomNav prefetches the five tab routes and ignores clicks on the current route. Auth/login/logout navigation still uses the shared full-document helper. `useAppResource` restores cached data in a layout effect before paint; large loading-profile/section messages have been replaced by accessible cold-load placeholders. Do not restore full-page reloads inside signed-in navigation. Next.js `devIndicators` is disabled so its badge cannot intercept Me-tab taps.
+
+The signed-in layout starts profile, nutrition, activity and Coach reads together. `useAppResource` displays the last confirmed response while revalidating; the shared API/cache layer deduplicates consumers and updates them after confirmed writes. `physiquequest-device-cache-v1` is bounded, expires and is scoped to one account/API server. A status notice distinguishes saved data from a successful refresh. This replaces the former profile-only loading gate; MongoDB remains authoritative and writes require API confirmation. See [backend.md](./backend.md) for lifecycle, invalidation and separate API/Coach build outputs.
 
 ## 10. Procedure: Change the Native WebView
 

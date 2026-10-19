@@ -5,7 +5,7 @@ import CalorieProgress from './CalorieProgress';
 import { useActivity } from '../../hooks/useActivity';
 import { useNutrition } from '../../hooks/useNutrition';
 import { useCoachPlan } from '../../hooks/useCoachPlan';
-import { navigate } from '../../lib/navigation';
+import { useRouter } from 'next/navigation';
 import { formatLocalDate } from '../../lib/localDate.mjs';
 import type { Profile } from './types';
 import { nutritionTargets } from '../Scan/types';
@@ -21,6 +21,7 @@ export default function HomeDashboard({ profile, onNotify }: {
   onNotify: () => void;
   onAction?: (message: string) => void;
 }) {
+  const { push: navigate } = useRouter();
   const { activity, dailyMissions, loading: activityLoading, error: activityError } = useActivity();
   const { meals, water, loading: nutritionLoading, error: nutritionError } = useNutrition();
   const { plan, loading: planLoading, error: planError } = useCoachPlan();
@@ -39,14 +40,15 @@ export default function HomeDashboard({ profile, onNotify }: {
   const levelPercent = activity.nextLevelExp
     ? Math.min(100, activity.currentExp / activity.nextLevelExp * 100)
     : 0;
-  const initials = profile.name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+  const joined = new Date(profile.createdAt ?? '');
+  const trainingWeek = Number.isNaN(joined.getTime()) ? null : Math.max(1, Math.floor((now.getTime() - joined.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1);
 
   return <div className="dashboard-container home-ref-dashboard">
     <header className="dashboard-header home-ref-header">
       <div className="user-greeting">
-        <div className="avatar-badge" aria-hidden="true">{initials || <Icon name="user" size={20} />}</div>
+        <div className="avatar-badge" aria-hidden="true"><img src="/logo.jpg" alt="" /></div>
         <div className="greeting-text">
-          <small className="greeting-meta">{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</small>
+          <small className="greeting-meta">{now.toLocaleDateString('en-US', { weekday: 'long' })}{trainingWeek !== null ? ` · Week ${trainingWeek}` : ''}</small>
           <h1 className="greeting-name">Hi, {profile.name.trim().split(' ')[0] || 'there'}</h1>
         </div>
       </div>
@@ -71,7 +73,7 @@ export default function HomeDashboard({ profile, onNotify }: {
     </section>
 
     <section className="stats-row home-ref-stats" aria-label="Activity summary">
-      <div className="stat-box"><div className="stat-number">{activityLoading ? '…' : activity.dayStreak}</div><div className="stat-text">day streak</div></div>
+      <div className="stat-box"><div className="stat-number"><Icon name="fire" size={15}/>{activityLoading ? '…' : activity.dayStreak}</div><div className="stat-text">day streak</div></div>
       <div className="stat-separator" />
       <div className="stat-box"><div className="stat-number">{activityLoading ? '…' : activity.earnedPoints.toLocaleString()}</div><div className="stat-text">points</div></div>
       <div className="stat-separator" />
