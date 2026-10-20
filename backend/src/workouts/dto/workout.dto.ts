@@ -100,7 +100,8 @@ export class ExerciseResultDto {
 
 export class CompleteWorkoutDto {
   @IsDateString({ strict: true, strictSeparator: true }) endedAt: string;
-  @IsInt() @Min(0) @Max(86400) durationSeconds: number;
+  // Legacy clients send this counter; completion derives duration from stored timestamps.
+  @IsOptional() @IsInt() @Min(0) durationSeconds?: number;
   @IsArray()
   @ArrayMaxSize(50)
   @ValidateNested({ each: true })

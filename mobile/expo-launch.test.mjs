@@ -21,6 +21,10 @@ test('ordinary mobile commands resolve to Expo Go even with a development client
 });
 
 test('Expo Go never probes or imports the custom pose module during app startup', async () => {
+  const sharedSource = await readFile(new URL('../shared/cameraReadiness.ts', import.meta.url), 'utf8');
+  const sharedOutput = ts.transpileModule(sharedSource, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+  const sharedModule = { exports: {} };
+  new Function('module', 'exports', sharedOutput)(sharedModule, sharedModule.exports);
   const source = await readFile(new URL('./NativeTrackingCamera.tsx', import.meta.url), 'utf8');
   const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } }).outputText;
   let nativeImports = 0;
@@ -31,6 +35,7 @@ test('Expo Go never probes or imports the custom pose module during app startup'
     if (name === 'expo-asset') return { Asset: {} };
     if (name === 'react-native') return {};
     if (name.endsWith('/repCounter')) return { jointIndices() {} };
+    if (name.endsWith('/cameraReadiness')) return sharedModule.exports;
     return require(name);
   }, module, module.exports);
   assert.equal(module.exports.nativePoseAvailable, false);

@@ -2,7 +2,13 @@
 description: PhysiqueQuest visual and responsive design system for the Next.js web app and Expo WebView. Defines the approved dark theme, preserved component layouts, responsive rules, and system-wide dark behavior. The web app is the design source for the native WebView.
 ---
 
-# PhysiqueQuest Design System (2026-10-19 · cached startup, dark palette and scrollbar-free launch)
+# PhysiqueQuest Design System (2026-10-21 - local camera readiness)
+
+**Camera readiness (October 21, 2026):** Camera check preserves its layout and dark tokens with independent Camera connection, Full body in frame, Scene brightness and Framing rows. Use text/icons plus Ready/Adjust/Checking/Unavailable and one polite stable summary; never announce every frame or rely on color. Framing is approximate, never measured meters; brightness is a coarse image estimate, never lux or guaranteed subject lighting. Body/brightness/framing remain Unavailable while device calibration flags are false. Keep Start session unrestricted and explicit Continue without camera available, with camera teardown. Retry is available after recoverable failures; controls are at least 48px/dp and labels wrap with enlarged text. Unsupported native runtimes retain honest preview/manual fallback. Do not describe software fixtures as physical-camera validation.
+
+**Launch/calibration copy clarification (October 20, 2026):** Launch describes workout plans, exercise guides, food logs and quests; it does not promise live form analysis. Device results are checks, not an entry gate. Camera access is optional for photos/previews and denial messaging explains that users can continue. Calibration discloses shared nutrition targets, treats commitment as a saved preference, and avoids automatic diet/progression or guaranteed-safety claims. Camera guidance describes a preview and unavailable live analysis; the existing required checkbox acknowledges that guidance rather than promising a physical setup. The final action is **Save profile & continue**, matching the existing profile-save/navigation flow. Goal values, validation branches, persistence and layouts remain unchanged.
+
+**Auth and first-log hardening (October 20, 2026):** Auth uses native form submission and prevents concurrent requests while preserving failed inputs. Recovery and auth outcome overlays use native modal dialogs; retain accessible names, background inertness, stage focus and opener restoration. Recovery supports Escape; the account-created outcome keeps its explicit Start calibration action. Registration links to `/terms`, `/privacy`, and `/camera-consent` in new tabs. These are empty, clearly marked **Draft, pending team review** placeholders, not approved policies; see `docs/policy-review-todo.md`. Nutrition starts with the user's actual empty state. Only the explicit **View sample nutrition** action enters samples after a successful empty response; **Start my log** exits, and selecting a real photo also exits sample mode. Sample writes remain local. Normal first meal/water writes use the existing authenticated APIs and show failures. This supersedes older automatic-empty-preview descriptions below.
 
 **Launch scrolling follow-up (October 19, 2026):** The landing page is non-scrollable (`overflow: clip`). Its compact short-screen layout keeps the brand, readiness details and both account actions inside the viewport, with 44px account buttons. Do not restore overflow scrolling or merely hide its scrollbar. Other pages retain their shared scrollbar styling.
 
@@ -15,6 +21,18 @@ This document specifies the current PhysiqueQuest product interface, design toke
 **Mandatory governing rules:** Follow [GENERAL.md](./GENERAL.md) together with this frontend design guide. [PROCEDURES.md](./PROCEDURES.md) governs architecture and engineering workflow; [DATABASE.md](./DATABASE.md) governs backend and persistence.
 
 ## 1. Product Architecture & Navigation
+
+**October 20, 2026 — exercise library:** Search leads into wrapped muscle filters and a native Equipment disclosure whose summary always shows the current selection. Clear filters resets search/muscle/equipment/page. Guide rows display full wrapping exercise names and metadata, with tracking/demo availability below and a trailing chevron. Preserve backend pagination, detail dialogs, provider attribution, retry states and demo playback. Opening the library resets its shared scroll container and focuses its heading; Escape from details still restores the opener. Avoid horizontal filter strips and ellipsis that hide names on phone screens.
+
+**October 20, 2026 — frontend finish:** Coach empty/recovery headings use the shared ink token, and dark input placeholders use muted text at full opacity. Every keyboard-operable control has a visible focus ring; the transparent video file input projects focus onto its visible Choose a video label. Camera input mode and saved safety threshold expose selected state with aria-pressed. Optional goal details omit absent weight/date placeholders. Profile save feedback follows the confirmed backend result even when the optional local cache cannot write.
+
+**October 20, 2026 — CSS consolidation:** Redundant declarations were removed only when the final equal-selector/equal-property/equal-importance declaration in the same unconditional context had the identical value. Preserve meaningful media/supports/layer boundaries and differing-value compatibility fallbacks. Shared navigation owns height/flex accessibility sizing; obsolete fixed-height declarations are removed rather than stacked beneath it. Visual identity, responsive behavior and component states are preserved. The unimported nested responsive-globals.css copy is removed; globals.css remains the shared stylesheet, with scoped Coach/library styles retained.
+
+**October 20, 2026 — touch/text adaptation:** Shared bottom navigation uses at least 48px targets and 0.75rem labels, with explicit accessible names and `aria-current="page"` for selected destinations (including related subroutes). At native font scale 1.5+ it reflows into three columns/two rows rather than clipping or shrinking text. Preserve all five destinations and client routing/prefetch. Coarse-pointer controls have a 48px minimum; seven-day selectors wrap to fit these targets. Expo follows system font scale via Android textZoom and iOS text-size-adjust, updating without remounting the WebView. Native connection fallback scrolls and its URL field is explicitly labeled. Physical VoiceOver/TalkBack and Dynamic Type rendering remain hardware validation gaps.
+
+**October 20, 2026 — resumable calibration:** Preserve the four-step structure and core required fields. Body measurements, weight target/date, camera guidance and health notes have explicit skip/add controls; skipping never invents answers or suppresses the required emergency contact. Step headings receive focus after navigation. Progress status distinguishes the same-device account draft from the final backend profile save, and warns on unavailable storage. Final save has a pending state and duplicate guard; errors retain progress. Login checks the server profile and routes unfinished accounts back into setup, even without a draft.
+
+**October 20, 2026 — active routine:** Show the ordered routine and each prescribed set above the optional camera. Confirm actual work manually; never describe prescribed values as measured. Use explicit kg labels, numeric keyboards, at least 44px targets, and no required typing for prescribed bodyweight work. Confirmed sets can be corrected until ending; skip and revisit preserve existing completed sets. Early ending requires confirmation and reports unfinished slots as skipped. Recovery is explicit and paused; disclose account-owned saved sets versus device-owned unsaved drafts and the unknown-time fallback when no checkpoint exists. Camera failure cannot block logging or progression. Preserve inactivity/alarm priority.
 
 ### Non-Negotiable System Design Rules
 
@@ -479,7 +497,7 @@ Layout/component styles and scoped theme colors live in `frontend/app/globals.cs
 6. Responsive overrides (media queries, typically at end)
 7. Deprecated/legacy styles (marked clearly)
 
-**Legacy Note:** `frontend/app/responsive-globals.css` is deprecated and should not be used. It contains older base rules; new styles go in `globals.css`.
+The unimported legacy `frontend/app/frontend/app/responsive-globals.css` copy was removed. Shared responsive styles live in `globals.css`; do not restore a parallel base stylesheet.
 
 ### Adding New Styles
 

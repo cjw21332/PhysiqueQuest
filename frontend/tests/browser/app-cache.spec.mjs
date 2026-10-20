@@ -164,15 +164,16 @@ test('every main tab switches without reloading the document or flashing cached 
     window.tabLoadingObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
   });
   const tabs = ['Home', 'Coach', 'Scan', 'Quests', 'Me'];
+  const tabName = tab => ({ Scan: 'Scan food and nutrition', Me: 'Me, account and settings' }[tab] ?? tab);
   for (const from of tabs) {
-    await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: from, exact: true }).click();
+    await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: tabName(from), exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/${from.toLowerCase()}$`));
     for (const to of tabs) {
-      await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: to, exact: true }).click();
+      await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: tabName(to), exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`/${to.toLowerCase()}$`));
       expect(errors).toEqual([]);
       expect(await page.evaluate(() => window.tabNavigationMarker)).toBe('same-document');
-      await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: from, exact: true }).click();
+      await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: tabName(from), exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`/${from.toLowerCase()}$`));
     }
   }

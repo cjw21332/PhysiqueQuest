@@ -38,14 +38,15 @@ async function fixture(page) {
     if (path.endsWith('/pose/status')) json = { available: true };
     if (path.endsWith('/pose/analyze')) json = { readiness: { fullBodyInFrame: true, lighting: true, distance: { meters: 2.7 } } };
     if (path.endsWith('/workouts') && req.method() === 'POST') { session = { _id: 'session-1', ...req.postDataJSON(), status: 'active' }; json = session; }
-    if (path.endsWith('/pause')) { paused = req.postDataJSON().paused; json = session; }
+    if (path.endsWith('/pause')) { paused = req.postDataJSON().paused; session = { ...session, pausedAt: paused ? req.postDataJSON().occurredAt : null, revision: (session.revision??0)+1 }; json = session; }
+    if (path.endsWith('/sets')) { const result=req.postDataJSON().result;session={...session,sets:[...(session.sets??[]).filter(set=>set.setId!==result.setId),result],revision:(session.revision??0)+1};json=session; }
     if (path.endsWith('/complete')) {
       ended = true;
       json = { ...session, ...req.postDataJSON(), durationSeconds: 2536, status: 'completed', sets: [{ exerciseId: 'bench-press', reps: 37, loadKg: 22, status: 'completed' }, { exerciseId: 'overhead-press', reps: 29, loadKg: 16, status: 'completed' }], exerciseResults: [{ exerciseId: 'push-up', reps: 36 }, { exerciseId: 'bench-press', reps: 37, loadKg: 22 }, { exerciseId: 'overhead-press', reps: 29, loadKg: 16 }] };
     }
     return route.fulfill({ json, headers });
   });
-  return { get paused() { return paused; }, get ended() { return ended; } };
+  return { get paused() { return paused; }, get ended() { return ended; }, get requestKey() { return session?.requestKey; } };
 }
 
 async function capture(page, info, name) {
@@ -77,7 +78,8 @@ test('dark Coach plan, library and exercise details retain filters, playback and
   await page.locator('.coach-scroll').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await capture(page, info, '02-coach-plan-scrolled');
   await page.getByRole('button', { name: /Exercise library/ }).click();
-  await expect(page.getByText('6 results', { exact: true })).toBeVisible();
+  await expect(page.getByText('6 exercises', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Exercise library', exact: true })).toBeInViewport();
   await expectBackBeforeTitle(page);
   await capture(page, info, '03-exercise-library');
   await page.getByRole('button', { name: /Dumbbell bench press Chest/ }).click();
@@ -91,7 +93,7 @@ test('dark Coach plan, library and exercise details retain filters, playback and
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('bench');
-  await expect(page.getByText('1 results', { exact: true })).toBeVisible();
+  await expect(page.getByText('1 exercise', { exact: true })).toBeVisible();
   for (const size of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(size);
     await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeInViewport();
@@ -103,6 +105,7 @@ test('dark Coach plan, library and exercise details retain filters, playback and
 });
 
 test('dark camera, upload, live session and confirmed report preserve the workout lifecycle', async ({ page }, info) => {
+  await page.addInitScript(() => Object.defineProperty(globalThis.crypto, 'randomUUID', { value: undefined, configurable: true }));
   const state = await fixture(page);
   await page.goto('/coach');
   await page.getByRole('button', { name: 'Start session', exact: true }).click();
@@ -116,15 +119,20 @@ test('dark camera, upload, live session and confirmed report preserve the workou
   await expect(page.getByText('4 of 4 ready', { exact: true })).toBeVisible();
   await capture(page, info, '05-camera-check');
   await page.getByRole('button', { name: 'Upload video', exact: true }).click();
+  await expect(page.getByRole('group', { name: 'Camera input' }).getByRole('button', { name: 'Upload video', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Live feed', exact: true })).toHaveAttribute('aria-pressed', 'false');
   await expect(page.getByText('Upload a recorded set', { exact: true })).toBeVisible();
   await expectBackBeforeTitle(page);
   await expectReferenceLayout(page, ['.coach-scroll', '.coach-header', '.camera-tabs', '.upload-dropzone', '.coach-footer']);
   await page.locator('.choose-video input[type="file"]').focus();
   await expect(page.locator('.choose-video input[type="file"]')).toBeFocused();
+  await expect(page.locator('.choose-video')).toHaveCSS('outline-width', '2px');
+  await expect(page.locator('.choose-video input[type="file"]')).toHaveAttribute('aria-label', 'Choose a recorded exercise video');
   await capture(page, info, '06-upload-video');
   await page.getByRole('button', { name: 'Live feed', exact: true }).click();
   await page.getByRole('button', { name: 'Start session', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Pause workout', exact: true })).toBeVisible();
+  expect(state.requestKey).toMatch(/^workout-[a-f0-9]{32}$/);
   const enableLive = page.getByRole('button', { name: 'Enable camera', exact: true });
   if (await enableLive.isVisible()) await enableLive.click();
   await expect(page.locator('.live-camera')).toHaveJSProperty('readyState', 4);
@@ -134,6 +142,7 @@ test('dark camera, upload, live session and confirmed report preserve the workou
   await page.getByRole('button', { name: 'Resume workout', exact: true }).click();
   await expect.poll(() => state.paused).toBe(false);
   await page.getByRole('button', { name: 'End session', exact: true }).click();
+  await page.getByRole('button', { name: 'Save and end workout', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Workout report', exact: true })).toBeVisible();
   expect(state.ended).toBe(true);
   await expect(page.getByText('42:16', { exact: true })).toBeVisible();

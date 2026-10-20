@@ -5,7 +5,7 @@ import { UsdaService } from './usda.service.js';
 describe('USDA search request construction', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('encodes search terms and USDA data types as query parameters', async () => {
+  it('sends food search terms and USDA data types as a JSON POST body', async () => {
     const fetchJson = vi.fn().mockResolvedValue({ foods: [] });
     const service = new UsdaService(
       {
@@ -25,10 +25,10 @@ describe('USDA search request construction', () => {
     const requestedUrl = new URL(fetchJson.mock.calls[0][0] as string);
     expect(requestedUrl.pathname).toBe('/fdc/v1/foods/search');
     expect(requestedUrl.searchParams.get('api_key')).toBe('test-key');
-    expect(requestedUrl.searchParams.get('query')).toBe('chicken & rice, raw');
-    expect(requestedUrl.searchParams.get('pageSize')).toBe('25');
-    expect(requestedUrl.searchParams.get('dataType')).toBe(
-      'Foundation,SR Legacy,Survey (FNDDS),Branded',
-    );
+    expect([...requestedUrl.searchParams.keys()]).toEqual(['api_key']);
+    const options = fetchJson.mock.calls[0][1];
+    expect(options.method).toBe('POST');
+    expect(options.headers['content-type']).toBe('application/json');
+    expect(JSON.parse(options.body)).toEqual({ query: 'chicken & rice, raw', pageSize: 25, dataType: ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded'] });
   });
 });

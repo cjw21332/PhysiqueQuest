@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import { api } from '../../lib/api';
 import { useCameraStream } from '../../hooks/useCameraStream';
-import { parseCameraReadiness, readyCheckCount, type CameraReadiness, type ReadinessCheck } from '../../lib/cameraReadiness';
+import { useCameraReadiness } from '../../hooks/useCameraReadiness';
+import type { ReadinessCheck } from '../../../shared/cameraReadiness';
 
 export default function CameraCheck({ onBack, onStart }: { onBack: () => void; onStart: () => void }) {
   const [mode, setMode] = useState<'live' | 'upload'>('live');
@@ -14,42 +15,25 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
   const [analysis, setAnalysis] = useState<unknown>(null);
   const [analysisBusy, setAnalysisBusy] = useState(false);
   const [analysisError, setAnalysisError] = useState('');
-  const [cameraMessage, setCameraMessage] = useState('Checking pose-analysis service…');
+  const [cameraMessage, setCameraMessage] = useState('');
   const [poseAvailable, setPoseAvailable] = useState(false);
-  const [liveReadiness, setLiveReadiness] = useState<CameraReadiness | null>(null);
-  const [readinessBusy, setReadinessBusy] = useState(false);
-  const [readinessError, setReadinessError] = useState('');
-  const readinessRequestRef = useRef(0);
   const live = useCameraStream();
+  const readiness = useCameraReadiness({ videoRef: live.videoRef, frameRef: live.frameRef,
+    active: mode === 'live' && live.status === 'on', native: live.nativePreview,
+    generation: live.generation, generationRef: live.generationRef, mirrored: live.facing === 'front' });
+  const readyCount = [readiness.connection, readiness.fullBody, readiness.lighting, readiness.framing].filter(check => check.status === 'ready').length;
   useEffect(() => { return () => { if (fileUrl) URL.revokeObjectURL(fileUrl); }; }, [fileUrl]);
-  useEffect(() => { let active = true; api.getPoseStatus().then(status => { if (!active) return; setPoseAvailable(status.available); setCameraMessage(status.available ? 'Live framing, lighting, and distance checks use the configured pose-analysis service.' : 'Pose analysis is not configured. Camera preview is available, but framing, lighting, and distance cannot be verified.'); }).catch(error => { if (active) setCameraMessage(error instanceof Error ? error.message : 'Could not check pose-analysis availability.'); }); return () => { active = false; }; }, []);
-  const analyzeReadiness = useCallback(async () => {
-    const requestId = ++readinessRequestRef.current;
-    setReadinessBusy(true);
-    setReadinessError('');
-    setLiveReadiness(null);
-    try {
-      const mediaBase64 = await live.captureFrame();
-      const analysis = await api.analyzePose({
-        mediaBase64,
-        mimeType: 'image/jpeg',
-        analysisType: 'readiness',
-        requestedChecks: ['fullBodyInFrame', 'lighting', 'distance'],
-      });
-      if (requestId === readinessRequestRef.current) setLiveReadiness(parseCameraReadiness(analysis));
-    } catch (error) {
-      if (requestId === readinessRequestRef.current) {
-        setReadinessError(error instanceof Error ? error.message : 'Readiness analysis could not be completed.');
-      }
-    } finally {
-      if (requestId === readinessRequestRef.current) setReadinessBusy(false);
-    }
-  }, [live.captureFrame]);
   useEffect(() => {
-    if (mode !== 'live' || live.status !== 'on' || !poseAvailable) return;
-    void analyzeReadiness();
-    return () => { readinessRequestRef.current += 1; };
-  }, [analyzeReadiness, live.facing, live.status, mode, poseAvailable]);
+    if (mode !== 'upload') return;
+    let active = true;
+    setCameraMessage('Checking recorded-video analysis availability…');
+    api.getPoseStatus().then(status => {
+      if (!active) return;
+      setPoseAvailable(status.available);
+      setCameraMessage(status.available ? 'Selected video is sent only when you choose Analyze video.' : 'Pose analysis is not configured. Use the local video as a reference for manual logging.');
+    }).catch(error => { if (active) setCameraMessage(error instanceof Error ? error.message : 'Could not check pose-analysis availability.'); });
+    return () => { active = false; };
+  }, [mode]);
   const chooseFile = (file?: File) => { if (!file) return; if (fileUrl) URL.revokeObjectURL(fileUrl); setFileUrl(URL.createObjectURL(file)); setFileName(file.name); setSelectedFile(file); setAnalysis(null); setAnalysisError(''); };
   const analyzeVideo = async () => {
     if (!selectedFile) return;
@@ -65,17 +49,19 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
     finally { setAnalysisBusy(false); }
   };
   const switchToUpload = () => { live.stop(true); setMode('upload'); };
+  const startSession = () => { live.stop(); onStart(); };
+  const continueWithoutCamera = () => { live.stop(true); onStart(); };
 
   return (
     <>
       <header className="coach-header">
-        <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
+        <button className="coach-back" onClick={() => { live.stop(); onBack(); }} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
         <h2>Camera check</h2>
       </header>
 
-      <div className="camera-tabs">
-        <button className={mode==='live'?'active':''} onClick={()=>setMode('live')}>Live feed</button>
-        <button className={mode==='upload'?'active':''} onClick={switchToUpload}>Upload video</button>
+      <div className="camera-tabs" role="group" aria-label="Camera input">
+        <button type="button" aria-pressed={mode==='live'} className={mode==='live'?'active':''} onClick={()=>setMode('live')}>Live feed</button>
+        <button type="button" aria-pressed={mode==='upload'} className={mode==='upload'?'active':''} onClick={switchToUpload}>Upload video</button>
       </div>
 
       {mode === 'live' ? (
@@ -103,32 +89,28 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
             <div className="camera-frame" aria-hidden="true">
               <span/><span/><span/><span/>
             </div>
-            {live.status === 'on' && <p className="camera-distance-pill" role="status"><i aria-hidden="true"/>{readinessBusy ? 'Checking camera readiness…' : liveReadiness?.distance.label ?? 'Distance not assessed'}</p>}
+            {live.status === 'on' && <p className="camera-distance-pill"><i aria-hidden="true"/>Approximate framing guidance</p>}
           </div>
           {live.message && <p className="camera-message" role="alert">{live.message}</p>}
 
-          <section className="readiness-list" aria-labelledby="readiness-title">
+          <section className="readiness-list" aria-labelledby="readiness-title" data-local-observations={readiness.localObservations}>
             <div className="section-head">
               <h3 id="readiness-title">Readiness checks</h3>
-              <small>{readinessBusy ? 'Analyzing live view…' : `${readyCheckCount(liveReadiness, live.status === 'on')} of 4 ready`}</small>
+              <small role="status" aria-live="polite" aria-atomic="true">{readyCount} of 4 ready. {readiness.connection.status === 'ready' ? 'Camera frames are arriving.' : 'You can continue without the camera.'}</small>
             </div>
             <ul className="readiness-rows">
-              <ReadinessRow label="Camera feed" check={{ status: live.status === 'on' ? 'ready' : 'unknown', label: live.status === 'on' ? 'Connected' : live.status === 'starting' ? 'Starting' : 'Not connected' }} />
-              <ReadinessRow label="Full body in frame" check={liveReadiness?.fullBody ?? { status: 'unknown', label: readinessBusy ? 'Analyzing…' : 'Not assessed' }} />
-              <ReadinessRow label="Lighting" check={liveReadiness?.lighting ?? { status: 'unknown', label: readinessBusy ? 'Analyzing…' : 'Not assessed' }} />
-              <ReadinessRow label="Distance" check={liveReadiness?.distance ?? { status: 'unknown', label: readinessBusy ? 'Analyzing…' : 'Not assessed' }} />
+              <ReadinessRow label="Camera connection" check={live.status === 'starting' ? { status: 'unknown', reason: 'pending' } : readiness.connection} />
+              <ReadinessRow label="Full body in frame" check={readiness.fullBody} />
+              <ReadinessRow label="Scene brightness" check={readiness.lighting} />
+              <ReadinessRow label="Framing" check={readiness.framing} />
             </ul>
-            {readinessError && <p className="camera-message" role="alert">{readinessError}</p>}
-            {poseAvailable && live.status === 'on' && (
-              <button type="button" className="readiness-retry" disabled={readinessBusy} onClick={() => void analyzeReadiness()}>
-                {readinessBusy ? 'Analyzing camera…' : 'Analyze readiness again'}
-              </button>
-            )}
-            <p className="camera-note">{cameraMessage}</p>
+            {live.status === 'on' && <button type="button" className="readiness-retry" onClick={() => void live.start()}>Retry camera checks</button>}
+            <p className="camera-note">Live checks run on this device without uploading images. Body and framing guidance await device validation. Scene brightness is a coarse image estimate and cannot establish subject lighting.</p>
           </section>
 
           <footer className="coach-footer">
-            <button className="primary" onClick={onStart}>Start session</button>
+            <button className="primary" onClick={startSession}>Start session</button>
+            <button className="readiness-continue" onClick={continueWithoutCamera}>Continue without camera</button>
           </footer>
         </>
       ) : (
@@ -156,14 +138,15 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
               </>
             )}
           </div>
+          <p className="camera-note">{cameraMessage}</p>
 
           <footer className="coach-footer">
             {fileUrl ? (
-              <button className="primary" onClick={onStart}>Start manual session</button>
+              <button className="primary" onClick={continueWithoutCamera}>Start manual session</button>
             ) : (
               <label className="primary choose-video">
                 Choose a video
-                <input type="file" accept="video/mp4,video/quicktime,video/*" onChange={e => chooseFile(e.target.files?.[0])}/>
+                <input type="file" aria-label="Choose a recorded exercise video" accept="video/mp4,video/quicktime,video/*" onChange={e => chooseFile(e.target.files?.[0])}/>
               </label>
             )}
           </footer>
@@ -174,10 +157,18 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
 }
 
 function ReadinessRow({ label, check }: { label: string; check: ReadinessCheck }) {
+  const status = check.status === 'ready' ? 'Ready' : check.status === 'adjust' ? 'Adjust' : check.reason === 'pending' ? 'Checking' : 'Unavailable';
+  const explanation = check.reason === 'stable' ? 'Fresh evidence received.' : check.reason === 'uncalibrated' ? 'Device validation is pending. Check your preview and continue manually.' :
+    check.reason === 'pending' ? 'Waiting for fresh evidence…' : check.reason === 'model-error' ? 'Local analysis failed. Retry camera checks or continue manually.' :
+    check.reason === 'unsupported' ? 'Local checks are not supported here. Continue manually.' : check.reason === 'stale' ? 'Fresh evidence expired. Retry the camera or continue manually.' :
+    check.reason === 'clipped' ? 'Move back or center your whole body in the visible preview.' : check.reason === 'too-small' ? 'Approximate guidance: move closer while keeping your whole body visible.' :
+    check.reason === 'too-large' ? 'Approximate guidance: move back slightly.' : check.reason === 'dim' ? 'The camera image looks dim. Try a brighter space.' :
+    check.reason === 'bright' ? 'The camera image looks very bright. Reduce glare.' : check.reason === 'disabled' ? 'Enable the camera or continue without it.' :
+    'A clear whole-body view is needed. Check your preview or continue manually.';
   return (
     <li className={`readiness-row ${check.status}`}>
-      <span><i aria-hidden="true">{check.status === 'ready' ? <Icon name="check" size={13} /> : null}</i>{label}</span>
-      <b>{check.label}</b>
+      <span><i aria-hidden="true">{check.status === 'ready' ? <Icon name="check" size={13} /> : check.status === 'adjust' ? '!' : '?'}</i>{label}</span>
+      <div className="readiness-detail"><b>{status}</b><small>{explanation}</small></div>
     </li>
   );
 }

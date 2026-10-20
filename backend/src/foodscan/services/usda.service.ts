@@ -103,18 +103,22 @@ export class UsdaService {
     }
   }
 
-  private searchUrl(query: string, pageSize: number, dataTypes: readonly string[]): string {
+  private search(query: string, pageSize: number, dataTypes: readonly string[]) {
     const cfg = this.config.value;
     // USDA requires the key as a query parameter, so this URL is a secret in
     // transit. It is never logged; safeUrl() strips the query string.
     const url = new URL(`${cfg.usda.base.replace(/\/$/, '')}/foods/search`);
     url.search = new URLSearchParams({
       api_key: cfg.usda.apiKey,
-      query,
-      pageSize: String(pageSize),
-      dataType: dataTypes.join(','),
     }).toString();
-    return url.toString();
+    // USDA's JSON search avoids intermittent nginx 400s observed on GET searches.
+    return this.http.fetchJson<{ foods?: UsdaFood[] }>(url.toString(), {
+      upstream: 'nutrition database',
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ query, pageSize, dataType: dataTypes }),
+      retryServerErrors: true,
+    });
   }
 
   private async searchFood(query: string): Promise<UsdaFood | undefined> {
@@ -123,10 +127,7 @@ export class UsdaService {
     const cached = searchCache.get(key);
     if (cached) return cached;
 
-    const data = await this.http.fetchJson<{ foods?: UsdaFood[] }>(
-      this.searchUrl(query, 10, ['Foundation', 'SR Legacy']),
-      { upstream: 'nutrition database', retryServerErrors: true }
-    );
+    const data = await this.search(query, 10, ['Foundation', 'SR Legacy']);
 
     const foods = (data.foods || []).filter((f) => f.fdcId && (f.foodNutrients?.length ?? 0) > 0);
     foods.sort((a, b) => rankDataType(b.dataType) - rankDataType(a.dataType));
@@ -191,10 +192,7 @@ export class UsdaService {
     this.requireConfigured();
     // Bounded independently of caller input.
     const pageSize = Math.max(1, Math.min(25, Math.trunc(limit)));
-    const data = await this.http.fetchJson<{ foods?: UsdaFood[] }>(
-      this.searchUrl(query, 25, ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded']),
-      { upstream: 'nutrition database', retryServerErrors: true }
-    );
+    const data = await this.search(query, 25, ['Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded']);
 
     const foods = (data.foods || []).filter((food) => food.fdcId && food.description);
     const nonBranded = foods.filter((food) => food.dataType !== 'Branded');

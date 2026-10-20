@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon } from '../Home/icons';
 import { InactivityCountdown, EmergencyAlarm } from './InactivityViews';
 import { api, type CoachExercise } from '../../lib/api';
@@ -26,6 +26,11 @@ type Props = {
   contactPhone: string;
   onEnd: (seconds: number) => Promise<void>;
   onPause: (paused: boolean) => Promise<void>;
+  initialSeconds?: number;
+  initialPaused?: boolean;
+  onCheckpoint?: () => void;
+  controlsDisabled?: boolean;
+  renderRoutine?: (paused: boolean) => ReactNode;
 };
 
 /** Posts a command to the Expo host. Does nothing in a plain browser. */
@@ -38,9 +43,12 @@ function newKey() {
   return globalThis.crypto?.randomUUID?.() ?? `inactivity-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-export default function LiveSession({ exercise, workoutId, thresholdSeconds, contactName, contactPhone, onEnd, onPause }: Props) {
-  const [seconds, setSeconds] = useState(0);
-  const [paused, setPaused] = useState(false);
+export default function LiveSession({ exercise, workoutId, thresholdSeconds, contactName, contactPhone, onEnd, onPause, initialSeconds = 0, initialPaused = false, onCheckpoint, controlsDisabled = false, renderRoutine }: Props) {
+  const [seconds, setSeconds] = useState(initialSeconds);
+  const [paused, setPaused] = useState(initialPaused);
+  useEffect(() => { setPaused(initialPaused); }, [initialPaused]);
+  const exerciseRef = useRef(exercise);
+  exerciseRef.current = exercise;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [phase, setPhase] = useState<Phase>('active');
@@ -72,6 +80,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
     const id = window.setInterval(() => setSeconds(s => s + 1), 1000);
     return () => window.clearInterval(id);
   }, [paused, phase]);
+  useEffect(() => { onCheckpoint?.(); }, [seconds, onCheckpoint]);
 
   // Countdown ticks down locally once the host reports it started; the host decides when it ends.
   useEffect(() => {
@@ -97,9 +106,9 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   }, []);
 
   useEffect(() => {
-    if (phase !== 'active') camera.stop();
+    if (paused || phase !== 'active') camera.stop();
     else if (camera.shouldAutoStart && camera.status === 'idle') void camera.start();
-  }, [camera.start, camera.status, camera.stop, camera.shouldAutoStart, phase]);
+  }, [camera.start, camera.status, camera.stop, camera.shouldAutoStart, phase, paused]);
 
   // Native host events arrive through the WebView bridge.
   useEffect(() => {
@@ -134,6 +143,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
 
   // Start the host's inactivity monitor when the session mounts; stop it on unmount.
   useEffect(() => {
+    if (paused) { postToHost({ type: 'inactivity-stop' }); return; }
     postToHost({ type: 'inactivity-start', thresholdMs: thresholdSeconds * 1000 });
     postToHost({ type: 'inactivity-request-motion-status' });
     return () => {
@@ -141,7 +151,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       stopSound();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [thresholdSeconds]);
+  }, [thresholdSeconds, paused]);
 
   const playSound = () => startAlarm();
   const stopSound = () => stopAlarm();
@@ -160,7 +170,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         idempotencyKey: key,
         eventType: 'inactivity',
         workoutSessionId: workoutId,
-        exerciseId: exercise.exerciseId ?? exercise.name,
+        exerciseId: exerciseRef.current.exerciseId ?? exerciseRef.current.name,
         ...(location ? { location } : {}),
       });
       setAlert({
@@ -226,7 +236,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
 
   const togglePause = async () => {
     setBusy(true); setError('');
-    try { await onPause(!paused); setPaused(value => !value); }
+    try { await onPause(!paused); }
     catch (err) { setError(err instanceof Error ? err.message : 'Could not update the workout.'); }
     finally { setBusy(false); }
   };
@@ -268,6 +278,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         <span className="session-meta">{exercise.name}</span>
         <b className="session-time" aria-label="Elapsed time">{time}</b>
       </header>
+      {renderRoutine?.(paused)}
       <div ref={camera.frameRef} className="live-video">
         <video ref={camera.videoRef} className={`live-camera ${camera.facing === 'front' ? 'front-facing' : ''}`} autoPlay muted playsInline style={camera.nativePreview ? { opacity: 0 } : undefined} />
         {camera.status !== 'on' && <div className="live-scene" aria-hidden="true" />}
@@ -282,6 +293,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
           </button>
         )}
       </div>
+      {camera.status === 'on' && <button type="button" className="secondary" onClick={()=>camera.stop(true)}>Turn camera off</button>}
       {camera.status !== 'on' && (
         <div className="live-camera-action">
           <button type="button" className="secondary" disabled={camera.status === 'starting'} onClick={() => void camera.start()}>
@@ -295,8 +307,8 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       <div className="session-progress-label"><span>Elapsed time</span><b>{time}</b></div>
       <div className="session-progress-track"><i style={{width: `${Math.min(seconds / 1800 * 100, 100)}%`}}/></div>
       <div className="session-controls">
-        <button type="button" className="pause-button" aria-label={paused ? 'Resume workout' : 'Pause workout'} disabled={busy} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <Icon name="pause" size={16}/>}{paused ? 'Resume' : 'Pause'}</button>
-        <button className="end-button" disabled={busy} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
+        <button type="button" className="pause-button" aria-label={paused ? 'Resume workout' : 'Pause workout'} disabled={busy || controlsDisabled} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <Icon name="pause" size={16}/>}{paused ? 'Resume' : 'Pause'}</button>
+        <button className="end-button" disabled={busy || controlsDisabled} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
       </div>
       {paused && <div className="paused-banner">Session paused</div>}
       {error && <p className="scan-warning" role="alert">{error}</p>}

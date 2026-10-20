@@ -42,10 +42,11 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   };
   const [previewSnapshot, setPreviewSnapshot] = useState(() => createNutritionPreview());
   const [previewEligible,setPreviewEligible]=useState(false);
+  const [previewRequested,setPreviewRequested]=useState(false);
   useEffect(()=>{if(!loading)setPreviewEligible(canPreviewNutrition(loading,error,meals,water));},[loading,error,meals,water]);
   // Keep an explicitly established preview stable during background refreshes.
   // Real records, real water or errors always take precedence immediately.
-  const preview = previewEligible && !error && meals.length === 0 && water === 0;
+  const preview = previewRequested && previewEligible && !error && meals.length === 0 && water === 0;
   const displayMeals = preview ? previewSnapshot.meals : meals;
   const displayWater = preview ? previewSnapshot.water : water;
   const todayMeals = displayMeals.filter(meal => meal.date === formatLocalDate());
@@ -98,6 +99,7 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const onPhoto=(file?:File)=>{
     if(!file)return;
     setPhotoSourceOpen(false);
+    setPreviewRequested(false);
     setSampleReview(false);
     photo.current=file;
     if(imageUrl)URL.revokeObjectURL(imageUrl);
@@ -147,7 +149,8 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
     <div ref={contentRef} className="scan-content">
     {loading && view === 'nutrition' ? <div className="profile-load-state" role="status" aria-label="Loading nutrition" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div> : <>
     {(error || actionError) && <p className="error" role="alert">{actionError || error}</p>}
-    {preview && (view!=='review'||sampleReview) && <p className="scan-preview-label">Sample preview · not your saved nutrition data</p>}
+    {preview && (view!=='review'||sampleReview) && <p className="scan-preview-label">Sample preview · not your saved nutrition data <button type="button" onClick={()=>{setPreviewRequested(false);setSampleReview(false);setNotice('');setActionError('');setView('nutrition');}}>Start my log</button></p>}
+    {!preview && previewEligible && !loading && !error && meals.length===0 && water===0 && view==='nutrition' && <button type="button" className="scan-preview-toggle" onClick={()=>{setPreviewSnapshot(createNutritionPreview());setPreviewRequested(true);}}>View sample nutrition</button>}
     {notice&&<p className="scan-preview-notice" role="status">{notice}</p>}
     {error&&<button type="button" className="scan-retry" onClick={()=>void refresh()}>Retry nutrition</button>}
     {view==='nutrition'&&<NutritionDashboard meals={todayMeals} historyMeals={displayMeals} water={displayWater} onScan={scan} onAdd={add} onLogs={()=>{if(!preview)void refresh();setView('logs');}} onHistory={openHistory}/>}

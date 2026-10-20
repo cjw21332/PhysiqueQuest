@@ -30,7 +30,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      navigate('/home');
+      // Recovery checks the server profile before routing to home or unfinished setup.
+      navigate('/register');
     } catch (err) {
       if (err instanceof ApiRequestError && (err.statusCode === 401 || err.statusCode === 429)) {
         setError('');
@@ -85,6 +86,7 @@ export default function LoginPage() {
       )}
       {loginDialog && <AuthOutcomeModal
         kind="login-failed"
+        onClose={() => setLoginDialog(null)}
         locked={loginDialog.locked}
         onPrimary={() => {
           if (loginDialog.locked) {

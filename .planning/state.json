@@ -1,0 +1,18 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": null,
+  "phases": [
+    {
+      "number": "1",
+      "name": "Camera Readiness",
+      "status": "pending"
+    }
+  ],
+  "next": {
+    "command": "/gsd:progress --next",
+    "label": "Advance to the next step (plan phase 1)",
+    "reason": "Phase 1 of 1 — needs a plan"
+  },
+  "updated_at": "2026-10-20T14:32:37.243Z"
+}

@@ -180,6 +180,7 @@ test('Scan nutrition, estimate, and log use the dark reference palette', async (
 
   await page.goto('/scan');
   await expect(page.getByRole('heading', { name: 'Nutrition' })).toBeVisible();
+  await page.getByRole('button', { name: 'View sample nutrition' }).click();
   await expect(page.locator('.scan-dark-theme')).toHaveCSS('color-scheme', 'dark');
   await expect(page.locator('.scan-reference')).toHaveCSS('background-color', 'rgb(11, 15, 21)');
   await expect(page.locator('.home-bottom-nav')).toHaveCSS('background-color', 'rgb(22, 29, 39)');

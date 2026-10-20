@@ -74,12 +74,12 @@ export default function LaunchPage() {
     try {
       if (isNativeBridgeAvailable()) {
         window.ReactNativeWebView?.postMessage(JSON.stringify({ type: 'request-camera-permission' }));
-        setNotice('Phone camera permission request sent. Approve it to enable camera features.');
+        setNotice('Camera access requested for photos and previews. You can continue without it.');
         return;
       }
       if (!navigator.mediaDevices?.getUserMedia) {
         setReadiness(current => ({ ...current, cameraPermission: 'unavailable' }));
-        setNotice('This browser does not expose camera access. Open the app in a supported secure browser.');
+        setNotice('Camera access is unavailable here. You can continue without it or try a secure browser.');
         return;
       }
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
@@ -88,26 +88,26 @@ export default function LaunchPage() {
       setNotice('Camera permission granted.');
     } catch {
       setReadiness(current => ({ ...current, cameraPermission: 'denied' }));
-      setNotice('Camera permission was not granted. You can enable it in browser settings.');
+      setNotice('Camera access was not granted. You can continue without it or enable it in browser settings.');
     } finally {
       setCameraRequesting(false);
     }
   };
 
-  const cameraLabel = readiness.cameraPermission === 'granted' ? 'Granted' : readiness.cameraPermission === 'denied' ? 'Blocked' : readiness.cameraPermission === 'unavailable' ? 'Unavailable' : 'Needed for form tracking';
-  const networkLabel = readiness.wifiConnected ? `Connected${readiness.wifiSpeedMbps == null ? '' : ` · ${isNativeBridgeAvailable() ? '' : 'Estimated · '}${readiness.wifiSpeedMbps} Mbps`}` : readiness.networkType === 'unknown' ? 'Connection speed unavailable' : `${readiness.networkType} · Wi-Fi not detected`;
+  const cameraLabel = readiness.cameraPermission === 'granted' ? 'Granted · photos and previews' : readiness.cameraPermission === 'denied' ? 'Blocked · you can continue' : readiness.cameraPermission === 'unavailable' ? 'Unavailable · you can continue' : 'Optional · photos and previews';
+  const networkLabel = readiness.wifiConnected ? `Connected${readiness.wifiSpeedMbps == null ? '' : ` · ${isNativeBridgeAvailable() ? '' : 'Estimated · '}${readiness.wifiSpeedMbps} Mbps`}` : readiness.networkType === 'unknown' ? 'Connection details unavailable' : `${readiness.networkType} · Wi-Fi not confirmed`;
   const deviceLabel = readiness.osVersion ? `${readiness.osName ?? readiness.platform} ${readiness.osVersion} detected` : `${readiness.osName ?? readiness.platform} version unavailable`;
 
   return (
     <main className="scene">
       <div className="app-shell">
         <section className="launch screen-enter">
-          <div className="launch-brand"><span className="launch-logo"><img src="/logo.jpg" alt="PhysiqueQuest logo" className="brand-logo" /></span><h1>PhysiqueQuest</h1><p className="subtitle">AI-assisted, gamified fitness coaching that watches your form.</p></div>
+          <div className="launch-brand"><span className="launch-logo"><img src="/logo.jpg" alt="PhysiqueQuest logo" className="brand-logo" /></span><h1>PhysiqueQuest</h1><p className="subtitle">Workout plans, exercise guides, food logs and quests.</p></div>
           <div className="launch-spacer" />
           <div className="readiness">
-            <div className="readiness-head"><b>Device readiness</b><span>{readyCount} of 3 ready</span></div>
+            <div className="readiness-head"><b>Device checks</b><span>{readyCount} of 3 confirmed</span></div>
             <ReadinessRow ready={osStatus.ready} title={osStatus.title} detail={deviceLabel} />
-            <ReadinessRow ready={readiness.wifiConnected} title="High-speed Wi-Fi" detail={networkLabel} />
+            <ReadinessRow ready={readiness.wifiConnected} title="Network connection" detail={networkLabel} />
             <div className="ready-row">
               <b className={readiness.cameraPermission === 'granted' ? 'ready-icon' : 'camera-icon'}>{readiness.cameraPermission === 'granted' ? <Icon name="check" size={17}/> : <Icon name="camera" size={16}/>}</b>
               <p>Camera permission<small>{cameraLabel}</small></p>

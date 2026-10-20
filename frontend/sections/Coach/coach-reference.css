@@ -85,7 +85,7 @@
 }
 .coach-reference .start-session-btn { min-height: 54px; height: 54px; gap: 8px; border-radius: 13px; background: #80e687; color: #111a2c; font-size: 15px; font-weight: 600; box-shadow: none; transform: none; transition: none; }
 .coach-reference .start-session-btn:disabled { opacity: .5; cursor: not-allowed; }
-.coach-reference > .home-bottom-nav { height: var(--coach-nav-height); min-height: var(--coach-nav-height); flex: 0 0 var(--coach-nav-height); max-width: var(--coach-width); margin: 0 auto; padding: 8px 8px 10px; background: #fff; border-top: 1px solid #edf0ed; }
+.coach-reference > .home-bottom-nav { min-height: var(--coach-nav-height); max-width: var(--coach-width); margin: 0 auto; padding: 8px 8px 10px; background: #fff; border-top: 1px solid #edf0ed; }
 .coach-reference .home-bottom-nav button { min-height: 44px; gap: 5px; padding: 0; color: #536176; }
 .coach-reference .home-bottom-nav button .nav-icon { width: 50px; height: 30px; min-height: 30px; border-radius: 18px; }
 .coach-reference .home-bottom-nav button.active .nav-icon { background: #80e687; }

@@ -80,7 +80,9 @@ export interface ExerciseRecord {
 }
 export interface ExerciseCatalog { items: ExerciseRecord[]; total: number; page: number; limit: number; pages: number; source?: string; coverageNote?: string; }
 export interface ProgressRecord { _id: string; metric: 'weight' | 'waist' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
-export interface WorkoutSessionRecord { _id: string; exerciseIds: string[]; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: { exerciseId: string; reps: number; loadKg?: number; status: 'completed' | 'skipped' }[]; }
+export interface WorkoutExerciseSnapshot { exerciseId: string; name: string; equipment: string; prescription?: string; sets: number; }
+export interface WorkoutSetResult { setId: string; exerciseId: string; setIndex: number; reps: number; durationSeconds?: number; loadKg?: number; status: 'completed' | 'skipped'; source: 'manual' | 'local-video'; }
+export interface WorkoutSessionRecord { _id: string; exerciseIds: string[]; exercises?: WorkoutExerciseSnapshot[]; revision?: number; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: WorkoutSetResult[]; }
 export type AlertRecord = {
   _id?: string;
   id?: string;
@@ -481,6 +483,9 @@ class ApiClient {
   async addProgress(data: any) { return this.request<any>('/progress', { method: 'POST', body: JSON.stringify(data) }); }
   async deleteProgress(id: string) { return this.request<any>(`/progress/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
   async getWorkouts(limit = 20) { return this.request<WorkoutSessionRecord[]>(`/workouts?limit=${encodeURIComponent(limit)}`); }
+  async getActiveWorkout() { return this.request<WorkoutSessionRecord | null>('/workouts/active', { cache: 'no-store' }); }
+  async getWorkout(id: string) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}`, { cache: 'no-store' }); }
+  async saveWorkoutSet(id: string, expectedRevision: number, result: WorkoutSetResult) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}/sets`, { method: 'PATCH', body: JSON.stringify({ expectedRevision, result }) }); }
   async createWorkout(data: any) { return this.request<any>('/workouts', { method: 'POST', body: JSON.stringify(data) }); }
   async getAdminExercises() { return this.request<any[]>('/admin/exercises'); }
   async createAdminExercise(data: any) { return this.request<any>('/admin/exercises', { method: 'POST', body: JSON.stringify(data) }); }

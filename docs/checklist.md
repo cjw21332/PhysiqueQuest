@@ -11,6 +11,62 @@
 
 This checklist separates what is implemented in the frontend, what is implemented and tested in the backend, and what has actually been demonstrated as a complete user journey using genuine account data.
 
+### Android shared-module bundling fix — October 21, 2026
+
+Added plain `shared/` to Metro watch folders; Expo's workspace defaults omitted it and could not resolve the new camera-readiness import. Actual cache-cleared Android export passed: 1,400 modules and bundled pose model. Metro regression 1/1 and native readiness tests 13/13 pass. Export evidence: `artifacts/metro-shared-fix/android`. Restart Metro to load config changes. No physical-device or live-integration status changes.
+
+### Local camera readiness implementation — October 21, 2026
+
+Implemented local browser worker/native full-landmark readiness with independent fresh-frame connection, bounded session/geometry validation, stale/lifecycle teardown, honest fallback, 48px controls and camera-off manual continuation. Explicit video analysis and existing workout/rep contracts remain. Independent review found/fixed background auto-restart and premature native startup timeout; recheck is clean. Final targeted Node 63/63, backend pose 3/3, browser 30/30, full frontend Node 131/131, mobile types and production build pass. Physical validation remains pending: all 45 trials and six calibration decisions are unresolved; body/brightness/framing flags remain false. Phase 1 is human_needed at Plan 01-03 Task 2. See PROGRESS-55 and `.planning/phases/01-camera-readiness/01-UAT.md`. No new live-integration marks.
+
+### Camera readiness planning — October 20, 2026
+
+Initialized `.planning/` for the existing app and planned local camera readiness in three sequential waves: browser checks, native bridge integration, and regression/device calibration. The user selected on-device MediaPipe analysis and approximate framing guidance. All 12 requirements and seven decisions map to plans; readiness remains unimplemented by this task. Physical camera calibration and Android/iOS behavior require execution evidence. See `.planning/ROADMAP.md` and PROGRESS-54. No implementation or live-integration status marks changed.
+
+### USDA food search 400 fix — October 20, 2026
+
+Reproduced intermittent nginx HTML 400s on USDA GET searches, including chicken breast. Switched candidate and scan ingredient search to the documented JSON POST form; the updated compiled service returned eight candidates on two live chicken-breast searches. Targeted nutrition tests 52/52, backend build/lint pass. Provider-only verification does not establish an authenticated app-to-database journey. See PROGRESS-53; live-integration status marks remain unchanged.
+
+### Exercise library layout and HTTP startup fix — October 20, 2026
+
+Library now wraps full names/metadata and muscle filters, groups equipment in a labeled disclosure, offers Clear filters and resets entry scroll/focus. Existing API search/filter/pagination/detail/demo/retry flows remain. Workout startup no longer directly requires crypto.randomUUID; browser regression disables it and verifies a fallback request key reaches the create API and session/report lifecycle completes. Coach/library browser suite 14/14, frontend Node 117/117 and production build pass. Layout inspected on phone and tested at 320/390/844/1280 widths. See PROGRESS-52; no live-integration status changes.
+
+### Completed workout recovery banner fix — October 20, 2026
+
+Recovery now represents the latest full session, preventing older abandoned sessions from resurfacing after it ends. Coach verifies active status with uncached detail data and refreshes on plan return/app focus; stale request generations cannot restore the banner. Tests cover completion → report Back → reload with stale active responses and completion on another screen. Workout browser 12/12, backend workout checks 34/34, frontend Node 116/116, backend lint/build and frontend build pass. See PROGRESS-51; no live records were deleted or modified.
+
+### Abandoned workout completion fix — October 20, 2026
+
+Fixed the mismatch where completion rejected a client elapsed counter above 86400 seconds even though server timestamps determine duration. Legacy counters are optional/nonnegative integers without that completion cap; new routine requests omit them. Per-set duration limits remain. Regression covers the reported 11301:31 stale session. Backend workout checks 28/28, routine browser 10/10, frontend Node 116/116, backend lint/build and frontend build pass. See PROGRESS-50. No live account was modified.
+
+### Frontend polish before final review — October 20, 2026
+
+Reviewed the full captured frontend and earlier critique/audit, preserving the current visual system and workflows. Fixed Coach empty-heading contrast, search placeholder readability, shared keyboard focus (including file picker), camera-mode/safety-threshold selected semantics, optional goal detail formatting and false profile-save failure on local cache errors. Broad browser regression batch covered 54 scenarios: 53 passed initially, one new fixture had an incorrect settings request shape; after correction all six affected polish/Coach checks passed. Dedicated touch/text check passed, frontend Node 116/116 and production build passed. Independent scoped review found no new actionable regressions. See PROGRESS-49. No physical device, deployed-data or screen-reader certification claim; live-integration marks unchanged.
+
+### Duplicated CSS and legacy override cleanup — October 20, 2026
+
+Removed 596 superseded identical declarations, 49 empty rules, seven obsolete navigation sizing declarations, and an unimported 881-line responsive stylesheet. Responsive/conditional boundaries and differing-value fallbacks were retained. Theme browser suite passed 14/14 before and after; 46/50 captures are pixel-identical, with remaining differences isolated to live camera content, scrollbar rendering and the development badge. Accessibility browser checks, frontend Node suite and production build pass. No backend/data changes or live-integration status updates. See PROGRESS-48 and `artifacts/css-distill/`.
+
+### Mobile touch, scaling and navigation labels — October 20, 2026
+
+Shared navigation exposes current destination and descriptive Scan/Me names, uses 48px targets and scalable labels, and reflows for large text. Coarse-pointer controls gain 48px minimums; day selectors wrap. Expo follows system font scaling without a WebView reload; native connection fallback scrolls and labels its input, and native camera/retry controls are enlarged. Touch-emulated Chromium checks cover 320/390/768px and landscape, 100/200% navigation text, complete label/control visibility, seven-day target geometry and a synthesized navigation tap. Cache/navigation regressions 8/8; frontend/mobile Node suites, mobile TypeScript and production frontend build pass. See PROGRESS-47. Physical iOS/Android scaling and screen-reader behavior remain unverified; no live-integration marks changed.
+
+### Resumable calibration and optional sections — October 20, 2026
+
+Calibration restores same-device/account/API-scoped drafts with step and skipped sections. Explicit skip/add controls cover optional measurements, targets, camera guidance and health notes; core personal/training/contact fields retain validation. Login checks server profile existence and returns incomplete accounts to setup even without a draft. Final save still uses the backend and retains drafts on failure; pending guards, account-switch protection and ambiguous-response recovery are covered. Dedicated browser tests 11/11, existing onboarding 2/2, frontend Node 116/116 and production build passed. Responsive captures at 320×480 through desktop were inspected; no new live-database/physical-device evidence or integration status-mark changes. See PROGRESS-46.
+
+### Active routine progression — October 20, 2026
+
+Full ordered routine, manual per-set reps/kg, active-session corrections, skip/revisit, early-end confirmation and saved/skipped report are implemented against existing workout APIs. Device-scoped drafts restore unsaved inputs; server records restore confirmed sets. Explicit resume starts paused, with an elapsed-time caveat if no device checkpoint exists. Camera-off/denied logging, numeric keyboards and 44px controls are covered. Frontend Node suite 116/116, existing Coach browser suite 13/13, backend workout tests 31/31 and production build passed; dedicated routine regressions and recovery checks are documented in PROGRESS-45. No new live-service or physical-device evidence; existing integration status marks remain unchanged.
+
+### Launch and calibration copy clarification — October 20, 2026
+
+Replaced the launch form-watching promise with the available plans, exercise guides, food logs and quests. Camera/connection copy distinguishes optional checks from prerequisites. Calibration now discloses shared nutrition targets and unavailable live form analysis, describes saved preferences without promising automatic difficulty/diet changes or exercise safety, and ends with **Save profile & continue**. Existing validation, values and profile persistence are unchanged. Frontend Node tests: 114/114; onboarding browser tests: 2/2; production build passed. Launch screenshots at 320×480, 390×844, 768×1024 and 1440×900 verify visible account actions and no clipped scroll content; calibration screenshots were visually inspected. Evidence is under `artifacts/launch-calibration-copy/`. No new live-service/device evidence or status-mark changes.
+
+### Auth, recovery and first-time nutrition hardening — October 20, 2026
+
+Auth now supports Enter submission, required fields, pending states and duplicate-request guards. Recovery/auth outcomes use native modal dialogs with accessible names, Escape where appropriate, stage focus and opener restoration. Registration removes the QA tip and links to clearly marked empty policy drafts at `/terms`, `/privacy`, and `/camera-consent`; team content remains outstanding in `docs/policy-review-todo.md`. Nutrition starts with real empty data; samples require an explicit opt-in and have a **Start my log** exit. First meal/water saves remain API-backed, and failed writes preserve inputs and show errors. Frontend Node tests: 114/114; new mocked-browser hardening tests: 10/10; existing onboarding: 2/2, journeys: 6/6 and overlays: 2/2; production build passed. Captured layouts cover 320×480, 390×844, 768×1024 and 1440×900. No live provider, real-account database, physical-device or screen-reader application verification was performed; existing live-integration marks and totals remain unchanged. See [PROGRESS-44](../ProgressReports/PROGRESS-44.md).
+
 ### Section switching without loading interstitials — October 19, 2026
 
 Main tabs and signed-in section shortcuts now use the Next.js client router instead of reloading the whole document. BottomNav prefetches its five routes and ignores same-tab clicks. Cached resources restore before paint, eliminating the initial empty-state flash on cached transitions. Cold Profile/Coach/Scan/Quests loads use quiet accessible placeholders; real errors and Retry remain. Disabled the development badge that was intercepting Me-tab taps. Frontend production build passed. Cache/navigation/Coach browser checks: 8/8, including all 25 ordered main-tab pairs with no document reload, loading-text flash or page error; existing journey checks: 6/6. Frontend Node tests: 113/114, with the previously recorded unrelated meal-edit wording assertion unchanged. No physical WebView/back-button test or backend change was made. See PROGRESS-42.md.
@@ -240,8 +296,8 @@ The progress bars are native HTML progress indicators. They are audit snapshots;
 
 ### 6. Camera Check and pose readiness
 
-- [✅] Camera preview, front/rear switching, capture, and readiness submission are wired through browser or Expo camera paths and the pose API.
-- [✅] Readiness values are rendered only when the API response contains recognized values; absent values display “Not assessed,” not a fabricated pass.
+- [✅] Camera preview and front/rear switching use browser or Expo paths; live readiness uses local worker/native observations. Explicit recorded-video analysis alone uses the pose API.
+- [✅] Independent readiness rows require fresh, validated evidence. Missing, stale, unsupported or uncalibrated results remain Unavailable; body/brightness/framing flags are false pending device calibration.
 
 ### 7. Workout session and report
 
@@ -333,7 +389,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 ### 6. Camera Check and pose readiness
 
 - [✅] Pose status and authenticated analysis endpoints validate request types, including readiness-check metadata.
-- [❌] Actual analysis depends on `POSE_ANALYSIS_URL` and `POSE_ANALYSIS_API_KEY`; provider readiness response shape/availability is not verified against deployment.
+- [❌] Explicit recorded-video/provider analysis still depends on `POSE_ANALYSIS_URL` and `POSE_ANALYSIS_API_KEY` and remains unverified against deployment. Live local readiness has no provider dependency; physical validation remains pending.
 
 ### 7. Workout session and report
 
@@ -421,7 +477,7 @@ Backend criteria that do not apply to a frontend/native-shell module are labeled
 
 ### 6. Camera Check and pose readiness
 
-- [❌] Capture a real camera frame, receive structured readiness results from the deployed pose provider, and verify full-body, lighting, and distance values in the UI.
+- [❌] Validate local readiness on actual browser/Android/iOS cameras: visible crop/orientation/mirroring, full body, scene brightness, approximate framing, lifecycle and accessibility. Record device calibration before enabling those checks; software fixtures do not satisfy this criterion.
 
 ### 7. Workout session and report
 

@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+
 type ModalKind = 'login-failed' | 'email-registered' | 'account-created';
 
 type Props = {
@@ -9,6 +11,7 @@ type Props = {
   locked?: boolean;
   onPrimary: () => void;
   onSecondary?: () => void;
+  onClose?: () => void;
 };
 
 const content: Record<ModalKind, { title: string; description: string; primary: string; secondary?: string; icon: string }> = {
@@ -33,7 +36,14 @@ const content: Record<ModalKind, { title: string; description: string; primary: 
   },
 };
 
-export default function AuthOutcomeModal({ kind, name, email, locked = false, onPrimary, onSecondary }: Props) {
+export default function AuthOutcomeModal({ kind, name, email, locked = false, onPrimary, onSecondary, onClose }: Props) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => { dialog?.close(); if (opener?.isConnected) opener.focus(); };
+  }, []);
   const item = content[kind];
   const description = kind === 'login-failed' && locked
     ? 'Too many attempts. Sign-in is paused for 15 minutes. Reset your password to get back into your account sooner.'
@@ -43,8 +53,8 @@ export default function AuthOutcomeModal({ kind, name, email, locked = false, on
       ? `Welcome to PhysiqueQuest, ${name?.trim() || 'there'}. Next, four quick steps to calibrate your plan — about two minutes.`
       : item.description;
 
-  return <div className="auth-outcome-overlay">
-    <section className={`auth-outcome-modal auth-outcome-${kind}`} role="dialog" aria-modal="true" aria-labelledby="auth-outcome-title" aria-describedby="auth-outcome-description">
+  return <dialog ref={dialogRef} className="auth-outcome-overlay" aria-modal="true" aria-labelledby="auth-outcome-title" aria-describedby="auth-outcome-description" onCancel={event => { event.preventDefault(); onClose?.(); }}>
+    <section className={`auth-outcome-modal auth-outcome-${kind}`}>
       <div className={`auth-outcome-icon auth-outcome-icon-${kind}`}><AuthOutcomeIcon kind={kind} /></div>
       <h2 id="auth-outcome-title">{locked && kind === 'login-failed' ? 'Sign-in paused' : item.title}</h2>
       <p id="auth-outcome-description">{description}</p>
@@ -53,7 +63,7 @@ export default function AuthOutcomeModal({ kind, name, email, locked = false, on
         {item.secondary && onSecondary && !(locked && kind === 'login-failed') && <button className="auth-outcome-secondary" type="button" onClick={onSecondary}>{item.secondary}</button>}
       </div>
     </section>
-  </div>;
+  </dialog>;
 }
 
 function AuthOutcomeIcon({ kind }: { kind: ModalKind }) {

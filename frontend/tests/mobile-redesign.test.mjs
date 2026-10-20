@@ -182,7 +182,7 @@ test('Expo camera preview uses the native camera instead of insecure WebView med
   assert.doesNotMatch(cameraHook, /Open the app over https or through the Expo app/);
 });
 
-test('Camera Check waits for its visible frame, supports both cameras, and requests live readiness analysis', async () => {
+test('Camera Check waits for its visible frame, supports both cameras, and uses local live readiness', async () => {
   const camera = await source('sections/Coach/CameraCheck.tsx');
   const cameraHook = await source('hooks/useCameraStream.ts');
   const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
@@ -192,13 +192,17 @@ test('Camera Check waits for its visible frame, supports both cameras, and reque
   assert.doesNotMatch(cameraHook, /camera preview is not visible yet/);
   assert.match(camera, /live\.switchFacing/);
   assert.match(cameraHook, /requestedFacing === 'front' \? 'user' : 'environment'/);
-  assert.match(camera, /analysisType: 'readiness'/);
-  assert.match(camera, /requestedChecks: \['fullBodyInFrame', 'lighting', 'distance'\]/);
+  assert.match(camera, /useCameraReadiness/);
+  assert.doesNotMatch(camera, /analysisType: 'readiness'/);
+  assert.doesNotMatch(camera, /live\.captureFrame/);
   assert.match(camera, /Full body in frame/);
-  assert.match(camera, /Lighting/);
-  assert.match(camera, /Distance/);
-  assert.match(mobile, /camera-capture-readiness/);
-  assert.match(mobile, /takePictureAsync/);
+  assert.match(camera, /Scene brightness/);
+  assert.match(camera, /Framing/);
+  assert.match(camera, /Continue without camera/);
+  assert.doesNotMatch(mobile, /camera-capture-readiness|takePictureAsync/);
+  assert.doesNotMatch(cameraHook, /camera-capture-readiness|captureFrame/);
+  assert.match(mobile, /readinessScript/);
+  assert.match(mobile, /validateNativeReadinessContext/);
   assert.match(api, /analysisType\?: 'workout' \| 'readiness'/);
   assert.match(api, /requestedChecks\?: \('fullBodyInFrame' \| 'lighting' \| 'distance'\)\[\]/);
 });
@@ -282,7 +286,7 @@ test('auth boundaries reload the document while signed-in tabs use client naviga
   const register = await source('app/(auth)/register/page.tsx');
   const bottomNav = await source('sections/Home/BottomNav.tsx');
   assert.match(navigation, /window\.location\.assign/);
-  assert.match(login, /navigate\('\/home'\)/);
+  assert.match(login, /await login\(email, password\);[\s\S]*navigate\('\/register'\)/);
   assert.match(register, /navigate\('\/home'\)/);
   assert.match(bottomNav, /router\.push\(path\)/);
   assert.match(bottomNav, /router\.prefetch\(tab\.path\)/);

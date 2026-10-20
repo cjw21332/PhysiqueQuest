@@ -42,7 +42,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   useEffect(() => { let active = true; api.getActivity().then(result => { if (active && Number.isFinite(result.state?.level)) setLevel(result.state.level); }).catch(() => {}); return () => { active = false; }; }, []);
   useEffect(() => { setCurrentProfile(profile); }, [profile]);
 
-  const toggle = async (key: 'inactivity' | 'alarmVolume' | 'showLeaderboard') => { try { await updateSettings({ [key]: !settings[key] }); } catch (error) { setSaveError(error instanceof Error ? error.message : 'Could not save settings.'); } };
+  const toggle = async (key: 'inactivity' | 'alarmVolume' | 'showLeaderboard') => { setSaveError(''); try { await updateSettings({ [key]: !settings[key] }); } catch (error) { setSaveError(error instanceof Error ? error.message : 'Could not save settings.'); } };
   const equipment = currentProfile.equipment?.length ? currentProfile.equipment.join(', ') : '—';
   const selectedTrainingDays = normalizeTrainingDays(currentProfile.days || []);
   const daysPerWeek = selectedTrainingDays.length;
@@ -55,7 +55,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const targetDate = currentProfile.targetDate
     ? new Date(currentProfile.targetDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     : '—';
-  const goalDetail = `${currentProfile.goal || '—'} · ${goalWeight} by ${targetDate}`;
+  const goalDetail = [currentProfile.goal || 'Set your goal', currentProfile.targetWeight ? goalWeight : '', currentProfile.targetDate ? `by ${targetDate}` : ''].filter(Boolean).join(' · ');
 
   // Persist a partial profile update to the database (MongoDB via the
   // JWT-guarded PUT /api/profile endpoint), then refresh the cached copy
@@ -66,7 +66,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       const updated = await api.updateProfile(patch);
       const merged = { ...currentProfile, ...patch, ...updated };
       setCurrentProfile(merged);
-      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged));
+      try { localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged)); } catch { /* The server-confirmed profile remains saved. */ }
       window.dispatchEvent(new Event('physiquequest-profile-updated'));
       setNotice(`${featureName} saved`);
       return true;
@@ -118,7 +118,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
         <h3 className="me-group-title">Inactivity threshold</h3>
         <p>Time without movement before we check on you</p>
         <div className="me-threshold" role="group" aria-label="Inactivity threshold">
-          {([30, 45, 60] as const).map(value => <button key={value} className={settings.threshold === value ? 'selected' : ''} onClick={() => { void updateSettings({ threshold: value }).catch(error => setSaveError(error instanceof Error ? error.message : 'Could not save threshold.')); }}>{value} s</button>)}
+          {([30, 45, 60] as const).map(value => <button type="button" key={value} aria-pressed={settings.threshold === value} className={settings.threshold === value ? 'selected' : ''} onClick={() => { setSaveError(''); void updateSettings({ threshold: value }).catch(error => setSaveError(error instanceof Error ? error.message : 'Could not save threshold.')); }}>{value} s</button>)}
         </div>
       </section>
       <div className="me-setting-row"><span><b>Emergency alarm volume</b><small>Maximum volume in the Android app. Device volume applies on iOS, web, and Expo Go; system restrictions may limit sound.</small></span></div>

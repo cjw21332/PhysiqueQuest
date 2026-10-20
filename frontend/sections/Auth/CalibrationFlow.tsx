@@ -5,6 +5,7 @@ import { Icon } from '../Home/icons';
 import type { Profile } from '../Home/types';
 import { formatPhoneNumber, unformatPhoneNumber } from '../../lib/phoneFormatter';
 import { normalizeTrainingDays, TRAINING_DAYS } from '../../lib/trainingDays';
+import { calibrationDraftKey, readCalibrationDraft } from '../../lib/calibrationDraft';
 
 type CalibrationData = {
   age: string;
@@ -43,10 +44,10 @@ const initialData: CalibrationData = {
 };
 
 const goalOptions = [
-  { title: 'Weight loss', detail: 'Calorie deficit + conditioning', icon: 'weight-loss' },
-  { title: 'Build muscle', detail: 'Hypertrophy split, higher protein', icon: 'dumbbell' },
-  { title: 'Strength', detail: 'Low reps, progressive overload', icon: 'strength' },
-  { title: 'Endurance', detail: 'Circuit and interval focus', icon: 'pulse' },
+  { title: 'Weight loss', detail: 'Work toward your weight goal', icon: 'weight-loss' },
+  { title: 'Build muscle', detail: 'Resistance training for muscle growth', icon: 'dumbbell' },
+  { title: 'Strength', detail: 'Strength-focused exercise choices', icon: 'strength' },
+  { title: 'Endurance', detail: 'Cardio and conditioning sessions', icon: 'pulse' },
   { title: 'General fitness', detail: 'Balanced weekly plan', icon: 'health' },
 ];
 const equipmentOptions = ['Bodyweight only', 'Dumbbells', 'Resistance bands', 'Full gym'];
@@ -56,14 +57,40 @@ const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingemen
 export default function CalibrationFlow({ name, email, onComplete, submitError = '' }: {
   name: string;
   email: string;
-  onComplete: (profile: Profile) => void;
+  onComplete: (profile: Profile) => void | Promise<void>;
   submitError?: string;
 }) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<CalibrationData>(initialData);
   const [error, setError] = useState('');
+  const [ready, setReady] = useState(false);
+  const [skipped, setSkipped] = useState<string[]>([]);
+  const [draftError, setDraftError] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const submitting = useRef(false);
+  const draftKey = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); }, [step]);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    draftKey.current = calibrationDraftKey();
+    const draft = readCalibrationDraft(initialData);
+    if (draft) { setData(draft.data); setStep(draft.step); setSkipped(draft.skipped); }
+    setReady(true);
+  }, []);
+  useEffect(() => {
+    if (!ready) return;
+    try {
+      const key = draftKey.current;
+      if (!key || key !== calibrationDraftKey()) throw new Error('Account changed');
+      localStorage.setItem(key, JSON.stringify({ version: 1, data, step, skipped }));
+      setDraftError(false);
+    } catch { setDraftError(true); }
+  }, [data, step, skipped, ready]);
+  useEffect(() => { scrollRef.current?.scrollTo({ top: 0 }); if (ready) headingRef.current?.focus(); }, [step, ready]);
+  const skip = (section: string, fields: Partial<CalibrationData>) => {
+    setData(current => ({ ...current, ...fields })); setSkipped(current => [...current, section]); setError('');
+  };
+  const restore = (section: string) => setSkipped(current => current.filter(item => item !== section));
 
   const bmi = useMemo(() => {
     const heightMeters = heightInMeters(data.height, data.heightInches, data.heightUnit);
@@ -97,8 +124,10 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
     }));
   };
 
-  function submitStep(event: FormEvent<HTMLFormElement>) {
+  async function submitStep(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!ready || submitting.current) return;
+    if (!draftKey.current || draftKey.current !== calibrationDraftKey()) { setError('Your account or connection changed. Reopen registration to continue with the correct account.'); return; }
     setError('');
     if (step === 1) {
       const age = Number(data.age);
@@ -117,7 +146,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
     }
     if (step === 2) {
       if (!data.goal) { setError('Choose a primary training goal.'); return; }
-      if (!data.seriousness) { setError('Select how serious you are about training.'); return; }
+      if (!data.seriousness) { setError('Choose your training commitment level.'); return; }
       setStep(3);
       return;
     }
@@ -125,7 +154,6 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
       if (!data.equipment.length) { setError('Choose at least one available equipment option.'); return; }
       if (!data.days.length) { setError('Choose at least one training day.'); return; }
       if (!data.duration) { setError('Choose a session duration.'); return; }
-      if (!data.placementConfirmed) { setError('Confirm that you can place your phone at a safe distance.'); return; }
       setStep(4);
       return;
     }
@@ -135,7 +163,8 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
     }
 
     const days = normalizeTrainingDays(data.days);
-    onComplete({
+    submitting.current = true; setSaving(true);
+    try { await onComplete({
       name: name.trim(), email: email.trim(), age: data.age, gender: data.gender,
       height: data.height, heightInches: data.heightInches, heightUnit: data.heightUnit,
       weight: data.weight, weightUnit: data.weightUnit,
@@ -147,7 +176,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
       seriousness: data.seriousness, equipment: data.equipment, days,
       duration: data.duration, conditions: data.conditions, healthNotes: data.healthNotes.trim(),
       contactName: data.contactName.trim(), contactPhone: data.contactPhone.trim(),
-    });
+    }); } finally { submitting.current = false; setSaving(false); }
   }
 
   const clearBasicInfo = () => {
@@ -175,14 +204,15 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
   };
 
   const stepTitles = ['Personal data', 'What are you training for?', 'Training preference', 'Health & safety'];
-  const continueLabels = ['Next: Goals', 'Next: Training', 'Next: Health info', 'Finish & build my plan'];
+  const continueLabels = ['Next: Goals', 'Next: Training', 'Next: Health info', 'Save profile & continue'];
 
   return (
     <section className="wizard calibration-wizard" aria-label={`Calibration step ${step} of 4`}>
       <div className="progress" role="img" aria-label={`Step ${step} of 4`}>
         {stepTitles.map((title, index) => <i key={title} className={index < step ? 'filled' : ''} />)}
       </div>
-      <form className="calibration-form" onSubmit={submitStep}>
+      <form className="calibration-form" onSubmit={submitStep} aria-busy={saving}>
+        <fieldset className="calibration-fields" disabled={!ready || saving}>
         <div className="calibration-scroll" ref={scrollRef}>
       <div className="wizard-heading">
         <div className="step-header">
@@ -194,8 +224,9 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
             </button>
           )}
         </div>
-        <h2>{stepTitles[step - 1]}</h2>
-        <p>{step === 1 ? 'Used to size your plan and daily calorie targets.' : step === 2 ? 'Pick one primary goal. You can change it later.' : step === 3 ? 'Your plan is built around what you actually have.' : 'Keeps unsafe exercises out of your plan.'}</p>
+        <h2 ref={headingRef} tabIndex={-1}>{stepTitles[step - 1]}</h2>
+        <p className="calibration-draft-status" role="status">{!ready ? 'Loading your progress…' : draftError ? 'Device storage is unavailable. Keep this page open to avoid losing progress.' : 'Progress saved on this device for your account. Reopen registration to continue. Your profile is sent when you finish.'}</p>
+        <p>{step === 1 ? 'Save your starting measurements. Nutrition targets currently use shared defaults.' : step === 2 ? 'Choose a goal to track. You can update it later.' : step === 3 ? 'Choose equipment, training days and session length for your plan.' : 'Add health notes and an emergency contact to your profile.'}</p>
       </div>
 
         <div className="step-content">
@@ -216,7 +247,8 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
             <ChoiceGroup label="Gender" options={['Male', 'Female', 'Other']} value={data.gender} onChange={(value) => setField('gender', value)} />
             <div className="choice-group">
               <div className="group-title"><b>Body measurements</b><small>Optional</small></div>
-              <div className="measure-grid">
+              <button type="button" className="ghost calibration-skip" onClick={()=>skipped.includes('measurements') ? restore('measurements') : skip('measurements', { chest: '', waist: '', arms: '' })}>{skipped.includes('measurements') ? 'Add body measurements' : 'Skip body measurements'}</button>
+              {!skipped.includes('measurements') && <div className="measure-grid">
                 {(['Chest', 'Waist', 'Arms'] as const).map((label) => {
                   const key = label.toLowerCase() as 'chest' | 'waist' | 'arms';
                   const unitKey = `${key}Unit` as 'chestUnit' | 'waistUnit' | 'armsUnit';
@@ -237,7 +269,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
                     }}
                   />;
                 })}
-              </div>
+              </div>}
             </div>
             <ChoiceGroup label="Activity level" options={activityOptions} value={data.activity} onChange={(value) => setField('activity', value)} />
             <p className="microcopy">{activityDescription(data.activity)}</p>
@@ -257,12 +289,14 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
                 </button>
               ))}
             </div>
-            <div className="field-grid target-grid">
+            <div className="group-title"><b>Weight target & date</b><small>Optional</small></div>
+            <button type="button" className="ghost calibration-skip" onClick={()=>skipped.includes('targets') ? restore('targets') : skip('targets', { targetWeight: '', targetDate: '' })}>{skipped.includes('targets') ? 'Add weight target & date' : 'Skip weight target & date'}</button>
+            {!skipped.includes('targets') && <div className="field-grid target-grid">
               <UnitNumberField label="Target weight" value={data.targetWeight} unit={data.weightUnit} units={['kg', 'lbs']} min={data.weightUnit === 'kg' ? 25 : 55} max={data.weightUnit === 'kg' ? 350 : 772} step="0.1" onChange={(value) => setField('targetWeight', value)} onUnitChange={(unit) => { const convert = (value: string) => value ? (unit === 'lbs' ? Number(value) * 2.2046226218 : Number(value) / 2.2046226218).toFixed(1) : ''; setField('targetWeight', convert(data.targetWeight)); setField('weight', convert(data.weight)); setField('weightUnit', unit as CalibrationData['weightUnit']); }} />
               <label className="field"><span>Target date</span><div className="input-wrap"><input type="date" value={data.targetDate} onChange={(event) => setField('targetDate', event.target.value)} aria-label="Target date" /></div></label>
-            </div>
-            <ChoiceGroup label="How serious are you?" options={['Casual', 'Consistent', 'Hardcore']} value={data.seriousness} onChange={(value) => setField('seriousness', value)} />
-            <p className="microcopy">{data.seriousness === 'Casual' ? 'A flexible plan that fits your pace.' : data.seriousness === 'Hardcore' ? 'A challenging plan with focused weekly targets.' : 'A steady weekly plan with daily missions.'}</p>
+            </div>}
+            <ChoiceGroup label="Training commitment" options={['Casual', 'Consistent', 'Hardcore']} value={data.seriousness} onChange={(value) => setField('seriousness', value)} />
+            <p className="microcopy">{data.seriousness ? 'Saved with your profile. Your schedule and session length shape your plan.' : 'Choose the commitment level that best describes you.'}</p>
           </>}
 
           {step === 3 && <>
@@ -295,11 +329,13 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
               <button type="button" className="ghost clear-section-btn" onClick={clearSessionInfo}>Clear</button>
             </div>
             <ChoiceGroup label="Session duration" options={['20 min', '30 min', '45 min', '60 min']} value={data.duration} onChange={(value) => setField('duration', value)} />
-            <div className="placement-card">
+            <div className="group-title"><b>Camera guidance</b><small>Optional</small></div>
+            <button type="button" className="ghost calibration-skip" onClick={()=>skipped.includes('camera') ? restore('camera') : skip('camera', { placementConfirmed: false })}>{skipped.includes('camera') ? 'Show camera guidance' : 'Skip camera guidance'}</button>
+            {!skipped.includes('camera') && <div className="placement-card">
               <span className="phone-icon"><Icon name="smartphone" size={18} /></span>
-              <div><b>Phone placement for form tracking</b><p>Prop your phone at waist height, 2.5–3.0 m away, so your full body stays in frame.</p></div>
-              <label className="placement-check"><input type="checkbox" checked={data.placementConfirmed} onChange={(event) => setField('placementConfirmed', event.target.checked)} />I can place my phone 2.5–3.0 m away</label>
-            </div>
+              <div><b>Camera preview setup</b><p>For a full-body preview, prop your phone at waist height, 2.5–3.0 m away. Live form analysis is unavailable.</p></div>
+              <label className="placement-check"><input type="checkbox" checked={data.placementConfirmed} onChange={(event) => setField('placementConfirmed', event.target.checked)} />I understand this camera setup guidance</label>
+            </div>}
           </>}
 
           {step === 4 && <>
@@ -307,14 +343,16 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
               <div className="group-title"><b>Health & safety</b></div>
               <button type="button" className="ghost clear-section-btn" onClick={clearHealthInfo}>Clear</button>
             </div>
-            <div className="choice-group condition-list">
-              <div className="group-title"><b>Existing conditions</b></div>
+            <button type="button" className="ghost calibration-skip" onClick={()=>skipped.includes('health') ? restore('health') : skip('health', { conditions: [], healthNotes: '' })}>{skipped.includes('health') ? 'Add health notes' : 'Skip health notes'}</button>
+            {!skipped.includes('health') && <><div className="choice-group condition-list">
+              <div className="group-title"><b>Existing conditions</b><small>Optional</small></div>
               {conditionOptions.map((condition) => <label key={condition}><input type="checkbox" checked={data.conditions.includes(condition)} onChange={() => toggleCondition(condition)} />{condition}</label>)}
             </div>
             <div className="choice-group notes-group">
               <div className="group-title"><b>Additional information</b><small>Optional</small></div>
-              <textarea value={data.healthNotes} onChange={(event) => setField('healthNotes', event.target.value)} maxLength={500} placeholder="Recent surgery, medication, anything your coach should know" />
+              <textarea value={data.healthNotes} onChange={(event) => setField('healthNotes', event.target.value)} maxLength={500} placeholder="Health notes you want to save with your profile" />
             </div>
+            </>}
             <div className="choice-group emergency">
               <div className="group-title"><b>Emergency contact</b><small className="required">Required</small></div>
               <div className="safety-note"><span><Icon name="shield" size={16} /></span><p>Emergency contact information is saved with your profile. Alerts depend on device permissions and the configured delivery service.</p></div>
@@ -328,9 +366,10 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
 
         <footer className="wizard-footer calibration-footer">
           <button className="primary continue-btn" type="submit">
-            {continueLabels[step - 1]} <Icon name={step === 4 ? 'check' : 'arrow'} size={16} />
+            {saving ? 'Saving profile…' : continueLabels[step - 1]} <Icon name={step === 4 ? 'check' : 'arrow'} size={16} />
           </button>
         </footer>
+        </fieldset>
       </form>
     </section>
   );

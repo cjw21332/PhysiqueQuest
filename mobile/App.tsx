@@ -3,12 +3,13 @@ import { Camera, CameraView } from 'expo-camera';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
   Keyboard,
   Pressable,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -21,6 +22,7 @@ import { WebView } from 'react-native-webview';
 import { resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
+import { readinessMessageLimit, readinessScript, validateNativeReadinessContext, validateReadinessCheck, type NativeReadinessContext, type ReadinessCheck } from '../shared/cameraReadiness';
 
 declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string } };
 
@@ -36,17 +38,17 @@ type DeviceReadiness = {
 
 type CameraFrame = { x: number; y: number; width: number; height: number };
 type NativeCameraContext =
-  | { screen: 'camera-check' }
+  | { screen: 'camera-check'; readiness: NativeReadinessContext }
   | { screen: 'live-session'; exerciseName: string; equipment: string; elapsed: string; tracking?: NativeTrackingOptions };
-type NativeCameraPreview = { frame: CameraFrame; facing: 'back' | 'front'; context: NativeCameraContext };
+type NativeCameraPreview = { frame: CameraFrame; facing: 'back' | 'front'; context: NativeCameraContext; instanceId: number };
 
-function isNativeCameraContext(value: unknown): value is NativeCameraContext {
+export function isNativeCameraContext(value: unknown): value is NativeCameraContext {
   if (!value || typeof value !== 'object' || !('screen' in value)) return false;
   const context = value as Record<string, unknown>;
-  if (context.screen === 'camera-check') return true;
+  if (context.screen === 'camera-check') return validateNativeReadinessContext(context.readiness);
   if (context.tracking !== undefined) {
     const tracking = context.tracking as Partial<NativeTrackingOptions> | null;
-    if (!tracking || typeof tracking !== 'object' || typeof tracking.requestId !== 'string' || tracking.requestId.length > 100 ||
+    if (!tracking || typeof tracking !== 'object' || typeof tracking.requestId !== 'string' || !tracking.requestId.length || tracking.requestId.length > 100 ||
       !['squat', 'curl'].includes(tracking.kind ?? '') || !['left', 'right'].includes(tracking.side ?? '') || typeof tracking.active !== 'boolean') return false;
   }
   return context.screen === 'live-session'
@@ -56,6 +58,17 @@ function isNativeCameraContext(value: unknown): value is NativeCameraContext {
     && context.exerciseName.length <= 100
     && context.equipment.length <= 60
     && context.elapsed.length <= 8;
+}
+
+export function isCameraFrame(frame: unknown): frame is CameraFrame {
+  if(!frame || typeof frame!=='object')return false;
+  const f=frame as CameraFrame;
+  return [f.x,f.y,f.width,f.height].every(n=>Number.isFinite(n) && Math.abs(n)<=32768) && f.width>0 && f.height>0;
+}
+export function nativeFramingText(check:ReadinessCheck) {
+  if(!validateReadinessCheck(check))return 'Framing unavailable';
+  if(check.status==='ready')return 'Framing ready';
+  return ({'too-small':'Move a little closer','too-large':'Move a little farther away','clipped':'Keep your whole body in view',pending:'Checking framing…',uncalibrated:'Framing validation pending',bent:'Stand upright to check framing'} as Partial<Record<ReadinessCheck['reason'],string>>)[check.reason]??'Framing unavailable';
 }
 
 function getInitialAddress() {
@@ -68,15 +81,18 @@ function getInitialAddress() {
  * display cutouts) to the web document as CSS custom properties so the web app
  * can pad its content clear of the system UI.
  */
-function buildInsetsScript(insets: { top: number; bottom: number; left: number; right: number }, apiUrl: string) {
+function buildInsetsScript(insets: { top: number; bottom: number; left: number; right: number }, apiUrl: string, fontScale: number) {
   const { top, bottom, left, right } = insets;
   const encodedApiUrl = JSON.stringify(apiUrl);
   return `(function(){try{
     var r=document.documentElement.style;
+    document.documentElement.dataset.largeText='${fontScale >= 1.5}';
     r.setProperty('--safe-top','${top}px');
     r.setProperty('--safe-bottom','${bottom}px');
     r.setProperty('--safe-left','${left}px');
     r.setProperty('--safe-right','${right}px');
+    r.setProperty('-webkit-text-size-adjust','${Platform.OS === 'ios' ? Math.round(fontScale * 100) : 100}%');
+    r.setProperty('text-size-adjust','${Platform.OS === 'ios' ? Math.round(fontScale * 100) : 100}%');
     var m=document.createElement('meta');
     m.name='viewport';
     m.content='width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover';
@@ -115,8 +131,7 @@ function buildCameraScript(detail: {
 function AppContent() {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView>(null);
-  const nativeCameraRef = useRef<CameraView>(null);
-  const { width } = useWindowDimensions();
+  const { width, fontScale } = useWindowDimensions();
   const inferredAddress = useMemo(getInitialAddress, []);
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_API_URL?: string } | undefined;
   const [address, setAddress] = useState(inferredAddress ?? '');
@@ -127,6 +142,7 @@ function AppContent() {
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
   const [cameraPreview, setCameraPreview] = useState<NativeCameraPreview | null>(null);
+  const [framing,setFraming]=useState<ReadinessCheck>({status:'unknown',reason:'pending'});
   const cameraRequestId = useRef(0);
   const monitor = useRef<ReturnType<typeof createNativeMonitor> | null>(null);
   if (!monitor.current) {
@@ -144,13 +160,14 @@ function AppContent() {
   useEffect(() => () => monitor.current?.stop(), []);
 
   const insetScript = useMemo(
-    () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }, apiUrl ?? 'invalid-api-address'),
-    [apiUrl, insets.top, insets.bottom, insets.left, insets.right],
+    () => buildInsetsScript({ top: insets.top, bottom: insets.bottom, left: insets.left, right: insets.right }, apiUrl ?? 'invalid-api-address', fontScale),
+    [apiUrl, insets.top, insets.bottom, insets.left, insets.right, fontScale],
   );
 
   const pushInsets = useCallback(() => {
     webRef.current?.injectJavaScript(insetScript);
   }, [insetScript]);
+  useEffect(() => { pushInsets(); }, [pushInsets]);
 
   const checkBackend = useCallback(() => {
     setBackendStatus('checking');
@@ -211,9 +228,8 @@ function AppContent() {
     context: NativeCameraContext,
     requestId: number,
   ) => {
-    const validFrame = [frame.x, frame.y, frame.width, frame.height].every(Number.isFinite)
-      && frame.width > 0
-      && frame.height > 0;
+    const validFrame = isCameraFrame(frame) && (context.screen!=='camera-check' ||
+      (context.readiness.previewWidth===frame.width && context.readiness.previewHeight===frame.height));
     if (!validFrame) {
       webRef.current?.injectJavaScript(buildCameraScript({
         type: 'status',
@@ -235,7 +251,8 @@ function AppContent() {
         }));
         return;
       }
-      setCameraPreview({ frame, facing, context });
+      setFraming({status:'unknown',reason:'pending'});
+      setCameraPreview({ frame, facing, context, instanceId:requestId });
       webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'starting' }));
     } catch (error) {
       console.error('Native camera could not start:', error);
@@ -249,9 +266,7 @@ function AppContent() {
   }, [requestCameraPermission]);
 
   const updateNativeCameraFrame = useCallback((frame: CameraFrame, context?: NativeCameraContext) => {
-    if (![frame.x, frame.y, frame.width, frame.height].every(Number.isFinite)
-      || frame.width <= 0
-      || frame.height <= 0) return;
+    if (!isCameraFrame(frame)) return;
     setCameraPreview(current => current ? { ...current, frame, ...(context ? { context } : {}) } : current);
   }, []);
 
@@ -265,9 +280,16 @@ function AppContent() {
     webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'idle' }));
   }, []);
 
+  useEffect(()=>{
+    const change=AppState.addEventListener('change',state=>{if(state!=='active')stopNativeCamera();});
+    const blur=AppState.addEventListener('blur',stopNativeCamera);
+    return ()=>{cameraRequestId.current++;change.remove();blur.remove();};
+  },[stopNativeCamera]);
+
   const switchNativeCameraFacing = () => {
     const nextFacing = cameraPreview?.facing === 'back' ? 'front' : 'back';
     setCameraPreview(current => current ? { ...current, facing: nextFacing } : current);
+    setFraming({status:'unknown',reason:'pending'});
     webRef.current?.injectJavaScript(buildCameraScript({ type: 'facing', facing: nextFacing }));
   };
 
@@ -290,6 +312,8 @@ function AppContent() {
   const cardMax = Math.min(width - pad * 2, 560);
   const cardPad = Math.max(22, Math.min(38, Math.round(width * 0.07)));
   const bodySize = Math.max(15, Math.min(18, Math.round(width / 24)));
+  const poseOptions=cameraPreview?.context.screen==='camera-check' ? cameraPreview.context.readiness : cameraPreview?.context.tracking;
+  const posePreview=!!(cameraPreview && poseOptions && nativePoseAvailable);
 
   return (
     <View style={styles.root}>
@@ -319,7 +343,7 @@ function AppContent() {
         setBuiltInZoomControls={false}
         setDisplayZoomControls={false}
         scalesPageToFit={false}
-        textZoom={100}
+        textZoom={Math.round(fontScale * 100)}
         renderLoading={() => (
           <View style={[styles.loading, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
             <ActivityIndicator size="large" color="#22c55e" />
@@ -328,15 +352,17 @@ function AppContent() {
         )}
         onError={(e) => {
           monitor.current?.stop();
+          stopNativeCamera();
           console.error('WebView error:', e.nativeEvent);
           setError(true);
         }}
         onHttpError={e => {
           console.error('HTTP error:', e.nativeEvent);
-          if (e.nativeEvent.statusCode >= 500) setError(true);
+          if (e.nativeEvent.statusCode >= 500) {stopNativeCamera();setError(true);}
         }}
         onMessage={(e) => {
           try {
+            if(e.nativeEvent.data.length>readinessMessageLimit){stopNativeCamera();return;}
             const message = JSON.parse(e.nativeEvent.data) as {
               type?: string;
               ok?: boolean;
@@ -345,6 +371,9 @@ function AppContent() {
               previewContext?: unknown;
               requestId?: string;
               side?: 'left' | 'right';
+              sessionId?: string;
+              geometryGeneration?: number;
+              framing?: unknown;
             };
             if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
             if (message.type === 'request-camera-permission') void requestCameraPermission();
@@ -355,45 +384,26 @@ function AppContent() {
             if (message.type === 'camera-start' && message.frame) {
               const requestId = cameraRequestId.current + 1;
               cameraRequestId.current = requestId;
-              const context = isNativeCameraContext(message.previewContext)
-                ? message.previewContext
-                : { screen: 'camera-check' as const };
+              setCameraPreview(null);
+              if(!isNativeCameraContext(message.previewContext)){stopNativeCamera();return;}
+              const context = message.previewContext;
               void startNativeCamera(message.frame, message.facing === 'front' ? 'front' : 'back', context, requestId);
             }
             if (message.type === 'camera-update-frame' && message.frame) {
-              const context = isNativeCameraContext(message.previewContext) ? message.previewContext : undefined;
+              if(!isNativeCameraContext(message.previewContext) || !isCameraFrame(message.frame) ||
+                (message.previewContext.screen==='camera-check' && (message.previewContext.readiness.previewWidth!==message.frame.width || message.previewContext.readiness.previewHeight!==message.frame.height))) {stopNativeCamera();return;}
+              const context = message.previewContext;
               updateNativeCameraFrame(message.frame, context);
             }
-            if (message.type === 'camera-update-overlay' && isNativeCameraContext(message.previewContext)) {
+            if (message.type === 'camera-update-overlay') {
+              if(!isNativeCameraContext(message.previewContext)){stopNativeCamera();return;}
               updateNativeCameraContext(message.previewContext);
             }
-            if (message.type === 'camera-capture-readiness' && message.requestId) {
-              const requestId = message.requestId;
-              const camera = nativeCameraRef.current;
-              if (!camera) {
-                webRef.current?.injectJavaScript(buildCameraScript({
-                  type: 'readiness-error',
-                  requestId,
-                  message: 'The camera preview is not ready to capture an image.',
-                }));
-                return;
+            if(message.type==='camera-readiness-status' && cameraPreview?.context.screen==='camera-check') {
+              const context=cameraPreview.context.readiness;
+              if(message.sessionId===context.sessionId && message.geometryGeneration===context.geometryGeneration) {
+                setFraming(validateReadinessCheck(message.framing)?message.framing:{status:'unknown',reason:'invalid'});
               }
-              void camera.takePictureAsync({ quality: 0.45, base64: true, skipProcessing: true })
-                .then(photo => {
-                  if (!photo?.base64) throw new Error('The camera returned an empty image.');
-                  webRef.current?.injectJavaScript(buildCameraScript({
-                    type: 'readiness-frame',
-                    requestId,
-                    mediaBase64: photo.base64,
-                  }));
-                })
-                .catch(error => {
-                  webRef.current?.injectJavaScript(buildCameraScript({
-                    type: 'readiness-error',
-                    requestId,
-                    message: error instanceof Error ? error.message : 'The camera image could not be captured.',
-                  }));
-                });
             }
             if (message.type === 'camera-stop') stopNativeCamera();
             const native = monitor.current;
@@ -409,11 +419,13 @@ function AppContent() {
               if (payload.type === 'inactivity-request-motion-status') void native.reportMotionStatus();
             }
           } catch (error) {
-            console.warn('Could not handle WebView message:', error);
+            stopNativeCamera();
+            console.warn('Could not handle malformed WebView message.');
           }
         }}
         onLoadStart={() => {
           monitor.current?.stop();
+          stopNativeCamera();
           console.log('WebView load started:', loadedAddress);
         }}
         onLoadEnd={(e) => {
@@ -424,30 +436,31 @@ function AppContent() {
         }}
         onContentProcessDidTerminate={() => {
           monitor.current?.stop();
+          stopNativeCamera();
           console.error('WebView process terminated');
           setError(true);
         }}
       /> : null}
-      {cameraPreview && cameraPreview.context.screen === 'live-session' && cameraPreview.context.tracking && nativePoseAvailable && (
+      {cameraPreview && poseOptions && posePreview && (
         <NativeTrackingCamera
-          key={`${cameraPreview.context.tracking.requestId}-${cameraPreview.facing}`}
-          options={cameraPreview.context.tracking}
+          key={`${cameraPreview.instanceId}-${poseOptions.mode==='readiness'?poseOptions.sessionId:poseOptions.requestId}-${cameraPreview.facing}`}
+          options={poseOptions}
           facing={cameraPreview.facing}
           style={[styles.nativeCameraPreview, { left: cameraPreview.frame.x, top: cameraPreview.frame.y, width: cameraPreview.frame.width, height: cameraPreview.frame.height }]}
           emit={detail => {
-            webRef.current?.injectJavaScript(poseScript(detail));
+            if(cameraPreview.instanceId!==cameraRequestId.current)return;
+            webRef.current?.injectJavaScript(poseOptions.mode==='readiness'?readinessScript(detail):poseScript(detail));
             if (detail.type === 'error') {
               setCameraPreview(null);
               webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'unavailable', message: String(detail.message) }));
             }
           }}
-          ready={() => webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }))}
+          ready={() => {if(cameraPreview.instanceId===cameraRequestId.current)webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }));}}
         />
       )}
-      {cameraPreview && !(cameraPreview.context.screen === 'live-session' && cameraPreview.context.tracking && nativePoseAvailable) && (
+      {cameraPreview && !posePreview && (
         <CameraView
           key={cameraPreview.facing}
-          ref={nativeCameraRef}
           facing={cameraPreview.facing}
           mirror={cameraPreview.facing === 'front'}
           style={[
@@ -460,12 +473,18 @@ function AppContent() {
             },
           ]}
           onCameraReady={() => {
+            if(cameraPreview.instanceId!==cameraRequestId.current)return;
             webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }));
+            if(cameraPreview.context.screen==='camera-check') {
+              const {sessionId,geometryGeneration}=cameraPreview.context.readiness;
+              webRef.current?.injectJavaScript(readinessScript({type:'capability',sessionId,geometryGeneration,reason:'unsupported'}));
+            }
             if (cameraPreview.context.screen === 'live-session' && cameraPreview.context.tracking) {
               webRef.current?.injectJavaScript(poseScript({ type: 'error', requestId: cameraPreview.context.tracking.requestId, side: cameraPreview.context.tracking.side, message: 'Camera rep counting needs a development build. Camera preview and manual counting are available.' }));
             }
           }}
           onMountError={event => {
+            if(cameraPreview.instanceId!==cameraRequestId.current)return;
             console.error('Native camera preview failed:', event.message);
             setCameraPreview(null);
             webRef.current?.injectJavaScript(buildCameraScript({
@@ -510,7 +529,7 @@ function AppContent() {
               </View>
               <View style={styles.nativeCameraDistance}>
                 <View style={styles.nativeCameraDot} />
-                <Text style={styles.nativeCameraDistanceText}>Distance not measured</Text>
+                <Text style={styles.nativeCameraDistanceText}>{nativeFramingText(framing)}</Text>
               </View>
             </>
           ) : (
@@ -533,7 +552,7 @@ function AppContent() {
       {loadedAddress && !error && backendStatus === 'offline' && (
         <View style={[styles.backendBanner, { top: insets.top + 8, left: insets.left + 12, right: insets.right + 12 }]}>
           <Text style={styles.backendBannerText}>Backend unavailable · server-backed features cannot sync</Text>
-          <Pressable accessibilityRole="button" onPress={checkBackend}><Text style={styles.retryText}>Retry backend check</Text></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Retry backend connection check" style={styles.retryButton} onPress={checkBackend}><Text style={styles.retryText}>Retry backend check</Text></Pressable>
         </View>
       )}
       {loadedAddress && !error && readiness?.cameraPermission === 'denied' && (
@@ -542,7 +561,8 @@ function AppContent() {
         </View>
       )}
       {error && (
-        <View
+        <ScrollView
+          contentContainerStyle={styles.errorScroll}
           style={[
             styles.errorOverlay,
             {
@@ -563,6 +583,8 @@ function AppContent() {
             </Text>
             <Text style={[styles.label, { fontSize: bodySize - 1 }]}>Computer address</Text>
             <TextInput
+              accessibilityLabel="Computer address"
+              accessibilityHint="Enter the frontend server URL to connect PhysiqueQuest"
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="url"
@@ -584,7 +606,7 @@ function AppContent() {
               The computer address is usually printed beside "Network" when Next.js starts.
             </Text>
           </View>
-        </View>
+        </ScrollView>
       )}
     </View>
   );
@@ -620,7 +642,8 @@ const styles = StyleSheet.create({
     zIndex: 12,
     top: 12,
     right: 12,
-    minHeight: 34,
+    minHeight: 48,
+    minWidth: 48,
     justifyContent: 'center',
     paddingHorizontal: 11,
     borderWidth: 1,
@@ -714,10 +737,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: '#0b0f15',
   },
+  errorScroll: { flexGrow: 1, alignItems: 'center', justifyContent: 'center' },
   errorCard: { width: '100%', backgroundColor: '#161d27' },
   title: { marginBottom: 10, color: '#f8fafc', fontWeight: '700' },
   body: { color: '#94a3b8' },
@@ -754,6 +776,7 @@ const styles = StyleSheet.create({
   },
   backendBannerText: { flex: 1, color: '#f87171', fontSize: 12, fontWeight: '600' },
   retryText: { color: '#22c55e', fontSize: 12, fontWeight: '700' },
+  retryButton: { minWidth: 48, minHeight: 48, justifyContent: 'center', paddingHorizontal: 8 },
   permissionBanner: {
     position: 'absolute',
     minHeight: 40,

@@ -48,6 +48,7 @@ test('Coach library loads API records, searches, filters, pages and opens real d
   await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('seated');
   await expect.poll(() => queries.at(-1)?.search).toBe('seated');
   await page.getByRole('button', { name: 'Shoulders', exact: true }).click();
+  await page.locator('.library-equipment-panel summary').click();
   await page.getByRole('button', { name: 'Dumbbells', exact: true }).click();
   await expect.poll(() => queries.at(-1)?.equipment).toBe('Dumbbells');
   expect(queries.at(-1).muscle).toBe('Shoulders');
@@ -92,7 +93,7 @@ test('library and bottom sheet fit narrow phones and desktop', async ({ page }) 
   await setup(page, (route, url, headers) => route.fulfill({ json: { items: [exercise], total: 1, page: 1, limit: 12, pages: 1 }, headers }));
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 844 });
-    await expect(page.getByRole('button', { name: 'Any equipment', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('.library-equipment-panel summary')).toContainText('Any equipment');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.getByRole('button', { name: /Backend seated press/ }).click();
     await expect(page.getByText('Fresh detail: press overhead slowly.')).toBeVisible();
@@ -114,6 +115,27 @@ test('API failure stays visible, retry loads an honest empty library', async ({ 
   fail = false;
   await page.getByRole('button', { name: 'Try again', exact: true }).click();
   await expect(page.getByText('No exercises match those filters.')).toBeVisible();
+});
+test('full exercise names and wrapped filters remain usable across library sizes', async ({ page }, info) => {
+  const long = { ...exercise, name: 'Single-arm half-kneeling resistance band overhead shoulder press with controlled tempo' };
+  await setup(page, (route, url, headers) => route.fulfill({ json: { items: [long], total: 1, page: 1, limit: 12, pages: 1 }, headers }));
+  const row = page.getByRole('button', { name: /Single-arm half-kneeling/ });
+  await expect(row).toBeVisible();
+  for (const [width,height] of [[320,568],[390,844],[844,390],[1280,900]]) {
+    await page.setViewportSize({ width,height });
+    expect(await row.locator('b').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+    for (const button of await page.getByRole('group', { name: 'Muscle group' }).getByRole('button').all()) {
+      const box = await button.boundingBox();expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(width);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: info.outputPath(`library-layout-${width}.png`), animations:'disabled', fullPage:true });
+  }
+  const equipment = page.locator('.library-equipment-panel summary');
+  await equipment.focus();await page.keyboard.press('Enter');
+  await expect(page.getByRole('button', { name:'Resistance bands',exact:true })).toBeVisible();
+  await page.getByRole('button', { name:'Resistance bands',exact:true }).click();
+  await page.getByRole('button', { name:'Clear filters',exact:true }).click();
+  await expect(equipment).toContainText('Any equipment');
 });
 
 test('Me opens the backend admin catalog and saves muscle/equipment before refreshing', async ({ page }) => {

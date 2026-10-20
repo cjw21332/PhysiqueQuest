@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T11:12:24.376Z",
+  "title": "Design System: PhysiqueQuest",
+  "extensions": {
+    "colorMeta": {
+      "progress-green": {
+        "role": "primary",
+        "displayName": "Progress Green",
+        "tonalRamp": [
+          "oklch(15.00% 0.1920 149.58)",
+          "oklch(26.43% 0.1920 149.58)",
+          "oklch(37.86% 0.1920 149.58)",
+          "oklch(49.29% 0.1920 149.58)",
+          "oklch(60.71% 0.1920 149.58)",
+          "oklch(72.14% 0.1920 149.58)",
+          "oklch(83.57% 0.1920 149.58)",
+          "oklch(95.00% 0.1920 149.58)"
+        ]
+      },
+      "progress-hover": {
+        "role": "primary",
+        "displayName": "Progress Hover",
+        "tonalRamp": [
+          "oklch(15.00% 0.1821 151.71)",
+          "oklch(26.43% 0.1821 151.71)",
+          "oklch(37.86% 0.1821 151.71)",
+          "oklch(49.29% 0.1821 151.71)",
+          "oklch(60.71% 0.1821 151.71)",
+          "oklch(72.14% 0.1821 151.71)",
+          "oklch(83.57% 0.1821 151.71)",
+          "oklch(95.00% 0.1821 151.71)"
+        ]
+      },
+      "progress-tint": {
+        "role": "primary",
+        "displayName": "Progress Tint",
+        "tonalRamp": [
+          "oklch(15.00% 0.0584 157.01)",
+          "oklch(26.43% 0.0584 157.01)",
+          "oklch(37.86% 0.0584 157.01)",
+          "oklch(49.29% 0.0584 157.01)",
+          "oklch(60.71% 0.0584 157.01)",
+          "oklch(72.14% 0.0584 157.01)",
+          "oklch(83.57% 0.0584 157.01)",
+          "oklch(95.00% 0.0584 157.01)"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Night",
+        "tonalRamp": [
+          "oklch(15.00% 0.0142 258.35)",
+          "oklch(26.43% 0.0142 258.35)",
+          "oklch(37.86% 0.0142 258.35)",
+          "oklch(49.29% 0.0142 258.35)",
+          "oklch(60.71% 0.0142 258.35)",
+          "oklch(72.14% 0.0142 258.35)",
+          "oklch(83.57% 0.0142 258.35)",
+          "oklch(95.00% 0.0142 258.35)"
+        ]
+      },
+      "night-panel": {
+        "role": "neutral",
+        "displayName": "Night Panel",
+        "tonalRamp": [
+          "oklch(15.00% 0.0221 257.28)",
+          "oklch(26.43% 0.0221 257.28)",
+          "oklch(37.86% 0.0221 257.28)",
+          "oklch(49.29% 0.0221 257.28)",
+          "oklch(60.71% 0.0221 257.28)",
+          "oklch(72.14% 0.0221 257.28)",
+          "oklch(83.57% 0.0221 257.28)",
+          "oklch(95.00% 0.0221 257.28)"
+        ]
+      },
+      "night-raised": {
+        "role": "neutral",
+        "displayName": "Night Raised",
+        "tonalRamp": [
+          "oklch(15.00% 0.0327 259.65)",
+          "oklch(26.43% 0.0327 259.65)",
+          "oklch(37.86% 0.0327 259.65)",
+          "oklch(49.29% 0.0327 259.65)",
+          "oklch(60.71% 0.0327 259.65)",
+          "oklch(72.14% 0.0327 259.65)",
+          "oklch(83.57% 0.0327 259.65)",
+          "oklch(95.00% 0.0327 259.65)"
+        ]
+      },
+      "steel-border": {
+        "role": "neutral",
+        "displayName": "Steel Border",
+        "tonalRamp": [
+          "oklch(15.00% 0.0336 253.94)",
+          "oklch(26.43% 0.0336 253.94)",
+          "oklch(37.86% 0.0336 253.94)",
+          "oklch(49.29% 0.0336 253.94)",
+          "oklch(60.71% 0.0336 253.94)",
+          "oklch(72.14% 0.0336 253.94)",
+          "oklch(83.57% 0.0336 253.94)",
+          "oklch(95.00% 0.0336 253.94)"
+        ]
+      },
+      "steel": {
+        "role": "neutral",
+        "displayName": "Steel",
+        "tonalRamp": [
+          "oklch(15.00% 0.0351 256.79)",
+          "oklch(26.43% 0.0351 256.79)",
+          "oklch(37.86% 0.0351 256.79)",
+          "oklch(49.29% 0.0351 256.79)",
+          "oklch(60.71% 0.0351 256.79)",
+          "oklch(72.14% 0.0351 256.79)",
+          "oklch(83.57% 0.0351 256.79)",
+          "oklch(95.00% 0.0351 256.79)"
+        ]
+      },
+      "steel-muted": {
+        "role": "neutral",
+        "displayName": "Steel Muted",
+        "tonalRamp": [
+          "oklch(15.00% 0.0407 257.42)",
+          "oklch(26.43% 0.0407 257.42)",
+          "oklch(37.86% 0.0407 257.42)",
+          "oklch(49.29% 0.0407 257.42)",
+          "oklch(60.71% 0.0407 257.42)",
+          "oklch(72.14% 0.0407 257.42)",
+          "oklch(83.57% 0.0407 257.42)",
+          "oklch(95.00% 0.0407 257.42)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text",
+        "tonalRamp": [
+          "oklch(15.00% 0.0034 247.86)",
+          "oklch(26.43% 0.0034 247.86)",
+          "oklch(37.86% 0.0034 247.86)",
+          "oklch(49.29% 0.0034 247.86)",
+          "oklch(60.71% 0.0034 247.86)",
+          "oklch(72.14% 0.0034 247.86)",
+          "oklch(83.57% 0.0034 247.86)",
+          "oklch(95.00% 0.0034 247.86)"
+        ]
+      },
+      "warning-coral": {
+        "role": "semantic",
+        "displayName": "Warning Coral",
+        "tonalRamp": [
+          "oklch(15.00% 0.1661 22.22)",
+          "oklch(26.43% 0.1661 22.22)",
+          "oklch(37.86% 0.1661 22.22)",
+          "oklch(49.29% 0.1661 22.22)",
+          "oklch(60.71% 0.1661 22.22)",
+          "oklch(72.14% 0.1661 22.22)",
+          "oklch(83.57% 0.1661 22.22)",
+          "oklch(95.00% 0.1661 22.22)"
+        ]
+      },
+      "warning-field": {
+        "role": "semantic",
+        "displayName": "Warning Field",
+        "tonalRamp": [
+          "oklch(15.00% 0.0931 26.48)",
+          "oklch(26.43% 0.0931 26.48)",
+          "oklch(37.86% 0.0931 26.48)",
+          "oklch(49.29% 0.0931 26.48)",
+          "oklch(60.71% 0.0931 26.48)",
+          "oklch(72.14% 0.0931 26.48)",
+          "oklch(83.57% 0.0931 26.48)",
+          "oklch(95.00% 0.0931 26.48)"
+        ]
+      },
+      "focus-halo": {
+        "role": "neutral",
+        "displayName": "Focus Halo",
+        "tonalRamp": [
+          "oklch(15.00% 0.1821 151.71)",
+          "oklch(26.43% 0.1821 151.71)",
+          "oklch(37.86% 0.1821 151.71)",
+          "oklch(49.29% 0.1821 151.71)",
+          "oklch(60.71% 0.1821 151.71)",
+          "oklch(72.14% 0.1821 151.71)",
+          "oklch(83.57% 0.1821 151.71)",
+          "oklch(95.00% 0.1821 151.71)"
+        ]
+      }
+    },
+    "shadows": [
+      {
+        "name": "legacy-card-sm",
+        "value": "0 1px 3px rgba(25,34,51,0.06)",
+        "purpose": "Existing utility; current flat reference cards override shadows to none."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-standard",
+        "value": "200ms cubic-bezier(0.4,0,0.2,1)",
+        "purpose": "Existing transition-smooth utility."
+      },
+      {
+        "name": "screen-entry",
+        "value": "280ms cubic-bezier(0.34,1.56,0.64,1)",
+        "purpose": "Generic entry animation; restored scopes override it and reduced motion disables it."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-scope",
+        "value": "359px"
+      },
+      {
+        "name": "phone",
+        "value": "390px"
+      },
+      {
+        "name": "tablet",
+        "value": "700px"
+      },
+      {
+        "name": "short-height",
+        "value": "740px"
+      },
+      {
+        "name": "launch-short-height",
+        "value": "800px"
+      }
+    ],
+    "notes": [
+      "Tonal ramps are generated OKLCH preview aids, not approved runtime color tokens; out-of-gamut preview colors may be clipped by the renderer.",
+      "The focus-halo ramp previews hue/chroma without alpha; use DESIGN.md's primitive for its actual transparency.",
+      "Component snippets are static framework-free specimens. Library hit-area enlargement is a preview accessibility accommodation; native migration is not implemented."
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Scoped authentication and Coach primary action.",
+      "html": "<button class=\"ds-primary\">Save changes</button>",
+      "css": ".ds-primary{font-family:Inter,sans-serif;width:100%;height:54px;padding:0 16px;border:0;border-radius:14px;background:var(--green,#22c55e);color:var(--surface,#0b0f15);font-size:15px;font-weight:600;cursor:pointer}.ds-primary:hover:not(:disabled){background:#4ade80}.ds-primary:focus-visible{outline:2px solid var(--green,#22c55e);outline-offset:3px;}.ds-primary:disabled{background:var(--line,#273444);color:var(--muted,#94a3b8);cursor:not-allowed}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Bordered alternate action on a dark panel.",
+      "html": "<button class=\"ds-secondary\">Cancel</button>",
+      "css": ".ds-secondary{font-family:Inter,sans-serif;width:100%;height:54px;border:1px solid var(--line,#273444);border-radius:14px;background:var(--soft,#161d27);color:var(--ink,#f8fafc);font-size:14px;font-weight:600;cursor:pointer}.ds-secondary:hover{background:var(--bg-tertiary,#212b3b)}.ds-secondary:focus-visible{outline:2px solid var(--green,#22c55e);outline-offset:3px;}"
+    },
+    {
+      "name": "Labeled Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Authentication/calibration field with green focus border.",
+      "html": "<label class=\"ds-field\">Email<input type=\"email\" placeholder=\"Enter your email\"></label>",
+      "css": ".ds-field{font-family:Inter,sans-serif;display:block;color:var(--ink,#f8fafc);font-size:13px}.ds-field input{display:block;box-sizing:border-box;width:100%;height:47px;margin-top:7px;padding:0 14px;border:1px solid var(--line,#273444);border-radius:12px;background:var(--soft,#161d27);color:var(--ink,#f8fafc);font:15px Inter,sans-serif;caret-color:var(--green,#22c55e)}.ds-field input::placeholder{color:var(--muted,#94a3b8)}.ds-field input:focus{border-color:var(--green,#22c55e);outline:none}.ds-field input:focus-visible{outline:2px solid var(--green,#22c55e);outline-offset:3px;}"
+    },
+    {
+      "name": "Library Filter",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Library filter pill; wrapper supplies a 44px preview hit area.",
+      "html": "<button class=\"ds-filter\" aria-pressed=\"true\"><span>Dumbbells</span></button>",
+      "css": ".ds-filter{font-family:Inter,sans-serif;min-height:44px;padding:0;border:0;border-radius:999px;background:transparent;cursor:pointer}.ds-filter span{display:flex;align-items:center;min-height:32px;padding:0 11px;border:1px solid var(--line,#273444);border-radius:999px;background:var(--soft,#161d27);color:var(--muted,#94a3b8);font-size:11px}.ds-filter[aria-pressed=true] span{background:var(--green,#22c55e);border-color:var(--green,#22c55e);color:var(--surface,#0b0f15)}.ds-filter:focus-visible{outline:2px solid var(--green,#22c55e);outline-offset:3px;}"
+    },
+    {
+      "name": "Workout Panel",
+      "kind": "card",
+      "refersTo": "workout-card",
+      "description": "Static specimen of the Home workout panel; example text is not user data.",
+      "html": "<section class=\"ds-workout\" aria-label=\"Workout panel example\"><small>Workout panel example</small><h3>Your workout</h3><p>Session details appear here</p></section>",
+      "css": ".ds-workout{font-family:Inter,sans-serif;padding:20px 19px 12px;border-radius:23px;background:var(--green-light,#143b26);color:var(--ink,#f8fafc);box-shadow:none}.ds-workout small{color:var(--green,#22c55e);font-size:12px}.ds-workout h3{margin:9px 0 12px;font-size:23px;font-weight:700;line-height:1.35;letter-spacing:-.6px}.ds-workout p{color:var(--muted,#94a3b8);font-size:12px;line-height:1.5}"
+    },
+    {
+      "name": "Five-tab Navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Home, Coach, Scan, Quests, and Me with selected icon pill. Preview buttons are static.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navigation specimen\"><button type=\"button\" aria-current=\"page\"><span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m3 10 9-7 9 7v10a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z\"/></svg></span><small>Home</small></button><button type=\"button\"><span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z\"/><path d=\"m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z\"/></svg></span><small>Coach</small></button><button type=\"button\"><span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3\"/><path d=\"M7 12h10\"/></svg></span><small>Scan</small></button><button type=\"button\"><span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM7 6H4v2a4 4 0 004 4M17 6h3v2a4 4 0 01-4 4\"/></svg></span><small>Quests</small></button><button type=\"button\"><span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"8\" r=\"3.5\"/><path d=\"M5 21a7 7 0 0114 0\"/></svg></span><small>Me</small></button></nav>",
+      "css": ".ds-nav{font-family:Inter,sans-serif;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));box-sizing:border-box;height:74px;padding:6px 10px 10px;border-top:1px solid var(--line,#273444);background:var(--soft,#161d27)}.ds-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;padding:0;border:0;background:transparent;color:var(--muted,#94a3b8);cursor:pointer}.ds-nav button span{display:grid;place-items:center;width:52px;max-width:100%;height:29px;border-radius:999px}.ds-nav button[aria-current=page]{color:var(--ink,#f8fafc)}.ds-nav button[aria-current=page] span{background:var(--green,#22c55e);color:var(--surface,#0b0f15)}.ds-nav small{font-size:10px;line-height:1.3;font-weight:400}.ds-nav button:focus-visible{outline:2px solid var(--green,#22c55e);outline-offset:3px;}"
+    }
+  ],
+  "narrative": {
+    "overview": "PhysiqueQuest should feel modern, aesthetic, appealing, and easy to use, access, and navigate. The existing interface expresses this through dark surfaces, green actions, compact information groups, rounded controls, and familiar five-tab navigation. Depth is primarily tonal; controls are rounded and restrained.\n\nThis is a documentation companion for both `frontend/` and `mobile/`, extracted on October 20, 2026. The detailed governing guide remains [.agents/rules/DESIGN.md](.agents/rules/DESIGN.md), together with [GENERAL.md](.agents/rules/GENERAL.md) and [PROCEDURES.md](.agents/rules/PROCEDURES.md). Preserve its approved screen-specific exceptions. This file does not replace or rewrite that guide. The palette snapshot above comes from `frontend/app/theme.css`; update documentation alongside future intentional token changes.\n\nThe current interface runs in Next.js and an Expo WebView. [PRODUCT.md](PRODUCT.md) records the intended native Android/iOS direction; these extracted web dimensions are not a completed native component specification. No metaphor or new visual identity is introduced.",
+    "keyCharacteristics": [
+      "Dark appearance independent of the operating system theme.",
+      "Progress Green for actions, selection, and progress.",
+      "Night surfaces, Steel metadata, and Warning Coral feedback.",
+      "Compact, readable groups with accessible controls and predictable navigation."
+    ],
+    "rules": [
+      {
+        "name": "The Single Palette Rule",
+        "body": "Reuse the shared dark CSS tokens. Legacy orange, blue, and gray token names are aliases, not permission to restore their old light values. Photography, logos, GIFs, and camera video retain their own colors. The separately approved OTP email palette is outside this app palette.",
+        "section": "colors"
+      },
+      {
+        "name": "The Preserve Hierarchy Rule",
+        "body": "Use the owning screen's existing type rules. Do not replace all titles with the largest generic heading rule or introduce additional fonts. Current scoped declarations take precedence over the older broad tables in the detailed guide; several older examples still show superseded muted colors or system-font-only instructions.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal Depth Rule",
+        "body": "Preserve flat reference surfaces and use their existing tonal hierarchy. Shared dark modal backdrops use `rgb(0 0 0 / 70%)`; camera overlays may use translucent slate over video. Keep existing modal focus containment, dismissal, focus restoration, and layering.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** use the shared dark palette and existing CSS custom properties.",
+      "**Do** preserve screen-specific geometry, type, controls, and navigation unless a redesign explicitly changes them.",
+      "**Do** keep clear labels, visible focus, safe-area spacing, and accessible touch areas.",
+      "**Do** retain real loading, empty, cached, failure, and retry states.",
+      "**Do** keep layout/component styles in globals.css, shared colors in theme.css, and scrollbar utilities in scrollbars.css."
+    ],
+    "donts": [
+      "**Don't** restore old light-theme colors or introduce a second competing palette.",
+      "**Don't** hide Back, Clear, Close, edit, or completion controls to match a screenshot.",
+      "**Don't** invent user data, coaching results, delivery success, or competitive penalties from reference artwork.",
+      "**Don't** introduce a UI kit, icon package, font, or parallel stylesheet without the required scope and approval.",
+      "**Don't** describe this web snapshot as a completed native Android/iOS design system."
+    ]
+  }
+}

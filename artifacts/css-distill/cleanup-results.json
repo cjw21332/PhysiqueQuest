@@ -1,0 +1,42 @@
+[
+  {
+    "file": "app/globals.css",
+    "beforeBytes": 449451,
+    "afterBytes": 436538,
+    "duplicates": 596,
+    "legacyNavigation": 5,
+    "emptyRules": 49
+  },
+  {
+    "file": "app/theme.css",
+    "beforeBytes": 872,
+    "afterBytes": 872,
+    "duplicates": 0,
+    "legacyNavigation": 0,
+    "emptyRules": 0
+  },
+  {
+    "file": "app/scrollbars.css",
+    "beforeBytes": 1888,
+    "afterBytes": 1888,
+    "duplicates": 0,
+    "legacyNavigation": 0,
+    "emptyRules": 0
+  },
+  {
+    "file": "sections/Coach/coach-reference.css",
+    "beforeBytes": 6344,
+    "afterBytes": 6276,
+    "duplicates": 0,
+    "legacyNavigation": 2,
+    "emptyRules": 0
+  },
+  {
+    "file": "sections/Coach/libraryreference.css",
+    "beforeBytes": 3653,
+    "afterBytes": 3653,
+    "duplicates": 0,
+    "legacyNavigation": 0,
+    "emptyRules": 0
+  }
+]

@@ -2,15 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TrackingKind, TrackingSide } from '../../shared/repCounter';
+import { readinessSessionId, type NativeReadinessContext } from '../../shared/cameraReadiness';
 
 export type CameraStatus = 'idle' | 'starting' | 'on' | 'denied' | 'unavailable';
 export type CameraFacing = 'back' | 'front';
 export type CameraPreviewContext =
-  | { screen: 'camera-check' }
+  | { screen: 'camera-check'; readiness?: NativeReadinessContext }
   | { screen: 'live-session'; exerciseName: string; equipment: string; elapsed: string; tracking?: { requestId: string; kind: TrackingKind; side: TrackingSide; active: boolean } };
 
 let preferredFacing: CameraFacing = 'back';
 let cameraWasEnabled = false;
+let cameraGeneration = 0;
 
 declare global {
   interface Window {
@@ -20,8 +22,6 @@ declare global {
 
 type CameraEvent =
   | { type: 'status'; status: CameraStatus; message?: string }
-  | { type: 'readiness-frame'; requestId: string; mediaBase64: string }
-  | { type: 'readiness-error'; requestId: string; message: string }
   | { type: 'facing'; facing: CameraFacing };
 
 function nativeBridge() {
@@ -43,13 +43,10 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
   const streamRef = useRef<MediaStream | null>(null);
   const nativeActiveRef = useRef(false);
   const startRequestRef = useRef(0);
-  const captureRequestRef = useRef(0);
-  const captureWaiterRef = useRef<{
-    requestId: string;
-    resolve: (mediaBase64: string) => void;
-    reject: (error: Error) => void;
-    timeout: number;
-  } | null>(null);
+  const [generation, setGeneration] = useState(()=>++cameraGeneration);
+  const generationRef = useRef(generation);
+  const invalidate = useCallback(() => { generationRef.current = ++cameraGeneration; setGeneration(generationRef.current); }, []);
+  const trackCleanupRef = useRef<(() => void) | null>(null);
   const previewContextRef = useRef(previewContext);
   previewContextRef.current = previewContext;
   const previewContextKey = JSON.stringify(previewContext);
@@ -57,14 +54,21 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
   const [message, setMessage] = useState('');
   const [nativePreview, setNativePreview] = useState(false);
   const [facing, setFacing] = useState<CameraFacing>(preferredFacing);
+  const nativeContext = useCallback((): CameraPreviewContext => {
+    const context=previewContextRef.current, rect=frameRef.current?.getBoundingClientRect();
+    return context.screen==='camera-check' ? {screen:'camera-check',readiness:{mode:'readiness',sessionId:readinessSessionId(generationRef.current),
+      geometryGeneration:generationRef.current,previewWidth:rect?.width??0,previewHeight:rect?.height??0,active:true}} : context;
+  },[]);
 
   const release = useCallback(() => {
+    trackCleanupRef.current?.(); trackCleanupRef.current = null;
     streamRef.current?.getTracks().forEach(track => track.stop());
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
   }, []);
 
   const stop = useCallback((resetAutoStart = false) => {
+    invalidate();
     startRequestRef.current += 1;
     if (nativeActiveRef.current) {
       nativeActiveRef.current = false;
@@ -75,15 +79,10 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
     setStatus('idle');
     setMessage('');
     if (resetAutoStart) cameraWasEnabled = false;
-    const waiter = captureWaiterRef.current;
-    if (waiter) {
-      window.clearTimeout(waiter.timeout);
-      waiter.reject(new Error('Camera preview stopped before an image could be captured.'));
-      captureWaiterRef.current = null;
-    }
-  }, [release]);
+  }, [release, invalidate]);
 
   const start = useCallback(async (requestedFacing: CameraFacing = facing) => {
+    invalidate();
     const requestId = ++startRequestRef.current;
     preferredFacing = requestedFacing;
     cameraWasEnabled = true;
@@ -110,7 +109,7 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
         setMessage('The camera view could not be laid out. Return to Camera Check and try again.');
         return;
       }
-      bridge.postMessage(JSON.stringify({ type: 'camera-start', frame, facing: requestedFacing, previewContext: previewContextRef.current }));
+      bridge.postMessage(JSON.stringify({ type: 'camera-start', frame, facing: requestedFacing, previewContext: nativeContext() }));
       return;
     }
     if (typeof window === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
@@ -144,14 +143,24 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
         return;
       }
       streamRef.current = stream;
+      const lost = () => {
+        if (requestId !== startRequestRef.current) return;
+        invalidate(); startRequestRef.current += 1; release(); setStatus('unavailable');
+        setMessage('Camera delivery stopped. Enable the camera again or continue without it.');
+      };
+      const tracks = stream.getVideoTracks();
+      tracks.forEach(track => { track.addEventListener('ended', lost); track.addEventListener('mute', lost); });
+      trackCleanupRef.current = () => tracks.forEach(track => { track.removeEventListener('ended', lost); track.removeEventListener('mute', lost); });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play().catch(() => undefined);
+        await videoRef.current.play();
       }
+      if (requestId !== startRequestRef.current) { stream.getTracks().forEach(track => track.stop()); return; }
       setFacing(requestedFacing);
       setStatus('on');
     } catch (error) {
       if (requestId !== startRequestRef.current) return;
+      invalidate(); release();
       cameraWasEnabled = false;
       const blocked = error instanceof DOMException && (error.name === 'NotAllowedError' || error.name === 'SecurityError');
       setStatus(blocked ? 'denied' : 'unavailable');
@@ -159,72 +168,29 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
         ? 'Camera access is blocked. Allow the camera in your browser or phone settings, then tap Enable camera again.'
         : 'No camera was found or it could not start.');
     }
-  }, [facing, release]);
+  }, [facing, release, invalidate, nativeContext]);
 
   const switchFacing = useCallback(() => {
     const nextFacing: CameraFacing = facing === 'back' ? 'front' : 'back';
     preferredFacing = nextFacing;
     setFacing(nextFacing);
-    if (status === 'on') void start(nextFacing);
+    if (status === 'on' || status === 'starting') void start(nextFacing);
   }, [facing, start, status]);
-
-  const captureFrame = useCallback(async () => {
-    const bridge = nativeBridge();
-    if (bridge) {
-      if (!nativeActiveRef.current || status !== 'on') throw new Error('Wait for the camera preview to become ready.');
-      if (captureWaiterRef.current) throw new Error('A camera image is already being captured.');
-      const requestId = `readiness-${++captureRequestRef.current}`;
-      return await new Promise<string>((resolve, reject) => {
-        const timeout = window.setTimeout(() => {
-          if (captureWaiterRef.current?.requestId !== requestId) return;
-          captureWaiterRef.current = null;
-          reject(new Error('The camera image could not be captured. Check camera access and try again.'));
-        }, 10_000);
-        captureWaiterRef.current = { requestId, resolve, reject, timeout };
-        bridge.postMessage(JSON.stringify({ type: 'camera-capture-readiness', requestId }));
-      });
-    }
-    const video = videoRef.current;
-    if (!video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || video.videoWidth <= 0 || video.videoHeight <= 0) {
-      throw new Error('Wait for the camera preview to become ready.');
-    }
-    const width = Math.min(video.videoWidth, 640);
-    const height = Math.round(video.videoHeight * width / video.videoWidth);
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('This browser cannot capture a camera image.');
-    context.drawImage(video, 0, 0, width, height);
-    return canvas.toDataURL('image/jpeg', 0.55).split(',')[1] ?? '';
-  }, [status]);
 
   useEffect(() => {
     const handleCameraEvent = (event: Event) => {
       const detail = (event as CustomEvent<CameraEvent>).detail;
       if (!detail) return;
-      if (detail.type === 'readiness-frame') {
-        const waiter = captureWaiterRef.current;
-        if (!waiter || waiter.requestId !== detail.requestId) return;
-        window.clearTimeout(waiter.timeout);
-        captureWaiterRef.current = null;
-        waiter.resolve(detail.mediaBase64);
-        return;
-      }
-      if (detail.type === 'readiness-error') {
-        const waiter = captureWaiterRef.current;
-        if (!waiter || waiter.requestId !== detail.requestId) return;
-        window.clearTimeout(waiter.timeout);
-        captureWaiterRef.current = null;
-        waiter.reject(new Error(detail.message));
-        return;
-      }
       if (detail.type === 'facing') {
+        if(detail.facing!=='front' && detail.facing!=='back')return;
+        invalidate();
         preferredFacing = detail.facing;
         setFacing(detail.facing);
         return;
       }
       if (!nativeActiveRef.current) return;
+      if (!['idle','starting','on','denied','unavailable'].includes(detail.status)) return;
+      if (detail.status !== 'on' && detail.status !== 'starting') invalidate();
       setStatus(detail.status);
       setMessage(detail.message ?? '');
       if (detail.status === 'unavailable' || detail.status === 'denied') {
@@ -233,6 +199,7 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
         setNativePreview(false);
       }
       if (detail.status === 'idle') {
+        cameraWasEnabled = false;
         nativeActiveRef.current = false;
         setNativePreview(false);
       }
@@ -243,21 +210,42 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       nativeBridge()?.postMessage(JSON.stringify({
         type: 'camera-update-frame',
         frame: getCameraFrame(element),
-        previewContext: previewContextRef.current,
+        previewContext: nativeContext(),
       }));
     };
+    let lastGeometry = '';
+    const geometryChanged = () => {
+      const element=frameRef.current;
+      if(element) {
+        const {width,height}=element.getBoundingClientRect();
+        const key=`${width}:${height}`;
+        if(lastGeometry && key!==lastGeometry) invalidate();
+        lastGeometry=key;
+      }
+      updateFrame();
+    };
+    const lifecycleLost = () => { if(document.visibilityState==='hidden' || !document.hasFocus()) stop(true); };
+    const blurred = () => stop(true);
     const resizeObserver = frameRef.current && typeof ResizeObserver !== 'undefined'
-      ? new ResizeObserver(updateFrame)
+      ? new ResizeObserver(geometryChanged)
       : null;
     if (frameRef.current) resizeObserver?.observe(frameRef.current);
     window.addEventListener('physiquequest-camera', handleCameraEvent);
-    window.addEventListener('resize', updateFrame);
+    window.addEventListener('resize', geometryChanged);
+    videoRef.current?.addEventListener('resize', invalidate);
+    window.addEventListener('blur', blurred);
+    document.addEventListener('visibilitychange', lifecycleLost);
     window.addEventListener('scroll', updateFrame, true);
     window.visualViewport?.addEventListener('resize', updateFrame);
     window.visualViewport?.addEventListener('scroll', updateFrame);
     return () => {
       window.removeEventListener('physiquequest-camera', handleCameraEvent);
-      window.removeEventListener('resize', updateFrame);
+      startRequestRef.current += 1;
+      generationRef.current += 1;
+      window.removeEventListener('resize', geometryChanged);
+      videoRef.current?.removeEventListener('resize', invalidate);
+      window.removeEventListener('blur', blurred);
+      document.removeEventListener('visibilitychange', lifecycleLost);
       window.removeEventListener('scroll', updateFrame, true);
       window.visualViewport?.removeEventListener('resize', updateFrame);
       window.visualViewport?.removeEventListener('scroll', updateFrame);
@@ -265,22 +253,16 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       if (nativeActiveRef.current) nativeBridge()?.postMessage(JSON.stringify({ type: 'camera-stop' }));
       nativeActiveRef.current = false;
       release();
-      const waiter = captureWaiterRef.current;
-      if (waiter) {
-        window.clearTimeout(waiter.timeout);
-        waiter.reject(new Error('Camera preview closed before an image could be captured.'));
-        captureWaiterRef.current = null;
-      }
     };
-  }, [release]);
+  }, [release, invalidate, stop, nativeContext]);
 
   useEffect(() => {
     if (!nativeActiveRef.current) return;
     nativeBridge()?.postMessage(JSON.stringify({
       type: 'camera-update-overlay',
-      previewContext: previewContextRef.current,
+      previewContext: nativeContext(),
     }));
-  }, [nativePreview, previewContextKey]);
+  }, [nativePreview, previewContextKey, generation, nativeContext]);
 
   return {
     videoRef,
@@ -291,8 +273,9 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
     stop,
     facing,
     switchFacing,
-    captureFrame,
     nativePreview,
     shouldAutoStart: cameraWasEnabled,
+    generation,
+    generationRef,
   };
 }

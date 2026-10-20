@@ -5,6 +5,8 @@ import { safeUrl } from './redact.js';
 
 export interface FetchJsonOptions {
   upstream: string;
+  method?: 'GET' | 'POST';
+  body?: string;
   timeoutMs?: number;
   headers?: Record<string, string>;
   retryServerErrors?: boolean;
@@ -26,7 +28,8 @@ export class HttpService {
     let res: Response;
     try {
       res = await fetch(url, {
-        method: 'GET',
+        method: opts.method ?? 'GET',
+        ...(opts.body === undefined ? {} : { body: opts.body }),
         headers: { accept: 'application/json', ...opts.headers },
         signal: AbortSignal.timeout(timeoutMs),
       });

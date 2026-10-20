@@ -22,6 +22,21 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const codeInputs = useRef<Array<HTMLInputElement | null>>([]);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const inFlight = useRef(false);
+
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => { dialog?.close(); if (opener?.isConnected) opener.focus(); };
+  }, []);
+
+  useEffect(() => {
+    const panel = dialogRef.current?.querySelector('.forgot-password-modal:not(.forgot-password-modal-background)');
+    ((panel?.querySelector('input:not([readonly])') ?? panel?.querySelector('button')) as HTMLElement | null)?.focus();
+    if (step === 'verify') codeInputs.current[0]?.focus();
+  }, [step]);
 
   useEffect(() => {
     if (step !== 'verify' || resendSeconds === 0) return;
@@ -31,6 +46,8 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
 
   const requestCode = async (event: FormEvent) => {
     event.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
     setError('');
     try {
@@ -50,12 +67,14 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not request a verification code.');
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };
 
   const resendCode = async () => {
-    if (busy || resendSeconds > 0) return;
+    if (inFlight.current || resendSeconds > 0) return;
+    inFlight.current = true;
     setBusy(true);
     setError('');
     try {
@@ -74,17 +93,20 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not resend the verification code.');
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };
 
   const verifyCode = async (event: FormEvent) => {
     event.preventDefault();
+    if (inFlight.current) return;
     setError('');
     if (!/^\d{6}$/.test(code)) {
       setError('Enter all 6 digits of your verification code.');
       return;
     }
+    inFlight.current = true;
     setBusy(true);
     try {
       if (!requestId) throw new Error('Request a new verification code before continuing.');
@@ -96,6 +118,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That verification code is invalid or expired.');
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };
@@ -136,11 +159,13 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
 
   const confirm = async (event: FormEvent) => {
     event.preventDefault();
+    if (inFlight.current) return;
     setError('');
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
+    inFlight.current = true;
     setBusy(true);
     try {
       if (!resetToken) throw new Error('Verify your code again before updating the password.');
@@ -151,13 +176,14 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update the password.');
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };
 
   const formatCountdown = `${String(Math.floor(resendSeconds / 60)).padStart(2, '0')}:${String(resendSeconds % 60).padStart(2, '0')}`;
 
-  return <div className="forgot-password-overlay">
+  return <dialog ref={dialogRef} className="forgot-password-overlay" aria-modal="true" aria-label={step === 'verify' ? 'Verification code' : step === 'password' ? 'Set new password' : step === 'success' ? 'Password updated' : mode === 'change' ? 'Change your password' : 'Reset your password'} onCancel={event => { event.preventDefault(); onClose(); }}>
     {step === 'verify' && <div className="forgot-password-modal forgot-password-modal-background" aria-hidden="true" inert>
       <div className="modal-header"><h3>{mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><span className="close-btn">×</span></div>
       <div className="modal-body">
@@ -232,7 +258,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
       <div className="success-modal-content"><div className="success-icon">✓</div><h3 className="success-title">Password updated</h3><p className="success-description">Your password was changed successfully. Sign in with your new password.</p></div>
       <div className="modal-footer"><button className="btn-primary" onClick={() => { onSuccess(); onClose(); }}>Return to sign in</button></div>
     </>}
-  </div></div>;
+  </div></dialog>;
 }
 
 function EyeIcon({ visible }: { visible: boolean }) {

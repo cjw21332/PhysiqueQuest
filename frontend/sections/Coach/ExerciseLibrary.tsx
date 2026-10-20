@@ -29,6 +29,12 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const openerRef = useRef<HTMLButtonElement | null>(null);
+  const libraryRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    libraryRef.current?.closest('.coach-scroll')?.scrollTo({ top: 0 });
+    headingRef.current?.focus({ preventScroll: true });
+  }, []);
 
   useEffect(() => {
     let current = true;
@@ -70,31 +76,35 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
   const reset = () => { setSearchTerm(''); setSelectedMuscle('All'); setEquipment('Any equipment'); setPage(1); };
   const trackingLabel = (item: ExerciseRecord) => item.pose === 'missing' ? 'Manual' : item.trackingStatus || 'Manual';
 
-  return <div className="coach-library">
+  return <div className="coach-library" ref={libraryRef}>
     <header className="coach-header library-header">
       <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button>
-      <h2>Exercise library</h2>
+      <h2 ref={headingRef} tabIndex={-1}>Exercise library</h2>
     </header>
+    <p className="library-intro">Browse exercise instructions and available demonstrations.</p>
     <label className="library-search">
       <Icon name="search" size={19}/>
       <input type="search" aria-label="Search Exercise" placeholder="Search Exercise" value={searchTerm} onChange={event => { setSearchTerm(event.target.value); setPage(1); }}/>
       {searchTerm && <button type="button" onClick={() => { setSearchTerm(''); setPage(1); }} aria-label="Clear search"><Icon name="close" size={16}/></button>}
     </label>
+    <div className="library-filter-heading"><h3>Muscle group</h3>{(searchTerm || selectedMuscle !== 'All' || equipment !== 'Any equipment') && <button type="button" onClick={reset}>Clear filters</button>}</div>
     <div className="filter-row" role="group" aria-label="Muscle group">
       {muscles.map(item => <button type="button" key={item} aria-pressed={selectedMuscle === item} onClick={() => { setSelectedMuscle(item); setPage(1); }}><span>{item}</span></button>)}
     </div>
+    <details className="library-equipment-panel"><summary>Equipment <strong>{equipment}</strong></summary>
     <div className="filter-row equipment-filters" role="group" aria-label="Equipment">
       {equipmentOptions.map(item => <button type="button" key={item} aria-pressed={equipment === item} onClick={() => { setEquipment(item); setPage(1); }}><span>{item}</span></button>)}
     </div>
+    </details>
     {loading && <p role="status">Loading exercises…</p>}
     {error && <div className="empty-library" role="alert"><p>{error}</p><button type="button" className="secondary" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
     {!loading && !error && catalog && <>
-      <div className="library-caption"><p className="result-count" role="status">{catalog.total} results</p></div>
+      <div className="library-caption library-results-heading"><p className="result-count" role="status">{catalog.total} {catalog.total === 1 ? 'exercise' : 'exercises'}</p><span>Open a guide</span></div>
       <div className="library-list">
         {catalog.items.map(item => <button type="button" className="library-item" key={item._id} aria-haspopup="dialog" onClick={event => { openerRef.current = event.currentTarget; setMediaError(false); setSelected(item); }}>
           <span className="exercise-thumb"><Icon name="library-dumbbells" size={24}/>{item.gifUrl && <i><Icon name="play" size={8}/></i>}</span>
-          <span className="library-copy"><b>{item.name}</b><small>{metadata(item)}</small></span>
-          <span className={`tracking-tag ${trackingLabel(item) === 'Caution' ? 'caution' : trackingLabel(item) === 'Manual' ? 'manual' : ''}`}>{trackingLabel(item)}</span>
+          <span className="library-copy"><b>{item.name}</b><small>{metadata(item)}</small><span className="library-item-meta"><span className={`tracking-tag ${trackingLabel(item) === 'Caution' ? 'caution' : trackingLabel(item) === 'Manual' ? 'manual' : ''}`}>{trackingLabel(item)}</span>{item.gifUrl && <span className="library-demo-label">Demonstration</span>}</span></span>
+          <Icon name="arrow" size={16}/>
         </button>)}
         {!catalog.items.length && <div className="empty-library"><p>No exercises match those filters.</p><button type="button" className="secondary" onClick={reset}>Reset filters</button></div>}
       </div>
@@ -112,7 +122,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
             {detail.gifUrl && !mediaError ? <>
               <img ref={imageRef} src={detail.gifUrl} alt={`Exercise demonstration - ${detail.name}`} style={{ visibility: playing || !frameReady ? 'visible' : 'hidden' }} onLoad={freezeFrame} onError={() => { setMediaError(true); setPlaying(false); }}/>
               <canvas ref={canvasRef} aria-hidden="true" style={{ visibility: !playing && frameReady ? 'visible' : 'hidden' }}/>
-              <button type="button" className={`library-demo-toggle ${playing ? 'is-playing' : ''}`} aria-label={playing ? 'Pause exercise demonstration' : 'Play exercise demonstration'} onClick={() => { if (playing) freezeFrame(); setPlaying(value => !value); }}>{playing ? <span aria-hidden="true">Ⅱ</span> : <Icon name="play" size={22}/>}</button>
+              <button type="button" className={`library-demo-toggle ${playing ? 'is-playing' : ''}`} aria-label={playing ? 'Pause exercise demonstration' : 'Play exercise demonstration'} onClick={() => { if (playing) freezeFrame(); setPlaying(value => !value); }}><Icon name={playing ? 'pause' : 'play'} size={22}/></button>
             </> : <span className="library-video-unavailable"><Icon name="library-dumbbells" size={40}/><small>{mediaError ? 'Could not load this demonstration.' : 'No demonstration available'}</small></span>}
           </div>
           {mediaError && <button type="button" className="secondary library-media-retry" onClick={() => setDetailRetry(value => value + 1)}>Retry demonstration</button>}

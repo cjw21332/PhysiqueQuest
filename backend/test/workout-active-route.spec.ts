@@ -25,6 +25,7 @@ describe('GET /workouts/active JSON contract', () => {
       try {
         const response = await request(app.getHttpServer()).get('/workouts/active');
         expect(response.status).toBe(200);
+        expect(response.headers['cache-control']).toBe('no-store');
         expect(response.headers['content-type']).toContain('application/json');
         expect(JSON.parse(response.text)).toEqual(workout);
         expect(service.active).toHaveBeenCalledWith(USER);

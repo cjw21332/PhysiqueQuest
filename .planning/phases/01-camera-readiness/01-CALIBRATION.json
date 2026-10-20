@@ -1,0 +1,520 @@
+{
+  "schemaVersion": 1,
+  "status": "pending",
+  "created": "2026-10-21",
+  "mediaStored": false,
+  "thresholdProposals": {
+    "status": "provisional",
+    "confidence": 0.65,
+    "margin": 0.04,
+    "heightBand": [0.55, 0.85],
+    "dwellMs": 1000,
+    "expiryMs": 1250,
+    "samplingMs": 200,
+    "initializationMs": 10000,
+    "inferenceTimeoutMs": 5000,
+    "allowEarHead": false,
+    "lightingBand": null,
+    "reason": "Existing software hypotheses only; no physical trial supports enabling a check"
+  },
+  "limitations": [
+    "Software fixtures use synthetic cameras/bridge events; none establish physical accuracy.",
+    "All six policy flags remain false; scene brightness has no calibrated band.",
+    "Global native flags require supporting Android and iOS evidence; no device/build observation supplied."
+  ],
+  "devices": [
+    {
+      "id": "web-pending",
+      "surface": "web",
+      "status": "pending",
+      "tested": false,
+      "model": null,
+      "os": null,
+      "buildRevision": null,
+      "capability": "unknown",
+      "notes": { "timing": null, "heat": null, "cleanup": null, "accessibility": null },
+      "limitation": "Actual target camera/build not exercised"
+    },
+    {
+      "id": "android-pending",
+      "surface": "android",
+      "status": "pending",
+      "tested": false,
+      "model": null,
+      "os": null,
+      "buildRevision": null,
+      "capability": "unknown",
+      "notes": { "timing": null, "heat": null, "cleanup": null, "accessibility": null },
+      "limitation": "Actual target camera/build not exercised"
+    },
+    {
+      "id": "ios-pending",
+      "surface": "ios",
+      "status": "pending",
+      "tested": false,
+      "model": null,
+      "os": null,
+      "buildRevision": null,
+      "capability": "unknown",
+      "notes": { "timing": null, "heat": null, "cleanup": null, "accessibility": null },
+      "limitation": "Actual target camera/build not exercised"
+    }
+  ],
+  "trials": [
+    {
+      "id": "web-front-back",
+      "deviceId": "web-pending",
+      "caseId": "front-back",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-orientation",
+      "deviceId": "web-pending",
+      "caseId": "orientation",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-cover-crop-mirror",
+      "deviceId": "web-pending",
+      "caseId": "cover-crop-mirror",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-entry-exit-clipping",
+      "deviceId": "web-pending",
+      "caseId": "entry-exit-clipping",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-body-diversity",
+      "deviceId": "web-pending",
+      "caseId": "body-diversity",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-side-bent-occlusion",
+      "deviceId": "web-pending",
+      "caseId": "side-bent-occlusion",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-lighting-cover",
+      "deviceId": "web-pending",
+      "caseId": "lighting-cover",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-permissions-busy",
+      "deviceId": "web-pending",
+      "caseId": "permissions-busy",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-background-lock",
+      "deviceId": "web-pending",
+      "caseId": "background-lock",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-switch-exit-reopen",
+      "deviceId": "web-pending",
+      "caseId": "switch-exit-reopen",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-model-worker-failure",
+      "deviceId": "web-pending",
+      "caseId": "model-worker-failure",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-slow-thermal",
+      "deviceId": "web-pending",
+      "caseId": "slow-thermal",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-screen-reader",
+      "deviceId": "web-pending",
+      "caseId": "screen-reader",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-font-scale-targets",
+      "deviceId": "web-pending",
+      "caseId": "font-scale-targets",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "web-manual-continuation",
+      "deviceId": "web-pending",
+      "caseId": "manual-continuation",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-front-back",
+      "deviceId": "android-pending",
+      "caseId": "front-back",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-orientation",
+      "deviceId": "android-pending",
+      "caseId": "orientation",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-cover-crop-mirror",
+      "deviceId": "android-pending",
+      "caseId": "cover-crop-mirror",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-entry-exit-clipping",
+      "deviceId": "android-pending",
+      "caseId": "entry-exit-clipping",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-body-diversity",
+      "deviceId": "android-pending",
+      "caseId": "body-diversity",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-side-bent-occlusion",
+      "deviceId": "android-pending",
+      "caseId": "side-bent-occlusion",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-lighting-cover",
+      "deviceId": "android-pending",
+      "caseId": "lighting-cover",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-permissions-busy",
+      "deviceId": "android-pending",
+      "caseId": "permissions-busy",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-background-lock",
+      "deviceId": "android-pending",
+      "caseId": "background-lock",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-switch-exit-reopen",
+      "deviceId": "android-pending",
+      "caseId": "switch-exit-reopen",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-model-worker-failure",
+      "deviceId": "android-pending",
+      "caseId": "model-worker-failure",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-slow-thermal",
+      "deviceId": "android-pending",
+      "caseId": "slow-thermal",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-screen-reader",
+      "deviceId": "android-pending",
+      "caseId": "screen-reader",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-font-scale-targets",
+      "deviceId": "android-pending",
+      "caseId": "font-scale-targets",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "android-manual-continuation",
+      "deviceId": "android-pending",
+      "caseId": "manual-continuation",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-front-back",
+      "deviceId": "ios-pending",
+      "caseId": "front-back",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-orientation",
+      "deviceId": "ios-pending",
+      "caseId": "orientation",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-cover-crop-mirror",
+      "deviceId": "ios-pending",
+      "caseId": "cover-crop-mirror",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-entry-exit-clipping",
+      "deviceId": "ios-pending",
+      "caseId": "entry-exit-clipping",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-body-diversity",
+      "deviceId": "ios-pending",
+      "caseId": "body-diversity",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-side-bent-occlusion",
+      "deviceId": "ios-pending",
+      "caseId": "side-bent-occlusion",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-lighting-cover",
+      "deviceId": "ios-pending",
+      "caseId": "lighting-cover",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-permissions-busy",
+      "deviceId": "ios-pending",
+      "caseId": "permissions-busy",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-background-lock",
+      "deviceId": "ios-pending",
+      "caseId": "background-lock",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-switch-exit-reopen",
+      "deviceId": "ios-pending",
+      "caseId": "switch-exit-reopen",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-model-worker-failure",
+      "deviceId": "ios-pending",
+      "caseId": "model-worker-failure",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-slow-thermal",
+      "deviceId": "ios-pending",
+      "caseId": "slow-thermal",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-screen-reader",
+      "deviceId": "ios-pending",
+      "caseId": "screen-reader",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-font-scale-targets",
+      "deviceId": "ios-pending",
+      "caseId": "font-scale-targets",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    },
+    {
+      "id": "ios-manual-continuation",
+      "deviceId": "ios-pending",
+      "caseId": "manual-continuation",
+      "status": "pending",
+      "observation": null,
+      "falseGreen": null,
+      "notes": null
+    }
+  ],
+  "decisions": [
+    {
+      "platform": "web",
+      "check": "fullBody",
+      "status": "pending",
+      "values": null,
+      "trialIds": [],
+      "reason": "No physical-device calibration observations supplied"
+    },
+    {
+      "platform": "web",
+      "check": "lighting",
+      "status": "pending",
+      "values": null,
+      "trialIds": [],
+      "reason": "No physical-device calibration observations supplied"
+    },
+    {
+      "platform": "web",
+      "check": "framing",
+      "status": "pending",
+      "values": null,
+      "trialIds": [],
+      "reason": "No physical-device calibration observations supplied"
+    },
+    {
+      "platform": "native",
+      "check": "fullBody",
+      "status": "pending",
+      "values": null,
+      "trialIds": [],
+      "reason": "No physical-device calibration observations supplied"
+    },
+    {
+      "platform": "native",
+      "check": "lighting",
+      "status": "pending",
+      "values": null,
+      "trialIds": [],
+      "reason": "No physical-device calibration observations supplied"
+    },
+    {
+      "platform": "native",
+      "check": "framing",
+      "status": "pending",
+      "values": null,
+      "trialIds": [],
+      "reason": "No physical-device calibration observations supplied"
+    }
+  ]
+}

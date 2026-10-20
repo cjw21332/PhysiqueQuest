@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Query, Param, Req, Res, UseGuards, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import { Body, Controller, Get, Header, Patch, Post, Query, Param, Req, Res, UseGuards, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ApplyRecordingDto, CompleteWorkoutDto, CreateWorkoutDto, PauseWorkoutDto, RecordedWorkoutDto, SaveSetDto } from './dto/workout.dto.js';
@@ -14,10 +14,10 @@ export class WorkoutsController {
   @Get('active') async active(@Req() req: AuthenticatedRequest, @Res() response: Response) {
     // Explicit JSON keeps the no-session case as the literal `null`, rather
     // than an empty HTTP body produced by the default response adapter.
-    return response.json(await this.service.active(req.user.userId));
+    return response.set('Cache-Control', 'no-store').json(await this.service.active(req.user.userId));
   }
   @Get('summary') summary(@Req() req: AuthenticatedRequest, @Query('timezone') timezone?: string) { return this.service.summary(req.user.userId, timezone); }
-  @Get(':id') detail(@Req() req: AuthenticatedRequest, @Param('id') id: string) { return this.service.detail(req.user.userId, id); }
+  @Get(':id') @Header('Cache-Control', 'no-store') detail(@Req() req: AuthenticatedRequest, @Param('id') id: string) { return this.service.detail(req.user.userId, id); }
   @Post('recorded') record(@Req() req: AuthenticatedRequest, @Body() dto: RecordedWorkoutDto) { return this.service.record(req.user.userId, dto); }
   @Post('recorded/:id/apply') applyRecording(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: ApplyRecordingDto) { return this.service.applyRecording(req.user.userId, id, dto); }
   @Patch(':id/sets') saveSet(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: SaveSetDto) { return this.service.saveSet(req.user.userId, id, dto); }

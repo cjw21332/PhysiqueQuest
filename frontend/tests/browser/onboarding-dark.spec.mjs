@@ -30,10 +30,18 @@ test('dark reference onboarding preserves registration, calibration, scrolling, 
 
   await page.goto('/launch');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.getByText('2 of 3 ready')).toBeVisible();
+  await expect(page.getByText('2 of 3 confirmed')).toBeVisible();
   await expect(page.locator('.launch')).toHaveCSS('background-color', 'rgb(11, 15, 21)');
   await expectReferenceLayout(page, ['.launch', '.launch-brand', '.brand-logo', '.readiness', '.launch-actions']);
   await capture(page, testInfo, '01-launch');
+  for (const [width, height] of [[320, 480], [390, 844], [768, 1024], [1440, 900]]) {
+    await page.setViewportSize({ width, height });
+    await expect(page.getByRole('link', { name: 'Get started', exact: true })).toBeInViewport();
+    await expect(page.getByRole('link', { name: 'I already have an account', exact: true })).toBeInViewport();
+    expect(await page.locator('.launch').evaluate(el => el.scrollHeight <= el.clientHeight + 1)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath(`launch-copy-${width}.png`), animations: 'disabled' });
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
   for (const size of [{ width: 320, height: 480 }, { width: 320, height: 568 }, { width: 390, height: 700 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(size);
     await expect(page.locator('.launch')).toHaveCSS('overflow-y', 'clip');
@@ -87,7 +95,7 @@ test('dark reference onboarding preserves registration, calibration, scrolling, 
   await expect(page.getByRole('heading', { name: 'Personal data', exact: true })).toBeVisible();
   await expect(page.getByLabel('Age', { exact: true })).toHaveValue('24');
   await page.getByRole('button', { name: 'Next: Goals', exact: true }).click();
-  await page.getByRole('button', { name: /Build muscle Hypertrophy/ }).click();
+  await page.getByRole('button', { name: /Build muscle Resistance training/ }).click();
   await page.getByRole('button', { name: 'Consistent', exact: true }).click();
   await page.locator('.calibration-scroll').evaluate(el => { el.scrollTop = 0; });
   await capture(page, testInfo, '05-goals');
@@ -95,16 +103,14 @@ test('dark reference onboarding preserves registration, calibration, scrolling, 
   await capture(page, testInfo, '06-goals-scrolled');
   await page.getByRole('button', { name: 'Next: Training', exact: true }).click();
   await page.getByRole('button', { name: 'Back', exact: true }).click();
-  await expect(page.getByRole('button', { name: /Build muscle Hypertrophy/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /Build muscle Resistance training/ })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Next: Training', exact: true }).click();
   await page.getByRole('button', { name: 'Dumbbells', exact: true }).click();
   for (const day of ['Monday', 'Wednesday', 'Friday', 'Saturday']) await page.getByRole('button', { name: day, exact: true }).click();
   await page.getByRole('button', { name: '45 min', exact: true }).click();
   await page.locator('.calibration-scroll').evaluate(el => { el.scrollTop = 0; });
-  await page.getByRole('button', { name: 'Next: Health info', exact: true }).click();
-  await expect(page.locator('.calibration-wizard [role="alert"]')).toContainText('Confirm that you can place your phone');
   await capture(page, testInfo, '07-training');
-  await page.getByRole('checkbox', { name: 'I can place my phone 2.5–3.0 m away' }).check();
+  await page.getByRole('checkbox', { name: 'I understand this camera setup guidance' }).check();
   await page.locator('.calibration-scroll').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await capture(page, testInfo, '08-training-scrolled');
   await page.getByRole('button', { name: 'Next: Health info', exact: true }).click();
@@ -118,12 +124,12 @@ test('dark reference onboarding preserves registration, calibration, scrolling, 
   await capture(page, testInfo, '10-health-safety-scrolled');
   for (const size of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(size);
-    await expect(page.getByRole('button', { name: 'Finish & build my plan', exact: true })).toBeInViewport();
+    await expect(page.getByRole('button', { name: 'Save profile & continue', exact: true })).toBeInViewport();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.getByLabel('Name', { exact: true }).fill('Maria Cruz');
   await page.getByLabel('Mobile number').fill('09123456789');
-  await page.getByRole('button', { name: 'Finish & build my plan', exact: true }).click();
+  await page.getByRole('button', { name: 'Save profile & continue', exact: true }).click();
   await expect.poll(() => savedProfile?.contactName).toBe('Maria Cruz');
   expect(savedProfile).toMatchObject({ age: '24', goal: 'Build muscle', equipment: ['Dumbbells'], duration: '45 min', conditions: ['Knee injury'] });
   expect(savedProfile.days).toHaveLength(4);

@@ -189,10 +189,13 @@ export class WorkoutsService implements OnModuleInit {
     return workouts.filter(workout => workoutCalendarDate({ ...workout, startedAt: workout.startedAt.toISOString() }, timezone) === date);
   }
   async active(userId: string) {
-    return this.model
-      .findOne({ userId: new Types.ObjectId(userId), status: 'active' })
-      .sort({ startedAt: -1 })
+    // Recovery follows the latest full session; ending it must not resurrect
+    // an older abandoned session. Individual recorded sets are not sessions.
+    const latest = await this.model
+      .findOne({ userId: new Types.ObjectId(userId), origin: { $ne: 'recorded-set' } })
+      .sort({ startedAt: -1, _id: -1 })
       .exec();
+    return latest?.status === 'active' ? latest : null;
   }
   async detail(userId: string, id: string) {
     return this.owned(userId, id);
