@@ -11,6 +11,10 @@
 
 This checklist separates what is implemented in the frontend, what is implemented and tested in the backend, and what has actually been demonstrated as a complete user journey using genuine account data.
 
+### PhysiqueQuest v3.1.1 release preparation — October 21, 2026
+
+Packaged the non-ignored project snapshot and release documentation for the requested version/main pushes. Fresh full frontend/mobile Node suite 159/159, backend suite 382/382, production frontend build and mobile TypeScript pass. Updated the Expo Go test harness for the shared readiness module; kept native-module startup assertions. See `docs/RELEASE-v3.1.1.md` and PROGRESS-56. Physical camera calibration and live-integration status marks remain unchanged.
+
 ### Android shared-module bundling fix — October 21, 2026
 
 Added plain `shared/` to Metro watch folders; Expo's workspace defaults omitted it and could not resolve the new camera-readiness import. Actual cache-cleared Android export passed: 1,400 modules and bundled pose model. Metro regression 1/1 and native readiness tests 13/13 pass. Export evidence: `artifacts/metro-shared-fix/android`. Restart Metro to load config changes. No physical-device or live-integration status changes.

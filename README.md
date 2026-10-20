@@ -4,6 +4,8 @@ A responsive, mobile-first fitness application with a Next.js frontend, Expo Go 
 
 ## System status
 
+**Release:** [PhysiqueQuest v3.1.1](./docs/RELEASE-v3.1.1.md) — connected workout improvements, calibration drafts, accessibility and local camera-readiness integration. Actual-device camera calibration remains pending.
+
 **[Open the full system functionality checklist](./docs/checklist.md)** for all 17 modules, specific completed and outstanding functions, verification dates, and progress totals.
 
 - The checklist reports frontend implementation, backend implementation/test coverage, and genuine end-to-end user-data verification separately.
