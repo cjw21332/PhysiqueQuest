@@ -23,6 +23,7 @@ function loader(react = React, api = {}) {
       if (name.endsWith('/ForgotPasswordFlow') || /\/AdminExerciseLibrary$|\/EngagementAnalytics$|\/EmergencyAlertLog$/.test(name)) return { default: () => null, __esModule: true };
       if (name.startsWith('.')) {
         const absolute = path.resolve(path.dirname(file), name);
+        if (absolute.endsWith('.mjs') && existsSync(absolute)) return require(absolute);
         const candidate = [absolute + '.tsx', absolute + '.ts'].find(existsSync);
         if (candidate) return load(candidate);
       }

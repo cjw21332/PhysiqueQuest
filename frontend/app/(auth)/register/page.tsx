@@ -20,7 +20,7 @@ export default function RegisterPage() {
   const [calibrationError, setCalibrationError] = useState('');
   const [authDialog, setAuthDialog] = useState<'email-registered' | 'account-created' | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
-  const registeredAccount = useRef<{ scope: string | null; token: string | undefined } | null>(null);
+  const registeredAccount = useRef<{ scope: string | null; sessionKey: number | undefined } | null>(null);
   const [checkingAccount, setCheckingAccount] = useState(true);
   const [recoveryFailed, setRecoveryFailed] = useState(false);
   const recover = async () => {
@@ -28,7 +28,7 @@ export default function RegisterPage() {
     const user = getCurrentUser();
     if (!user?.token) { setCheckingAccount(false); return; }
     const owner = calibrationDraftKey();
-    const sameAccount = () => owner === calibrationDraftKey() && user.token === getCurrentUser()?.token;
+    const sameAccount = () => owner === calibrationDraftKey() && user.sessionKey === getCurrentUser()?.sessionKey;
     try {
       const profile = await api.getProfile(true);
       if (!sameAccount()) { setRecoveryFailed(true); return; }
@@ -61,7 +61,7 @@ export default function RegisterPage() {
     setCreatingAccount(true);
     try {
       await register(name, normalizedEmail, pass);
-      registeredAccount.current = { scope: calibrationDraftKey(), token: getCurrentUser()?.token };
+      registeredAccount.current = { scope: calibrationDraftKey(), sessionKey: getCurrentUser()?.sessionKey };
       setAuthDialog('account-created');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
@@ -77,8 +77,8 @@ export default function RegisterPage() {
 
   const finishCalibration = async (profile: Profile) => {
     setCalibrationError('');
-    const owner = calibrationDraftKey(), token = getCurrentUser()?.token;
-    const sameAccount = () => Boolean(owner && owner === calibrationDraftKey() && token === getCurrentUser()?.token);
+    const owner = calibrationDraftKey(), sessionKey = getCurrentUser()?.sessionKey;
+    const sameAccount = () => Boolean(owner && owner === calibrationDraftKey() && sessionKey === getCurrentUser()?.sessionKey);
     try {
       if (!sameAccount()) throw new Error('Your account or connection changed. Sign in again to continue setup.');
       // Prepare profile data for backend - remove fields that aren't in the DTO
@@ -189,7 +189,7 @@ export default function RegisterPage() {
       name={name}
       onPrimary={() => {
         setAuthDialog(null); setCalibrationError('');
-        if (!registeredAccount.current?.scope || registeredAccount.current.scope !== calibrationDraftKey() || registeredAccount.current.token !== getCurrentUser()?.token) { void recover(); return; }
+        if (!registeredAccount.current?.scope || registeredAccount.current.scope !== calibrationDraftKey() || registeredAccount.current.sessionKey !== getCurrentUser()?.sessionKey) { void recover(); return; }
         setCalibrating(true);
       }}
     />}

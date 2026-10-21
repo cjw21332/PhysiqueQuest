@@ -12,8 +12,8 @@ export default function ScanPage() {
   const { profile, loading, error, retry } = useCurrentProfile();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 

@@ -27,5 +27,5 @@ export function resolveApiBaseUrl(buildApiUrl, runtimeApiUrl, pageLocation) {
   if (!pageLocation) return 'http://localhost:4000/api';
   if (pageLocation.protocol !== 'http:' && pageLocation.protocol !== 'https:') return null;
 
-  return normalizeBaseUrl(`${pageLocation.protocol}//${pageLocation.hostname}:4000/api`);
+  return normalizeBaseUrl(`${pageLocation.protocol}//${pageLocation.hostname}${pageLocation.port ? `:${pageLocation.port}` : ''}/api`);
 }

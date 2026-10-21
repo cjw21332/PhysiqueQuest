@@ -1,5 +1,5 @@
-import { api, ApiRequestError } from './api';
-import { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './session';
+import { api, ApiRequestError, getApiBaseUrl } from './api';
+import { clearAuthSession, session } from './session';
 
 // Authentication utilities
 export interface User {
@@ -7,6 +7,7 @@ export interface User {
   name: string;
   email: string;
   token: string;
+  sessionKey?: number;
   profile?: any; // Full profile data
 }
 
@@ -23,7 +24,7 @@ export async function register(name: string, email: string, password: string): P
       token: response.access_token, // Backend returns access_token
     };
 
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    session.set(response, getApiBaseUrl());
     return user;
   } catch (error) {
     if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
@@ -45,7 +46,7 @@ export async function login(email: string, password: string): Promise<User> {
       token: response.access_token, // Backend returns access_token
     };
 
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    session.set(response, getApiBaseUrl());
     return user;
   } catch (error) {
     if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
@@ -56,7 +57,8 @@ export async function login(email: string, password: string): Promise<User> {
   }
 }
 
-export function logout() {
+export async function logout() {
+  await api.logout();
   clearAuthSession();
   // The bounded device snapshot is restored only for the same authenticated account.
 }
@@ -64,12 +66,7 @@ export function logout() {
 export function getCurrentUser(): User | null {
   if (typeof window === 'undefined') return null;
 
-  try {
-    const authData = localStorage.getItem(AUTH_STORAGE_KEY);
-    return authData ? JSON.parse(authData) : null;
-  } catch {
-    return null;
-  }
+  return session.current(getApiBaseUrl());
 }
 
 export function isAuthenticated(): boolean {

@@ -15,8 +15,8 @@ export default function CoachPage() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [browseLibrary, setBrowseLibrary] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 

@@ -21,13 +21,13 @@ test('uses the API address injected by the Expo WebView before host inference', 
   );
 });
 
-test('derives the API host and port from the loaded frontend page', () => {
+test('uses the frontend origin proxy by default on LAN and HTTPS', () => {
   assert.equal(resolveApiBaseUrl(undefined, undefined, {
-    protocol: 'http:', hostname: '192.168.1.42',
-  }), 'http://192.168.1.42:4000/api');
+    protocol: 'http:', hostname: '192.168.1.42', port: '3000',
+  }), 'http://192.168.1.42:3000/api');
   assert.equal(resolveApiBaseUrl(undefined, undefined, {
     protocol: 'https:', hostname: 'fitness.example.com',
-  }), 'https://fitness.example.com:4000/api');
+  }), 'https://fitness.example.com/api');
 });
 
 test('uses localhost during server rendering only when no explicit API address exists', () => {

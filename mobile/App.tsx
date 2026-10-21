@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
+import { isTrustedWebViewUrl, resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
 import { readinessMessageLimit, readinessScript, validateNativeReadinessContext, validateReadinessCheck, type NativeReadinessContext, type ReadinessCheck } from '../shared/cameraReadiness';
@@ -98,6 +98,7 @@ function buildInsetsScript(insets: { top: number; bottom: number; left: number; 
     m.content='width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover';
     document.head.appendChild(m);
     localStorage.setItem('physiquequest-runtime-api-url',${encodedApiUrl});
+    localStorage.setItem('physiquequest-app-version',${JSON.stringify(Constants.expoConfig?.version ?? '')});
   }catch(e){}})();true;`;
 }
 
@@ -324,10 +325,13 @@ function AppContent() {
         source={{ uri: loadedAddress }}
         style={StyleSheet.absoluteFill}
         containerStyle={styles.webContainer}
-        originWhitelist={['*']}
+        originWhitelist={[new URL(loadedAddress).origin]}
+        onShouldStartLoadWithRequest={request => isTrustedWebViewUrl(request.url, loadedAddress)}
         injectedJavaScriptBeforeContentLoaded={insetScript}
         javaScriptEnabled
         domStorageEnabled
+        sharedCookiesEnabled
+        thirdPartyCookiesEnabled={false}
         allowsBackForwardNavigationGestures
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction={false}
@@ -361,6 +365,7 @@ function AppContent() {
           if (e.nativeEvent.statusCode >= 500) {stopNativeCamera();setError(true);}
         }}
         onMessage={(e) => {
+          if (!isTrustedWebViewUrl(e.nativeEvent.url, loadedAddress)) return;
           try {
             if(e.nativeEvent.data.length>readinessMessageLimit){stopNativeCamera();return;}
             const message = JSON.parse(e.nativeEvent.data) as {

@@ -1,5 +1,5 @@
 // API client configuration
-import { clearAuthSession } from './session';
+import { appVersionHeaders, clearAuthSession, session } from './session';
 import { resolveApiBaseUrl } from './apiBaseUrl.mjs';
 import { resolveCoachBaseUrl } from './coachBaseUrl.mjs';
 import { createDeviceCache } from './deviceCache.mjs';
@@ -8,8 +8,8 @@ export const deviceCache = createDeviceCache({
   context: () => {
     if (typeof window === 'undefined') return null;
     try {
-      const user = JSON.parse(localStorage.getItem('physiquequest-auth') ?? 'null');
-      return user?.id && user?.token ? { scope: `${getApiBaseUrl()}:${user.id}`, session: user.token } : null;
+      const user = session.current(getApiBaseUrl());
+      return user?.id && user?.token ? { scope: `${getApiBaseUrl()}:${user.id}`, session: String(user.sessionKey) } : null;
     } catch { return null; }
   },
   storage: () => typeof window === 'undefined' ? undefined : window.localStorage,
@@ -32,11 +32,11 @@ export function getCoachApiBaseUrl() {
 
 export function getApiBaseUrl() {
   let runtimeApiUrl: string | undefined;
-  let pageLocation: { protocol: string; hostname: string } | undefined;
+    let pageLocation: { protocol: string; hostname: string; port?: string } | undefined;
   if (typeof window !== 'undefined') {
     try { runtimeApiUrl = window.localStorage.getItem('physiquequest-runtime-api-url') ?? undefined; }
     catch { runtimeApiUrl = undefined; }
-    pageLocation = { protocol: window.location.protocol, hostname: window.location.hostname };
+    pageLocation = { protocol: window.location.protocol, hostname: window.location.hostname, port: window.location.port };
   }
   const baseUrl = resolveApiBaseUrl(process.env.NEXT_PUBLIC_API_URL, runtimeApiUrl, pageLocation);
   if (!baseUrl) throw new Error('The API address is invalid or unavailable. Check the app connection settings.');
@@ -288,11 +288,24 @@ class ApiClient {
     const { timeoutMs, ...init } = options;
     const config: RequestInit = {
       ...init,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...appVersionHeaders(),
         ...init.headers,
       },
     };
+
+    const isAuth = endpoint.startsWith('/auth/session/') || endpoint.startsWith('/auth/password-reset/');
+    const ownApi = requestBaseUrl === getApiBaseUrl();
+    const existing = session.current(requestBaseUrl);
+    if (ownApi && !isAuth && existing && existing.expiresAt <= Date.now() + 30_000) {
+      const refreshed = await session.refresh(requestBaseUrl);
+      if (!refreshed || refreshed.sessionKey !== existing.sessionKey) {
+        if (!session.current(requestBaseUrl)) clearAuthSession();
+        throw new ApiRequestError('Session expired. Sign in again.', 401);
+      }
+    }
 
     // Opt-in per request: only the long-running vision call gets a cap, so no
     // existing caller changes behaviour and quick writes cannot be cut short.
@@ -309,7 +322,7 @@ class ApiClient {
     if (controller) config.signal = controller.signal;
 
     // Add auth token if available
-    const token = this.getToken();
+    let token = ownApi ? this.getToken() : null;
     if (token) {
       config.headers = {
         ...config.headers,
@@ -318,7 +331,16 @@ class ApiClient {
     }
 
     try {
-      const response = await fetch(url, config);
+      let response = await fetch(url, config);
+      if (response.status === 401 && ownApi && !isAuth && token && existing?.sessionKey === session.current(requestBaseUrl)?.sessionKey) {
+        const current = session.current(requestBaseUrl);
+        const refreshed = current?.token !== token ? current : await session.refresh(requestBaseUrl);
+        if (refreshed && refreshed.sessionKey === existing?.sessionKey) {
+          token = refreshed.token;
+          config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
+          response = await fetch(url, config);
+        } else if (!session.current(requestBaseUrl)) clearAuthSession();
+      }
 
       if (!response.ok) {
         const error = readErrorBody(await response.json().catch(() => null));
@@ -362,15 +384,7 @@ class ApiClient {
   }
 
   private getToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    const authData = localStorage.getItem('physiquequest-auth');
-    if (!authData) return null;
-    try {
-      const parsed = JSON.parse(authData);
-      return parsed.token || null;
-    } catch {
-      return null;
-    }
+    return session.current(getApiBaseUrl())?.token ?? null;
   }
 
   // Auth endpoints
@@ -382,7 +396,8 @@ class ApiClient {
     return this.request<{
       user: { id: string; name: string; email: string };
       access_token: string;
-    }>('/auth/register', {
+      expires_in: number;
+    }>('/auth/session/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -392,11 +407,14 @@ class ApiClient {
     return this.request<{
       user: { id: string; name: string; email: string };
       access_token: string;
-    }>('/auth/login', {
+      expires_in: number;
+    }>('/auth/session/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
+
+  async logout() { return this.request('/auth/logout', { method: 'POST', body: '{}' }); }
 
   // Profile endpoints
   async createProfile(data: unknown) {

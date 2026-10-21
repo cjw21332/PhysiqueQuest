@@ -14,6 +14,6 @@ test('API client exposes LAN-safe URL derivation and 401 session clearing', asyn
 
 test('auth utilities expose a safe session clear operation', async () => {
   const file = await source('lib/session.ts');
-  assert.match(file, /export function clearAuthSession\(\)/);
+  assert.match(file, /export function clearAuthSession\(/);
   assert.match(file, /localStorage\.removeItem\(AUTH_STORAGE_KEY\)/);
 });

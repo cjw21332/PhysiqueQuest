@@ -2,9 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   normalizeFrontendUrl,
+  isTrustedWebViewUrl,
   resolveApiUrl,
   resolveFrontendUrl,
 } from './connection.mjs';
+
+test('native messages and navigation are restricted to the configured frontend origin', () => {
+  assert.equal(isTrustedWebViewUrl('http://192.168.1.42:3000/home', 'http://192.168.1.42:3000'), true);
+  for (const value of ['https://attacker.invalid', 'javascript:alert(1)', 'http://user:pass@192.168.1.42:3000', 'http://192.168.1.42:4000']) assert.equal(isTrustedWebViewUrl(value, 'http://192.168.1.42:3000'), false);
+});
 
 test('normalizes a manually entered IPv4 address without a scheme', () => {
   assert.equal(normalizeFrontendUrl(' 192.168.1.42:3000/ '), 'http://192.168.1.42:3000');
@@ -38,9 +44,9 @@ test('uses an explicit API URL and ensures the API prefix appears once', () => {
   assert.equal(resolveApiUrl('http://192.168.1.42:4000', 'http://192.168.1.42:3000'), 'http://192.168.1.42:4000/api');
 });
 
-test('derives the API origin from the frontend host while preserving HTTP or HTTPS', () => {
-  assert.equal(resolveApiUrl(undefined, 'http://192.168.1.42:3000'), 'http://192.168.1.42:4000/api');
-  assert.equal(resolveApiUrl(undefined, 'https://fitness.example.com'), 'https://fitness.example.com:4000/api');
+test('uses the frontend proxy origin while preserving HTTP or HTTPS', () => {
+  assert.equal(resolveApiUrl(undefined, 'http://192.168.1.42:3000'), 'http://192.168.1.42:3000/api');
+  assert.equal(resolveApiUrl(undefined, 'https://fitness.example.com'), 'https://fitness.example.com/api');
 });
 
 test('rejects malformed API URLs', () => {

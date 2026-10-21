@@ -1,5 +1,12 @@
 const PRIVATE_IPV4_PATTERN = /^(?:10\.(?:\d{1,3}\.){2}\d{1,3}|192\.168\.(?:\d{1,3}\.)\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.(?:\d{1,3}\.)\d{1,3})$/;
 
+export function isTrustedWebViewUrl(value, frontendUrl) {
+  try {
+    const source = new URL(value), frontend = new URL(frontendUrl);
+    return !source.username && !source.password && source.origin === frontend.origin && ['http:', 'https:'].includes(source.protocol);
+  } catch { return false; }
+}
+
 function withHttpScheme(value) {
   return /^[a-z][a-z\d+.-]*:\/\//i.test(value) ? value : `http://${value}`;
 }
@@ -50,7 +57,6 @@ export function resolveApiUrl(configuredApiUrl, frontendUrl) {
 
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
   if (url.username || url.password || !url.hostname) return null;
-  if (!configuredApiUrl?.trim()) url.port = '4000';
   const path = url.pathname.replace(/\/+$/, '');
   url.pathname = /\/api$/i.test(path) ? path : `${path}/api`;
   url.search = '';
