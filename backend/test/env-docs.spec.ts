@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { retentionDefaults } from '../src/privacy/retention.js';
 
 /**
  * The environment variable list is a contract: operators set these in a hosting
@@ -24,7 +25,7 @@ const read = (relPath: string) => readFileSync(path.join(BACKEND_ROOT, relPath),
  * configuration.
  */
 function envVarsInSource(): Set<string> {
-  const found = new Set<string>();
+  const found = new Set<string>(Object.keys(retentionDefaults));
   const walk = (dir: string): void => {
     for (const entry of readdirSync(dir)) {
       const full = path.join(dir, entry);
@@ -32,15 +33,16 @@ function envVarsInSource(): Set<string> {
         walk(full);
         continue;
       }
-      if (!/\.(ts|js)$/.test(entry)) continue;
+      if (!/\.(ts|js|mjs)$/.test(entry)) continue;
       const src = readFileSync(full, 'utf8');
-      const patterns = [/\.(?:get|getOrThrow)(?:<[^>]*>)?\('([A-Z][A-Z0-9_]+)'\)/g, /\bread\('([A-Z][A-Z0-9_]+)'\)/g];
+      const patterns = [/\.(?:get|getOrThrow)(?:<[^>]*>)?\('([A-Z][A-Z0-9_]+)'\)/g, /\bread\('([A-Z][A-Z0-9_]+)'\)/g, /\benv\.([A-Z][A-Z0-9_]+)/g, /'((?:CDN_|BACKUP_)[A-Z0-9_]+)'/g];
       for (const pattern of patterns) {
         for (const m of src.matchAll(pattern)) found.add(m[1]);
       }
     }
   };
   walk(SRC_ROOT);
+  walk(path.join(BACKEND_ROOT, 'scripts'));
   return found;
 }
 

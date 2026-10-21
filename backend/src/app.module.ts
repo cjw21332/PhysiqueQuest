@@ -20,12 +20,20 @@ import { ExercisesModule } from './exercises/exercises.module.js';
 import { SafetyModule } from './safety/safety.module.js';
 import { PoseModule } from './pose/pose.module.js';
 import { AdminModule } from './admin/admin.module.js';
+import { validateEnvironment } from './config/environment.js';
+import { HealthController } from './health.controller.js';
+import { PrivacyModule } from './privacy/privacy.module.js';
+import { PushModule } from './push/push.module.js';
+import { StorageModule } from './storage/storage.module.js';
+import { SyncModule } from './sync/sync.module.js';
+import { AnalysisJobsModule } from './jobs/analysis-jobs.module.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+      validate: validateEnvironment,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -48,8 +56,13 @@ import { AdminModule } from './admin/admin.module.js';
     SafetyModule,
     PoseModule,
     AdminModule,
+    PrivacyModule,
+    PushModule,
+    StorageModule,
+    SyncModule,
+    AnalysisJobsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule {}

@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { AuthService } from '../src/auth/auth.service.js';
 import { JwtStrategy } from '../src/auth/jwt.strategy.js';
+import { SessionService } from '../src/auth/session.service.js';
 import { scannerBodyErrorHandler } from '../src/common/foodscan/app-exception.filter.js';
 import { FoodScanConfigService } from '../src/common/foodscan/foodscan-config.js';
 import { PinoLogger } from '../src/common/foodscan/pino-logger.js';
@@ -61,6 +62,7 @@ describe('JWT authentication', () => {
           },
         },
         JwtStrategy,
+        { provide: SessionService, useValue: {} },
       ],
     }).compile();
 

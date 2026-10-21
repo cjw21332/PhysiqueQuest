@@ -20,8 +20,22 @@ export class User {
   @Prop({ default: true })
   isActive: boolean;
 
+  @Prop({ type: Date, default: null })
+  deletedAt: Date | null;
+
+  @Prop({ type: Date, default: null, index: true })
+  purgeAfter: Date | null;
+
+  @Prop({ type: Date, default: null })
+  purgingAt: Date | null;
+
   @Prop({ enum: ['user', 'admin'], default: 'user', required: true })
   role: 'user' | 'admin';
+
+  @Prop({ default: false }) emailVerified: boolean;
+  @Prop({ type: Date, default: null }) emailVerifiedAt: Date | null;
+  @Prop({ default: 1 }) authPolicyVersion: number;
+  @Prop({ type: Boolean }) legacyEmailAccess?: boolean;
 
   @Prop({ default: 0, min: 0 })
   failedLoginAttempts: number;

@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { withCircuit } from '../../common/outbound.js';
 import { GoogleGenAI, type ThinkingLevel } from '@google/genai';
 import { FoodScanConfigService } from '../../common/foodscan/foodscan-config.js';
 import {
@@ -158,7 +159,7 @@ export class GeminiService {
       const budget = attemptBudgetMs(cfg.upstreamTimeoutMs, deadline);
       const timeoutSignal = AbortSignal.timeout(budget);
       try {
-        result = await this.getClient().models.generateContent({
+        result = await withCircuit('gemini', () => this.getClient().models.generateContent({
           model: cfg.gemini.model,
           contents: [
             {
@@ -178,7 +179,7 @@ export class GeminiService {
             },
             abortSignal: deadline ? AbortSignal.any([timeoutSignal, deadline.signal]) : timeoutSignal,
           },
-        });
+        }));
         break;
       } catch (cause) {
         // The deadline already produced the client's response. Reporting a

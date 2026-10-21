@@ -106,14 +106,11 @@ export class FoodScanService {
     const results = await mapConcurrent(detected, USDA_CONCURRENCY, async (d) => {
       try {
         return await this.usda.lookupFood(d.food_name);
-      } catch (err) {
+      } catch {
         // A single failed nutrition lookup must not fail the whole analysis:
         // the caller can still show the detected items.
         degraded = true;
-        this.logger.warn(
-          `nutrition_lookup_failed request_id=${requestId} food_name=${JSON.stringify(d.food_name)} ` +
-            `reason=${JSON.stringify(err instanceof Error ? err.message : String(err))}`
-        );
+        this.logger.warn({ event: 'nutrition_lookup_failed', request_id: requestId });
         return undefined;
       }
     });

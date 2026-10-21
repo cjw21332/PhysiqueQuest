@@ -22,6 +22,9 @@ describe('standalone coach HTTP without database or account modules', () => {
     expect(status.body).toMatchObject({ source: 'ExerciseDB V1', persistence: 'stateless', media: 'GIF' });
     const detail = await request(app.getHttpServer()).get('/api/exercises/provider-id').expect(200);
     expect(detail.body._id).toBe('provider-id');
+    expect(detail.headers['cache-control']).toBe('public, max-age=30');
+    expect(detail.headers.etag).toBeTruthy();
+    await request(app.getHttpServer()).get('/api/exercises/provider-id').set('If-None-Match', detail.headers.etag).expect(304);
     await request(app.getHttpServer()).get('/api/exercises?muscle=Chest&page=2&limit=12').expect(200);
     expect(catalog.findAll).toHaveBeenCalledWith({ muscle: 'Chest', page: 2, limit: 12 });
   });

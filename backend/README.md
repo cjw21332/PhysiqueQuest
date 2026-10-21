@@ -2,7 +2,7 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
@@ -97,6 +97,8 @@ Raising the client cap instead means raising this too. `FOODSCAN_UPSTREAM_TIMEOU
 timeout rather than holding the request open until the deadline.
 
 ## Project setup
+
+See [backend hardening operations](OPERATIONS.md) for the compatible authentication rollout, proxy/cookie configuration, production environment requirements, isolated database checks, load tests, device verification and deployment limitations.
 
 ```bash
 $ npm install

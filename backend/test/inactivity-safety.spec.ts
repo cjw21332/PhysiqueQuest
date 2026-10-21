@@ -39,7 +39,7 @@ describe('cancelled events', () => {
     const model = makeModel();
     const provider = makeProvider();
     const add = vi.fn();
-    const service = new SafetyService(model as any, withContact as any, { add } as any, provider as any);
+    const service = new SafetyService(model as any, withContact as any, { add } as any, provider as any, {} as any);
     const result = await service.send(USER, { idempotencyKey: 'cancel-test-123456', eventType: 'cancelled' });
     expect(result.status).toBe('cancelled');
     expect(provider.send).not.toHaveBeenCalled();
@@ -51,7 +51,8 @@ describe('inactivity alert payload', () => {
   it('forwards location, workout id, and exercise id to the provider', async () => {
     const model = makeModel();
     const provider = makeProvider(true);
-    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, provider as any);
+    const detail = vi.fn(async () => ({}));
+    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, provider as any, { detail } as any);
     const result = await service.send(USER, {
       idempotencyKey: 'inactive-test-123456',
       eventType: 'inactivity',
@@ -65,13 +66,20 @@ describe('inactivity alert payload', () => {
     expect(payload.location).toEqual(location);
     expect(payload.workoutSessionId).toBe(WORKOUT);
     expect(payload.exerciseId).toBe('exercise-2');
+    expect(detail).toHaveBeenCalledWith(USER, WORKOUT);
+  });
+  it('rejects another account\'s workout association before storing or delivering an alert', async () => {
+    const model = makeModel(), provider = makeProvider(true);
+    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, provider as any, { detail: vi.fn(async () => { throw new Error('Workout not found'); }) } as any);
+    await expect(service.send(USER, { idempotencyKey: 'ownership-check', eventType: 'inactivity', workoutSessionId: WORKOUT })).rejects.toThrow('Workout not found');
+    expect(provider.send).not.toHaveBeenCalled();
   });
 
   // Review Focus 2: location denied or timed out. The alert still goes out, without location.
   it('sends without location when the lifter gave none', async () => {
     const model = makeModel();
     const provider = makeProvider(true);
-    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, provider as any);
+    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, provider as any, {} as any);
     await service.send(USER, { idempotencyKey: 'noloc-test-1234567', eventType: 'inactivity' });
     const payload = provider.send.mock.calls[0][0] as any;
     expect(payload.location).toBeUndefined();
@@ -82,7 +90,7 @@ describe('inactivity alert payload', () => {
   it('records CONTACT_NOT_CONFIGURED and does not call the provider when no contact is saved', async () => {
     const model = makeModel();
     const provider = makeProvider(true);
-    const service = new SafetyService(model as any, withoutContact as any, { add: vi.fn() } as any, provider as any);
+    const service = new SafetyService(model as any, withoutContact as any, { add: vi.fn() } as any, provider as any, {} as any);
     const result = await service.send(USER, { idempotencyKey: 'nocontact-test-1234', eventType: 'inactivity' });
     expect(result.status).toBe('failed');
     expect(result.errorCode).toBe('CONTACT_NOT_CONFIGURED');
@@ -93,7 +101,7 @@ describe('inactivity alert payload', () => {
   it('returns the stored record for a repeated idempotency key without a second provider call', async () => {
     const model = makeModel();
     const provider = makeProvider(true);
-    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, provider as any);
+    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, provider as any, {} as any);
     const body = { idempotencyKey: 'retry-test-1234567', eventType: 'inactivity' as const };
     await service.send(USER, body);
     const second = await service.send(USER, body);
@@ -106,7 +114,7 @@ describe('inactivity alert payload', () => {
 describe('resolve', () => {
   it('sets resolvedAt and flagged on the owner\'s inactivity alert and is idempotent', async () => {
     const model = makeModel();
-    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any);
+    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any, {} as any);
     const created = await service.send(USER, { idempotencyKey: 'resolve-test-123456', eventType: 'inactivity' });
     const first = await service.resolve(USER, String(created._id));
     expect(first.flagged).toBe(true);
@@ -118,14 +126,14 @@ describe('resolve', () => {
 
   it('returns not found to a different user', async () => {
     const model = makeModel();
-    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any);
+    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any, {} as any);
     const created = await service.send(USER, { idempotencyKey: 'owner-test-1234567', eventType: 'inactivity' });
     await expect(service.resolve(OTHER_USER, String(created._id))).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('rejects resolving a manual alert', async () => {
     const model = makeModel();
-    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any);
+    const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any, {} as any);
     const created = await service.send(USER, { idempotencyKey: 'manual-test-1234567', eventType: 'manual' });
     await expect(service.resolve(USER, String(created._id))).rejects.toBeInstanceOf(BadRequestException);
   });

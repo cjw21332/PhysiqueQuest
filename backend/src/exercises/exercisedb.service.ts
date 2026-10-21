@@ -1,3 +1,4 @@
+import { outboundFetch } from '../common/outbound.js';
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { commonMovementScore } from '../coach/movement-curation.js';
 
@@ -34,10 +35,17 @@ export function normalizeExercise(row: RawExercise) {
 export class ExerciseDbService {
   private nextRequestAt = 0;
   private readonly inFlight = new Map<string, Promise<Envelope>>();
+  private readonly cache = new Map<string, { expiresAt: number; value: Envelope }>();
   private request(path: string, deadline = Date.now() + 8000): Promise<Envelope> {
+    const saved = this.cache.get(path);
+    if (saved && saved.expiresAt > Date.now()) return Promise.resolve(saved.value);
     const existing = this.inFlight.get(path);
     if (existing) return existing;
-    const pending = this.requestActual(path, deadline).finally(() => this.inFlight.delete(path));
+    const pending = this.requestActual(path, deadline).then(value => {
+      if (this.cache.size >= 100) this.cache.delete(this.cache.keys().next().value!);
+      this.cache.set(path, { expiresAt: Date.now() + 30_000, value });
+      return value;
+    }).finally(() => this.inFlight.delete(path));
     this.inFlight.set(path, pending);
     return pending;
   }
@@ -52,7 +60,7 @@ export class ExerciseDbService {
       if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait));
       const remaining = deadline - Date.now();
       if (remaining <= 0) throw new DOMException('ExerciseDB deadline exceeded', 'TimeoutError');
-      const response = await fetch(`https://oss.exercisedb.dev/api/v1${path}`, { signal: AbortSignal.timeout(Math.min(8000, remaining)) });
+      const response = await outboundFetch(`https://oss.exercisedb.dev/api/v1${path}`, { signal: AbortSignal.timeout(Math.min(8000, remaining)) });
       if (response.status === 404) throw new NotFoundException('Exercise not found');
       if (!response.ok) throw new HttpException({ message: response.status === 429 ? 'ExerciseDB is rate limited. Please retry later.' : 'ExerciseDB is unavailable', source: SOURCE, ...(response.headers.get('retry-after') ? { retryAfter: response.headers.get('retry-after') } : {}) }, response.status === 429 ? 429 : response.status === 503 ? 503 : 502);
       const body = await response.json() as Envelope;

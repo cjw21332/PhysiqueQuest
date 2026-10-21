@@ -57,6 +57,6 @@ export const SCANNER_ROUTE_PATHS = [
     ScanContentTypeGuard,
     ScanRateLimitGuard,
   ],
-  exports: [PinoLogger, FoodScanConfigService],
+  exports: [PinoLogger, FoodScanConfigService, FoodScanService],
 })
 export class FoodScanModule {}

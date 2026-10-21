@@ -175,7 +175,7 @@ describe('signed-in password changes', () => {
 });
 it('rejects old login sessions after reset and keeps migration version zero compatible', async () => {
   const config = { getOrThrow: () => 'secret' }, auth = { validateUser: vi.fn(async () => ({ email: 'stored@example.com', role: 'user', sessionVersion: 0 })) };
-  const strategy = new JwtStrategy(config as any, auth as any);
+  const strategy = new JwtStrategy(config as any, auth as any, {} as any);
   await expect(strategy.validate({ sub: String(A), email: 'stale@example.com' })).resolves.toMatchObject({ userId: String(A), email: 'stored@example.com' });
   auth.validateUser.mockResolvedValue({ email: 'stored@example.com', role: 'user', sessionVersion: 1 });
   await expect(strategy.validate({ sub: String(A), sessionVersion: 0 })).rejects.toThrow('Session expired');

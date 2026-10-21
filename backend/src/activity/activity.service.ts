@@ -43,7 +43,7 @@ export class ActivityService {
   async get(userId: string, requestedTimezone?: string) {
     const record = await this.model.findOne({ userId: new Types.ObjectId(userId) }).exec();
     const timezone = resolveTimezone(requestedTimezone ?? record?.state?.timezone);
-    const [nutrition, workouts] = await Promise.all([this.nutrition.read(userId), this.workouts.creditHistory(userId, timezone)]);
+    const [nutrition, workouts] = await Promise.all([this.nutrition.read(userId, 'userId meals.date water.date water.glasses'), this.workouts.creditHistory(userId, timezone)]);
     const today = zoneDate(new Date(), timezone);
 
     const mealDates = nutrition.meals.map(meal => meal.date).filter((date): date is string => typeof date === 'string');

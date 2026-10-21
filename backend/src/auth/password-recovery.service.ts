@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, HttpException, HttpStatus, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpException, HttpStatus, Logger, UnauthorizedException, Optional } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { createHash, createHmac, randomBytes, randomInt } from 'node:crypto';
@@ -9,6 +9,7 @@ import { RecoveryToken } from './recovery-token.schema.js';
 import { AuthRateLimit } from './auth-rate-limit.schema.js';
 import { EmailDeliveryProvider } from '../providers/email-delivery.provider.js';
 import { RECOVERY_CODE_VALIDITY_MINUTES } from '../common/recovery-policy.js';
+import { PrivacyService } from '../privacy/privacy.service.js';
 
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 const invalid = () => new BadRequestException('Recovery request is invalid or expired. Request a new code.');
@@ -22,6 +23,7 @@ export class PasswordRecoveryService {
     private readonly email: EmailDeliveryProvider,
     @InjectModel(AuthRateLimit.name) private readonly limits: Model<AuthRateLimit>,
     private readonly config: ConfigService,
+    @Optional() private readonly audit?: PrivacyService,
   ) {}
 
   private codeHash(requestId: string, code: string) {
@@ -123,6 +125,7 @@ export class PasswordRecoveryService {
     // Hash before opening a database transaction to minimize transaction time.
     const passwordHash = await bcrypt.hash(password, 10);
     const session = await this.tokens.db.startSession();
+    let actorId: string | undefined;
     try {
       await session.withTransaction(async () => {
         const recovery = await this.tokens.findOneAndUpdate(
@@ -132,11 +135,13 @@ export class PasswordRecoveryService {
         if (!recovery) throw invalid();
         const result = await this.users.updateOne({ _id: recovery.userId, isActive: true,
           ...(account ? { email: account.accountEmail, sessionVersion: this.versionFilter(account) } : {}) },
-          { $set: { passwordHash, failedLoginAttempts: 0, lockoutUntil: null }, $inc: { sessionVersion: 1 } }, { session });
+          { $set: { passwordHash, failedLoginAttempts: 0, lockoutUntil: null, emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false }, $inc: { sessionVersion: 1 } }, { session });
         if (result.matchedCount !== 1) throw invalid();
+        actorId = String(recovery.userId);
         await this.tokens.updateMany({ userId: recovery.userId, usedAt: null }, { $set: { usedAt: new Date() } }, { session });
       });
     } finally { await session.endSession(); }
+    if (actorId && this.audit) await this.audit.audit({ actorId, action: account ? 'password_changed' : 'password_reset_completed', ip }).catch(() => this.logger.warn({ event: 'audit_persistence_failed' }));
     return { updated: true };
   }
 }

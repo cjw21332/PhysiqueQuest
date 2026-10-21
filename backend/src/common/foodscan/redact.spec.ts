@@ -91,6 +91,13 @@ describe('secret redaction', () => {
   });
 
   describe('logger configuration', () => {
+    it('redacts session credentials, passwords, emails and parser bodies', () => {
+      const { logger, text } = captureLogger();
+      const keys = ['access_token', 'refresh_token', 'resetToken', 'password', 'passwordHash', 'email', 'body', 'conditions', 'healthNotes', 'contactName', 'contactPhone', 'contactRelationship'];
+      const payload = Object.fromEntries(keys.map((key, i) => [key, `private-value-${i}`]));
+      logger.info({ ...payload, nested: payload, req: { body: payload } }, 'redaction check');
+      for (let i = 0; i < keys.length; i++) expect(text()).not.toContain(`private-value-${i}`);
+    });
     it('redacts the bearer token from serialized headers', () => {
       const { logger, text } = captureLogger();
       logger.info(

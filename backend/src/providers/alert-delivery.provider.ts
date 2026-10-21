@@ -1,3 +1,4 @@
+import { outboundFetch } from '../common/outbound.js';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -19,7 +20,7 @@ export class AlertDeliveryProvider {
     const apiKey = this.config.get<string>('ALERT_DELIVERY_API_KEY');
     if (!endpoint || !apiKey) return { confirmed: false };
     try {
-      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}`, 'Idempotency-Key': payload.idempotencyKey }, body: JSON.stringify(payload), signal: AbortSignal.timeout(10_000) });
+      const response = await outboundFetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}`, 'Idempotency-Key': payload.idempotencyKey }, body: JSON.stringify(payload), signal: AbortSignal.timeout(10_000) });
       if (!response.ok) return { confirmed: false };
       const result = await response.json().catch(() => ({})) as { id?: string };
       return { confirmed: true, providerReference: result.id };

@@ -1,5 +1,7 @@
+import { outboundFetch } from '../common/outbound.js';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { configuredMailProvider } from './mail.provider.js';
 
 import { RECOVERY_CODE_VALIDITY_MINUTES as OTP_VALIDITY_MINUTES } from '../common/recovery-policy.js';
 
@@ -53,11 +55,14 @@ export class EmailDeliveryProvider {
   }
 
   isAvailable() {
+    if (configuredMailProvider()) return true;
     return Boolean(this.serviceId() && this.templateId() && this.publicKey())
       || Boolean(this.config.get<string>('EMAIL_DELIVERY_URL') && this.config.get<string>('EMAIL_DELIVERY_API_KEY'));
   }
 
   async sendPasswordReset(email: string, token: string, name = 'there'): Promise<EmailDeliveryResult> {
+    const provider = configuredMailProvider();
+    if (provider) return await provider.send({ template: 'password-reset', to: email, token, name }) ? { ok: true } : { ok: false, code: 'EMAIL_PROVIDER_UNAVAILABLE', reason: 'Mail delivery failed.' };
     const serviceId = this.serviceId();
     const templateId = this.templateId();
     const publicKey = this.publicKey();
@@ -86,7 +91,7 @@ export class EmailDeliveryProvider {
   ): Promise<EmailDeliveryResult> {
     const privateKey = this.config.get<string>('EMAILJS_PRIVATE_KEY');
     try {
-      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      const response = await outboundFetch('https://api.emailjs.com/api/v1.0/email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -109,7 +114,7 @@ export class EmailDeliveryProvider {
       return { ok: true };
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
-      this.logger.error(`EmailJS request failed: ${reason}`);
+      this.logger.error('EmailJS request failed (EMAIL_PROVIDER_UNREACHABLE)');
       return { ok: false, code: 'EMAIL_PROVIDER_UNREACHABLE', reason };
     }
   }
@@ -121,7 +126,7 @@ export class EmailDeliveryProvider {
     apiKey: string,
   ): Promise<EmailDeliveryResult> {
     try {
-      const response = await fetch(endpoint, {
+      const response = await outboundFetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
         body: JSON.stringify({ template: 'password-reset', to: email, token, expiresInMinutes: OTP_VALIDITY_MINUTES }),
@@ -133,7 +138,7 @@ export class EmailDeliveryProvider {
       return { ok: true };
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Legacy email delivery request failed: ${reason}`);
+      this.logger.error('Legacy email delivery request failed (EMAIL_PROVIDER_UNREACHABLE)');
       return { ok: false, code: 'EMAIL_PROVIDER_UNREACHABLE', reason };
     }
   }
@@ -142,7 +147,7 @@ export class EmailDeliveryProvider {
   private failure(status: number, body: string): EmailDeliveryResult {
     const code = classifyStatus(status);
     const reason = body.trim().slice(0, 500) || `Email provider responded with status ${status}.`;
-    this.logger.error(`Email delivery failed (${status}, ${code}): ${reason}`);
+    this.logger.error(`Email delivery failed (${status}, ${code})`);
     return { ok: false, code, status, reason };
   }
 }

@@ -32,7 +32,7 @@ export function isAllowedFrontendOrigin(
 
   try {
     const url = new URL(origin);
-    return url.protocol === 'http:' && url.port === '3000' && isPrivateIpv4(url.hostname);
+    return url.protocol === 'http:' && url.port === '3000' && (isPrivateIpv4(url.hostname) || url.hostname === '127.0.0.1');
   } catch {
     return false;
   }

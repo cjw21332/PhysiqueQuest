@@ -1,12 +1,14 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsEmpty, IsString, MaxLength, Matches } from 'class-validator';
 import { IsStrongPassword } from '../validators/password.validator.js';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 export class PasswordResetRequestDto {
   @Transform(({ value }) => typeof value === 'string' ? value.trim().toLowerCase() : value)
   @IsEmail() @MaxLength(254) email: string;
 }
 export class PasswordChangeRequestDto {
+  @ApiHideProperty()
   @IsEmpty({ message: 'The verification email is selected from your signed-in account.' }) email?: never;
 }
 export class PasswordResetVerifyDto {

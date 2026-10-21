@@ -8,6 +8,16 @@ const response = (data: unknown, meta?: unknown) => new Response(JSON.stringify(
 afterEach(() => vi.unstubAllGlobals());
 
 describe('ExerciseDB live adapter contract', () => {
+  it('reuses a hot public detail for 30 seconds and refetches after expiry', async () => {
+    let clock = 10_000; const now = vi.spyOn(Date, 'now').mockImplementation(() => clock);
+    const fetcher = vi.fn().mockImplementation(async () => response(row())); vi.stubGlobal('fetch', fetcher);
+    try {
+      const service = new ExerciseDbService();
+      await service.findBySlug('real-id'); await service.findBySlug('real-id');
+      expect(fetcher).toHaveBeenCalledTimes(1);
+      clock += 31_000; await service.findBySlug('real-id'); expect(fetcher).toHaveBeenCalledTimes(2);
+    } finally { now.mockRestore(); }
+  });
   it('normalizes actual metadata and GIFs without fabricated tracking or videos', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response(row())));
     const actual = await new ExerciseDbService().findBySlug('real-id');
@@ -17,7 +27,7 @@ describe('ExerciseDB live adapter contract', () => {
   });
 
   it('traverses at most four cursor pages and exposes partial coverage honestly', async () => {
-    const fetcher = vi.fn().mockImplementation(async () => response([row()], { hasNextPage: true, nextCursor: 'next' }));
+    const fetcher = vi.fn().mockImplementation(async () => response([row()], { hasNextPage: true, nextCursor: `next-${fetcher.mock.calls.length}` }));
     vi.stubGlobal('fetch', fetcher);
     const result = await new ExerciseDbService().findAll({ muscle: 'Chest', equipment: 'Dumbbells' });
     expect(fetcher).toHaveBeenCalledTimes(4);
@@ -60,13 +70,13 @@ describe('ExerciseDB live adapter contract', () => {
     expect(controller.status()).toMatchObject({ status: 'ready', persistence: 'stateless', source: 'ExerciseDB V1' });
   });
 
-  it('deduplicates concurrent requests then discards results after completion', async () => {
+  it('deduplicates concurrent requests and retains the public result briefly', async () => {
     const fetcher = vi.fn().mockImplementation(async () => response(row()));
     vi.stubGlobal('fetch', fetcher);
     const service = new ExerciseDbService();
     await Promise.all([service.findBySlug('real-id'), service.findBySlug('real-id')]);
     expect(fetcher).toHaveBeenCalledTimes(1);
     await service.findBySlug('real-id');
-    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
 });

@@ -4,9 +4,11 @@ import { Test } from '@nestjs/testing';
 import { UnauthorizedException, ValidationPipe, type INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AuthController } from '../src/auth/auth.controller.js';
+import { EmailVerificationService } from '../src/auth/email-verification.service.js';
 import { AuthService } from '../src/auth/auth.service.js';
 import { PasswordRecoveryService } from '../src/auth/password-recovery.service.js';
 import { JwtAuthGuard } from '../src/auth/jwt-auth.guard.js';
+import { SessionService } from '../src/auth/session.service.js';
 
 describe('authenticated password change HTTP boundary', () => {
   let app: INestApplication;
@@ -18,7 +20,9 @@ describe('authenticated password change HTTP boundary', () => {
   };
   beforeAll(async () => {
     const module = await Test.createTestingModule({ controllers: [AuthController], providers: [
+      { provide: EmailVerificationService, useValue: { request: async () => ({ accepted: true }) } },
       { provide: AuthService, useValue: {} }, { provide: PasswordRecoveryService, useValue: recovery },
+      { provide: SessionService, useValue: {} },
     ] }).overrideGuard(JwtAuthGuard).useValue({ canActivate(context: any) {
       const req = context.switchToHttp().getRequest();
       if (req.headers.authorization !== 'Bearer fixture-token') throw new UnauthorizedException();

@@ -23,7 +23,7 @@ const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/;
 export const DEFAULT_MAX_SEARCH_QUERY_LENGTH = 120;
 
 /** Magic-byte signatures. A declared MIME type is advisory; these are authoritative. */
-function sniffImageMime(buf: Buffer): ImageMimeType | null {
+export function sniffImageMime(buf: Buffer): ImageMimeType | null {
   if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) {
     return 'image/jpeg';
   }

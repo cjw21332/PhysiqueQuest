@@ -10,3 +10,5 @@ export class ProgressEntry {
   @Prop({ required: true }) measuredAt: Date;
 }
 export const ProgressEntrySchema = SchemaFactory.createForClass(ProgressEntry);
+ProgressEntrySchema.index({ userId: 1, metric: 1, measuredAt: -1 });
+ProgressEntrySchema.index({ userId: 1, measuredAt: -1 });

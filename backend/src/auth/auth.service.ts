@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import { User } from './schemas/user.schema.js';
 import { SignInEvent } from './schemas/sign-in-event.schema.js';
 import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto.js';
+import { emailStatus } from './email-verification.js';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +45,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // The unique email index is the final guard against concurrent duplicate registrations.
-    const user = await this.userModel.create({ email: normalizedEmail, name: name.trim(), passwordHash }).catch((error: unknown) => {
+    const user = await this.userModel.create({ email: normalizedEmail, name: name.trim(), passwordHash, emailVerified: false, legacyEmailAccess: false, authPolicyVersion: 2 }).catch((error: unknown) => {
       if (isDuplicateKeyError(error)) throw new ConflictException('Email already registered');
       throw error;
     });
@@ -60,6 +61,7 @@ export class AuthService {
         id: user._id.toString(),
         email: user.email,
         name: user.name,
+        ...emailStatus(user),
       },
     };
   }
@@ -117,6 +119,7 @@ export class AuthService {
         id: user._id.toString(),
         email: user.email,
         name: user.name,
+        ...emailStatus(user),
       },
     };
   }
@@ -127,6 +130,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid user');
     }
     return user;
+  }
+
+  async revokeAll(userId: string): Promise<void> {
+    await this.userModel.updateOne({ _id: new Types.ObjectId(userId) }, { $inc: { sessionVersion: 1 } });
   }
 }
 

@@ -6,5 +6,6 @@ import { AlertDeliveryProvider } from '../providers/alert-delivery.provider.js';
 import { SafetyController } from './safety.controller.js';
 import { SafetyService } from './safety.service.js';
 import { AlertEvent, AlertEventSchema } from './schemas/alert-event.schema.js';
-@Module({ imports: [MongooseModule.forFeature([{ name: AlertEvent.name, schema: AlertEventSchema }]), ProfileModule, NotificationsModule], controllers: [SafetyController], providers: [SafetyService, AlertDeliveryProvider] })
+import { WorkoutsModule } from '../workouts/workouts.module.js';
+@Module({ imports: [MongooseModule.forFeature([{ name: AlertEvent.name, schema: AlertEventSchema }]), ProfileModule, NotificationsModule, WorkoutsModule], controllers: [SafetyController], providers: [SafetyService, AlertDeliveryProvider] })
 export class SafetyModule {}

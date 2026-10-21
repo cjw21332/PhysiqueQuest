@@ -52,6 +52,7 @@ export class LeaderboardService {
     const names = await this.names([...points.keys(), userId]);
 
     const ranked = [...points.entries()]
+      .filter(([id]) => names.has(id))
       .map(([id, value]) => ({ userId: id, name: names.get(id) ?? 'Athlete', points: value }))
       .sort((a, b) => b.points - a.points || a.name.localeCompare(b.name))
       .map((entry, index) => ({ ...entry, rank: index + 1 }));
@@ -122,7 +123,7 @@ export class LeaderboardService {
   private async names(ids: string[]): Promise<Map<string, string>> {
     const valid = [...new Set(ids.filter(id => Types.ObjectId.isValid(id)))];
     if (!valid.length) return new Map();
-    const users = await this.users.find({ _id: { $in: valid.map(id => new Types.ObjectId(id)) } }).select('name').lean().exec();
+    const users = await this.users.find({ _id: { $in: valid.map(id => new Types.ObjectId(id)) }, isActive: { $ne: false }, deletedAt: null }).select('name').lean().exec();
     return new Map((users as { _id: unknown; name?: string }[]).map(user => [String(user._id), user.name ?? 'Athlete']));
   }
 

@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { AppError, ErrorCode, statusForCode } from './errors.js';
 import { PinoLogger } from './pino-logger.js';
-import { redact, safeString } from './redact.js';
+import { captureUnexpectedError } from '../sentry.js';
 import type { ScanRequest } from './scan-request.js';
 
 interface BodyParserError extends Error {
@@ -24,10 +24,10 @@ function fromHttpException(err: HttpException): AppError {
     ERROR_CODES.find((key) => statusForCode(key) === status);
 
   const response = err.getResponse();
-  let message = err.message;
+  let message = status >= 500 ? 'Service temporarily unavailable' : err.message;
   let details: unknown;
 
-  if (typeof response === 'object' && response !== null) {
+  if (status < 500 && typeof response === 'object' && response !== null) {
     const raw = (response as { message?: unknown }).message;
     if (typeof raw === 'string') {
       message = raw;
@@ -107,28 +107,26 @@ export function writeAppError(
   const logPayload = {
     event: 'request_failed',
     request_id: requestId,
-    user_id: req.user?.userId,
     code: appErr.code,
     status: appErr.status,
     method: req.method,
     // req.path only: the query string can carry search terms.
     path: req.path,
     ...(req.durationMs === undefined ? {} : { duration_ms: req.durationMs }),
-    ...(appErr.details === undefined ? {} : { details: redact(appErr.details) }),
   };
 
   if (appErr.status >= 500) {
+    captureUnexpectedError(appErr.cause ?? appErr, requestId);
     logger.event(
       'error',
       {
         ...logPayload,
-        reason: appErr.logMessage ?? appErr.message,
-        err: (appErr.cause as Error) ?? appErr,
+        errorType: exception instanceof Error ? exception.name : 'Unknown',
       },
       'request failed'
     );
   } else {
-    logger.event('warn', logPayload, safeString(appErr.message));
+    logger.event('warn', logPayload, 'request rejected');
   }
 
   if (res.headersSent) {

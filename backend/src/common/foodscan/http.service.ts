@@ -1,3 +1,4 @@
+import { outboundFetch } from '../outbound.js';
 import { Injectable } from '@nestjs/common';
 import { FoodScanConfigService } from './foodscan-config.js';
 import { AppError, ErrorCode, upstreamTimeout, upstreamUnavailable } from './errors.js';
@@ -27,7 +28,7 @@ export class HttpService {
 
     let res: Response;
     try {
-      res = await fetch(url, {
+      res = await outboundFetch(url, {
         method: opts.method ?? 'GET',
         ...(opts.body === undefined ? {} : { body: opts.body }),
         headers: { accept: 'application/json', ...opts.headers },
@@ -50,7 +51,7 @@ export class HttpService {
       // it unread can keep the socket open.
       await res.text().catch(() => '');
       if (opts.retryServerErrors && [500, 502, 503, 504].includes(res.status)) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200 + Math.random() * 200));
         return this.fetchJson<T>(url, { ...opts, retryServerErrors: false });
       }
       if (res.status === 404) {

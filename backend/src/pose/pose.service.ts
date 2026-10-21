@@ -1,6 +1,7 @@
-import { Injectable, ServiceUnavailableException, BadGatewayException } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException, BadGatewayException, BadRequestException, PayloadTooLargeException } from '@nestjs/common';
 import { PoseAnalysisProvider } from '../providers/pose-analysis.provider.js';
 import { PoseAnalysisDto } from './dto/pose-analysis.dto.js';
+import { sniffImageMime } from '../foodscan/foodscan.schemas.js';
 
 @Injectable()
 export class PoseService {
@@ -8,6 +9,13 @@ export class PoseService {
   status() { return this.provider.isAvailable() ? { available: true as const } : { available: false as const, reason: 'provider_not_configured' as const }; }
   async analyze(dto: PoseAnalysisDto) {
     if (!this.provider.isAvailable()) throw new ServiceUnavailableException({ code: 'PROVIDER_NOT_CONFIGURED', message: 'Pose analysis is not configured on the backend.' });
+    const bytes = Buffer.from(dto.mediaBase64, 'base64');
+    if (bytes.length > 20 * 1024 * 1024) throw new PayloadTooLargeException('Media is too large');
+    const imageType = sniffImageMime(bytes);
+    const brand = bytes.subarray(8, 12).toString('ascii');
+    const movieType = bytes.length >= 16 && bytes.subarray(4, 8).toString('ascii') === 'ftyp'
+      ? brand === 'qt  ' ? 'video/quicktime' : /^(?:isom|iso[2-9]|mp4[12]|avc1|M4V )$/.test(brand) ? 'video/mp4' : null : null;
+    if ((imageType ?? movieType) !== dto.mimeType) throw new BadRequestException('Media bytes do not match the declared format');
     try { return await this.provider.analyze(dto); }
     catch { throw new BadGatewayException({ code: 'POSE_PROVIDER_FAILED', message: 'Pose analysis did not return a usable result. Please retry later.' }); }
   }

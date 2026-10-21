@@ -13,10 +13,16 @@ import { AuthRateLimit, AuthRateLimitSchema } from './auth-rate-limit.schema.js'
 import { RecoveryToken, RecoveryTokenSchema } from './recovery-token.schema.js';
 import { PasswordRecoveryService } from './password-recovery.service.js';
 import { EmailDeliveryProvider } from '../providers/email-delivery.provider.js';
+import { AuthSession, AuthSessionSchema } from './session.schema.js';
+import { SessionService } from './session.service.js';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthThrottleGuard } from './auth-throttle.guard.js';
+import { EmailVerificationService } from './email-verification.service.js';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: AuthRateLimit.name, schema: AuthRateLimitSchema }, { name: RecoveryToken.name, schema: RecoveryTokenSchema }, { name: SignInEvent.name, schema: SignInEventSchema }]),
+    MongooseModule.forFeature([{ name: AuthSession.name, schema: AuthSessionSchema }]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -30,7 +36,7 @@ import { EmailDeliveryProvider } from '../providers/email-delivery.provider.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, PasswordRecoveryService, EmailDeliveryProvider],
+  providers: [AuthService, JwtStrategy, PasswordRecoveryService, EmailDeliveryProvider, EmailVerificationService, SessionService, { provide: APP_GUARD, useClass: AuthThrottleGuard }],
   exports: [AuthService, PasswordRecoveryService],
 })
 export class AuthModule {}

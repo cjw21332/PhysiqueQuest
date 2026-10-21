@@ -20,7 +20,7 @@ export class RequestContextInterceptor implements NestInterceptor {
     const res = http.getResponse<Response>();
 
     const inbound = normalizeInboundId(req.headers[INBOUND_ID_HEADER]);
-    req.requestId = inbound ?? randomUUID();
+    req.requestId = normalizeInboundId(req.requestId) ?? inbound ?? randomUUID();
     req.startedAt = Date.now();
 
     // Safe by construction: normalizeInboundId only passes the SAFE_REQUEST_ID shape.
@@ -38,7 +38,6 @@ export class RequestContextInterceptor implements NestInterceptor {
           this.logger.event(status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info', {
             event: 'http_request',
             request_id: req.requestId,
-            user_id: req.user?.userId,
             method: req.method,
             // req.path only: the query string can carry search terms.
             path: req.path,

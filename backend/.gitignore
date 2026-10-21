@@ -25,6 +25,7 @@ lerna-debug.log*
 
 # Tests
 coverage
+openapi.json
 *.lcov
 
 # IDEs
@@ -37,3 +38,5 @@ coverage
 # Temp files
 *.tmp
 *.temp
+.data/
+index-snapshot.json

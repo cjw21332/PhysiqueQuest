@@ -17,6 +17,7 @@ export class ProgressService {
     return this.model.create({ userId: new Types.ObjectId(userId), metric: dto.metric, value: dto.value, unit: dto.unit, measuredAt });
   }
   async list(userId: string, metric: string, limit = 90) {
+    if (typeof metric !== 'string' || (metric && !['weight', 'waist', 'benchPress'].includes(metric))) throw new BadRequestException('Invalid measurement metric');
     const filter: Record<string, unknown> = { userId: new Types.ObjectId(userId) };
     if (metric) filter.metric = metric;
     return this.model.find(filter).sort({ measuredAt: -1 }).limit(Math.min(Math.max(limit, 1), 365));

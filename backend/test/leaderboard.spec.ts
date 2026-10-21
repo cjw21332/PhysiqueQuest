@@ -40,6 +40,12 @@ const build = (overrides: {
   );
 
 describe('leaderboard', () => {
+  it('excludes points belonging to users absent from the active-user lookup', async () => {
+    const service = build({ workouts: [{ userId: A }, { userId: B }], users: [{ _id: A, name: 'Ana' }] });
+    const result = await service.get(A, 'all');
+    expect(result.entries.map(entry => entry.userId)).toEqual([A]);
+    expect((service as any).users.find).toHaveBeenCalledWith(expect.objectContaining({ isActive: { $ne: false }, deletedAt: null }));
+  });
   it('credits a training day once and excludes standalone recordings and skipped sessions', async () => {
     const service = build({ workouts: [{ userId: A }, { userId: A }, { userId: A, origin: 'recorded-set' }, { userId: A, sets: [{ status: 'skipped' }] }], users: [{ _id: A, name: 'Ana' }] });
     expect((await service.get(A, 'all')).self.points).toBe(100);

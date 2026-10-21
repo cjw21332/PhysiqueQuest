@@ -49,6 +49,7 @@ export class ScanRateLimitGuard implements CanActivate {
           if (v.resetAt <= now) this.buckets.delete(k);
           if (this.buckets.size < MAX_BUCKETS) break;
         }
+        if (this.buckets.size >= MAX_BUCKETS) throw rateLimited('Request capacity exceeded', 60);
       }
       bucket = { count: 0, resetAt: now + rateLimit.windowMs };
       this.buckets.set(key, bucket);

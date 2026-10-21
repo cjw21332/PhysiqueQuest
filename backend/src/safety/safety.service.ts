@@ -6,6 +6,7 @@ import { NotificationsService } from '../notifications/notifications.service.js'
 import { AlertDeliveryProvider } from '../providers/alert-delivery.provider.js';
 import { CreateAlertDto } from './dto/create-alert.dto.js';
 import { AlertEvent } from './schemas/alert-event.schema.js';
+import { WorkoutsService } from '../workouts/workouts.service.js';
 
 @Injectable()
 export class SafetyService {
@@ -14,12 +15,14 @@ export class SafetyService {
     private readonly profiles: ProfileService,
     private readonly notifications: NotificationsService,
     private readonly provider: AlertDeliveryProvider,
+    private readonly workouts: WorkoutsService,
   ) {}
 
   async send(userId: string, dto: CreateAlertDto) {
     const owner = new Types.ObjectId(userId);
     const existing = await this.model.findOne({ userId: owner, idempotencyKey: dto.idempotencyKey }).exec();
     if (existing) return existing;
+    if (dto.workoutSessionId) await this.workouts.detail(userId, dto.workoutSessionId);
     const occurredAt = new Date();
     const details = {
       ...(dto.location ? { location: { lat: dto.location.lat, lng: dto.location.lng, accuracyMeters: dto.location.accuracyMeters, capturedAt: new Date(dto.location.capturedAt) } } : {}),

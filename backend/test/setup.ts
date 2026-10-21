@@ -7,3 +7,6 @@
  * in-memory stream instead of relying on this.
  */
 process.env.LOG_LEVEL ??= 'silent';
+import { beforeEach } from 'vitest';
+import { resetOutboundCircuits } from '../src/common/outbound.js';
+beforeEach(resetOutboundCircuits);

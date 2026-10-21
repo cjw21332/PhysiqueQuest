@@ -1,6 +1,7 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import { IsStrongPassword } from '../validators/password.validator.js';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
   @Transform(({ value }) => typeof value === 'string' ? value.trim().toLowerCase() : value)
@@ -39,5 +40,17 @@ export class AuthResponseDto {
     id: string;
     email: string;
     name: string;
+    emailVerified?: boolean;
+    legacyEmailAccess?: boolean;
   };
+}
+
+export class SessionResponseDto extends AuthResponseDto {
+  expires_in: number;
+}
+
+export class RefreshDto {
+  @ApiHideProperty()
+  @IsEmpty({ message: 'Refresh credentials must be supplied by cookie' })
+  refresh_token?: never;
 }

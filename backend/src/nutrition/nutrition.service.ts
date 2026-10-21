@@ -9,8 +9,10 @@ import { Nutrition, type NutritionDocument } from './schemas/nutrition.schema.js
 export class NutritionService {
   constructor(@InjectModel(Nutrition.name) private readonly model: Model<Nutrition>) {}
 
-  async read(userId: string) {
-    return await this.model.findOne({ userId: new Types.ObjectId(userId) }).lean().exec() ?? { meals: [], water: [] };
+  async read(userId: string, projection?: string) {
+    const query = this.model.findOne({ userId: new Types.ObjectId(userId) });
+    if (projection) query.select(projection);
+    return await query.lean().exec() ?? { meals: [], water: [] };
   }
 
   async get(userId: string): Promise<NutritionDocument> {
@@ -31,12 +33,15 @@ export class NutritionService {
   }
 
   async updateMeal(userId: string, id: string, dto: MealDto): Promise<NutritionDocument> {
-    const current = await this.get(userId);
-    const index = current.meals.findIndex((meal) => meal.id === id);
-    if (index < 0) throw new NotFoundException('Meal not found');
-    const original = current.meals[index];
-    Object.assign(original, dto, { id, source: original.source, time: original.time, date: original.date, edited: true });
-    return current.save();
+    const patch: Record<string, unknown> = { 'meals.$.edited': true };
+    for (const key of ['name', 'meal', 'calories', 'detail', 'protein', 'carbs', 'fat', 'fdcId'] as const) {
+      if (dto[key] !== undefined) patch[`meals.$.${key}`] = dto[key];
+    }
+    const updated = await this.model.findOneAndUpdate(
+      { userId: new Types.ObjectId(userId), 'meals.id': id }, { $set: patch }, { returnDocument: 'after', runValidators: true },
+    );
+    if (!updated) throw new NotFoundException('Meal not found');
+    return updated;
   }
 
   async deleteMeal(userId: string, id: string): Promise<NutritionDocument> {
@@ -50,11 +55,15 @@ export class NutritionService {
   }
 
   async setWater(userId: string, dto: WaterDto): Promise<NutritionDocument> {
-    const current = await this.get(userId);
-    const existing = current.water.find((entry) => entry.date === dto.date);
-    if (existing) existing.glasses = dto.glasses;
-    else current.water.push(dto);
-    return current.save();
+    return this.model.findOneAndUpdate(
+      { userId: new Types.ObjectId(userId) },
+      [{ $set: {
+        meals: { $ifNull: ['$meals', []] },
+        water: { $concatArrays: [{ $filter: { input: { $ifNull: ['$water', []] }, as: 'entry', cond: { $ne: ['$$entry.date', { $literal: dto.date }] } } }, { $literal: [{ date: dto.date, glasses: dto.glasses }] }] },
+        createdAt: { $ifNull: ['$createdAt', '$$NOW'] },
+      } }],
+      { upsert: true, returnDocument: 'after', updatePipeline: true },
+    );
   }
 
   /**
