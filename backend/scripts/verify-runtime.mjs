@@ -31,6 +31,11 @@ try {
   assert.equal((await request('/api/admin/metrics', { headers: { Authorization: `Bearer ${legacy.access_token}` } })).status, 403);
   const oversized = await request('/api/auth/login', { ...post({}), body: JSON.stringify({ email: 'x'.repeat(150_000) }) }); assert.equal(oversized.status, 413);
   report.checks.push('mass assignment and operator query rejection, admin authorization, body-size limit');
+  for (let i = 0; i < 10; i++) assert.equal((await request('/api/jobs/nutrition', post({ uploadId: 'a'.repeat(24) }, legacy.access_token))).status, 404);
+  const quota = await request('/api/jobs/nutrition', post({ uploadId: 'a'.repeat(24) }, legacy.access_token));
+  assert.equal(quota.status, 429); assert.equal(quota.headers.get('retry-after'), '60');
+  assert.equal((await request('/api/storage/uploads', post({ contentType: 'image/png', size: 12 }, legacy.access_token))).status, 429);
+  report.checks.push('shared expensive-job/upload throttle returns429 with Retry-After before paid work');
   const deletionCredentials = { ...credentials, email: 'deletion@example.invalid' };
   const disposable = await (await request('/api/auth/register', post(deletionCredentials))).json();
   assert.equal((await request('/api/account/export', { headers: { Authorization: `Bearer ${disposable.access_token}` } })).status, 200);

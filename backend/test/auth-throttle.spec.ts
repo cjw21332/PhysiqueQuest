@@ -21,6 +21,13 @@ describe('shared auth throttling', () => {
     expect(await new AuthThrottleGuard(model as any).canActivate(ctx)).toBe(true);
     expect(model.findOneAndUpdate).not.toHaveBeenCalled();
   });
+  it('uses the tighter shared bucket for job and upload creation', async () => {
+    const model = { findOneAndUpdate: vi.fn(async () => ({ hits: 11 })) };
+    for (const url of ['/api/jobs/nutrition', '/api/storage/uploads']) {
+      const ctx: any = { switchToHttp: () => ({ getRequest: () => ({ method: 'POST', url, ip: '192.0.2.1' }), getResponse: () => ({ setHeader: vi.fn() }) }) };
+      await expect(new AuthThrottleGuard(model as any).canActivate(ctx)).rejects.toThrow('Too many attempts');
+    }
+  });
   it('throttles trailing-slash and case variants accepted by Express', async () => {
     const model = { findOneAndUpdate: vi.fn(async () => ({ hits: 1000 })) };
     const guard = new AuthThrottleGuard(model as any);

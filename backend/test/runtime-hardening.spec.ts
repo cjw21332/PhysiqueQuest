@@ -4,6 +4,7 @@ import { validateEnvironment } from '../src/config/environment.js';
 import { securityMiddleware } from '../src/common/security.middleware.js';
 import { SafeExceptionFilter } from '../src/common/safe-exception.filter.js';
 import { queryValidationMiddleware } from '../src/common/query-validation.middleware.js';
+import { rateLimited } from '../src/common/foodscan/errors.js';
 
 describe('production configuration', () => {
   const production = { NODE_ENV: 'production', MONGODB_URI: 'mongodb://db/app', JWT_SECRET: 'x'.repeat(48), STORAGE_DRIVER: 's3', S3_BUCKET: 'synthetic-private-bucket', HEALTH_DATA_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString('base64'), FRONTEND_URL: 'https://app.example.com', API_PUBLIC_URL: 'https://api.example.com' };
@@ -15,6 +16,14 @@ describe('production configuration', () => {
 });
 
 describe('request protection', () => {
+  it('preserves shared quota errors on new non-scanner job routes', () => {
+    const res: any = { headersSent: false, setHeader: vi.fn(), status: vi.fn().mockReturnThis(), json: vi.fn() };
+    const host: any = { switchToHttp: () => ({ getRequest: () => ({ requestId: 'synthetic' }), getResponse: () => res }) };
+    new SafeExceptionFilter({ error: vi.fn() } as any).catch(rateLimited('Wait before retrying', 60), host);
+    expect(res.status).toHaveBeenCalledWith(429);
+    expect(res.setHeader).toHaveBeenCalledWith('Retry-After', '60');
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'RATE_LIMITED' }));
+  });
   it('rejects unknown query fields and NoSQL operators, including versioned routes', () => {
     const next = vi.fn(); const res: any = { status: vi.fn().mockReturnThis(), json: vi.fn() };
     for (const query of [{ 'metric[$ne]': 'x' }, { metric: { $ne: 'x' } }, { metric: ['weight'] }]) {

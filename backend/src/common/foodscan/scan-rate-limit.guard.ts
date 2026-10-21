@@ -67,7 +67,6 @@ export class ScanRateLimitGuard implements CanActivate {
       this.logger.event('warn', {
         event: 'rate_limited',
         request_id: req.requestId,
-        user_id: req.user?.userId,
         path: req.path,
         retry_after_s: retryAfter,
       }, 'caller exceeded rate limit');
