@@ -1,5 +1,17 @@
 # Backend hardening operations
 
+## Verify email in development
+
+Existing accounts retain access while their email is unverified; dismissing the floating reminder does not mark an address verified. Open **Verify your email**, request a message, open its link, then press **Confirm email**. Successful confirmation refreshes the session and removes the reminder.
+
+The `console` mail adapter captures messages in memory for tests; it does not deliver to Gmail or expose an inbox. A missing provider also cannot deliver mail. To verify locally:
+
+1. Start Docker Desktop's engine and run `docker run -d --name physiquequest-mailpit -p 127.0.0.1:8025:8025 axllent/mailpit` (for an existing container, use `docker start physiquequest-mailpit`). The inbox is bound to the development PC only.
+2. In the backend's private `.env`, set `MAIL_PROVIDER=mailpit`, `MAILPIT_URL=http://127.0.0.1:8025`, and `EMAIL_VERIFICATION_URL` to the frontend origin. Use `http://localhost:3000` for PC-only verification; use the frontend's LAN/tunnel origin for links opened on a phone. Restart the backend after environment changes.
+3. Request verification in the app. Open `http://127.0.0.1:8025` on the PC, open the captured email, follow its link and press **Confirm email**. Links expire after `EMAIL_VERIFICATION_TTL_MINUTES` (default 60); requests are limited to one per address per minute.
+
+Mailpit is a local inbox and does not deliver to real email accounts. For real inbox delivery, set `MAIL_PROVIDER=resend` or `brevo`, supply `MAIL_API_KEY` and a provider-verified `MAIL_FROM`, and set `EMAIL_VERIFICATION_URL` to the deployed frontend origin. No verification bypass or raw-token inbox endpoint is provided.
+
 Development is the only established environment. Production checks below are runnable preparation, not a claim of deployment verification.
 
 ## Authentication rollout
@@ -20,7 +32,7 @@ Development:
 - `COOKIE_SECURE=false`, `COOKIE_SAMESITE=lax`, `COOKIE_DOMAIN` unset.
 - `CORS_ALLOWED_ORIGINS`: exact localhost/LAN/tunnel frontend origins. Dev additionally allows private LAN HTTP hosts on port 3000; a tunnel or alternate port must be explicit.
 - `TRUST_PROXY=1` for exactly one trusted Next proxy; 0 for direct API access. Do not expose the Nest port publicly when trusting a Next proxy.
-- In frontend's private environment, set `DEV_ALLOWED_ORIGINS` to your PC LAN IP or tunnel hostname (no scheme/port). Next also permits localhost and 127.0.0.1.
+- Next development resources allow any IPv4 address, including changing LAN and emulator addresses. Set `DEV_ALLOWED_ORIGINS` for additional tunnel hostnames or IPv6 hosts (no scheme/port). Restart the dev server after configuration changes; keep it on a trusted network.
 - Expo's optional web address can be a LAN IP, Android emulator address, or tunnel. The default API stays on that frontend origin. Do not configure a separate direct API address unless testing that fallback deliberately.
 
 Production — implemented, activates in production:

@@ -351,7 +351,6 @@ function AppContent() {
         renderLoading={() => (
           <View style={[styles.loading, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
             <ActivityIndicator size="large" color="#22c55e" />
-            <Text style={[styles.loadingText, { fontSize: bodySize }]}>Opening PhysiqueQuest…</Text>
           </View>
         )}
         onError={(e) => {
@@ -735,7 +734,6 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: '#0b0f15',
   },
-  loadingText: { color: '#94a3b8', textAlign: 'center' },
   errorOverlay: {
     position: 'absolute',
     top: 0,

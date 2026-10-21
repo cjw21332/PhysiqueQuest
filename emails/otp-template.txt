@@ -1,0 +1,13 @@
+PhysiqueQuest
+
+Reset your password
+
+Hi {{name}},
+
+Enter the code below in PhysiqueQuest to reset your password.
+
+{{passcode}}
+
+This code expires in {{time}} and can be used once.
+
+If you didn't request this, you can ignore this email.

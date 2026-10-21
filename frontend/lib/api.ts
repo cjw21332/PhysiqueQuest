@@ -3,6 +3,7 @@ import { appVersionHeaders, clearAuthSession, session } from './session';
 import { resolveApiBaseUrl } from './apiBaseUrl.mjs';
 import { resolveCoachBaseUrl } from './coachBaseUrl.mjs';
 import { createDeviceCache } from './deviceCache.mjs';
+import { ApiNetworkError, normalizeTransportError } from './apiErrors.mjs';
 
 export const deviceCache = createDeviceCache({
   context: () => {
@@ -284,20 +285,20 @@ class ApiClient {
   ): Promise<T> {
     const requestBaseUrl = baseUrl ?? getApiBaseUrl();
     const url = `${requestBaseUrl}${endpoint}`;
+    const ownApi = requestBaseUrl === getApiBaseUrl();
 
     const { timeoutMs, ...init } = options;
     const config: RequestInit = {
       ...init,
-      credentials: 'include',
+      credentials: ownApi ? 'include' : 'omit',
       headers: {
         'Content-Type': 'application/json',
-        ...appVersionHeaders(),
+        ...(ownApi ? appVersionHeaders() : {}),
         ...init.headers,
       },
     };
 
     const isAuth = endpoint.startsWith('/auth/session/') || endpoint.startsWith('/auth/password-reset/');
-    const ownApi = requestBaseUrl === getApiBaseUrl();
     const existing = session.current(requestBaseUrl);
     if (ownApi && !isAuth && existing && existing.expiresAt <= Date.now() + 30_000) {
       const refreshed = await session.refresh(requestBaseUrl);
@@ -368,15 +369,18 @@ class ApiClient {
       }
       return result;
     } catch (error) {
+      const failure = normalizeTransportError(error);
       // HTTP rejections are expected application responses (for example, an
       // already-registered email). Keep those for the caller to handle without
       // reporting them as network failures; log transport and server failures.
-      if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
-        console.error('Network/API error:', error instanceof Error ? error.message : String(error));
+      if (failure instanceof ApiNetworkError) {
+        console.warn('API connection failed:', endpoint.split('?')[0], failure.message);
+      } else if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
+        console.error('Network/API error:', endpoint.split('?')[0], error instanceof Error ? error.message : String(error));
       }
       // Only report a timeout when our own timer fired; otherwise throw the real error
       if (timedOut) throw new ApiTimeoutError(cap);
-      if (error instanceof Error) throw error;
+      if (failure instanceof Error) throw failure;
       throw new Error('Network error occurred');
     } finally {
       if (timer) clearTimeout(timer);

@@ -1,12 +1,19 @@
 'use client';
-import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+import { usePathname } from 'next/navigation';
+import { Icon } from '../sections/Home/icons';
 import { getApiBaseUrl } from '../lib/api';
 import { clearAuthSession, session } from '../lib/session';
 
 export default function SessionBoundary({ children }: { children: React.ReactNode }) {
+  const user = useSyncExternalStore(session.subscribe, session.current, () => null);
+  const pathname = usePathname();
+  const [dismissedUser, setDismissedUser] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
   const [attempt, setAttempt] = useState(0);
+  useEffect(() => { if (!user) setDismissedUser(null); }, [user]);
   useEffect(() => {
     let active = true;
     void session.restore(getApiBaseUrl()).then(() => { if (active) setReady(true); }).catch(() => { if (active) setError('Could not restore your session. Check your connection and retry.'); });
@@ -16,7 +23,6 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     window.addEventListener('storage', onStorage);
     return () => { active = false; window.removeEventListener('storage', onStorage); };
   }, [attempt]);
-  if (!ready) return <div role="status">{error || 'Opening PhysiqueQuest…'}{error && <button type="button" onClick={() => { setError(''); setAttempt(value => value + 1); }}>Retry</button>}</div>;
-  const user = session.current();
-  return <>{user?.emailVerified === false && <aside aria-label="Email verification"><a href="/verify-email">Verify your email</a>{user.legacyEmailAccess ? ' — your account access is unchanged.' : ' to unlock protected features when verification is enabled.'}</aside>}{children}</>;
+  if (!ready) return error ? <div role="alert">{error}<button type="button" onClick={() => { setError(''); setAttempt(value => value + 1); }}>Retry</button></div> : null;
+  return <>{user?.emailVerified === false && dismissedUser !== user.id && pathname !== '/verify-email' && <aside className="verification-alert" role="status" aria-label="Email verification"><div><Link href="/verify-email">Verify your email</Link><p>{user.legacyEmailAccess ? 'You can keep using your account.' : 'Confirm your email to unlock protected features.'}</p></div><button type="button" aria-label="Dismiss email verification reminder" onClick={() => setDismissedUser(user.id)}><Icon name="close" size={20}/></button></aside>}{children}</>;
 }

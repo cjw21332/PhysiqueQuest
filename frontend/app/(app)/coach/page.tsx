@@ -6,11 +6,12 @@ import LogoutModal from '../../../components/LogoutModal';
 import { getCurrentUser, logout } from '../../../lib/auth';
 import { useCurrentProfile } from '../../../hooks/useCurrentProfile';
 import ProfileLoadState from '../../../components/ProfileLoadState';
-import { navigate } from '../../../lib/navigation';
+import { useRouter } from 'next/navigation';
 import ExerciseLibrary from '../../../sections/Coach/ExerciseLibrary';
 import BottomNav from '../../../sections/Home/BottomNav';
 
 export default function CoachPage() {
+  const { push: navigate } = useRouter();
   const { profile, loading, error, retry } = useCurrentProfile();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [browseLibrary, setBrowseLibrary] = useState(false);

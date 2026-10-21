@@ -6,6 +6,8 @@ test('text fields avoid the extra focus outline while interactive controls retai
   const styles = await readFile(new URL('../app/globals.css', import.meta.url), 'utf8');
 
   assert.match(styles, /:is\(button, a, summary\):focus-visible\s*\{\s*outline:\s*2px solid var\(--green-dark\)/);
-  assert.match(styles, /:is\(input:not\(\[type="checkbox"\]\):not\(\[type="radio"\]\):not\(\[type="file"\]\)\):focus-visible,\s*:is\(select, textarea\):focus,\s*:is\(select, textarea\):focus-visible\s*\{\s*outline:\s*none;/);
-  assert.match(styles, /:is\(\.input-wrap, \.focus-within\):focus-within,\s*textarea:focus\s*\{\s*outline:\s*none;/);
+  assert.match(styles, /textarea, select\):focus\s*\{\s*outline: none;\s*outline-offset: 0;\s*box-shadow: none;\s*border-color: var\(--green\);/);
+  assert.match(styles, /:is\(\.input-wrap, \.focus-within, \.library-search, \.food-search, \.admin-search\):focus-within\s*\{\s*outline: none;\s*box-shadow: none;\s*border-color: var\(--green\);/);
+  assert.match(styles, /html\s*\{\s*-webkit-tap-highlight-color: transparent;/);
+  assert.doesNotMatch(styles, /:is\(button, a\[href\], input, select, textarea, summary\):focus-visible/);
 });

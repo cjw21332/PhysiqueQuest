@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../sections/Home/icons';
 import { deviceOsStatus } from '../../lib/deviceReadiness.mjs';
@@ -114,7 +115,7 @@ export default function LaunchPage() {
               {readiness.cameraPermission !== 'granted' && <button className="allow" disabled={cameraRequesting} onClick={requestCameraPermission}>{cameraRequesting ? 'Waiting…' : 'Allow'}</button>}
             </div>
           </div>
-          <div className="launch-actions"><a className="primary" href="/register">Get started</a><a className="secondary" href="/login">I already have an account</a></div>
+          <div className="launch-actions"><Link className="primary" href="/register">Get started</Link><Link className="secondary" href="/login">I already have an account</Link></div>
         </section>
         {notice && <div className="toast" role="status">{notice}<button onClick={() => setNotice('')} aria-label="Dismiss">×</button></div>}
       </div>

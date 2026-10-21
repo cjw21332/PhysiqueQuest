@@ -6,9 +6,10 @@ import ForgotPasswordFlow from '../../../sections/Forgot Password/ForgotPassword
 import AuthOutcomeModal from '../../../sections/Auth/AuthOutcomeModal';
 import { login } from '../../../lib/auth';
 import { ApiRequestError } from '../../../lib/api';
-import { navigate } from '../../../lib/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const { push: navigate } = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');

@@ -7,6 +7,8 @@ const allowedQueries: Record<string, string[]> = {
   '/api/exercises': ['search', 'muscle', 'equipment', 'page', 'limit'], '/api/nutrition/foods/search': ['q'],
 };
 export function queryValidationMiddleware(req: Request, res: Response, next: NextFunction) {
+  // Preflight carries the target URL's query but must reach CORS before validation.
+  if (req.method === 'OPTIONS') { next(); return; }
   const path = req.path.replace(/^\/api\/v1(?=\/|$)/i, '/api').replace(/\/+$/, '').toLowerCase();
   const allowed = req.method === 'GET' ? allowedQueries[path] ?? [] : [];
   if (Object.entries(req.query).some(([key, value]) => !allowed.includes(key) || typeof value !== 'string')) {

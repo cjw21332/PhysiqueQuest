@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { isAuthenticated } from '../../lib/auth';
-import { navigate } from '../../lib/navigation';
 import { api, deviceCache } from '../../lib/api';
 import { AUTH_STORAGE_KEY } from '../../lib/session';
 
@@ -12,6 +11,7 @@ export default function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { push: navigate } = useRouter();
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [cacheNotice, setCacheNotice] = useState('');
@@ -28,10 +28,11 @@ export default function AppLayout({
 
   useEffect(() => {
     const update = () => {
-      const resources = (['profile', 'nutrition', 'activity', 'coach'] as const).map(key => deviceCache.get(key));
+      const resources = (['profile', 'nutrition', 'activity', 'coach'] as const).map(key => ({ key, ...deviceCache.get(key) }));
       const saved = resources.filter(resource => resource.data !== undefined);
-      setCacheNotice(saved.some(resource => resource.error)
-        ? 'Could not refresh all data. Showing your last saved data; changes still need a connection.'
+      const failed = resources.filter(resource => resource.error);
+      setCacheNotice(failed.length
+        ? `Could not refresh ${failed.map(resource => resource.key).join(', ')}. ${saved.length ? 'Showing available saved data. ' : ''}${failed[0].error}`
         : saved.some(resource => resource.refreshing) ? 'Showing saved data while checking for updates…' : '');
     };
     const preload = () => {

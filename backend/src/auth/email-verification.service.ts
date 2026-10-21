@@ -39,7 +39,9 @@ export class EmailVerificationService implements OnModuleInit {
         this.logger.warn({ event: 'verification_email_delivery_failed' });
       }
     }
-    return { accepted: true };
+    return { accepted: true, ...(process.env.NODE_ENV !== 'production' ? {
+      developmentDelivery: !provider ? 'unavailable' : process.env.MAIL_PROVIDER === 'console' ? 'console' : process.env.MAIL_PROVIDER === 'mailpit' ? 'mailpit' : 'provider',
+    } : {}) };
   }
   async confirm(token: string) {
     const session = await this.connection.startSession();

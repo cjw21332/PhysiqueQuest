@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import AuthForm from '../../../sections/Auth/AuthForm';
 import CalibrationFlow from '../../../sections/Auth/CalibrationFlow';
@@ -8,9 +9,10 @@ import { register, getCurrentUser } from '../../../lib/auth';
 import { calibrationDraftKey, clearCalibrationDraft } from '../../../lib/calibrationDraft';
 import { ApiRequestError, api } from '../../../lib/api';
 import type { Profile } from '../../../sections/Home/types';
-import { navigate } from '../../../lib/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const { push: navigate } = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -133,7 +135,7 @@ export default function RegisterPage() {
     }
   };
 
-  if (checkingAccount || recoveryFailed) return <main className="scene"><div className="app-shell"><section className="wizard"><h1>Continue setup</h1>{checkingAccount ? <p role="status">Checking your saved profile…</p> : <><p role="alert">Could not check your profile. Your device draft is unchanged.</p><button type="button" className="primary" onClick={()=>void recover()}>Retry setup recovery</button><a href="/login">Sign in again</a></>}</section></div></main>;
+  if (checkingAccount || recoveryFailed) return <main className="scene"><div className="app-shell"><section className="wizard"><h1>Continue setup</h1>{checkingAccount ? <p role="status">Checking your saved profile…</p> : <><p role="alert">Could not check your profile. Your device draft is unchanged.</p><button type="button" className="primary" onClick={()=>void recover()}>Retry setup recovery</button><Link href="/login">Sign in again</Link></>}</section></div></main>;
 
   if (calibrating) {
     return (

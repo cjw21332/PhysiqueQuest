@@ -1,11 +1,14 @@
 export function createSession({ fetcher = (...args) => fetch(...args), storage = () => undefined, headers = () => ({}) } = {}) {
   let user = null, base = null, generation = 0, pending = null, restoring = null, legacyToken = null, legacyBase = null;
+  const listeners = new Set();
+  const notify = () => { for (const listener of listeners) listener(); };
   const current = (url) => !url || url === base ? user : null;
-  const clear = () => { user = null; base = null; legacyToken = null; legacyBase = null; generation++; };
+  const clear = () => { user = null; base = null; legacyToken = null; legacyBase = null; generation++; notify(); };
   const accept = (body, url) => {
     if (body.refresh_token || typeof body.access_token !== 'string' || !body.user?.id || typeof body.expires_in !== 'number') throw Error('Invalid session response');
     base = url;
     user = { ...body.user, token: body.access_token, sessionKey: generation, expiresAt: Date.now() + body.expires_in * 1000 };
+    notify();
     return user;
   };
   const request = async (url, legacy) => {
@@ -48,5 +51,5 @@ export function createSession({ fetcher = (...args) => fetch(...args), storage =
     restoring = restoreOnce(url).finally(() => { restoring = null; });
     return restoring;
   };
-  return { current, clear, refresh, restore, set: (body, url) => { generation++; legacyToken = null; legacyBase = null; return accept(body, url); } };
+  return { current, clear, refresh, restore, subscribe: listener => { listeners.add(listener); return () => { listeners.delete(listener); }; }, set: (body, url) => { generation++; legacyToken = null; legacyBase = null; return accept(body, url); } };
 }

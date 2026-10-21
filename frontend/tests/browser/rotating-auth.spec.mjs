@@ -1,5 +1,19 @@
 import { test, expect } from '@playwright/test';
 
+test('page transitions preserve the document and do not restore the session again', async ({ page }) => {
+  await page.goto('/launch');
+  await expect(page.getByRole('link', { name: 'I already have an account' })).toBeVisible();
+  await page.evaluate(() => { window.__navigationMarker = 'same-document'; });
+  const refreshes = [];
+  page.on('request', request => { if (request.url().endsWith('/auth/session/refresh')) refreshes.push(request.url()); });
+  await page.getByRole('link', { name: 'I already have an account' }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+  expect(await page.evaluate(() => window.__navigationMarker)).toBe('same-document');
+  expect(refreshes).toEqual([]);
+  await expect(page.getByText(/Opening PhysiqueQuest|Loading Physique Quest/i)).toHaveCount(0);
+});
+
 test('real proxy forwards httpOnly cookies, persists across reload, rotates and detects replay', async ({ page, context }) => {
   await page.goto('/launch');
   const email = `browser-${Date.now()}@example.invalid`;

@@ -4,6 +4,18 @@ import { createSession } from '../lib/rotatingSession.mjs';
 
 const reply = (token = 'access') => ({ ok: true, status: 200, json: async () => ({ access_token: token, expires_in: 900, user: { id: 'owner', name: 'Owner', email: 'a@example.com' } }) });
 
+test('session subscribers see login, verification refresh and logout', async () => {
+  const session = createSession({ fetcher: async () => ({ ok: true, status: 200, json: async () => ({ access_token: 'updated', expires_in: 900, user: { id: 'owner', emailVerified: true } }) }) });
+  const changes = [];
+  const unsubscribe = session.subscribe(() => changes.push(session.current()?.emailVerified ?? null));
+  session.set({ access_token: 'initial', expires_in: 900, user: { id: 'owner', emailVerified: false } }, '/api');
+  await session.refresh('/api');
+  session.clear();
+  unsubscribe();
+  session.set({ access_token: 'next', expires_in: 900, user: { id: 'owner', emailVerified: true } }, '/api');
+  assert.deepEqual(changes, [false, true, null]);
+});
+
 test('migrates legacy storage once, deletes stored tokens immediately and keeps access only in memory', async () => {
   const storage = new Map([['physiquequest-auth', JSON.stringify({ token: 'legacy' })]]);
   const calls = [];

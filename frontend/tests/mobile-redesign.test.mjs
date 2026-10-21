@@ -64,10 +64,10 @@ test('Me keeps persistence and root navigation', async () => {
   assert.match(file, /<BottomNav \/>/);
 });
 
-test('launch actions use WebView-safe document navigation', async () => {
+test('launch actions use client navigation without reloading the WebView', async () => {
   const file = await source('app/launch/page.tsx');
-  assert.match(file, /<a className="primary" href="\/register">/);
-  assert.match(file, /<a className="secondary" href="\/login">/);
+  assert.match(file, /<Link className="primary" href="\/register">/);
+  assert.match(file, /<Link className="secondary" href="\/login">/);
   assert.doesNotMatch(file, /router\.push\('\/(?:register|login)'\)/);
 });
 
@@ -280,12 +280,14 @@ test('live inactivity countdown and alarm have connected safety UI and persisten
   assert.match(styles, /\.coach-view-session \.emergency-alarm/);
 });
 
-test('auth boundaries reload the document while signed-in tabs use client navigation', async () => {
-  const navigation = await source('lib/navigation.ts');
+test('auth boundaries and signed-in tabs use client navigation without a startup interstitial', async () => {
   const login = await source('app/(auth)/login/page.tsx');
   const register = await source('app/(auth)/register/page.tsx');
   const bottomNav = await source('sections/Home/BottomNav.tsx');
-  assert.match(navigation, /window\.location\.assign/);
+  const boundary = await source('components/SessionBoundary.tsx');
+  assert.match(login, /push: navigate.*useRouter/);
+  assert.match(register, /push: navigate.*useRouter/);
+  assert.doesNotMatch(boundary, /Opening PhysiqueQuest/);
   assert.match(login, /await login\(email, password\);[\s\S]*navigate\('\/register'\)/);
   assert.match(register, /navigate\('\/home'\)/);
   assert.match(bottomNav, /router\.push\(path\)/);
