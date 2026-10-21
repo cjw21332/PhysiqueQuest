@@ -5,6 +5,9 @@ description: Use when changing PhysiqueQuest backend APIs, mobile data loading, 
 
 # Backend and mobile data loading
 
+**October 21, 2026 — authentication and privacy hardening (current behavior, supersedes older JWT/localStorage statements below):** Access tokens live only in memory for15 minutes. The Next same-origin `/api` rewrite forwards a rotating httpOnly refresh cookie; legacy7-day credentials remain accepted/logged until the deployed minimum-version transition finishes. Old physiquequest-auth storage is removed once and never written again. Session/version checks enforce logout/password/deletion revocation; refresh first on protected401, with one same-session retry. Existing account data caches remain non-authoritative. New signup verification is rollout-gated; old accounts are grandfathered with sensitive-action verification. Account soft deletion blocks login immediately, recovery is allowed during the30-day grace period, and resumable purge removes all owned data/objects afterward. Profile health/contact encryption requires a private HEALTH_DATA_ENCRYPTION_KEY in production. See root checklist.md and backend/PROVIDERS.md for evidence, retention and deployment obligations.
+
+
 Read with [GENERAL.md](./GENERAL.md), [DATABASE.md](./DATABASE.md), and [PROCEDURES.md](./PROCEDURES.md). This is the requested project rule file for future backend changes.
 
 ## Ownership

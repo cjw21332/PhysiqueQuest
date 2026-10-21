@@ -1,0 +1,40 @@
+{
+  "environment": "isolated development MongoDB, real Nest middleware/services",
+  "concurrency": 10,
+  "requestsPerRoute": 200,
+  "measuredAt": "2026-10-21T13:14:41.129Z",
+  "routes": [
+    {
+      "label": "legacy authentication",
+      "path": "/api/auth/me",
+      "p50Ms": 31.87,
+      "p95Ms": 239.63,
+      "p99Ms": 744.96,
+      "requestsPerSecond": 132.83
+    },
+    {
+      "label": "session authentication",
+      "path": "/api/auth/me",
+      "p50Ms": 51.29,
+      "p95Ms": 801.73,
+      "p99Ms": 1054.39,
+      "requestsPerSecond": 55.03
+    },
+    {
+      "label": "workout list",
+      "path": "/api/workouts?limit=20",
+      "p50Ms": 95.96,
+      "p95Ms": 786.2,
+      "p99Ms": 793.83,
+      "requestsPerSecond": 42.91
+    },
+    {
+      "label": "nutrition read",
+      "path": "/api/nutrition",
+      "p50Ms": 91.51,
+      "p95Ms": 792.62,
+      "p99Ms": 807.17,
+      "requestsPerSecond": 42.15
+    }
+  ]
+}

@@ -11,6 +11,10 @@
 
 This checklist separates what is implemented in the frontend, what is implemented and tested in the backend, and what has actually been demonstrated as a complete user journey using genuine account data.
 
+### Backend hardening and auth/privacy rollout — October21,2026
+
+Implemented compatible rotating15-minute access/httpOnly refresh sessions, same-origin Next proxy, memory-only credentials/legacy cleanup, verification rollout gates, private upload/push/mail/Sentry adapters, resumable privacy purge and health-field encryption. New owner-bound sync/dashboard and reference-only analysis jobs retain existing client APIs. Local evidence: backend499 unit tests,16 integration tests across11 files with isolated real MongoDB, lint/build/audit0; frontend142 Node tests/build/scoped audit0; mobile29 tests/types; actual proxy browser3 tests; full reachable141-commit Gitleaks history scan with exact false-positive baseline; real encrypted mongodump/restore comparison and recorded load percentiles. Root mobile audit still16 inherited high findings; cloud/device/Docker and legacy history-pagination decisions remain explicit. Do not change deployed/physical-device journey marks from these tests. See root checklist.md, backend/PROVIDERS.md and PROGRESS-57.
+
 ### PhysiqueQuest v3.1.1 release preparation — October 21, 2026
 
 Packaged the non-ignored project snapshot and release documentation for the requested version/main pushes. Fresh full frontend/mobile Node suite 159/159, backend suite 382/382, production frontend build and mobile TypeScript pass. Updated the Expo Go test harness for the shared readiness module; kept native-module startup assertions. See `docs/RELEASE-v3.1.1.md` and PROGRESS-56. Physical camera calibration and live-integration status marks remain unchanged.

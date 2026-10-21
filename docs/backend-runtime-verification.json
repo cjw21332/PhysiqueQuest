@@ -1,0 +1,20 @@
+{
+  "environment": "isolated development database; real compiled Nest application",
+  "checkedAt": "2026-10-21T15:08:44.470Z",
+  "checks": [
+    "liveness, DB ping readiness, /api and /api/v1 config, security headers and correlation IDs",
+    "legacy seven-day and new 15-minute tokens, versioned cookie rotation, v2 migration rejection, immediate logout revocation",
+    "mass assignment and operator query rejection, admin authorization, body-size limit",
+    "shared expensive-job/upload throttle returns429 with Retry-After before paid work",
+    "authenticated export, immediate deletion login/session block, grace-period password recovery without reviving old tokens",
+    "new-user verification gate, grandfathered ordinary access, verified-mailbox requirement for deletion, older-client update response",
+    "minimum version enforcement and explicit gated legacy retirement"
+  ],
+  "queryPlan": {
+    "endpoint": "workout list",
+    "syntheticDocuments": 200,
+    "collectionScanDocsExamined": 200,
+    "indexedDocsExamined": 20,
+    "indexedKeysExamined": 20
+  }
+}
