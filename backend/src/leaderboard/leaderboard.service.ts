@@ -7,6 +7,7 @@ import { Nutrition } from '../nutrition/schemas/nutrition.schema.js';
 import { WorkoutSession } from '../workouts/schemas/workout-session.schema.js';
 import { LeaderboardSnapshot } from './schemas/leaderboard-snapshot.schema.js';
 import { workoutCreditFilter, WORKOUT_CREDIT_POINTS } from '../workouts/workout-contract.js';
+import { personalRecordDays } from '../workouts/personal-records.js';
 
 export type LeaderboardPeriod = 'week' | 'month' | 'all';
 
@@ -90,7 +91,7 @@ export class LeaderboardService {
 
   /** Sum of period points per user from completed workouts, meals, and water. */
   private async computePoints(start: Date | null): Promise<Map<string, number>> {
-    const [workouts, nutrition] = await Promise.all([
+    const [workouts, nutrition, recordSessions] = await Promise.all([
       this.workouts.aggregate<{ userId: string; day: string }>([
         { $match: { status: 'completed', endedAt: { $type: 'date' }, ...workoutCreditFilter } },
         { $group: { _id: { userId: '$userId', day: { $ifNull: ['$activityDate', { $dateToString: { date: '$endedAt', format: '%Y-%m-%d', timezone: { $ifNull: ['$timezone', 'UTC'] } } }] } }, firstAt: { $min: '$endedAt' } } },
@@ -98,6 +99,7 @@ export class LeaderboardService {
         { $project: { _id: 0, userId: '$_id.userId', day: '$_id.day' } },
       ]),
       this.nutrition.find({}).select('userId meals.date water.date water.glasses').lean().exec(),
+      this.workouts.find({ status: 'completed', 'sets.status': 'completed' }).select('userId endedAt timezone status sets').lean().exec(),
     ]);
 
     const points = new Map<string, number>();
@@ -108,6 +110,7 @@ export class LeaderboardService {
     }
 
     const startDate = start ? start.toISOString().slice(0, 10) : '0000-00-00';
+    for (const [id, days] of personalRecordDays(recordSessions)) for (const day of days) if (day >= startDate) add(id, 150);
     for (const record of nutrition as { userId: unknown; meals?: { date: string }[]; water?: { date: string; glasses: number }[] }[]) {
       const id = String(record.userId);
       const mealDays = new Map<string, number>();

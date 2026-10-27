@@ -16,6 +16,8 @@ import EmergencyContactEdit from './EmergencyContactEdit';
 import { useSettings } from '../../hooks/useSettings';
 import { normalizeTrainingDays } from '../../lib/trainingDays';
 import ForgotPasswordFlow from '../Forgot Password/ForgotPasswordFlow';
+import { useScreenRoute } from '../../hooks/useScreenRoute';
+import ProfilePhoto from './ProfilePhoto';
 
 type MeView = 'settings' | 'exercises' | 'engagement' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
 
@@ -34,8 +36,9 @@ function SettingRow({ icon, title, detail, onClick, danger = false }: { icon: st
 export default function MeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const { settings, loading: settingsLoading, error: settingsError, updateSettings, retry: retrySettings } = useSettings();
   const [passwordOpen, setPasswordOpen] = useState(false);
+  const [photoOpen, setPhotoOpen] = useState(false);
   const [currentProfile, setCurrentProfile] = useState(profile);
-  const [view, setView] = useState<MeView>('settings');
+  const [view, setView] = useScreenRoute<MeView>('/me', { settings: '', exercises: '/exercises', engagement: '/engagement', 'edit-personal': '/personal-data', 'edit-goals': '/goals', 'edit-training': '/training', 'edit-health': '/health', 'edit-emergency': '/emergency-contact' }, 'settings');
   const [notice, setNotice] = useState('');
   const [saveError, setSaveError] = useState('');
   const [level, setLevel] = useState<number | null>(null);
@@ -93,8 +96,8 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     <header className="me-header"><h2>Account &amp; settings</h2></header>
     <div className="me-scroll">
       <div className="me-profile-summary">
-        <span className="me-avatar me-reference-avatar" aria-hidden="true"/>
-        <div className="me-profile-name"><b>{currentProfile.name || '—'}</b><small>{level !== null ? `Level ${level} · ` : ''}member since {memberSince}</small></div>
+        <span className="me-avatar me-reference-avatar" aria-hidden="true">{currentProfile.photo ? <img src={currentProfile.photo} alt=""/> : <Icon name="user" size={28}/>}</span>
+        <div className="me-profile-name"><b>{currentProfile.name || '—'}</b><small>{level !== null ? `Level ${level} · ` : ''}member since {memberSince}</small><button type="button" className="me-photo-link" onClick={() => setPhotoOpen(true)}>Change photo</button></div>
         <button className="me-edit" onClick={() => setView('edit-personal')}>Edit</button>
       </div>
 
@@ -135,6 +138,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <button className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
     </div>
     <BottomNav />
+    {photoOpen && <ProfilePhoto photo={currentProfile.photo} onClose={() => setPhotoOpen(false)} onSaved={saved => { setCurrentProfile(current => ({ ...current, ...saved })); setNotice('Profile photo saved'); }}/>}
     {passwordOpen && <ForgotPasswordFlow mode="change" accountEmail={currentProfile.email} onClose={() => setPasswordOpen(false)} onSuccess={() => { setPasswordOpen(false); setNotice('Password updated. Sign in again with your new password.'); onLogoutRequest?.(); }}/>}
     {notice && <div className="home-toast me-toast" role="status">{notice}</div>}
   </section>;

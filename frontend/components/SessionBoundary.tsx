@@ -1,8 +1,7 @@
 'use client';
-import Link from 'next/link';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { usePathname } from 'next/navigation';
-import { Icon } from '../sections/Home/icons';
+import ForgotPasswordFlow from '../sections/Forgot Password/ForgotPasswordFlow';
 import { getApiBaseUrl } from '../lib/api';
 import { clearAuthSession, session } from '../lib/session';
 
@@ -24,5 +23,5 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     return () => { active = false; window.removeEventListener('storage', onStorage); };
   }, [attempt]);
   if (!ready) return error ? <div role="alert">{error}<button type="button" onClick={() => { setError(''); setAttempt(value => value + 1); }}>Retry</button></div> : null;
-  return <>{user?.emailVerified === false && dismissedUser !== user.id && pathname !== '/verify-email' && <aside className="verification-alert" role="status" aria-label="Email verification"><div><Link href="/verify-email">Verify your email</Link><p>{user.legacyEmailAccess ? 'You can keep using your account.' : 'Confirm your email to unlock protected features.'}</p></div><button type="button" aria-label="Dismiss email verification reminder" onClick={() => setDismissedUser(user.id)}><Icon name="close" size={20}/></button></aside>}{children}</>;
+  return <>{children}{user?.emailVerified === false && dismissedUser !== user.id && pathname !== '/verify-email' && <ForgotPasswordFlow mode="verify-email" accountEmail={user.email} onClose={() => setDismissedUser(user.id)} onSuccess={() => { setDismissedUser(user.id); void session.refresh(getApiBaseUrl()).catch(() => {}); }} />}</>;
 }

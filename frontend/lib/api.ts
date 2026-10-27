@@ -116,6 +116,8 @@ export type AdminAlertRow = {
 };
 
 export type LeaderboardPeriod = 'week' | 'month' | 'all';
+export type StrengthStanding = { userId: string; name: string; rank: number; score: number; maxKg: number; loadKg: number; reps: number; bodyweightKg?: number; isCurrentUser: boolean };
+export type StrengthLeaderboardRecord = { exercises: { id: string; name: string }[]; exerciseId: string | null; metric: 'heaviest' | 'relative'; entries: StrengthStanding[]; self: StrengthStanding | null; hidden: boolean };
 
 export interface LeaderboardEntryRecord {
   userId: string;
@@ -333,6 +335,10 @@ class ApiClient {
 
     try {
       let response = await fetch(url, config);
+      if (ownApi && (!config.method || config.method === 'GET') && (endpoint === '/profile' || endpoint === '/nutrition') && response.status >= 500 && !timedOut) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        if (!timedOut) response = await fetch(url, config);
+      }
       if (response.status === 401 && ownApi && !isAuth && token && existing?.sessionKey === session.current(requestBaseUrl)?.sessionKey) {
         const current = session.current(requestBaseUrl);
         const refreshed = current?.token !== token ? current : await session.refresh(requestBaseUrl);
@@ -347,9 +353,9 @@ class ApiClient {
         const error = readErrorBody(await response.json().catch(() => null));
         if (response.status === 401 && token === this.getToken() && requestBaseUrl === (baseUrl ?? getApiBaseUrl())) clearAuthSession();
         const raw = error.message;
-        const message =
-          (Array.isArray(raw) ? raw.join(', ') : raw?.trim()) ||
-          `Request failed (${response.status})`;
+        const message = endpoint === '/auth/registration-code/request' && response.status === 503
+          ? 'We couldn’t send your verification code right now. Please try again later.'
+          : (Array.isArray(raw) ? raw.join(', ') : raw?.trim()) || `Request failed (${response.status})`;
         throw new ApiRequestError(message, response.status, error.code);
       }
 
@@ -375,7 +381,9 @@ class ApiClient {
       // reporting them as network failures; log transport and server failures.
       if (failure instanceof ApiNetworkError) {
         console.warn('API connection failed:', endpoint.split('?')[0], failure.message);
-      } else if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
+      } else if (error instanceof ApiRequestError && error.statusCode >= 500) {
+        console.warn('API request failed:', endpoint.split('?')[0], error.message);
+      } else if (!(error instanceof ApiRequestError)) {
         console.error('Network/API error:', endpoint.split('?')[0], error instanceof Error ? error.message : String(error));
       }
       // Only report a timeout when our own timer fired; otherwise throw the real error
@@ -396,6 +404,8 @@ class ApiClient {
     name: string;
     email: string;
     password: string;
+    requestId: string;
+    code: string;
   }) {
     return this.request<{
       user: { id: string; name: string; email: string };
@@ -406,6 +416,12 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
+
+  async requestRegistrationCode(email: string) {
+    return this.request<{ requestId: string }>('/auth/registration-code/request', { method: 'POST', body: JSON.stringify({ email }) });
+  }
+  async requestAccountVerificationCode() { return this.request<{ requestId: string }>('/auth/verification-code/request', { method: 'POST', body: '{}' }); }
+  async confirmAccountVerificationCode(requestId: string, code: string) { return this.request<{ verified: boolean }>('/auth/verification-code/confirm', { method: 'POST', body: JSON.stringify({ requestId, code }) }); }
 
   async login(data: { email: string; password: string }) {
     return this.request<{
@@ -455,6 +471,9 @@ class ApiClient {
   }
   async updateActivity(state: Record<string, unknown>) { return this.request<any>('/activity/state', { method: 'PUT', body: JSON.stringify({ state }) }); }
   async getLeaderboard(period: LeaderboardPeriod = 'week') { return this.request<LeaderboardRecord>(`/leaderboard?period=${encodeURIComponent(period)}`); }
+  async getStrengthLeaderboard(exerciseId: string, metric: 'heaviest' | 'relative') { const params = new URLSearchParams({ metric }); if (exerciseId) params.set('exerciseId', exerciseId); return this.request<StrengthLeaderboardRecord>(`/leaderboard/strength?${params}`); }
+  async saveProfilePhoto(photo: string | null) { const profile = await this.request<any>('/profile/photo', photo ? { method: 'PUT', body: JSON.stringify({ photo }) } : { method: 'DELETE' }); deviceCache.publish('profile', profile); return profile; }
+  async chat(messages: { role: 'user' | 'assistant'; text: string }[]) { return this.request<{ reply: string }>('/chat', { method: 'POST', body: JSON.stringify({ messages }), timeoutMs: 30000 }); }
   async getCoachPlan(force = false) { return deviceCache.fetch('coach', () => this.request<CoachPlanRecord>('/coach/plan', { timeoutMs: 30_000 }), force); }
   async preloadAppData(force = false) {
     return Promise.allSettled([this.getProfile(force), this.getNutrition(force), this.getActivity(force), this.getCoachPlan(force)]);

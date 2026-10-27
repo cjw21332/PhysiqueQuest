@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { useState } from 'react';
 import { Icon } from '../Home/icons';
@@ -20,7 +21,7 @@ export default function EditMeal({ entries, onBack, onSave }: { entries: FoodEnt
   return <form className="meal-edit" onSubmit={save}>
     <header className="scan-header add-food-header"><button type="button" className="coach-back" onClick={onBack} disabled={saving} aria-label="Back to Today's Log"><Icon name="arrow" size={20}/></button><h2>Edit meal</h2></header>
     <p className="meal-edit-caption">Update your logged food. Its original source and logging time are kept.</p>
-    {entries.length > 1 && <label className="meal-edit-field">Food to edit<select disabled={saving} value={entry.id} onChange={event => { setEntry(entries.find(item => item.id === event.target.value)!); setError(''); }}>{entries.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>}
+    {entries.length > 1 && <label className="meal-edit-field">Food to edit<select disabled={saving} value={entry.id} onChange={event => { setEntry(entries.find(item => item.id === event.target.value)!); setError(''); }}>{entries.map(item => <option key={item.id} value={item.id}>{titleCase(item.name)}</option>)}</select></label>}
     <FoodNameSearch key={entry.id} value={entry.name} disabled={saving} onChange={name => setEntry({ ...entry, name, fdcId: undefined })} onSelect={food => setEntry({ ...entry, name: food.description.slice(0, 120), fdcId: food.fdc_id })}/>
     <fieldset disabled={saving} className="meal-edit-category"><legend>Meal</legend><div className="scan-chips">{mealNames.map(meal => <button type="button" key={meal} className={entry.meal === meal ? 'active' : ''} aria-pressed={entry.meal === meal} onClick={() => setEntry({ ...entry, meal })}>{meal}</button>)}</div></fieldset>
     <h3>Nutrition</h3>

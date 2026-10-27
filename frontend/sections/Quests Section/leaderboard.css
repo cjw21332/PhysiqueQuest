@@ -1,0 +1,34 @@
+.account-dark-theme .leaderboard-screen .leaderboard-scroll { padding: 14px 18px 24px; }
+.account-dark-theme .leaderboard-screen .leaderboard-mode { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: var(--green-light); }
+.account-dark-theme .leaderboard-screen .leaderboard-mode button { min-height: 48px; padding: 6px 12px; border: 0; border-radius: 9px; background: transparent; color: var(--ink); text-align: left; }
+.account-dark-theme .leaderboard-screen .leaderboard-mode button[aria-pressed='true'] { background: var(--green); color: var(--surface); }
+.account-dark-theme .leaderboard-screen .leaderboard-mode strong, .account-dark-theme .leaderboard-screen .leaderboard-mode small { display: block; }
+.account-dark-theme .leaderboard-screen .leaderboard-mode strong { font-size: 13px; line-height: 1.25; }
+.account-dark-theme .leaderboard-screen .leaderboard-mode small { margin-top: 2px; font-size: 10px; opacity: .72; }
+.account-dark-theme .leaderboard-screen .leaderboard-periods { margin-top: 12px; }
+.account-dark-theme .leaderboard-screen .leaderboard-periods button { min-height: 44px; font-size: 12px; }
+.account-dark-theme .leaderboard-screen .leaderboard-podium { min-height: 210px; padding-top: 18px; }
+.account-dark-theme .leaderboard-screen .podium-player strong { font-size: 12px; }
+.account-dark-theme .leaderboard-screen .podium-player small { font-size: 11px; }
+.account-dark-theme .leaderboard-screen .podium-avatar { width: 42px; height: 42px; font-size: 11px; }
+.account-dark-theme .leaderboard-screen .podium-rank-1 .podium-avatar { width: 48px; height: 48px; }
+.account-dark-theme .leaderboard-screen .podium-step { height: 52px; }
+.account-dark-theme .leaderboard-screen .podium-rank-1 .podium-step { height: 76px; }
+.account-dark-theme .leaderboard-screen .podium-rank-3 .podium-step { height: 42px; }
+.account-dark-theme .leaderboard-screen .leaderboard-row { min-height: 64px; }
+.account-dark-theme .leaderboard-screen .leaderboard-rank, .account-dark-theme .leaderboard-screen .leaderboard-movement { font-size: 12px; }
+.account-dark-theme .leaderboard-screen .leaderboard-avatar, .account-dark-theme .leaderboard-screen .leaderboard-self-avatar { width: 36px; height: 36px; flex-basis: 36px; font-size: 11px; }
+.account-dark-theme .leaderboard-screen .leaderboard-person strong { font-size: 13px; }
+.account-dark-theme .leaderboard-screen .leaderboard-person small { font-size: 11px; }
+.account-dark-theme .leaderboard-screen .leaderboard-self-row { min-height: 62px; margin-top: 18px; padding: 8px; }
+.leaderboard-profile-photo { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.account-dark-theme .leaderboard-screen .leaderboard-context, .account-dark-theme .leaderboard-screen .leaderboard-privacy { margin: 12px 0; color: var(--muted); font-size: 11px; line-height: 1.5; text-align: center; }
+.account-dark-theme .leaderboard-screen .leaderboard-lifts { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.account-dark-theme .leaderboard-screen .leaderboard-lifts button { min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--soft); color: var(--ink); font-size: 12px; }
+.account-dark-theme .leaderboard-screen .leaderboard-lifts button[aria-pressed='true'] { border-color: var(--green); background: var(--green); color: var(--surface); }
+.account-dark-theme .leaderboard-screen .leaderboard-strength-empty { display: grid; justify-items: center; gap: 10px; padding: 56px 16px; color: var(--muted); text-align: center; }
+.account-dark-theme .leaderboard-screen .leaderboard-strength-empty svg { color: var(--green); }
+.account-dark-theme .leaderboard-screen .leaderboard-strength-empty h3 { margin: 0; color: var(--ink); font-size: 16px; }
+.account-dark-theme .leaderboard-screen .leaderboard-strength-empty p { max-width: 260px; margin: 0; font-size: 13px; line-height: 1.5; }
+.account-dark-theme .leaderboard-screen .leaderboard-submit { width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: var(--line); color: var(--muted); font-size: 13px; font-weight: 600; }
+.account-dark-theme .leaderboard-screen :is(.leaderboard-mode, .leaderboard-lifts) button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }

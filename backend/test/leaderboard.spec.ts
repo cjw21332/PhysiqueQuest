@@ -31,7 +31,7 @@ const build = (overrides: {
     findModel(overrides.users ?? []),
     findModel(overrides.settings ?? []),
     findModel(overrides.nutrition ?? []),
-    { aggregate: vi.fn(async () => {
+    { find: () => chain([]), aggregate: vi.fn(async () => {
       const rows = (overrides.workouts ?? []).map((row: any) => ({ status: 'completed', endedAt: new Date('2099-01-01T10:00:00Z'), ...row }));
       const days = new Map();
       for (const row of rows) if (earnsWorkoutCredit(row)) { const day = row.activityDate || activityDate(row.endedAt, row.timezone ?? 'UTC'); days.set(`${row.userId}:${day}`, { userId: row.userId, day }); }
@@ -40,6 +40,12 @@ const build = (overrides: {
   );
 
 describe('leaderboard', () => {
+  it('adds the personal record bonus once for the day', async () => {
+    const service = build({ users: [{ _id: A, name: 'Ana' }] });
+    const rows = [40, 50, 60].map((loadKg, index) => ({ userId: A, status: 'completed', endedAt: new Date(`2026-01-0${index ? 2 : 1}T${10 + index}:00:00Z`), sets: [{ exerciseId: 'squat', status: 'completed', reps: 5, loadKg }] }));
+    (service as any).workouts.find = () => chain(rows);
+    expect((await service.get(A, 'all')).self.points).toBe(150);
+  });
   it('excludes points belonging to users absent from the active-user lookup', async () => {
     const service = build({ workouts: [{ userId: A }, { userId: B }], users: [{ _id: A, name: 'Ana' }] });
     const result = await service.get(A, 'all');
@@ -108,7 +114,7 @@ describe('leaderboard read efficiency', () => {
       return { lean: () => ({ exec: async () => [{ userId: B, values: { showLeaderboard: false } }] }) };
     } })) };
     const users = findModel([{ _id: A, name: 'Ana' }, { _id: B, name: 'Ben' }]);
-    const service = new LeaderboardService(snapshots(), users, settings as any, nutrition as any, { aggregate: vi.fn(async () => [{ userId: A, day: '2099-01-01' }, { userId: B, day: '2099-01-01' }]) } as any);
+    const service = new LeaderboardService(snapshots(), users, settings as any, nutrition as any, { find: () => chain([]), aggregate: vi.fn(async () => [{ userId: A, day: '2099-01-01' }, { userId: B, day: '2099-01-01' }]) } as any);
     const result = await service.get(A, 'all');
     expect(result.self).toMatchObject({ userId: A, rank: 1, points: 200 });
     expect(result.entries.map(entry => entry.userId)).toEqual([A]);

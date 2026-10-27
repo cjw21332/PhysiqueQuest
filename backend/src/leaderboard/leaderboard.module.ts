@@ -7,6 +7,8 @@ import { WorkoutSession, WorkoutSessionSchema } from '../workouts/schemas/workou
 import { LeaderboardSnapshot, LeaderboardSnapshotSchema } from './schemas/leaderboard-snapshot.schema.js';
 import { LeaderboardController } from './leaderboard.controller.js';
 import { LeaderboardService } from './leaderboard.service.js';
+import { StrengthService } from './strength.service.js';
+import { Profile, ProfileSchema } from '../profile/schemas/profile.schema.js';
 
 @Module({
   imports: [
@@ -16,9 +18,11 @@ import { LeaderboardService } from './leaderboard.service.js';
       { name: Settings.name, schema: SettingsSchema },
       { name: Nutrition.name, schema: NutritionSchema },
       { name: WorkoutSession.name, schema: WorkoutSessionSchema },
+      { name: Profile.name, schema: ProfileSchema },
     ]),
   ],
   controllers: [LeaderboardController],
-  providers: [LeaderboardService],
+  providers: [LeaderboardService, StrengthService],
+  exports: [LeaderboardService],
 })
 export class LeaderboardModule {}

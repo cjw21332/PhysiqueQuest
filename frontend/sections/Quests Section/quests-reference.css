@@ -1,0 +1,20 @@
+.account-dark-theme .quests-reference .quest-v2-scroll { padding: 16px 20px 24px; }
+.account-dark-theme .quests-reference .quest-v2-level-card { margin-bottom: 22px; padding: 20px; border-radius: 22px; background: var(--green-light); }
+.account-dark-theme .quests-reference .quest-v2-level-top h3 { font-size: 24px; line-height: 1.2; }
+.account-dark-theme .quests-reference .quest-v2-streak strong { font-size: 24px; }
+.account-dark-theme .quests-reference :is(.quest-v2-level-top p, .quest-v2-level-card > p, .quest-v2-streak small) { font-size: 12px; }
+.account-dark-theme .quests-reference .quest-v2-exp-track { height: 8px; margin: 14px 0 12px; }
+.account-dark-theme .quests-reference .quest-v2-streak-days { gap: 5px; }
+.account-dark-theme .quests-reference .quest-v2-streak-days span { height: 26px; border-radius: 6px; }
+.account-dark-theme .quests-reference .quest-v2-level-card > p { margin-top: 12px; }
+.account-dark-theme .quests-reference .quest-v2-section-heading { margin-bottom: 6px; }
+.account-dark-theme .quests-reference .quest-v2-section-heading h3 { font-size: 14px; font-weight: 600; }
+.account-dark-theme .quests-reference .quest-v2-mission { min-height: 68px; gap: 12px; }
+.account-dark-theme .quests-reference .quest-v2-mission-main > strong { font-size: 13px; }
+.account-dark-theme .quests-reference .quest-v2-mission-icon { width: 34px; height: 34px; flex-basis: 34px; border-radius: 8px; }
+.account-dark-theme .quests-reference .quest-v2-mission-progress { max-width: 150px; }
+.account-dark-theme .quests-reference .quest-v2-badges { margin-top: 24px; }
+.account-dark-theme .quests-reference .quest-v2-badge-grid { gap: 16px 8px; }
+.account-dark-theme .quests-reference .quest-v2-badge > span { width: 48px; height: 48px; }
+.account-dark-theme .quests-reference .quest-v2-badge > small { max-width: 86px; font-size: 11px; line-height: 1.35; }
+@media (max-width: 350px) { .account-dark-theme .quests-reference .quest-v2-scroll { padding-inline: 14px; } }

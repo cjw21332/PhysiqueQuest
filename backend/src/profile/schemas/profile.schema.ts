@@ -8,6 +8,7 @@ export type ProfileDocument = HydratedDocument<Profile>;
 export class Profile {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, unique: true })
   userId: Types.ObjectId;
+  @Prop({ default: '' }) photo?: string;
 
   @Prop({ required: true })
   name: string;

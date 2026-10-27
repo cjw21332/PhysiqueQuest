@@ -6,7 +6,7 @@ it('reports missing dev delivery equally for existing and unknown accounts', asy
   vi.stubEnv('NODE_ENV', 'development');
   vi.stubEnv('MAIL_PROVIDER', '');
   const findOne = vi.fn().mockResolvedValue(null);
-  const service = new EmailVerificationService({ db: { collection: () => ({ updateOne: async () => ({}), findOne }) } } as any);
+  const service = new EmailVerificationService({ db: { collection: () => ({ updateOne: async () => ({}), findOne }) } } as any, {} as any);
   const unknown = await service.request('synthetic@example.invalid');
   findOne.mockResolvedValue({ emailVerified: false });
   expect(await service.request('other@example.invalid')).toEqual(unknown);

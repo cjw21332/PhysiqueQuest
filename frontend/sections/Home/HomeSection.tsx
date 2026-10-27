@@ -5,11 +5,12 @@ import BottomNav from './BottomNav';
 import HomeDashboard from './HomeDashboard';
 import Notifications from './Notifications';
 import type { Profile } from './types';
+import { useScreenRoute } from '../../hooks/useScreenRoute';
 
 type View = 'dashboard' | 'notifications';
 
 export default function HomeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
-  const [view, setView] = useState<View>('dashboard');
+  const [view, setView] = useScreenRoute<View>('/home', { dashboard: '', notifications: '/notifications' }, 'dashboard');
   const [message, setMessage] = useState('');
   const open = (next: View) => { setView(next); setMessage(''); };
   const goHome = () => open('dashboard');

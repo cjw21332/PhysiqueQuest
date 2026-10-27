@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { useState } from 'react';
 import { Icon } from '../Home/icons';
@@ -25,7 +26,7 @@ export default function CoachPlan({ profile, onStart, onLibrary }: { profile: Pr
     {isWorkoutDay ? <>
       <section className="workout-info-card"><div className="workout-label">{selectedDay === todayIndex ? 'Today' : currentDay?.name ?? 'Selected day'}</div><h3 className="workout-title">{currentDay.title}</h3><div className="workout-meta"><span className="meta-item">{plan.duration}</span><span className="meta-separator">·</span><span className="meta-item">{todayExercises.length} exercises</span>{currentDay.equipmentLabel && <><span className="meta-separator">·</span><span className="meta-item">{currentDay.equipmentLabel}</span></>}</div></section>
       {!plan.libraryReady ? <div className="rest-day-message"><h3>Exercises coming soon</h3><p>Your coach needs published exercises in the library before it can fill this session.</p></div> : <>
-        <section className="exercise-list-card" aria-label="Suggested exercises"><div className="exercise-list">{todayExercises.map((exercise, index) => <div key={exercise.exerciseId} className="exercise-item"><div className="exercise-number">{index + 1}</div><div className="exercise-details"><div className="exercise-name">{exercise.name}</div><div className="exercise-sets">{exercise.prescription || plan.sets}</div></div><div className={`tracking-badge ${exercise.tracking === 'AI tracked' ? 'ai-tracked' : 'manual'}`}>{exercise.tracking}</div></div>)}</div></section>
+        <section className="exercise-list-card" aria-label="Suggested exercises"><div className="exercise-list">{todayExercises.map((exercise, index) => <div key={exercise.exerciseId} className="exercise-item"><div className="exercise-number">{index + 1}</div><div className="exercise-details"><div className="exercise-name">{titleCase(exercise.name)}</div><div className="exercise-sets">{exercise.prescription || plan.sets}</div></div><div className={`tracking-badge ${exercise.tracking === 'AI tracked' ? 'ai-tracked' : 'manual'}`}>{exercise.tracking}</div></div>)}</div></section>
         {currentDay.formTip && <div className="form-tip-card"><div className="tip-icon"><Icon name="lightbulb" size={18} /></div><div className="tip-content"><div className="tip-title">Form tip · {currentDay.formTip.exerciseName}</div><div className="tip-text">{currentDay.formTip.text}</div></div></div>}
         {!todayExercises.length && <p className="coach-plan-note">No matching exercises are available for this day. Check your preferences or browse the library.</p>}
         {!!todayExercises.length && currentDay.availabilityNote && <p className="coach-plan-note">{currentDay.availabilityNote}</p>}

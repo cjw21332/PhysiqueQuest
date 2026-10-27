@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { mealNames, type MealName } from './types';
@@ -185,7 +186,7 @@ export default function AddFood({
               const detail = isSelected ? selected?.detail : food.detail;
               return <button type="button" key={food.fdc_id} className={isSelected ? 'selected' : ''} aria-pressed={isSelected} onClick={() => void selectFood(food)}>
                 <i className={isSelected ? 'checked' : ''} aria-hidden="true" />
-                <span><b>{food.description}</b><small>{food.data_type} · per 100 g</small></span>
+                <span><b>{titleCase(food.description)}</b><small>{food.data_type} · per 100 g</small></span>
                 <strong>{detail ? `${Math.round(detail.per_100g.kcal)} kcal` : 'Select to load'}</strong>
               </button>;
             })}

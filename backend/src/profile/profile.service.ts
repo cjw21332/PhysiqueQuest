@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, type HydratedDocument } from 'mongoose';
 import { Profile } from './schemas/profile.schema.js';
 import { CreateProfileDto, UpdateProfileDto } from './dto/profile.dto.js';
+import { sniffImageMime } from '../foodscan/foodscan.schemas.js';
 
 @Injectable()
 export class ProfileService {
@@ -60,6 +61,13 @@ export class ProfileService {
       throw new NotFoundException('Profile not found');
     }
 
+    return profile;
+  }
+
+  async updatePhoto(userId: string, photo: string): Promise<HydratedDocument<Profile>> {
+    if (photo && sniffImageMime(Buffer.from(photo.slice('data:image/jpeg;base64,'.length), 'base64')) !== 'image/jpeg') throw new BadRequestException('Please choose a valid image.');
+    const profile = await this.profileModel.findOneAndUpdate({ userId: new Types.ObjectId(userId) }, { $set: { photo } }, { returnDocument: 'after' });
+    if (!profile) throw new NotFoundException('Profile not found');
     return profile;
   }
 

@@ -19,6 +19,22 @@ afterEach(() => {
 });
 
 describe('EmailDeliveryProvider', () => {
+  it('uses the same EmailJS delivery and parameters for registration codes', async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response(null, { status: 200 }));
+    vi.stubGlobal('fetch', fetch);
+    const provider = createProvider(emailJsSettings);
+    expect(await provider.sendVerificationCode('member@example.com', '123456')).toBe(true);
+    const registration = JSON.parse(String(fetch.mock.calls[0][1]?.body));
+    await provider.sendPasswordReset('member@example.com', '123456');
+    expect(JSON.parse(String(fetch.mock.calls[1][1]?.body))).toEqual(registration);
+  });
+
+  it('uses the existing legacy mailer for registration codes', async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response(null, { status: 202 }));
+    vi.stubGlobal('fetch', fetch);
+    const provider = createProvider({ EMAIL_DELIVERY_URL: 'https://delivery.example.test/send', EMAIL_DELIVERY_API_KEY: 'legacy-key' });
+    expect(await provider.sendVerificationCode('member@example.com', '123456')).toBe(true);
+  });
   it('sends the reset code through EmailJS with the configured template parameters', async () => {
     const fetch = vi.fn(async () => new Response(null, { status: 200 }));
     vi.stubGlobal('fetch', fetch);

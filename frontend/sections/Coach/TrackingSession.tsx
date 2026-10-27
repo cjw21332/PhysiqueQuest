@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { useEffect, useState } from 'react';
 import { useCameraStream } from '../../hooks/useCameraStream';
@@ -46,7 +47,7 @@ export default function TrackingSession({ exercise, onFinish, onPause }: { exerc
   };
 
   return <section className="live-session">
-    <header className="coach-header"><h2>{review ? 'Review your reps' : exercise.name}</h2></header>
+    <header className="coach-header"><h2>{review ? 'Review your reps' : titleCase(exercise.name)}</h2></header>
     {!review && <>
       <p className="live-notice">{trackingGuidance[kind]}</p>
       <label className="tracking-side">Track side <select value={side} disabled={camera.status === 'on'} onChange={event => setSide(event.target.value as TrackingSide)}><option value="left">Left</option><option value="right">Right</option></select></label>
@@ -71,7 +72,7 @@ export default function TrackingSession({ exercise, onFinish, onPause }: { exerc
       <p className="live-notice">Prototype rep counting · counts may need correction. Camera frames stay on this device. Tracking pauses when the app is hidden.</p>
     </>}
     {review && <>
-      <p>{exercise.name} · {seconds} seconds</p>
+      <p>{titleCase(exercise.name)} · {seconds} seconds</p>
       <label className="tracking-side">Reps <input aria-label="Final rep count" type="number" min={0} max={1000} step={1} value={count} onChange={event => setCount(Math.min(1000, Math.max(0, Math.floor(Number(event.target.value) || 0))))}/></label>
       <p className="live-notice">Check the count before saving. You can also enter reps manually.</p>
       <button type="button" className="primary" disabled={busy} onClick={() => void finish()}>{busy ? 'Saving…' : 'Save workout'}</button>

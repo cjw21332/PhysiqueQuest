@@ -11,7 +11,7 @@
 .coach-reference > .coach-scroll {
   position: static;
   max-width: var(--coach-width);
-  padding: 0 20px 104px;
+  padding: 0 20px 12px;
   scrollbar-width: none;
 }
 .coach-reference .coach-plan { position: static; padding: 0; }
@@ -70,18 +70,15 @@
 .coach-reference .library-subtitle { color: #536176; font-size: 12px; }
 .coach-reference .library-link-card > svg { color: #8793a1; }
 .coach-reference .start-button-container {
-  position: absolute;
-  z-index: 4;
-  bottom: var(--coach-nav-height);
-  left: 50%;
-  transform: translateX(-50%);
+  position: static;
+  transform: none;
   width: 100%;
   max-width: var(--coach-width);
-  height: 84px;
-  margin: 0;
-  padding: 14px 20px 16px;
-  border-top: 1px solid #edf0ed;
-  background: #fff;
+  height: auto;
+  margin: 16px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 .coach-reference .start-session-btn { min-height: 54px; height: 54px; gap: 8px; border-radius: 13px; background: #80e687; color: #111a2c; font-size: 15px; font-weight: 600; box-shadow: none; transform: none; transition: none; }
 .coach-reference .start-session-btn:disabled { opacity: .5; cursor: not-allowed; }
@@ -99,5 +96,4 @@
   .coach-reference .exercise-item { gap: 9px; }
   .coach-reference .exercise-name { font-size: 13px; }
   .coach-reference .tracking-badge { padding-inline: 7px; font-size: 10px; }
-  .coach-reference .start-button-container { padding-inline: 16px; }
 }

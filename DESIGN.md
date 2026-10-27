@@ -158,6 +158,8 @@ The approved palette combines Night and Steel neutrals with a single green actio
 
 ## Typography
 
+Use Title Case for displayed exercise and food names and for short navigation or section labels where appropriate. Preserve abbreviations, mixed-case brand names, units, personal names, user-entered values, and the exact underlying saved data. Keep explanatory sentences and messages in sentence case. Apply name formatting at display time so editing and API records retain their original text.
+
 Bundled Inter (`frontend/public/fonts/Inter-Variable.ttf`, weights 100–900, `font-display: swap`) is used by the current scoped reference screens. The global fallback is `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`. The mobile host uses native system text.
 
 The extracted roles above are representative, not a new universal scale: launch title, authentication heading, workout title, nested page title, coaching-tip body, primary action, supporting metadata, and Home navigation. Existing scopes vary: account headers use weight 550, Home greetings use 650, and Scan metrics use tabular numerals. At viewport heights up to 800px, the launch title becomes 24px and its subtitle 12px; account actions become 44px tall.
@@ -168,13 +170,15 @@ The extracted roles above are representative, not a new universal scale: launch 
 
 Main reference screens use a centered mobile frame with a maximum width of 440px, typically 20px horizontal gutters. Launch uses 24px horizontal padding. Home content uses 18px top and 28px bottom padding. Narrow-screen scopes reduce gutters to 14px below 360px. Older generic layouts retain fluid gutters and wider tablet/desktop frames; do not turn those historical values into a universal width requirement.
 
-Use a flex-column shell with one primary scrolling content region, `min-height: 0`, and navigation/footer outside that region. Home navigation is 74px tall; its selected icon sits in a 52-by-29px pill. Keep trailing space where Coach pins its Start action above navigation. Launch is intentionally non-scrollable (`overflow: clip`); short-height rules keep readiness and account actions in view.
+Use a flex-column shell with one primary scrolling content region, `min-height: 0`, and navigation/footer outside that region. Home navigation is 74px tall; its selected icon sits in a 52-by-29px pill. Place Coach’s Start action at the end of its scrolling content, with space for the floating assistant. Launch is intentionally non-scrollable (`overflow: clip`); short-height rules keep readiness and account actions in view.
 
 Preserve the safe-area aliases backed by native `--safe-*` properties and `env(safe-area-inset-*)`, applying each inset once. Source inspection found one `--sat` definition; the older guide's warning about a later duplicate is historical. Keep controls clear of cutouts, keyboard, and system navigation. Existing responsive thresholds include 359px, 390px, 700px, 740px height, and the launch-specific 800px height rule. These are scope-dependent, not a new breakpoint system.
 
 ## Elevation & Depth
 
 Depth primarily comes from Night, Night Panel, Night Raised, and thin Steel borders. The current Home workout card, stats, Coach tip, and Home navigation explicitly remove shadows. Legacy shadow utilities remain available, including `0 1px 3px rgba(25,34,51,0.06)`; document them as existing exceptions rather than adding shadows to flat reference screens.
+
+Verification dialogs keep the complete email address visible by wrapping long addresses, and fit all six code fields without horizontal scrolling. Use the shared modal colors and preserve the resend countdown and keyboard navigation on narrow screens.
 
 **The Tonal Depth Rule.** Preserve flat reference surfaces and use their existing tonal hierarchy. Shared dark modal backdrops use `rgb(0 0 0 / 70%)`; camera overlays may use translucent slate over video. Keep existing modal focus containment, dismissal, focus restoration, and layering.
 
@@ -207,6 +211,18 @@ The Home workout panel uses Progress Tint, 23px corners, and `20px 19px 12px` pa
 Keep Home, Coach, Scan, Quests, and Me, with shared SVG icons and visible labels. Active icons receive a green pill; active labels use Primary Text and inactive labels Steel. Signed-in transitions use the client router. Back controls precede nested titles. Preserve the guide's explicit tab-visibility exceptions for the library, Today's Log, Food History, and notifications; do not impose one blanket rule on all nested screens.
 
 ### Progress and feedback
+
+Food History uses the reference's unboxed vertical layout: period pills, a prominent daily average, a compact daily bar chart with a target line, macro tracks, and expandable dated records. Use muted green bars, bright green for the latest day, and a warm accent for days above target. Show every day in longer periods while reducing date labels to fit. Adapt the chart and tracks to the dark palette, retain readable labels and 44px filter targets, and keep the shared bottom navigation and back control.
+
+Manual workout logging uses numbered expandable exercise cards with compact set rows, a weight-unit selector, and adjustable rest durations. Saved loads remain in kilograms on the server; the displayed unit and unsaved entries follow the selected unit. Keep existing workout recovery, save feedback, and safety controls available; the manual view does not display the camera preview.
+
+The signed-in assistant entry is a floating circular PhysiqueQuest logo above the bottom controls. Its dark bottom sheet uses the shared palette, a compact coach header, a scrollable conversation area, and a composer. Explain that messages and relevant account summaries are sent to Gemini. Use a native dialog for keyboard focus and dismissal.
+
+Account settings provides a Change photo action and a dark bottom sheet with preview, library and camera choices, removal, and explicit save or cancel. Crop selected photos to a square and keep the existing account settings and navigation.
+
+Leaderboard uses a segmented Quests/Strength selector, period or lift filters, a three-place podium, compact ranking rows and a highlighted personal rank. Strength rankings use self-reported completed sets, clearly label estimated one-rep maximum and bodyweight-relative scores, and never present them as verified lifts or sample standings.
+
+Quests uses a green-tinted level and streak panel, compact divided mission rows, and a four-column badge grid in the shared dark theme. Display missions, personal records, badges and streak information derived from account records; do not invent freeze or penalty data from a mockup.
 
 An empty nutrition account starts with its own zero-state data and normal API-backed logging. **View sample nutrition** explicitly enters a labeled sample experience; **Start my log** returns to real logging. Sample actions remain local. Real photo selection exits sample mode. Neither an empty response nor a failed request silently selects demonstration data.
 

@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiRequestError, getApiBaseUrl, type WorkoutSessionRecord, type WorkoutSetResult } from '../../lib/api';
 import { getCurrentUser } from '../../lib/auth';
 import LiveSession from './LiveSession';
+import { Icon } from '../Home/icons';
 import { exerciseProgress, prescribedWork } from './workoutRoutine';
+import { titleCase } from '../../lib/titleCase';
 
-type Draft = { selected: number; values: Record<string, { reps: string; weight: string }>; checkpoint?: string };
+type Draft = { selected: number; values: Record<string, { reps: string; weight: string }>; checkpoint?: string; unit?: 'kg' | 'lbs' };
 export function workoutDraftKey(id: string) { return `physiquequest-workout-draft:${getApiBaseUrl()}:${getCurrentUser()?.id ?? 'signed-out'}:${id}`; }
 export function readWorkoutDraft(id: string): Draft {
   try {
@@ -17,7 +19,7 @@ export function readWorkoutDraft(id: string): Draft {
         const item = row as { reps?: unknown; weight?: unknown };
         if (item && typeof item.reps === 'string' && item.reps.length <= 8 && typeof item.weight === 'string' && item.weight.length <= 8) values[key] = { reps: item.reps, weight: item.weight };
       }
-      return { selected: value.selected, values, checkpoint: typeof value.checkpoint === 'string' && Number.isFinite(Date.parse(value.checkpoint)) ? value.checkpoint : undefined };
+      return { selected: value.selected, values, unit: value.unit === 'lbs' ? 'lbs' : 'kg', checkpoint: typeof value.checkpoint === 'string' && Number.isFinite(Date.parse(value.checkpoint)) ? value.checkpoint : undefined };
     }
   } catch { /* A damaged or unavailable device draft never replaces server records. */ }
   return { selected: 0, values: {} };
@@ -36,6 +38,19 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
   const [error, setError] = useState('');
   const [storageError, setStorageError] = useState(false);
   const [notice, setNotice] = useState('');
+  const [expanded, setExpanded] = useState(true);
+  const unit = draft.unit ?? 'kg';
+  const [restSets, setRestSets] = useState(90);
+  const [restExercises, setRestExercises] = useState(120);
+  const [restUntil, setRestUntil] = useState(0);
+  const [restNow, setRestNow] = useState(Date.now());
+  const restDialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => { if (!restUntil) return; const timer = window.setInterval(() => { const now = Date.now(); setRestNow(now); if (now >= restUntil) setRestUntil(0); }, 1000); return () => window.clearInterval(timer); }, [restUntil]);
+  useEffect(() => {
+    const dialog = restDialog.current;
+    if (restUntil && dialog && !dialog.open) dialog.showModal();
+    if (!restUntil && dialog?.open) dialog.close();
+  }, [restUntil]);
   const [ending, setEnding] = useState<number | null>(null);
   const endDialog = useRef<HTMLDialogElement>(null);
   const completionRequest = useRef<{ endedAt: string; exerciseResults: []; expectedRevision: number } | null>(null);
@@ -56,6 +71,7 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
     catch { setStorageError(true); }
   }, [workout._id]);
   const changeDraft = (next: Draft) => { persist(next); setDraft(next); };
+  const setUnit = (next: 'kg' | 'lbs') => { if (next === unit) return; const factor = next === 'lbs' ? 2.2046226218 : 1 / 2.2046226218; const values = Object.fromEntries(Object.entries(draftRef.current.values).map(([key, value]) => [key, { ...value, weight: value.weight === '' ? '' : String(Math.round(Number(value.weight) * factor * 100) / 100) }])); changeDraft({ ...draftRef.current, unit: next, values }); };
   const checkpoint = useCallback(() => persist({ ...draftRef.current, checkpoint: new Date().toISOString() }), [persist]);
   useEffect(() => { persist(draftRef.current); }, [persist]);
   useEffect(() => {
@@ -93,9 +109,11 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
     const existing = sets.find(set => set.setId === setId);
     const input = draftRef.current.values[setId];
     const reps = prescribed.durationSeconds ? 0 : Number(input?.reps ?? (existing?.reps ?? prescribed.reps));
-    const weight = input?.weight ?? (existing?.loadKg === undefined ? '' : String(existing.loadKg));
-    if ((!prescribed.durationSeconds && (input?.reps === '' || !Number.isInteger(reps) || reps < 1 || reps > 1000)) || (weight !== '' && (!Number.isFinite(Number(weight)) || Number(weight) < 0 || Number(weight) > 1000))) throw new Error('Enter 1–1000 whole reps and a weight from 0–1000 kg, or leave weight blank.');
-    await writeSet({ setId, exerciseId: exercise.exerciseId, setIndex: index, reps, ...(prescribed.durationSeconds ? { durationSeconds: prescribed.durationSeconds } : {}), ...(weight !== '' ? { loadKg: Number(weight) } : {}), status: 'completed', source: 'manual' });
+    const weight = input?.weight ?? (existing?.loadKg === undefined ? '' : String(existing.loadKg * (unit === 'lbs' ? 2.2046226218 : 1)));
+    const loadKg = weight === '' ? undefined : Number(weight) / (unit === 'lbs' ? 2.2046226218 : 1);
+    if ((!prescribed.durationSeconds && (input?.reps === '' || !Number.isInteger(reps) || reps < 1 || reps > 1000)) || (loadKg !== undefined && (!Number.isFinite(loadKg) || loadKg < 0 || loadKg > 1000))) throw new Error('Enter 1–1000 whole reps and a valid weight, or leave weight blank.');
+    await writeSet({ setId, exerciseId: exercise.exerciseId, setIndex: index, reps, ...(prescribed.durationSeconds ? { durationSeconds: prescribed.durationSeconds } : {}), ...(loadKg !== undefined ? { loadKg } : {}), status: 'completed', source: 'manual' });
+    if (existing?.status !== 'completed') { const seconds = exerciseProgress(exercise, recordRef.current.sets ?? []) === 'completed' ? restExercises : restSets; const now = Date.now(); setRestNow(now); setRestUntil(now + seconds * 1000); }
     const values = { ...draftRef.current.values }; delete values[setId];
     changeDraft({ ...draftRef.current, values });
     setNotice(`Set ${index + 1} saved to your account.`);
@@ -135,32 +153,34 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
       initialSeconds={initialSeconds} initialPaused={Boolean(record.pausedAt)} onCheckpoint={checkpoint} controlsDisabled={saving}
       onPause={async paused => { const saved = await attempt(async () => { updateRecord(await api.pauseWorkout(workout._id, { paused, occurredAt: new Date().toISOString(), expectedRevision: recordRef.current.revision ?? 0 })); }); if (!saved) throw new Error('Pause state was not saved. Review the error and retry.'); }}
       onEnd={end} renderRoutine={paused => <>
+        <section className="manual-settings" aria-label="Manual log settings"><div className="manual-unit"><strong>Weight unit</strong><div role="group" aria-label="Weight unit">{(['kg', 'lbs'] as const).map(value => <button type="button" key={value} aria-pressed={unit === value} onClick={() => setUnit(value)}>{value}</button>)}</div></div><h3>Rest timer</h3>{([['Between sets', restSets, setRestSets], ['Between exercises', restExercises, setRestExercises]] as const).map(([label, seconds, update]) => <div className="manual-rest" key={label}><span>{label}</span><button type="button" aria-label={`Decrease ${label.toLowerCase()} rest`} onClick={() => update(Math.max(0, seconds - 15))}>−</button><strong>{Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}</strong><button type="button" aria-label={`Increase ${label.toLowerCase()} rest`} onClick={() => update(Math.min(600, seconds + 15))}>+</button></div>)}<small>Saving a set starts the timer automatically.</small>{restUntil > 0 && <p role="status">Rest: {Math.floor(Math.max(0, Math.ceil((restUntil - restNow) / 1000)) / 60)}:{String(Math.max(0, Math.ceil((restUntil - restNow) / 1000)) % 60).padStart(2, '0')}</p>}</section>
+        <h2 className="manual-exercises-title">Exercises · {exercises.length}</h2>
         <div className="routine-progress" role="status">{completed} of {total} sets completed · Manual logging</div>
         <nav aria-label="Workout routine"><ol>{exercises.map((row, index) => {
           const status = exerciseProgress(row, sets);
           const reachable = index <= selected || index === exercises.findIndex(item => exerciseProgress(item, sets) !== 'completed') || status !== 'upcoming';
-          return <li key={row.exerciseId}><button type="button" aria-current={index === selected ? 'step' : undefined} disabled={saving || !reachable} onClick={()=>changeDraft({ ...draftRef.current, selected: index })} aria-label={`${status === 'completed' || status === 'skipped' ? 'Revisit' : 'View'} ${row.name}`}><span>{index + 1}. {row.name}</span><small>{index === selected ? 'Current · ' : ''}{status}</small></button></li>;
-        })}</ol></nav>
-        {exercise ? <section aria-label="Current exercise" className="routine-current"><h2>{exercise.name}</h2><p>{exercise.prescription ?? 'Record the work you performed.'}</p><p className="routine-help">Save each set after you do it. Prescribed values are not measured. Blank weight means no added load.</p>
+          return <li key={row.exerciseId} className={index === selected && expanded ? 'routine-exercise-open' : ''}><button type="button" aria-current={index === selected ? 'step' : undefined} aria-expanded={index === selected && expanded} disabled={saving || !reachable} onClick={()=>{ if (index === selected) setExpanded(value => !value); else { changeDraft({ ...draftRef.current, selected: index }); setExpanded(true); } }} aria-label={`${status === 'completed' || status === 'skipped' ? 'Revisit' : 'View'} ${titleCase(row.name)}`}><span className="routine-exercise-number">{index + 1}</span><span className="routine-exercise-label"><strong>{titleCase(row.name)}</strong><small>{row.prescription ?? `${row.sets} sets`}</small></span><small>{sets.filter(set => set.exerciseId === row.exerciseId && set.status === 'completed').length}/{row.sets}</small><span aria-hidden="true">⌄</span></button>{index === selected && expanded && <section aria-label="Current exercise" className="routine-current"><p className="routine-help">Blank weight means no added load.</p>
+          <div className="routine-set-heading" aria-hidden="true"><span>Set</span><span>{/body\s*weight|bodyweight|none/i.test(exercise.equipment) ? 'Load' : unit}</span><span>{prescribedWork(exercise.prescription).durationSeconds ? 'Time' : 'Reps'}</span><span /></div>
           {Array.from({ length: exercise.sets }, (_, index) => {
             const setId = `${exercise.exerciseId}:${index}`, saved = sets.find(set => set.setId === setId), input = draft.values[setId], prescribed = prescribedWork(exercise.prescription);
-            const values = { reps: input?.reps ?? String(saved?.status === 'completed' ? saved.reps : prescribed.reps || ''), weight: input?.weight ?? (saved?.loadKg === undefined ? '' : String(saved.loadKg)) };
+            const values = { reps: input?.reps ?? String(saved?.status === 'completed' ? saved.reps : prescribed.reps || ''), weight: input?.weight ?? (saved?.loadKg === undefined ? '' : String(unit === 'kg' ? saved.loadKg : Math.round(saved.loadKg * 2.2046226218 * 100) / 100)) };
             const bodyweight = /body\s*weight|bodyweight|none/i.test(exercise.equipment);
             const change = (key: 'reps' | 'weight', value: string) => changeDraft({ ...draftRef.current, values: { ...draftRef.current.values, [setId]: { ...values, [key]: value } } });
-            return <form key={setId} className="routine-set" onSubmit={event=>{event.preventDefault();void save(index);}}><h3>Set {index + 1} <small>{saved?.status ?? 'Not saved'}</small></h3>
-              {prescribed.durationSeconds ? <p>Confirm {prescribed.durationSeconds} seconds completed</p> : <label>Reps<input type="number" inputMode="numeric" min={1} max={1000} step={1} required value={values.reps} disabled={paused || saving} aria-label={`Reps, set ${index + 1}`} onChange={event=>change('reps',event.target.value)}/></label>}
-              {!bodyweight && <label>Weight (kg)<input type="number" inputMode="decimal" min={0} max={1000} step="any" value={values.weight} disabled={paused || saving} aria-label={`Weight (kg), set ${index + 1}`} onChange={event=>change('weight',event.target.value)}/></label>}
+            return <form key={setId} className="routine-set" onSubmit={event=>{event.preventDefault();void save(index);}}><h3><span className="visually-hidden">Set </span>{index + 1}<small className="visually-hidden"> {saved?.status ?? 'Not saved'}</small></h3>
+              {!bodyweight && <label><span className="visually-hidden">Weight ({unit})</span><input type="number" inputMode="decimal" min={0} max={unit === 'kg' ? 1000 : 2204.62} step="any" value={values.weight} disabled={paused || saving} aria-label={`Weight (${unit}), set ${index + 1}`} onChange={event=>change('weight',event.target.value)}/></label>}
               {bodyweight && <p>Bodyweight · no added load</p>}
-              <button type="submit" disabled={paused || saving}>{saved?.status === 'completed' ? 'Update' : 'Save'} set {index + 1}</button>
+              {prescribed.durationSeconds ? <p>{prescribed.durationSeconds} sec</p> : <label><span className="visually-hidden">Reps</span><input type="number" inputMode="numeric" min={1} max={1000} step={1} required value={values.reps} disabled={paused || saving} aria-label={`Reps, set ${index + 1}`} onChange={event=>change('reps',event.target.value)}/></label>}
+              <button type="submit" className={saved?.status === 'completed' ? 'is-saved' : undefined} aria-label={`${saved?.status === 'completed' ? 'Update' : 'Save'} set ${index + 1}`} disabled={paused || saving}><Icon name="check" size={18}/></button>
             </form>;
           })}
           <button type="button" disabled={paused || saving} onClick={()=>void skip()}>Skip exercise</button>
-        </section> : <p>This older workout has no routine snapshot. You can finish it, but no sets will be invented.</p>}
-        <p className="routine-help">Saved sets are on your account and editable until you end. Unsaved inputs stay on this device; reopen Coach to resume.</p>
+        </section>}</li>;
+        })}</ol></nav>
         {storageError && <p role="alert">Device draft storage is unavailable. Unsaved inputs will be lost if you close the app.</p>}
         {notice && <p role="status">{notice}</p>}
         {error && <p role="alert">{error}</p>}
       </>}/>
+    <dialog ref={restDialog} className="routine-rest-dialog" aria-labelledby="routine-rest-title" onCancel={event => { event.preventDefault(); setRestUntil(0); }}><h2 id="routine-rest-title">Rest time</h2><p>Take a breath before your next set.</p><strong role="timer" aria-label="Rest time remaining">{Math.floor(Math.max(0, Math.ceil((restUntil - restNow) / 1000)) / 60)}:{String(Math.max(0, Math.ceil((restUntil - restNow) / 1000)) % 60).padStart(2, '0')}</strong><div className="routine-rest-actions"><button type="button" onClick={() => setRestUntil(until => until + 60000)}>+1 min</button><button type="button" onClick={() => setRestUntil(0)}>End rest</button></div></dialog>
     {ending !== null && <dialog ref={endDialog} aria-labelledby="routine-end-title" className="routine-end-dialog" onCancel={event=>{event.preventDefault();if(!saving)setEnding(null);}}><h2 id="routine-end-title">End workout early?</h2><p>{total - completed} sets are not completed. Remaining sets will be saved as skipped. Unsaved inputs are not counted.</p>{error && <p role="alert">{error}</p>}<button type="button" disabled={saving} onClick={()=>{completionRequest.current=null;setEnding(null);}}>Keep training</button><button type="button" disabled={saving} onClick={()=>void finish(ending)}>{saving ? 'Saving…' : 'Save and end workout'}</button></dialog>}
   </div>;
 }

@@ -4,21 +4,21 @@ import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent, type 
 import { api } from '../../lib/api';
 
 type Step = 'reset' | 'verify' | 'password' | 'success';
-type Props = { onClose: () => void; onSuccess: () => void; mode?: 'reset' | 'change'; accountEmail?: string };
+type Props = { onClose: () => void; onSuccess: () => void; mode?: 'reset' | 'change' | 'register' | 'verify-email'; accountEmail?: string; initialRequestId?: string; onRegister?: (requestId: string, code: string) => Promise<void> };
 const OTP_LENGTH = 6;
 const RESEND_DELAY = 60;
 
-export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset', accountEmail }: Props) {
-  const [step, setStep] = useState<Step>('reset');
+export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset', accountEmail, initialRequestId = '', onRegister }: Props) {
+  const [step, setStep] = useState<Step>(mode === 'register' ? 'verify' : 'reset');
   const [email, setEmail] = useState(accountEmail ?? '');
   const [code, setCode] = useState('');
-  const [requestId, setRequestId] = useState('');
+  const [requestId, setRequestId] = useState(initialRequestId);
   const [resetToken, setResetToken] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [resendSeconds, setResendSeconds] = useState(0);
+  const [resendSeconds, setResendSeconds] = useState(mode === 'register' ? RESEND_DELAY : 0);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const codeInputs = useRef<Array<HTMLInputElement | null>>([]);
@@ -51,6 +51,11 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     setBusy(true);
     setError('');
     try {
+      if (mode === 'verify-email') {
+        const response = await api.requestAccountVerificationCode();
+        setRequestId(response.requestId); setCode(''); setResendSeconds(RESEND_DELAY); setStep('verify');
+        return;
+      }
       const response = mode === 'change'
         ? await api.requestPasswordChange()
         : await api.requestPasswordReset(email.trim());
@@ -78,6 +83,11 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     setBusy(true);
     setError('');
     try {
+      if (mode === 'register' || mode === 'verify-email') {
+        const response = mode === 'register' ? await api.requestRegistrationCode(email.trim()) : await api.requestAccountVerificationCode();
+        setRequestId(response.requestId); setCode(''); setResendSeconds(RESEND_DELAY);
+        return;
+      }
       const response = mode === 'change'
         ? await api.requestPasswordChange()
         : await api.requestPasswordReset(email.trim());
@@ -110,6 +120,16 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     setBusy(true);
     try {
       if (!requestId) throw new Error('Request a new verification code before continuing.');
+      if (mode === 'verify-email') {
+        await api.confirmAccountVerificationCode(requestId, code);
+        onSuccess();
+        return;
+      }
+      if (mode === 'register') {
+        if (!onRegister) throw new Error('Registration is unavailable.');
+        await onRegister(requestId, code);
+        return;
+      }
       const result = mode === 'change'
         ? await api.verifyPasswordChange(requestId, code)
         : await api.verifyPasswordResetCode(requestId, code);
@@ -183,8 +203,8 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
 
   const formatCountdown = `${String(Math.floor(resendSeconds / 60)).padStart(2, '0')}:${String(resendSeconds % 60).padStart(2, '0')}`;
 
-  return <dialog ref={dialogRef} className="forgot-password-overlay" aria-modal="true" aria-label={step === 'verify' ? 'Verification code' : step === 'password' ? 'Set new password' : step === 'success' ? 'Password updated' : mode === 'change' ? 'Change your password' : 'Reset your password'} onCancel={event => { event.preventDefault(); onClose(); }}>
-    {step === 'verify' && <div className="forgot-password-modal forgot-password-modal-background" aria-hidden="true" inert>
+  return <dialog ref={dialogRef} className="forgot-password-overlay" aria-modal="true" aria-label={step === 'verify' ? 'Verification code' : step === 'password' ? 'Set new password' : step === 'success' ? 'Password updated' : mode === 'verify-email' ? 'Verify your email' : mode === 'change' ? 'Change your password' : 'Reset your password'} onCancel={event => { event.preventDefault(); onClose(); }}>
+    {step === 'verify' && mode !== 'register' && mode !== 'verify-email' && <div className="forgot-password-modal forgot-password-modal-background" aria-hidden="true" inert>
       <div className="modal-header"><h3>{mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><span className="close-btn">×</span></div>
       <div className="modal-body">
         <p className="modal-description">{mode === 'change' ? 'Enter the verification code sent to your account email to change your password.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
@@ -194,16 +214,16 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     </div>}
     <div className={`forgot-password-modal${step === 'verify' ? ' forgot-password-modal-otp' : ''}`}>
     {step === 'reset' && <>
-      <div className="modal-header"><h3>{mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>{mode === 'verify-email' ? 'Verify your email' : mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
       <form onSubmit={event => void requestCode(event)}>
         <div className="modal-body">
-          <p className="modal-description">{mode === 'change' ? 'We’ll send a verification code to the email address on your signed-in account.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
-          {mode === 'change'
+          <p className="modal-description">{mode === 'verify-email' ? 'Confirm your email address to finish verifying your account.' : mode === 'change' ? 'We’ll send a verification code to the email address on your signed-in account.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
+          {mode === 'change' || mode === 'verify-email'
             ? <label className="forgot-field"><span>Account email</span><input type="email" value={email} readOnly /></label>
             : <label className="forgot-field"><span>Email address</span><input type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} placeholder="you@email.com" /></label>}
           {error && <p className="error-hint" role="alert">{error}</p>}
         </div>
-        <div className="modal-footer"><button className="btn-primary" disabled={busy}>{busy ? 'Sending…' : mode === 'change' ? 'Send Verification Code' : 'Send OTP Verification'}</button></div>
+        <div className="modal-footer"><button className="btn-primary" disabled={busy}>{busy ? 'Sending…' : mode === 'change' || mode === 'verify-email' ? 'Send Verification Code' : 'Send OTP Verification'}</button></div>
       </form>
     </>}
 

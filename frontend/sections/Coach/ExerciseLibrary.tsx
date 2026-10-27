@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { useEffect, useRef, useState } from 'react';
 import { api, type ExerciseCatalog, type ExerciseRecord } from '../../lib/api';
@@ -103,7 +104,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
       <div className="library-list">
         {catalog.items.map(item => <button type="button" className="library-item" key={item._id} aria-haspopup="dialog" onClick={event => { openerRef.current = event.currentTarget; setMediaError(false); setSelected(item); }}>
           <span className="exercise-thumb"><Icon name="library-dumbbells" size={24}/>{item.gifUrl && <i><Icon name="play" size={8}/></i>}</span>
-          <span className="library-copy"><b>{item.name}</b><small>{metadata(item)}</small><span className="library-item-meta"><span className={`tracking-tag ${trackingLabel(item) === 'Caution' ? 'caution' : trackingLabel(item) === 'Manual' ? 'manual' : ''}`}>{trackingLabel(item)}</span>{item.gifUrl && <span className="library-demo-label">Demonstration</span>}</span></span>
+          <span className="library-copy"><b>{titleCase(item.name)}</b><small>{metadata(item)}</small><span className="library-item-meta"><span className={`tracking-tag ${trackingLabel(item) === 'Caution' ? 'caution' : trackingLabel(item) === 'Manual' ? 'manual' : ''}`}>{trackingLabel(item)}</span>{item.gifUrl && <span className="library-demo-label">Demonstration</span>}</span></span>
           <Icon name="arrow" size={16}/>
         </button>)}
         {!catalog.items.length && <div className="empty-library"><p>No exercises match those filters.</p><button type="button" className="secondary" onClick={reset}>Reset filters</button></div>}
@@ -114,13 +115,13 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
     </>}
     {selected && <dialog ref={dialogRef} className="library-dialog" aria-labelledby="library-exercise-title" onCancel={() => setSelected(null)} onClick={event => { if (event.target === event.currentTarget) setSelected(null); }}>
       <article className="exercise-sheet library-exercise-sheet">
-        <header className="library-sheet-header"><div><h3 id="library-exercise-title">{detail?.name || selected.name}</h3><p>{metadata(detail || selected)}</p></div><button type="button" className="sheet-close" onClick={() => setSelected(null)} aria-label="Close exercise details" autoFocus><Icon name="close" size={18}/></button></header>
+        <header className="library-sheet-header"><div><h3 id="library-exercise-title">{titleCase(detail?.name || selected.name)}</h3><p>{metadata(detail || selected)}</p></div><button type="button" className="sheet-close" onClick={() => setSelected(null)} aria-label="Close exercise details" autoFocus><Icon name="close" size={18}/></button></header>
         {!detail && !detailError && <p role="status">Loading exercise details…</p>}
         {detailError && <div role="alert" className="empty-library"><p>{detailError}</p><button className="secondary" onClick={() => setDetailRetry(value => value + 1)}>Retry details</button></div>}
         {detail && <>
           <div className="library-demo">
             {detail.gifUrl && !mediaError ? <>
-              <img ref={imageRef} src={detail.gifUrl} alt={`Exercise demonstration - ${detail.name}`} style={{ visibility: playing || !frameReady ? 'visible' : 'hidden' }} onLoad={freezeFrame} onError={() => { setMediaError(true); setPlaying(false); }}/>
+              <img ref={imageRef} src={detail.gifUrl} alt={`Exercise demonstration - ${titleCase(detail.name)}`} style={{ visibility: playing || !frameReady ? 'visible' : 'hidden' }} onLoad={freezeFrame} onError={() => { setMediaError(true); setPlaying(false); }}/>
               <canvas ref={canvasRef} aria-hidden="true" style={{ visibility: !playing && frameReady ? 'visible' : 'hidden' }}/>
               <button type="button" className={`library-demo-toggle ${playing ? 'is-playing' : ''}`} aria-label={playing ? 'Pause exercise demonstration' : 'Play exercise demonstration'} onClick={() => { if (playing) freezeFrame(); setPlaying(value => !value); }}><Icon name={playing ? 'pause' : 'play'} size={22}/></button>
             </> : <span className="library-video-unavailable"><Icon name="library-dumbbells" size={40}/><small>{mediaError ? 'Could not load this demonstration.' : 'No demonstration available'}</small></span>}

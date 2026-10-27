@@ -1,0 +1,20 @@
+.me-reference .me-profile-summary .me-avatar { position: relative; overflow: hidden; border-radius: 50%; background: var(--soft); }
+.me-reference .me-profile-summary .me-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.me-reference .me-photo-link { display: block; width: fit-content; min-height: 36px; padding: 0; border: 0; background: transparent; color: var(--green); font-size: 12px; font-weight: 600; text-align: left; }
+.profile-photo-dialog { box-sizing: border-box; position: fixed; inset: auto 0 0; width: min(100%, 440px); max-height: calc(100dvh - 24px); margin: 0 auto; padding: 20px 18px calc(18px + var(--sab, 0px)); overflow-y: auto; border: 1px solid var(--line); border-radius: 22px 22px 0 0; background: var(--surface); color: var(--ink); }
+.profile-photo-dialog::backdrop { background: rgb(0 0 0 / 70%); }
+.profile-photo-dialog header { display: flex; justify-content: space-between; gap: 10px; }
+.profile-photo-dialog h2 { margin: 0; font-size: 18px; }
+.profile-photo-dialog header p, .profile-photo-note { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.profile-photo-dialog header p { margin: 6px 0 0; }
+.profile-photo-dialog header button { width: 44px; height: 44px; border: 0; background: transparent; color: var(--muted); }
+.profile-photo-preview { display: grid; place-items: center; width: 100px; height: 100px; margin: 18px auto; overflow: hidden; border-radius: 50%; background: var(--soft); color: var(--muted); }
+.profile-photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.profile-photo-option { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 4px; border: 0; background: transparent; color: var(--ink); text-align: left; font-size: 14px; }
+.profile-photo-option.remove, .profile-photo-error { color: var(--red-dark); }
+.profile-photo-option:disabled { opacity: .5; }
+.profile-photo-dialog footer { display: flex; gap: 10px; margin-top: 12px; }
+.profile-photo-dialog footer button { flex: 1; min-height: 48px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); color: var(--ink); font-weight: 600; }
+.profile-photo-dialog footer button:last-child { background: var(--green); color: var(--surface); border-color: var(--green); }
+.profile-photo-dialog footer button:disabled { opacity: .5; }
+.profile-photo-dialog button:focus-visible, .me-photo-link:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }

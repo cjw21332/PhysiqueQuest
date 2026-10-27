@@ -18,6 +18,7 @@ test('reference Coach layout renders server prescriptions and starts the chosen 
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
     let json = {};
+    if (path.endsWith('/auth/session/migrate') || path.endsWith('/auth/session/refresh')) json = { access_token: 'test', expires_in: 3600, user: { id: 'test', name: 'Test', email: 'test@example.test', emailVerified: true } };
     if (path.endsWith('/profile')) json = { name: 'Test', equipment: ['Dumbbell'], duration: '45 min' };
     if (path.endsWith('/coach/plan')) json = plan;
     if (path.endsWith('/pose/status')) json = { available: false };
@@ -34,11 +35,15 @@ test('reference Coach layout renders server prescriptions and starts the chosen 
   await expect(page.getByText('22 kg', { exact: false })).toHaveCount(0);
   for (const size of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(size);
+    await page.locator('.coach-scroll').evaluate(element => { element.scrollTop = 0; });
+    expect(await page.locator('.start-button-container').evaluate(element => getComputedStyle(element).position)).toBe('static');
     await page.locator('.coach-scroll').evaluate(element => { element.scrollTop = element.scrollHeight; });
     await expect(page.getByRole('button', { name: 'Start session', exact: true })).toBeInViewport();
     const start = await page.getByRole('button', { name: 'Start session', exact: true }).boundingBox();
     const nav = await page.getByRole('navigation', { name: 'Main navigation' }).boundingBox();
+    const chat = await page.getByRole('button', { name: 'Open Phiq coach' }).boundingBox();
     expect(start.y + start.height).toBeLessThanOrEqual(nav.y);
+    expect(chat.y + chat.height).toBeLessThanOrEqual(nav.y);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.getByRole('button', { name: 'Start session', exact: true }).click();

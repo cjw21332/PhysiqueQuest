@@ -1,5 +1,6 @@
 export type Profile = {
   name: string;
+  photo?: string;
   email: string;
   goal: string;
   duration: string;

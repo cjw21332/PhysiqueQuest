@@ -1,5 +1,14 @@
 # PhysiqueQuest — Frontend, Backend, and End-to-End Checklist
 
+## v4.0.0 review — October 28, 2026
+
+- [x] Compare the current changes against `PhysiqueQuest-v3.1.2` and record scope in [PROGRESS-59](../ProgressReports/PROGRESS-59.md).
+- [x] Backend build and unit tests, frontend production build, mobile TypeScript and mobile Node tests pass locally.
+- [ ] Repair and rerun the complete frontend Node suite: 13 tests currently fail, including stale component harnesses and expectations.
+- [ ] Verify real registration email delivery, Gemini responses, persisted end-to-end flows and Android/iOS devices in an appropriate environment.
+- [ ] Implement reliable form scoring before enabling the Perfect Form badge; it is currently marked unavailable.
+- [ ] Complete the previously recorded production, provider and security checks; prior unchecked items remain open.
+
 - October 22, 2026: Prepared `PhysiqueQuest-v3.1.2` for the user's requested publication and fast-forward of `main`. Fresh checks pass: backend 503 tests and Nest build; complete frontend/mobile Node suites; mobile TypeScript; Next production build. See `ProgressReports/PROGRESS-58.md` for included updates and unchanged external verification limits. Credentials and generated output remain excluded under Git ignore rules.
 
 - October 21, 2026: Traced OTP delivery to `EmailDeliveryProvider.sendWithEmailJs()` (backend REST call), with `MAIL_PROVIDER` unset and EmailJS configured. Active dashboard IDs: service `service_pdqqhio`, template `template_a9s1vuh`; payload variables are `email`, first-name `name`, six-digit `passcode`, and `time` (`10 minutes`). Path A applies: no runtime code reads the old dark `backend/email-templates/otp.html`. Created canonical light `emails/otp-template.html` and `.txt`, corrected the old README's unsupported live-update claim and documented exact dashboard Content/code-editor/Save/Test steps. No OTP generation, expiry, backend behavior or provider selection changed in this task. Local assertions and visual previews pass at 740px and 320px: HTML 2,912 bytes, only supported escaped variables, loaded 40px logo, `012345` retained, correct expiry and no horizontal overflow. Real EmailJS Test and Gmail desktop/mobile checks remain pending: Work browser access is disabled, no connected EmailJS/Gmail interface or recipient is available. Provider-injected branding is governed by the EmailJS plan and cannot be removed by local HTML.

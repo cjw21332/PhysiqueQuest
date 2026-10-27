@@ -4,7 +4,7 @@ import { expectDarkPalette, expectReferenceLayout, expectHomeBack } from './them
 async function fixtures(page) {
   await page.clock.setFixedTime(new Date('2026-10-19T08:00:00Z'));
   await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'visual', token: 'visual-test' })));
-  const profile = { name: 'Toji', email: 'toji@example.test', goal: 'Build muscle', weight: '59.5', weightUnit: 'kg', targetWeight: '74', targetDate: '2027-03-31', duration: '45 min', equipment: ['Dumbbells'], days: ['Monday', 'Wednesday', 'Friday', 'Saturday'], createdAt: '2026-10-05' };
+  const profile = { name: 'Toji', email: 'toji@example.test', goal: 'Build muscle', weight: '59.5', weightUnit: 'kg', targetWeight: '74', targetDate: '2027-03-31', duration: '45 min', equipment: ['Dumbbells'], days: ['Monday', 'Wednesday', 'Friday', 'Saturday'], createdAt: '2026-10-05', photo: '' };
   const weights = Array.from({ length: 8 }, (_, i) => ({ _id: `weight-${i}`, metric: 'weight', unit: 'kg', value: Number((66.4 + i * .3).toFixed(1)), measuredAt: new Date(Date.UTC(2026, 7, 24 + i * 8)).toISOString() }));
   let measurements = [...weights];
   let items = [
@@ -23,6 +23,8 @@ async function fixtures(page) {
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
     if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
     let json = {};
+    if (path.endsWith('/profile/photo')) { profile.photo = req.method() === 'DELETE' ? '' : req.postDataJSON().photo; json = profile; }
+    if (path.endsWith('/auth/session/migrate') || path.endsWith('/auth/session/refresh')) json = { access_token: 'visual-test', expires_in: 3600, user: { id: 'visual', name: 'Toji', email: 'toji@example.test', emailVerified: true } };
     if (path.endsWith('/profile')) json = profile;
     if (path.endsWith('/workouts')) json = [];
     if (path.endsWith('/settings')) json = { values: {} };
@@ -48,6 +50,29 @@ async function fixtures(page) {
   });
   return { get marks() { return marks; }, get saved() { return saved; } };
 }
+
+test('profile photo can be selected, saved, and removed', async ({ page }) => {
+  await fixtures(page);
+  await page.goto('/me');
+  await page.getByRole('button', { name: 'Change photo' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Profile picture' });
+  await expect(dialog).toBeVisible();
+  await dialog.locator('input[type=file]').first().setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/aP8AAAAASUVORK5CYII=', 'base64') });
+  await expect(dialog.getByAltText('Profile photo preview')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Save photo' }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator('.me-avatar img')).toBeVisible();
+  await page.goto('/home');
+  const homePhoto = page.locator('.avatar-badge img.user-photo');
+  await expect(homePhoto).toBeVisible();
+  await expect(homePhoto).toHaveCSS('object-fit', 'cover');
+  expect(await homePhoto.evaluate(image => image.getBoundingClientRect().width === image.parentElement.clientWidth)).toBe(true);
+  await page.goto('/me');
+  await page.getByRole('button', { name: 'Change photo' }).click();
+  await dialog.getByRole('button', { name: 'Remove photo' }).click();
+  await dialog.getByRole('button', { name: 'Save photo' }).click();
+  await expect(page.locator('.me-avatar img')).toHaveCount(0);
+});
 
 async function capture(page, info, name) {
   await page.evaluate(() => document.fonts.ready);
@@ -93,7 +118,9 @@ test('account dark references preserve all editor navigation and save controls',
 
 test('dark quests retain leaderboard period selection and return navigation', async ({ page }, info) => {
   await fixtures(page);
-  await page.route('**/api/leaderboard**', route => route.fulfill({ json: {
+  await page.route('**/api/leaderboard**', route => route.fulfill({ json: new URL(route.request().url()).pathname.endsWith('/strength') ? {
+    exercises: [{ id: 'squat', name: 'Squat' }, { id: 'deadlift', name: 'Deadlift' }], exerciseId: new URL(route.request().url()).searchParams.get('exerciseId') || 'squat', metric: new URL(route.request().url()).searchParams.get('metric'), entries: [{ userId: 'player-1', rank: 1, name: 'Levi M.', score: 120, maxKg: 120, loadKg: 100, reps: 6 }], self: null, hidden: false,
+  } : {
     entries: Array.from({ length: 7 }, (_, i) => ({ userId: `player-${i}`, rank: i + 1, name: ['Levi M.', 'Charles W.', 'Michael A.', 'Rico M.', 'Angel P.', 'Karl D.', 'Bea S.'][i], points: 4210 - i * 180, movement: i % 2 ? 2 : null })),
     self: { rank: 14, points: 1840, movement: 3 },
   }, headers: { 'access-control-allow-origin': '*' } }));
@@ -106,6 +133,13 @@ test('dark quests retain leaderboard period selection and return navigation', as
   await page.getByRole('tab', { name: 'This month' }).click();
   await expect(page.getByRole('tab', { name: 'This month' })).toHaveAttribute('aria-selected', 'true');
   await capture(page, info, 'leaderboard-dark');
+  await page.getByRole('button', { name: /Strength/ }).click();
+  await expect(page.getByRole('region', { name: 'Top three lifters' })).toContainText('Levi M.');
+  await page.getByRole('button', { name: 'Deadlift', exact: true }).click();
+  await page.getByRole('button', { name: /Pound for pound/ }).click();
+  await expect(page.getByRole('button', { name: /Submit.*video/i })).toHaveCount(0);
+  await page.getByRole('button', { name: /Quests Points earned/ }).click();
+  await expect(page.locator('.podium-player')).toHaveCount(3);
   await page.getByRole('button', { name: 'Back to quests' }).click();
   await expect(page.getByRole('heading', { name: 'Quests', exact: true })).toBeVisible();
 });

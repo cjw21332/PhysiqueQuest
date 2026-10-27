@@ -30,9 +30,9 @@ export default function BottomNav({ coachIcon = 'coach' }: { coachIcon?: string 
         <button
           type="button"
           key={tab.label}
-          className={pathname === tab.path || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) || (tab.path === '/coach' && pathname === '/exercises') ? 'active' : ''}
+          className={pathname === tab.path || pathname.startsWith(`${tab.path}/`) || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) || (tab.path === '/coach' && pathname === '/exercises') ? 'active' : ''}
           aria-label={accessibleLabels[tab.label]}
-          aria-current={pathname === tab.path || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) || (tab.path === '/coach' && pathname === '/exercises') ? 'page' : undefined}
+          aria-current={pathname === tab.path || pathname.startsWith(`${tab.path}/`) || (tab.path === '/home' && ['/goals', '/progress'].includes(pathname)) || (tab.path === '/coach' && pathname === '/exercises') ? 'page' : undefined}
           onClick={() => handleNavigation(tab.path)}
         >
           <span className="nav-icon" aria-hidden="true">

@@ -18,5 +18,6 @@ import { CoachProgram, CoachProgramSchema } from './coach-program.schema.js';
   ],
   controllers: [CoachController],
   providers: [CoachService],
+  exports: [CoachService],
 })
 export class CoachModule {}

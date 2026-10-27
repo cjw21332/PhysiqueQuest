@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { useEffect, useState } from 'react';
 import { api, type FoodCandidate } from '../../lib/api';
@@ -24,7 +25,7 @@ export default function FoodNameSearch({ value, disabled, onChange, onSelect }: 
     <label className="meal-edit-field">Food name<input type="search" required maxLength={120} value={value} disabled={disabled} autoComplete="off" aria-describedby="meal-food-search-hint" onChange={event => { onChange(event.target.value); setQuery(event.target.value); }}/></label>
     <p id="meal-food-search-hint" className="meal-food-search-hint">Type to find matching foods. Selecting a name keeps your nutrition values for review.</p>
     {query.trim() && <section className="meal-food-suggestions" aria-label="Matching foods" aria-busy={loading}>
-      {loading ? <p role="status">Searching foods…</p> : error ? <><p role="alert">{error}</p><button type="button" className="scan-retry" disabled={disabled} onClick={() => setRetry(value => value + 1)}>Try again</button></> : results.length ? <div className="food-result-list">{results.map(food => <button type="button" key={food.fdc_id} disabled={disabled} onClick={() => { onSelect(food); setQuery(''); setResults([]); }}><span><b>{food.description}</b><small>{food.data_type}</small></span></button>)}</div> : <p role="status">No matching foods. Try another name or keep your own.</p>}
+      {loading ? <p role="status">Searching foods…</p> : error ? <><p role="alert">{error}</p><button type="button" className="scan-retry" disabled={disabled} onClick={() => setRetry(value => value + 1)}>Try again</button></> : results.length ? <div className="food-result-list">{results.map(food => <button type="button" key={food.fdc_id} disabled={disabled} onClick={() => { onSelect(food); setQuery(''); setResults([]); }}><span><b>{titleCase(food.description)}</b><small>{food.data_type}</small></span></button>)}</div> : <p role="status">No matching foods. Try another name or keep your own.</p>}
     </section>}
   </div>;
 }

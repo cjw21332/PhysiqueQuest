@@ -16,11 +16,12 @@ import { useNutrition } from '../../hooks/useNutrition';
 import { toScanImage } from '../../lib/scanImage';
 import { api, ApiRequestError, ApiTimeoutError, type ScanAnalysis, type ScannedItem } from '../../lib/api';
 import { formatLocalDate } from '../../lib/localDate.mjs';
+import { useScreenRoute } from '../../hooks/useScreenRoute';
 
 type View = 'nutrition' | 'review' | 'add' | 'logs' | 'history' | 'edit';
 type ScanStatus = 'loading' | 'ready' | 'error';
 export default function ScanSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
-  const [view,setView]=useState<View>('nutrition');
+  const [view,setView]=useScreenRoute<View>('/scan', { nutrition: '', review: '/review', add: '/add-food', logs: '/today', history: '/history', edit: '/edit-meal' }, 'nutrition');
   const contentRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{contentRef.current?.scrollTo(0,0);},[view]);
   const [photoSourceOpen,setPhotoSourceOpen]=useState(false);
@@ -64,6 +65,10 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const photo=useRef<File|null>(null);
   const [scanStatus,setScanStatus]=useState<ScanStatus>('loading');
   const [analysis,setAnalysis]=useState<ScanAnalysis|null>(null);
+  useEffect(() => {
+    if (view === 'edit' && !editingEntries.length) window.history.replaceState(null, '', '/scan/today');
+    if (view === 'review' && !imageUrl) window.history.replaceState(null, '', '/scan');
+  }, [view, editingEntries.length, imageUrl]);
   const [scanError,setScanError]=useState('');
   const [selectedMeal,setSelectedMeal]=useState<MealName>('Dinner');
   const cameraInput=useRef<HTMLInputElement>(null);

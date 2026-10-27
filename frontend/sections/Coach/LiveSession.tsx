@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon } from '../Home/icons';
@@ -248,12 +249,12 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   };
 
   if (phase === 'countdown') {
-    return <InactivityCountdown remainingSeconds={countdown} thresholdSeconds={thresholdSeconds} exerciseName={exercise.name} contactName={contactName} onImOkay={imOkay} />;
+    return <InactivityCountdown remainingSeconds={countdown} thresholdSeconds={thresholdSeconds} exerciseName={titleCase(exercise.name)} contactName={contactName} onImOkay={imOkay} />;
   }
   if (phase === 'alarm') {
     return (
       <EmergencyAlarm
-        exerciseName={exercise.name}
+        exerciseName={titleCase(exercise.name)}
         recordedAt={recordedAt}
         contactName={contactName}
         contactPhone={contactPhone}
@@ -275,17 +276,17 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   return (
     <section className="live-session">
       <header className="live-session-head">
-        <span className="session-meta">{exercise.name}</span>
+        <span className="session-meta">{titleCase(exercise.name)}</span>
         <b className="session-time" aria-label="Elapsed time">{time}</b>
       </header>
       {renderRoutine?.(paused)}
-      <div ref={camera.frameRef} className="live-video">
+      {!renderRoutine && <><div ref={camera.frameRef} className="live-video">
         <video ref={camera.videoRef} className={`live-camera ${camera.facing === 'front' ? 'front-facing' : ''}`} autoPlay muted playsInline style={camera.nativePreview ? { opacity: 0 } : undefined} />
         {camera.status !== 'on' && <div className="live-scene" aria-hidden="true" />}
         {!camera.nativePreview && <>
           <span className="form-score"><Icon name="shield" size={14}/> Form analysis unavailable</span>
           <div className="live-time-card"><small>Elapsed</small><b>{time}</b></div>
-          <div className="exercise-label"><small>{exercise.equipment}</small><b>{exercise.name}</b></div>
+          <div className="exercise-label"><small>{exercise.equipment}</small><b>{titleCase(exercise.name)}</b></div>
         </>}
         {camera.status === 'on' && !camera.nativePreview && (
           <button type="button" className="camera-facing-toggle" onClick={camera.switchFacing} aria-label={`Switch to ${camera.facing === 'back' ? 'front' : 'back'} camera`}>
@@ -303,9 +304,9 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         </div>
       )}
       <p className="live-notice" role="note">Keep the app open and the screen on during your workout. Detection pauses when the phone is locked.</p>
-      {motionAvailable === false && <p className="scan-warning" role="status">Movement detection needs the phone app with an accelerometer. Countdown is off on this device.</p>}
       <div className="session-progress-label"><span>Elapsed time</span><b>{time}</b></div>
-      <div className="session-progress-track"><i style={{width: `${Math.min(seconds / 1800 * 100, 100)}%`}}/></div>
+      <div className="session-progress-track"><i style={{width: `${Math.min(seconds / 1800 * 100, 100)}%`}}/></div></>}
+      {motionAvailable === false && <p className="scan-warning" role="status">Movement detection needs the phone app with an accelerometer. Countdown is off on this device.</p>}
       <div className="session-controls">
         <button type="button" className="pause-button" aria-label={paused ? 'Resume workout' : 'Pause workout'} disabled={busy || controlsDisabled} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <Icon name="pause" size={16}/>}{paused ? 'Resume' : 'Pause'}</button>
         <button className="end-button" disabled={busy || controlsDisabled} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>

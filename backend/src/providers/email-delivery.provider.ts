@@ -60,6 +60,12 @@ export class EmailDeliveryProvider {
       || Boolean(this.config.get<string>('EMAIL_DELIVERY_URL') && this.config.get<string>('EMAIL_DELIVERY_API_KEY'));
   }
 
+  async sendVerificationCode(email: string, code: string) {
+    const provider = configuredMailProvider();
+    if (provider) return provider.send({ template: 'verification-code', to: email, token: code });
+    return (await this.sendPasswordReset(email, code)).ok;
+  }
+
   async sendPasswordReset(email: string, token: string, name = 'there'): Promise<EmailDeliveryResult> {
     const provider = configuredMailProvider();
     if (provider) return await provider.send({ template: 'password-reset', to: email, token, name }) ? { ok: true } : { ok: false, code: 'EMAIL_PROVIDER_UNAVAILABLE', reason: 'Mail delivery failed.' };
@@ -147,7 +153,8 @@ export class EmailDeliveryProvider {
   private failure(status: number, body: string): EmailDeliveryResult {
     const code = classifyStatus(status);
     const reason = body.trim().slice(0, 500) || `Email provider responded with status ${status}.`;
-    this.logger.error(`Email delivery failed (${status}, ${code})`);
+    const detail = /template/i.test(body) ? 'template' : /service/i.test(body) ? 'service' : /quota|limit/i.test(body) ? 'quota' : /user|key|account/i.test(body) ? 'account' : 'other';
+    this.logger.error(`Email delivery failed (${status}, ${code}, ${detail})`);
     return { ok: false, code, status, reason };
   }
 }

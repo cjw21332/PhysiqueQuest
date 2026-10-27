@@ -13,9 +13,9 @@ export interface User {
 
 export { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './session';
 
-export async function register(name: string, email: string, password: string): Promise<User> {
+export async function register(name: string, email: string, password: string, requestId: string, code: string): Promise<User> {
   try {
-    const response = await api.register({ name, email, password });
+    const response = await api.register({ name, email, password, requestId, code });
 
     const user: User = {
       id: response.user.id,

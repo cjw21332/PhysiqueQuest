@@ -38,6 +38,7 @@ export async function cameraFixture(page) {
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
     const exercises = [{ exerciseId: 'push', name: 'Push-up', equipment: 'Bodyweight', prescription: '2 × 12', sets: 2, tracking: 'Manual' }];
     let json = {};
+    if (path.endsWith('/auth/session/migrate') || path.endsWith('/auth/session/refresh')) json = { access_token: 'test', expires_in: 3600, user: { id: 'readiness-user', name: 'Student', email: 'student@example.test', emailVerified: true } };
     if (path.endsWith('/profile')) json = { name: 'Student' };
     if (path.endsWith('/workouts/active')) json = null;
     if (path.endsWith('/coach/plan')) json = { weekLabel: 'This week', libraryReady: true, days: [{ index: 0, name: 'Monday', isWorkoutDay: true, title: 'Workout', exercises }] };
@@ -50,6 +51,17 @@ export async function cameraFixture(page) {
   await expect(page.getByRole('heading', { name: 'Camera check', exact: true })).toBeVisible();
   return requests;
 }
+
+test('camera preparation keeps the dark coach layout on its routed page', async ({ page }) => {
+  await cameraFixture(page);
+  await expect(page).toHaveURL(/\/coach\/prepare$/);
+  await expect(page.locator('.signed-in-layout')).toHaveClass(/coach-dark-theme/);
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(page.getByRole('heading', { name: 'Camera check' })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});
 
 test('web tracer: real local inference receives blank frames, connection stays independent and no live media leaves', async ({ page }) => {
   const requests = await cameraFixture(page);

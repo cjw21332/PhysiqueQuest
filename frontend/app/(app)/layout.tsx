@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { isAuthenticated } from '../../lib/auth';
 import { api, deviceCache } from '../../lib/api';
 import { AUTH_STORAGE_KEY } from '../../lib/session';
+import CoachChat from '../../components/CoachChat';
 
 export default function AppLayout({
   children,
@@ -59,15 +60,16 @@ export default function AppLayout({
     };
   }, []);
 
-  const darkPage = ['/home', '/goals', '/progress', '/coach'].includes(pathname);
-  const theme = pathname === '/coach'
+  const inSection = (section: string) => pathname === section || pathname.startsWith(`${section}/`);
+  const darkPage = ['/home', '/goals', '/progress', '/coach'].some(inSection);
+  const theme = inSection('/coach')
     ? 'coach-dark-theme'
-    : pathname === '/scan'
+    : inSection('/scan')
       ? 'scan-dark-theme'
-      : pathname === '/quests' || pathname === '/me'
+      : inSection('/quests') || inSection('/me')
         ? 'account-dark-theme'
       : darkPage
         ? 'journey-dark-theme'
         : 'system-dark-theme';
-  return <div className={`${theme} signed-in-layout`}>{cacheNotice && <div className="cache-notice" role="status">{cacheNotice} <button type="button" onClick={() => void api.preloadAppData(true)}>Refresh</button></div>}{children}</div>;
+  return <div className={`${theme} signed-in-layout`}>{cacheNotice && <div className="cache-notice" role="status">{cacheNotice} <button type="button" onClick={() => void api.preloadAppData(true)}>Refresh</button></div>}{children}{isClient && isAuthenticated() && <CoachChat />}</div>;
 }

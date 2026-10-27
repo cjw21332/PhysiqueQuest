@@ -33,9 +33,9 @@ export class AuthController {
   @ApiCreatedResponse({ type: SessionResponseDto })
   async sessionRegister(@Body() dto: RegisterDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     assertSessionRequest(req);
+    await this.verification.consumeRegistration(dto.email, dto.requestId, dto.code);
     const result = await this.authService.register(dto);
     req.user = { userId: result.user.id };
-    await this.verification.request(dto.email).catch(() => this.logger.warn({ event: 'verification_request_failed' }));
     return this.deliver(await this.sessions.issue(await this.authService.validateUser(result.user.id)), res);
   }
 
@@ -112,9 +112,9 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto, @Req() req?: Request): Promise<AuthResponseDto> {
     assertLegacyAuthEnabled();
+    await this.verification.consumeRegistration(registerDto.email, registerDto.requestId, registerDto.code);
     const result = await this.authService.register(registerDto);
     if (req) req.user = { userId: result.user.id };
-    await this.verification.request(registerDto.email).catch(() => this.logger.warn({ event: 'verification_request_failed' }));
     return result;
   }
 
@@ -132,6 +132,17 @@ export class AuthController {
 
   @Post('verification/request')
   requestVerification(@Body() dto: ResendVerificationDto) { return this.verification.request(dto.email); }
+
+  @Post('registration-code/request')
+  requestRegistrationCode(@Body() dto: ResendVerificationDto) { return this.verification.requestRegistration(dto.email); }
+
+  @Post('verification-code/request')
+  @UseGuards(JwtAuthGuard)
+  requestAccountCode(@Req() req: Request & { user: { email: string } }) { return this.verification.requestRegistration(req.user.email); }
+
+  @Post('verification-code/confirm')
+  @UseGuards(JwtAuthGuard)
+  confirmAccountCode(@Body() dto: PasswordResetVerifyDto, @Req() req: Request & { user: { userId: string; email: string } }) { return this.verification.confirmAccount(req.user.userId, req.user.email, dto.requestId, dto.code); }
 
   @Post('verification/confirm')
   confirmVerification(@Body() dto: ConfirmVerificationDto) { return this.verification.confirm(dto.token); }

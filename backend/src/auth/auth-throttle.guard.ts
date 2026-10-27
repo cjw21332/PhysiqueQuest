@@ -10,7 +10,7 @@ export class AuthThrottleGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
     const path = String(req.route?.path ?? req.url.split('?')[0]).replace(/\/+$/, '').toLowerCase();
-    if (req.method !== 'POST' || !/^\/api\/(?:v1\/)?(?:account\/recover|auth\/(?:login|register|verification\/(?:request|confirm)|session\/(?:login|register|refresh|migrate))|pose\/analyze|jobs\/nutrition|storage\/uploads)$/.test(path)) return true;
+    if (req.method !== 'POST' || !/^\/api\/(?:v1\/)?(?:account\/recover|auth\/(?:login|register|registration-code\/request|verification-code\/(?:request|confirm)|verification\/(?:request|confirm)|session\/(?:login|register|refresh|migrate))|pose\/analyze|jobs\/nutrition|storage\/uploads)$/.test(path)) return true;
     const refresh = path.endsWith('/refresh');
     const expensive = /\/(?:pose\/analyze|jobs\/nutrition|storage\/uploads)$/.test(path);
     const keys: Array<[string, number]> = [[`ip:${req.ip}`, refresh ? 120 : expensive ? 10 : 30]];

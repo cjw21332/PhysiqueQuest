@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { Icon } from '../Home/icons';
 import CalorieProgress from '../Home/CalorieProgress';
@@ -53,7 +54,7 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
           {mealNames.map((meal) => {
             const entries = meals.filter((item) => item.meal === meal);
             const total = entries.reduce((sum, item) => sum + item.calories, 0);
-            const names = entries.map((item) => item.name).join(' · ');
+            const names = entries.map((item) => titleCase(item.name)).join(' · ');
             const times = entries.map((item) => [item.source === 'Scanned' ? 'Scanned' : 'Manual', item.edited ? 'edited' : '', item.time].filter(Boolean).join(' · ')).join(' / ');
 
             return (

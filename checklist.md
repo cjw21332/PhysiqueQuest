@@ -1,5 +1,11 @@
 # Backend Hardening Checklist
 
+## v4.0.0 review — October 28, 2026
+
+- [x] Backend build and unit tests pass after the activity test fixture was updated for its new dependencies.
+- [ ] Verify email and Gemini provider delivery and the complete application journey in the target environment.
+- [ ] Complete the existing H1–H7 production and device checks below. See `ProgressReports/PROGRESS-59.md` for the release comparison and frontend verification gaps.
+
 ## Stack Discovery
 2026-10-21. TypeScript ESM NestJS12/Express, Mongoose9/MongoDB, Next16 frontend and Expo57 WebView. Backend is a separate package; frontend/mobile share root workspaces. Development only: LAN/tunnel/localhost; no production URLs or provider accounts. Existing DTO/Zod validation, bcrypt, recovery, ownership/admin guards and Vitest suites were reused. No SQL/RLS applies. Initial discovery commit e1d0946; implementation evidence below supersedes the original discovery-only checkpoint.
 

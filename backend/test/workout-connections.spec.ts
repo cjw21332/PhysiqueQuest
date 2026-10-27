@@ -251,7 +251,8 @@ describe('read costs and shared credit rules', () => {
     const activity = new ActivityService(
       { findOne, findOneAndUpdate: write } as any,
       { read: async () => ({ meals: [], water: [] }) } as any,
-      { creditHistory } as any,
+      { creditHistory, personalRecordDays: async () => [] } as any,
+      { get: async () => ({ self: { rank: 1, points: 0 } }) } as any,
     );
     const result = await activity.get(owner, 'Asia/Taipei');
     expect(write).not.toHaveBeenCalled();

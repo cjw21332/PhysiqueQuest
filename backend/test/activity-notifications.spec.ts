@@ -6,7 +6,7 @@ describe('activity and notification services', () => {
   it('starts activity with no fabricated progress', async () => {
     const state: any = { state: { timezone: 'UTC' } };
     const model = { findOne: () => ({ exec: async () => state }) } as any;
-    const result = await new ActivityService(model, { read: async () => ({ meals: [], water: [] }) } as any, { creditHistory: async () => [] } as any).get('507f1f77bcf86cd799439011');
+    const result = await new ActivityService(model, { read: async () => ({ meals: [], water: [] }) } as any, { creditHistory: async () => [], personalRecordDays: async () => [] } as any, { get: async () => ({ self: { rank: 1, points: 0 } }) } as any).get('507f1f77bcf86cd799439011');
     expect(result.state.questProgress).toEqual({ workout: 0, meals: 0, water: 0 });
     expect(result.dailyMissions.every(mission => !mission.complete)).toBe(true);
   });

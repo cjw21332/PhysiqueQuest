@@ -1,9 +1,10 @@
 import { outboundFetch } from '../common/outbound.js';
-export type MailMessage = { template: 'verification' | 'password-reset'; to: string; name?: string; token: string; verificationUrl?: string };
+export type MailMessage = { template: 'verification' | 'verification-code' | 'password-reset'; to: string; name?: string; token: string; verificationUrl?: string };
 export interface MailProvider { send(message: MailMessage): Promise<boolean>; }
 
 const escape = (value: string) => value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]!));
 export function mailTemplate(message: MailMessage) {
+  if (message.template === 'verification-code') return { subject: 'Your PhysiqueQuest verification code', text: `Your verification code is ${message.token}. It expires in 10 minutes.`, html: `<p>Your verification code is <strong>${escape(message.token)}</strong>.</p><p>It expires in 10 minutes. If you did not request this, ignore this email.</p>` };
   const verification = message.template === 'verification';
   const subject = verification ? 'Verify your PhysiqueQuest email' : 'PhysiqueQuest password reset';
   const text = verification ? `Verify your email: ${message.verificationUrl}` : `Your password reset code is ${message.token}. It expires in 10 minutes.`;

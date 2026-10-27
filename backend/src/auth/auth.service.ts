@@ -45,7 +45,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // The unique email index is the final guard against concurrent duplicate registrations.
-    const user = await this.userModel.create({ email: normalizedEmail, name: name.trim(), passwordHash, emailVerified: false, legacyEmailAccess: false, authPolicyVersion: 2 }).catch((error: unknown) => {
+    const user = await this.userModel.create({ email: normalizedEmail, name: name.trim(), passwordHash, emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false, authPolicyVersion: 2 }).catch((error: unknown) => {
       if (isDuplicateKeyError(error)) throw new ConflictException('Email already registered');
       throw error;
     });

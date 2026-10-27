@@ -46,7 +46,7 @@ export default function HomeDashboard({ profile, onNotify }: {
   return <div className="dashboard-container home-ref-dashboard">
     <header className="dashboard-header home-ref-header">
       <div className="user-greeting">
-        <div className="avatar-badge" aria-hidden="true"><img src="/logo.jpg" alt="" /></div>
+        <div className="avatar-badge" aria-hidden="true"><img className={profile.photo ? 'user-photo' : undefined} src={profile.photo || '/logo.jpg'} alt="" /></div>
         <div className="greeting-text">
           <small className="greeting-meta">{now.toLocaleDateString('en-US', { weekday: 'long' })}{trainingWeek !== null ? ` · Week ${trainingWeek}` : ''}</small>
           <h1 className="greeting-name">Hi, {profile.name.trim().split(' ')[0] || 'there'}</h1>

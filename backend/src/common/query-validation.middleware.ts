@@ -3,6 +3,7 @@ const allowedQueries: Record<string, string[]> = {
   '/api/sync': ['resource', 'since', 'cursor', 'limit'],
   '/api/workouts': ['limit', 'before', 'date', 'timezone'], '/api/workouts/summary': ['timezone'],
   '/api/activity/state': ['timezone'], '/api/progress': ['metric', 'limit'], '/api/leaderboard': ['period'],
+  '/api/leaderboard/strength': ['exerciseId', 'metric'],
   '/api/admin/analytics': ['days'], '/api/admin/alerts': ['days', 'status'], '/api/admin/exercises': ['limit'],
   '/api/exercises': ['search', 'muscle', 'equipment', 'page', 'limit'], '/api/nutrition/foods/search': ['q'],
 };

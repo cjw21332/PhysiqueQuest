@@ -14,6 +14,7 @@ const NUTRIENT_IDS = {
 interface UsdaNutrient {
   nutrientId?: number;
   nutrientNumber?: string;
+  unitName?: string;
   nutrient?: { id?: number; number?: string; name?: string; unitName?: string };
   value?: number;
   amount?: number;
@@ -276,30 +277,40 @@ function parseNutrients(data: UsdaFood): {
     const n = nu.find((x) => (x.nutrient?.id ?? x.nutrientId ?? Number(x.nutrientNumber)) === id);
     return n ? (n.value ?? (n as { amount?: number }).amount ?? 0) : 0;
   };
-  let kcal = get(NUTRIENT_IDS.kcal);
+  const energy = (id: number) => {
+    const n = nu.find((x) => (x.nutrient?.id ?? x.nutrientId ?? Number(x.nutrientNumber)) === id && (!((x.nutrient?.unitName ?? x.unitName)) || (x.nutrient?.unitName ?? x.unitName)?.toLowerCase() === 'kcal'));
+    const value = n?.value ?? n?.amount;
+    return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
+  };
+  let kcal = energy(2048) ?? energy(2047) ?? energy(NUTRIENT_IDS.kcal);
   let protein = get(NUTRIENT_IDS.protein);
   let carbs = get(NUTRIENT_IDS.carbs);
   let fat = get(NUTRIENT_IDS.fat);
   let source: 'foodNutrients' | 'labelNutrients' = 'foodNutrients';
 
   // Branded foods often omit foodNutrients and expose labelNutrients instead.
-  if (kcal + protein + carbs + fat === 0 && data.labelNutrients) {
+  if ((kcal ?? 0) + protein + carbs + fat === 0 && data.labelNutrients && data.servingSize && data.servingSize > 0 && data.servingSizeUnit?.toLowerCase() === 'g') {
     const ln = data.labelNutrients;
-    kcal = ln.calories?.value ?? 0;
+    kcal = ln.calories?.value;
     protein = ln.protein?.value ?? 0;
     carbs = ln.carbohydrates?.value ?? 0;
     fat = ln.fat?.value ?? 0;
     source = 'labelNutrients';
   }
 
+  if (kcal === undefined && data.labelNutrients?.calories?.value !== undefined && data.servingSize && data.servingSize > 0 && data.servingSizeUnit?.toLowerCase() === 'g') {
+    kcal = data.labelNutrients.calories.value * 100 / data.servingSize;
+  }
+
   // labelNutrients are per serving; normalize to per-100g when serving is in grams.
-  if (source === 'labelNutrients' && data.servingSize && data.servingSizeUnit === 'g') {
+  if (source === 'labelNutrients' && data.servingSize && data.servingSizeUnit?.toLowerCase() === 'g') {
     const factor = 100 / data.servingSize;
-    kcal *= factor;
+    if (kcal !== undefined) kcal *= factor;
     protein *= factor;
     carbs *= factor;
     fat *= factor;
   }
 
+  if (kcal === undefined || !Number.isFinite(kcal) || kcal < 0) throw serviceUnavailable('Calories are unavailable for this food. Please choose another result.');
   return { kcal, protein, carbs, fat };
 }

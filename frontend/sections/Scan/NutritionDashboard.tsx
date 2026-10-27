@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { Icon } from '../Home/icons';
 import CalorieProgress from '../Home/CalorieProgress';
@@ -68,7 +69,7 @@ export default function NutritionDashboard({
           {mealNames.map((mealName) => {
             const entries = meals.filter((item) => item.meal === mealName);
             const mealCalories = entries.reduce((sum, item) => sum + item.calories, 0);
-            const detail = entries.map((item) => item.detail || item.name).join(' · ');
+            const detail = entries.map((item) => item.detail || titleCase(item.name)).join(' · ');
             return (
               <article className="scan-dashboard-meal" key={mealName}>
                 <div className="scan-dashboard-meal-head">

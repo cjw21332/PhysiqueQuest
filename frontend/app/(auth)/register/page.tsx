@@ -10,6 +10,7 @@ import { calibrationDraftKey, clearCalibrationDraft } from '../../../lib/calibra
 import { ApiRequestError, api } from '../../../lib/api';
 import type { Profile } from '../../../sections/Home/types';
 import { useRouter } from 'next/navigation';
+import ForgotPasswordFlow from '../../../sections/Forgot Password/ForgotPasswordFlow';
 
 export default function RegisterPage() {
   const { push: navigate } = useRouter();
@@ -21,6 +22,8 @@ export default function RegisterPage() {
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [calibrationError, setCalibrationError] = useState('');
   const [authDialog, setAuthDialog] = useState<'email-registered' | 'account-created' | null>(null);
+  const [verification, setVerification] = useState<{ email: string; name: string; password: string; requestId: string } | null>(null);
+  const [formVersion, setFormVersion] = useState(0);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const registeredAccount = useRef<{ scope: string | null; sessionKey: number | undefined } | null>(null);
   const [checkingAccount, setCheckingAccount] = useState(true);
@@ -62,9 +65,8 @@ export default function RegisterPage() {
     setError('');
     setCreatingAccount(true);
     try {
-      await register(name, normalizedEmail, pass);
-      registeredAccount.current = { scope: calibrationDraftKey(), sessionKey: getCurrentUser()?.sessionKey };
-      setAuthDialog('account-created');
+      const result = await api.requestRegistrationCode(normalizedEmail);
+      setVerification({ email: normalizedEmail, name: name.trim(), password: pass, requestId: result.requestId });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
       if ((err instanceof ApiRequestError && err.statusCode === 409) || /email already registered/i.test(message)) {
@@ -156,6 +158,7 @@ export default function RegisterPage() {
     <main className="scene">
       <div className="app-shell">
         <AuthForm
+          key={formVersion}
           mode="register"
           onModeChange={(mode) => {
             if (mode === 'login') navigate('/login');
@@ -175,6 +178,12 @@ export default function RegisterPage() {
         />
       </div>
     </main>
+    {verification && <ForgotPasswordFlow mode="register" accountEmail={verification.email} initialRequestId={verification.requestId} onClose={() => { setVerification(null); setName(''); setEmail(''); setConsent(false); setError(''); setFormVersion(value => value + 1); }} onSuccess={() => {}} onRegister={async (requestId, code) => {
+      await register(verification.name, verification.email, verification.password, requestId, code);
+      registeredAccount.current = { scope: calibrationDraftKey(), sessionKey: getCurrentUser()?.sessionKey };
+      setVerification(null);
+      setAuthDialog('account-created');
+    }} />}
     {authDialog === 'email-registered' && <AuthOutcomeModal
       kind="email-registered"
       onClose={() => setAuthDialog(null)}

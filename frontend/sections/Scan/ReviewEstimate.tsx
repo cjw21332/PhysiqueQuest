@@ -1,4 +1,5 @@
 'use client';
+import { titleCase } from '../../lib/titleCase';
 
 import { useEffect, useState } from 'react';
 import { SCAN_TIMEOUT_MS, type ScanAnalysis, type ScannedItem } from '../../lib/api';
@@ -60,8 +61,8 @@ export default function ReviewEstimate({ imageUrl, status, analysis, error, onBa
         {status === 'error' && <div className="detected-list" role="alert"><b>Could not analyse this photo</b><p>{error}</p><button className="scan-retry" onClick={onRetry}>Try again</button></div>}
         {status === 'ready' && !items.length && <div className="detected-list"><b>No food recognised</b><p>Try a clearer shot, or enter the meal manually.</p></div>}
         {status === 'ready' && !!items.length && <div className="detected-list"><b>Detected items</b><ul className="detected-items">
-          {items.map((item, index) => <li key={`${item.food_name}-${index}`} className={item.found ? (excluded.includes(index) ? 'excluded' : '') : 'unmatched'}>
-            {item.found ? <label><input className="visually-hidden" type="checkbox" aria-label={`Include ${item.food_name}`} checked={!excluded.includes(index)} onChange={() => toggle(index)}/><span className="detected-item-body"><b>{item.food_name}</b><small>{preview && item.description && portion === 1 ? item.description : `${Math.round(item.est_weight_g * portion)} g`}</small></span><em className={confidencePercent(item.confidence) < 75 ? 'low' : ''}>{confidencePercent(item.confidence)}</em></label> : <span className="detected-item-body"><b>{item.food_name}</b><small>No nutrition record matched; this item cannot be saved.</small></span>}
+          {items.map((item, index) => <li key={`${titleCase(item.food_name)}-${index}`} className={item.found ? (excluded.includes(index) ? 'excluded' : '') : 'unmatched'}>
+            {item.found ? <label><input className="visually-hidden" type="checkbox" aria-label={`Include ${titleCase(item.food_name)}`} checked={!excluded.includes(index)} onChange={() => toggle(index)}/><span className="detected-item-body"><b>{titleCase(item.food_name)}</b><small>{preview && item.description && portion === 1 ? item.description : `${Math.round(item.est_weight_g * portion)} g`}</small></span><em className={confidencePercent(item.confidence) < 75 ? 'low' : ''}>{confidencePercent(item.confidence)}</em></label> : <span className="detected-item-body"><b>{titleCase(item.food_name)}</b><small>No nutrition record matched; this item cannot be saved.</small></span>}
           </li>)}</ul>{analysis?.degraded && <p className="detected-degraded">Some nutrition lookups failed. These values may be incomplete.</p>}</div>}
       </div>
       {status === 'ready' && <div className="scan-warning"><Icon name="warning" size={20}/><p><strong>{lowConfidence.length ? `Low confidence on ${lowConfidence.length} item${lowConfidence.length > 1 ? 's' : ''}` : 'Review before saving'}</strong><br/>{lowConfidence.length ? `Check “${lowConfidence.map(item => item.food_name).join('”, “')}” before saving, or edit the values manually.` : 'Check the identified foods and portions. Tap an item to exclude it.'}</p></div>}

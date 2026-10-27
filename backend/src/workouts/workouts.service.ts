@@ -18,6 +18,7 @@ import {
 } from './dto/workout.dto.js';
 import { WorkoutSession } from './schemas/workout-session.schema.js';
 import { activityDate, calendarWeekday, plannedDayResults, shiftCalendarDate, validCalendarDate, workoutCalendarDate, workoutCreditFilter, type SetResult, type WorkoutRecord } from './workout-contract.js';
+import { personalRecordDays } from './personal-records.js';
 
 const hash = (value: unknown) =>
   createHash('sha256')
@@ -530,6 +531,10 @@ export class WorkoutsService implements OnModuleInit {
       policyVersion: 2,
     };
   }
+  async personalRecordDays(userId: string, timezone = 'UTC') {
+    const rows = await this.model.find({ userId: new Types.ObjectId(userId), status: 'completed' }).select('userId endedAt timezone status sets').lean().exec();
+    return [...(personalRecordDays(rows, timezone).get(userId) ?? [])];
+  }
   async creditHistory(userId: string, timezone = 'UTC') {
     try {
       new Intl.DateTimeFormat('en', { timeZone: timezone });
@@ -540,6 +545,7 @@ export class WorkoutsService implements OnModuleInit {
       status: 'completed';
       endedAt: Date;
       activityDate: string;
+      earlyBird: boolean;
     }>([
       {
         $match: {
@@ -564,6 +570,7 @@ export class WorkoutsService implements OnModuleInit {
             ],
           },
           endedAt: { $max: '$endedAt' },
+          earlyBird: { $max: { $and: [{ $gte: [{ $hour: { date: '$endedAt', timezone } }, 5] }, { $lt: [{ $hour: { date: '$endedAt', timezone } }, 9] }] } },
         },
       },
       {
@@ -572,6 +579,7 @@ export class WorkoutsService implements OnModuleInit {
           status: { $literal: 'completed' },
           activityDate: '$_id',
           endedAt: 1,
+          earlyBird: 1,
         },
       },
     ]);

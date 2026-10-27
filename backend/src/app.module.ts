@@ -27,6 +27,7 @@ import { PushModule } from './push/push.module.js';
 import { StorageModule } from './storage/storage.module.js';
 import { SyncModule } from './sync/sync.module.js';
 import { AnalysisJobsModule } from './jobs/analysis-jobs.module.js';
+import { ChatModule } from './chat/chat.module.js';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { AnalysisJobsModule } from './jobs/analysis-jobs.module.js';
     StorageModule,
     SyncModule,
     AnalysisJobsModule,
+    ChatModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

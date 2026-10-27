@@ -17,12 +17,13 @@ import { useSettings } from '../../hooks/useSettings';
 import { primeAlarmAudio } from '../../lib/alarmAudio';
 import { createRequestKey } from '../../lib/requestKey';
 import { api, type WorkoutSessionRecord, type CoachExercise } from '../../lib/api';
+import { useScreenRoute } from '../../hooks/useScreenRoute';
 
 type View = 'plan' | 'library' | 'camera' | 'session' | 'report';
 
 export default function CoachSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
   const { push: navigate } = useRouter();
-  const [view, setView] = useState<View>('plan');
+  const [view, setView] = useScreenRoute<View>('/coach', { plan: '', library: '/library', camera: '/prepare', session: '/session', report: '/report' }, 'plan');
   const [sessionExercises, setSessionExercises] = useState<CoachExercise[]>([]);
   const [sessionTitle, setSessionTitle] = useState('Workout session');
   const [workout, setWorkout] = useState<WorkoutSessionRecord | null>(null);
@@ -33,6 +34,21 @@ export default function CoachSection({ profile, onLogoutRequest }: { profile: Pr
   const starting = useRef(false);
   const startAttempt = useRef<{ requestKey: string; startedAt: string } | null>(null);
   const recoveryRequest = useRef(0);
+  useEffect(() => {
+    if (view === 'camera' && !sessionExercises.length) window.history.replaceState(null, '', '/coach');
+    if (view === 'session' && workout?.status === 'completed') { window.history.replaceState(null, '', '/coach/report'); return; }
+    if ((view !== 'session' && view !== 'report') || workout) return;
+    let active = true;
+    let id: string | null = null;
+    try { if (view === 'report') id = sessionStorage.getItem('physiquequest-last-workout-report'); } catch { /* Storage may be unavailable. */ }
+    const request = id ? api.getWorkout(id) : view === 'session' ? api.getActiveWorkout() : Promise.resolve(null);
+    void request.then(saved => {
+      if (!active) return;
+      if (saved && saved.status === (view === 'report' ? 'completed' : 'active')) { setWorkout(saved); setSessionTitle('Workout session'); }
+      else window.history.replaceState(null, '', '/coach');
+    }).catch(() => { if (active) { setActionError('Could not load your workout. Please try again.'); window.history.replaceState(null, '', '/coach'); } });
+    return () => { active = false; };
+  }, [view, workout, sessionExercises.length]);
   const refreshRecovery = useCallback(async () => {
     const request = ++recoveryRequest.current;
     setChecking(true); setCheckFailed(false);
@@ -83,8 +99,8 @@ export default function CoachSection({ profile, onLogoutRequest }: { profile: Pr
           <ExerciseLibrary selectedEquipment={profile.equipment ?? []} onBack={() => setView('plan')}/>
         </>}
         {view === 'camera' && <CameraCheck onBack={() => setView('plan')} onStart={async () => { if(starting.current)return;starting.current=true;setActionError(''); try { if (!sessionExercises.length) throw new Error('Select a program with available exercises first.'); primeAlarmAudio();startAttempt.current??={requestKey:createRequestKey(),startedAt:new Date().toISOString()}; const created = await startWorkout(sessionExercises.map(exercise => exercise.exerciseId),routineSnapshot(sessionExercises),startAttempt.current.requestKey,startAttempt.current.startedAt); setWorkout(created); setView('session'); } catch (err) { setActionError(err instanceof Error ? err.message : 'Could not start workout.'); }finally{starting.current=false;} }}/>}
-        {view === 'session' && workout && <RoutineSession workout={workout} thresholdSeconds={settings.threshold} contactName={profile.contactName??''} contactPhone={profile.contactPhone??''} onSaved={setWorkout} onComplete={saved=>{setWorkout(saved);setRecoverable(null);setView('report');}}/>}
-        {view === 'report' && workout && <WorkoutReport workout={workout} title={sessionTitle} exercises={sessionExercises} onBack={() => setView('plan')} onHome={goHome} onShare={() => say('Sharing is not available in this Expo Go session.')}/>}
+        {view === 'session' && workout?.status === 'active' && <RoutineSession workout={workout} thresholdSeconds={settings.threshold} contactName={profile.contactName??''} contactPhone={profile.contactPhone??''} onSaved={setWorkout} onComplete={saved=>{setWorkout(saved);setRecoverable(null);try { sessionStorage.setItem('physiquequest-last-workout-report', saved._id); } catch {} setView('report');}}/>}
+        {view === 'report' && workout?.status === 'completed' && <WorkoutReport workout={workout} title={sessionTitle} exercises={sessionExercises} onBack={() => setView('plan')} onHome={goHome} onShare={() => say('Sharing is not available in this Expo Go session.')}/>}
       </div>
       {(view === 'plan' || view === 'library') && <BottomNav coachIcon="coach-wand" />}
       {actionError && <div className="scan-warning" role="alert">{actionError}</div>}

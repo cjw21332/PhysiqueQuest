@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsEmpty, IsString, MaxLength, MinLength, Matches } from 'class-validator';
 import { IsStrongPassword } from '../validators/password.validator.js';
 import { ApiHideProperty } from '@nestjs/swagger';
 
@@ -20,6 +20,8 @@ export class RegisterDto {
     message: 'Password must contain at least one lowercase letter, one uppercase letter, one number, and be between 8-15 characters'
   })
   password: string;
+  @Matches(/^[a-f0-9]{64}$/, { message: 'Your verification request is invalid or has expired. Please request a new code.' }) requestId: string;
+  @Matches(/^\d{6}$/, { message: 'Enter the 6-digit verification code sent to your email.' }) code: string;
 }
 
 export class LoginDto {
