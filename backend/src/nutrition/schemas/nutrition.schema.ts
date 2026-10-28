@@ -43,6 +43,9 @@ export class Nutrition {
   @Prop({ type: [MealEntry], default: [] })
   meals: MealEntry[];
 
+  @Prop({ type: Object, default: null })
+  dietaryPlan?: { goal: string; calories: number; protein: number; carbs: number; fat: number; activity?: string; startedAt?: string };
+
   @Prop({ type: [WaterEntry], default: [] })
   water: WaterEntry[];
 }

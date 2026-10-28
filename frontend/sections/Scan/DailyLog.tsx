@@ -3,9 +3,10 @@ import { titleCase } from '../../lib/titleCase';
 
 import { Icon } from '../Home/icons';
 import CalorieProgress from '../Home/CalorieProgress';
-import { mealNames, nutritionTargets, type FoodEntry, type MealName } from './types';
+import { mealNames, nutritionTargets as defaultTargets, type FoodEntry, type MealName } from './types';
 
 type DailyLogProps = {
+  targets?: typeof defaultTargets;
   meals: FoodEntry[];
   water: number;
   onBack: () => void;
@@ -16,7 +17,7 @@ type DailyLogProps = {
 };
 
 
-export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdit, onWater }: DailyLogProps) {
+export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdit, onWater, targets: nutritionTargets = defaultTargets }: DailyLogProps) {
   const calories = meals.reduce((sum, item) => sum + item.calories, 0);
   const protein = meals.reduce((sum, item) => sum + item.protein, 0);
   const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);

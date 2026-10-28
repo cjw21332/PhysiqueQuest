@@ -38,6 +38,16 @@ export class WaterDto {
   @IsInt() @Min(0) @Max(30) glasses: number;
 }
 
+export class DietaryPlanDto {
+  @IsIn(['Clean Bulk', 'Weight Loss', 'Maintenance', 'Hypertrophy']) goal: string;
+  @IsInt() @Min(1000) @Max(6000) calories: number;
+  @IsInt() @Min(1) @Max(80) protein: number;
+  @IsInt() @Min(1) @Max(80) carbs: number;
+  @IsInt() @Min(1) @Max(80) fat: number;
+  @IsOptional() @IsIn(['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete']) activity?: string;
+  @IsOptional() @IsDateString() startedAt?: string;
+}
+
 /** Per-100 g macros, exactly as the scan reports them. Informational only. */
 export class ScannedMacrosDto {
   @IsNumber() @Min(0) kcal: number;

@@ -19,6 +19,9 @@ export const deviceCache = createDeviceCache({
     if (key === 'profile') return typeof data.name === 'string';
     if (key === 'coach') return Array.isArray(data.days) && data.days.every((day: any) => day && Array.isArray(day.exercises));
     if (key === 'nutrition') return Array.isArray(data.meals) && Array.isArray(data.water);
+    if (key === 'notifications') return Array.isArray(data.items);
+    if (key === 'workouts' || key.startsWith('progress:')) return Array.isArray(data);
+    if (key === 'exercise-library') return (typeof data.query === 'string' && Array.isArray(data.result?.items)) || (data.queries && typeof data.queries === 'object' && data.details && typeof data.details === 'object');
     return data.state && typeof data.state === 'object' && Array.isArray(data.dailyMissions);
   },
 });
@@ -100,6 +103,7 @@ export type PoseAnalysisInput = {
   analysisType?: 'workout' | 'readiness';
   requestedChecks?: ('fullBodyInFrame' | 'lighting' | 'distance')[];
   durationSeconds?: number;
+  exerciseHint?: 'chest_press' | 'squat';
 };
 
 export type AdminAlertRow = {
@@ -366,12 +370,15 @@ class ApiClient {
           else deviceCache.publish('profile', result);
           deviceCache.invalidate('coach');
         }
-        if (endpoint === '/nutrition/water' || /^\/nutrition\/meals(?:\/|$)/.test(endpoint)) {
+        if (endpoint === '/nutrition/water' || endpoint === '/nutrition/plan' || /^\/nutrition\/meals(?:\/|$)/.test(endpoint)) {
           deviceCache.publish('nutrition', result);
           deviceCache.invalidate('activity');
         }
-        if (endpoint.startsWith('/workouts')) deviceCache.invalidate('activity');
+        if (endpoint.startsWith('/workouts')) { deviceCache.invalidate('activity'); deviceCache.invalidate('workouts'); if (endpoint.endsWith('/complete')) deviceCache.invalidate('notifications'); }
+        if (endpoint.startsWith('/progress')) for (const metric of ['weight', 'waist', 'benchPress'] as const) deviceCache.invalidate(`progress:${metric}`);
         if (endpoint === '/settings') deviceCache.invalidate('coach');
+        if (endpoint.startsWith('/admin/exercises')) deviceCache.invalidate('exercise-library');
+        if (endpoint.startsWith('/notifications/')) deviceCache.publish('notifications', result);
       }
       return result;
     } catch (error) {
@@ -459,6 +466,8 @@ class ApiClient {
   }
 
   async getNutrition(force = false) { return deviceCache.fetch('nutrition', () => this.request<any>('/nutrition', { timeoutMs: 15_000 }), force); }
+  async setDietaryPlan(data: { goal: string; calories: number; protein: number; carbs: number; fat: number; activity?: string; startedAt?: string }) { return this.request<any>('/nutrition/plan', { method: 'PUT', body: JSON.stringify(data) }); }
+  async recommendDietaryPlan() { return this.request<{ goal: string; calories: number; protein: number; carbs: number; fat: number }>('/nutrition/plan/recommend', { method: 'POST', body: '{}' }); }
   async addMeal(data: unknown) { return this.request<any>('/nutrition/meals', { method: 'POST', body: JSON.stringify(data) }); }
   async updateMeal(id: string, data: unknown) { return this.request<any>(`/nutrition/meals/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(data) }); }
   async deleteMeal(id: string) { return this.request<any>(`/nutrition/meals/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
@@ -478,7 +487,10 @@ class ApiClient {
   async preloadAppData(force = false) {
     return Promise.allSettled([this.getProfile(force), this.getNutrition(force), this.getActivity(force), this.getCoachPlan(force)]);
   }
-  async getNotifications() { return this.request<any>('/notifications'); }
+  async getNotifications(force = false) { return deviceCache.fetch('notifications', () => this.request<any>('/notifications'), force); }
+  async setNotificationReminder(reminder: { enabled: boolean; hour: number; minute: number; timezone: string }) { return this.request<any>('/notifications/reminder', { method: 'PUT', body: JSON.stringify(reminder) }); }
+  async registerPushDevice(deviceId: string, token: string) { return this.request<{ registered: boolean; mode: string }>('/push/devices', { method: 'PUT', body: JSON.stringify({ deviceId, token }) }); }
+  async revokePushDevice(deviceId: string) { return this.request('/push/devices/' + encodeURIComponent(deviceId), { method: 'DELETE' }); }
   async markNotification(id: string, unread: boolean) { return this.request<any>(`/notifications/${encodeURIComponent(id)}/read`, { method: 'PATCH', body: JSON.stringify({ unread }) }); }
   async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }
 
@@ -520,10 +532,14 @@ class ApiClient {
     });
   }
 
-  async getProgress(metric: string, limit = 90) { return this.request<any>(`/progress?metric=${encodeURIComponent(metric)}&limit=${limit}`); }
+  async getProgress(metric: string, limit = 90, force = false) {
+    const load = () => this.request<any>(`/progress?metric=${encodeURIComponent(metric)}&limit=${limit}`);
+    if (limit !== 90 || !['weight', 'waist', 'benchPress'].includes(metric)) return load();
+    return deviceCache.fetch(`progress:${metric}` as 'progress:weight' | 'progress:waist' | 'progress:benchPress', load, force);
+  }
   async addProgress(data: any) { return this.request<any>('/progress', { method: 'POST', body: JSON.stringify(data) }); }
   async deleteProgress(id: string) { return this.request<any>(`/progress/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
-  async getWorkouts(limit = 20) { return this.request<WorkoutSessionRecord[]>(`/workouts?limit=${encodeURIComponent(limit)}`); }
+  async getWorkouts(limit = 20, force = false) { const load = () => this.request<WorkoutSessionRecord[]>(`/workouts?limit=${encodeURIComponent(limit)}`); return limit === 20 ? deviceCache.fetch('workouts', load, force) : load(); }
   async getActiveWorkout() { return this.request<WorkoutSessionRecord | null>('/workouts/active', { cache: 'no-store' }); }
   async getWorkout(id: string) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}`, { cache: 'no-store' }); }
   async saveWorkoutSet(id: string, expectedRevision: number, result: WorkoutSetResult) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}/sets`, { method: 'PATCH', body: JSON.stringify({ expectedRevision, result }) }); }
@@ -604,7 +620,7 @@ class ApiClient {
   }
 
   async getPoseStatus() { return this.request<any>('/pose/status'); }
-  async analyzePose(data: PoseAnalysisInput) { return this.request<unknown>('/pose/analyze', { method: 'POST', body: JSON.stringify(data), timeoutMs: 60000 }); }
+  async analyzePose(data: PoseAnalysisInput) { return this.request<unknown>('/pose/analyze', { method: 'POST', body: JSON.stringify(data), timeoutMs: 95000 }); }
   async pauseWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/pause`, { method: 'PATCH', body: JSON.stringify(data) }); }
   async completeWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/complete`, { method: 'POST', body: JSON.stringify(data) }); }
 

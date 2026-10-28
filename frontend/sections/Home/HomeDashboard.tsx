@@ -5,6 +5,7 @@ import CalorieProgress from './CalorieProgress';
 import { useActivity } from '../../hooks/useActivity';
 import { useNutrition } from '../../hooks/useNutrition';
 import { useCoachPlan } from '../../hooks/useCoachPlan';
+import { useNotifications } from '../../hooks/useNotifications';
 import { useRouter } from 'next/navigation';
 import { formatLocalDate } from '../../lib/localDate.mjs';
 import type { Profile } from './types';
@@ -25,6 +26,8 @@ export default function HomeDashboard({ profile, onNotify }: {
   const { activity, dailyMissions, loading: activityLoading, error: activityError } = useActivity();
   const { meals, water, loading: nutritionLoading, error: nutritionError } = useNutrition();
   const { plan, loading: planLoading, error: planError } = useCoachPlan();
+  const { items: notifications } = useNotifications();
+  const unread = notifications.filter(item => item.unread).length;
   const now = new Date();
   const today = formatLocalDate(now);
   const todayIndex = (now.getDay() + 6) % 7;
@@ -52,7 +55,7 @@ export default function HomeDashboard({ profile, onNotify }: {
           <h1 className="greeting-name">Hi, {profile.name.trim().split(' ')[0] || 'there'}</h1>
         </div>
       </div>
-      <button className="notification-bell" aria-label="Notifications" onClick={onNotify}><Icon name="bell" size={20} /></button>
+      <button className="notification-bell" aria-label="Notifications" onClick={onNotify}><Icon name="bell" size={20} />{unread > 0 && <span className="notification-bell-count" aria-hidden="true">{unread > 99 ? '99+' : unread}</span>}</button>
     </header>
 
     <section className="workout-card home-ref-workout" aria-label="Today's session">

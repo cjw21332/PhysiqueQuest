@@ -6,10 +6,8 @@ import CalorieProgress from '../Home/CalorieProgress';
 import { mealNames, nutritionTargets, type FoodEntry, type MealName } from './types';
 import { summarizeHistory } from './nutritionPresentation';
 
-const calorieTarget = nutritionTargets.calories;
-const macroTargets = { Protein: nutritionTargets.protein, Carbs: nutritionTargets.carbs, Fats: nutritionTargets.fats };
-
 export default function NutritionDashboard({
+  targets = nutritionTargets, onPlan,
   meals,
   historyMeals = meals,
   water,
@@ -18,6 +16,8 @@ export default function NutritionDashboard({
   onLogs,
   onHistory,
 }: {
+  targets?: typeof nutritionTargets;
+  onPlan: () => void;
   meals: FoodEntry[];
   historyMeals?: FoodEntry[];
   water: number;
@@ -26,6 +26,8 @@ export default function NutritionDashboard({
   onLogs: () => void;
   onHistory: () => void;
 }) {
+  const calorieTarget = targets.calories;
+  const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
   const calories = meals.reduce((sum, item) => sum + item.calories, 0);
   const protein = meals.reduce((sum, item) => sum + item.protein, 0);
   const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
@@ -86,6 +88,7 @@ export default function NutritionDashboard({
 
       <section className="scan-dashboard-more" aria-labelledby="scan-more-heading">
         <h2 id="scan-more-heading">More</h2>
+        <button type="button" className="scan-dashboard-link" onClick={onPlan}><span className="scan-dashboard-link-icon"><Icon name="meal" size={19} /></span><span><strong>My dietary plan</strong><small>Manage targets and meal schedule</small></span><Icon name="arrow" size={16} /></button>
         <button type="button" className="scan-dashboard-link" onClick={onLogs}>
           <span className="scan-dashboard-link-icon water"><Icon name="water" size={19} /></span>
           <span><strong>Log &amp; water intake</strong><small>{water} of 8 glasses today</small></span>

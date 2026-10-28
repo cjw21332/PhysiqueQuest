@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'physiquequest-device-cache-v1';
-const RESOURCES = ['profile', 'nutrition', 'activity', 'coach'];
+const RESOURCES = ['profile', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:waist', 'progress:benchPress', 'workouts', 'exercise-library'];
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const MAX_BYTES = 512_000;
 const day = time => new Date(time).toLocaleDateString('en-CA');
@@ -62,7 +62,7 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
   const publish = (key, data) => {
     if (!RESOURCES.includes(key)) throw new Error('Resource is not allowed in the device cache');
     if (!activate()) return;
-    entries[key] = { ...entries[key], data, savedAt: now(), revision: (entries[key]?.revision ?? 0) + 1, error: '' };
+    entries[key] = { ...entries[key], data, savedAt: now(), confirmedAt: now(), revision: (entries[key]?.revision ?? 0) + 1, error: '' };
     persist();
     notify();
   };
@@ -78,7 +78,7 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
     if (!owner) return Promise.reject(new Error('Sign in to load your saved data.'));
     const entry = entries[key] ?? (entries[key] = { revision: 0 });
     if (entry.pending) return entry.pending;
-    if (!force && usable(key, entry) && entry.confirmedAt && now() - entry.confirmedAt < 15_000) return Promise.resolve(entry.data);
+    if (!force && usable(key, entry) && entry.confirmedAt && now() - entry.confirmedAt < 60_000) return Promise.resolve(entry.data);
     const revision = entry.revision;
     const request = Promise.resolve().then(load).then(data => {
       if (!validate(key, data)) throw new Error('The server returned incomplete data. Try refreshing.');

@@ -134,3 +134,26 @@ test('expiry clears yesterday\'s failed refresh so today\'s quests can load', as
   await f.cache.fetch('activity', async () => ({ dailyMissions: ['today'] }));
   assert.deepEqual(f.cache.get('activity').data.dailyMissions, ['today']);
 });
+
+test('reuses recently confirmed data, refreshes when stale, and respects invalidation', async () => {
+  const f = fixture();
+  let calls = 0;
+  const load = async () => [{ id: ++calls }];
+  assert.deepEqual(await f.cache.fetch('progress:weight', load), [{ id: 1 }]);
+  assert.deepEqual(await f.cache.fetch('progress:weight', load), [{ id: 1 }]);
+  f.advance(60_001);
+  assert.deepEqual(await f.cache.fetch('progress:weight', load), [{ id: 2 }]);
+  f.cache.invalidate('progress:weight');
+  assert.deepEqual(await f.cache.fetch('progress:weight', load), [{ id: 3 }]);
+  assert.equal(createDeviceCache(f.options).get('progress:weight').data[0].id, 3);
+  f.setContext({ scope: 'api:user-b', session: 'session-b' });
+  assert.equal(f.cache.get('progress:weight').data, undefined);
+});
+
+test('exercise library snapshots are scoped to the signed-in account', () => {
+  const f = fixture();
+  f.cache.publish('exercise-library', { query: 'default', result: { items: [{ name: 'Squat' }] } });
+  assert.equal(createDeviceCache(f.options).get('exercise-library').data.result.items[0].name, 'Squat');
+  f.setContext({ scope: 'api:user-b', session: 'session-b' });
+  assert.equal(f.cache.get('exercise-library').data, undefined);
+});

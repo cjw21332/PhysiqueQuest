@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import type { Profile } from './types';
 import { Icon } from './icons';
 import { useProgress } from '../../hooks/useProgress';
 import { normalizeTrainingDays } from '../../lib/trainingDays';
 import { useRouter } from 'next/navigation';
-import { api, type WorkoutSessionRecord } from '../../lib/api';
+import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 
 const sampleMilestones = [
   { title: '70 kg body weight', detail: 'Reached Oct 12', state: 'done' },
@@ -26,20 +25,7 @@ function shortDate(value?: string) {
 export default function GoalsMilestones({ profile }: { profile: Profile }) {
   const { push: navigate } = useRouter();
   const { entries, loading, error, refresh } = useProgress('weight');
-  const [workouts, setWorkouts] = useState<WorkoutSessionRecord[]>([]);
-  const [workoutLoading, setWorkoutLoading] = useState(true);
-  const [workoutError, setWorkoutError] = useState('');
-  useEffect(() => {
-    let active = true;
-    api.getWorkouts().then(records => {
-      if (active) setWorkouts(records);
-    }).catch(loadError => {
-      if (active) setWorkoutError(loadError instanceof Error ? loadError.message : 'Could not load training progress.');
-    }).finally(() => {
-      if (active) setWorkoutLoading(false);
-    });
-    return () => { active = false; };
-  }, []);
+  const { workouts, workoutLoading, workoutError } = useWorkoutHistory();
   const orderedEntries = [...entries].sort((a, b) =>
     new Date(b.measuredAt ?? b.date ?? 0).getTime() - new Date(a.measuredAt ?? a.date ?? 0).getTime(),
   );

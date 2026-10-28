@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { randomUUID } from 'node:crypto';
-import { MealDto, MealFromScanDto, WaterDto } from './dto/nutrition.dto.js';
+import { DietaryPlanDto, MealDto, MealFromScanDto, WaterDto } from './dto/nutrition.dto.js';
 import { Nutrition, type NutritionDocument } from './schemas/nutrition.schema.js';
 
 @Injectable()
@@ -52,6 +52,15 @@ export class NutritionService {
     );
     if (!updated) throw new NotFoundException('Meal not found');
     return updated;
+  }
+
+  async setPlan(userId: string, dto: DietaryPlanDto) {
+    if (dto.protein + dto.carbs + dto.fat !== 100) throw new BadRequestException('Macro percentages must add up to 100');
+    return this.model.findOneAndUpdate(
+      { userId: new Types.ObjectId(userId) },
+      { $set: { dietaryPlan: { ...dto, startedAt: dto.startedAt ?? new Date().toISOString() } } },
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true, runValidators: true },
+    );
   }
 
   async setWater(userId: string, dto: WaterDto): Promise<NutritionDocument> {

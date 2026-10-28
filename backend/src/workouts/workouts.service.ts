@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
+  Optional,
   type OnModuleInit,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -19,6 +20,7 @@ import {
 import { WorkoutSession } from './schemas/workout-session.schema.js';
 import { activityDate, calendarWeekday, plannedDayResults, shiftCalendarDate, validCalendarDate, workoutCalendarDate, workoutCreditFilter, type SetResult, type WorkoutRecord } from './workout-contract.js';
 import { personalRecordDays } from './personal-records.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 
 const hash = (value: unknown) =>
   createHash('sha256')
@@ -39,6 +41,7 @@ export class WorkoutsService implements OnModuleInit {
   constructor(
     @InjectModel(WorkoutSession.name)
     private readonly model: Model<WorkoutSession>,
+    @Optional() private readonly notifications?: NotificationsService,
   ) {}
   async onModuleInit() {
     await this.model.init();
@@ -414,7 +417,7 @@ export class WorkoutsService implements OnModuleInit {
         })
       : dto.exerciseResults;
     try {
-      return await this.change(userId, id, workout.revision ?? 0, {
+      const completed = await this.change(userId, id, workout.revision ?? 0, {
         endedAt,
         durationSeconds: elapsed,
         exerciseResults: results,
@@ -423,6 +426,8 @@ export class WorkoutsService implements OnModuleInit {
         activityDate: activityDate(endedAt, workout.timezone),
         creditPolicyVersion: workout.creditPolicyVersion ?? 1,
       });
+      await this.notifications?.addOnce(userId, `workout:${id}`, { icon: 'clipboard', title: 'Workout completed', subtitle: '', body: 'Your workout is saved. Review your progress in the app.', time: 'now', group: 'Today', unread: true }).catch(() => undefined);
+      return completed;
     } catch (error) {
       if (!(error instanceof ConflictException)) throw error;
       const replay = await this.owned(userId, id);

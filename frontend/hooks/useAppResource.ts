@@ -16,7 +16,7 @@ export function useAppResource<T>(key: CachedResource, load: (force?: boolean) =
       setState(next);
       if (next.data === undefined && !next.refreshing && !next.error) void load().catch(() => undefined);
     };
-    const reload = () => { if (document.visibilityState === 'visible') void refresh(); };
+    const reload = () => { if (document.visibilityState === 'visible') void load().catch(() => undefined); };
     const unsubscribe = deviceCache.subscribe(update);
     update();
     void load().catch(() => undefined);

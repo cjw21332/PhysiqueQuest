@@ -12,7 +12,7 @@ describe('activity and notification services', () => {
   });
   it('marks a stored notification read', async () => {
     const state: any = { items: [{ id: 'n1', unread: true }], save: async function () { return this; } };
-    const model = { findOneAndUpdate: async () => state } as any;
+    const model = { findOneAndUpdate: async (_query: unknown, update: { $set: { 'items.$.unread': boolean } }) => { state.items[0].unread = update.$set['items.$.unread']; return state; } } as any;
     const result = await new NotificationsService(model).mark('507f1f77bcf86cd799439011', 'n1', false);
     expect(result.items[0].unread).toBe(false);
   });

@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import { Camera, CameraView } from 'expo-camera';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
+import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
@@ -23,6 +24,8 @@ import { isTrustedWebViewUrl, resolveApiUrl, resolveFrontendUrl } from './connec
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
 import { readinessMessageLimit, readinessScript, validateNativeReadinessContext, validateReadinessCheck, type NativeReadinessContext, type ReadinessCheck } from '../shared/cameraReadiness';
+
+Notifications.setNotificationHandler({ handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }) });
 
 declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string } };
 
@@ -132,6 +135,27 @@ function buildCameraScript(detail: {
 function AppContent() {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView>(null);
+  const pendingNotificationOpen = useRef(false);
+  const requestPush = useCallback(async () => {
+    let detail: { token?: string; error?: string };
+    try {
+      if (!Device.isDevice) throw new Error('Phone notifications require a physical device.');
+      if (Platform.OS === 'android') await Notifications.setNotificationChannelAsync('default', { name: 'Notifications', importance: Notifications.AndroidImportance.DEFAULT });
+      const existing = await Notifications.getPermissionsAsync();
+      const permission = existing.granted ? existing : await Notifications.requestPermissionsAsync();
+      if (!permission.granted) throw new Error('Notification permission is off. Enable it in your phone settings.');
+      const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+      if (!projectId) throw new Error('Phone notifications are not configured for this build.');
+      detail = { token: (await Notifications.getExpoPushTokenAsync({ projectId })).data };
+    } catch (error) { detail = { error: error instanceof Error ? error.message : 'Could not enable phone notifications.' }; }
+    webRef.current?.injectJavaScript(`window.dispatchEvent(new CustomEvent('physiquequest-push-registration',{detail:${JSON.stringify(detail)}}));true;`);
+  }, []);
+  useEffect(() => {
+    const received = Notifications.addNotificationReceivedListener(() => webRef.current?.injectJavaScript("window.dispatchEvent(new Event('physiquequest-notification-received'));true;"));
+    const opened = Notifications.addNotificationResponseReceivedListener(() => { pendingNotificationOpen.current = true; Notifications.clearLastNotificationResponse(); webRef.current?.injectJavaScript("window.location.assign('/home/notifications');true;"); });
+    void Notifications.getLastNotificationResponseAsync().then(response => { if (response) { pendingNotificationOpen.current = true; Notifications.clearLastNotificationResponse(); webRef.current?.injectJavaScript("window.location.assign('/home/notifications');true;"); } });
+    return () => { received.remove(); opened.remove(); };
+  }, []);
   const { width, fontScale } = useWindowDimensions();
   const inferredAddress = useMemo(getInitialAddress, []);
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_API_URL?: string } | undefined;
@@ -381,6 +405,7 @@ function AppContent() {
             };
             if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
             if (message.type === 'request-camera-permission') void requestCameraPermission();
+            if (message.type === 'request-push-permission') void requestPush();
             if (message.type === 'request-device-readiness') void publishReadiness();
             if (message.type === 'pose-status' && !nativePoseAvailable) {
               webRef.current?.injectJavaScript(poseScript({ type: 'error', requestId: message.requestId, side: message.side, message: 'Camera rep counting needs a development build. Camera preview and manual counting are available.' }));
@@ -434,6 +459,7 @@ function AppContent() {
         }}
         onLoadEnd={(e) => {
           console.log('WebView load ended:', e.nativeEvent.url);
+          if (pendingNotificationOpen.current && isTrustedWebViewUrl(e.nativeEvent.url, loadedAddress)) { pendingNotificationOpen.current = false; webRef.current?.injectJavaScript("if(!location.pathname.startsWith('/home/notifications')) location.assign('/home/notifications');true;"); }
           pushInsets();
           checkBackend();
           void publishReadiness();

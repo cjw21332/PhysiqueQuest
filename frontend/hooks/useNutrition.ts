@@ -6,7 +6,8 @@ import type { FoodEntry, MealName } from '../sections/Scan/types';
 import { formatLocalDate } from '../lib/localDate.mjs';
 import { useAppResource } from './useAppResource';
 
-type ServerNutrition = { meals: FoodEntry[]; water: { date: string; glasses: number }[] };
+export type DietaryPlan = { goal: string; calories: number; protein: number; carbs: number; fat: number; activity?: string; startedAt?: string };
+type ServerNutrition = { meals: FoodEntry[]; water: { date: string; glasses: number }[]; dietaryPlan?: DietaryPlan | null };
 const load = (force?: boolean) => api.getNutrition(force);
 
 export function useNutrition() {
@@ -20,5 +21,5 @@ export function useNutrition() {
   const updateMeal = useCallback(async (id: string, meal: Partial<FoodEntry>) => { await api.updateMeal(id, meal); }, []);
   const deleteMeal = useCallback(async (id: string) => { await api.deleteMeal(id); }, []);
   const setWater = useCallback(async (glasses: number) => { await api.setWater({ date: formatLocalDate(), glasses }); }, []);
-  return { meals: data?.meals ?? [], water: data?.water?.find(entry => entry.date === formatLocalDate())?.glasses ?? 0, loading, error, refresh, addMeal, addMealsFromScan, updateMeal, deleteMeal, setWater };
+  return { dietaryPlan: data?.dietaryPlan ?? null, meals: data?.meals ?? [], water: data?.water?.find(entry => entry.date === formatLocalDate())?.glasses ?? 0, loading, error, refresh, addMeal, addMealsFromScan, updateMeal, deleteMeal, setWater };
 }

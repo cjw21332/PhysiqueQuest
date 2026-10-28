@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 
 const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
 export async function cameraFixture(page) {
@@ -43,6 +44,7 @@ export async function cameraFixture(page) {
     if (path.endsWith('/workouts/active')) json = null;
     if (path.endsWith('/coach/plan')) json = { weekLabel: 'This week', libraryReady: true, days: [{ index: 0, name: 'Monday', isWorkoutDay: true, title: 'Workout', exercises }] };
     if (path.endsWith('/pose/status')) json = { available: true };
+    if (path.endsWith('/pose/analyze')) json = { exercise: 'Squat', observations: ['Keep your feet planted'] };
     if (path.endsWith('/workouts') && request.method() === 'POST') json = { _id: 'readiness-workout', ...request.postDataJSON(), exercises, sets: [], status: 'active', revision: 0 };
     return route.fulfill({ json, headers });
   });
@@ -342,12 +344,57 @@ test('readiness UX: upload status is lazy and explicit analysis retains video pa
   expect(requests.filter(r=>r.path.includes('/pose'))).toEqual([]);
   await page.getByRole('button',{name:'Upload video',exact:true}).click();
   await expect.poll(()=>requests.filter(r=>r.path.endsWith('/pose/status')).length).toBe(1);
-  await page.getByLabel('Choose a recorded exercise video').setInputFiles({name:'set.mp4',mimeType:'video/mp4',buffer:Buffer.from('explicit-video')});
+  await page.getByLabel('Choose a recorded exercise video').setInputFiles(fileURLToPath(new URL('../../public/opening-app-animation.mp4', import.meta.url)));
+  await expect.poll(() => page.locator('.upload-dropzone video').evaluate(video => video.readyState)).toBeGreaterThan(0);
+  await page.getByLabel('Exercise in this recording (optional)').selectOption('chest_press');
   expect(requests.filter(r=>r.method==='POST' && r.path.includes('/pose'))).toEqual([]);
   await page.getByRole('button',{name:'Analyze video',exact:true}).click();
   await expect.poll(()=>requests.filter(r=>r.method==='POST' && r.path.includes('/pose')).length).toBe(1);
   const data=JSON.parse(requests.find(r=>r.method==='POST' && r.path.includes('/pose')).data);
-  expect(data).toEqual({mediaBase64:Buffer.from('explicit-video').toString('base64'),mimeType:'video/mp4'});
+  expect(data).toMatchObject({mimeType:'video/mp4', analysisType:'workout'});
+  expect(data.exerciseHint).toBe('chest_press');
+  expect(data.durationSeconds).toBeGreaterThan(0);
+  expect(data.mediaBase64.length).toBeGreaterThan(100);
+  await expect(page.getByRole('region', { name: 'Video analysis' })).toContainText('Keep your feet planted');
+  await expect(page.getByRole('region', { name: 'Video analysis' })).toContainText('Your workout has not been changed.');
+});
+
+test('an unavailable exercise review can be retried and shows the returned guidance', async ({ page }) => {
+  await cameraFixture(page);
+  let attempts = 0;
+  await page.route('**/api/pose/analyze', route => {
+    attempts++;
+    return route.fulfill({ json: attempts === 1 ? { observations: ['Tracked'], exerciseReview: null } : { observations: ['Tracked'], exerciseReview: { exercise: 'Chest press', equipment: 'Machine', generalBodyPart: 'Upper body', specificMuscles: 'Chest', estimatedReps: 3, formObservations: ['Review elbow position'], corrections: ['Keep wrists aligned'], instructions: ['Press under control'] } }, headers });
+  });
+  await page.getByRole('button', { name: 'Upload video', exact: true }).click();
+  await page.getByLabel('Choose a recorded exercise video').setInputFiles(fileURLToPath(new URL('../../public/opening-app-animation.mp4', import.meta.url)));
+  await expect.poll(() => page.locator('.upload-dropzone video').evaluate(video => video.readyState)).toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'Analyze video', exact: true }).click();
+  await expect(page.getByText('Exercise review unavailable')).toBeVisible();
+  await page.getByRole('button', { name: 'Retry exercise review' }).click();
+  await expect(page.getByText('Likely exercise: Chest press')).toBeVisible();
+  await expect(page.getByText('Keep wrists aligned')).toBeVisible();
+  await expect(page.getByText('Not verified')).toBeVisible();
+  await expect(page.getByLabel('Form accuracy unavailable')).toBeVisible();
+  await expect(page.locator('.report-ring')).not.toContainText('tracking');
+  for (const width of [320, 390, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.locator('.recording-report-body').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+  }
+  expect(attempts).toBe(2);
+});
+
+for (const method of ['click', 'keyboard']) test(`upload icon opens the video picker by ${method}`, async ({ page }) => {
+  await cameraFixture(page);
+  await page.getByRole('button', { name: 'Upload video', exact: true }).click();
+  const icon = page.getByRole('button', { name: 'Choose a video', exact: true });
+  const chooser = page.waitForEvent('filechooser');
+  if (method === 'keyboard') { await icon.focus(); await page.keyboard.press('Enter'); }
+  else await icon.click();
+  await (await chooser).setFiles(fileURLToPath(new URL('../../public/opening-app-animation.mp4', import.meta.url)));
+  await expect(page.getByText('opening-app-animation.mp4')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Start manual session' })).toBeVisible();
 });
 
 test('readiness regression: live enable and retry send no analysis/media and returning starts fresh', async ({page}) => {

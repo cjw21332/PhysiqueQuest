@@ -16,6 +16,14 @@ export default function AppLayout({
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [cacheNotice, setCacheNotice] = useState('');
+  const retryCache = () => {
+    void Promise.allSettled([
+      api.preloadAppData(true),
+      ...(['notifications', 'progress:weight', 'progress:waist', 'progress:benchPress', 'workouts'] as const)
+        .filter(key => deviceCache.get(key).error)
+        .map(key => key === 'notifications' ? api.getNotifications(true) : key === 'workouts' ? api.getWorkouts(20, true) : api.getProgress(key.slice('progress:'.length), 90, true)),
+    ]);
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -29,7 +37,7 @@ export default function AppLayout({
 
   useEffect(() => {
     const update = () => {
-      const resources = (['profile', 'nutrition', 'activity', 'coach'] as const).map(key => ({ key, ...deviceCache.get(key) }));
+      const resources = (['profile', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:waist', 'progress:benchPress', 'workouts'] as const).map(key => ({ key, ...deviceCache.get(key) }));
       const saved = resources.filter(resource => resource.data !== undefined);
       const failed = resources.filter(resource => resource.error);
       setCacheNotice(failed.length
@@ -71,5 +79,5 @@ export default function AppLayout({
       : darkPage
         ? 'journey-dark-theme'
         : 'system-dark-theme';
-  return <div className={`${theme} signed-in-layout`}>{cacheNotice && <div className="cache-notice" role="status">{cacheNotice} <button type="button" onClick={() => void api.preloadAppData(true)}>Refresh</button></div>}{children}{isClient && isAuthenticated() && <CoachChat />}</div>;
+  return <div className={`${theme} signed-in-layout`}>{cacheNotice && <div className="cache-notice" role="status">{cacheNotice} <button type="button" onClick={retryCache}>Refresh</button></div>}{children}{isClient && isAuthenticated() && <CoachChat />}</div>;
 }

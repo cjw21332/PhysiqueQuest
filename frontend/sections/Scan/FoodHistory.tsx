@@ -3,12 +3,12 @@ import { titleCase } from '../../lib/titleCase';
 
 import { useMemo, useState } from 'react';
 import type { FoodEntry } from './types';
-import { nutritionTargets } from './types';
+import { nutritionTargets as defaultTargets } from './types';
 import { Icon } from '../Home/icons';
 import { summarizeHistory } from './nutritionPresentation';
 
 const ranges = [{ label: '7 days', days: 7 }, { label: '30 days', days: 30 }, { label: '90 days', days: 90 }];
-export default function FoodHistory({ meals, onBack, backLabel = 'Back to Nutrition' }: { meals: FoodEntry[]; onBack: () => void; backLabel?: string }) {
+export default function FoodHistory({ meals, onBack, targets: nutritionTargets = defaultTargets, backLabel = 'Back to Nutrition' }: { meals: FoodEntry[]; onBack: () => void; targets?: typeof defaultTargets; backLabel?: string }) {
   const [range, setRange] = useState(ranges[0]);
   const [openedDate, setOpenedDate] = useState<string | null>(null);
   const summary = useMemo(() => summarizeHistory(meals, range.days), [meals, range]);

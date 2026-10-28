@@ -8,10 +8,10 @@ test('local camera keeps explicit upload provider status and reports never fabri
   const report = await source('sections/Coach/WorkoutReport.tsx');
   assert.match(camera, /getPoseStatus/);
   assert.match(camera, /if \(mode !== 'upload'\) return/);
-  assert.match(camera, /api\.analyzePose\(\{ mediaBase64, mimeType \}\)/);
+  assert.match(camera, /api\.analyzePose\(\{ mediaBase64, mimeType, analysisType: 'workout', durationSeconds:/);
   assert.doesNotMatch(camera, /analysisType: 'readiness'/);
   assert.match(camera, /Pose analysis is not configured/);
   assert.match(api, /\/pose\/status/);
-  assert.match(report, /Form analysis.*unavailable/i);
+  assert.doesNotMatch(report, /form score/i);
   assert.doesNotMatch(report, /\d+%/);
 });

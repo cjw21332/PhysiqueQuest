@@ -226,6 +226,8 @@ Quests uses a green-tinted level and streak panel, compact divided mission rows,
 
 An empty nutrition account starts with its own zero-state data and normal API-backed logging. **View sample nutrition** explicitly enters a labeled sample experience; **Start my log** returns to real logging. Sample actions remain local. Real photo selection exits sample mode. Neither an empty response nor a failed request silently selects demonstration data.
 
+My Dietary Plan uses the Scan shell and bottom navigation. Its segmented views show the active targets, editable goals and macro split, and a four-meal allocation. Use Night surfaces, green selection and actions, and Steel metadata. Display estimates and recorded meal totals as such; do not invent audit scores, progress, or phase end dates. AI recommendations are reviewed before saving and explain which profile data is sent to the provider.
+
 Mission/macro tracks are commonly 5px high with rounded ends, Steel tracks, and green fills. Calorie rings reuse the shared CalorieProgress component. Display the user's returned values, not screenshot examples. Retain visible cache/connection notices and Retry controls; cold-load placeholders remain quiet and accessible. Sample previews must remain explicitly labeled and must not mask API failures.
 
 ### Motion and accessibility

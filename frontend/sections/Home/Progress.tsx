@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useProgress } from '../../hooks/useProgress';
 import type { ProgressRecord, WorkoutSessionRecord } from '../../lib/api';
-import { api } from '../../lib/api';
+import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
 import { Icon } from './icons';
 import { useRouter } from 'next/navigation';
 
@@ -65,9 +65,7 @@ export default function Progress() {
   const [saving, setSaving] = useState(false);
   const [showEntryForm, setShowEntryForm] = useState(false);
   const [actionError, setActionError] = useState('');
-  const [workouts, setWorkouts] = useState<WorkoutSessionRecord[]>([]);
-  const [workoutLoading, setWorkoutLoading] = useState(true);
-  const [workoutError, setWorkoutError] = useState('');
+  const { workouts, workoutLoading, workoutError } = useWorkoutHistory();
   const weight = useProgress('weight');
   const waist = useProgress('waist');
   const benchPress = useProgress('benchPress');
@@ -89,17 +87,6 @@ export default function Progress() {
     ? Math.max(...chartEntries.map(entry => entry.value)) - Math.min(...chartEntries.map(entry => entry.value))
     : 0;
 
-  useEffect(() => {
-    let active = true;
-    api.getWorkouts().then(records => {
-      if (active) setWorkouts(records);
-    }).catch(loadError => {
-      if (active) setWorkoutError(loadError instanceof Error ? loadError.message : 'Could not load recent workouts.');
-    }).finally(() => {
-      if (active) setWorkoutLoading(false);
-    });
-    return () => { active = false; };
-  }, []);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();

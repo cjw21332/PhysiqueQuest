@@ -7,6 +7,7 @@ const nextConfig = (phase: string): NextConfig => ({
   allowedDevOrigins: ['localhost', '*.*.*.*', ...(process.env.DEV_ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean)],
   distDir: phase === PHASE_DEVELOPMENT_SERVER ? '.next-dev' : '.next',
   devIndicators: false,
+  experimental: { proxyClientMaxBodySize: '28mb' },
   async headers() { return [{ source: '/((?!api/).*)', headers: securityHeaders(phase === PHASE_DEVELOPMENT_SERVER) }]; },
   async rewrites() {
     const backend = (process.env.BACKEND_URL || 'http://127.0.0.1:4000').replace(/\/$/, '');

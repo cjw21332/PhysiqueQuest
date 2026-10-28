@@ -23,6 +23,7 @@
     "expo-location": "~57.0.20",
     "expo-mediapipe-pose": "0.3.0",
     "expo-network": "~57.0.2",
+    "expo-notifications": "~57.0.24",
     "expo-sensors": "~57.0.3",
     "expo-web-browser": "~57.0.3",
     "next": "^16.3.8",

@@ -1,0 +1,8 @@
+**
+!pose-service/
+!pose-service/main.py
+!pose-service/requirements.txt
+!frontend/
+!frontend/public/
+!frontend/public/pose/
+!frontend/public/pose/pose_landmarker_lite.task

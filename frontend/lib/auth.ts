@@ -58,6 +58,8 @@ export async function login(email: string, password: string): Promise<User> {
 }
 
 export async function logout() {
+  const deviceId = typeof window === 'undefined' ? null : localStorage.getItem('physiquequest-push-device');
+  if (deviceId) { await api.revokePushDevice(deviceId); localStorage.removeItem('physiquequest-push-device'); }
   await api.logout();
   clearAuthSession();
   // The bounded device snapshot is restored only for the same authenticated account.

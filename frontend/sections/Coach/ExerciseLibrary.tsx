@@ -2,13 +2,24 @@
 import { titleCase } from '../../lib/titleCase';
 
 import { useEffect, useRef, useState } from 'react';
-import { api, type ExerciseCatalog, type ExerciseRecord } from '../../lib/api';
+import { api, deviceCache, getCoachApiBaseUrl, type ExerciseCatalog, type ExerciseRecord } from '../../lib/api';
+import { getCurrentUser } from '../../lib/auth';
 import { Icon } from '../Home/icons';
 import './libraryreference.css';
 
 const muscles = ['All', 'Chest', 'Back', 'Legs', 'Core', 'Shoulders', 'Arms'];
 const equipmentOptions = ['Any equipment', 'Dumbbells', 'Barbell', 'Bodyweight', 'Cable', 'Machine', 'Kettlebell', 'Resistance bands'];
 const metadata = (item: ExerciseRecord) => [item.targetMuscle || item.group, item.equipment, item.difficulty].filter(Boolean).join(' · ');
+type LibraryCache = { queries: Record<string, { result: ExerciseCatalog; savedAt: number }>; details: Record<string, { result: ExerciseRecord; savedAt: number }> };
+const readLibraryCache = (): LibraryCache => {
+  const data = deviceCache.get<LibraryCache>('exercise-library').data;
+  return { queries: data?.queries && typeof data.queries === 'object' ? data.queries : {}, details: data?.details && typeof data.details === 'object' ? data.details : {} };
+};
+const saveLibraryEntry = (section: keyof LibraryCache, key: string, result: ExerciseCatalog | ExerciseRecord) => {
+  const cache = readLibraryCache();
+  const entries = { ...cache[section], [key]: { result, savedAt: Date.now() } };
+  deviceCache.publish('exercise-library', { ...cache, [section]: Object.fromEntries(Object.entries(entries).sort((a, b) => b[1].savedAt - a[1].savedAt).slice(0, section === 'queries' ? 12 : 20)) });
+};
 
 export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { onBack: () => void; selectedEquipment?: string[] }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,13 +50,23 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
 
   useEffect(() => {
     let current = true;
-    setLoading(true); setError(''); setCatalog(null);
+    const query = { search: searchTerm.trim() || undefined, muscle: selectedMuscle === 'All' ? undefined : selectedMuscle, equipment: equipment === 'Any equipment' ? undefined : equipment, page, limit: 12 };
+    let cacheKey: string;
+    try { cacheKey = JSON.stringify([getCoachApiBaseUrl(), query]); }
+    catch (err) { setLoading(false); setError(err instanceof Error ? err.message : 'Could not load exercises.'); setCatalog(null); return; }
+    const owner = getCurrentUser();
+    const cached = readLibraryCache().queries[cacheKey];
+    const usable = cached && Array.isArray(cached.result?.items) && Date.now() >= cached.savedAt && Date.now() - cached.savedAt < 30 * 60_000;
+    setLoading(!usable); setError(''); setCatalog(usable ? cached.result : null);
+    if (usable && Date.now() - cached.savedAt < 60_000 && !retry) return () => { current = false; };
     const timer = window.setTimeout(async () => {
       try {
-        const result = await api.getExercises({ search: searchTerm.trim() || undefined, muscle: selectedMuscle === 'All' ? undefined : selectedMuscle, equipment: equipment === 'Any equipment' ? undefined : equipment, page, limit: 12 });
-        if (current) setCatalog(result);
+        const result = await api.getExercises(query);
+        const active = getCurrentUser();
+        if (current && owner && active && owner.id === active.id && owner.sessionKey === active.sessionKey) { setCatalog(result); saveLibraryEntry('queries', cacheKey, result); }
       } catch (err) {
-        if (current) setError(err instanceof Error ? err.message : 'Could not load exercises.');
+        if (current && !usable) setError(err instanceof Error ? err.message : 'Could not load exercises.');
+        else if (current) setError('Could not refresh exercises. Showing saved results.');
       } finally { if (current) setLoading(false); }
     }, 250);
     return () => { current = false; window.clearTimeout(timer); };
@@ -61,8 +82,14 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
   useEffect(() => {
     if (!selected) return;
     let current = true;
-    setDetail(null); setDetailError(''); setMediaError(false); setPlaying(false); setFrameReady(false);
-    api.getExercise(selected._id).then(record => { if (current) setDetail(record); }).catch(err => { if (current) setDetailError(err instanceof Error ? err.message : 'Could not load exercise details.'); });
+    const owner = getCurrentUser();
+    let key: string;
+    try { key = JSON.stringify([getCoachApiBaseUrl(), selected._id]); } catch { key = ''; }
+    const cached = readLibraryCache().details[key];
+    const usable = cached && cached.result?._id === selected._id && Date.now() >= cached.savedAt && Date.now() - cached.savedAt < 30 * 60_000;
+    setDetail(usable ? cached.result : null); setDetailError(''); setMediaError(false); setPlaying(false); setFrameReady(false);
+    if (usable && Date.now() - cached.savedAt < 60_000 && !detailRetry) return () => { current = false; };
+    api.getExercise(selected._id).then(record => { const active = getCurrentUser(); if (current && owner && active && owner.id === active.id && owner.sessionKey === active.sessionKey) { setDetail(record); if (key) saveLibraryEntry('details', key, record); } }).catch(err => { if (current) setDetailError(usable ? 'Could not refresh exercise details. Showing saved information.' : err instanceof Error ? err.message : 'Could not load exercise details.'); });
     return () => { current = false; };
   }, [selected, detailRetry]);
 
@@ -99,7 +126,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
     </details>
     {loading && <p role="status">Loading exercises…</p>}
     {error && <div className="empty-library" role="alert"><p>{error}</p><button type="button" className="secondary" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
-    {!loading && !error && catalog && <>
+    {!loading && catalog && <>
       <div className="library-caption library-results-heading"><p className="result-count" role="status">{catalog.total} {catalog.total === 1 ? 'exercise' : 'exercises'}</p><span>Open a guide</span></div>
       <div className="library-list">
         {catalog.items.map(item => <button type="button" className="library-item" key={item._id} aria-haspopup="dialog" onClick={event => { openerRef.current = event.currentTarget; setMediaError(false); setSelected(item); }}>
