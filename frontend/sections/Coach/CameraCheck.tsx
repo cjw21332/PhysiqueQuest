@@ -40,7 +40,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
     }).catch(error => { if (active) setCameraMessage(error instanceof Error ? error.message : 'Could not check pose-analysis availability.'); });
     return () => { active = false; };
   }, [mode]);
-  const chooseFile = (file?: File) => { if (!file) return; analysisGeneration.current++; if (fileUrl) URL.revokeObjectURL(fileUrl); setFileUrl(URL.createObjectURL(file)); setFileName(file.name); setSelectedFile(file); setDuration(null); setAnalysisBusy(false); setAnalysis(null); setAnalysisError(''); };
+  const chooseFile = (file?: File) => { if (!file) return; analysisGeneration.current++; if (fileUrl) URL.revokeObjectURL(fileUrl); setFileUrl(URL.createObjectURL(file)); setFileName(file.name); setSelectedFile(file); setExerciseHint(''); setDuration(null); setAnalysisBusy(false); setAnalysis(null); setAnalysisError(''); };
   const analyzeVideo = async () => {
     if (!selectedFile) return;
     if (selectedFile.size > 20 * 1024 * 1024) { setAnalysisError('Choose a video smaller than 20 MB.'); return; }

@@ -5,6 +5,7 @@ import ts from 'typescript';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createRequire } from 'node:module';
+import { titleCase } from './title-case-helper.mjs';
 
 const path = new URL('../sections/Coach/libraryPreview.ts', import.meta.url);
 const loadPreview = async () => {
@@ -47,6 +48,7 @@ test('the independent sample library stays reachable during loading, plan errors
     const { default: CoachPlan } = compile(source, name => {
       if (name.endsWith('useCoachPlan')) return { useCoachPlan: () => ({ ...state, refresh: () => {} }) };
       if (name.endsWith('/icons')) return actualIcons;
+      if (name.endsWith('/titleCase')) return { titleCase };
       return require(name);
     });
     const html = renderToStaticMarkup(React.createElement(CoachPlan, { profile: {}, onStart: () => {}, onLibrary: () => {} }));

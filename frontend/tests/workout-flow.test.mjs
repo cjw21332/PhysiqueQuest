@@ -15,6 +15,6 @@ test('workout UI only opens a report after the API confirms completion', async (
   assert.match(session, /onPause/);
   assert.match(session, /paused/);
   assert.doesNotMatch(session, /setReps/);
-  assert.match(report, /PROVIDER_NOT_CONFIGURED|unavailable/i);
+  assert.match(report, /No sets logged/);
   assert.doesNotMatch(report, /312 kcal|4\.2k kg|88%/);
 });

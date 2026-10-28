@@ -5,6 +5,7 @@ import ts from 'typescript';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createRequire } from 'node:module';
+import { titleCase } from './title-case-helper.mjs';
 
 const load = async () => {
   const source = await readFile(new URL('../sections/Scan/nutritionPresentation.ts', import.meta.url), 'utf8');
@@ -62,6 +63,7 @@ test('review renders only matched scan totals and keeps saving disabled on analy
     if (name.endsWith('/icons')) return icons;
     if (name === './types') return types;
     if (name === './nutritionPresentation') return helper;
+    if (name.endsWith('/titleCase')) return { titleCase };
     return require(name);
   });
   const props = { imageUrl: '', onBack() {}, onRetake() {}, onRetry() {}, onAddManual() {}, onSave() {} };

@@ -24,7 +24,8 @@ test('sample-only progress insights are distinguished from API-backed workout da
   const styles = await source('app/globals.css');
 
   assert.match(progress, /Sample data/);
-  assert.match(progress, /api\.getWorkouts/);
+  assert.match(progress, /useWorkoutHistory/);
+  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getWorkouts/);
   assert.match(progress, /addMeasurement/);
   assert.match(goals, /2 of 4 reached · sample plan/);
   assert.match(goals, /conic-gradient/);

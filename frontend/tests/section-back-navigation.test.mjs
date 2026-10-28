@@ -14,7 +14,7 @@ test('every nested section header places its back control before the page headin
   ];
   for (const page of pages) {
     const content = await source(`sections/${page}.tsx`);
-    const back = content.search(/<button\b[^>]*className="(?:coach-back|leaderboard-back|ghost back-btn)"/);
+    const back = content.search(/<button\b[^>]*(?:className="(?:coach-back|leaderboard-back|ghost back-btn)"|aria-label="Back to AI Coach")/);
     assert.ok(back >= 0, `${page} has a back control`);
     const headerStart = content.lastIndexOf('<header', back);
     const headerEnd = content.indexOf('</header>', back);

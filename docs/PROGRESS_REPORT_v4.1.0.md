@@ -2,6 +2,15 @@
 
 Date: 29 October 2026 (Asia/Singapore)
 
+## Follow-up verification
+
+- Fixed a Prepare-page defect where a newly selected video could inherit the previous video's exercise selection. The upload browser test now checks that the selection resets.
+- Updated the frontend test loaders and obsolete assertions to reflect the existing account-backed notification, workout report, progress and session flows. The full frontend Node suite now passes **147 tests**.
+- Updated the cache browser fixture for the current session refresh and notification response contracts. The complete cache browser configuration passed **8 tests**, including cached reload, account isolation, water persistence and cross-tab logout.
+- The standalone journey browser configuration passed **7 tests** in isolation. Focused upload tests passed **2 tests**; these browser tests use mocked API responses and are not production-service tests.
+- Backend suite: **535 passed**. Frontend and mobile TypeScript checks passed. Backend and frontend production builds passed during the preceding release verification.
+- These checks do not establish that all physical-device, third-party-provider, production push or AI form-analysis paths work. The earlier Gemini 503 and unvalidated form/repetition accuracy remain unresolved.
+
 This report describes the working tree being prepared from v4.0.0. It is a test and implementation snapshot, not a statement that the complete system is production-ready or error-free.
 
 ## Changes and improvements
@@ -21,12 +30,12 @@ This report describes the working tree being prepared from v4.0.0. It is a test 
 - Frontend and mobile TypeScript checks: passed (`npx tsc --noEmit` in each workspace).
 - Focused browser checks for recorded-video upload/retry and exercise-library caching/responsive layout: 4 passed. These use mocked API responses.
 - Local pose cycle unit test passed. The real local pose-provider integration also passed in the backend suite. Earlier testing of the supplied 11-second recording produced valid pose observations, but insufficient evidence for a local repetition count.
-- The broad frontend Node test collection **failed**. Failures include test harnesses that cannot load component CSS or a newer `titleCase` import, and assertions that no longer match current views; the full set requires investigation rather than being assumed harmless.
-- The browser notification test passed in isolation after timing out during a heavily concurrent run. The cache browser suite had seven failures around restoring the mocked session; its separate Coach plan test passed. These failures do not establish whether the production workflows work correctly.
+- The earlier broad frontend Node and cache browser runs failed; their test harnesses and obsolete expectations were updated and the reruns above passed.
+- The browser notification test passed in isolation after timing out during a heavily concurrent run.
 
 ## Remaining risks and follow-up
 
-1. Investigate and repair the failing frontend unit and cache browser suites, and rerun end-to-end journeys in isolation.
+1. Run production-connected end-to-end journeys and additional browser configurations, beyond the mocked suites above.
 2. Verify production push registration, delivery, background behavior and permission flows on physical Android and iOS devices.
 3. Verify Gemini and other configured providers in the intended deployment; Gemini previously returned 503 errors for exercise review. Do not infer that two API keys guarantee availability.
 4. Validate pose-based repetition counting and exercise-specific form feedback against labeled videos, camera angles, people and exercises before making accuracy or safety claims.

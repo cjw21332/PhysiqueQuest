@@ -16,6 +16,7 @@ function loader(react = React, api = {}) {
     if (cache.has(file)) return cache.get(file);
     const module = { exports: {} }; cache.set(file, module.exports);
     const imports = name => {
+      if (name.endsWith('.css')) return {};
       if (name === 'react') return react;
       if (name.endsWith('/api')) return { api };
       if (name.endsWith('/useSettings')) return { useSettings: () => ({ settings: { inactivity: true, alarmVolume: false, showLeaderboard: true, threshold: 45 }, loading: false, error: '', async updateSettings() {}, async retry() {} }) };
@@ -112,8 +113,8 @@ test('admin mock catalog and analytics match the supplied reference', async () =
   assert.equal(analyticsCsv([['A"B', 14]]), '"A""B","14"');
   const load = loader();
   const catalog = renderToStaticMarkup(React.createElement(load('AdminExerciseLibrary').default, { preview: true, onBack() {} }));
-  assert.match(catalog, /Bulgarian split squat/);
-  assert.match(catalog, /Kettlebell swing/);
+  assert.match(catalog, /Bulgarian split squat/i);
+  assert.match(catalog, /Kettlebell swing/i);
   assert.match(catalog, /Sample data/);
   assert.doesNotMatch(catalog, /Delete|Unpublish/);
   const analytics = renderToStaticMarkup(React.createElement(load('EngagementAnalytics').default, { preview: true, onBack() {} }));

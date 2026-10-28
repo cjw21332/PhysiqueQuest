@@ -15,7 +15,8 @@ test('progress history comes from API reads and measurements save before appeari
   assert.match(screen, /sampleFormScores/);
   assert.match(screen, /Sample form accuracy trend/);
   assert.match(screen, /showSampleRecords/);
-  assert.match(screen, /api\.getWorkouts/);
+  assert.match(screen, /useWorkoutHistory/);
+  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getWorkouts/);
   assert.match(hook, /api\.getProgress/);
   assert.match(hook, /await api\.addProgress/);
   assert.match(api, /\/progress/);

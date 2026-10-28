@@ -9,35 +9,27 @@ test('progress displays saved measurement history and honest empty states', asyn
   assert.match(file, /useProgress/);
   assert.match(file, /Save measurement/);
   assert.match(file, /Log your first .* to start a trend/);
-  assert.match(file, /api\.getWorkouts\(\)/);
+  assert.match(file, /useWorkoutHistory/);
+  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getWorkouts\(20, force\)/);
   assert.match(file, /completedWorkouts/);
   assert.match(file, /samplePersonalRecords/);
   assert.match(file, /Sample data/);
   assert.match(file, /Form accuracy/);
 });
 
-test('notifications prefer API records and show the requested preview only for a successful empty response', async () => {
+test('notifications use account records and display an honest empty state', async () => {
   const file = await source('sections/Home/Notifications.tsx');
   assert.match(file, /useNotifications/);
   assert.match(file, /markAllRead/);
   assert.match(file, /Try again/);
-  assert.match(file, /const sampleNotifications: AppNotification\[\]/);
-  assert.match(file, /!loading && !error && items\.length === 0/);
-  assert.match(file, /showingSamples \? sampleItems : items/);
-  assert.match(file, /Emergency alert sent — Nov 14, 7:42 PM/);
-  assert.match(file, /Maria Dela Cruz was notified\. Review the flagged session\./);
-  assert.match(file, /2 missions left/);
-  assert.match(file, /Post-workout report ready/);
-  assert.match(file, /Streak penalty applied/);
-  assert.match(file, /New badge unlocked/);
-  assert.match(file, /Sample notifications · live notifications will replace this preview\./);
-  assert.match(file, /This sample alert is not linked to a real session\./);
+  assert.match(file, /!items\.length && !error/);
+  assert.match(file, /New notifications will appear here/);
+  assert.doesNotMatch(file, /sampleNotifications/);
 });
 
-test('sample notification read actions stay local and do not call the API', async () => {
+test('notification read actions use account-backed hooks', async () => {
   const file = await source('sections/Home/Notifications.tsx');
-  assert.match(file, /if \(showingSamples\) \{\s+setSampleItems/);
-  assert.match(file, /if \(showingSamples\) \{\s+setSampleItems\(current => current\.map\(sample => \(\{ \.\.\.sample, unread: false \}\)\)\)/);
+  assert.match(file, /markRead\(safety\.id\)/);
   assert.match(file, /void markRead\(item\.id\)/);
   assert.match(file, /void markAllRead\(\)/);
 });
@@ -45,13 +37,13 @@ test('sample notification read actions stay local and do not call the API', asyn
 test('notifications pin real safety alerts and preserve truthful actions', async () => {
   const file = await source('sections/Home/Notifications.tsx');
   const styles = await source('app/globals.css');
-  assert.match(file, /displayedItems\.find\(item =>/);
+  assert.match(file, /sorted\.find\(item =>/);
   assert.match(file, /item\.icon === 'shield'/);
-  assert.match(file, /<SafetyNotification\s+item=\{pinnedSafety\}/);
+  assert.match(file, /aria-label="Pinned safety notice"/);
   assert.match(file, /Safety notice · pinned/);
   assert.match(file, /Mark as read/);
   assert.match(file, /notification-unread-label/);
-  assert.match(file, /aria-label=\{\`\$\{group\} notifications\`\}/);
+  assert.match(file, /aria-label="Your notifications"/);
   assert.match(styles, /\.home-notifications \.notification-safety-card/);
   assert.match(styles, /\.home-notifications \.notification-item\.unread/);
 });

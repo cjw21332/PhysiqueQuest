@@ -3,6 +3,7 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
+import { titleCase } from './title-case-helper.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -43,6 +44,7 @@ test('a native alarm reveals stop controls after a late cancellation and stays s
     '../../hooks/useCameraStream': { useCameraStream: () => ({ stop() {}, status: 'idle' }) },
     '../../lib/alarmAudio': { startAlarm: () => { browserStarts++; }, stopAlarm() {} },
     '../../lib/inactivityConstants.mjs': { COUNTDOWN_SECONDS: 30 },
+    '../../lib/titleCase': { titleCase },
   };
   const window = {
     addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener() {},

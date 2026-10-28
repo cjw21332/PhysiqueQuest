@@ -13,7 +13,7 @@ async function setup(page, savedWater = false) {
       sessionStorage.setItem('cache-test-auth-seeded', 'true');
     }
   });
-  let mode = 'ready', title = 'Saved workout', release;
+  let mode = 'ready', title = 'Saved workout', release, account = 'cached-user';
   let nutritionState = savedWater ? { meals: [], water: [{ date: '2026-10-19', glasses: 1 }] } : structuredClone(nutrition);
   let barrier = Promise.resolve();
   const calls = [];
@@ -22,6 +22,11 @@ async function setup(page, savedWater = false) {
     const path = new URL(request.url()).pathname;
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
+    if (path.endsWith('/auth/session/migrate') || path.endsWith('/auth/session/refresh')) {
+      if (mode === 'unauthorized') return route.fulfill({ status: 401, json: { message: 'Session expired' }, headers });
+      if (path.endsWith('/migrate')) account = request.headers().authorization === 'Bearer other-session' ? 'other-user' : 'cached-user';
+      return route.fulfill({ json: { user: { id: account, name: profile.name, email: profile.email, emailVerified: true }, access_token: 'test-session', expires_in: 3600 }, headers });
+    }
     calls.push({ path, method: request.method() });
     if (mode === 'offline') return route.abort('failed');
     if (mode === 'unauthorized') return route.fulfill({ status: 401, json: { message: 'Session expired' }, headers });
@@ -35,6 +40,7 @@ async function setup(page, savedWater = false) {
       json = nutritionState;
     }
     if (path.endsWith('/activity/state')) json = activity;
+    if (path.endsWith('/notifications')) json = { items: [], reminder: null };
     if (path.endsWith('/coach/plan')) json = makePlan(title);
     if (path.endsWith('/settings')) json = { values: {} };
     return route.fulfill({ json, headers });
@@ -122,7 +128,6 @@ test('a confirmed water write updates the saved snapshot and survives a slow rel
   await expect(page.locator('.target-log-water')).toContainText('3 / 8 glasses');
   fixture.block();
   await page.reload();
-  await page.getByRole('button', { name: 'Log & water intake' }).click();
   await expect(page.locator('.target-log-water')).toContainText('3 / 8 glasses');
   fixture.release();
 });
@@ -135,10 +140,12 @@ test('two tabs settle their reads and cross-tab logout exits both protected view
   const other = await setup(second);
   await second.goto('/home');
   await expect(second.getByRole('heading', { name: 'Saved workout' })).toBeVisible();
-  await page.waitForTimeout(500);
-  expect(first.calls).toHaveLength(4);
-  expect(other.calls).toHaveLength(4);
-  await second.evaluate(() => localStorage.removeItem('physiquequest-auth'));
+  await expect.poll(async () => {
+    const counts = [first.calls.length, other.calls.length];
+    await page.waitForTimeout(500);
+    return first.calls.length === counts[0] && other.calls.length === counts[1];
+  }, { timeout: 10_000 }).toBe(true);
+  await second.evaluate(() => localStorage.setItem('physiquequest-logout', String(Date.now())));
   await expect(page).toHaveURL(/\/launch$/);
   await expect(page.getByRole('heading', { name: 'Saved workout' })).toHaveCount(0);
   await second.close();

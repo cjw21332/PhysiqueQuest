@@ -357,6 +357,10 @@ test('readiness UX: upload status is lazy and explicit analysis retains video pa
   expect(data.mediaBase64.length).toBeGreaterThan(100);
   await expect(page.getByRole('region', { name: 'Video analysis' })).toContainText('Keep your feet planted');
   await expect(page.getByRole('region', { name: 'Video analysis' })).toContainText('Your workout has not been changed.');
+  await page.getByRole('button', { name: 'Back to video', exact: true }).first().click();
+  await page.getByRole('button', { name: 'Choose a different video' }).click();
+  await page.getByLabel('Choose a recorded exercise video').setInputFiles(fileURLToPath(new URL('../../public/opening-app-animation.mp4', import.meta.url)));
+  await expect(page.getByLabel('Exercise in this recording (optional)')).toHaveValue('');
 });
 
 test('an unavailable exercise review can be retried and shows the returned guidance', async ({ page }) => {

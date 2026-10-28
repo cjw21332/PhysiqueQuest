@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { titleCase } from './title-case-helper.mjs';
 import ts from 'typescript';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -18,8 +19,8 @@ const components = async (file, react = React) => {
   const icons = await load('sections/Home/icons.tsx');
   const types = await load('sections/Scan/types.ts');
   const calorieProgress = await load('sections/Home/CalorieProgress.tsx');
-  const foodNameSearch = await load('sections/Scan/FoodNameSearch.tsx', name => name === '../../lib/api' ? { api: {} } : require(name));
-  return load(`sections/Scan/${file}.tsx`, name => name === 'react' ? react : name === '../Home/icons' ? icons : name === './types' ? types : name === '../Home/CalorieProgress' ? calorieProgress : name === './FoodNameSearch' ? foodNameSearch : require(name));
+  const foodNameSearch = await load('sections/Scan/FoodNameSearch.tsx', name => name === '../../lib/api' ? { api: {} } : name.endsWith('/titleCase') ? { titleCase } : require(name));
+  return load(`sections/Scan/${file}.tsx`, name => name === 'react' ? react : name === '../Home/icons' ? icons : name === './types' ? types : name === '../Home/CalorieProgress' ? calorieProgress : name === './FoodNameSearch' ? foodNameSearch : name.endsWith('/titleCase') ? { titleCase } : require(name));
 };
 
 test('shared Home calorie progress handles empty, partial, and exceeded targets', async () => {
@@ -45,7 +46,7 @@ test('typed food names use debounced backend search and ignore obsolete results'
   const react = { ...React, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; }, useEffect(callback) { effect = callback; } };
   const calls = [];
   const api = { searchFoods(query) { return new Promise(resolve => { calls.push({ query, resolve }); }); } };
-  const { default: Search } = await load('sections/Scan/FoodNameSearch.tsx', name => name === 'react' ? react : name === '../../lib/api' ? { api } : require(name));
+  const { default: Search } = await load('sections/Scan/FoodNameSearch.tsx', name => name === 'react' ? react : name === '../../lib/api' ? { api } : name.endsWith('/titleCase') ? { titleCase } : require(name));
   let value = 'Rice'; let selected;
   const render = () => { cursor = 0; return Search({ value, disabled: false, onChange(next) { value = next; }, onSelect(food) { selected = food; } }); };
   const find = (node, type) => {
@@ -66,7 +67,7 @@ test('typed food names use debounced backend search and ignore obsolete results'
   calls[0].resolve({ candidates: [{ fdc_id: 456, description: 'Old chicken', data_type: 'Foundation' }] });
   await new Promise(resolve => setImmediate(resolve));
   const tree = render();
-  assert.match(renderToStaticMarkup(tree), /Rice, cooked/);
+  assert.match(renderToStaticMarkup(tree), /Rice, cooked/i);
   assert.doesNotMatch(renderToStaticMarkup(tree), /Old chicken/);
   find(tree, 'button').props.onClick();
   assert.equal(selected.fdc_id, 123);
@@ -81,7 +82,7 @@ test('today log displays source, edited flag and original time, with an edit act
   assert.match(html, /Scanned · edited · 12:40/);
   assert.match(html, /Manual · 15:10/);
   assert.match(html, /Not logged yet/);
-  assert.match(html, /aria-label="Edit Breakfast: Oats and eggs"/);
+  assert.match(html, /aria-label="Edit Breakfast: Oats and eggs"/i);
   assert.doesNotMatch(html, /aria-label="Edit Dinner/);
 });
 test('meal editor supports individual foods in a multi-item meal and retains the Scan form theme', async () => {
@@ -89,8 +90,8 @@ test('meal editor supports individual foods in a multi-item meal and retains the
   const { sampleMeals } = await load('sections/Scan/types.ts');
   const html = renderToStaticMarkup(React.createElement(Editor, { entries: sampleMeals.slice(0, 2), onBack() {}, async onSave() {} }));
   assert.match(html, /Food to edit/);
-  assert.match(html, /Oats and eggs/);
-  assert.match(html, /Chicken rice bowl/);
+  assert.match(html, /Oats and eggs/i);
+  assert.match(html, /Chicken rice bowl/i);
   assert.match(html, /Back to Today&#x27;s Log/);
   assert.match(html, /Save changes/);
   assert.equal((html.match(/type="number"/g) || []).length, 4);
