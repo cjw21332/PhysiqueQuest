@@ -1,0 +1,103 @@
+{
+  "syntheticOnly": true,
+  "intents": [
+    {
+      "id": "0",
+      "intent": "What is my current dietary plan?"
+    },
+    {
+      "id": "1",
+      "intent": "What is my daily calorie target?"
+    },
+    {
+      "id": "2",
+      "intent": "What are my dietary plan macros?"
+    },
+    {
+      "id": "3",
+      "intent": "What have I eaten today?"
+    },
+    {
+      "id": "4",
+      "intent": "How much water have I logged today?"
+    },
+    {
+      "id": "5",
+      "intent": "What is my saved workout program?"
+    },
+    {
+      "id": "6",
+      "intent": "Which exercises did I complete in my last workout?"
+    },
+    {
+      "id": "7",
+      "intent": "What is my current weight?"
+    },
+    {
+      "id": "8",
+      "intent": "What is my height?"
+    },
+    {
+      "id": "9",
+      "intent": "What is my target weight?"
+    },
+    {
+      "id": "10",
+      "intent": "How much XP do I still need for the next level?"
+    },
+    {
+      "id": "11",
+      "intent": "What time is my saved daily reminder?"
+    }
+  ],
+  "questions": [
+    {
+      "id": "fresh-0",
+      "question": "Could you tell me what my current dietary plan looks like right now?"
+    },
+    {
+      "id": "fresh-1",
+      "question": "What is the specific calorie target I have set for today?"
+    },
+    {
+      "id": "fresh-2",
+      "question": "Can you show me the macro breakdown of my existing dietary plan?"
+    },
+    {
+      "id": "fresh-3",
+      "question": "What meals and snacks have I successfully logged for today so far?"
+    },
+    {
+      "id": "fresh-4",
+      "question": "How many ounces of water have I recorded in my log today?"
+    },
+    {
+      "id": "fresh-5",
+      "question": "Which specific exercises are included in my saved workout program?"
+    },
+    {
+      "id": "fresh-6",
+      "question": "Can you list the exercises that were completed during my last session?"
+    },
+    {
+      "id": "fresh-7",
+      "question": "What is the current weight measurement stored in my profile?"
+    },
+    {
+      "id": "fresh-8",
+      "question": "Could you tell me what height I have entered into my settings?"
+    },
+    {
+      "id": "fresh-9",
+      "question": "What is the target weight goal that I am currently working toward?"
+    },
+    {
+      "id": "fresh-10",
+      "question": "How much experience points do I still need to reach the next level?"
+    },
+    {
+      "id": "fresh-11",
+      "question": "At what time is my saved daily reminder scheduled to go off?"
+    }
+  ]
+}

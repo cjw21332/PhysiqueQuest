@@ -1,4 +1,6 @@
 'use client';
+import AdditionalNutrition from '../Scan/AdditionalNutrition';
+import { nutrientTotal, nutrientLabel } from '../Scan/nutrientTotal';
 import { titleCase } from '../../lib/titleCase';
 
 import { Icon } from '../Home/icons';
@@ -28,10 +30,10 @@ export default function NutritionDashboard({
 }) {
   const calorieTarget = targets.calories;
   const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
-  const calories = meals.reduce((sum, item) => sum + item.calories, 0);
-  const protein = meals.reduce((sum, item) => sum + item.protein, 0);
-  const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
-  const fats = meals.reduce((sum, item) => sum + item.fat, 0);
+  const calories = nutrientTotal(meals, item => item.calories);
+  const protein = nutrientTotal(meals, item => item.protein);
+  const carbs = nutrientTotal(meals, item => item.carbs);
+  const fats = nutrientTotal(meals, item => item.fat);
   const historyAverage = summarizeHistory(historyMeals, 7).average;
 
   return (
@@ -48,7 +50,7 @@ export default function NutritionDashboard({
 
         <div className="scan-dashboard-macros">
           <p className="scan-calories-remaining">
-            <strong>{Math.max(0, calorieTarget - Math.round(calories)).toLocaleString()} kcal</strong> remaining
+            <strong>{calories === null ? 'Unavailable' : nutrientLabel(Math.max(0, calorieTarget - calories), 'kcal')}</strong> remaining
           </p>
           <MacroBar label="Protein" current={protein} target={macroTargets.Protein} />
           <MacroBar label="Carbs" current={carbs} target={macroTargets.Carbs} />
@@ -56,6 +58,7 @@ export default function NutritionDashboard({
         </div>
       </section>
 
+      <AdditionalNutrition entries={meals}/>
       <button type="button" className="scan-dashboard-scan" onClick={onScan}>
         <span className="scan-dashboard-scan-icon"><Icon name="camera" size={22} /></span>
         <span className="scan-dashboard-scan-copy">
@@ -70,13 +73,13 @@ export default function NutritionDashboard({
         <div className="scan-dashboard-meal-list">
           {mealNames.map((mealName) => {
             const entries = meals.filter((item) => item.meal === mealName);
-            const mealCalories = entries.reduce((sum, item) => sum + item.calories, 0);
+            const mealCalories = nutrientTotal(entries, item => item.calories);
             const detail = entries.map((item) => item.detail || titleCase(item.name)).join(' · ');
             return (
               <article className="scan-dashboard-meal" key={mealName}>
                 <div className="scan-dashboard-meal-head">
                   <h3>{mealName}</h3>
-                  <span>{entries.length ? `${Math.round(mealCalories).toLocaleString()} kcal` : 'Not logged'}</span>
+                  <span>{entries.length ? `${nutrientLabel(mealCalories, 'kcal')}` : 'Not logged'}</span>
                   <button type="button" onClick={() => onAdd(mealName)} aria-label={`Add food to ${mealName}`}>＋</button>
                 </div>
                 <p>{entries.length ? detail : 'Add what you ate to stay on target'}</p>
@@ -104,7 +107,8 @@ export default function NutritionDashboard({
   );
 }
 
-function MacroBar({ label, current, target }: { label: string; current: number; target: number }) {
+function MacroBar({ label, current, target }: { label: string; current: number | null; target: number }) {
+  if (current === null) return <div>{label} · Incomplete</div>;
   const progress = Math.min(100, Math.max(0, (current / target) * 100));
   return (
     <div className="scan-dashboard-macro">

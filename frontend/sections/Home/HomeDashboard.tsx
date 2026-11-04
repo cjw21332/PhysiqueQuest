@@ -1,4 +1,6 @@
 'use client';
+import AdditionalNutrition from '../Scan/AdditionalNutrition';
+import { nutrientTotal, nutrientLabel } from '../Scan/nutrientTotal';
 
 import { Icon } from './icons';
 import CalorieProgress from './CalorieProgress';
@@ -34,10 +36,10 @@ export default function HomeDashboard({ profile, onNotify }: {
   const todayPlan = plan?.days[todayIndex];
   const todayMeals = meals.filter(meal => meal.date === today);
   const totals = {
-    calories: todayMeals.reduce((sum, meal) => sum + meal.calories, 0),
-    Protein: todayMeals.reduce((sum, meal) => sum + meal.protein, 0),
-    Carbs: todayMeals.reduce((sum, meal) => sum + meal.carbs, 0),
-    Fats: todayMeals.reduce((sum, meal) => sum + meal.fat, 0),
+    calories: nutrientTotal(todayMeals, item => item.calories),
+    Protein: nutrientTotal(todayMeals, item => item.protein),
+    Carbs: nutrientTotal(todayMeals, item => item.carbs),
+    Fats: nutrientTotal(todayMeals, item => item.fat),
   };
   const completed = dailyMissions.filter(mission => mission.complete).length;
   const levelPercent = activity.nextLevelExp
@@ -92,6 +94,7 @@ export default function HomeDashboard({ profile, onNotify }: {
       <div className="section-title-row"><h3 className="section-title">Nutrition today</h3><button className="scan-link" onClick={() => navigate('/scan')}><Icon name="scan" size={12} />Scan meal</button></div>
       {nutritionError ? <p role="alert" className="error">{nutritionError}</p> : nutritionLoading ? <p role="status">Loading your nutrition…</p> : <div className="nutrition-overview home-ref-nutrition">
         <CalorieProgress calories={totals.calories} target={nutritionTargets.calories}/>
+      <AdditionalNutrition entries={todayMeals}/>
         <div className="macros-list">
           {(Object.keys(macroTargets) as (keyof typeof macroTargets)[]).map(label => <MacroProgress key={label} label={label} value={totals[label]} target={macroTargets[label]} />)}
         </div>
@@ -113,7 +116,8 @@ function MissionCard({ title, current, total }: { title: string; current: number
   return <div className="mission-card"><div className="mission-header"><span className="mission-title">{title}</span><span className="mission-count">{current} / {total}</span></div><div className="mission-bar" role="progressbar" aria-label={title} aria-valuemin={0} aria-valuemax={total} aria-valuenow={current}><div className="mission-bar-fill" style={{ width: `${percent}%` }} /></div></div>;
 }
 
-function MacroProgress({ label, value, target }: { label: string; value: number; target: number }) {
+function MacroProgress({ label, value, target }: { label: string; value: number | null; target: number }) {
+  if (value === null) return <div>{label} · Incomplete</div>;
   const percent = Math.min(100, target > 0 ? value / target * 100 : 0);
   return <div className="macro-item">
     <div className="macro-header"><span className="macro-label">{label}</span><span className="macro-values">{Math.round(value)} / {target} g</span></div>

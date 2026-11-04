@@ -22,6 +22,9 @@ const USDA_CONCURRENCY = 4;
 function round(n: number): number {
   return Math.round(n * 10) / 10;
 }
+function scale(value: number | null, factor: number): number | null {
+  return value === null ? null : round(value * factor);
+}
 
 function titleCase(s: string): string {
   return s.toLowerCase().replace(/\b\w+/g, (c) => c.charAt(0).toUpperCase() + c.slice(1));
@@ -117,7 +120,6 @@ export class FoodScanService {
 
     const items: AnalyzedItem[] = [];
     const unmatched: string[] = [];
-    const totals = zeroMacros();
 
     detected.forEach((d, i) => {
       const nut: NutrientResult | undefined = results[i];
@@ -128,22 +130,18 @@ export class FoodScanService {
           est_weight_g: d.est_weight_g,
           confidence: d.confidence,
           found: false,
-          ...zeroMacros(),
+          kcal: null, protein_g: null, carbs_g: null, fat_g: null,
         });
         return;
       }
 
       const factor = d.est_weight_g / 100;
       const macros = {
-        kcal: round(nut.kcal_per_100g * factor),
-        protein_g: round(nut.protein_g_per_100g * factor),
-        carbs_g: round(nut.carbs_g_per_100g * factor),
-        fat_g: round(nut.fat_g_per_100g * factor),
+        kcal: scale(nut.kcal_per_100g, factor),
+        protein_g: scale(nut.protein_g_per_100g, factor),
+        carbs_g: scale(nut.carbs_g_per_100g, factor),
+        fat_g: scale(nut.fat_g_per_100g, factor),
       };
-      totals.kcal += macros.kcal;
-      totals.protein_g += macros.protein_g;
-      totals.carbs_g += macros.carbs_g;
-      totals.fat_g += macros.fat_g;
 
       items.push({
         // Preserve the model's exact item label: scan results are sent back to
@@ -156,24 +154,26 @@ export class FoodScanService {
         description: titleCase(nut.description),
         ...macros,
         per_100g: {
-          kcal: round(nut.kcal_per_100g),
-          protein_g: round(nut.protein_g_per_100g),
-          carbs_g: round(nut.carbs_g_per_100g),
-          fat_g: round(nut.fat_g_per_100g),
+          kcal: scale(nut.kcal_per_100g, 1),
+          protein_g: scale(nut.protein_g_per_100g, 1),
+          carbs_g: scale(nut.carbs_g_per_100g, 1),
+          fat_g: scale(nut.fat_g_per_100g, 1),
         },
       });
     });
 
+    const total = (key: 'kcal' | 'protein_g' | 'carbs_g' | 'fat_g') =>
+      items.some(item => item[key] === null) ? null : round(items.reduce((sum, item) => sum + item[key]!, 0));
     const response: AnalyzeResponse = {
       request_id: requestId,
       model: cfg.gemini.model,
       items,
       unmatched,
       totals: {
-        kcal: round(totals.kcal),
-        protein_g: round(totals.protein_g),
-        carbs_g: round(totals.carbs_g),
-        fat_g: round(totals.fat_g),
+        kcal: total('kcal'),
+        protein_g: total('protein_g'),
+        carbs_g: total('carbs_g'),
+        fat_g: total('fat_g'),
       },
       degraded,
     };

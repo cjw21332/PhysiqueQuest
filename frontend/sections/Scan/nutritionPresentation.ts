@@ -1,3 +1,4 @@
+import { nutrientTotal } from './nutrientTotal';
 import type { FoodCandidate, FoodDetail, ScanAnalysis, ScannedItem } from '../../lib/api';
 import type { FoodEntry } from './types';
 
@@ -23,13 +24,18 @@ export function createNutritionPreview(now = new Date()): { meals: FoodEntry[]; 
 export function summarizeHistory(meals: FoodEntry[], range: number, now = new Date()) {
   const days = Array.from({ length: range }, (_, index) => { const day = new Date(now); day.setDate(day.getDate() - (range - index - 1)); return dateKey(day); });
   const visible = meals.filter(entry => !!entry.date && days.includes(entry.date));
-  const daily = days.map(date => ({ date, calories: visible.filter(entry => entry.date === date).reduce((sum, entry) => sum + entry.calories, 0) }));
-  const logged = daily.filter(entry => entry.calories > 0);
-  const average = logged.length ? Math.round(logged.reduce((sum, day) => sum + day.calories, 0) / logged.length) : 0;
-  const energy = visible.reduce((sum, item) => ({ protein: sum.protein + item.protein * 4, carbs: sum.carbs + item.carbs * 4, fat: sum.fat + item.fat * 9 }), { protein: 0, carbs: 0, fat: 0 });
-  const total = energy.protein + energy.carbs + energy.fat;
-  const split = { protein: total ? Math.round(energy.protein / total * 100) : 0, carbs: total ? Math.round(energy.carbs / total * 100) : 0, fat: total ? Math.round(energy.fat / total * 100) : 0 };
-  return { daily, visible, average, split };
+  const daily = days.map(date => {
+    const entries = visible.filter(entry => entry.date === date);
+    return { date, count: entries.length, calories: nutrientTotal(entries, entry => entry.calories) };
+  });
+  const logged = daily.filter(day => day.count);
+  const sum = nutrientTotal(logged, day => day.calories);
+  const average = sum === null ? null : logged.length ? Math.round(sum / logged.length) : 0;
+  const grams = { protein: nutrientTotal(visible, x => x.protein), carbs: nutrientTotal(visible, x => x.carbs), fat: nutrientTotal(visible, x => x.fat) };
+  const energy = grams.protein === null || grams.carbs === null || grams.fat === null ? null : grams.protein * 4 + grams.carbs * 4 + grams.fat * 9;
+  const share = (value: number | null, factor: number) => energy === null || value === null ? null : energy ? Math.round(value * factor / energy * 100) : 0;
+  const split = { protein: share(grams.protein, 4), carbs: share(grams.carbs, 4), fat: share(grams.fat, 9) };
+  return { daily, visible, average, split, grams };
 }
 
 export const previewFoods: (FoodCandidate & { detail: FoodDetail })[] = [
@@ -54,5 +60,6 @@ export const previewScan: ScanAnalysis = {
   ], totals: { kcal: 620, protein_g: 48, carbs_g: 68, fat_g: 20 },
 };
 export function scaleScannedItems(items: ScannedItem[], factor: number) {
-  return items.map(item => ({ ...item, est_weight_g: item.est_weight_g * factor, kcal: item.kcal * factor, protein_g: item.protein_g * factor, carbs_g: item.carbs_g * factor, fat_g: item.fat_g * factor }));
+  const scale = (value: number | null) => value === null ? null : value * factor;
+  return items.map(item => ({ ...item, est_weight_g: item.est_weight_g * factor, kcal: scale(item.kcal), protein_g: scale(item.protein_g), carbs_g: scale(item.carbs_g), fat_g: scale(item.fat_g) }));
 }

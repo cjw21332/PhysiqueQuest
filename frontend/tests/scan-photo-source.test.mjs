@@ -9,12 +9,15 @@ test('meal scanning offers camera capture and photo upload into the same analysi
   const dashboard = await source('sections/Scan/NutritionDashboard.tsx');
 
   assert.match(dashboard, /onClick=\{onScan\}/);
-  assert.match(scan, /capture="environment"/);
-  assert.match(scan, /aria-label="Take a meal photo"/);
+  const camera = await source('sections/Scan/FoodCamera.tsx');
+  assert.match(camera, /getUserMedia/);
+  assert.match(camera, /track\.stop\(\)/);
+  assert.match(camera, /canvas\.toBlob/);
+  assert.match(camera, /Confirm and analyse/);
   assert.match(scan, /aria-label="Upload a meal photo"/);
-  assert.match(scan, /onClick=\{\(\)=>cameraInput\.current\?\.click\(\)\}/);
+  assert.match(scan, /setCameraOpen\(true\)/);
   assert.match(scan, /onClick=\{\(\)=>uploadInput\.current\?\.click\(\)\}/);
-  assert.equal((scan.match(/onPhoto\(e\.target\.files\?\.\[0\]\)/g) ?? []).length, 2);
+  assert.match(scan, /onCapture=\{file=>\{setCameraOpen\(false\);onPhoto\(file\);\}\}/);
   assert.match(scan, /setAnalysis\(await api\.analyzeImage\(image\)\)/);
   assert.match(scan, /const retake=.*setPhotoSourceOpen\(true\)/);
 });
@@ -23,7 +26,7 @@ test('photo inputs stay mounted during nutrition refresh and the review opens im
   const scan = await source('sections/Scan/ScanSection.tsx');
 
   assert.doesNotMatch(scan, /if\s*\(loading\)\s*return/);
-  assert.match(scan, /<input ref=\{cameraInput\}/);
+  assert.match(scan, /<FoodCamera/);
   assert.match(scan, /<input ref=\{uploadInput\}/);
   assert.match(scan, /loading && view === 'nutrition'/);
   assert.match(scan, /\{view==='review'&&<ReviewEstimate/);

@@ -44,9 +44,18 @@ export class ActivityService {
   }
 
   async get(userId: string, requestedTimezone?: string) {
+    return this.summary(userId, requestedTimezone, true);
+  }
+
+  /** Own records only, with no leaderboard reads or snapshot writes. */
+  async getForAssistant(userId: string) {
+    return this.summary(userId, undefined, false);
+  }
+
+  private async summary(userId: string, requestedTimezone: string | undefined, includeLeaderboard: boolean) {
     const record = await this.model.findOne({ userId: new Types.ObjectId(userId) }).exec();
     const timezone = resolveTimezone(requestedTimezone ?? record?.state?.timezone);
-    const [nutrition, workouts, records, ranking] = await Promise.all([this.nutrition.read(userId, 'userId meals.date meals.protein meals.carbs meals.fat water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), this.leaderboard.get(userId, 'all').catch(() => null)]);
+    const [nutrition, workouts, records, ranking] = await Promise.all([this.nutrition.read(userId, 'userId meals.date meals.protein meals.carbs meals.fat water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? this.leaderboard.get(userId, 'all').catch(() => null) : Promise.resolve(null)]);
     const today = zoneDate(new Date(), timezone);
 
     const mealDates = nutrition.meals.map(meal => meal.date).filter((date): date is string => typeof date === 'string');
@@ -159,17 +168,26 @@ function computeExp(allMeals: Map<string, number>, allWorkouts: Set<string>, all
   return currentExp;
 }
 
-function buildBadges(completedWorkouts: any[], meals: { date: string; protein?: number; carbs?: number; fat?: number }[], allWater: Map<string, number>, activityDates: Set<string>, records: string[], rank: number | null, rankingAvailable: boolean) {
+function buildBadges(completedWorkouts: any[], meals: { date: string; protein?: number | null; carbs?: number | null; fat?: number | null }[], allWater: Map<string, number>, activityDates: Set<string>, records: string[], rank: number | null, rankingAvailable: boolean) {
   const longest = [...activityDates].sort().reduce((state, date) => { const previous = state.previous && new Date(`${state.previous}T00:00:00Z`); const consecutive = previous && new Date(`${date}T00:00:00Z`).getTime() - previous.getTime() === 86400000; const count = consecutive ? state.count + 1 : 1; return { previous: date, count, longest: Math.max(state.longest, count) }; }, { previous: '', count: 0, longest: 0 }).longest;
-  const macros = new Map<string, { protein: number; carbs: number; fat: number }>();
-  for (const meal of meals) { if (!meal.date) continue; const total = macros.get(meal.date) ?? { protein: 0, carbs: 0, fat: 0 }; total.protein += meal.protein ?? 0; total.carbs += meal.carbs ?? 0; total.fat += meal.fat ?? 0; macros.set(meal.date, total); }
+  const macros = new Map<string, { protein: number; carbs: number; fat: number; complete: boolean }>();
+  for (const meal of meals) {
+    if (!meal.date) continue;
+    const total = macros.get(meal.date) ?? { protein: 0, carbs: 0, fat: 0, complete: true };
+    for (const key of ['protein', 'carbs', 'fat'] as const) {
+      const value = meal[key];
+      if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) total.complete = false;
+      else total[key] += value;
+    }
+    macros.set(meal.date, total);
+  }
   const early = completedWorkouts.some(workout => workout.earlyBird === true);
   return [
     { id: 'streak-10', title: '10-day streak', icon: 'fire', earned: longest >= 10 },
     { id: 'first-pr', title: 'First PR', icon: 'trophy', earned: records.length > 0 },
     { id: 'perfect-form', title: 'Perfect form', icon: 'medal', earned: false, available: false, description: 'Form scoring is not available yet.' },
     { id: 'hydrated', title: 'Hydrated', icon: 'water', earned: [...allWater.values()].some(glasses => glasses >= 8) },
-    { id: 'macro-master', title: 'Macro master', icon: 'target', earned: [...macros.values()].some(day => day.protein >= 140 && day.carbs >= 240 && day.fat >= 70), description: 'Reach the app’s current daily protein, carb and fat targets.' },
+    { id: 'macro-master', title: 'Macro master', icon: 'target', earned: [...macros.values()].some(day => day.complete && day.protein >= 140 && day.carbs >= 240 && day.fat >= 70), description: 'Reach the app’s current daily protein, carb and fat targets.' },
     { id: 'streak-30', title: '30-day streak', icon: 'fire', earned: longest >= 30 },
     { id: 'top-10', title: 'Top 10', icon: 'crown', earned: rank !== null && rank <= 10, available: rankingAvailable, description: rankingAvailable ? 'Reach the top 10 in all-time quest points.' : 'Leaderboard is unavailable right now.' },
     { id: 'early-bird', title: 'Early bird', icon: 'sun', earned: early, description: 'Complete a workout between 5:00 and 9:00 AM in your activity timezone.' },

@@ -6,6 +6,7 @@ import { RequestContextInterceptor } from '../common/foodscan/request-context.in
 import { ScanRateLimitGuard } from '../common/foodscan/scan-rate-limit.guard.js';
 import type { ScanRequest } from '../common/foodscan/scan-request.js';
 import { FoodScanSchemasService, fdcIdParamSchema } from './foodscan.schemas.js';
+import { ProductService } from './services/product.service.js';
 import { FoodScanService } from './foodscan.service.js';
 import type { FoodDetailResponse, FoodSearchResponse } from './foodscan.schemas.js';
 
@@ -23,6 +24,7 @@ import type { FoodDetailResponse, FoodSearchResponse } from './foodscan.schemas.
 export class FoodSearchController {
   constructor(
     private readonly service: FoodScanService,
+    private readonly products: ProductService,
     private readonly schemas: FoodScanSchemasService,
   ) {}
 
@@ -31,6 +33,9 @@ export class FoodSearchController {
     const { q } = this.schemas.parseFoodSearchQuery(query);
     return this.service.searchFoods(q, req.requestId ?? 'unknown');
   }
+
+  @Get('barcode/:code')
+  barcode(@Param('code') code:string, @Query('format') format?:string) { return this.products.lookup(code,format); }
 
   @Get(':fdcId')
   getFood(@Req() req: ScanRequest, @Param() params: unknown): Promise<FoodDetailResponse> {

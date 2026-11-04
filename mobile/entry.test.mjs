@@ -5,7 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
-const { resolveEntryPoint } = require('@expo/config/paths');
+const { resolveEntryPoint } = require('expo/config/paths');
 const mobileRoot = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(mobileRoot, '..');
 

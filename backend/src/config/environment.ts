@@ -1,6 +1,8 @@
 import { retention, retentionDefaults } from '../privacy/retention.js';
+import { chatConfig } from '../chat/chat-config.js';
 
 export function validateEnvironment(env: Record<string, unknown>) {
+  chatConfig(env);
   const read = (name: string) => String(env[name] ?? '').trim();
   const fail = (name: string): never => { throw new Error(`Invalid or missing ${name}`); };
   for (const name of Object.keys(retentionDefaults) as Array<keyof typeof retentionDefaults>) retention(name, env as NodeJS.ProcessEnv);

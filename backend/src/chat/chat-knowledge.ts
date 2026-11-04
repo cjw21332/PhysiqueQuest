@@ -1,0 +1,26 @@
+import { selectChatPages } from './chat-pages.js';
+
+/** Reviewed application knowledge. Never crawl source/environment files or URLs. */
+export const CHAT_KNOWLEDGE = [
+  { id: 'system-home', label: 'Home guide', data: { route: '/home', facts: 'Home summarizes saved nutrition, training, goals and activity. Goals/milestones: /goals. Saved weight/waist/bench measurements: /progress. Notices/reminders: /home/notifications. Samples and unsaved device drafts are not personal records.' } },
+  { id: 'system-coach', label: 'Coach guide', data: { route: '/coach', facts: 'Coach uses saved goals, equipment, weekdays and duration for a weekly program. /coach/library and /exercises browse ExerciseDB; /coach/prepare checks optional camera readiness; /coach/session saves manual sets/rest/pause; /coach/report shows a completed session. Plans may be older saved versions. Saved loads are self-reported, never verified lifts/form.' } },
+  { id: 'system-scan', label: 'Scan guide', data: { route: '/scan', facts: 'Scan provides water and meal logs, food search/manual entry, photo estimates and dietary plans. /scan/plan has Active Plan, Custom Goals, Meal Schedule; /scan/today daily logs; /scan/history food history; /scan/add-food portions/manual food; /scan/review photo estimates; /scan/edit-meal selected entry edits. Review estimates before saving. Dietary percentages and gram targets differ. Photo/dietary providers have separate availability.' } },
+  { id: 'system-quests', label: 'Quests guide', data: { route: '/quests', facts: 'Daily points: one workout 100, three meals 60, eight water glasses 40, personal record 150. Workout credit is once/training day; recorded-set sessions do not independently earn it. Own computed state follows app rules: currentExp earned within level, experienceToNextLevel remaining XP, totalExperience all-time XP; streak capped365 days. /quests/leaderboard has quest-period and estimated strength rankings. Chat never loads other users/standings/Top10.' } },
+  { id: 'system-me', label: 'Me guide', data: { route: '/me', facts: 'Me contains personal data, goals, training, health profile, emergency contact, inactivity/alarm settings, leaderboard visibility, profile photo, password change and logout. /me/exercises is admin legacy catalogue; /me/engagement is analytics preview. With personal-data access enabled, Phiq can answer explicit questions about the signed-in user’s saved profile, declared health fields and emergency-contact fields. It never grants roles, changes records or retrieves other-user/admin datasets.' } },
+  { id: 'system-education', label: 'PhysiqueQuest learning guide', data: { facts: 'Nutrition targets are planning values, not logged intake. Scan stores macro percentages; displayed grams are estimated by calories × percentage ÷ 400 for protein/carbs and ÷ 900 for fat, rounded to the nearest gram. This uses approximate energy factors of 4 kcal per gram of protein or carbohydrate and 9 kcal per gram of fat. Food scans and portions are estimates. Profile weight and Progress measurements are separate; trends need comparable dated records. Logged exercise loads are self-reported and do not verify form or prove a strength trend. Daily Quest rewards are 100 points for a workout, 60 for three meals, 40 for eight glasses of water and 150 for a personal record; leaderboard standing is not available to chat. This is general app education, not diagnosis or individualized medical advice.' } },
+  { id: 'system-privacy', label: 'Assistant privacy boundaries', data: { route: '/privacy', facts: 'Phiq is read-only. Guidance requires no personal-data consent. Opt-in context is scoped to the authenticated account and only relevant fields. Credentials, email, locations, photos, recordings and other users are excluded. Health details and emergency contacts are retrieved only when directly asked, and are answered by deterministic code rather than sent to model generation. Safety/notification context is limited to safe status metadata. Missing/null/filtered fields are unknown, never filled from another field; current weight is not target weight. Personal context is not training data. No browser, shell, database-query or mutation tools. No diagnosis, medication directions, extreme diets or unsafe exercise. Current privacy/terms pages are draft notices.' } },
+] as const;
+
+/** Only relevant guides enter the model context; the complete catalogue stays server-side. */
+export function selectChatKnowledge(question: string, page?: string) {
+  const selected = selectChatPages(question, page, 3);
+  const sections = new Set(selected.map(item => item.section.toLowerCase()));
+  const modules = CHAT_KNOWLEDGE.filter(source => source.id !== 'system-privacy' && sections.has(source.id.slice(7)));
+  const privacy = CHAT_KNOWLEDGE.find(source => source.id === 'system-privacy')!;
+  const asksEducation = /\b(?:calories?|kcal|macros?|protein|carbs?|carbohydrates?|fat|grams?|nutrition|estimate|portion|trend|progress|strength|xp|quest points?)\b/i.test(question);
+  const education = asksEducation ? [CHAT_KNOWLEDGE.find(source => source.id === 'system-education')!] : [];
+  return [privacy, ...education, ...modules, ...selected.map(item => ({
+    id: `page-${item.id}`, label: `${item.title} guide`,
+    data: { route: item.path, facts: item.summary, steps: item.steps },
+  }))];
+}

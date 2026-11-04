@@ -1,0 +1,278 @@
+{
+  "checkedAt": "2026-10-30T15:21:07.570Z",
+  "syntheticOnly": true,
+  "passes": 3,
+  "distinctQuestions": 228,
+  "corpusPhrasingsPerPass": 1254,
+  "totalChecksPerPass": 1273,
+  "checked": 3819,
+  "passed": 3809,
+  "failed": 10,
+  "modelGenerations": 21,
+  "latency": {
+    "direct": {
+      "count": 3798,
+      "medianMs": 1,
+      "p95Ms": 3,
+      "maxMs": 60
+    },
+    "model": {
+      "count": 21,
+      "medianMs": 3662,
+      "p95Ms": 6072,
+      "maxMs": 29912
+    }
+  },
+  "samples": [
+    {
+      "id": "diet-exact-reported",
+      "question": "what's my current diet plan?",
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "elapsedMs": 3,
+      "mode": "direct"
+    },
+    {
+      "id": "quests-points-total",
+      "question": "What are my total quest points?",
+      "reply": "Your all-time Quest points (XP) are 640.",
+      "elapsedMs": 4,
+      "mode": "direct"
+    },
+    {
+      "id": "model-plan-versus-settings",
+      "question": "Compare my saved dietary plan calories with my independent saved nutrition target settings.",
+      "reply": "Your saved dietary plan calorie target is 2000 kcal/day. Your independent saved nutrition-settings target is 2100 kcal/day. They are separate saved values; Phiq cannot infer why they differ or change either value.",
+      "elapsedMs": 5,
+      "mode": "direct"
+    },
+    {
+      "id": "model-estimate-limit",
+      "question": "Why can you not say my logged meal calories prove exactly how much I ate?",
+      "reply": "Saved food calories and macros may be estimates. Food identity, portion size and nutrient values can differ from actual intake. Review these values before saving; a saved entry does not verify exactly what you ate.",
+      "elapsedMs": 3,
+      "mode": "direct"
+    },
+    {
+      "id": "model-current-versus-target",
+      "question": "Explain why my target weight is different from my current profile weight, using only the saved values.",
+      "reply": "Your saved current profile weight is 72 kg. Your target weight is 68 kg. These are separate saved fields. The records do not state why this target was chosen or when the profile weight was last measured. Progress check-ins are separate records.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "model-total-versus-today",
+      "question": "Compare my all-time Quest XP with my mission points earned today.",
+      "reply": "Your all-time Quest XP is 640. Mission points earned today are 160. All-time XP accumulates across saved activity; today’s points cover only completed daily missions.",
+      "elapsedMs": 4,
+      "mode": "direct"
+    },
+    {
+      "id": "model-outside-app",
+      "question": "PhysiqueQuest: what is the capital of France?",
+      "reply": "I can help with PhysiqueQuest’s Home, Coach, Scan, Quests and Me modules, and your own shared app records. Please ask about something in PhysiqueQuest.",
+      "elapsedMs": 29912,
+      "mode": "model"
+    },
+    {
+      "id": "model-food-portions",
+      "question": "Why should I review my estimated food portions before treating the saved calories as exact?",
+      "reply": "Saved food calories and macros may be estimates. Food identity, portion size and nutrient values can differ from actual intake. Review these values before saving; a saved entry does not verify exactly what you ate.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "model-water-mission",
+      "question": "Why is my saved water mission still incomplete?",
+      "reply": "Your saved water mission shows 6 of 8 glasses and is marked incomplete. This is the saved daily mission state; it does not verify unlogged drinking.",
+      "elapsedMs": 3,
+      "mode": "direct"
+    },
+    {
+      "id": "model-form-verification",
+      "question": "Why can you not verify my exercise form from my saved workout records?",
+      "reply": "Saved workout records contain self-reported sets, reps, loads and session status. These records cannot verify exercise form. A live Coach form check is separate from a saved workout record.",
+      "elapsedMs": 1,
+      "mode": "direct"
+    },
+    {
+      "id": "model-history-limit",
+      "question": "Explain why my recent food history should not be treated as my complete meal history.",
+      "reply": "Phiq receives only a bounded recent excerpt of saved food history. Older saved entries can be outside that excerpt, so it cannot establish complete or all-time meal history. Daily totals are calculated separately from all saved entries for the selected day; unlogged food remains unknown.",
+      "elapsedMs": 1,
+      "mode": "direct"
+    },
+    {
+      "id": "model-profile-progress-semantics",
+      "question": "Why would my profile weight and Progress check-ins have different saved values?",
+      "reply": "Your saved profile weight is 72 kg, and your latest saved Progress weight check-in is 71 kg. These are separate saved fields. The available records do not explain why they differ.",
+      "elapsedMs": 1,
+      "mode": "direct"
+    },
+    {
+      "id": "model-program-preferences",
+      "question": "Explain the distinction between my saved Coach snapshot and my training preferences without guessing which is newer.",
+      "reply": "Your saved training preferences: equipment Dumbbells, days Monday, Wednesday, Friday, planned duration 45 min. Your saved Coach snapshot has goal Build muscle, duration 45 min and the saved weekly program. The snapshot and profile preferences are separate records. The available records cannot establish which reflects the newest intended preferences.",
+      "elapsedMs": 1,
+      "mode": "direct"
+    },
+    {
+      "id": "model-workout-evidence",
+      "question": "Why does my saved workout load not prove that my strength improved over time?",
+      "reply": "Saved workout loads are self-reported records. A single load or a bounded set of recent sessions cannot establish a strength trend; that would require comparable performance across multiple sessions. The available records do not establish whether your strength improved.",
+      "elapsedMs": 1,
+      "mode": "direct"
+    },
+    {
+      "id": "model-notification-versus-safety",
+      "question": "Explain why my unread notifications cannot confirm delivery of a safety alert.",
+      "reply": "Unread notifications and safety-alert delivery status are separate records. An unread count only says saved notifications remain unopened; it cannot confirm alert delivery. A saved delivered status, when available, reflects provider status and is not a guarantee that a person received it.",
+      "elapsedMs": 1,
+      "mode": "direct"
+    },
+    {
+      "id": "reasoning-plan-and-intake",
+      "question": "Why might my saved diet plan target more calories than I have logged today?",
+      "reply": "Your saved diet plan targets 2,100 calories with a 30/40/30 macro split (150g protein, 200g carbs, 67g fat), while your logged intake for today totals only 1,500 calories. This gap exists because the plan represents your pre-set nutritional goals, whereas the logged values reflect actual meals and water consumed so far.",
+      "elapsedMs": 3999,
+      "mode": "model"
+    },
+    {
+      "id": "reasoning-interpret-intake",
+      "question": "What should I keep in mind when interpreting my saved dietary plan alongside my logged intake today?",
+      "reply": "Your active dietary plan targets 2,000 calories with a 30/40/30 macro split (150g protein, 200g carbs, 67g fat), while your logged intake for today totals 1,500 calories. You are currently below your calorie target by 500 calories and significantly under your protein goal of 90g versus the planned 150g.\n\nNote that your plan's gram targets are derived from percentages using standard caloric conversions (4 kcal/g for carbs/protein, 9 kcal/g for fat), but these are targets, not logged values. Your logged meals include Oatmeal, Rice bowl, Salmon dinner, and Yogurt, which sum to the 1,500 calories shown. Always review photo estimates before saving new entries, as dietary percentages and gram targets differ from actual intake logs.",
+      "elapsedMs": 6072,
+      "mode": "model"
+    },
+    {
+      "id": "reasoning-weight-trend",
+      "question": "What should I keep in mind before drawing a weight trend from my saved Progress check-ins?",
+      "reply": "Before drawing a weight trend from your saved Progress check-ins, remember that each measurement is an independent data point with its own date. Your profile weight (72 kg) and recent check-in (71 kg on 2026-10-30) are separate records; the former does not automatically establish the latter as your current state for trend analysis.\n\nTo create a valid trend, ensure you are comparing measurements taken under similar conditions over time. Since logged exercise loads are self-reported and food scans use estimated grams based on calorie percentages, focus on the explicit dates and values in your Progress history rather than inferred data.",
+      "elapsedMs": 4485,
+      "mode": "model"
+    },
+    {
+      "id": "reasoning-reminder-delivery",
+      "question": "Why might my daily reminder fail to reach my phone even though it is enabled?",
+      "reply": "Your daily reminder is set for 9:05 AM in the Asia/Singapore timezone and has been saved. If it isn't reaching your phone, the issue likely stems from device permissions or network connectivity rather than the app settings itself.",
+      "elapsedMs": 2117,
+      "mode": "model"
+    },
+    {
+      "id": "reasoning-session-timer",
+      "question": "Why can my saved completed workout not confirm the live state of my current session timer?",
+      "reply": "Your current active session timer is a live device draft that records sets only after you explicitly save them. The completed workouts shown in your history are separate server-saved records created when you chose 'End session' and confirmed the save. Until you finish and save the active workout, its data remains on the device and cannot appear as a completed report.",
+      "elapsedMs": 3003,
+      "mode": "model"
+    },
+    {
+      "id": "reasoning-quest-versus-rank",
+      "question": "Why does my current Quest level not tell you my leaderboard position?",
+      "reply": "Your current Quest level (Level 7) is determined by your total experience earned from activities like workouts and logging meals, which tracks all-time progress toward leveling up. Leaderboard positions are calculated separately based on strength rankings or specific quest periods, not directly tied to your overall Quest level.\n\nThe assistant can explain the rules for how leaderboards work—such as how strength is estimated relative to body weight—but it cannot load or display actual leaderboard standings or other users' data due to privacy boundaries. To view your own ranking, you would need to open the Leaderboard screen within the app and select a specific period or exercise type.",
+      "elapsedMs": 5098,
+      "mode": "model"
+    }
+  ],
+  "failures": [
+    {
+      "pass": 1,
+      "id": "reasoning-plan-and-intake",
+      "variant": "original",
+      "question": "Why might my saved diet plan target more calories than I have logged today?",
+      "issues": [
+        "Missing expected fact: 2,?000"
+      ],
+      "reply": "Your saved diet plan targets 2,100 calories with a 30/40/30 macro split (150g protein, 200g carbs, 67g fat), while your logged intake for today totals only 1,500 calories. This gap exists because the plan represents your pre-set nutritional goals, whereas the logged values reflect actual meals and water consumed so far."
+    },
+    {
+      "pass": 1,
+      "id": "reasoning-weight-trend",
+      "variant": "original",
+      "question": "What should I keep in mind before drawing a weight trend from my saved Progress check-ins?",
+      "issues": [
+        "Missing expected fact: more|multiple|single|one|insufficient|cannot|not enough"
+      ],
+      "reply": "Before drawing a weight trend from your saved Progress check-ins, remember that each measurement is an independent data point with its own date. Your profile weight (72 kg) and recent check-in (71 kg on 2026-10-30) are separate records; the former does not automatically establish the latter as your current state for trend analysis.\n\nTo create a valid trend, ensure you are comparing measurements taken under similar conditions over time. Since logged exercise loads are self-reported and food scans use estimated grams based on calorie percentages, focus on the explicit dates and values in your Progress history rather than inferred data."
+    },
+    {
+      "pass": 2,
+      "id": "reasoning-plan-and-intake",
+      "variant": "original",
+      "question": "Why might my saved diet plan target more calories than I have logged today?",
+      "issues": [
+        "Missing expected fact: 2,?000"
+      ],
+      "reply": "Your saved diet plan targets 2,100 calories with a 30/40/30 macro split (150g protein, 200g carbs, 67g fat), while your logged intake for today totals only 1,500 calories. This gap exists because the plan represents your planned nutritional goals, whereas the logged values reflect actual meals and water consumed so far."
+    },
+    {
+      "pass": 2,
+      "id": "reasoning-interpret-intake",
+      "variant": "original",
+      "question": "What should I keep in mind when interpreting my saved dietary plan alongside my logged intake today?",
+      "issues": [
+        "Missing expected fact: estimate|unlogged|not.*(?:actual|verify|proof)|cannot"
+      ],
+      "reply": "Your active dietary plan targets 2,000 calories with a 30/40/30 macro split (150g protein, 200g carbs, 67g fat), while your logged intake for today totals 1,500 calories (90g protein, 177g carbs, 44g fat). You are currently under your calorie target by 500 calories but have met your protein goal exactly. Your plan includes a suggested meal schedule, though the app notes this is guidance rather than a saved personalized list."
+    },
+    {
+      "pass": 2,
+      "id": "reasoning-weight-trend",
+      "variant": "original",
+      "question": "What should I keep in mind before drawing a weight trend from my saved Progress check-ins?",
+      "issues": [
+        "Missing expected fact: more|multiple|single|one|insufficient|cannot|not enough"
+      ],
+      "reply": "Before drawing a weight trend from your saved Progress check-ins, remember that each measurement is an independent data point with its own date. Your current weight (71 kg) and your target weight (68 kg) are separate values; the current weight does not automatically update your goal or vice versa.\n\nTo create a valid trend, ensure you are comparing measurements taken on similar occasions to account for natural daily fluctuations. Since your recent check-in is from October 30, 2026, any previous entries should ideally be from comparable times of day or weeks to minimize noise in the data."
+    },
+    {
+      "pass": 2,
+      "id": "reasoning-quest-versus-rank",
+      "variant": "original",
+      "question": "Why does my current Quest level not tell you my leaderboard position?",
+      "issues": [
+        "Missing expected fact: 7",
+        "Missing expected fact: unavailable|cannot|not|unknown"
+      ],
+      "reply": "Your Quest level is determined solely by your earned experience points (currentExp and totalExperience) within the app's progression system. Leaderboard positions are calculated based on self-reported strength metrics relative to bodyweight or estimated one-rep maximums, which are tracked separately from your XP accumulation."
+    },
+    {
+      "pass": 3,
+      "id": "reasoning-plan-and-intake",
+      "variant": "original",
+      "question": "Why might my saved diet plan target more calories than I have logged today?",
+      "issues": [
+        "Missing expected fact: 2,?000"
+      ],
+      "reply": "Your saved diet plan targets 2,100 calories with a 30/40/30 macro split (150g protein, 200g carbs, 67g fat), while your logged intake for today totals only 1,500 calories. This gap exists because the plan represents your pre-set nutritional goals, whereas the logged values are actual meals and water entries recorded in the app so far."
+    },
+    {
+      "pass": 3,
+      "id": "reasoning-interpret-intake",
+      "variant": "original",
+      "question": "What should I keep in mind when interpreting my saved dietary plan alongside my logged intake today?",
+      "issues": [
+        "Missing expected fact: estimate|unlogged|not.*(?:actual|verify|proof)|cannot"
+      ],
+      "reply": "Your active dietary plan targets 2,000 calories with a 30/40/30 macro split (150g protein, 200g carbs, 67g fat), while your logged intake for today totals 1,500 calories (90g protein, 177g carbs, 44g fat). You are currently under your calorie target by 500 calories but have met your protein goal. Note that the plan's gram targets were calculated assuming a 4 kcal/g conversion for carbs, which differs from standard scientific values; these are internal app targets, not universal standards."
+    },
+    {
+      "pass": 3,
+      "id": "reasoning-weight-trend",
+      "variant": "original",
+      "question": "What should I keep in mind before drawing a weight trend from my saved Progress check-ins?",
+      "issues": [
+        "Missing expected fact: more|multiple|single|one|insufficient|cannot|not enough"
+      ],
+      "reply": "Before drawing a weight trend from your saved Progress check-ins, remember that each measurement is an independent data point with its own date. Your current weight (71 kg) and your target weight (68 kg) are separate values; the former does not automatically become the latter unless you explicitly update your goal.\n\nTo create a valid trend, ensure all selected measurements share the same metric type (e.g., only weight) and ideally similar conditions. Since your recent record is dated 2026-10-30, any historical data used for comparison must also be from that specific measurement history to avoid mixing unrelated values."
+    },
+    {
+      "pass": 3,
+      "id": "reasoning-quest-versus-rank",
+      "variant": "original",
+      "question": "Why does my current Quest level not tell you my leaderboard position?",
+      "issues": [
+        "Missing expected fact: 7"
+      ],
+      "reply": "Your Quest level is determined solely by your earned experience points (currentExp and totalExperience) within the app's progression system. Leaderboard positions are calculated separately based on strength rankings or specific quest periods, which require access to other users' data that the assistant cannot retrieve."
+    }
+  ]
+}

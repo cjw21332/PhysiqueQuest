@@ -1,0 +1,492 @@
+{
+  "checkedAt": "2026-10-30T16:31:42.763Z",
+  "syntheticOnly": true,
+  "passes": 1,
+  "originalOnly": true,
+  "distinctQuestions": 252,
+  "corpusPhrasingsPerPass": 229,
+  "totalChecksPerPass": 252,
+  "checked": 252,
+  "passed": 227,
+  "failed": 25,
+  "modelGenerations": 0,
+  "semanticResolutions": 182,
+  "latency": {
+    "direct": {
+      "count": 70,
+      "medianMs": 1,
+      "p95Ms": 3,
+      "maxMs": 4
+    },
+    "model": {
+      "count": 0,
+      "medianMs": null,
+      "p95Ms": null,
+      "maxMs": null
+    },
+    "semantic": {
+      "count": 182,
+      "medianMs": 2839,
+      "p95Ms": 5824,
+      "maxMs": 13673
+    }
+  },
+  "samples": [
+    {
+      "id": "diet-exact-reported",
+      "question": "what's my current diet plan?",
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "quests-points-total",
+      "question": "What are my total quest points?",
+      "reply": "Your all-time Quest points (XP) are 640.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "model-plan-versus-settings",
+      "question": "Compare my saved dietary plan calories with my independent saved nutrition target settings.",
+      "reply": "Your saved dietary plan calorie target is 2000 kcal/day. Your independent saved nutrition-settings target is 2100 kcal/day. They are separate saved values; Phiq cannot infer why they differ or change either value.",
+      "elapsedMs": 5824,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-estimate-limit",
+      "question": "Why can you not say my logged meal calories prove exactly how much I ate?",
+      "reply": "Saved food calories and macros may be estimates. Food identity, portion size and nutrient values can differ from actual intake. Review these values before saving; a saved entry does not verify exactly what you ate.",
+      "elapsedMs": 4887,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-current-versus-target",
+      "question": "Explain why my target weight is different from my current profile weight, using only the saved values.",
+      "reply": "Your saved current profile weight is 72 kg. Your target weight is 68 kg. These are separate saved fields. The records do not state why this target was chosen or when the profile weight was last measured. Progress check-ins are separate records.",
+      "elapsedMs": 5811,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-total-versus-today",
+      "question": "Compare my all-time Quest XP with my mission points earned today.",
+      "reply": "Your all-time Quest XP is 640. Mission points earned today are 160. All-time XP accumulates across saved activity; today’s points cover only completed daily missions.",
+      "elapsedMs": 5881,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-outside-app",
+      "question": "PhysiqueQuest: what is the capital of France?",
+      "reply": "I can help with PhysiqueQuest’s Home, Coach, Scan, Quests and Me modules, and your own shared app records. Please ask about something in PhysiqueQuest.",
+      "elapsedMs": 7305,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-food-portions",
+      "question": "Why should I review my estimated food portions before treating the saved calories as exact?",
+      "reply": "Review a scan estimate: Reviews a photo analysis before anything is saved. Food identity, estimated weight and macros can be wrong; unmatched items cannot be treated as zero-calorie food. A photo is needed to open this screen; scan/image drafts are not available to the chatbot.\n\n1. Capture or upload a meal photo from Scan.\n2. Review detected foods, portions and nutrition.\n3. Correct supported fields, choose the meal, then save matched items.\n\nOpen /scan/review in PhysiqueQuest.",
+      "elapsedMs": 3411,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-water-mission",
+      "question": "Why is my saved water mission still incomplete?",
+      "reply": "Average logged calories for 2026-10-30: 375 kcal/entry (1500 kcal across 4 saved meal entries). These are saved records, not verified intake.",
+      "elapsedMs": 2976,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-form-verification",
+      "question": "Why can you not verify my exercise form from my saved workout records?",
+      "reply": "Workout report: Shows the completed saved session, exercise/set results and duration. Reports require a completed workout. Uploaded video analysis and sharing have separate availability; the assistant cannot inspect recordings or assert verified form.\n\n1. Finish and save a workout.\n2. Review the workout report and its saved results.\n3. Return to Coach or Home when finished.\n\nOpen /coach/report in PhysiqueQuest.",
+      "elapsedMs": 1816,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-history-limit",
+      "question": "Explain why my recent food history should not be treated as my complete meal history.",
+      "reply": "Phiq receives only a bounded recent excerpt of saved food history. Older saved entries can be outside that excerpt, so it cannot establish complete or all-time meal history. Daily totals are calculated separately from all saved entries for the selected day; unlogged food remains unknown.",
+      "elapsedMs": 1940,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-profile-progress-semantics",
+      "question": "Why would my profile weight and Progress check-ins have different saved values?",
+      "reply": "Your saved profile weight is 72 kg, and your latest saved Progress weight check-in is 71 kg. These are separate saved fields. The available records do not explain why they differ.",
+      "elapsedMs": 1618,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-program-preferences",
+      "question": "Explain the distinction between my saved Coach snapshot and my training preferences without guessing which is newer.",
+      "reply": "Coach weekly program: Shows a saved weekly program based on account goals, training days, duration and equipment. Training concepts such as sets, reps, recovery and progressive overload are general education, not verified performance. Changing relevant preferences can create a new saved version. Resume saved workout restores confirmed sets; unsaved device drafts are separate.\n\n1. Open Coach and choose a training day/program.\n2. Review its exercises, then start preparation.\n3. Use Resume saved workout when an existing session is available.\n\nOpen /coach in PhysiqueQuest.\n\nTraining preferences: Edits available equipment, training weekdays and session duration. These preferences influence saved Coach program versions.\n\n1. Open Me, then Training preference.\n2. Select equipment, days and duration.\n3. Save, then open Coach to load the appropriate program.\n\nOpen /me/training in PhysiqueQuest.",
+      "elapsedMs": 1949,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-workout-evidence",
+      "question": "Why does my saved workout load not prove that my strength improved over time?",
+      "reply": "Workout report: Shows the completed saved session, exercise/set results and duration. Reports require a completed workout. Uploaded video analysis and sharing have separate availability; the assistant cannot inspect recordings or assert verified form.\n\n1. Finish and save a workout.\n2. Review the workout report and its saved results.\n3. Return to Coach or Home when finished.\n\nOpen /coach/report in PhysiqueQuest.",
+      "elapsedMs": 2034,
+      "mode": "semantic"
+    },
+    {
+      "id": "model-notification-versus-safety",
+      "question": "Explain why my unread notifications cannot confirm delivery of a safety alert.",
+      "reply": "Your saved unread notification count is 2.",
+      "elapsedMs": 2119,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-plan-and-intake",
+      "question": "Why might my saved diet plan target more calories than I have logged today?",
+      "reply": "Daily calorie target: 2000 kcal.\n\nLogged calories for 2026-10-30: 1500 kcal. These are saved records, not verified intake.\n\ncalories remaining for 2026-10-30: 500 kcal (saved target 2000 kcal, logged 1500 kcal). These are saved records, not verified intake.\n\nA saved plan is a planning target. Logged meals may be estimates or incomplete; they do not verify actual intake. A gap alone cannot establish why the values differ, whether unlogged food was eaten, or what you should eat.",
+      "elapsedMs": 2593,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-interpret-intake",
+      "question": "What should I keep in mind when interpreting my saved dietary plan alongside my logged intake today?",
+      "reply": "Daily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).\n\nLogged calories for 2026-10-30: 1500 kcal.\nLogged protein for 2026-10-30: 90 g.\nLogged carbs for 2026-10-30: 177 g.\nLogged fat for 2026-10-30: 44 g. These are saved records, not verified intake.\n\ncalories remaining for 2026-10-30: 500 kcal (saved target 2000 kcal, logged 1500 kcal).\nprotein remaining for 2026-10-30: 60 g (saved target 150 g, logged 90 g).\ncarbs remaining for 2026-10-30: 23 g (saved target 200 g, logged 177 g).\nfat remaining for 2026-10-30: 23 g (saved target 67 g, logged 44 g). These are saved records, not verified intake.\n\nA saved plan is a planning target. Logged meals may be estimates or incomplete; they do not verify actual intake. A gap alone cannot establish why the values differ, whether unlogged food was eaten, or what you should eat.",
+      "elapsedMs": 2607,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-weight-trend",
+      "question": "What should I keep in mind before drawing a weight trend from my saved Progress check-ins?",
+      "reply": "Progress and measurements: Tracks saved weight, waist and bench-press measurements. Supports Add measurement and deleting an entry from its history. Personal-record/session panels use saved workouts where available; form-accuracy examples and empty-state samples are not verified personal results.\n\n1. Open Progress from Home.\n2. Choose Weight, Waist or Bench press.\n3. Use Add measurement to save a value; expand its history to review or delete entries.\n\nOpen /progress in PhysiqueQuest.",
+      "elapsedMs": 2838,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-reminder-delivery",
+      "question": "Why might my daily reminder fail to reach my phone even though it is enabled?",
+      "reply": "Notifications and daily reminders: Lists account notices and unread state. Supports Mark all read and a daily check-in time in the device timezone. Phone push requires device permission and a configured server push provider.\n\n1. Open Home, then Notifications.\n2. Choose a reminder time and Save reminder, or Turn off.\n3. Use Enable phone notifications on supported phone builds; review any delivery/setup message.\n\nOpen /home/notifications in PhysiqueQuest.",
+      "elapsedMs": 2838,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-session-timer",
+      "question": "Why can my saved completed workout not confirm the live state of my current session timer?",
+      "reply": "Active workout and rest timer: Records reps and weights by set, supports skip/revisit, pause/resume, rest timers, and saving/ending the workout. Pounds entered in the UI are converted for saved kilogram loads. Only saved set results are confirmed; unsaved input drafts stay on the device.\n\n1. Enter the set reps and load, then Save set.\n2. Use rest controls, pause/resume or skip/revisit as needed.\n3. Choose End session and confirm Save and end workout to create the report.\n\nOpen /coach/session in PhysiqueQuest.",
+      "elapsedMs": 1907,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-quest-versus-rank",
+      "question": "Why does my current Quest level not tell you my leaderboard position?",
+      "reply": "Quests, missions, XP and badges: Derives daily missions, level, XP and streak from saved account activity. Workout earns 100 points, three meals 60, eight glasses of water 40, and a personal record 150. currentExp is earned within-level XP, totalExperience all-time XP, experienceToNextLevel remaining XP. Streak calculation currently caps at 365 days. Ranking-dependent badges are unavailable to the assistant.\n\n1. Open Quests for level progress and current streak.\n2. Review each daily mission’s progress and points.\n3. Review earned/locked badges; unavailable badges are marked separately.\n\nOpen /quests in PhysiqueQuest.",
+      "elapsedMs": 2324,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-prescribed-versus-completed",
+      "question": "What should I consider when comparing my saved completed sets to my prescribed Coach sets?",
+      "reply": "Your saved Coach program: Build muscle, 45 min.\nMonday: Strength day — Squat 3 × 8. Keep your movement controlled. Follow the exercise instructions.\nTuesday: Recovery day (rest/recovery)\nWednesday: Strength day — Squat 3 × 8. Keep your movement controlled. Follow the exercise instructions.\nThursday: Recovery day (rest/recovery)\nFriday: Strength day — Squat 3 × 8. Keep your movement controlled. Follow the exercise instructions.\nSaturday: Recovery day (rest/recovery)\nSunday: Recovery day (rest/recovery)\nThis is a saved snapshot and may predate newer preferences.\n\nWorkout preparation and camera readiness: Prepares a selected program, checks optional camera readiness and calibration, and can start a manual workout without a camera. Permission, lighting, device/model readiness and drafts are device state, not saved server results.\n\n1. Select a program in Coach before opening preparation.\n2. Review camera readiness or choose the manual/camera-off path.\n3. Start the workout when ready.\n\nOpen /coach/prepare in PhysiqueQuest.",
+      "elapsedMs": 3427,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-safety-status",
+      "question": "How should I interpret my saved safety alert status without assuming a person received it?",
+      "reply": "Your latest available saved safety event: inactivity, status delivered, occurred 2026-10-30T15:31:29.223Z. This reflects saved provider status and is not a guarantee that a person received it.",
+      "elapsedMs": 4120,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-manual-versus-camera",
+      "question": "What should I know about camera readiness versus manual logging in Coach?",
+      "reply": "Workout preparation and camera readiness: Prepares a selected program, checks optional camera readiness and calibration, and can start a manual workout without a camera. Permission, lighting, device/model readiness and drafts are device state, not saved server results.\n\n1. Select a program in Coach before opening preparation.\n2. Review camera readiness or choose the manual/camera-off path.\n3. Start the workout when ready.\n\nOpen /coach/prepare in PhysiqueQuest.",
+      "elapsedMs": 3246,
+      "mode": "semantic"
+    },
+    {
+      "id": "reasoning-food-estimates",
+      "question": "What should I keep in mind about food photo estimates before saving an entry in Scan?",
+      "reply": "Review a scan estimate: Reviews a photo analysis before anything is saved. Food identity, estimated weight and macros can be wrong; unmatched items cannot be treated as zero-calorie food. A photo is needed to open this screen; scan/image drafts are not available to the chatbot.\n\n1. Capture or upload a meal photo from Scan.\n2. Review detected foods, portions and nutrition.\n3. Correct supported fields, choose the meal, then save matched items.\n\nOpen /scan/review in PhysiqueQuest.",
+      "elapsedMs": 6172,
+      "mode": "semantic"
+    }
+  ],
+  "failures": [
+    {
+      "pass": 1,
+      "id": "nutrition-meals-and-water",
+      "variant": "original",
+      "question": "What did I eat and drink today?",
+      "issues": [
+        "Missing expected fact: Oatmeal",
+        "Missing expected fact: Rice bowl",
+        "Missing expected fact: 6 glasses"
+      ],
+      "reply": "Logged calories for 2026-10-30: 1500 kcal.\nLogged protein for 2026-10-30: 90 g.\nLogged carbs for 2026-10-30: 177 g.\nLogged fat for 2026-10-30: 44 g. These are saved records, not verified intake."
+    },
+    {
+      "pass": 1,
+      "id": "analytics-progress-single-observation",
+      "variant": "original",
+      "question": "What should I keep in mind before drawing a weight trend from my saved Progress check-ins?",
+      "issues": [
+        "Missing expected fact: 71 kg",
+        "Missing expected fact: one comparable",
+        "Missing expected fact: cannot establish a trend",
+        "Did not answer from own records",
+        "Wrong record domain"
+      ],
+      "reply": "Progress and measurements: Tracks saved weight, waist and bench-press measurements. Supports Add measurement and deleting an entry from its history. Personal-record/session panels use saved workouts where available; form-accuracy examples and empty-state samples are not verified personal results.\n\n1. Open Progress from Home.\n2. Choose Weight, Waist or Bench press.\n3. Use Add measurement to save a value; expand its history to review or delete entries.\n\nOpen /progress in PhysiqueQuest."
+    },
+    {
+      "pass": 1,
+      "id": "analytics-quest-versus-ranking",
+      "variant": "original",
+      "question": "Why does my current Quest level not tell you my leaderboard position?",
+      "issues": [
+        "Missing expected fact: level is 7",
+        "Missing expected fact: 640",
+        "Missing expected fact: position is unavailable",
+        "Did not answer from own records",
+        "Wrong record domain"
+      ],
+      "reply": "Quests, missions, XP and badges: Derives daily missions, level, XP and streak from saved account activity. Workout earns 100 points, three meals 60, eight glasses of water 40, and a personal record 150. currentExp is earned within-level XP, totalExperience all-time XP, experienceToNextLevel remaining XP. Streak calculation currently caps at 365 days. Ranking-dependent badges are unavailable to the assistant.\n\n1. Open Quests for level progress and current streak.\n2. Review each daily mission’s progress and points.\n3. Review earned/locked badges; unavailable badges are marked separately.\n\nOpen /quests in PhysiqueQuest."
+    },
+    {
+      "pass": 1,
+      "id": "nutrition-meal-macro-detail",
+      "variant": "original",
+      "question": "How much protein did I log for breakfast today?",
+      "issues": [
+        "Missing expected fact: 15 g"
+      ],
+      "reply": "Saved meals for 2026-10-30: Oatmeal (calories 300 kcal). These are saved records, not verified intake."
+    },
+    {
+      "pass": 1,
+      "id": "nutrition-day-before-yesterday",
+      "variant": "original",
+      "question": "What did I eat the day before yesterday?",
+      "issues": [
+        "Missing expected fact: No matching meals",
+        "Forbidden claim: Oatmeal",
+        "Forbidden claim: Chicken salad"
+      ],
+      "reply": "Available recent saved meals: Oatmeal (2026-10-30, 300 kcal); Rice bowl (2026-10-30, 500 kcal); Salmon dinner (2026-10-30, 600 kcal); Yogurt (2026-10-30, 100 kcal); Chicken salad (2026-10-29, 450 kcal). This is a recent excerpt, not complete history."
+    },
+    {
+      "pass": 1,
+      "id": "nutrition-followup-owned-intake",
+      "variant": "original",
+      "question": "And my protein?",
+      "issues": [
+        "Forbidden claim: 150 g/day"
+      ],
+      "reply": "Protein: 30% (150 g/day).\n\nLogged calories for 2026-10-30: 1500 kcal.\nLogged protein for 2026-10-30: 90 g.\nLogged carbs for 2026-10-30: 177 g.\nLogged fat for 2026-10-30: 44 g. These are saved records, not verified intake."
+    },
+    {
+      "pass": 1,
+      "id": "nutrition-followup-intake-protein",
+      "variant": "original",
+      "question": "And protein?",
+      "issues": [
+        "Forbidden claim: 150 g/day"
+      ],
+      "reply": "Protein: 30% (150 g/day).\n\nLogged calories for 2026-10-30: 1500 kcal.\nLogged protein for 2026-10-30: 90 g.\nLogged carbs for 2026-10-30: 177 g.\nLogged fat for 2026-10-30: 44 g. These are saved records, not verified intake."
+    },
+    {
+      "pass": 1,
+      "id": "nutrition-followup-yesterday",
+      "variant": "original",
+      "question": "What about yesterday?",
+      "issues": [
+        "Forbidden claim: Oatmeal"
+      ],
+      "reply": "Available recent saved meals: Oatmeal (2026-10-30, 300 kcal); Rice bowl (2026-10-30, 500 kcal); Salmon dinner (2026-10-30, 600 kcal); Yogurt (2026-10-30, 100 kcal); Chicken salad (2026-10-29, 450 kcal). This is a recent excerpt, not complete history."
+    },
+    {
+      "pass": 1,
+      "id": "profile-multiple-measurements",
+      "variant": "original",
+      "question": "What are my latest weight and waist measurements?",
+      "issues": [
+        "Missing expected fact: 71 kg",
+        "Missing expected fact: 81 cm",
+        "Forbidden claim: 72 kg",
+        "Forbidden claim: 82 cm",
+        "Wrong record domain"
+      ],
+      "reply": "Your saved current weight is 72 kg.\n\nYour saved waist measurement is 82 cm."
+    },
+    {
+      "pass": 1,
+      "id": "coach-preferences-versus-program",
+      "variant": "original",
+      "question": "Explain the distinction between my saved Coach snapshot and my training preferences without guessing which is newer.",
+      "issues": [
+        "Missing expected fact: Dumbbells",
+        "Missing expected fact: Monday",
+        "Missing expected fact: 45 min",
+        "Missing expected fact: snapshot",
+        "Missing expected fact: cannot|unknown|unavailable",
+        "Did not answer from own records",
+        "Wrong record domain"
+      ],
+      "reply": "Coach weekly program: Shows a saved weekly program based on account goals, training days, duration and equipment. Training concepts such as sets, reps, recovery and progressive overload are general education, not verified performance. Changing relevant preferences can create a new saved version. Resume saved workout restores confirmed sets; unsaved device drafts are separate.\n\n1. Open Coach and choose a training day/program.\n2. Review its exercises, then start preparation.\n3. Use Resume saved workout when an existing session is available.\n\nOpen /coach in PhysiqueQuest.\n\nTraining preferences: Edits available equipment, training weekdays and session duration. These preferences influence saved Coach program versions.\n\n1. Open Me, then Training preference.\n2. Select equipment, days and duration.\n3. Save, then open Coach to load the appropriate program.\n\nOpen /me/training in PhysiqueQuest."
+    },
+    {
+      "pass": 1,
+      "id": "quests-mission-count",
+      "variant": "original",
+      "question": "How many of my daily missions are complete?",
+      "issues": [
+        "Missing expected fact: 2 of 3|2/3"
+      ],
+      "reply": "Complete one workout: 1/1 — complete.\nLog 3 meals: 3/3 — complete.\nDrink 8 glasses of water: 6/8 — not complete."
+    },
+    {
+      "pass": 1,
+      "id": "current-plan-coach",
+      "variant": "original",
+      "question": "What is my current plan?",
+      "issues": [
+        "Missing expected fact: saved Coach program",
+        "Forbidden claim: 2000 kcal",
+        "Wrong record domain"
+      ],
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day)."
+    },
+    {
+      "pass": 1,
+      "id": "profile-latest-weight",
+      "variant": "original",
+      "question": "What is my latest saved weight check-in?",
+      "issues": [
+        "Wrong record domain"
+      ],
+      "reply": "Your saved current weight is 72 kg."
+    },
+    {
+      "pass": 1,
+      "id": "profile-latest-waist",
+      "variant": "original",
+      "question": "What is my latest waist measurement in Progress?",
+      "issues": [
+        "Wrong record domain"
+      ],
+      "reply": "Your saved waist measurement is 82 cm."
+    },
+    {
+      "pass": 1,
+      "id": "emergency-contact-details",
+      "variant": "original",
+      "question": "Who is my emergency contact?",
+      "issues": [
+        "Missing expected fact: \\+1 555 0100",
+        "Missing expected fact: Sibling"
+      ],
+      "reply": "Your saved emergency contact: name Emergency Person."
+    },
+    {
+      "pass": 1,
+      "id": "emergency-contact-what-is",
+      "variant": "original",
+      "question": "What is my emergency contact?",
+      "issues": [
+        "Missing expected fact: \\+1 555 0100",
+        "Missing expected fact: Sibling"
+      ],
+      "reply": "Your saved emergency contact: name Emergency Person."
+    },
+    {
+      "pass": 1,
+      "id": "diet-plan-name-is-not-profile-name",
+      "variant": "original",
+      "question": "What is the name of my saved diet plan?",
+      "issues": [
+        "Missing expected fact: no separate name"
+      ],
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day)."
+    },
+    {
+      "pass": 1,
+      "id": "model-water-mission",
+      "variant": "original",
+      "question": "Why is my saved water mission still incomplete?",
+      "issues": [
+        "Missing expected fact: 8|eight"
+      ],
+      "reply": "Average logged calories for 2026-10-30: 375 kcal/entry (1500 kcal across 4 saved meal entries). These are saved records, not verified intake."
+    },
+    {
+      "pass": 1,
+      "id": "model-workout-evidence",
+      "variant": "original",
+      "question": "Why does my saved workout load not prove that my strength improved over time?",
+      "issues": [
+        "Missing expected fact: history|time|compar|multiple|trend"
+      ],
+      "reply": "Workout report: Shows the completed saved session, exercise/set results and duration. Reports require a completed workout. Uploaded video analysis and sharing have separate availability; the assistant cannot inspect recordings or assert verified form.\n\n1. Finish and save a workout.\n2. Review the workout report and its saved results.\n3. Return to Coach or Home when finished.\n\nOpen /coach/report in PhysiqueQuest."
+    },
+    {
+      "pass": 1,
+      "id": "model-notification-versus-safety",
+      "variant": "original",
+      "question": "Explain why my unread notifications cannot confirm delivery of a safety alert.",
+      "issues": [
+        "Missing expected fact: safety|alert"
+      ],
+      "reply": "Your saved unread notification count is 2."
+    },
+    {
+      "pass": 1,
+      "id": "reasoning-weight-trend",
+      "variant": "original",
+      "question": "What should I keep in mind before drawing a weight trend from my saved Progress check-ins?",
+      "issues": [
+        "Missing expected fact: 71",
+        "Missing expected fact: trend",
+        "Missing expected fact: more|multiple|single|one|insufficient|cannot|not enough"
+      ],
+      "reply": "Progress and measurements: Tracks saved weight, waist and bench-press measurements. Supports Add measurement and deleting an entry from its history. Personal-record/session panels use saved workouts where available; form-accuracy examples and empty-state samples are not verified personal results.\n\n1. Open Progress from Home.\n2. Choose Weight, Waist or Bench press.\n3. Use Add measurement to save a value; expand its history to review or delete entries.\n\nOpen /progress in PhysiqueQuest."
+    },
+    {
+      "pass": 1,
+      "id": "reasoning-reminder-delivery",
+      "variant": "original",
+      "question": "Why might my daily reminder fail to reach my phone even though it is enabled?",
+      "issues": [
+        "Missing expected fact: 09:05|9:05",
+        "Missing expected fact: Asia/Singapore"
+      ],
+      "reply": "Notifications and daily reminders: Lists account notices and unread state. Supports Mark all read and a daily check-in time in the device timezone. Phone push requires device permission and a configured server push provider.\n\n1. Open Home, then Notifications.\n2. Choose a reminder time and Save reminder, or Turn off.\n3. Use Enable phone notifications on supported phone builds; review any delivery/setup message.\n\nOpen /home/notifications in PhysiqueQuest."
+    },
+    {
+      "pass": 1,
+      "id": "reasoning-session-timer",
+      "variant": "original",
+      "question": "Why can my saved completed workout not confirm the live state of my current session timer?",
+      "issues": [
+        "Missing expected fact: cannot|not|unavailable|unknown"
+      ],
+      "reply": "Active workout and rest timer: Records reps and weights by set, supports skip/revisit, pause/resume, rest timers, and saving/ending the workout. Pounds entered in the UI are converted for saved kilogram loads. Only saved set results are confirmed; unsaved input drafts stay on the device.\n\n1. Enter the set reps and load, then Save set.\n2. Use rest controls, pause/resume or skip/revisit as needed.\n3. Choose End session and confirm Save and end workout to create the report.\n\nOpen /coach/session in PhysiqueQuest."
+    },
+    {
+      "pass": 1,
+      "id": "reasoning-quest-versus-rank",
+      "variant": "original",
+      "question": "Why does my current Quest level not tell you my leaderboard position?",
+      "issues": [
+        "Missing expected fact: 7"
+      ],
+      "reply": "Quests, missions, XP and badges: Derives daily missions, level, XP and streak from saved account activity. Workout earns 100 points, three meals 60, eight glasses of water 40, and a personal record 150. currentExp is earned within-level XP, totalExperience all-time XP, experienceToNextLevel remaining XP. Streak calculation currently caps at 365 days. Ranking-dependent badges are unavailable to the assistant.\n\n1. Open Quests for level progress and current streak.\n2. Review each daily mission’s progress and points.\n3. Review earned/locked badges; unavailable badges are marked separately.\n\nOpen /quests in PhysiqueQuest."
+    },
+    {
+      "pass": 1,
+      "id": "reasoning-prescribed-versus-completed",
+      "variant": "original",
+      "question": "What should I consider when comparing my saved completed sets to my prescribed Coach sets?",
+      "issues": [
+        "Missing expected fact: prescrib|prescription|plan"
+      ],
+      "reply": "Your saved Coach program: Build muscle, 45 min.\nMonday: Strength day — Squat 3 × 8. Keep your movement controlled. Follow the exercise instructions.\nTuesday: Recovery day (rest/recovery)\nWednesday: Strength day — Squat 3 × 8. Keep your movement controlled. Follow the exercise instructions.\nThursday: Recovery day (rest/recovery)\nFriday: Strength day — Squat 3 × 8. Keep your movement controlled. Follow the exercise instructions.\nSaturday: Recovery day (rest/recovery)\nSunday: Recovery day (rest/recovery)\nThis is a saved snapshot and may predate newer preferences.\n\nWorkout preparation and camera readiness: Prepares a selected program, checks optional camera readiness and calibration, and can start a manual workout without a camera. Permission, lighting, device/model readiness and drafts are device state, not saved server results.\n\n1. Select a program in Coach before opening preparation.\n2. Review camera readiness or choose the manual/camera-off path.\n3. Start the workout when ready.\n\nOpen /coach/prepare in PhysiqueQuest."
+    }
+  ]
+}

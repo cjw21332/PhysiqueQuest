@@ -44,8 +44,42 @@ describe('USDA search request construction', () => {
     const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson } as never);
     expect((await service.getNutrients(990001)).kcal_per_100g).toBe(120);
     expect((await service.getNutrients(990002)).kcal_per_100g).toBe(115);
-    await expect(service.getNutrients(990003)).rejects.toThrow('Calories are unavailable');
+    expect(await service.getNutrients(990003)).toMatchObject({ kcal_per_100g: null, protein_g_per_100g: 20, carbs_g_per_100g: null, fat_g_per_100g: null });
     expect((await service.getNutrients(990004)).kcal_per_100g).toBe(0);
     expect((await service.getNutrients(990005)).kcal_per_100g).toBe(150);
+    expect(await service.getNutrients(990004)).toMatchObject({ kcal_per_100g: 0, protein_g_per_100g: null, carbs_g_per_100g: null, fat_g_per_100g: null });
+  });
+
+  it('chooses the complete exact match from prepared and branded datasets over a nutrient-empty partial match', async () => {
+    const empty = { fdcId: 1, description: 'Oil, peanut', dataType: 'Foundation', foodNutrients: [] };
+    const brittle = { fdcId: 2, description: 'Peanut brittle', dataType: 'Branded', foodNutrients: [
+      { nutrientId: 1008, unitName: 'KCAL', value: 425 }, { nutrientId: 1003, value: 5 },
+      { nutrientId: 1005, value: 70 }, { nutrientId: 1004, value: 15 },
+    ] };
+    const fetchJson = vi.fn().mockImplementation(async (url: string, options: { body?: string }) => {
+      if (url.includes('/foods/search')) {
+        const body = JSON.parse(options.body!);
+        return body.dataType.includes('Branded') ? { foods: [brittle] } : { foods: [empty] };
+      }
+      if (url.includes('/food/2?')) return { ...brittle, foodNutrients: [] };
+      throw new Error('unexpected request');
+    });
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson } as never);
+    await expect(service.lookupFood('peanut brittle')).resolves.toMatchObject({
+      fdcId: 2, description: 'Peanut brittle', kcal_per_100g: 425, protein_g_per_100g: 5, carbs_g_per_100g: 70, fat_g_per_100g: 15,
+    });
+    expect(fetchJson.mock.calls.filter(([, options]) => JSON.parse(options.body ?? '{}').dataType?.includes('Branded'))).toHaveLength(1);
+  });
+
+  it('uses a complete search payload if its detail request is temporarily unavailable', async () => {
+    const food = { fdcId: 3, description: 'Sesame brittle', dataType: 'Survey (FNDDS)', foodNutrients: [
+      { nutrientNumber: '208', unitName: 'KCAL', value: 480 }, { nutrientNumber: '203', value: 8 },
+      { nutrientNumber: '205', value: 65 }, { nutrientNumber: '204', value: 20 },
+    ] };
+    const fetchJson = vi.fn().mockImplementation(async (url: string) => url.includes('/foods/search') ? { foods: [food] } : Promise.reject(new Error('temporary outage')));
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson } as never);
+    await expect(service.lookupFood('sesame brittle')).resolves.toMatchObject({
+      kcal_per_100g: 480, protein_g_per_100g: 8, carbs_g_per_100g: 65, fat_g_per_100g: 20,
+    });
   });
 });

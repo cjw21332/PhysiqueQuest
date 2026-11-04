@@ -37,7 +37,9 @@ export default function ReviewEstimate({ imageUrl, status, analysis, error, onBa
   }, [status]);
   const hint = WAITING_HINTS.filter(step => elapsed >= step.after).pop()?.text;
   const included = scaleScannedItems(saveable.filter(({ index }) => !excluded.includes(index)).map(({ item }) => item), portion);
-  const totals = included.reduce((sum, item) => ({ kcal: sum.kcal + item.kcal, protein: sum.protein + item.protein_g, carbs: sum.carbs + item.carbs_g, fat: sum.fat + item.fat_g }), { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+  const total = (key: 'kcal' | 'protein_g' | 'carbs_g' | 'fat_g') => !included.length || included.some(item => item[key] == null) ? null : included.reduce((sum, item) => sum + item[key]!, 0);
+  const totals = { kcal: total('kcal'), protein: total('protein_g'), carbs: total('carbs_g'), fat: total('fat_g') };
+  const incomplete = Object.values(totals).some(value => value === null);
   const lowConfidence = items.filter(item => confidencePercent(item.confidence) < 75);
   const toggle = (index: number) => setExcluded(current => current.includes(index) ? current.filter(value => value !== index) : [...current, index]);
   const save = async () => {
@@ -68,7 +70,7 @@ export default function ReviewEstimate({ imageUrl, status, analysis, error, onBa
       {status === 'ready' && <div className="scan-warning"><Icon name="warning" size={20}/><p><strong>{lowConfidence.length ? `Low confidence on ${lowConfidence.length} item${lowConfidence.length > 1 ? 's' : ''}` : 'Review before saving'}</strong><br/>{lowConfidence.length ? `Check “${lowConfidence.map(item => item.food_name).join('”, “')}” before saving, or edit the values manually.` : 'Check the identified foods and portions. Tap an item to exclude it.'}</p></div>}
       <section className="scan-choice"><h3>Meal</h3><div className="scan-chips">{mealNames.map(option => <button type="button" key={option} aria-pressed={meal === option} className={meal === option ? 'active' : ''} onClick={() => setMeal(option)}>{option}</button>)}</div></section>
       <section className="scan-choice"><h3>Portion size</h3><div className="scan-chips portions">{portions.map(value => <button type="button" key={value} aria-pressed={portion === value} className={portion === value ? 'active' : ''} onClick={() => setPortion(value)}>{value}×</button>)}</div></section>
-      {status === 'ready' && <section className="review-macros"><h3>Estimated macros</h3><div className="estimated-macros">{[['Calories', totals.kcal, 'kcal'], ['Protein', totals.protein, 'g'], ['Carbohydrates', totals.carbs, 'g'], ['Fat', totals.fat, 'g']].map(([label, value, unit]) => <div key={label}><span>{label}</span><span><b>{Math.round(Number(value))}</b> {unit}</span></div>)}</div></section>}
+      {status === 'ready' && <section className="review-macros"><h3>Estimated macros for included foods</h3>{items.some(item => !item.found) && <p>Nutrition for unmatched foods is unavailable and excluded.</p>}{included.length > 0 && incomplete && <p>Nutrition information is missing. Known values will be saved.</p>}<div className="estimated-macros">{([['Calories', totals.kcal, 'kcal'], ['Protein', totals.protein, 'g'], ['Carbohydrates', totals.carbs, 'g'], ['Fat', totals.fat, 'g']] as const).map(([label, value, unit]) => <div key={label}><span>{label}</span><span><b>{value === null ? 'Incomplete total' : Math.round(value)}</b> {value === null ? '' : unit}</span></div>)}</div></section>}
       {saveError && <p className="error" role="alert">{saveError}</p>}
     </div>
     <footer className="scan-footer split-footer review-estimate-footer"><button className="secondary" onClick={() => onAddManual(meal)}>Edit manually</button><button className="primary" disabled={saving || status !== 'ready' || !included.length} onClick={()=>void save()}>{saving ? 'Saving…' : 'Save entry'}</button></footer>

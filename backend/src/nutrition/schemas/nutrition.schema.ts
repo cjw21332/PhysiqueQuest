@@ -5,17 +5,28 @@ export type NutritionDocument = HydratedDocument<Nutrition>;
 
 @Schema({ _id: false })
 export class MealEntry {
+@Prop({type:Number, min:0}) saturatedFat?: number | null;
+@Prop({type:Number, min:0}) transFat?: number | null;
+@Prop({type:Number, min:0}) fiber?: number | null;
+@Prop({type:Number, min:0}) sugars?: number | null;
+@Prop({type:Number, min:0}) addedSugar?: number | null;
+@Prop({type:Number, min:0}) sodium?: number | null;
+@Prop({type:Number, min:0}) cholesterol?: number | null;
+  @Prop({ type: String }) brand?: string;
+  @Prop({ type: Number, min: 0 }) servingQuantity?: number;
+  @Prop({ type: String }) servingUnit?: string;
+  @Prop({ type: String }) barcode?: string;
   @Prop({ required: true }) id: string;
   @Prop({ required: true }) name: string;
   @Prop({ required: true }) meal: string;
-  @Prop({ required: true, min: 0 }) calories: number;
+  @Prop({ type: Number, default: null, min: 0 }) calories: number | null;
   @Prop({ default: '' }) detail: string;
   @Prop({ default: '' }) time: string;
   @Prop({ default: 'Manual' }) source: string;
   @Prop({ default: false }) edited: boolean;
-  @Prop({ default: 0, min: 0 }) protein: number;
-  @Prop({ default: 0, min: 0 }) carbs: number;
-  @Prop({ default: 0, min: 0 }) fat: number;
+  @Prop({ type: Number, default: null, min: 0 }) protein: number | null;
+  @Prop({ type: Number, default: null, min: 0 }) carbs: number | null;
+  @Prop({ type: Number, default: null, min: 0 }) fat: number | null;
   @Prop({ required: true }) date: string;
 
   // Provenance for meals written by POST /api/nutrition/meals/from-scan. All

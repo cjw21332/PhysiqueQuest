@@ -34,7 +34,7 @@ export class NutritionService {
 
   async updateMeal(userId: string, id: string, dto: MealDto): Promise<NutritionDocument> {
     const patch: Record<string, unknown> = { 'meals.$.edited': true };
-    for (const key of ['name', 'meal', 'calories', 'detail', 'protein', 'carbs', 'fat', 'fdcId'] as const) {
+    for (const key of ['name', 'meal', 'calories', 'detail', 'protein', 'carbs', 'fat', 'saturatedFat', 'transFat', 'fiber', 'sugars', 'addedSugar', 'sodium', 'cholesterol', 'fdcId'] as const) {
       if (dto[key] !== undefined) patch[`meals.$.${key}`] = dto[key];
     }
     const updated = await this.model.findOneAndUpdate(

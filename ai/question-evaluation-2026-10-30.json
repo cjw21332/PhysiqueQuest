@@ -1,0 +1,204 @@
+{
+  "checkedAt": "2026-10-30T15:36:17.384Z",
+  "syntheticOnly": true,
+  "passes": 3,
+  "distinctQuestions": 252,
+  "corpusPhrasingsPerPass": 1374,
+  "totalChecksPerPass": 1397,
+  "checked": 4191,
+  "passed": 4191,
+  "failed": 0,
+  "modelGenerations": 15,
+  "latency": {
+    "direct": {
+      "count": 4176,
+      "medianMs": 1,
+      "p95Ms": 4,
+      "maxMs": 79
+    },
+    "model": {
+      "count": 15,
+      "medianMs": 3561,
+      "p95Ms": 12298,
+      "maxMs": 12298
+    }
+  },
+  "samples": [
+    {
+      "id": "diet-exact-reported",
+      "question": "what's my current diet plan?",
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "elapsedMs": 4,
+      "mode": "direct"
+    },
+    {
+      "id": "quests-points-total",
+      "question": "What are my total quest points?",
+      "reply": "Your all-time Quest points (XP) are 640.",
+      "elapsedMs": 3,
+      "mode": "direct"
+    },
+    {
+      "id": "model-plan-versus-settings",
+      "question": "Compare my saved dietary plan calories with my independent saved nutrition target settings.",
+      "reply": "Your saved dietary plan calorie target is 2000 kcal/day. Your independent saved nutrition-settings target is 2100 kcal/day. They are separate saved values; Phiq cannot infer why they differ or change either value.",
+      "elapsedMs": 3,
+      "mode": "direct"
+    },
+    {
+      "id": "model-estimate-limit",
+      "question": "Why can you not say my logged meal calories prove exactly how much I ate?",
+      "reply": "Saved food calories and macros may be estimates. Food identity, portion size and nutrient values can differ from actual intake. Review these values before saving; a saved entry does not verify exactly what you ate.",
+      "elapsedMs": 3,
+      "mode": "direct"
+    },
+    {
+      "id": "model-current-versus-target",
+      "question": "Explain why my target weight is different from my current profile weight, using only the saved values.",
+      "reply": "Your saved current profile weight is 72 kg. Your target weight is 68 kg. These are separate saved fields. The records do not state why this target was chosen or when the profile weight was last measured. Progress check-ins are separate records.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "model-total-versus-today",
+      "question": "Compare my all-time Quest XP with my mission points earned today.",
+      "reply": "Your all-time Quest XP is 640. Mission points earned today are 160. All-time XP accumulates across saved activity; today’s points cover only completed daily missions.",
+      "elapsedMs": 9,
+      "mode": "direct"
+    },
+    {
+      "id": "model-outside-app",
+      "question": "PhysiqueQuest: what is the capital of France?",
+      "reply": "I can help with PhysiqueQuest’s Home, Coach, Scan, Quests and Me modules, and your own shared app records. Please ask about something in PhysiqueQuest.",
+      "elapsedMs": 12298,
+      "mode": "model"
+    },
+    {
+      "id": "model-food-portions",
+      "question": "Why should I review my estimated food portions before treating the saved calories as exact?",
+      "reply": "Saved food calories and macros may be estimates. Food identity, portion size and nutrient values can differ from actual intake. Review these values before saving; a saved entry does not verify exactly what you ate.",
+      "elapsedMs": 55,
+      "mode": "direct"
+    },
+    {
+      "id": "model-water-mission",
+      "question": "Why is my saved water mission still incomplete?",
+      "reply": "Your saved water mission shows 6 of 8 glasses and is marked incomplete. This is the saved daily mission state; it does not verify unlogged drinking.",
+      "elapsedMs": 28,
+      "mode": "direct"
+    },
+    {
+      "id": "model-form-verification",
+      "question": "Why can you not verify my exercise form from my saved workout records?",
+      "reply": "Saved workout records contain self-reported sets, reps, loads and session status. These records cannot verify exercise form. A live Coach form check is separate from a saved workout record.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "model-history-limit",
+      "question": "Explain why my recent food history should not be treated as my complete meal history.",
+      "reply": "Phiq receives only a bounded recent excerpt of saved food history. Older saved entries can be outside that excerpt, so it cannot establish complete or all-time meal history. Daily totals are calculated separately from all saved entries for the selected day; unlogged food remains unknown.",
+      "elapsedMs": 4,
+      "mode": "direct"
+    },
+    {
+      "id": "model-profile-progress-semantics",
+      "question": "Why would my profile weight and Progress check-ins have different saved values?",
+      "reply": "Your saved profile weight is 72 kg, and your latest saved Progress weight check-in is 71 kg. These are separate saved fields. The available records do not explain why they differ.",
+      "elapsedMs": 6,
+      "mode": "direct"
+    },
+    {
+      "id": "model-program-preferences",
+      "question": "Explain the distinction between my saved Coach snapshot and my training preferences without guessing which is newer.",
+      "reply": "Your saved training preferences: equipment Dumbbells, days Monday, Wednesday, Friday, planned duration 45 min. Your saved Coach snapshot has goal Build muscle, duration 45 min and the saved weekly program. The snapshot and profile preferences are separate records. The available records cannot establish which reflects the newest intended preferences.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "model-workout-evidence",
+      "question": "Why does my saved workout load not prove that my strength improved over time?",
+      "reply": "Saved workout loads are self-reported records. A single load or a bounded set of recent sessions cannot establish a strength trend; that would require comparable performance across multiple sessions. The available records do not establish whether your strength improved.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "model-notification-versus-safety",
+      "question": "Explain why my unread notifications cannot confirm delivery of a safety alert.",
+      "reply": "Unread notifications and safety-alert delivery status are separate records. An unread count only says saved notifications remain unopened; it cannot confirm alert delivery. A saved delivered status, when available, reflects provider status and is not a guarantee that a person received it.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "reasoning-plan-and-intake",
+      "question": "Why might my saved diet plan target more calories than I have logged today?",
+      "reply": "Daily calorie target: 2000 kcal.\n\nLogged calories for 2026-10-30: 1500 kcal. These are saved records, not verified intake.\n\ncalories remaining for 2026-10-30: 500 kcal (saved target 2000 kcal, logged 1500 kcal). These are saved records, not verified intake.\n\nA saved plan is a planning target. Logged meals may be estimates or incomplete; they do not verify actual intake. A gap alone cannot establish why the values differ, whether unlogged food was eaten, or what you should eat.",
+      "elapsedMs": 10,
+      "mode": "direct"
+    },
+    {
+      "id": "reasoning-interpret-intake",
+      "question": "What should I keep in mind when interpreting my saved dietary plan alongside my logged intake today?",
+      "reply": "Daily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).\n\nLogged calories for 2026-10-30: 1500 kcal.\nLogged protein for 2026-10-30: 90 g.\nLogged carbs for 2026-10-30: 177 g.\nLogged fat for 2026-10-30: 44 g. These are saved records, not verified intake.\n\ncalories remaining for 2026-10-30: 500 kcal (saved target 2000 kcal, logged 1500 kcal).\nprotein remaining for 2026-10-30: 60 g (saved target 150 g, logged 90 g).\ncarbs remaining for 2026-10-30: 23 g (saved target 200 g, logged 177 g).\nfat remaining for 2026-10-30: 23 g (saved target 67 g, logged 44 g). These are saved records, not verified intake.\n\nA saved plan is a planning target. Logged meals may be estimates or incomplete; they do not verify actual intake. A gap alone cannot establish why the values differ, whether unlogged food was eaten, or what you should eat.",
+      "elapsedMs": 3,
+      "mode": "direct"
+    },
+    {
+      "id": "reasoning-weight-trend",
+      "question": "What should I keep in mind before drawing a weight trend from my saved Progress check-ins?",
+      "reply": "Available saved weight check-ins: 71 kg measured 2026-10-30T15:35:21.569Z.\nOnly one comparable check-in is available, so these records cannot establish a trend. Profile values and targets are separate from Progress check-ins; do not treat them as extra dated observations.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "reasoning-reminder-delivery",
+      "question": "Why might my daily reminder fail to reach my phone even though it is enabled?",
+      "reply": "Your daily reminder is set for 9:05 AM in the Asia/Singapore timezone and has been saved. If it isn't reaching your phone, the most common cause is that device-level push notification permissions are not granted or have been revoked by the operating system.\n\nTo fix this, ensure you have enabled 'Enable phone notifications' on your specific device build as described in the guide. Additionally, verify that no other app has blocked the notification service for PhysiqueQuest, and check if your device's battery optimization settings are restricting background activity.",
+      "elapsedMs": 5015,
+      "mode": "model"
+    },
+    {
+      "id": "reasoning-session-timer",
+      "question": "Why can my saved completed workout not confirm the live state of my current session timer?",
+      "reply": "The live session and rest timers are device state and are unavailable to Phiq. A server-saved active workout can contain confirmed sets and pause metadata, while a completed workout is a separate historical record. Neither record confirms the current live timer or unsaved input. I cannot infer elapsed time from a saved start time alone.",
+      "elapsedMs": 2,
+      "mode": "direct"
+    },
+    {
+      "id": "reasoning-quest-versus-rank",
+      "question": "Why does my current Quest level not tell you my leaderboard position?",
+      "reply": "Your saved Quest level is 7, with 640 all-time XP. Level describes your own earned XP. Leaderboard position is unavailable to Phiq because it does not read other accounts or standings. The app has quest-period and strength rankings; your level alone cannot establish either position.",
+      "elapsedMs": 5,
+      "mode": "direct"
+    },
+    {
+      "id": "reasoning-prescribed-versus-completed",
+      "question": "What should I consider when comparing my saved completed sets to my prescribed Coach sets?",
+      "reply": "Saved Coach snapshot prescriptions: Squat: 3 × 8.\nMost recent completed workout set excerpt: Squat: 8 reps at 20 kg.\nThese are separate saved records; the available snapshot may differ from the program used for that workout. A reps/sets prescription does not specify a load unless one is explicitly saved. The excerpt cannot establish total completed sets, exact plan adherence or verified exercise form; loads are self-reported.",
+      "elapsedMs": 4,
+      "mode": "direct"
+    },
+    {
+      "id": "reasoning-safety-status",
+      "question": "How should I interpret my saved safety alert status without assuming a person received it?",
+      "reply": "Your safety alert status shows that an inactivity event was delivered on October 30, 2026. This record confirms the system sent the notification but does not indicate whether you personally received it or took action.\n\nThe summary explicitly states that missing records do not prove a lack of past alerts and that no delivery guarantees exist. To manage your settings, you can review inactivity thresholds and alarm volumes directly in the Me section.",
+      "elapsedMs": 4817,
+      "mode": "model"
+    },
+    {
+      "id": "reasoning-manual-versus-camera",
+      "question": "What should I know about camera readiness versus manual logging in Coach?",
+      "reply": "In Coach, you can choose between a camera-assisted path or a manual logging path. The camera feature is optional and requires checking device readiness, lighting conditions, and permissions before starting. If your device isn't ready or you prefer not to use the camera, you can simply select the manual/camera-off option to begin your workout without any technical setup.",
+      "elapsedMs": 3864,
+      "mode": "model"
+    },
+    {
+      "id": "reasoning-food-estimates",
+      "question": "What should I keep in mind about food photo estimates before saving an entry in Scan?",
+      "reply": "When adding a meal via photo estimate in Scan, review the provided calorie and macro breakdown carefully before saving. These estimates are generated by external providers and may differ from your saved dietary targets or gram goals.\n\nYou can adjust water intake directly after logging the food, but ensure you verify the estimated values against your plan to maintain accuracy in your daily logs.",
+      "elapsedMs": 3561,
+      "mode": "model"
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,17 @@
+{
+  email {$ACME_EMAIL}
+}
+{$APP_DOMAIN} {
+  encode zstd gzip
+  header X-Content-Type-Options nosniff
+  @account path /api/* /health /ready
+  handle @account {
+    reverse_proxy backend:4000
+  }
+  handle_path /coach-api/* {
+    reverse_proxy coach:4050
+  }
+  handle {
+    reverse_proxy frontend:3000
+  }
+}

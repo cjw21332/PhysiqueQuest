@@ -187,10 +187,10 @@ export interface AdminAnalyticsRecord {
 
 /** Per-100 g macros, as reported alongside a scanned item. Informational only. */
 export interface ScannedMacros {
-  kcal: number;
-  protein_g: number;
-  carbs_g: number;
-  fat_g: number;
+  kcal: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
 }
 
 export interface FoodCandidate {
@@ -199,6 +199,11 @@ export interface FoodCandidate {
   data_type: string;
 }
 
+export interface BarcodeProduct {
+  code:string; name:string; brand:string; image:string; quantity:string; servingLabel:string; packageAmount:number|null; basis:string; serving:number|null;
+  ingredients:string; allergens:string; categories:string; countries:string; grade:string;
+  per100:Record<'calories'|'protein'|'carbs'|'fat'|'saturatedFat'|'fiber'|'sugars'|'sodium'|'transFat'|'addedSugar'|'cholesterol',number|null>;
+}
 export interface FoodDetail {
   request_id: string;
   fdc_id: number;
@@ -221,10 +226,10 @@ export interface ScannedItem {
   found: boolean;
   fdc_id?: number;
   description?: string;
-  kcal: number;
-  protein_g: number;
-  carbs_g: number;
-  fat_g: number;
+  kcal: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
   est_weight_g: number;
   confidence: number;
   per_100g?: ScannedMacros;
@@ -235,7 +240,7 @@ export interface ScanAnalysis {
   model: string;
   items: ScannedItem[];
   unmatched: string[];
-  totals: ScannedMacros;
+  totals: { [K in keyof ScannedMacros]: number | null };
   /** True when some USDA lookups failed and macros may be incomplete. */
   degraded: boolean;
 }
@@ -304,11 +309,12 @@ class ApiClient {
       },
     };
 
+    if (init.signal?.aborted) throw init.signal.reason ?? new Error('Request cancelled');
     const isAuth = endpoint.startsWith('/auth/session/') || endpoint.startsWith('/auth/password-reset/');
     const existing = session.current(requestBaseUrl);
     if (ownApi && !isAuth && existing && existing.expiresAt <= Date.now() + 30_000) {
       const refreshed = await session.refresh(requestBaseUrl);
-      if (!refreshed || refreshed.sessionKey !== existing.sessionKey) {
+      if (!refreshed || refreshed.id !== existing.id || refreshed.sessionKey !== existing.sessionKey || requestBaseUrl !== getApiBaseUrl()) {
         if (!session.current(requestBaseUrl)) clearAuthSession();
         throw new ApiRequestError('Session expired. Sign in again.', 401);
       }
@@ -326,7 +332,13 @@ class ApiClient {
           controller.abort();
         }, cap)
       : null;
-    if (controller) config.signal = controller.signal;
+    const externalSignal = init.signal;
+    const forwardAbort = () => controller?.abort(externalSignal?.reason);
+    if (controller) {
+      config.signal = controller.signal;
+      if (externalSignal?.aborted) forwardAbort();
+      else externalSignal?.addEventListener('abort', forwardAbort, { once: true });
+    }
 
     // Add auth token if available
     let token = ownApi ? this.getToken() : null;
@@ -338,15 +350,16 @@ class ApiClient {
     }
 
     try {
+      if (config.signal?.aborted) throw config.signal.reason ?? new Error('Request cancelled');
       let response = await fetch(url, config);
       if (ownApi && (!config.method || config.method === 'GET') && (endpoint === '/profile' || endpoint === '/nutrition') && response.status >= 500 && !timedOut) {
         await new Promise(resolve => setTimeout(resolve, 300));
         if (!timedOut) response = await fetch(url, config);
       }
-      if (response.status === 401 && ownApi && !isAuth && token && existing?.sessionKey === session.current(requestBaseUrl)?.sessionKey) {
+      if (response.status === 401 && !config.signal?.aborted && ownApi && !isAuth && token && existing?.id === session.current(requestBaseUrl)?.id && existing?.sessionKey === session.current(requestBaseUrl)?.sessionKey && requestBaseUrl === getApiBaseUrl()) {
         const current = session.current(requestBaseUrl);
         const refreshed = current?.token !== token ? current : await session.refresh(requestBaseUrl);
-        if (refreshed && refreshed.sessionKey === existing?.sessionKey) {
+        if (refreshed && !config.signal?.aborted && refreshed.id === existing?.id && refreshed.sessionKey === existing?.sessionKey && requestBaseUrl === getApiBaseUrl()) {
           token = refreshed.token;
           config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
           response = await fetch(url, config);
@@ -382,6 +395,7 @@ class ApiClient {
       }
       return result;
     } catch (error) {
+      if (externalSignal?.aborted && !timedOut) throw externalSignal.reason ?? error;
       const failure = normalizeTransportError(error);
       // HTTP rejections are expected application responses (for example, an
       // already-registered email). Keep those for the caller to handle without
@@ -399,6 +413,7 @@ class ApiClient {
       throw new Error('Network error occurred');
     } finally {
       if (timer) clearTimeout(timer);
+      externalSignal?.removeEventListener('abort', forwardAbort);
     }
   }
 
@@ -482,7 +497,9 @@ class ApiClient {
   async getLeaderboard(period: LeaderboardPeriod = 'week') { return this.request<LeaderboardRecord>(`/leaderboard?period=${encodeURIComponent(period)}`); }
   async getStrengthLeaderboard(exerciseId: string, metric: 'heaviest' | 'relative') { const params = new URLSearchParams({ metric }); if (exerciseId) params.set('exerciseId', exerciseId); return this.request<StrengthLeaderboardRecord>(`/leaderboard/strength?${params}`); }
   async saveProfilePhoto(photo: string | null) { const profile = await this.request<any>('/profile/photo', photo ? { method: 'PUT', body: JSON.stringify({ photo }) } : { method: 'DELETE' }); deviceCache.publish('profile', profile); return profile; }
-  async chat(messages: { role: 'user' | 'assistant'; text: string }[]) { return this.request<{ reply: string }>('/chat', { method: 'POST', body: JSON.stringify({ messages }), timeoutMs: 30000 }); }
+  async chat(messages: { role: 'user' | 'assistant'; text: string }[], includePersonalData = false, page?: string, signal?: AbortSignal) {
+    return this.request<{ reply: string; sources?: { id: string; label: string }[]; privacy: { personalDataIncluded: boolean; historyStored: false; provider: 'self-hosted' } }>('/chat', { method: 'POST', body: JSON.stringify({ messages, includePersonalData, page }), timeoutMs: 60000, signal });
+  }
   async getCoachPlan(force = false) { return deviceCache.fetch('coach', () => this.request<CoachPlanRecord>('/coach/plan', { timeoutMs: 30_000 }), force); }
   async preloadAppData(force = false) {
     return Promise.allSettled([this.getProfile(force), this.getNutrition(force), this.getActivity(force), this.getCoachPlan(force)]);
@@ -614,6 +631,8 @@ class ApiClient {
   async searchFoods(query: string) {
     return this.request<{ request_id: string; candidates: FoodCandidate[] }>(`/nutrition/foods/search?q=${encodeURIComponent(query)}`);
   }
+
+  async lookupBarcode(code:string,format:string) { return this.request<BarcodeProduct>('/nutrition/foods/barcode/'+encodeURIComponent(code)+'?format='+encodeURIComponent(format)); }
 
   async getFoodDetail(fdcId: number) {
     return this.request<FoodDetail>(`/nutrition/foods/${encodeURIComponent(fdcId)}`);

@@ -66,8 +66,8 @@ test('shared focus survives section themes, wrappers, standalone fields and redu
   }
 });
 
-test('password visibility stays inside the textbox with an inset keyboard focus ring', async ({ page }) => {
-  await page.goto('/login');
+for (const route of ['/login', '/register']) test(`${route} password visibility stays transparent inside the textbox with an inset keyboard focus ring`, async ({ page }) => {
+  await page.goto(route);
   const password = page.getByPlaceholder('At least 8 characters');
   await password.fill('SyntheticPassword123');
   const wrapper = password.locator('..');
@@ -84,10 +84,19 @@ test('password visibility stays inside the textbox with an inset keyboard focus 
   await expect(hide).toHaveCSS('outline-style', 'solid');
   await expect(hide).toHaveCSS('outline-offset', '-3px');
   const eyeBounds = await hide.boundingBox();
+  await expect(hide).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(hide).toHaveCSS('box-shadow', 'none');
+  expect(eyeBounds.y).toBeGreaterThan(bounds.y);
+  expect(eyeBounds.y + eyeBounds.height).toBeLessThan(bounds.y + bounds.height);
   expect(eyeBounds.x).toBeGreaterThan(bounds.x);
   expect(eyeBounds.x + eyeBounds.width).toBeLessThan(bounds.x + bounds.width);
   await hide.click();
   await expect(wrapper.locator('input')).toHaveAttribute('type', 'password');
   await expect(wrapper.locator('input')).toHaveValue('SyntheticPassword123');
   await expect(wrapper).toHaveCSS('border-color', 'rgb(34, 197, 94)');
+  if (route === '/register') {
+    const confirm = page.getByRole('button', {name:'Show confirm password',exact:true});
+    await confirm.click();
+    await expect(page.getByRole('button', {name:'Hide confirm password',exact:true})).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
+  }
 });

@@ -35,10 +35,10 @@ export interface NutrientResult {
   fdcId: number;
   description: string;
   dataType: string;
-  kcal_per_100g: number;
-  protein_g_per_100g: number;
-  carbs_g_per_100g: number;
-  fat_g_per_100g: number;
+  kcal_per_100g: number | null;
+  protein_g_per_100g: number | null;
+  carbs_g_per_100g: number | null;
+  fat_g_per_100g: number | null;
   servingSizeG?: number;
 }
 
@@ -124,14 +124,24 @@ export class UsdaService {
 
   private async searchFood(query: string): Promise<UsdaFood | undefined> {
     this.requireConfigured();
-    const key = query.toLowerCase();
+    const key = normalizeFoodDescription(query);
     const cached = searchCache.get(key);
     if (cached) return cached;
 
-    const data = await this.search(query, 10, ['Foundation', 'SR Legacy']);
-
-    const foods = (data.foods || []).filter((f) => f.fdcId && (f.foodNutrients?.length ?? 0) > 0);
-    foods.sort((a, b) => rankDataType(b.dataType) - rankDataType(a.dataType));
+    const tokens = foodSearchTokens(query);
+    if (!tokens.length) return undefined;
+    // Search generic prepared foods before products so branded results cannot
+    // crowd the generic matches out of the provider's first page.
+    const data = await this.search(query, 25, ['Foundation', 'SR Legacy', 'Survey (FNDDS)']);
+    const eligible = (foods: UsdaFood[]) => foods.filter(food => food.fdcId && food.description &&
+      tokens.every(token => foodSearchTokens(food.description).includes(token)));
+    let foods = eligible(data.foods || []);
+    if (!foods.some(food => nutrientCount(food) === 4)) {
+      const products = await this.search(query, 25, ['Branded']);
+      foods = [...foods, ...eligible(products.foods || [])];
+    }
+    foods.sort((a, b) => nutrientCount(b) - nutrientCount(a) ||
+      foodSearchScore(b, tokens) - foodSearchScore(a, tokens));
     const best = foods[0];
     if (best) searchCache.set(key, best);
     return best;
@@ -172,21 +182,26 @@ export class UsdaService {
     const food = await this.searchFood(foodName);
     if (!food) return undefined;
 
-    const detail = await this.getNutrients(food.fdcId);
-    if (detail) return detail;
-
-    // The detail endpoint can fail while the search payload already carried
-    // nutrients, so fall back to parsing the search result.
+    // Search values and detail values belong to the same FDC record. Never
+    // fill missing macros from an unrelated food, or turn missing data into zero.
     const { kcal, protein, carbs, fat } = parseNutrients(food);
-    return {
-      fdcId: food.fdcId,
-      description: food.description,
-      dataType: food.dataType,
-      kcal_per_100g: kcal,
-      protein_g_per_100g: protein,
-      carbs_g_per_100g: carbs,
-      fat_g_per_100g: fat,
+    const summary: NutrientResult = {
+      fdcId: food.fdcId, description: food.description, dataType: food.dataType,
+      kcal_per_100g: kcal, protein_g_per_100g: protein,
+      carbs_g_per_100g: carbs, fat_g_per_100g: fat,
     };
+    try {
+      const detail = await this.getNutrients(food.fdcId);
+      return { ...detail,
+        kcal_per_100g: detail.kcal_per_100g ?? kcal,
+        protein_g_per_100g: detail.protein_g_per_100g ?? protein,
+        carbs_g_per_100g: detail.carbs_g_per_100g ?? carbs,
+        fat_g_per_100g: detail.fat_g_per_100g ?? fat,
+      };
+    } catch (error) {
+      if (nutrientCount(food) === 0) throw error;
+      return summary;
+    }
   }
 
   async searchCandidates(query: string, limit = 8): Promise<FoodCandidate[]> {
@@ -259,26 +274,29 @@ function tokenSimilarity(left: string[], right: string[]): number {
   return intersection / union.size;
 }
 
-function rankDataType(t: string): number {
-  if (t === 'Foundation') return 3;
-  if (t === 'SR Legacy') return 2;
-  if (t.startsWith('Survey')) return 1;
-  return 0;
+function nutrientCount(food: UsdaFood): number {
+  return Object.values(parseNutrients(food)).filter(value => value !== null).length;
+}
+
+function nutrientId(n: UsdaNutrient): number | undefined {
+  const legacy: Record<string, number> = { '208': 1008, '203': 1003, '204': 1004, '205': 1005 };
+  return n.nutrient?.id ?? n.nutrientId ?? legacy[n.nutrient?.number ?? n.nutrientNumber ?? ''];
 }
 
 function parseNutrients(data: UsdaFood): {
-  kcal: number;
-  protein: number;
-  carbs: number;
-  fat: number;
+  kcal: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
 } {
   const nu = data.foodNutrients || [];
   const get = (id: number) => {
-    const n = nu.find((x) => (x.nutrient?.id ?? x.nutrientId ?? Number(x.nutrientNumber)) === id);
-    return n ? (n.value ?? (n as { amount?: number }).amount ?? 0) : 0;
+    const n = nu.find((x) => nutrientId(x) === id);
+    const value = n?.value ?? n?.amount;
+    return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
   };
   const energy = (id: number) => {
-    const n = nu.find((x) => (x.nutrient?.id ?? x.nutrientId ?? Number(x.nutrientNumber)) === id && (!((x.nutrient?.unitName ?? x.unitName)) || (x.nutrient?.unitName ?? x.unitName)?.toLowerCase() === 'kcal'));
+    const n = nu.find((x) => nutrientId(x) === id && (!((x.nutrient?.unitName ?? x.unitName)) || (x.nutrient?.unitName ?? x.unitName)?.toLowerCase() === 'kcal'));
     const value = n?.value ?? n?.amount;
     return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
   };
@@ -286,31 +304,17 @@ function parseNutrients(data: UsdaFood): {
   let protein = get(NUTRIENT_IDS.protein);
   let carbs = get(NUTRIENT_IDS.carbs);
   let fat = get(NUTRIENT_IDS.fat);
-  let source: 'foodNutrients' | 'labelNutrients' = 'foodNutrients';
-
-  // Branded foods often omit foodNutrients and expose labelNutrients instead.
-  if ((kcal ?? 0) + protein + carbs + fat === 0 && data.labelNutrients && data.servingSize && data.servingSize > 0 && data.servingSizeUnit?.toLowerCase() === 'g') {
-    const ln = data.labelNutrients;
-    kcal = ln.calories?.value;
-    protein = ln.protein?.value ?? 0;
-    carbs = ln.carbohydrates?.value ?? 0;
-    fat = ln.fat?.value ?? 0;
-    source = 'labelNutrients';
-  }
-
-  if (kcal === undefined && data.labelNutrients?.calories?.value !== undefined && data.servingSize && data.servingSize > 0 && data.servingSizeUnit?.toLowerCase() === 'g') {
-    kcal = data.labelNutrients.calories.value * 100 / data.servingSize;
-  }
-
-  // labelNutrients are per serving; normalize to per-100g when serving is in grams.
-  if (source === 'labelNutrients' && data.servingSize && data.servingSizeUnit?.toLowerCase() === 'g') {
+  // Label nutrients are per serving. Only use them when a mass conversion is known.
+  if (data.labelNutrients && data.servingSize && data.servingSize > 0 && data.servingSizeUnit?.toLowerCase() === 'g') {
     const factor = 100 / data.servingSize;
-    if (kcal !== undefined) kcal *= factor;
-    protein *= factor;
-    carbs *= factor;
-    fat *= factor;
+    const label = (key: string) => {
+      const value = data.labelNutrients?.[key]?.value;
+      return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value * factor : undefined;
+    };
+    kcal ??= label('calories');
+    protein ??= label('protein');
+    carbs ??= label('carbohydrates');
+    fat ??= label('fat');
   }
-
-  if (kcal === undefined || !Number.isFinite(kcal) || kcal < 0) throw serviceUnavailable('Calories are unavailable for this food. Please choose another result.');
-  return { kcal, protein, carbs, fat };
+  return { kcal: kcal ?? null, protein: protein ?? null, carbs: carbs ?? null, fat: fat ?? null };
 }

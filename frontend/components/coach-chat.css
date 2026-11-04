@@ -12,6 +12,7 @@
 .coach-chat-header h2 { margin: 0; font-size: 16px; line-height: 1.25; }
 .coach-chat-header p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
 .coach-chat-header button { display: grid; place-items: center; min-width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--muted); }
+.coach-chat-header .coach-chat-clear { padding: 0 8px; font-size: 11px; text-decoration: underline; cursor: pointer; }
 .coach-chat-messages { flex: 1; min-height: 0; overflow-y: auto; padding: 20px 16px; }
 .coach-chat-message { display: flex; align-items: end; gap: 8px; }
 .coach-chat-message .coach-chat-avatar { width: 28px; height: 28px; flex: 0 0 28px; padding: 4px; }
@@ -20,6 +21,17 @@
 .coach-chat-message.user { justify-content: flex-end; }
 .coach-chat-message.user p { background: var(--green); color: var(--surface); border-radius: 16px 16px 4px 16px; }
 .coach-chat-message p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.coach-chat-content { min-width: 0; max-width: 80%; }
+.coach-chat-content p { max-width: none; }
+.coach-chat-prompts { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.coach-chat-prompts button, .coach-chat-pending button, .coach-chat-retry button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); color: var(--ink); font: inherit; font-size: 12px; cursor: pointer; }
+.coach-chat-prompts button:focus-visible, .coach-chat-pending button:focus-visible, .coach-chat-retry button:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.coach-chat-pending { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.coach-chat-retry { margin: 14px 0; }
+.coach-chat-retry .coach-chat-error { margin-bottom: 8px; }
+.coach-chat-consent { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 12px; cursor: pointer; }
+.coach-chat-consent input { width: 18px; height: 18px; flex: 0 0 18px; accent-color: var(--green); }
+.coach-chat-privacy.coach-chat-consent-note { margin-top: 0; }
 .coach-chat-privacy, .coach-chat-error { margin: 14px 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
 .coach-chat-error { color: var(--red-dark); }
 .coach-chat-composer { display: flex; flex: 0 0 auto; gap: 10px; padding: 12px 16px calc(12px + var(--sab, 0px)); border-top: 1px solid var(--line); }

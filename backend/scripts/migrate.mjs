@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import { loadEnvFile } from 'node:process';
 import mongoose from 'mongoose';
 import { up, down, id, indexes } from '../migrations/001-auth-query-indexes.mjs';
+import { up as migrateDiary } from '../migrations/002-nullable-diary.mjs';
 const direction = process.argv[2] || 'plan';
-assert(['plan', 'up', 'down'].includes(direction), 'Usage: node scripts/migrate.mjs [plan|up|down]');
+assert(['plan', 'up', 'down', 'diary-up'].includes(direction), 'Usage: node scripts/migrate.mjs [plan|up|down|diary-up]');
 if (direction === 'plan') {
   assert(new Set(indexes.map(index => `${index.collection}:${index.name}`)).size === indexes.length);
   assert(indexes.every(index => index.name !== '_id_' && Object.keys(index.key).length > 0));
@@ -12,6 +13,6 @@ if (direction === 'plan') {
   try { loadEnvFile('.env'); } catch { /* Environment may be supplied by hosting. */ }
   assert(process.env.MONGODB_URI, 'MONGODB_URI is required');
   const connection = await mongoose.createConnection(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 10_000, autoIndex: false }).asPromise();
-  try { await (direction === 'up' ? up : down)(connection.db); console.log(`${id}: ${direction} complete`); }
+  try { if (direction === 'diary-up') { const result = await migrateDiary(connection.db); console.log('Nullable diary documents updated:', result.modifiedCount); } else { await (direction === 'up' ? up : down)(connection.db); console.log(`${id}: ${direction} complete`); } }
   finally { await connection.close(); }
 }

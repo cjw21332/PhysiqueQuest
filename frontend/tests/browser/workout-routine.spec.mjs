@@ -93,29 +93,164 @@ test('profile and nutrition reads recover from a temporary server error', async 
   await expect.poll(() => state.reads.nutrition).toBeGreaterThanOrEqual(2);
   await expect(page.getByRole('heading', { name: /nutrition/i }).first()).toBeVisible();
 });
-test('Phiq opens and closes as an accessible chat preview', async ({ page }) => {
+test('Phiq keeps data sharing optional, hides sources and clears its conversation', async ({ page }) => {
   await fixture(page);
-  await page.route('**/api/chat', route => route.fulfill({ json: { reply: 'Try a gentle warm-up.' }, headers }));
+  const requests = [];
+  let refreshOnce = true;
+  await page.route('**/api/chat', route => {
+    requests.push(route.request().postDataJSON());
+    if (refreshOnce) { refreshOnce = false; return route.fulfill({ status: 401, headers, json: { message: 'Refresh session' } }); }
+    const personal = route.request().postDataJSON().includePersonalData;
+    return route.fulfill({ json: { reply: personal ? 'Your saved workouts are available.\n\nSources: Your workouts. Your saved goals and preferences.' : 'Coach supports manual set logging.', sources: [{ id: personal ? 'workouts' : 'coach', label: personal ? 'Your workouts' : 'Coach guide' }], privacy: { personalDataIncluded: personal, historyStored: false, provider: 'self-hosted' } }, headers });
+  });
   await page.goto('/coach');
   const launcher = page.getByRole('button', { name: 'Open Phiq coach' });
   await launcher.click();
   const dialog = page.getByRole('dialog', { name: 'Phiq' });
   await expect(dialog).toBeVisible();
+  const input = dialog.getByLabel('Ask Phiq about PhysiqueQuest');
+  const consent = dialog.getByRole('checkbox', { name: 'Use my saved fitness data' });
   for (const size of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(size);
     const box = await dialog.boundingBox();
     expect(box.height).toBeGreaterThan(size.height * .8);
     expect(box.y).toBeGreaterThanOrEqual(0);
-    await expect(dialog.getByLabel('Ask Phiq anything')).toBeInViewport();
+    await expect(input).toBeInViewport();
   }
-  await expect(dialog.getByText(/sent to Google Gemini/i)).toBeVisible();
-  await dialog.getByLabel('Ask Phiq anything').fill('What warm-up should I do?');
+  await dialog.getByText('What can Phiq access?', { exact: true }).click();
+  await expect(dialog.locator('.coach-chat-access-details p')).toContainText(/private AI service, not an external AI provider/i);
+  await dialog.getByText('What can Phiq access?', { exact: true }).click();
+  await expect(consent).not.toBeChecked();
+  await input.fill('How does Coach work?');
   await dialog.getByRole('button', { name: 'Send message' }).click();
-  await expect(dialog.getByText('Try a gentle warm-up.')).toBeVisible();
+  await expect(dialog.getByText('Coach supports manual set logging.')).toBeVisible();
+  await expect(dialog.getByRole('list', { name: 'Reply sources' })).toHaveCount(0);
+  await expect(dialog.getByText('Coach guide', { exact: true })).toHaveCount(0);
+  expect(requests[0].includePersonalData).toBe(false);
+  expect(requests[0].page).toBe('/coach');
+  // Refreshing the same account must preserve its in-memory conversation.
+  await expect(dialog.getByText('How does Coach work?', { exact: true })).toBeVisible();
+  await consent.check();
+  await expect(dialog.getByText('Coach supports manual set logging.')).toHaveCount(0);
+  await input.fill('What workouts have I saved?');
+  await dialog.getByRole('button', { name: 'Send message' }).click();
+  await expect(dialog.getByText('Your saved workouts are available.')).toBeVisible();
+  await expect(dialog.getByRole('list', { name: 'Reply sources' })).toHaveCount(0);
+  await expect(dialog.getByText(/Sources:|Your saved goals and preferences/)).toHaveCount(0);
+  expect(requests.at(-1)).toEqual({ messages: [{ role: 'user', text: 'What workouts have I saved?' }], includePersonalData: true, page: '/coach' });
+  await dialog.getByRole('button', { name: 'Clear chat' }).click();
+  await expect(dialog.getByText('Your saved workouts are available.')).toHaveCount(0);
+  await expect(dialog.getByRole('list', { name: 'Reply sources' })).toHaveCount(0);
+  await page.route('**/api/chat', route => route.fulfill({ status: 503, headers, json: { message: 'Internal model host secret detail' } }));
+  await input.fill('How does Scan work?');
+  await dialog.getByRole('button', { name: 'Send message' }).click();
+  await expect(dialog.getByRole('alert')).toHaveText('Phiq’s private AI is unavailable right now. Please try again later.');
+  await expect(dialog.getByText('Internal model host secret detail')).toHaveCount(0);
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
   await expect(launcher).toBeFocused();
 });
+test('Phiq drops an in-flight response when consent changes', async ({ page }) => {
+  await fixture(page);
+  let release;
+  const pending = new Promise(resolve => { release = resolve; });
+  let finished;
+  const completed = new Promise(resolve => { finished = resolve; });
+  const requests = [];
+  await page.route('**/api/chat', async route => {
+    requests.push(route.request().postDataJSON());
+    const first = requests.length === 1;
+    if (first) await pending;
+    await route.fulfill({ headers, json: { reply: first ? 'Old private response' : 'Fresh guide response', sources: [], privacy: { personalDataIncluded: first, historyStored: false, provider: 'self-hosted' } } });
+    finished();
+  });
+  await page.goto('/coach');
+  await page.getByRole('button', { name: 'Open Phiq coach' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Phiq' });
+  const consent = dialog.getByRole('checkbox', { name: 'Use my saved fitness data' });
+  await consent.check();
+  await dialog.getByLabel('Ask Phiq about PhysiqueQuest').fill('Show my progress');
+  await dialog.getByRole('button', { name: 'Send message' }).click();
+  await expect(dialog.getByRole('status')).toContainText('thinking');
+  await consent.uncheck();
+  release();
+  await completed;
+  await dialog.getByLabel('Ask Phiq about PhysiqueQuest').fill('How does Scan work?');
+  await dialog.getByRole('button', { name: 'Send message' }).click();
+  await expect(dialog.getByText('Fresh guide response')).toBeVisible();
+  expect(requests.at(-1)).toEqual({ messages: [{ role: 'user', text: 'How does Scan work?' }], includePersonalData: false, page: '/coach' });
+  await expect(dialog.getByText('Old private response')).toHaveCount(0);
+  await expect(dialog.getByText('Show my progress', { exact: true })).toHaveCount(0);
+  await expect(dialog.getByLabel('Ask Phiq about PhysiqueQuest')).toBeEnabled();
+});
+test('Phiq resets consent and history when a refreshed session belongs to another account', async ({ page }) => {
+  await fixture(page);
+  await page.route('**/api/auth/session/refresh', route => route.fulfill({ headers, json: { access_token: 'other-token', expires_in: 3600, user: { id: 'other-account', name: 'Other user', email: 'other@example.test', emailVerified: true } } }));
+  let calls = 0;
+  await page.route('**/api/chat', route => {
+    calls++;
+    return route.fulfill(calls === 1 ? { status: 401, headers, json: { message: 'Refresh session' } } : { headers, json: { reply: 'Late account response', sources: [], privacy: { personalDataIncluded: true, historyStored: false, provider: 'self-hosted' } } });
+  });
+  await page.goto('/coach');
+  const launcher = page.getByRole('button', { name: 'Open Phiq coach' });
+  await launcher.click();
+  const dialog = page.getByRole('dialog', { name: 'Phiq' });
+  await dialog.getByRole('checkbox', { name: 'Use my saved fitness data' }).check();
+  await dialog.getByLabel('Ask Phiq about PhysiqueQuest').fill('Private account question');
+  await dialog.getByRole('button', { name: 'Send message' }).click();
+  await expect(dialog).not.toBeVisible();
+  await launcher.click();
+  await expect(dialog.getByRole('checkbox', { name: 'Use my saved fitness data' })).not.toBeChecked();
+  await expect(dialog.getByText('Private account question', { exact: true })).toHaveCount(0);
+  await expect(dialog.getByText('Late account response')).toHaveCount(0);
+  expect(calls).toBe(1);
+});
+test('Phiq cancels waiting, restores the draft and ignores a late response', async ({ page }) => {
+  await fixture(page);
+  let release, finish;
+  const delayed = new Promise(resolve => { release = resolve; });
+  const completed = new Promise(resolve => { finish = resolve; });
+  await page.route('**/api/chat', async route => {
+    await delayed;
+    try { await route.fulfill({ headers, json: { reply: 'Old response that should not appear', sources: [] } }); }
+    finally { finish(); }
+  });
+  await page.goto('/coach');
+  await page.getByRole('button', { name: 'Open Phiq coach' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Phiq' });
+  const input = dialog.getByLabel('Ask Phiq about PhysiqueQuest');
+  await input.fill('Explain my current workout');
+  await dialog.getByRole('button', { name: 'Send message' }).click();
+  await expect(dialog.getByRole('status')).toHaveText('Phiq is thinking…');
+  const cancelled = page.waitForEvent('requestfailed', { predicate: request => new URL(request.url()).pathname.endsWith('/chat') });
+  await dialog.getByRole('button', { name: 'Stop waiting' }).click();
+  await cancelled;
+  await expect(input).toHaveValue('Explain my current workout');
+  await expect(input).toBeEnabled();
+  await expect(dialog.getByRole('status')).toContainText('Stopped waiting');
+  await expect(dialog.getByRole('alert')).toHaveCount(0);
+  release();
+  await completed;
+  await expect(dialog.getByText('Old response that should not appear', { exact: true })).toHaveCount(0);
+});
+for (const path of ['/home/notifications', '/coach', '/scan/history', '/quests', '/me/training']) {
+  test(`Phiq page help sends the current pathname on ${path}`, async ({ page }) => {
+    await fixture(page);
+    let submitted;
+    await page.route('**/api/chat', route => {
+      submitted = route.request().postDataJSON();
+      return route.fulfill({ headers, json: { reply: 'This page is part of PhysiqueQuest.', sources: [{ id: 'internal-only', label: 'Hidden internal reference' }] } });
+    });
+    await page.goto(path);
+    await page.getByRole('button', { name: 'Open Phiq coach' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Phiq' });
+    await dialog.getByRole('button', { name: 'Explain this page', exact: true }).click();
+    await expect(dialog.getByText('This page is part of PhysiqueQuest.', { exact: true })).toBeVisible();
+    expect(submitted).toEqual({ messages: [{ role: 'user', text: 'How do I use this page?' }], includePersonalData: false, page: path });
+    await expect(dialog.getByText('Hidden internal reference', { exact: true })).toHaveCount(0);
+    await expect(dialog.getByRole('list', { name: 'Reply sources' })).toHaveCount(0);
+  });
+}
 async function resume(page) {
   await page.goto('/coach');
   await page.getByRole('button', { name: 'Resume saved workout' }).click();

@@ -118,10 +118,10 @@ export type AnalyzeRequest = z.infer<typeof analyzeRequestSchema>;
 // --------------------------------------------------------------------------
 
 export const macrosSchema = z.object({
-  kcal: z.number(),
-  protein_g: z.number(),
-  carbs_g: z.number(),
-  fat_g: z.number(),
+  kcal: z.number().nullable(),
+  protein_g: z.number().nullable(),
+  carbs_g: z.number().nullable(),
+  fat_g: z.number().nullable(),
 });
 
 export const analyzedItemSchema = z.object({
@@ -131,10 +131,10 @@ export const analyzedItemSchema = z.object({
   found: z.boolean(),
   fdc_id: z.number().optional(),
   description: z.string().optional(),
-  kcal: z.number(),
-  protein_g: z.number(),
-  carbs_g: z.number(),
-  fat_g: z.number(),
+  kcal: z.number().nullable(),
+  protein_g: z.number().nullable(),
+  carbs_g: z.number().nullable(),
+  fat_g: z.number().nullable(),
   per_100g: macrosSchema.optional(),
 });
 
@@ -143,7 +143,7 @@ export const analyzeResponseSchema = z.object({
   model: z.string(),
   items: z.array(analyzedItemSchema),
   unmatched: z.array(z.string()),
-  totals: macrosSchema,
+  totals: z.object({ kcal: z.number().nullable(), protein_g: z.number().nullable(), carbs_g: z.number().nullable(), fat_g: z.number().nullable() }),
   degraded: z.boolean(),
 });
 

@@ -8,6 +8,7 @@ import { compressionMiddleware } from './common/compression.middleware.js';
 import { queryValidationMiddleware } from './common/query-validation.middleware.js';
 
 const app = await NestFactory.create<NestExpressApplication>(StandaloneCoachModule, { bodyParser: false });
+app.set('trust proxy', Number(process.env.TRUST_PROXY || 0));
 app.setGlobalPrefix('api');
 app.use(securityMiddleware(process.env));
 app.use(compressionMiddleware);

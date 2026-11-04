@@ -10,6 +10,7 @@ import { ScanContentTypeGuard } from '../common/foodscan/scan-content-type.guard
 import { ScanRateLimitGuard } from '../common/foodscan/scan-rate-limit.guard.js';
 import { FoodScanController } from './foodscan.controller.js';
 import { FoodScanSchemasService } from './foodscan.schemas.js';
+import { ProductService } from './services/product.service.js';
 import { FoodScanService } from './foodscan.service.js';
 import { FoodSearchController } from './foodsearch.controller.js';
 import { GeminiService } from './services/gemini.service.js';
@@ -50,6 +51,7 @@ export const SCANNER_ROUTE_PATHS = [
     FoodScanSchemasService,
     GeminiService,
     UsdaService,
+    ProductService,
     FoodScanService,
     AppExceptionFilter,
     RequestContextInterceptor,

@@ -1,0 +1,104 @@
+name: physiquequest
+services:
+  inference:
+    build:
+      context: ../..
+      dockerfile: ai/deploy/Dockerfile
+      args:
+        OLLAMA_IMAGE: ${OLLAMA_IMAGE:-ollama/ollama:0.40.11}
+    restart: unless-stopped
+    volumes:
+      - phiq-models:/root/.ollama
+    networks:
+      inference:
+        aliases: [ollama]
+    # No published port: only the backend can reach the inference network.
+    stop_grace_period: 30s
+  backend:
+    build: ../../backend
+    restart: unless-stopped
+    depends_on:
+      inference:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: '4000'
+      MONGODB_URI: ${MONGODB_URI:?Set production MongoDB URI}
+      JWT_SECRET: ${JWT_SECRET:?Set a strong production session secret}
+      HEALTH_DATA_ENCRYPTION_KEY: ${HEALTH_DATA_ENCRYPTION_KEY:?Set existing production encryption key}
+      FRONTEND_URL: https://${APP_DOMAIN:?Set the public application hostname}
+      CORS_ALLOWED_ORIGINS: https://${APP_DOMAIN}
+      API_PUBLIC_URL: https://${APP_DOMAIN}
+      COOKIE_SECURE: 'true'
+      COOKIE_SAMESITE: lax
+      TRUST_PROXY: '1'
+      STORAGE_DRIVER: s3
+      S3_BUCKET: ${S3_BUCKET:?Set production object storage bucket}
+      S3_REGION: ${S3_REGION:-auto}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_FORCE_PATH_STYLE: ${S3_FORCE_PATH_STYLE:-false}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:?Set resend or brevo for production mail}
+      MAIL_API_KEY: ${MAIL_API_KEY:?Set the selected mail provider credential}
+      MAIL_FROM: ${MAIL_FROM:?Set verified sender}
+      EMAIL_VERIFICATION_URL: https://${APP_DOMAIN}
+      EMAIL_VERIFICATION_ENFORCED: 'false'
+      PUSH_PROVIDER: ${PUSH_PROVIDER:-dry-run}
+      EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      USDA_API_KEY: ${USDA_API_KEY:-}
+      CHAT_OLLAMA_URL: http://ollama:11434
+      CHAT_OLLAMA_MODEL: physiquequest-phiq
+      CHAT_KEEP_ALIVE: 30m
+      CHAT_MAX_CONCURRENCY: '1'
+      CHAT_MAX_OUTPUT_TOKENS: '384'
+      CHAT_WARMUP_ENABLED: 'true'
+    networks: [app, inference]
+  coach:
+    build: ../../backend
+    restart: unless-stopped
+    command: ['node', 'dist/coach-main.js']
+    environment:
+      NODE_ENV: production
+      COACH_PORT: '4050'
+      COACH_FRONTEND_URL: https://${APP_DOMAIN}
+      API_PUBLIC_URL: https://${APP_DOMAIN}
+      TRUST_PROXY: '1'
+    healthcheck:
+      test: ['CMD', 'node', '-e', 'fetch("http://127.0.0.1:4050/api/coach/status",{headers:{"X-Forwarded-Proto":"https"}}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))']
+      interval: 30s
+      timeout: 5s
+    networks: [app]
+  frontend:
+    build:
+      context: ../..
+      dockerfile: frontend/Dockerfile
+      args:
+        BACKEND_URL: http://backend:4000
+        NEXT_PUBLIC_COACH_API_URL: https://${APP_DOMAIN}/coach-api/api
+    restart: unless-stopped
+    depends_on: [backend, coach]
+    networks: [app]
+  gateway:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ['80:80', '443:443']
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?Set TLS certificate contact email}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - tls-data:/data
+      - tls-config:/config
+    depends_on: [frontend, backend, coach]
+    networks: [app]
+networks:
+  app: {}
+  inference: {}
+    # Inference needs outbound access only for the initial public weight download.
+    # No frontend/Coach/gateway membership, no public inference port.
+volumes:
+  phiq-models: {}
+  tls-data: {}
+  tls-config: {}

@@ -35,7 +35,7 @@ function envVarsInSource(): Set<string> {
       }
       if (!/\.(ts|js|mjs)$/.test(entry)) continue;
       const src = readFileSync(full, 'utf8');
-      const patterns = [/\.(?:get|getOrThrow)(?:<[^>]*>)?\('([A-Z][A-Z0-9_]+)'\)/g, /\bread\('([A-Z][A-Z0-9_]+)'\)/g, /\benv\.([A-Z][A-Z0-9_]+)/g, /'((?:CDN_|BACKUP_)[A-Z0-9_]+)'/g];
+      const patterns = [/\.(?:get|getOrThrow)(?:<[^>]*>)?\('([A-Z][A-Z0-9_]+)'\)/g, /\b(?:read|integer)\('([A-Z][A-Z0-9_]+)'/g, /\benv\.([A-Z][A-Z0-9_]+)/g, /'((?:CDN_|BACKUP_)[A-Z0-9_]+)'/g];
       for (const pattern of patterns) {
         for (const m of src.matchAll(pattern)) found.add(m[1]);
       }

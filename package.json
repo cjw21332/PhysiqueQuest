@@ -9,10 +9,24 @@
     "start": "npm run start --workspace frontend",
     "coach": "npm --prefix backend run start:coach",
     "coach:dev": "npm --prefix backend run start:coach:dev",
-    "seed": "npm --prefix backend run seed:exercises"
+    "seed": "npm --prefix backend run seed:exercises",
+    "ai:setup": "node ai/setup.mjs",
+    "ai:check": "node ai/setup.mjs --check",
+    "ai:warmup": "node ai/setup.mjs --warmup",
+    "ai:evaluate": "node ai/setup.mjs --warmup && npm --prefix backend run build && node backend/scripts/evaluate-chat.mjs",
+    "ai:evaluate:questions": "npm --prefix backend run build && node backend/scripts/evaluate-chat-questions.mjs",
+    "ai:evaluate:paraphrases": "npm --prefix backend run build && node backend/scripts/evaluate-chat-paraphrases.mjs"
   },
   "devDependencies": {
-    "expo": "^57.0.28"
+    "expo": "^58.0.21"
+  },
+  "overrides": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "expo-mediapipe-pose": {
+      "expo": "~58.0.21",
+      "react-native": "0.88.1"
+    }
   },
   "workspaces": [
     "frontend",

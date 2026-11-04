@@ -10,10 +10,10 @@ import { previewFoods } from './nutritionPresentation';
 type FoodSelection = FoodCandidate & { detail?: FoodDetail };
 type SavedFood = {
   name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
+  calories: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
   per: string;
   group: string;
   fdcId: number;
@@ -119,10 +119,10 @@ export default function AddFood({
   const scale = grams / 100;
   const macros = selected?.detail?.per_100g;
   const calculated = useMemo(() => macros && Number.isFinite(scale) ? {
-    kcal: macros.kcal * scale,
-    protein: macros.protein_g * scale,
-    carbs: macros.carbs_g * scale,
-    fat: macros.fat_g * scale,
+    kcal: macros.kcal === null ? null : macros.kcal * scale,
+    protein: macros.protein_g === null ? null : macros.protein_g * scale,
+    carbs: macros.carbs_g === null ? null : macros.carbs_g * scale,
+    fat: macros.fat_g === null ? null : macros.fat_g * scale,
   } : null, [macros, scale]);
 
   const useRecent = (food: string) => {
@@ -136,10 +136,10 @@ export default function AddFood({
     setSaving(true); setError('');
     try { await onSave({
       name: selected.description,
-      calories: round(calculated.kcal),
-      protein: round(calculated.protein),
-      carbs: round(calculated.carbs),
-      fat: round(calculated.fat),
+      calories: calculated.kcal === null ? null : round(calculated.kcal),
+      protein: calculated.protein === null ? null : round(calculated.protein),
+      carbs: calculated.carbs === null ? null : round(calculated.carbs),
+      fat: calculated.fat === null ? null : round(calculated.fat),
       per: 'per 100 g',
       group: selected.data_type,
       fdcId: selected.fdc_id,
@@ -187,7 +187,7 @@ export default function AddFood({
               return <button type="button" key={food.fdc_id} className={isSelected ? 'selected' : ''} aria-pressed={isSelected} onClick={() => void selectFood(food)}>
                 <i className={isSelected ? 'checked' : ''} aria-hidden="true" />
                 <span><b>{titleCase(food.description)}</b><small>{food.data_type} · per 100 g</small></span>
-                <strong>{detail ? `${Math.round(detail.per_100g.kcal)} kcal` : 'Select to load'}</strong>
+                <strong>{detail ? detail.per_100g.kcal === null ? 'Calories unavailable' : `${Math.round(detail.per_100g.kcal)} kcal` : 'Select to load'}</strong>
               </button>;
             })}
             {!loading && !results.length && <>
@@ -209,10 +209,10 @@ export default function AddFood({
           {detailLoading && <p className="food-detail-loading" role="status">Loading nutrition…</p>}
           {!detailLoading && selected && !selected.detail && error && <p className="food-detail-loading" role="alert">{error}</p>}
           {[
-            ['Calories', calculated ? `${Math.round(calculated.kcal)} kcal` : '—'],
-            ['Protein', calculated ? `${calculated.protein.toFixed(1)} g` : '—'],
-            ['Carbohydrates', calculated ? `${calculated.carbs.toFixed(1)} g` : '—'],
-            ['Fat', calculated ? `${calculated.fat.toFixed(1)} g` : '—'],
+            ['Calories', calculated?.kcal != null ? `${Math.round(calculated.kcal)} kcal` : 'Unavailable'],
+            ['Protein', calculated?.protein != null ? `${calculated.protein.toFixed(1)} g` : 'Unavailable'],
+            ['Carbohydrates', calculated?.carbs != null ? `${calculated.carbs.toFixed(1)} g` : 'Unavailable'],
+            ['Fat', calculated?.fat != null ? `${calculated.fat.toFixed(1)} g` : 'Unavailable'],
           ].map(([label, value]) => <div className="food-value" key={label}><span>{label}</span><b>{value}</b></div>)}
           {unit === 'servings' && <small className="serving-basis">One serving = {round(servingSizeG)} g{selected?.detail?.serving_size_g ? '' : ' (USDA serving size unavailable)'}</small>}
         </section>
@@ -220,6 +220,7 @@ export default function AddFood({
 
       <footer className="scan-footer add-food-footer">
         {error && selected?.detail && <p className="error" role="alert">{error}</p>}
+        {calculated && Object.values(calculated).some(value => value === null) && <p>Nutrition information is missing. Known values will be saved.</p>}
         <button className="primary" disabled={saving || !selected?.detail || detailLoading || !calculated || !validAmount} onClick={()=>void handleSave()}>{saving ? 'Saving…' : `Save to ${meal}`}</button>
       </footer>
     </div>

@@ -6,6 +6,8 @@ import ReviewEstimate from './ReviewEstimate';
 import AddFood from './AddFood';
 import DailyLog from './DailyLog';
 import FoodHistory from './FoodHistory';
+import BarcodeMeal from './BarcodeMeal';
+import FoodCamera from './FoodCamera';
 import EditMeal from './EditMeal';
 import DietaryPlan, { planTargets } from './DietaryPlan';
 import { type FoodEntry, type MealName } from './types';
@@ -26,6 +28,8 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const contentRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{contentRef.current?.scrollTo(0,0);},[view]);
   const [photoSourceOpen,setPhotoSourceOpen]=useState(false);
+  const [barcodeOpen,setBarcodeOpen]=useState(false);
+  const [cameraOpen,setCameraOpen]=useState(false);
   const [addReturnView,setAddReturnView]=useState<View>('nutrition');
   const [historyReturnView,setHistoryReturnView]=useState<View>('nutrition');
   const { dietaryPlan, meals, water, loading, error, addMeal, addMealsFromScan, updateMeal, setWater: saveWater, refresh } = useNutrition();
@@ -73,7 +77,6 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   }, [view, editingEntries.length, imageUrl]);
   const [scanError,setScanError]=useState('');
   const [selectedMeal,setSelectedMeal]=useState<MealName>('Dinner');
-  const cameraInput=useRef<HTMLInputElement>(null);
   const uploadInput=useRef<HTMLInputElement>(null);
   useEffect(()=>()=>{if(imageUrl)URL.revokeObjectURL(imageUrl);},[imageUrl]);
   useEffect(()=>{
@@ -119,10 +122,10 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const addPreviewEntries=(entries:FoodEntry[])=>{setPreviewSnapshot(current=>({...current,meals:[...current.meals,...entries]}));setNotice('Sample entry added. Nothing was saved to your account.');setView('logs');};
   const saveScan=async(meal:MealName,items:ScannedItem[])=>{
     setActionError('');
-    if(sampleReview){addPreviewEntries(items.map((item,index)=>({id:`preview-scan-${Date.now()}-${index}`,name:item.food_name,meal,calories:item.kcal,detail:`${item.food_name} · ${Math.round(item.est_weight_g)} g`,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}),source:'Scanned',protein:item.protein_g,carbs:item.carbs_g,fat:item.fat_g,date:formatLocalDate()})));return;}
+    if(sampleReview){addPreviewEntries(items.map((item,index)=>({id:`preview-scan-${Date.now()}-${index}`,name:item.food_name,meal,calories:item.kcal!,detail:`${item.food_name} · ${Math.round(item.est_weight_g)} g`,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}),source:'Scanned',protein:item.protein_g!,carbs:item.carbs_g!,fat:item.fat_g!,date:formatLocalDate()})));return;}
     try{await addMealsFromScan({items,meal});setView('logs');}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');throw err;}
   };
-  const saveFood=async(food:{name:string;calories:number;protein:number;carbs:number;fat:number;fdcId:number;servingSizeG:number},meal:MealName,amount:number,unit:'grams'|'servings')=>{
+  const saveFood=async(food:{name:string;calories:number|null;protein:number|null;carbs:number|null;fat:number|null;fdcId:number;servingSizeG:number},meal:MealName,amount:number,unit:'grams'|'servings')=>{
     const grams=unit==='grams'?amount:amount*food.servingSizeG;const now=new Date();
     const entry={name:food.name,meal,calories:food.calories,detail:`${food.name} · ${unit==='grams'?`${amount} g`:`${amount} serving(s) (${Math.round(grams)} g)`}`,time:now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}),source:'Manual' as const,protein:food.protein,carbs:food.carbs,fat:food.fat,fdcId:food.fdcId};
     setActionError('');
@@ -133,13 +136,15 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const retake=()=>{setView('nutrition');setPhotoSourceOpen(true);};
   const retryScan=()=>{if(photo.current)void analyse(photo.current);};
   return <section className={`scan-section scan-reference scan-view-${view}`}>
-    <input ref={cameraInput} className="visually-hidden" type="file" accept="image/*" capture="environment" aria-label="Take a meal photo" onChange={e=>{onPhoto(e.target.files?.[0]);e.target.value='';}}/>
     <input ref={uploadInput} className="visually-hidden" type="file" accept="image/*" aria-label="Upload a meal photo" onChange={e=>{onPhoto(e.target.files?.[0]);e.target.value='';}}/>
+    {barcodeOpen && <BarcodeMeal search={()=>{setBarcodeOpen(false);setPreviewRequested(false);add('Dinner');}} close={()=>setBarcodeOpen(false)} save={async entry=>{await addMeal(entry);setNotice('Product saved to your diary.');setPreviewRequested(false);setBarcodeOpen(false);setView('logs');}}/>}
+    {cameraOpen && <FoodCamera onClose={()=>setCameraOpen(false)} onCapture={file=>{setCameraOpen(false);onPhoto(file);}} onGallery={()=>{setCameraOpen(false);uploadInput.current?.click();}} />}
     {photoSourceOpen&&<div className="scan-source-overlay" onClick={()=>setPhotoSourceOpen(false)}>
       <section className="scan-source-dialog" role="dialog" aria-modal="true" aria-labelledby="scan-source-title" onClick={event=>event.stopPropagation()}>
         <h2 id="scan-source-title">Add a meal photo</h2>
+        <button className="scan-source-option" onClick={()=>{setPhotoSourceOpen(false);setBarcodeOpen(true);}}>Scan product barcode</button>
         <p>Take a new photo or choose one from your device.</p>
-        <button type="button" className="scan-source-option" autoFocus onClick={()=>cameraInput.current?.click()}>
+        <button type="button" className="scan-source-option" autoFocus onClick={()=>{setPhotoSourceOpen(false);setCameraOpen(true);}}>
           <span className="scan-source-icon"><Icon name="camera" size={21}/></span>
           <span><strong>Take a photo</strong><small>Open your camera</small></span>
           <Icon name="arrow" size={17}/>

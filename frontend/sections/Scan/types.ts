@@ -1,5 +1,5 @@
 export type MealName = 'Breakfast' | 'Lunch' | 'Snack' | 'Dinner';
-export type FoodEntry = { id: string; name: string; meal: MealName; calories: number; detail: string; time: string; source: 'Scanned' | 'Manual'; protein: number; carbs: number; fat: number; date?: string; fdcId?: number; edited?: boolean };
+export type FoodEntry = { id: string; name: string; meal: MealName; calories: number | null; detail: string; time: string; source: 'Scanned' | 'Manual' | 'Barcode'; saturatedFat?: number | null; transFat?: number | null; fiber?: number | null; sugars?: number | null; addedSugar?: number | null; sodium?: number | null; cholesterol?: number | null; brand?: string; servingQuantity?: number; servingUnit?: string; barcode?: string; protein: number | null; carbs: number | null; fat: number | null; date?: string; fdcId?: number; estWeightG?: number; edited?: boolean };
 export const nutritionTargets = { calories: 2300, protein: 140, carbs: 240, fats: 70 };
 export const mealNames: MealName[] = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
 export const sampleMeals: FoodEntry[] = [

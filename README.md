@@ -15,6 +15,12 @@ A responsive, mobile-first fitness application with a Next.js frontend, Expo Go 
 
 Install root dependencies with `npm install`. Start the backend from `backend/` with `npm install` and `npm run start:dev`; start the frontend with `npm run dev` from the root. Start Expo Go with `npm run expo` from a third terminal. Configure MongoDB and JWT environment variables in `backend/.env`; keep secrets out of client environment files.
 
+Phiq is the private assistant available across Home, Coach, Scan, Quests and Me. It runs a self-hosted open-weight model without an AI-provider API key. Install/start Ollama, then run `npm run ai:setup` and `npm run ai:warmup` once from the root. Personal records require explicit chat consent and remain scoped to the signed-in account. See [the assistant setup and privacy boundaries](ai/README.md). This replaces Gemini for chat; existing image/video features retain their separate provider requirements.
+
+Phiq covers all 35 reviewed routes/subpages, uses current-page context, and answers common page help/exact supported metrics directly. Source labels are hidden from replies. For a hosted installation, use [the production containers, private inference and HTTPS gateway guide](ai/deploy/README.md); [verification evidence](ai/VERIFICATION.md) distinguishes completed checks from pending host/container staging.
+
+Run `rtk npm run ai:evaluate:questions` to repeat the expanded synthetic chatbot question suite with the installed local model. See [the question regression matrix](ai/question-test-matrix.md) for coverage and the browser/database test commands.
+
 ## Run on a phone with Expo Go
 
 1. Install dependencies with `npm install` from the project root.

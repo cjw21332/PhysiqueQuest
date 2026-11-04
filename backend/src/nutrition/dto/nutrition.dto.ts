@@ -18,11 +18,22 @@ import {
 } from 'class-validator';
 
 export class MealDto {
+@IsOptional() @IsNumber() @Min(0) @Max(10000000) saturatedFat?: number | null;
+@IsOptional() @IsNumber() @Min(0) @Max(10000000) transFat?: number | null;
+@IsOptional() @IsNumber() @Min(0) @Max(10000000) fiber?: number | null;
+@IsOptional() @IsNumber() @Min(0) @Max(10000000) sugars?: number | null;
+@IsOptional() @IsNumber() @Min(0) @Max(10000000) addedSugar?: number | null;
+@IsOptional() @IsNumber() @Min(0) @Max(10000000) sodium?: number | null;
+@IsOptional() @IsNumber() @Min(0) @Max(10000000) cholesterol?: number | null;
+  @IsOptional() @IsString() @MaxLength(120) brand?: string;
+  @IsOptional() @IsNumber() @Min(0.000001) @Max(100000) servingQuantity?: number;
+  @IsOptional() @IsIn(['g','ml']) servingUnit?: string;
+  @IsOptional() @IsString() @Matches(/^(?:\d{8}|\d{12,14})$/) barcode?: string;
   @IsOptional() @IsString() @MaxLength(80) id?: string;
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   @IsString() @MinLength(1) @MaxLength(120) name: string;
   @IsIn(['Breakfast', 'Lunch', 'Snack', 'Dinner']) meal: string;
-  @IsNumber() @Min(0) calories: number;
+  @IsOptional() @IsNumber() @Min(0) calories: number | null;
   @IsOptional() @IsString() @MaxLength(240) detail?: string;
   @IsOptional() @IsString() @MaxLength(20) time?: string;
   @IsOptional() @IsString() @MaxLength(30) source?: string;
@@ -50,10 +61,10 @@ export class DietaryPlanDto {
 
 /** Per-100 g macros, exactly as the scan reports them. Informational only. */
 export class ScannedMacrosDto {
-  @IsNumber() @Min(0) kcal: number;
-  @IsNumber() @Min(0) protein_g: number;
-  @IsNumber() @Min(0) carbs_g: number;
-  @IsNumber() @Min(0) fat_g: number;
+  @IsOptional() @IsNumber() @Min(0) kcal: number | null;
+  @IsOptional() @IsNumber() @Min(0) protein_g: number | null;
+  @IsOptional() @IsNumber() @Min(0) carbs_g: number | null;
+  @IsOptional() @IsNumber() @Min(0) fat_g: number | null;
 }
 
 /**
@@ -70,10 +81,10 @@ export class ScannedMealItemDto {
   @IsBoolean() found: boolean;
   @IsOptional() @IsInt() @Min(1) fdc_id?: number;
   @IsOptional() @IsString() @MaxLength(240) description?: string;
-  @IsNumber() @Min(0) kcal: number;
-  @IsNumber() @Min(0) protein_g: number;
-  @IsNumber() @Min(0) carbs_g: number;
-  @IsNumber() @Min(0) fat_g: number;
+  @IsOptional() @IsNumber() @Min(0) kcal: number | null;
+  @IsOptional() @IsNumber() @Min(0) protein_g: number | null;
+  @IsOptional() @IsNumber() @Min(0) carbs_g: number | null;
+  @IsOptional() @IsNumber() @Min(0) fat_g: number | null;
   @IsOptional() @IsNumber() @Min(0) @Max(5000) est_weight_g?: number;
   @IsOptional() @IsNumber() @Min(0) @Max(1) confidence?: number;
   /**

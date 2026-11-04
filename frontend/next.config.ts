@@ -4,6 +4,8 @@ import { withSentryConfig } from '@sentry/nextjs/config';
 import { securityHeaders } from './lib/securityHeaders.mjs';
 // Keep a running dev server's output isolated from `next build` artifacts.
 const nextConfig = (phase: string): NextConfig => ({
+  output: 'standalone',
+  outputFileTracingRoot: process.cwd().replace(/[\\/]frontend$/, ''),
   allowedDevOrigins: ['localhost', '*.*.*.*', ...(process.env.DEV_ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean)],
   distDir: phase === PHASE_DEVELOPMENT_SERVER ? '.next-dev' : '.next',
   devIndicators: false,

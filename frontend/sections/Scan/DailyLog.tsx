@@ -1,4 +1,6 @@
 'use client';
+import AdditionalNutrition from '../Scan/AdditionalNutrition';
+import { nutrientTotal, nutrientLabel } from '../Scan/nutrientTotal';
 import { titleCase } from '../../lib/titleCase';
 
 import { Icon } from '../Home/icons';
@@ -18,10 +20,10 @@ type DailyLogProps = {
 
 
 export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdit, onWater, targets: nutritionTargets = defaultTargets }: DailyLogProps) {
-  const calories = meals.reduce((sum, item) => sum + item.calories, 0);
-  const protein = meals.reduce((sum, item) => sum + item.protein, 0);
-  const carbs = meals.reduce((sum, item) => sum + item.carbs, 0);
-  const fats = meals.reduce((sum, item) => sum + item.fat, 0);
+  const calories = nutrientTotal(meals, item => item.calories);
+  const protein = nutrientTotal(meals, item => item.protein);
+  const carbs = nutrientTotal(meals, item => item.carbs);
+  const fats = nutrientTotal(meals, item => item.fat);
 
   return (
     <>
@@ -38,7 +40,7 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
 
         <div className="target-log-macros">
           <p className="target-log-remaining">
-            <strong>{Math.max(0, nutritionTargets.calories - Math.round(calories)).toLocaleString()} kcal</strong> remaining
+            <strong>{calories === null ? 'Unavailable' : nutrientLabel(Math.max(0, nutritionTargets.calories - calories), 'kcal')}</strong> remaining
           </p>
           <MacroProgress label="Protein" current={protein} target={nutritionTargets.protein} />
           <MacroProgress label="Carbs" current={carbs} target={nutritionTargets.carbs} />
@@ -46,6 +48,7 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
         </div>
       </section>
 
+      <AdditionalNutrition entries={meals}/>
       <section className="target-log-meals" aria-labelledby="target-log-meals-heading">
         <div className="target-log-section-head">
           <h3 id="target-log-meals-heading">Today&apos;s meals</h3>
@@ -54,9 +57,9 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
         <div className="target-log-meal-list">
           {mealNames.map((meal) => {
             const entries = meals.filter((item) => item.meal === meal);
-            const total = entries.reduce((sum, item) => sum + item.calories, 0);
+            const total = nutrientTotal(entries, item => item.calories);
             const names = entries.map((item) => titleCase(item.name)).join(' · ');
-            const times = entries.map((item) => [item.source === 'Scanned' ? 'Scanned' : 'Manual', item.edited ? 'edited' : '', item.time].filter(Boolean).join(' · ')).join(' / ');
+            const times = entries.map((item) => [item.source, item.edited ? 'edited' : '', item.time].filter(Boolean).join(' · ')).join(' / ');
 
             return (
               <article className="target-log-meal" key={meal}>
@@ -65,7 +68,7 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
                   <small>{times}</small>
                 </button> : <div className="target-log-meal-copy"><p><strong>{meal}</strong></p><small>Not logged yet</small></div>}
                 {entries.length
-                  ? <strong className="target-log-meal-calories">{Math.round(total).toLocaleString()} kcal</strong>
+                  ? <strong className="target-log-meal-calories">{nutrientLabel(total, 'kcal')}</strong>
                   : <button
                       type="button"
                       className="target-log-meal-add"
@@ -106,7 +109,8 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
   );
 }
 
-function MacroProgress({ label, current, target }: { label: string; current: number; target: number }) {
+function MacroProgress({ label, current, target }: { label: string; current: number | null; target: number }) {
+  if (current === null) return <div>{label} · Incomplete</div>;
   const progress = Math.min(100, Math.max(0, (current / target) * 100));
   return (
     <div className="target-log-macro">

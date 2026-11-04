@@ -1,0 +1,1590 @@
+{
+  "checkedAt": "2026-10-30T17:31:18.146Z",
+  "syntheticOnly": true,
+  "passes": 2,
+  "distinctQuestions": 50,
+  "checked": 100,
+  "passed": 100,
+  "failed": 0,
+  "semanticModelCalls": 96,
+  "questionGenerationCalls": 0,
+  "answerGenerations": 0,
+  "results": [
+    {
+      "pass": 1,
+      "id": "plan-blueprint",
+      "question": "What's the eating blueprint I've settled on?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 5357,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "plan-setup",
+      "question": "Can you remind me of the nutrition setup I committed to?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1103,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "plan-regimen",
+      "question": "Lay out the food regimen currently attached to my account.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1045,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "plan-strategy",
+      "question": "In plain terms, what eating strategy is on file for me?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1193,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "energy-allowance",
+      "question": "What's the energy allowance I set for each day?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1784,
+      "reply": "Daily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "energy-ceiling",
+      "question": "What is my daily kcal ceiling supposed to be?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1269,
+      "reply": "Daily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "nutrient-split",
+      "question": "Can you show the nutrient split I'm aiming to hit?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.macro-targets"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1326,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "nutrient-blueprint",
+      "question": "How do the three main nutrients divide up in my chosen eating blueprint?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.macro-targets"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1314,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "plate-today",
+      "question": "List what has gone onto my plate since I woke up.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.meals"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 1228,
+      "reply": "Saved meals for 2026-10-30: Oatmeal (calories 300 kcal); Rice bowl (calories 500 kcal); Salmon dinner (calories 600 kcal); Yogurt (calories 100 kcal). These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "plate-previous-day",
+      "question": "Which bites did I put on record the previous day?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.meals"
+        ],
+        "timeframe": "yesterday"
+      },
+      "elapsedMs": 1381,
+      "reply": "Saved meals for 2026-10-29: Chicken salad (calories 450 kcal). These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "energy-tally",
+      "question": "What's my energy tally so far since waking up?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calories-logged"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1334,
+      "reply": "Logged calories for 2026-10-30: 1500 kcal. These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "hydration-cups",
+      "question": "How many hydration cups have I ticked off so far?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.water"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1183,
+      "reply": "Saved water for 2026-10-30: 6 glasses. These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "calories-unused",
+      "question": "How much of my calorie allowance is still unused today?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calories-remaining"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 1774,
+      "reply": "calories remaining for 2026-10-30: 500 kcal (saved target 2000 kcal, logged 1500 kcal). These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "gym-blueprint",
+      "question": "What's the gym blueprint I've committed to for the week?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.program"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1369,
+      "reply": "Your saved Coach program: Build muscle, 45 min.\nMonday: Strength day\nTuesday: Recovery day (rest/recovery)\nWednesday: Strength day\nThursday: Recovery day (rest/recovery)\nFriday: Strength day\nSaturday: Recovery day (rest/recovery)\nSunday: Recovery day (rest/recovery)\nThis is a saved snapshot and may predate newer preferences.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "sweat-movements",
+      "question": "Which movements showed up in my most recent sweat session?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.latest-exercises"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1428,
+      "reply": "Your most recent available completed workout: status completed, ended 2026-10-30T16:09:28.890Z.\nExercises in the saved workout excerpt: Squat. The excerpt may omit other exercises.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "gym-effort-length",
+      "question": "How many minutes did that last gym effort take?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.latest-duration"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 2484,
+      "reply": "Your most recent available completed workout: status completed, ended 2026-10-30T16:09:30.318Z.\nSaved completed duration: 40 min (2400 seconds).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "available-iron",
+      "question": "What iron have I said I can train with?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "training.equipment"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1442,
+      "reply": "Your saved equipment: Dumbbells.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "body-mass",
+      "question": "What's the body mass currently entered against my profile?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 2005,
+      "reply": "Your saved current weight is 72 kg.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "stature",
+      "question": "How tall did I say I was when signing up?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.height"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1331,
+      "reply": "Your saved height is 175 cm.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "scale-destination",
+      "question": "Which number on the scale am I ultimately trying to reach?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.target-weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1263,
+      "reply": "Your target weight is 68 kg.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "quest-stage",
+      "question": "What stage of the Quest ladder am I on?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "quests.level"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 2051,
+      "reply": "Your Quest level is 7.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "xp-shortfall",
+      "question": "How far short am I of the next XP step?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "quests.remaining-xp"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1289,
+      "reply": "Your Quest level is 7.\nXP still needed for the next level: 60.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "daily-nudge",
+      "question": "What hour did I pick for my daily nudge?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "notifications.reminder"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1351,
+      "reply": "Your saved daily reminder is enabled at 09:05 (Asia/Singapore). Phone delivery still needs permission and a configured push provider.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "ranking-exposure",
+      "question": "Is the app set up to let others see me in the rankings?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "settings.visibility"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 2481,
+      "reply": "Your saved leaderboard visibility is hidden.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "supper-correction",
+      "question": "I made a typo in a supper entry. Where can I fix it?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "guide.scan-edit-meal"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 2234,
+      "reply": "Edit a saved meal: Edits the selected meal’s name, meal group and nutrition values. Open an existing entry first. Editing a sample preview changes only the sample, not the account.\n\n1. Open today’s log and select the meal entry.\n2. Change supported nutrition fields.\n3. Save and confirm the updated daily log.\n\nOpen /scan/edit-meal in PhysiqueQuest.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "parked-workout",
+      "question": "How do I get back into a workout I parked earlier?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "guide.resume-workout"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1179,
+      "reply": "Coach weekly program: Shows a saved weekly program based on account goals, training days, duration and equipment. Training concepts such as sets, reps, recovery and progressive overload are general education, not verified performance. Changing relevant preferences can create a new saved version. Resume saved workout restores confirmed sets; unsaved device drafts are separate.\n\n1. Open Coach and choose a training day/program.\n2. Review its exercises, then start preparation.\n3. Use Resume saved workout when an existing session is available.\n\nOpen /coach in PhysiqueQuest.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "contact-person",
+      "question": "Remind me who's listed as my person to call if something goes wrong.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.contact-name"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1275,
+      "reply": "Your saved emergency contact: name Emergency Person.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "two-fields",
+      "question": "Give me my energy allowance alongside my body mass.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target",
+          "profile.weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1315,
+      "reply": "Daily calorie target: 2000 kcal.\n\nYour saved current weight is 72 kg.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "mixed-literal-and-alias",
+      "question": "Tell me my current weight together with the energy allowance I chose.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.weight",
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1476,
+      "reply": "Your saved current weight is 72 kg.\n\nDaily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "protein-and-body-mass",
+      "question": "Give me my protein target and the body mass on my profile.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.protein-target",
+          "profile.weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1377,
+      "reply": "Protein: 30% (150 g/day).\n\nYour saved current weight is 72 kg.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "meal-intake-and-target",
+      "question": "How much protein did I log at breakfast, and what's my calorie allowance?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.protein-logged",
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1496,
+      "reply": "Saved meals for 2026-10-30: Oatmeal (protein 15 g). These are saved records, not verified intake.\n\nDaily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fragment-energy",
+      "question": "And the energy part?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1226,
+      "reply": "Daily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "implicit-plan-page",
+      "question": "Which blueprint am I following?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1030,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "ambiguous-blueprint",
+      "question": "Which blueprint am I following?",
+      "passed": true,
+      "elapsedMs": 3,
+      "reply": "Could you clarify which saved information you mean: your dietary plan or calorie target, logged meals or water, workout program, Progress measurements, or another app field? I could not confidently match that wording. You can name the field or rephrase your question.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "outside-holiday",
+      "question": "Plan a weekend in Kyoto for me.",
+      "passed": true,
+      "plan": {
+        "decision": "out_of_scope",
+        "routeIds": [],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1765,
+      "reply": "I can help with PhysiqueQuest’s Home, Coach, Scan, Quests and Me modules, and your own shared app records. Please ask about something in PhysiqueQuest.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "other-plate",
+      "question": "Peek at the other guy's plate for me.",
+      "passed": true,
+      "elapsedMs": 2,
+      "reply": "I can use selected saved records only from your signed-in account when you enable personal data. I cannot access another user’s data, credentials or account secrets, and I cannot change records.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "consent-energy",
+      "question": "What daily energy allowance did I choose?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1287,
+      "reply": "Enable “Use my saved fitness data” to let me read the selected records from your account for this question. I can still explain every PhysiqueQuest page without that permission.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "empty-regimen",
+      "question": "Lay out the food regimen currently attached to my account.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1133,
+      "reply": "No saved dietary plan is available. Open Scan → My Dietary Plan to review or save one.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-0",
+      "question": "Could you tell me what my current dietary plan looks like right now?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1701,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-1",
+      "question": "What is the specific calorie target I have set for today?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 1139,
+      "reply": "Daily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-2",
+      "question": "Can you show me the macro breakdown of my existing dietary plan?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.macro-targets"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1116,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-3",
+      "question": "What meals and snacks have I successfully logged for today so far?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.meals"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 1152,
+      "reply": "Saved meals for 2026-10-30: Oatmeal (calories 300 kcal); Rice bowl (calories 500 kcal); Salmon dinner (calories 600 kcal); Yogurt (calories 100 kcal). These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-4",
+      "question": "How many ounces of water have I recorded in my log today?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.water"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 1506,
+      "reply": "Saved water for 2026-10-30: 6 glasses. These are saved records, not verified intake.\n\nWater is saved as a glass count. No volume per glass is saved, so I cannot derive ounces, millilitres or litres from these records.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-5",
+      "question": "Which specific exercises are included in my saved workout program?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.program-exercises"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1146,
+      "reply": "Your saved Coach program: Build muscle, 45 min.\nMonday: Strength day — Squat 3 × 8\nTuesday: Recovery day (rest/recovery)\nWednesday: Strength day — Squat 3 × 8\nThursday: Recovery day (rest/recovery)\nFriday: Strength day — Squat 3 × 8\nSaturday: Recovery day (rest/recovery)\nSunday: Recovery day (rest/recovery)\nThis is a saved snapshot and may predate newer preferences.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-6",
+      "question": "Can you list the exercises that were completed during my last session?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.latest-exercises"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1100,
+      "reply": "Your most recent available completed workout: status completed, ended 2026-10-30T16:10:10.579Z.\nExercises in the saved workout excerpt: Squat. The excerpt may omit other exercises.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-7",
+      "question": "What is the current weight measurement stored in my profile?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1128,
+      "reply": "Your saved current weight is 72 kg.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-8",
+      "question": "Could you tell me what height I have entered into my settings?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.height"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1655,
+      "reply": "Your saved height is 175 cm.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-9",
+      "question": "What is the target weight goal that I am currently working toward?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.target-weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1603,
+      "reply": "Your target weight is 68 kg.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-10",
+      "question": "How much experience points do I still need to reach the next level?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "quests.remaining-xp"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1424,
+      "reply": "Your Quest level is 7.\nXP still needed for the next level: 60.",
+      "issues": []
+    },
+    {
+      "pass": 1,
+      "id": "fresh-11",
+      "question": "At what time is my saved daily reminder scheduled to go off?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "notifications.reminder"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1630,
+      "reply": "Your saved daily reminder is enabled at 09:05 (Asia/Singapore). Phone delivery still needs permission and a configured push provider.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "plan-blueprint",
+      "question": "What's the eating blueprint I've settled on?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1028,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "plan-setup",
+      "question": "Can you remind me of the nutrition setup I committed to?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1017,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "plan-regimen",
+      "question": "Lay out the food regimen currently attached to my account.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1063,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "plan-strategy",
+      "question": "In plain terms, what eating strategy is on file for me?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1059,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "energy-allowance",
+      "question": "What's the energy allowance I set for each day?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1294,
+      "reply": "Daily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "energy-ceiling",
+      "question": "What is my daily kcal ceiling supposed to be?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1245,
+      "reply": "Daily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "nutrient-split",
+      "question": "Can you show the nutrient split I'm aiming to hit?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.macro-targets"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1202,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "nutrient-blueprint",
+      "question": "How do the three main nutrients divide up in my chosen eating blueprint?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.macro-targets"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1171,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "plate-today",
+      "question": "List what has gone onto my plate since I woke up.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.meals"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 1086,
+      "reply": "Saved meals for 2026-10-30: Oatmeal (calories 300 kcal); Rice bowl (calories 500 kcal); Salmon dinner (calories 600 kcal); Yogurt (calories 100 kcal). These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "plate-previous-day",
+      "question": "Which bites did I put on record the previous day?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.meals"
+        ],
+        "timeframe": "yesterday"
+      },
+      "elapsedMs": 1171,
+      "reply": "Saved meals for 2026-10-29: Chicken salad (calories 450 kcal). These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "energy-tally",
+      "question": "What's my energy tally so far since waking up?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calories-logged"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1166,
+      "reply": "Logged calories for 2026-10-30: 1500 kcal. These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "hydration-cups",
+      "question": "How many hydration cups have I ticked off so far?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.water"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1082,
+      "reply": "Saved water for 2026-10-30: 6 glasses. These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "calories-unused",
+      "question": "How much of my calorie allowance is still unused today?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calories-remaining"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 644,
+      "reply": "calories remaining for 2026-10-30: 500 kcal (saved target 2000 kcal, logged 1500 kcal). These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "gym-blueprint",
+      "question": "What's the gym blueprint I've committed to for the week?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.program"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1210,
+      "reply": "Your saved Coach program: Build muscle, 45 min.\nMonday: Strength day\nTuesday: Recovery day (rest/recovery)\nWednesday: Strength day\nThursday: Recovery day (rest/recovery)\nFriday: Strength day\nSaturday: Recovery day (rest/recovery)\nSunday: Recovery day (rest/recovery)\nThis is a saved snapshot and may predate newer preferences.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "sweat-movements",
+      "question": "Which movements showed up in my most recent sweat session?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.latest-exercises"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1331,
+      "reply": "Your most recent available completed workout: status completed, ended 2026-10-30T16:10:34.559Z.\nExercises in the saved workout excerpt: Squat. The excerpt may omit other exercises.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "gym-effort-length",
+      "question": "How many minutes did that last gym effort take?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.latest-duration"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 2332,
+      "reply": "Your most recent available completed workout: status completed, ended 2026-10-30T16:10:35.890Z.\nSaved completed duration: 40 min (2400 seconds).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "available-iron",
+      "question": "What iron have I said I can train with?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "training.equipment"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1274,
+      "reply": "Your saved equipment: Dumbbells.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "body-mass",
+      "question": "What's the body mass currently entered against my profile?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1293,
+      "reply": "Your saved current weight is 72 kg.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "stature",
+      "question": "How tall did I say I was when signing up?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.height"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1191,
+      "reply": "Your saved height is 175 cm.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "scale-destination",
+      "question": "Which number on the scale am I ultimately trying to reach?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.target-weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1126,
+      "reply": "Your target weight is 68 kg.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "quest-stage",
+      "question": "What stage of the Quest ladder am I on?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "quests.level"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1935,
+      "reply": "Your Quest level is 7.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "xp-shortfall",
+      "question": "How far short am I of the next XP step?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "quests.remaining-xp"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1163,
+      "reply": "Your Quest level is 7.\nXP still needed for the next level: 60.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "daily-nudge",
+      "question": "What hour did I pick for my daily nudge?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "notifications.reminder"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1227,
+      "reply": "Your saved daily reminder is enabled at 09:05 (Asia/Singapore). Phone delivery still needs permission and a configured push provider.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "ranking-exposure",
+      "question": "Is the app set up to let others see me in the rankings?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "settings.visibility"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 2314,
+      "reply": "Your saved leaderboard visibility is hidden.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "supper-correction",
+      "question": "I made a typo in a supper entry. Where can I fix it?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "guide.scan-edit-meal"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1318,
+      "reply": "Edit a saved meal: Edits the selected meal’s name, meal group and nutrition values. Open an existing entry first. Editing a sample preview changes only the sample, not the account.\n\n1. Open today’s log and select the meal entry.\n2. Change supported nutrition fields.\n3. Save and confirm the updated daily log.\n\nOpen /scan/edit-meal in PhysiqueQuest.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "parked-workout",
+      "question": "How do I get back into a workout I parked earlier?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "guide.resume-workout"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1148,
+      "reply": "Coach weekly program: Shows a saved weekly program based on account goals, training days, duration and equipment. Training concepts such as sets, reps, recovery and progressive overload are general education, not verified performance. Changing relevant preferences can create a new saved version. Resume saved workout restores confirmed sets; unsaved device drafts are separate.\n\n1. Open Coach and choose a training day/program.\n2. Review its exercises, then start preparation.\n3. Use Resume saved workout when an existing session is available.\n\nOpen /coach in PhysiqueQuest.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "contact-person",
+      "question": "Remind me who's listed as my person to call if something goes wrong.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.contact-name"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1199,
+      "reply": "Your saved emergency contact: name Emergency Person.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "two-fields",
+      "question": "Give me my energy allowance alongside my body mass.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target",
+          "profile.weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1233,
+      "reply": "Daily calorie target: 2000 kcal.\n\nYour saved current weight is 72 kg.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "mixed-literal-and-alias",
+      "question": "Tell me my current weight together with the energy allowance I chose.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.weight",
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1378,
+      "reply": "Your saved current weight is 72 kg.\n\nDaily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "protein-and-body-mass",
+      "question": "Give me my protein target and the body mass on my profile.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.protein-target",
+          "profile.weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1341,
+      "reply": "Protein: 30% (150 g/day).\n\nYour saved current weight is 72 kg.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "meal-intake-and-target",
+      "question": "How much protein did I log at breakfast, and what's my calorie allowance?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.protein-logged",
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1380,
+      "reply": "Saved meals for 2026-10-30: Oatmeal (protein 15 g). These are saved records, not verified intake.\n\nDaily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fragment-energy",
+      "question": "And the energy part?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1135,
+      "reply": "Daily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "implicit-plan-page",
+      "question": "Which blueprint am I following?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 987,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "ambiguous-blueprint",
+      "question": "Which blueprint am I following?",
+      "passed": true,
+      "elapsedMs": 2,
+      "reply": "Could you clarify which saved information you mean: your dietary plan or calorie target, logged meals or water, workout program, Progress measurements, or another app field? I could not confidently match that wording. You can name the field or rephrase your question.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "outside-holiday",
+      "question": "Plan a weekend in Kyoto for me.",
+      "passed": true,
+      "plan": {
+        "decision": "out_of_scope",
+        "routeIds": [],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1888,
+      "reply": "I can help with PhysiqueQuest’s Home, Coach, Scan, Quests and Me modules, and your own shared app records. Please ask about something in PhysiqueQuest.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "other-plate",
+      "question": "Peek at the other guy's plate for me.",
+      "passed": true,
+      "elapsedMs": 2,
+      "reply": "I can use selected saved records only from your signed-in account when you enable personal data. I cannot access another user’s data, credentials or account secrets, and I cannot change records.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "consent-energy",
+      "question": "What daily energy allowance did I choose?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1235,
+      "reply": "Enable “Use my saved fitness data” to let me read the selected records from your account for this question. I can still explain every PhysiqueQuest page without that permission.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "empty-regimen",
+      "question": "Lay out the food regimen currently attached to my account.",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1118,
+      "reply": "No saved dietary plan is available. Open Scan → My Dietary Plan to review or save one.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-0",
+      "question": "Could you tell me what my current dietary plan looks like right now?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.plan"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1203,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-1",
+      "question": "What is the specific calorie target I have set for today?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.calorie-target"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 1130,
+      "reply": "Daily calorie target: 2000 kcal.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-2",
+      "question": "Can you show me the macro breakdown of my existing dietary plan?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.macro-targets"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1201,
+      "reply": "Your saved dietary plan goal is Maintenance.\nDaily calorie target: 2000 kcal.\nProtein: 30% (150 g/day).\nCarbs: 40% (200 g/day).\nFat: 30% (67 g/day).",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-3",
+      "question": "What meals and snacks have I successfully logged for today so far?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.meals"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 1283,
+      "reply": "Saved meals for 2026-10-30: Oatmeal (calories 300 kcal); Rice bowl (calories 500 kcal); Salmon dinner (calories 600 kcal); Yogurt (calories 100 kcal). These are saved records, not verified intake.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-4",
+      "question": "How many ounces of water have I recorded in my log today?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "nutrition.water"
+        ],
+        "timeframe": "today"
+      },
+      "elapsedMs": 576,
+      "reply": "Saved water for 2026-10-30: 6 glasses. These are saved records, not verified intake.\n\nWater is saved as a glass count. No volume per glass is saved, so I cannot derive ounces, millilitres or litres from these records.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-5",
+      "question": "Which specific exercises are included in my saved workout program?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.program-exercises"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1279,
+      "reply": "Your saved Coach program: Build muscle, 45 min.\nMonday: Strength day — Squat 3 × 8\nTuesday: Recovery day (rest/recovery)\nWednesday: Strength day — Squat 3 × 8\nThursday: Recovery day (rest/recovery)\nFriday: Strength day — Squat 3 × 8\nSaturday: Recovery day (rest/recovery)\nSunday: Recovery day (rest/recovery)\nThis is a saved snapshot and may predate newer preferences.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-6",
+      "question": "Can you list the exercises that were completed during my last session?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "workout.latest-exercises"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1168,
+      "reply": "Your most recent available completed workout: status completed, ended 2026-10-30T16:11:11.783Z.\nExercises in the saved workout excerpt: Squat. The excerpt may omit other exercises.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-7",
+      "question": "What is the current weight measurement stored in my profile?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1187,
+      "reply": "Your saved current weight is 72 kg.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-8",
+      "question": "Could you tell me what height I have entered into my settings?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.height"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 557,
+      "reply": "Your saved height is 175 cm.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-9",
+      "question": "What is the target weight goal that I am currently working toward?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "profile.target-weight"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1235,
+      "reply": "Your target weight is 68 kg.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-10",
+      "question": "How much experience points do I still need to reach the next level?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "quests.remaining-xp"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 1637,
+      "reply": "Your Quest level is 7.\nXP still needed for the next level: 60.",
+      "issues": []
+    },
+    {
+      "pass": 2,
+      "id": "fresh-11",
+      "question": "At what time is my saved daily reminder scheduled to go off?",
+      "passed": true,
+      "plan": {
+        "decision": "answer",
+        "routeIds": [
+          "notifications.reminder"
+        ],
+        "timeframe": "unspecified"
+      },
+      "elapsedMs": 577,
+      "reply": "Your saved daily reminder is enabled at 09:05 (Asia/Singapore). Phone delivery still needs permission and a configured push provider.",
+      "issues": []
+    }
+  ]
+}

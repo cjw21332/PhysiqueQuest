@@ -30,6 +30,7 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
     trend: <><path d="m4 16 6-6 4 4 6-7"/><path d="M14 7h6v6"/></>,
     check: <><path d="m5 12 4 4L19 6"/></>,
     arrow: <><path d="m9 18 6-6-6-6"/></>,
+    'arrow-up': <><path d="M12 19V5m-7 7 7-7 7 7"/></>,
     search: <><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.5 4.5"/></>,
     download: <><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 002 2h10a2 2 0 002-2v-4"/></>,
     medal: <><circle cx="12" cy="8" r="5"/><path d="m8 12-2 9 6-3 6 3-2-9"/></>,

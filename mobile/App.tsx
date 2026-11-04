@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import FoodScannerCamera, { type FoodCameraRequest } from './FoodScannerCamera';
 import { Camera, CameraView } from 'expo-camera';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
@@ -21,6 +22,7 @@ import {
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { isTrustedWebViewUrl, resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
+import { performanceGuardScript } from './performance-guard.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
 import { readinessMessageLimit, readinessScript, validateNativeReadinessContext, validateReadinessCheck, type NativeReadinessContext, type ReadinessCheck } from '../shared/cameraReadiness';
@@ -87,7 +89,7 @@ function getInitialAddress() {
 function buildInsetsScript(insets: { top: number; bottom: number; left: number; right: number }, apiUrl: string, fontScale: number) {
   const { top, bottom, left, right } = insets;
   const encodedApiUrl = JSON.stringify(apiUrl);
-  return `(function(){try{
+  return `${__DEV__ ? performanceGuardScript : ''}(function(){try{
     var r=document.documentElement.style;
     document.documentElement.dataset.largeText='${fontScale >= 1.5}';
     r.setProperty('--safe-top','${top}px');
@@ -134,7 +136,7 @@ function buildCameraScript(detail: {
 
 function AppContent() {
   const insets = useSafeAreaInsets();
-  const webRef = useRef<WebView>(null);
+  const webRef = useRef<WebView<object>>(null);
   const pendingNotificationOpen = useRef(false);
   const requestPush = useCallback(async () => {
     let detail: { token?: string; error?: string };
@@ -167,6 +169,7 @@ function AppContent() {
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
   const [cameraPreview, setCameraPreview] = useState<NativeCameraPreview | null>(null);
+  const [foodCamera, setFoodCamera] = useState<FoodCameraRequest | null>(null);
   const [framing,setFraming]=useState<ReadinessCheck>({status:'unknown',reason:'pending'});
   const cameraRequestId = useRef(0);
   const monitor = useRef<ReturnType<typeof createNativeMonitor> | null>(null);
@@ -342,8 +345,8 @@ function AppContent() {
 
   return (
     <View style={styles.root}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
-      {loadedAddress ? <WebView
+      <StatusBar barStyle="light-content" />
+      {loadedAddress ? <WebView<object>
         ref={webRef}
         key={key}
         source={{ uri: loadedAddress }}
@@ -378,6 +381,7 @@ function AppContent() {
           </View>
         )}
         onError={(e) => {
+          setFoodCamera(null);
           monitor.current?.stop();
           stopNativeCamera();
           console.error('WebView error:', e.nativeEvent);
@@ -393,6 +397,7 @@ function AppContent() {
             if(e.nativeEvent.data.length>readinessMessageLimit){stopNativeCamera();return;}
             const message = JSON.parse(e.nativeEvent.data) as {
               type?: string;
+              mode?: string;
               ok?: boolean;
               frame?: CameraFrame;
               facing?: 'back' | 'front';
@@ -404,6 +409,13 @@ function AppContent() {
               framing?: unknown;
             };
             if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
+            if (message.type === 'food-camera-start' && typeof message.requestId === 'string' && message.requestId.length <= 100 && ['photo', 'barcode'].includes(message.mode ?? '') && isCameraFrame(message.frame)) {
+              stopNativeCamera();
+              setFoodCamera({ requestId: message.requestId, mode: message.mode as 'photo' | 'barcode', frame: message.frame!, facing: message.facing === 'front' ? 'front' : 'back', capture: 0 });
+            }
+            if (message.type === 'food-camera-frame' && isCameraFrame(message.frame)) setFoodCamera(current => current && current.requestId === message.requestId ? { ...current, frame: message.frame! } : current);
+            if (message.type === 'food-camera-capture') setFoodCamera(current => current && current.requestId === message.requestId && current.mode === 'photo' ? { ...current, capture: current.capture + 1 } : current);
+            if (message.type === 'food-camera-stop') setFoodCamera(current => current?.requestId === message.requestId ? null : current);
             if (message.type === 'request-camera-permission') void requestCameraPermission();
             if (message.type === 'request-push-permission') void requestPush();
             if (message.type === 'request-device-readiness') void publishReadiness();
@@ -453,6 +465,7 @@ function AppContent() {
           }
         }}
         onLoadStart={() => {
+          setFoodCamera(null);
           monitor.current?.stop();
           stopNativeCamera();
           console.log('WebView load started:', loadedAddress);
@@ -465,12 +478,18 @@ function AppContent() {
           void publishReadiness();
         }}
         onContentProcessDidTerminate={() => {
+          setFoodCamera(null);
           monitor.current?.stop();
           stopNativeCamera();
           console.error('WebView process terminated');
           setError(true);
         }}
       /> : null}
+      {foodCamera && <FoodScannerCamera key={foodCamera.requestId} request={foodCamera} finish={result => {
+        const detail = JSON.stringify({ ...result, requestId: foodCamera.requestId }).replace(/</g, '\\u003c');
+        if (result.type !== 'ready') setFoodCamera(null);
+        webRef.current?.injectJavaScript(`window.dispatchEvent(new CustomEvent('physiquequest-food-camera',{detail:${detail}}));true;`);
+      }} />}
       {cameraPreview && poseOptions && posePreview && (
         <NativeTrackingCamera
           key={`${cameraPreview.instanceId}-${poseOptions.mode==='readiness'?poseOptions.sessionId:poseOptions.requestId}-${cameraPreview.facing}`}

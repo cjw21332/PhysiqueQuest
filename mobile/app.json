@@ -5,7 +5,6 @@
     "scheme": "physiquequest",
     "icon": "./assets/physiquequest-icon.png",
     "version": "1.0.0",
-    "sdkVersion": "57.0.0",
     "platforms": ["android", "ios"],
     "plugins": [["expo-camera", { "cameraPermission": "Allow camera access for exercise rep counting.", "recordAudioAndroid": false }], "expo-notifications"],
     "orientation": "default",
@@ -17,7 +16,6 @@
         "foregroundImage": "./assets/physiquequest-icon.png",
         "backgroundColor": "#0b0f15"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "androidStatusBar": {
@@ -25,20 +23,10 @@
       "backgroundColor": "#00000000",
       "barStyle": "light-content"
     },
-    "androidNavigationBar": {
-      "backgroundColor": "#00000000",
-      "barStyle": "light-content",
-      "visible": "leanback"
-    },
     "ios": {
       "bundleIdentifier": "com.physiquequest.app",
       "supportsTablet": true,
       "requireFullScreen": false
-    },
-    "iosStatusBar": {
-      "translucent": true,
-      "backgroundColor": "#00000000",
-      "barStyle": "light-content"
     },
     "web": {
       "favicon": "./assets/physiquequest-icon.png"

@@ -98,6 +98,18 @@ describe('POST /nutrition/scan', () => {
     expect(item).not.toHaveProperty('per100');
   });
 
+  it('preserves missing matched nutrients independently while scaling known values', async () => {
+    detectFoods.mockResolvedValue([
+      { food_name: 'chicken', est_weight_g: 150, confidence: 0.9 },
+      { food_name: 'rice', est_weight_g: 100, confidence: 0.8 },
+    ]);
+    lookupFood.mockImplementation(async (name: string) => name === 'chicken' ? { ...CHICKEN, carbs_g_per_100g: null } : RICE);
+    const res = await post();
+    expect(res.status).toBe(200);
+    expect(res.body.items[0]).toMatchObject({ found: true, kcal: 180, carbs_g: null, per_100g: { carbs_g: null } });
+    expect(res.body.totals).toEqual({ kcal: 310, protein_g: 36.2, carbs_g: null, fat_g: 4.2 });
+  });
+
   it('marks a food with no nutrition match as unmatched', async () => {
     detectFoods.mockResolvedValue([{ food_name: 'mystery paste', est_weight_g: 50, confidence: 0.4 }]);
     lookupFood.mockResolvedValue(undefined);
@@ -107,9 +119,9 @@ describe('POST /nutrition/scan', () => {
     expect(res.status).toBe(200);
     expect(res.body.degraded).toBe(false);
     expect(res.body.unmatched).toEqual(['mystery paste']);
-    expect(res.body.items[0]).toMatchObject({ found: false, kcal: 0, protein_g: 0, carbs_g: 0, fat_g: 0 });
+    expect(res.body.items[0]).toMatchObject({ found: false, kcal: null, protein_g: null, carbs_g: null, fat_g: null });
     expect(res.body.items[0].fdc_id).toBeUndefined();
-    expect(res.body.totals.kcal).toBe(0);
+    expect(res.body.totals.kcal).toBeNull();
   });
 
   it('degrades gracefully when one nutrition lookup fails', async () => {

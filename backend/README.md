@@ -27,6 +27,14 @@
 
 The main API runs on port 4000 for accounts, workouts, and saved Coach plans. The current frontend uses the independent Coach service on port 4050 for public ExerciseDB library requests and stateless plan previews. Start both with `npm run start:dev` and `npm run start:coach:dev` from `backend/` (or build, then use `npm run start:coach` for the Coach service). Both processes use shared backend source modules; only the main API connects to MongoDB.
 
+## Private Phiq assistant
+
+`POST /api/chat` (also `/api/v1/chat`) requires JWT/session authentication. Body: `{ "messages": [{ "role": "user", "text": "What can I do here?" }], "includePersonalData": false, "page": "/scan/plan" }`. The optional page must be a known application path, never an external URL. Personal context defaults off. Identity comes only from the verified session. Limits:12 messages,2000 characters/message,10 requests/account/minute,30 requests/IP/minute, one active request/account and configurable model concurrency. Account/IP quotas use atomic shared MongoDB counters and fail closed on store failure. Add edge/runtime capacity limits appropriate to the deployment.
+
+The response contains plain-text `reply`, internal evidence `sources` and `privacy` (`personalDataIncluded`, `historyStored:false`, `provider:"self-hosted"`). The UI does not retain/render source metadata, and model source footers are removed. Reviewed help covers35 pages and can answer directly; exact supported metrics also avoid inference. Other requests use compact relevant context. Expanded owner-only summaries include active workouts, notification metadata, selected preferences and safety event status. Explicitly requested health-profile and emergency-contact fields require consent, are projected field-by-field from the authenticated user's profile, and are answered deterministically without entering model prompts. Locations, media, credentials and other users remain excluded. Quest metrics reuse the app rules without leaderboard reads. No history is saved; client assistant messages are ignored and no model tools or mutation capabilities exist. Device drafts and complete raw history are unavailable. Model failures return503, quota failures429. Authenticated `GET /api/chat/status` returns only `{ready:boolean}`.
+
+Run `npm run ai:setup` and `npm run ai:warmup` from the root after installing Ollama. Configure `CHAT_OLLAMA_URL`, `CHAT_OLLAMA_MODEL` and `CHAT_TIMEOUT_MS` as needed; only approved local/private origins and local completion models are accepted. No Gemini or other AI API key is used for chat. Read [runtime setup](../ai/README.md) and [the data/security contract](../ai/AI-SPEC.md) before deployment. To rerun real local-model checks after building: `rtk proxy node scripts/evaluate-chat.mjs` from `backend/`; this uses synthetic data and writes `ai/evaluation-latest.json`.
+
 ## Food scanning
 
 `POST /api/nutrition/scan` runs a photo of a meal through a vision model to

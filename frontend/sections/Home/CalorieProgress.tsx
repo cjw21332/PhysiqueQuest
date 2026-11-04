@@ -1,4 +1,5 @@
-export default function CalorieProgress({ calories, target, detailed = false }: { calories: number; target: number; detailed?: boolean }) {
+export default function CalorieProgress({ calories, target, detailed = false }: { calories: number | null; target: number; detailed?: boolean }) {
+  if (calories === null) return <div className="calorie-circle">Calories incomplete</div>;
   const percent = target > 0 ? Math.min(100, Math.max(0, calories / target * 100)) : 0;
   return <div className="calorie-circle home-calorie-progress" role="img" aria-label={`${Math.round(calories)} of ${target} calories logged`}>
     <svg className="circle-svg" viewBox="0 0 100 100" aria-hidden="true">
