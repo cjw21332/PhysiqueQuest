@@ -13,7 +13,7 @@
   "dependencies": {
     "@react-native-community/netinfo": "12.0.1",
     "effect": "^3.21.4",
-    "expo": "~58.0.21",
+    "expo": "~58.0.22",
     "expo-asset": "~58.0.19",
     "expo-camera": "~58.0.14",
     "expo-constants": "~58.0.14",
