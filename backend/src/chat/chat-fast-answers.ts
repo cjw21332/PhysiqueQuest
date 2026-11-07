@@ -309,12 +309,18 @@ export function fastRecordAnswer(question: string, sources: Source[], page?: str
         const weekday = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].find(day => new RegExp('\\b' + day + '\\b').test(q));
         const rest = /\brest days?\b/.test(q);
         const selected = days.filter(day => weekday ? String(day.name).toLowerCase() === weekday : rest ? day.isWorkoutDay === false : true);
-        const detail = /\b(?:contain|instructions?|exercises?|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/.test(q);
-        const lines = selected.map(day => display(day.name) + ': ' + display(day.title) + (day.isWorkoutDay === false ? ' (rest/recovery)' : detail ? ' — ' + rows(day.exercises).map(exercise => {
-          const instructions = Array.isArray(exercise.instructions) ? exercise.instructions.filter(present).join(' ') : '';
-          return display(exercise.name) + ' ' + display(exercise.prescription) + (/\binstructions?\b/.test(q) && instructions ? '. ' + instructions : '');
-        }).join('; ') : ''));
-        add('user-program', 'Your saved Coach program: ' + display(program.goal) + ', ' + display(program.duration) + '.\n' + lines.join('\n') + '\nThis is a saved snapshot and may predate newer preferences.');
+        const lines = selected.map(day => {
+          const heading = display(day.name) + (present(day.title) ? ' — ' + display(day.title) : '') + (day.isWorkoutDay === false ? ' (rest/recovery)' : '');
+          if (day.isWorkoutDay === false) return heading;
+          const exercises = rows(day.exercises);
+          if (!exercises.length) return heading + '\n  No exercises are available in this snapshot.';
+          return heading + '\n' + exercises.map((exercise, index) => {
+            const instructions = Array.isArray(exercise.instructions) ? exercise.instructions.filter(present).join(' ') : '';
+            return '  ' + (index + 1) + '. ' + display(exercise.name) + ' — ' + display(exercise.prescription) + (/\binstructions?\b/.test(q) && instructions ? '\n     ' + instructions : '');
+          }).join('\n');
+        });
+        const selection = lines.length ? lines.join('\n\n') : 'No matching days were found in the saved snapshot.';
+        add('user-program', 'Your saved Coach program\nGoal: ' + display(program.goal) + '\nSession length: ' + display(program.duration) + '\n\n' + selection + '\n\nThis saved snapshot may predate newer preferences. It includes up to four exercises per day; open Coach for the full program.');
       }
     }
   }

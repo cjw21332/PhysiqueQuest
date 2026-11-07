@@ -18,7 +18,10 @@
     "ai:evaluate:paraphrases": "npm --prefix backend run build && node backend/scripts/evaluate-chat-paraphrases.mjs"
   },
   "devDependencies": {
-    "expo": "^58.0.21"
+    "@vitest/coverage-v8": "^5.1.0",
+    "expo": "^58.0.21",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^5.1.0"
   },
   "overrides": {
     "react": "19.3.0",

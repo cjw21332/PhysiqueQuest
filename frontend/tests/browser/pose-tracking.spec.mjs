@@ -6,7 +6,7 @@ test('camera counting beta is hidden and old tracking links do not start workout
   await page.route('**/api/**', route => {
     const request = route.request(), path = new URL(request.url()).pathname;
     if (path.endsWith('/workouts') && request.method() === 'POST') created++;
-    const json = path.endsWith('/profile') ? { name: 'Test' } : path.endsWith('/coach/plan') ? { days: [], libraryReady: false } : path.endsWith('/exercises') ? { items: [], total: 0, page: 1, limit: 12, pages: 0 } : {};
+    const json = path.includes('/auth/session/') ? { access_token: 'test', expires_in: 3600, user: { id: 'test', name: 'Test', email: 'test@example.test', emailVerified: true } } : path.endsWith('/profile') ? { name: 'Test' } : path.endsWith('/coach/plan') ? { days: [], libraryReady: false } : path.endsWith('/exercises') ? { items: [], total: 0, page: 1, limit: 12, pages: 0 } : {};
     return route.fulfill({ json, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' } });
   });
   await page.goto('/coach?track=camera-curl');
@@ -22,7 +22,7 @@ test('library remains reachable when the account/profile service is unavailable'
   await page.route('**/api/**', route => {
     const path = new URL(route.request().url()).pathname;
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
-    return path.endsWith('/profile') ? route.fulfill({ status: 503, json: { message: 'Account service offline' }, headers }) : route.fulfill({ json: { items: [], total: 0, page: 1, limit: 12, pages: 0 }, headers });
+    return path.endsWith('/profile') ? route.fulfill({ status: 503, json: { message: 'Account service offline' }, headers }) : route.fulfill({ json: path.includes('/auth/session/') ? { access_token: 'test', expires_in: 3600, user: { id: 'test', name: 'Test', email: 'test@example.test', emailVerified: true } } : { items: [], total: 0, page: 1, limit: 12, pages: 0 }, headers });
   });
   await page.goto('/coach');
   await page.getByRole('button', { name: 'Browse exercise library' }).click();

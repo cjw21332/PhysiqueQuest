@@ -1,0 +1,970 @@
+TAP version 13
+# Subtest: admin analytics preserves API mode and selects mock data only through the explicit preview flag
+ok 1 - admin analytics preserves API mode and selects mock data only through the explicit preview flag
+  ---
+  duration_ms: 6.4024
+  type: 'test'
+  ...
+# Subtest: admin exercise library uses protected API records and reports denied access
+ok 2 - admin exercise library uses protected API records and reports denied access
+  ---
+  duration_ms: 7.3599
+  type: 'test'
+  ...
+# Subtest: API client exposes LAN-safe URL derivation and 401 session clearing
+ok 3 - API client exposes LAN-safe URL derivation and 401 session clearing
+  ---
+  duration_ms: 6.6871
+  type: 'test'
+  ...
+# Subtest: auth utilities expose a safe session clear operation
+ok 4 - auth utilities expose a safe session clear operation
+  ---
+  duration_ms: 1.3654
+  type: 'test'
+  ...
+# Subtest: prefers an explicit frontend build API URL over the Expo runtime value
+ok 5 - prefers an explicit frontend build API URL over the Expo runtime value
+  ---
+  duration_ms: 1.586
+  type: 'test'
+  ...
+# Subtest: uses the API address injected by the Expo WebView before host inference
+ok 6 - uses the API address injected by the Expo WebView before host inference
+  ---
+  duration_ms: 0.2817
+  type: 'test'
+  ...
+# Subtest: uses the frontend origin proxy by default on LAN and HTTPS
+ok 7 - uses the frontend origin proxy by default on LAN and HTTPS
+  ---
+  duration_ms: 1.1098
+  type: 'test'
+  ...
+# Subtest: uses localhost during server rendering only when no explicit API address exists
+ok 8 - uses localhost during server rendering only when no explicit API address exists
+  ---
+  duration_ms: 0.2637
+  type: 'test'
+  ...
+# Subtest: rejects malformed or non-HTTP API origins instead of making a malformed request
+ok 9 - rejects malformed or non-HTTP API origins instead of making a malformed request
+  ---
+  duration_ms: 0.2648
+  type: 'test'
+  ...
+# Subtest: does not silently fall back when Expo explicitly injects an invalid or unavailable API address
+ok 10 - does not silently fall back when Expo explicitly injects an invalid or unavailable API address
+  ---
+  duration_ms: 0.2045
+  type: 'test'
+  ...
+# Subtest: API client uses the runtime address injected by the mobile WebView
+ok 11 - API client uses the runtime address injected by the mobile WebView
+  ---
+  duration_ms: 11.4487
+  type: 'test'
+  ...
+# Subtest: labels a rejected fetch as backend connectivity failure
+ok 12 - labels a rejected fetch as backend connectivity failure
+  ---
+  duration_ms: 1.6824
+  type: 'test'
+  ...
+# Subtest: preserves server errors with status codes and caller aborts
+ok 13 - preserves server errors with status codes and caller aborts
+  ---
+  duration_ms: 0.2756
+  type: 'test'
+  ...
+# Subtest: account requests include credentials; independent Coach requests omit them and account-only headers
+ok 14 - account requests include credentials; independent Coach requests omit them and account-only headers
+  ---
+  duration_ms: 313.2092
+  type: 'test'
+  ...
+# Subtest: failed data refresh reports its endpoint and a successful retry clears the cached error
+ok 15 - failed data refresh reports its endpoint and a successful retry clears the cached error
+  ---
+  duration_ms: 132.4368
+  type: 'test'
+  ...
+# Subtest: private chat defaults to guide-only requests and preserves consent on a same-account token refresh
+ok 16 - private chat defaults to guide-only requests and preserves consent on a same-account token refresh
+  ---
+  duration_ms: 81.3639
+  type: 'test'
+  ...
+# Subtest: chat is not replayed after a refresh replaces id
+ok 17 - chat is not replayed after a refresh replaces id
+  ---
+  duration_ms: 74.3668
+  type: 'test'
+  ...
+# Subtest: chat is not sent after a preflight refresh replaces id
+ok 18 - chat is not sent after a preflight refresh replaces id
+  ---
+  duration_ms: 49.671
+  type: 'test'
+  ...
+# Subtest: chat is not replayed after a refresh replaces sessionKey
+ok 19 - chat is not replayed after a refresh replaces sessionKey
+  ---
+  duration_ms: 64.0127
+  type: 'test'
+  ...
+# Subtest: chat is not sent after a preflight refresh replaces sessionKey
+ok 20 - chat is not sent after a preflight refresh replaces sessionKey
+  ---
+  duration_ms: 66.2934
+  type: 'test'
+  ...
+# Subtest: chat is not replayed if the API origin changes during refresh
+ok 21 - chat is not replayed if the API origin changes during refresh
+  ---
+  duration_ms: 40.7774
+  type: 'test'
+  ...
+# Subtest: chat sends only the pathname context and composes real cancellation with its timeout
+ok 22 - chat sends only the pathname context and composes real cancellation with its timeout
+  ---
+  duration_ms: 54.5486
+  type: 'test'
+  ...
+# Subtest: an already cancelled chat is never sent or refreshed
+ok 23 - an already cancelled chat is never sent or refreshed
+  ---
+  duration_ms: 42.929
+  type: 'test'
+  ...
+# Subtest: calibration evidence accepts a complete pending matrix and unresolved flags stay disabled
+ok 24 - calibration evidence accepts a complete pending matrix and unresolved flags stay disabled
+  ---
+  duration_ms: 3.915
+  type: 'test'
+  ...
+# Subtest: calibration guard rejects unsupported versions, private evidence, missing matrix rows and invented hardware passes
+ok 25 - calibration guard rejects unsupported versions, private evidence, missing matrix rows and invented hardware passes
+  ---
+  duration_ms: 5.6127
+  type: 'test'
+  ...
+# Subtest: calibration guard rejects missing trial support, numeric ranges and policy disagreement
+ok 26 - calibration guard rejects missing trial support, numeric ranges and policy disagreement
+  ---
+  duration_ms: 33.4712
+  type: 'test'
+  ...
+# Subtest: synthetic validator fixture accepts supported values then rejects mismatches and unresolved native OS coverage
+ok 27 - synthetic validator fixture accepts supported values then rejects mismatches and unresolved native OS coverage
+  ---
+  duration_ms: 2.83
+  type: 'test'
+  ...
+# Subtest: calibration remains false and normal use cannot pass body brightness or framing
+ok 28 - calibration remains false and normal use cannot pass body brightness or framing
+  ---
+  duration_ms: 2.3794
+  type: 'test'
+  ...
+# Subtest: complete body gives independent synthetic evidence; zero person still allows brightness
+ok 29 - complete body gives independent synthetic evidence; zero person still allows brightness
+  ---
+  duration_ms: 0.5156
+  type: 'test'
+  ...
+# Subtest: head hand foot and bilateral missing/uncertain evidence cannot pass
+ok 30 - head hand foot and bilateral missing/uncertain evidence cannot pass
+  ---
+  duration_ms: 5.8176
+  type: 'test'
+  ...
+# Subtest: bounds and malformed evidence reject without guessing confidence
+ok 31 - bounds and malformed evidence reject without guessing confidence
+  ---
+  duration_ms: 0.8651
+  type: 'test'
+  ...
+# Subtest: cover crop, portrait/landscape and a single mirror match visible coordinates
+ok 32 - cover crop, portrait/landscape and a single mirror match visible coordinates
+  ---
+  duration_ms: 1.4691
+  type: 'test'
+  ...
+# Subtest: small whole upright body may request closer; bent ambiguous body never does
+ok 33 - small whole upright body may request closer; bent ambiguous body never does
+  ---
+  duration_ms: 0.2886
+  type: 'test'
+  ...
+# Subtest: brightness limits are inclusive and invalid sampling affects lighting only
+ok 34 - brightness limits are inclusive and invalid sampling affects lighting only
+  ---
+  duration_ms: 0.4753
+  type: 'test'
+  ...
+# Subtest: fake clock dwell needs advancing frames and duplicate input cannot extend expiry
+ok 35 - fake clock dwell needs advancing frames and duplicate input cannot extend expiry
+  ---
+  duration_ms: 0.9783
+  type: 'test'
+  ...
+# Subtest: generation change late reply invalid evidence and backwards clock clear affected passes
+ok 36 - generation change late reply invalid evidence and backwards clock clear affected passes
+  ---
+  duration_ms: 0.4454
+  type: 'test'
+  ...
+# Subtest: new generation waits for evidence only within its initial freshness window
+ok 37 - new generation waits for evidence only within its initial freshness window
+  ---
+  duration_ms: 0.3046
+  type: 'test'
+  ...
+# Subtest: Coach uses the same-origin proxy and explicit deployment override
+ok 38 - Coach uses the same-origin proxy and explicit deployment override
+  ---
+  duration_ms: 1.2321
+  type: 'test'
+  ...
+# Subtest: coach plan is generated by the backend and rendered from its response
+ok 39 - coach plan is generated by the backend and rendered from its response
+  ---
+  duration_ms: 14.3071
+  type: 'test'
+  ...
+# Subtest: the API client exposes the coach plan and leaderboard endpoints
+ok 40 - the API client exposes the coach plan and leaderboard endpoints
+  ---
+  duration_ms: 5.5589
+  type: 'test'
+  ...
+# Subtest: training preferences store canonical weekdays and report failed saves
+ok 41 - training preferences store canonical weekdays and report failed saves
+  ---
+  duration_ms: 9.7819
+  type: 'test'
+  ...
+# Subtest: coach plan shows the saved weekday schedule with full accessible day names
+ok 42 - coach plan shows the saved weekday schedule with full accessible day names
+  ---
+  duration_ms: 1.8484
+  type: 'test'
+  ...
+# Subtest: restores successful responses across app restarts, scoped to user and API
+ok 43 - restores successful responses across app restarts, scoped to user and API
+  ---
+  duration_ms: 4.6816
+  type: 'test'
+  ...
+# Subtest: deduplicates reads and keeps cached data when refresh fails
+ok 44 - deduplicates reads and keeps cached data when refresh fails
+  ---
+  duration_ms: 0.974
+  type: 'test'
+  ...
+# Subtest: an old read cannot overwrite a confirmed write or resurrect an invalidated plan
+ok 45 - an old read cannot overwrite a confirmed write or resurrect an invalidated plan
+  ---
+  duration_ms: 0.5243
+  type: 'test'
+  ...
+# Subtest: logout and account switches ignore late responses and errors
+ok 46 - logout and account switches ignore late responses and errors
+  ---
+  duration_ms: 0.3414
+  type: 'test'
+  ...
+# Subtest: expires old snapshots, rolls over daily missions, and ignores damaged storage
+ok 47 - expires old snapshots, rolls over daily missions, and ignores damaged storage
+  ---
+  duration_ms: 28.6814
+  type: 'test'
+  ...
+# Subtest: storage failures and oversized records never break successful API responses
+ok 48 - storage failures and oversized records never break successful API responses
+  ---
+  duration_ms: 3.0702
+  type: 'test'
+  ...
+# Subtest: parallel resources resolve independently and notify subscribers
+ok 49 - parallel resources resolve independently and notify subscribers
+  ---
+  duration_ms: 0.8982
+  type: 'test'
+  ...
+# Subtest: rejects valid JSON with an invalid resource shape and does not reuse old sessions
+ok 50 - rejects valid JSON with an invalid resource shape and does not reuse old sessions
+  ---
+  duration_ms: 1.1702
+  type: 'test'
+  ...
+# Subtest: expiry clears yesterday's failed refresh so today's quests can load
+ok 51 - expiry clears yesterday's failed refresh so today's quests can load
+  ---
+  duration_ms: 6.1892
+  type: 'test'
+  ...
+# Subtest: reuses recently confirmed data, refreshes when stale, and respects invalidation
+ok 52 - reuses recently confirmed data, refreshes when stale, and respects invalidation
+  ---
+  duration_ms: 0.9256
+  type: 'test'
+  ...
+# Subtest: exercise library snapshots are scoped to the signed-in account
+ok 53 - exercise library snapshots are scoped to the signed-in account
+  ---
+  duration_ms: 0.9341
+  type: 'test'
+  ...
+# Subtest: Android below 12 or an unavailable OS version never passes Android 12 readiness
+ok 54 - Android below 12 or an unavailable OS version never passes Android 12 readiness
+  ---
+  duration_ms: 2.6936
+  type: 'test'
+  ...
+# Subtest: iOS and browsers do not claim Android compatibility
+ok 55 - iOS and browsers do not claim Android compatibility
+  ---
+  duration_ms: 0.2217
+  type: 'test'
+  ...
+# (node:34740) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/MY%20PC/Desktop/Projects/PhysiqueQuest/frontend/sections/Scan/nutrientTotal.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to \\\\?\\C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: each nutrient is complete only when all included entries supply it
+ok 56 - each nutrient is complete only when all included entries supply it
+  ---
+  duration_ms: 2.363
+  type: 'test'
+  ...
+# Subtest: a native alarm reveals stop controls after a late cancellation and stays stopped while location arrives
+ok 57 - a native alarm reveals stop controls after a late cancellation and stays stopped while location arrives
+  ---
+  duration_ms: 228.1318
+  type: 'test'
+  ...
+# Subtest: new accounts and accounts without a saved threshold default to 30 seconds
+ok 58 - new accounts and accounts without a saved threshold default to 30 seconds
+  ---
+  duration_ms: 190.1182
+  type: 'test'
+  ...
+# Subtest: saved preferences survive loading and users can change the threshold
+ok 59 - saved preferences survive loading and users can change the threshold
+  ---
+  duration_ms: 56.1219
+  type: 'test'
+  ...
+# Subtest: the reference preview contains six dumbbell exercises in the supplied order
+ok 60 - the reference preview contains six dumbbell exercises in the supplied order
+  ---
+  duration_ms: 37.2703
+  type: 'test'
+  ...
+# Subtest: search combines with muscle and equipment filters, including a true any-equipment reset
+ok 61 - search combines with muscle and equipment filters, including a true any-equipment reset
+  ---
+  duration_ms: 26.553
+  type: 'test'
+  ...
+# Subtest: the independent sample library stays reachable during loading, plan errors, and rest days
+ok 62 - the independent sample library stays reachable during loading, plan errors, and rest days
+  ---
+  duration_ms: 270.9734
+  type: 'test'
+  ...
+# (node:33272) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/MY%20PC/Desktop/Projects/PhysiqueQuest/shared/foodCamera.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to \\\\?\\C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: photo crop excludes pixels outside the visible scan frame with cover scaling
+ok 63 - photo crop excludes pixels outside the visible scan frame with cover scaling
+  ---
+  duration_ms: 2.3077
+  type: 'test'
+  ...
+# Subtest: barcode bounds must be fully inside the frame; missing bounds never match
+ok 64 - barcode bounds must be fully inside the frame; missing bounds never match
+  ---
+  duration_ms: 0.3048
+  type: 'test'
+  ...
+# Subtest: food history aggregates only saved meal dates and has a true empty state
+ok 65 - food history aggregates only saved meal dates and has a true empty state
+  ---
+  duration_ms: 14.0543
+  type: 'test'
+  ...
+# Subtest: text fields avoid the extra focus outline while interactive controls retain focus visibility
+ok 66 - text fields avoid the extra focus outline while interactive controls retain focus visibility
+  ---
+  duration_ms: 18.7935
+  type: 'test'
+  ...
+# Subtest: home cards reflect saved activity and route actions to real screens
+ok 67 - home cards reflect saved activity and route actions to real screens
+  ---
+  duration_ms: 11.9178
+  type: 'test'
+  ...
+# Subtest: countdown and hold-to-stop constants match the spec
+ok 68 - countdown and hold-to-stop constants match the spec
+  ---
+  duration_ms: 1.8383
+  type: 'test'
+  ...
+# Subtest: "Delivered" appears only for backend delivered status
+ok 69 - "Delivered" appears only for backend delivered status
+  ---
+  duration_ms: 0.2701
+  type: 'test'
+  ...
+# Subtest: failed status shows the reason from the error code
+ok 70 - failed status shows the reason from the error code
+  ---
+  duration_ms: 3.6724
+  type: 'test'
+  ...
+# Subtest: pending shows sending, cancelled shows not sent
+ok 71 - pending shows sending, cancelled shows not sent
+  ---
+  duration_ms: 0.1583
+  type: 'test'
+  ...
+# Subtest: admin badges: open, resolved, false alarm
+ok 72 - admin badges: open, resolved, false alarm
+  ---
+  duration_ms: 0.2383
+  type: 'test'
+  ...
+# Subtest: formats device-local year, month, and day without converting through UTC
+ok 73 - formats device-local year, month, and day without converting through UTC
+  ---
+  duration_ms: 3.3078
+  type: 'test'
+  ...
+# Subtest: pads single-digit calendar parts for stable API date keys
+ok 74 - pads single-digit calendar parts for stable API date keys
+  ---
+  duration_ms: 0.1702
+  type: 'test'
+  ...
+# Subtest: all five reference editors render saved profile values with shared header and footer
+ok 75 - all five reference editors render saved profile values with shared header and footer
+  ---
+  duration_ms: 596.3868
+  type: 'test'
+  ...
+# Subtest: every profile editor stays open after a rejected save and returns only after confirmation
+ok 76 - every profile editor stays open after a rejected save and returns only after confirmation
+  ---
+  duration_ms: 244.3751
+  type: 'test'
+  ...
+# Subtest: account presentation remains dynamic and unit-aware rather than replacing user data with the reference identity
+ok 77 - account presentation remains dynamic and unit-aware rather than replacing user data with the reference identity
+  ---
+  duration_ms: 419.5687
+  type: 'test'
+  ...
+# Subtest: admin mock catalog and analytics match the supplied reference
+ok 78 - admin mock catalog and analytics match the supplied reference
+  ---
+  duration_ms: 99.2783
+  type: 'test'
+  ...
+# Subtest: New exercise form validates, saves locally in preview mode and Cancel returns to the list
+ok 79 - New exercise form validates, saves locally in preview mode and Cancel returns to the list
+  ---
+  duration_ms: 58.0387
+  type: 'test'
+  ...
+# Subtest: explicit admin previews make no API requests, while denied live requests never become mock results
+ok 80 - explicit admin previews make no API requests, while denied live requests never become mock results
+  ---
+  duration_ms: 199.7447
+  type: 'test'
+  ...
+# Subtest: shared Home calorie progress handles empty, partial, and exceeded targets
+ok 81 - shared Home calorie progress handles empty, partial, and exceeded targets
+  ---
+  duration_ms: 151.3442
+  type: 'test'
+  ...
+# Subtest: typed food names use debounced backend search and ignore obsolete results
+ok 82 - typed food names use debounced backend search and ignore obsolete results
+  ---
+  duration_ms: 951.2848
+  type: 'test'
+  ...
+# Subtest: today log displays source, edited flag and original time, with an edit action and empty meal state
+ok 83 - today log displays source, edited flag and original time, with an edit action and empty meal state
+  ---
+  duration_ms: 163.2375
+  type: 'test'
+  ...
+# Subtest: meal editor supports individual foods in a multi-item meal and retains the Scan form theme
+ok 84 - meal editor supports individual foods in a multi-item meal and retains the Scan form theme
+  ---
+  duration_ms: 84.0531
+  type: 'test'
+  ...
+# Subtest: scan logging sends the device-local logging time rather than leaving it empty
+ok 85 - scan logging sends the device-local logging time rather than leaving it empty
+  ---
+  duration_ms: 1.3649
+  type: 'test'
+  ...
+# Subtest: editor awaits persistence, preserves entry identity, and shows failed saves for retry
+ok 86 - editor awaits persistence, preserves entry identity, and shows failed saves for retry
+  ---
+  duration_ms: 77.7601
+  type: 'test'
+  ...
+# Subtest: progress displays saved measurement history and honest empty states
+ok 87 - progress displays saved measurement history and honest empty states
+  ---
+  duration_ms: 27.8866
+  type: 'test'
+  ...
+# Subtest: notifications use account records and display an honest empty state
+ok 88 - notifications use account records and display an honest empty state
+  ---
+  duration_ms: 2.0505
+  type: 'test'
+  ...
+# Subtest: notification read actions use account-backed hooks
+ok 89 - notification read actions use account-backed hooks
+  ---
+  duration_ms: 1.3507
+  type: 'test'
+  ...
+# Subtest: notifications pin real safety alerts and preserve truthful actions
+ok 90 - notifications pin real safety alerts and preserve truthful actions
+  ---
+  duration_ms: 2.9538
+  type: 'test'
+  ...
+# Subtest: Me keeps persistence and root navigation
+ok 91 - Me keeps persistence and root navigation
+  ---
+  duration_ms: 1.1369
+  type: 'test'
+  ...
+# Subtest: launch actions use client navigation without reloading the WebView
+ok 92 - launch actions use client navigation without reloading the WebView
+  ---
+  duration_ms: 1.4408
+  type: 'test'
+  ...
+# Subtest: nutrition and settings screens use server-backed state
+ok 93 - nutrition and settings screens use server-backed state
+  ---
+  duration_ms: 4.0054
+  type: 'test'
+  ...
+# Subtest: quests and notifications use server-backed state
+ok 94 - quests and notifications use server-backed state
+  ---
+  duration_ms: 2.4513
+  type: 'test'
+  ...
+# Subtest: camera and scan capabilities never present fabricated AI results
+ok 95 - camera and scan capabilities never present fabricated AI results
+  ---
+  duration_ms: 4.1153
+  type: 'test'
+  ...
+# Subtest: a scan waits visibly, then offers a retry once it hits the limit
+ok 96 - a scan waits visibly, then offers a retry once it hits the limit
+  ---
+  duration_ms: 2.5886
+  type: 'test'
+  ...
+# Subtest: coach plan renders a library-backed workout dashboard
+ok 97 - coach plan renders a library-backed workout dashboard
+  ---
+  duration_ms: 0.9971
+  type: 'test'
+  ...
+# Subtest: native wrapper reports backend connectivity and can retry it
+ok 98 - native wrapper reports backend connectivity and can retry it
+  ---
+  duration_ms: 0.9836
+  type: 'test'
+  ...
+# Subtest: launch readiness renders live device, network, and camera state
+ok 99 - launch readiness renders live device, network, and camera state
+  ---
+  duration_ms: 0.9024
+  type: 'test'
+  ...
+# Subtest: Expo shell uses native readiness APIs and bridges camera permission
+ok 100 - Expo shell uses native readiness APIs and bridges camera permission
+  ---
+  duration_ms: 1.0978
+  type: 'test'
+  ...
+# Subtest: Expo camera preview uses the native camera instead of insecure WebView media APIs
+ok 101 - Expo camera preview uses the native camera instead of insecure WebView media APIs
+  ---
+  duration_ms: 1.9789
+  type: 'test'
+  ...
+# Subtest: Camera Check waits for its visible frame, supports both cameras, and uses local live readiness
+ok 102 - Camera Check waits for its visible frame, supports both cameras, and uses local live readiness
+  ---
+  duration_ms: 3.9206
+  type: 'test'
+  ...
+# Subtest: camera readiness displays only results actually present in provider analysis
+ok 103 - camera readiness displays only results actually present in provider analysis
+  ---
+  duration_ms: 154.8691
+  type: 'test'
+  ...
+# Subtest: safety phases replace the session, cancel stale phases, and restore the selected camera
+ok 104 - safety phases replace the session, cancel stale phases, and restore the selected camera
+  ---
+  duration_ms: 5.278
+  type: 'test'
+  ...
+# Subtest: Live Session uses a proper pause icon and hides duplicate native-preview labels
+ok 105 - Live Session uses a proper pause icon and hides duplicate native-preview labels
+  ---
+  duration_ms: 3.8859
+  type: 'test'
+  ...
+# Subtest: live inactivity countdown and alarm have connected safety UI and persistent resolution
+ok 106 - live inactivity countdown and alarm have connected safety UI and persistent resolution
+  ---
+  duration_ms: 3.763
+  type: 'test'
+  ...
+# Subtest: auth boundaries and signed-in tabs use client navigation without a startup interstitial
+ok 107 - auth boundaries and signed-in tabs use client navigation without a startup interstitial
+  ---
+  duration_ms: 3.2839
+  type: 'test'
+  ...
+# Subtest: scan errors keep the backend message instead of a generic fallback
+ok 108 - scan errors keep the backend message instead of a generic fallback
+  ---
+  duration_ms: 1.8738
+  type: 'test'
+  ...
+# Subtest: preview is allowed only for a successful, genuinely empty nutrition response
+ok 109 - preview is allowed only for a successful, genuinely empty nutrition response
+  ---
+  duration_ms: 87.4025
+  type: 'test'
+  ...
+# Subtest: reference preview agrees across dashboard, log, history, and food portions
+ok 110 - reference preview agrees across dashboard, log, history, and food portions
+  ---
+  duration_ms: 56.4138
+  type: 'test'
+  ...
+# Subtest: portion scaling preserves backend scan keys without mutating source values
+ok 111 - portion scaling preserves backend scan keys without mutating source values
+  ---
+  duration_ms: 51.5694
+  type: 'test'
+  ...
+# Subtest: review renders only matched scan totals and keeps saving disabled on analysis errors
+ok 112 - review renders only matched scan totals and keeps saving disabled on analysis errors
+  ---
+  duration_ms: 234.1232
+  type: 'test'
+  ...
+# Subtest: password recovery uses server-issued 6-digit codes and shows provider setup state
+ok 113 - password recovery uses server-issued 6-digit codes and shows provider setup state
+  ---
+  duration_ms: 26.0694
+  type: 'test'
+  ...
+# Subtest: local camera keeps explicit upload provider status and reports never fabricate a score
+ok 114 - local camera keeps explicit upload provider status and reports never fabricate a score
+  ---
+  duration_ms: 26.2487
+  type: 'test'
+  ...
+# Subtest: progress history comes from API reads and measurements save before appearing
+ok 115 - progress history comes from API reads and measurements save before appearing
+  ---
+  duration_ms: 14.3023
+  type: 'test'
+  ...
+# Subtest: quest progress is derived from server records and cannot be tapped into completion
+ok 116 - quest progress is derived from server records and cannot be tapped into completion
+  ---
+  duration_ms: 12.3581
+  type: 'test'
+  ...
+# Subtest: quests screen opens a period-switchable leaderboard with an account ranking
+ok 117 - quests screen opens a period-switchable leaderboard with an account ranking
+  ---
+  duration_ms: 9.2919
+  type: 'test'
+  ...
+# Subtest: leaderboard layout adapts its ranked list and podium to narrow screens
+ok 118 - leaderboard layout adapts its ranked list and podium to narrow screens
+  ---
+  duration_ms: 2.222
+  type: 'test'
+  ...
+# Subtest: leaderboard is fed by the ranking API instead of sample data
+ok 119 - leaderboard is fed by the ranking API instead of sample data
+  ---
+  duration_ms: 2.9052
+  type: 'test'
+  ...
+# Subtest: squats and curls count only complete straight-bent-straight cycles
+ok 120 - squats and curls count only complete straight-bent-straight cycles
+  ---
+  duration_ms: 1.8645
+  type: 'test'
+  ...
+# Subtest: partial motion and boundary jitter never count a rep
+ok 121 - partial motion and boundary jitter never count a rep
+  ---
+  duration_ms: 0.3548
+  type: 'test'
+  ...
+# Subtest: missing, uncertain, offscreen and stale joints discard the unfinished movement
+ok 122 - missing, uncertain, offscreen and stale joints discard the unfinished movement
+  ---
+  duration_ms: 0.513
+  type: 'test'
+  ...
+# Subtest: pausing and camera changes preserve completed reps but reset motion history
+ok 123 - pausing and camera changes preserve completed reps but reset motion history
+  ---
+  duration_ms: 0.2816
+  type: 'test'
+  ...
+# Subtest: out-of-order frames cannot advance the counter
+ok 124 - out-of-order frames cannot advance the counter
+  ---
+  duration_ms: 0.2412
+  type: 'test'
+  ...
+# Subtest: joint geometry respects portrait/landscape aspect and rejects invalid confidence
+ok 125 - joint geometry respects portrait/landscape aspect and rejects invalid confidence
+  ---
+  duration_ms: 1.0823
+  type: 'test'
+  ...
+# Subtest: request keys work with UUID, HTTP-only crypto, and no crypto object
+ok 126 - request keys work with UUID, HTTP-only crypto, and no crypto object
+  ---
+  duration_ms: 1.8977
+  type: 'test'
+  ...
+# Subtest: session subscribers see login, verification refresh and logout
+ok 127 - session subscribers see login, verification refresh and logout
+  ---
+  duration_ms: 6.5099
+  type: 'test'
+  ...
+# Subtest: migrates legacy storage once, deletes stored tokens immediately and keeps access only in memory
+ok 128 - migrates legacy storage once, deletes stored tokens immediately and keeps access only in memory
+  ---
+  duration_ms: 0.7915
+  type: 'test'
+  ...
+# Subtest: deduplicates simultaneous silent refreshes and includes credentials
+ok 129 - deduplicates simultaneous silent refreshes and includes credentials
+  ---
+  duration_ms: 0.4058
+  type: 'test'
+  ...
+# Subtest: retries an interrupted legacy migration using memory, without restoring the localStorage token
+ok 130 - retries an interrupted legacy migration using memory, without restoring the localStorage token
+  ---
+  duration_ms: 1.1299
+  type: 'test'
+  ...
+# Subtest: logout cannot be undone by a late refresh response
+ok 131 - logout cannot be undone by a late refresh response
+  ---
+  duration_ms: 0.5046
+  type: 'test'
+  ...
+# Subtest: rotation preserves session identity while a new login changes it
+ok 132 - rotation preserves session identity while a new login changes it
+  ---
+  duration_ms: 0.5345
+  type: 'test'
+  ...
+# Subtest: does not forward a retained legacy credential to a different API
+ok 133 - does not forward a retained legacy credential to a different API
+  ---
+  duration_ms: 0.7007
+  type: 'test'
+  ...
+# Subtest: rejects refresh credentials in JSON and clears invalid sessions
+ok 134 - rejects refresh credentials in JSON and clears invalid sessions
+  ---
+  duration_ms: 0.63
+  type: 'test'
+  ...
+# Subtest: Me omits the removed manual alert test while retaining persisted safety settings and the alert API
+ok 135 - Me omits the removed manual alert test while retaining persisted safety settings and the alert API
+  ---
+  duration_ms: 16.3307
+  type: 'test'
+  ...
+# Subtest: scan images are downscaled before upload and release their bitmap
+ok 136 - scan images are downscaled before upload and release their bitmap
+  ---
+  duration_ms: 102.95
+  type: 'test'
+  ...
+# Subtest: meal scanning offers camera capture and photo upload into the same analysis flow
+ok 137 - meal scanning offers camera capture and photo upload into the same analysis flow
+  ---
+  duration_ms: 26.0871
+  type: 'test'
+  ...
+# Subtest: photo inputs stay mounted during nutrition refresh and the review opens immediately
+ok 138 - photo inputs stay mounted during nutrition refresh and the review opens immediately
+  ---
+  duration_ms: 1.6367
+  type: 'test'
+  ...
+# Subtest: today log shows calorie and macro targets with live meals and water controls
+ok 139 - today log shows calorie and macro targets with live meals and water controls
+  ---
+  duration_ms: 5.348
+  type: 'test'
+  ...
+# Subtest: section back controls render as icon-only buttons without circular surfaces
+ok 140 - section back controls render as icon-only buttons without circular surfaces
+  ---
+  duration_ms: 10.9788
+  type: 'test'
+  ...
+# Subtest: every nested section header places its back control before the page heading
+ok 141 - every nested section header places its back control before the page heading
+  ---
+  duration_ms: 40.3422
+  type: 'test'
+  ...
+# Subtest: Scan and Exercise Library visually keep back controls beside the title
+ok 142 - Scan and Exercise Library visually keep back controls beside the title
+  ---
+  duration_ms: 3.2421
+  type: 'test'
+  ...
+# Subtest: standalone Goals and Progress pages return to the Home dashboard
+ok 143 - standalone Goals and Progress pages return to the Home dashboard
+  ---
+  duration_ms: 3.8825
+  type: 'test'
+  ...
+# Subtest: Scan Today log returns to Nutrition and retains its history action
+ok 144 - Scan Today log returns to Nutrition and retains its history action
+  ---
+  duration_ms: 3.0093
+  type: 'test'
+  ...
+# Subtest: Me alert log and Coach workout report return to their section roots
+ok 145 - Me alert log and Coach workout report return to their section roots
+  ---
+  duration_ms: 5.8096
+  type: 'test'
+  ...
+# Subtest: production CSP forbids object/frame/eval and preserves local camera workers
+ok 146 - production CSP forbids object/frame/eval and preserves local camera workers
+  ---
+  duration_ms: 1.7325
+  type: 'test'
+  ...
+# Subtest: Sentry remains disabled without a public DSN
+ok 147 - Sentry remains disabled without a public DSN
+  ---
+  duration_ms: 1.5404
+  type: 'test'
+  ...
+# Subtest: Sentry removes private values and retains only correlation tag and safe error structure
+ok 148 - Sentry removes private values and retains only correlation tag and safe error structure
+  ---
+  duration_ms: 2.927
+  type: 'test'
+  ...
+# Subtest: goals and progress are standalone authenticated routes with shared app navigation
+ok 149 - goals and progress are standalone authenticated routes with shared app navigation
+  ---
+  duration_ms: 21.7248
+  type: 'test'
+  ...
+# Subtest: sample-only progress insights are distinguished from API-backed workout data
+ok 150 - sample-only progress insights are distinguished from API-backed workout data
+  ---
+  duration_ms: 7.2701
+  type: 'test'
+  ...
+# Subtest: a slower old request cannot overwrite the Coach program after a profile invalidation
+ok 151 - a slower old request cannot overwrite the Coach program after a profile invalidation
+  ---
+  duration_ms: 125.3218
+  type: 'test'
+  ...
+# Subtest: workout UI only opens a report after the API confirms completion
+ok 152 - workout UI only opens a report after the API confirms completion
+  ---
+  duration_ms: 11.2052
+  type: 'test'
+  ...
+# Each child in a list should have a unique "key" prop.
+# Check the top-level render call using <li>. See https://react.dev/link/warning-keys for more information.
+# Each child in a list should have a unique "key" prop.
+# Check the top-level render call using <li>. See https://react.dev/link/warning-keys for more information.
+# Subtest: reference report preserves saved duration, exercise count, status and confirmed results
+ok 153 - reference report preserves saved duration, exercise count, status and confirmed results
+  ---
+  duration_ms: 48.2401
+  type: 'test'
+  ...
+# Subtest: reference report explains missing results without fabricated metrics
+ok 154 - reference report explains missing results without fabricated metrics
+  ---
+  duration_ms: 1.9435
+  type: 'test'
+  ...
+# Subtest: report calculates volume from completed sets instead of aggregate peak loads
+ok 155 - report calculates volume from completed sets instead of aggregate peak loads
+  ---
+  duration_ms: 9.6923
+  type: 'test'
+  ...
+# Subtest: report does not invent a volume from aggregate-only records
+ok 156 - report does not invent a volume from aggregate-only records
+  ---
+  duration_ms: 1.7469
+  type: 'test'
+  ...
+# Subtest: routine snapshots retain prescribed sets and timed sets do not fabricate reps
+ok 157 - routine snapshots retain prescribed sets and timed sets do not fabricate reps
+  ---
+  duration_ms: 105.26
+  type: 'test'
+  ...
+# Subtest: progress distinguishes skipped from done and revisiting uses the same set slot
+ok 158 - progress distinguishes skipped from done and revisiting uses the same set slot
+  ---
+  duration_ms: 17.9255
+  type: 'test'
+  ...
+1..158
+# tests 158
+# suites 0
+# pass 158
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2695.1832

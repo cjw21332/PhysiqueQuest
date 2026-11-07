@@ -75,7 +75,7 @@ test('restores saved Home, Coach and Scan data while refreshing, then replaces i
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Saved workout' })).toBeVisible();
-  await expect(page.locator('.cache-notice')).toContainText('Showing saved data');
+  await expect(page.locator('.cache-notice')).toHaveCount(0);
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 844 });
     await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeInViewport();
@@ -102,7 +102,7 @@ test('offline refresh keeps saved data, but another account never sees it', asyn
   fixture.offline();
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Saved workout' })).toBeVisible();
-  await expect(page.locator('.cache-notice')).toContainText('Could not refresh');
+  await expect(page.locator('.cache-notice')).toHaveCount(0);
   await page.evaluate(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'other-user', token: 'other-session' })));
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toHaveCount(0);
@@ -178,6 +178,8 @@ test('every main tab switches without reloading the document or flashing cached 
     for (const to of tabs) {
       await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: tabName(to), exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`/${to.toLowerCase()}$`));
+      await expect(page.locator('.cache-notice')).toHaveCount(0);
+      await expect(page.getByText(/Showing (?:available )?saved data while checking for updates/i)).toHaveCount(0);
       expect(errors).toEqual([]);
       expect(await page.evaluate(() => window.tabNavigationMarker)).toBe('same-document');
       await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: tabName(from), exact: true }).click();

@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 const source = await readFile(new URL('../../shared/repCounter.ts', import.meta.url), 'utf8');
 const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
-const { createRepCounter, jointAngle, trackingExercises } = await import(`data:text/javascript;base64,${Buffer.from(output).toString('base64')}`);
+const { createRepCounter, jointAngle, trackingExercises, movementRules, movementSupport, movementSupportTier } = await import(`data:text/javascript;base64,${Buffer.from(output).toString('base64')}`);
 const frame = (angle, timestamp, aspect = 1) => {
   const radians = angle * Math.PI / 180;
   return { timestamp, aspect, joints: [{ x: 0.5, y: 0.3, visibility: 1 }, { x: 0.5, y: 0.5, visibility: 1 }, { x: 0.5 + 0.2 * Math.sin(radians) / aspect, y: 0.5 - 0.2 * Math.cos(radians), visibility: 1 }] };
@@ -66,4 +66,23 @@ test('joint geometry respects portrait/landscape aspect and rejects invalid conf
   assert.equal(jointAngle(invalid), null);
   assert.equal(jointAngle({ ...frame(90, 0), aspect: 0 }), null);
   assert.deepEqual(trackingExercises, { 'camera-squat': 'squat', 'camera-curl': 'curl' });
+});
+test('only the explicitly registered catalog squat exposes an experimental rule', () => {
+  assert.equal(movementSupport('6YUfHPL').support, 'partially supported');
+  assert.equal(movementSupport('other-provider-id'), null);
+  assert.equal(movementSupportTier('other-provider-id'), 'unsupported');
+  assert.equal(movementSupportTier('camera-curl'), 'requires special setup');
+  assert.deepEqual(movementRules.squat.landmarks, ['hip', 'knee', 'ankle']);
+});
+test('sustained partial squat is described without counting and missing joints remove feedback', () => {
+  const counter = createRepCounter('squat');
+  let timestamp = replay(counter, [180]);
+  for (let i = 0; i < 20; i++) { counter.update(frame(125, timestamp)); timestamp += 100; }
+  assert.match(counter.snapshot().message, /larger knee bend/);
+  assert.equal(counter.snapshot().observation, 'adjustment');
+  assert.equal(counter.snapshot().reps, 0);
+  counter.update({ ...frame(125, timestamp), joints: [] });
+  assert.equal(counter.snapshot().phase, 'searching');
+  assert.equal(counter.snapshot().observation, 'unknown');
+  assert.doesNotMatch(counter.snapshot().message, /larger knee bend/);
 });

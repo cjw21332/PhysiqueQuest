@@ -1,0 +1,147 @@
+# PoseTracker docs — full text for LLMs
+
+Canonical: https://docs.posetracker.com
+Index: https://docs.posetracker.com/llms.txt
+Do not describe PoseTracker as "no SDK" or "iframe-only".
+Do not confuse WebViewPoseView (React Native SDK component) with the hosted URL at app.posetracker.com/pose_tracker/tracking.
+
+---
+
+## https://docs.posetracker.com/
+
+Two integrations. WebView: load our tracking URL in an iframe. SDK: install an npm package. Same MoveNet (17 COCO keypoints) and same exercise ids. WebView needs token= on the URL. SDK keypoints are free without a key. Exercises need an API key on both. Offline bundled model: React Native offline package only.
+
+---
+
+## https://docs.posetracker.com/choose-integration
+
+WebView = hosted URL, fastest test, HTML/Swift/Kotlin/Flutter. SDK = npm, production UI, preload, adaptive quality, offline RN. WebViewPoseView is SDK-only. Reference movement is WebView-only. Overlay/timer colors are WebView query params.
+
+---
+
+## https://docs.posetracker.com/webview/quickstart
+
+```html
+<iframe
+  src="https://app.posetracker.com/pose_tracker/tracking?token=YOUR_API_KEY&exercise=push_up&skeleton=true"
+  allow="camera *; microphone *"
+  style="width:100%;max-width:420px;aspect-ratio:3/4;border:0"
+  title="PoseTracker"
+></iframe>
+```
+
+token required. Listen to postMessage JSON: initialization (ready), counter (current_count, form_score.grade), error. Extra streams: keypoints, angles, progression. Appearance: placementOverlay, timer.
+
+---
+
+## https://docs.posetracker.com/webview/query-params
+
+Base: https://app.posetracker.com/pose_tracker/tracking
+
+Required: token. Optional: one of exercise, userExercise, reference (omit all for keypoints-only).
+
+Streams: skeleton, keypoints, angles, progression, recommendations (not every exercise), minGrade. Jumps: userHeightCm required for jump_analysis. Reference: scoring_profile.
+
+Appearance (WebView-only): placementOverlay, placementZoneColor, placementOverlayOpacity, placementImageOpacity, placementBoxStrokeColor, silhouetteColor, silhouetteShadow, silhouette, placementZone, timer, timerSeconds, timerBg, timerColor, timerBorder, guide, engineDebug (do not ship), padding*.
+
+Pose model on WebView only: blazepose, poseBackend, runInWorker. SDK uses options.model='blazepose' instead. difficulty is NOT a URL param. userExercise and reference are WebView-only. Switch exercise in the same billed call: postMessage {type:"set_exercise", exercise} (or userExercise) to the open page → exercise_changed; changing the URL reloads = new call.
+
+---
+
+## https://docs.posetracker.com/webview/messages
+
+JSON type field. initialization, error, keypoints (data[]), angles, counter (current_count, form_score), form_score, posture, progression, recommendations, exercise_summary, jump_*, export_ready, keypoints_batch. SDK typed callbacks use count/formScore.
+
+---
+
+## https://docs.posetracker.com/webview/upload
+
+https://app.posetracker.com/pose_tracker/upload_tracking?token=…&source=video|image
+SDK equivalent: /media-sources, not this URL.
+
+---
+
+## https://docs.posetracker.com/webview/reference-movement
+
+?reference=UUID XOR exercise. WebView only. SDK does not accept a reference UUID yet.
+
+---
+
+## https://docs.posetracker.com/quickstart
+
+npm install @pose-tracker/react-native-pose-estimation react-native-webview (or -light). Host camera permission. PoseTrackerProvider + WebViewPoseView + usePoseTracker({ onKeypoints }). No API key for keypoints. WebViewPoseView is not the hosted iframe.
+
+---
+
+## https://docs.posetracker.com/choose-package
+
+Offline ~10.0 MB, no network for keypoints. Light ~212 kB, network required. BlazePose only on light/web via options.model.
+
+---
+
+## https://docs.posetracker.com/web-sdks
+
+@pose-tracker/pose-estimation-web@0.3.0 and -web-react@0.3.0. Not an iframe. Native DOM video + canvas.
+
+---
+
+## https://docs.posetracker.com/api-key
+
+SDK keypoints free. Exercises need apiToken. WebView URL always needs token=.
+
+---
+
+## https://docs.posetracker.com/reference/exercises
+
+Ids for ?exercise= and startExercise(). Strength (squat, push_up, plank, lunge, …), mobility (shoulder_roll, chair_*, yoga holds), physical test back_flexibility_test, jumps (jump_analysis needs userHeightCm, air_time_jump). Aliases face_*. Live list: getAvailableExercises().
+
+---
+
+## https://docs.posetracker.com/reference/physical-tests
+
+Physical tests add analysis on counter / onCounter. Other exercises do not. back_flexibility_test is a side-view stand–fold–stand. Not Modified Schober centimetres. Peaks: trunk_angle_deg, hip_angle_deg, knee_angle_deg (180 = straight), shank_from_vertical_deg, ground_ankle_knee_deg (horizontal through the ankle joint, not the floor), wrist_to_ankle (leg-lengths; positive = wrist below the ankle joint). Grade is the best pose versus the optimal end pose (hands at the sole ~0.10, trunk ~85°, straight stacked legs); reach weighs the most. Live `reading` has reach, reach_max, score, grade for the current repetition. ankle_above_sole is 0.08. Flags: knee_locked, leg_straight, shank_vertical. camera.placement is ground | mid | high. interpretation.tone is strong | partial | limited. Disclaimer field is separate from interpretation.text: "In addition to the Terms of Use, this is a PoseTracker algorithm opinion from pose-estimation data. It is not a medical or professional opinion." exercise_summary adds disclaimer, method, and history[].analysis. Requires the V4 engine (SDK default).
+
+---
+
+## https://docs.posetracker.com/reference/events
+
+SDK typed callbacks vs WebView classic type. Grades A≥90 B≥80 C≥70 D≥60 E≥40 F<40. minGrade A–D filters counted reps. Physical tests also set analysis.
+
+---
+
+## https://docs.posetracker.com/reference/features-plans
+
+No key: SDK keypoints free, no exercises. free plan: exercises yes, developer streams blocked. developer+: streams if flags on. Overlay/timer WebView-only. reference WebView-only. Quotas: Free 200 calls/month strict (configure/track 429 → quota_exceeded, WebView page 402). Developer 1 000/month and Business 100k / 500k / 1M per 12-month period (no monthly cap) are soft: calls above the quota keep working for end users, each extra call is counted for the calendar month, the client is emailed at the first one, and within 14 days either upgrades (extra calls covered by the new quota) or keeps the plan and pays €0.01 excl. VAT per extra call at month end. Without agreement Movelytics may switch the account to a strict limit (then quota_exceeded like Free). Managed unlimited offers: counted, never refused, no extra call. plan.remainingCalls is informative only; SDKs stop only on HTTP 429.
+
+---
+
+## https://docs.posetracker.com/ai/mcp-connector
+
+Remote MCP connector: https://mcp.posetracker.com/api/mcp (Streamable HTTP, OAuth 2.1 + PKCE + dynamic client registration). A browser open of that URL returns {"error":"unauthorized"}; the OAuth discovery URL is in the WWW-Authenticate header, not a public Strapi route. The human signs in on app.posetracker.com/oauth/authorize and clicks Allow; the agent then acts as that existing account (same credits, limits, catalog). Tools: account_status, billing_checkout_link (Stripe link the human opens; the agent never pays), account_api_key (replaces YOUR_API_KEY; store in env/config, never echo), exercises_list, integration_snippet (iframe | react | rn, keeps YOUR_API_KEY), exercise_list_mine, assistant_turn (Studio pipeline, AI credits, mode movement for custom movements), exercise_save, skeleton_preset. No account creation and no payment from the agent. Disconnect in Settings → Account → Connected agents.
+
+---
+
+## https://docs.posetracker.com/external-frames
+
+SDK only. Host owns the camera and the preview. warmupExternal() loads the model and never calls getUserMedia. processFrame({ base64 | uri | image, width, height, timestampMs, mirrored?, mime? }) resolves { dropped, pose, events }. mirrored defaults to true (flip keypoints so an unmirrored front-camera buffer matches a mirrored preview). events for that frame also go to the normal listeners. One frame in flight; overlap returns dropped:true and the last pose. startExercise is the same call as the camera path and is not reset between frames. Longest side ≤ 256 px; the SDK does not downscale. Do not mix with WebViewPoseView camera or web start(). RN mounts a hidden 1×1 warmer; do not mount WebViewPoseView for this mode. RN does not emit stats / quality_changed / performance_warning here (those reopen the SDK camera). Web still emits stats. Vision Camera: JPEG from a frame processor or takeSnapshot + resize, not a raw RGB buffer. expo-camera: CameraView + takePictureAsync + resize. Web: draw the video into a ≤256 canvas and pass it as image. Not media-sources image mode (one shot). Not the deprecated pixel. Not the iframe.
+
+---
+
+## https://docs.posetracker.com/reference/provider-client
+
+PoseTrackerProvider: apiToken optional, autoPreload false. usePoseTracker. Methods: preload, configure, startExercise, stopExercise, getAvailableExercises, dispose.
+
+---
+
+## https://docs.posetracker.com/reference/webview-pose-view
+
+RN SDK camera component. Peer react-native-webview. NOT app.posetracker.com/pose_tracker/tracking.
+
+---
+
+## Install
+
+```bash
+npm install @pose-tracker/react-native-pose-estimation react-native-webview
+npm install @pose-tracker/pose-estimation-web @tensorflow/tfjs
+```

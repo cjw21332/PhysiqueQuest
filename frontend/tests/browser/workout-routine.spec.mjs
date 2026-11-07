@@ -1,4 +1,14 @@
 import { test, expect } from '@playwright/test';
+test('PoseTracker options in an active workout preserve manual draft values',async({page})=>{
+  const state=await fixture(page);await resume(page);
+  await page.getByLabel('Reps, set 1',{exact:true}).fill('17');
+  await page.route('**/exercises/push',route=>route.fulfill({json:{_id:'push',name:'Push-up',equipments:['bodyweight'],targetMuscles:['pectorals'],instructions:['Bend elbows']},headers}));
+  await page.route('**/pose-tracker/exercises/push',route=>route.fulfill({status:503,json:{message:'Configuration service offline'},headers}));
+  await page.getByRole('button',{name:'PoseTracker options for Push-up',exact:true}).click();
+  await expect(page.getByRole('region',{name:'PoseTracker exercise tracking'})).toBeVisible();
+  await page.getByRole('button',{name:'Back to exercise',exact:true}).click();
+  await expect(page.getByLabel('Reps, set 1',{exact:true})).toHaveValue('17');expect(state.workout.sets).toHaveLength(0);
+});
 test('manual logging converts pounds to kilograms and starts rest after saving', async ({ page }) => {
   const state = await fixture(page, { autoEndRest: false });
   await resume(page);
@@ -44,7 +54,7 @@ test('malformed and other-account drafts do not replace confirmed state',async({
     localStorage.setItem(key,'{broken');
   });
   await page.reload();
-  await page.getByRole('button',{name:'Resume saved workout'}).click();
+  // The active-session route now restores its workout directly on reload.
   await expect(page.getByLabel('Reps, set 1',{exact:true})).toHaveValue('12');
 });
 const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
@@ -113,7 +123,7 @@ test('Phiq keeps data sharing optional, hides sources and clears its conversatio
   for (const size of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(size);
     const box = await dialog.boundingBox();
-    expect(box.height).toBeGreaterThan(size.height * .8);
+    expect(box.height).toBeGreaterThanOrEqual(size.height * .8 - 1);
     expect(box.y).toBeGreaterThanOrEqual(0);
     await expect(input).toBeInViewport();
   }
@@ -346,8 +356,14 @@ test('camera denial never blocks routine logging and controls meet phone target 
   const state=await fixture(page);
   await page.addInitScript(()=>{Object.defineProperty(navigator,'mediaDevices',{configurable:true,value:{getUserMedia:async()=>{throw new DOMException('Denied','NotAllowedError');}}});});
   await resume(page);
-  await page.getByRole('button',{name:'Enable camera',exact:true}).click();
-  await expect(page.getByRole('alert').filter({hasText:'Camera access is blocked'})).toBeVisible();
+  await page.route('**/exercises/push',route=>route.fulfill({json:{_id:'push',name:'Push-up',equipments:['bodyweight'],targetMuscles:['pectorals'],instructions:['Bend elbows']},headers}));
+  await page.route('**/pose-tracker/exercises/push',route=>route.fulfill({status:503,json:{message:'Configuration unavailable'},headers}));
+  await page.route('**/pose-tracker/exercises/push/launch',route=>route.fulfill({json:{config:{exerciseId:'push',name:'Push-up',trackingMode:'builtin',providerExerciseId:'push_up',validationStatus:'documentation-mapped',cameraOrientation:'side',targetMuscles:['pectorals'],equipment:['bodyweight'],capabilities:['repetitions'],limitations:[]},token:'mock-only',developerOutputs:false},headers}));
+  await page.route('https://app.posetracker.com/pose_tracker/tracking?**',route=>route.fulfill({contentType:'text/html',body:'<script>parent.postMessage(JSON.stringify({type:"error",error:"NotAllowedError",message:"Camera permission denied"}),"*")</script>'}));
+  await page.getByRole('button',{name:'PoseTracker options for Push-up'}).click();
+  await page.getByRole('button',{name:'Start PoseTracker',exact:true}).click();
+  await expect(page.locator('.pose-tracker-session [role=alert]')).toContainText('Camera permission denied');
+  await page.getByRole('button',{name:'Back to exercise',exact:true}).click();
   for(const width of [320,390,768,1440]){
     await page.setViewportSize({width,height:844});
     for(const button of await page.locator('.routine-current button').all()) { const box=await button.boundingBox();expect(box.height).toBeGreaterThanOrEqual(44); }

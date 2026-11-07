@@ -107,9 +107,10 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   }, []);
 
   useEffect(() => {
-    if (paused || phase !== 'active') camera.stop();
+    if (renderRoutine) camera.stop(true);
+    else if (paused || phase !== 'active') camera.stop();
     else if (camera.shouldAutoStart && camera.status === 'idle') void camera.start();
-  }, [camera.start, camera.status, camera.stop, camera.shouldAutoStart, phase, paused]);
+  }, [camera.start, camera.status, camera.stop, camera.shouldAutoStart, phase, paused, Boolean(renderRoutine)]);
 
   // Native host events arrive through the WebView bridge.
   useEffect(() => {

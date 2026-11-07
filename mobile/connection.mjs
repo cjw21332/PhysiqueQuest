@@ -7,6 +7,13 @@ export function isTrustedWebViewUrl(value, frontendUrl) {
   } catch { return false; }
 }
 
+// Provider embeds may navigate only inside a subframe, never replace the app shell.
+export function isTrustedWebViewNavigation(value, frontendUrl, isTopFrame) {
+  if (isTrustedWebViewUrl(value, frontendUrl)) return true;
+  if (isTopFrame !== false) return false;
+  try { const url=new URL(value); return url.origin==='https://app.posetracker.com' && url.pathname==='/pose_tracker/tracking' && !url.username && !url.password; } catch { return false; }
+}
+
 function withHttpScheme(value) {
   return /^[a-z][a-z\d+.-]*:\/\//i.test(value) ? value : `http://${value}`;
 }

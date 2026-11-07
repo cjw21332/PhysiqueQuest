@@ -10,10 +10,15 @@ const nextConfig = (phase: string): NextConfig => ({
   distDir: phase === PHASE_DEVELOPMENT_SERVER ? '.next-dev' : '.next',
   devIndicators: false,
   experimental: { proxyClientMaxBodySize: '28mb' },
-  async headers() { return [{ source: '/((?!api/).*)', headers: securityHeaders(phase === PHASE_DEVELOPMENT_SERVER) }]; },
+  async headers() {
+    const shared = securityHeaders(phase === PHASE_DEVELOPMENT_SERVER);
+    const worker = shared.map(header => header.key === 'Content-Security-Policy' ? { ...header, value: header.value.replace("connect-src 'self'", "connect-src 'self' https://static.exercisedb.dev") } : header);
+    return [{ source: '/((?!api/|exercise-worker\\.js).*)', headers: shared }, { source: '/exercise-worker.js', headers: [...worker, { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' }] }];
+  },
   async rewrites() {
     const backend = (process.env.BACKEND_URL || 'http://127.0.0.1:4000').replace(/\/$/, '');
-    return [{ source: '/api/:path*', destination: `${backend}/api/:path*` }, ...['health', 'ready'].map(path => ({ source: `/${path}`, destination: `${backend}/${path}` }))];
+    const coach = (process.env.COACH_BACKEND_URL || 'http://127.0.0.1:4050').replace(/\/$/, '');
+    return [{ source: '/api/coach-service/:path*', destination: `${coach}/api/:path*` }, { source: '/api/:path*', destination: `${backend}/api/:path*` }, ...['health', 'ready'].map(path => ({ source: `/${path}`, destination: `${backend}/${path}` }))];
   },
 });
 export default process.env.SENTRY_UPLOAD_SOURCEMAPS === 'true'

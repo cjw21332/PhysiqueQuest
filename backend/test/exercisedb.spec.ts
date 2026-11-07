@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ExerciseDbService } from '../src/exercises/exercisedb.service.js';
+import { ExerciseDbService, normalizeExercise } from '../src/exercises/exercisedb.service.js';
 import { StandaloneCoachController } from '../src/coach/standalone-coach.module.js';
 
 const row = (id = 'real-id', name = 'dumbbell bench press') => ({ exerciseId: id, name, gifUrl: `https://static.exercisedb.dev/media/${id}.gif`, bodyParts: ['chest'], equipments: ['dumbbell'], targetMuscles: ['pectorals'], secondaryMuscles: ['triceps'], instructions: ['Step:1 Keep your feet on the floor.'] });
@@ -8,14 +8,18 @@ const response = (data: unknown, meta?: unknown) => new Response(JSON.stringify(
 afterEach(() => vi.unstubAllGlobals());
 
 describe('ExerciseDB live adapter contract', () => {
-  it('reuses a hot public detail for 30 seconds and refetches after expiry', async () => {
+  it('retains a valid record when optional provider metadata is missing', () => {
+    const item = normalizeExercise({ exerciseId: 'missing-fields', name: 'Example', gifUrl: null, bodyParts: null, equipments: null, targetMuscles: null, secondaryMuscles: null, instructions: null } as any);
+    expect(item).toMatchObject({ _id: 'missing-fields', gifUrl: '', instructions: [], bodyParts: [] });
+  });
+  it('reuses a hot public detail for five minutes and refetches after expiry', async () => {
     let clock = 10_000; const now = vi.spyOn(Date, 'now').mockImplementation(() => clock);
     const fetcher = vi.fn().mockImplementation(async () => response(row())); vi.stubGlobal('fetch', fetcher);
     try {
       const service = new ExerciseDbService();
       await service.findBySlug('real-id'); await service.findBySlug('real-id');
       expect(fetcher).toHaveBeenCalledTimes(1);
-      clock += 31_000; await service.findBySlug('real-id'); expect(fetcher).toHaveBeenCalledTimes(2);
+      clock += 301_000; await service.findBySlug('real-id'); expect(fetcher).toHaveBeenCalledTimes(2);
     } finally { now.mockRestore(); }
   });
   it('normalizes actual metadata and GIFs without fabricated tracking or videos', async () => {
@@ -29,7 +33,7 @@ describe('ExerciseDB live adapter contract', () => {
   it('traverses at most four cursor pages and exposes partial coverage honestly', async () => {
     const fetcher = vi.fn().mockImplementation(async () => response([row()], { hasNextPage: true, nextCursor: `next-${fetcher.mock.calls.length}` }));
     vi.stubGlobal('fetch', fetcher);
-    const result = await new ExerciseDbService().findAll({ muscle: 'Chest', equipment: 'Dumbbells' });
+    const result = await new ExerciseDbService().findAll({ muscle: 'Chest', equipment: 'Dumbbells' }, 4);
     expect(fetcher).toHaveBeenCalledTimes(4);
     expect(fetcher.mock.calls[0][0]).toContain('bodyParts=chest');
     expect(fetcher.mock.calls[0][0]).toContain('equipments=dumbbell');
@@ -37,11 +41,26 @@ describe('ExerciseDB live adapter contract', () => {
     expect(result.coverageNote).toContain('bounded');
   });
 
+  it('reaches pages beyond the former cap in provider order', async () => {
+    const service = new ExerciseDbService();
+    const fetcher = vi.fn().mockImplementation(async () => {
+      (service as any).nextRequestAt = 0;
+      const index = fetcher.mock.calls.length - 1;
+      return response(Array.from({ length: 25 }, (_, n) => row(String(index * 25 + n))), { total: 125, hasNextPage: index < 4, nextCursor: String(index + 1) });
+    });
+    vi.stubGlobal('fetch', fetcher);
+    const result = await service.findAll({ page: 10, limit: 12 });
+    expect(result.page).toBe(10);
+    expect(result.total).toBe(125);
+    expect(result.items.map((item: { _id: string }) => item._id)).toEqual(Array.from({ length: 12 }, (_, n) => String(108 + n)));
+    expect(fetcher).toHaveBeenCalledTimes(5);
+  });
+
   it('keeps every query token and rejects unrelated upstream fuzzy hits', async () => {
     const fetcher = vi.fn().mockResolvedValueOnce(response([row('one'), row('two', 'dumbbell curl')]));
     vi.stubGlobal('fetch', fetcher);
     const result = await new ExerciseDbService().findAll({ search: 'bench press' });
-    expect(result.items.map(item => item.name)).toEqual(['dumbbell bench press']);
+    expect(result.items.map((item: { name: string }) => item.name)).toEqual(['dumbbell bench press']);
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
 

@@ -31,7 +31,7 @@ describe('OpenAPI gate and error contract', () => {
         expect(json.body.components.securitySchemes).toHaveProperty('bearer');
         expect(json.body.components.schemas.StandardError.required).toContain('request_id');
       }
-      expect(createOpenApiDocument(app).paths['/example'].get.responses['401']).toBeDefined();
+      expect(createOpenApiDocument(app).paths['/example']?.get?.responses?.['401']).toBeDefined();
     } finally { await app.close(); }
   });
 });

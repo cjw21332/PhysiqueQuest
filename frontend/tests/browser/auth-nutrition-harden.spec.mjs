@@ -1,12 +1,16 @@
 import { test, expect } from '@playwright/test';
 
 const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
+test.beforeEach(async ({page})=>{
+  // Anonymous auth pages still attempt refresh; isolate them from a live backend.
+  await page.route('**/api/auth/session/**',route=>route.fulfill({status:401,headers,json:{message:'No active session'}}));
+});
 
 test('login submits with Enter, preserves failed inputs and prevents duplicate requests', async ({ page }) => {
   let attempts = 0;
   let release;
   const pending = new Promise(resolve => { release = resolve; });
-  await page.route('**/api/auth/login', async route => {
+  await page.route('**/api/auth/session/login', async route => {
     if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
     attempts++;
     await pending;
@@ -102,13 +106,13 @@ test('empty account saves its first real manual meal and restores it after reloa
   await expect(page.getByText('Sample preview · not your saved nutrition data')).toHaveCount(0);
   await page.getByRole('button', { name: 'Manual entry' }).click();
   await page.getByRole('textbox', { name: 'Search food' }).fill('banana');
-  await page.getByRole('button', { name: /Test banana/ }).click();
+  await page.getByRole('button', { name: /Test banana/i }).click();
   await page.getByRole('button', { name: 'Save to Dinner' }).click();
   await expect(page.getByRole('heading', { name: "Today's log" })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Edit Dinner: Test banana/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Edit Dinner: Test banana/i })).toBeVisible();
   expect(state.writes).toBe(1);
   await page.reload();
-  await expect(page.getByText('Test banana', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText(/Test banana/i).first()).toBeVisible();
   await page.screenshot({ path: info.outputPath('first-meal-390.png'), animations: 'disabled' });
 });
 
@@ -132,12 +136,12 @@ test('first water persists and sample preview remains explicitly escapable', asy
   await page.getByRole('button', { name: 'Set water intake to 1 glass', exact: true }).click();
   await expect(page.getByText('1 / 8 glasses', { exact: true })).toBeVisible();
   await page.reload();
-  await expect(page.getByText('1 of 8 glasses today')).toBeVisible();
+  await expect(page.getByText('1 / 8 glasses', { exact: true })).toBeVisible();
   expect(state.writes).toBe(1);
 });
 
 test('failed-login dialog makes the form inert and Escape returns to sign in', async ({ page }) => {
-  await page.route('**/api/auth/login', route => route.fulfill({ status: 401, headers, json: { message: 'Incorrect credentials' } }));
+  await page.route('**/api/auth/session/login', route => route.fulfill({ status: 401, headers, json: { message: 'Incorrect credentials' } }));
   await page.goto('/login');
   await page.getByRole('textbox', { name: 'Email address' }).fill('student@example.test');
   await page.getByLabel('Password', { exact: true }).fill('Testing123!');
@@ -189,7 +193,7 @@ test('failed first meal keeps selected food and portion for retry', async ({ pag
   await page.goto('/scan');
   await page.getByRole('button', { name: 'Manual entry' }).click();
   await page.getByRole('textbox', { name: 'Search food' }).fill('banana');
-  await page.getByRole('button', { name: /Test banana/ }).click();
+  await page.getByRole('button', { name: /Test banana/i }).click();
   await page.getByRole('spinbutton', { name: 'Quantity' }).fill('200');
   await page.getByRole('button', { name: 'Save to Dinner' }).click();
   await expect(page.getByRole('heading', { name: 'Add food', exact: true })).toBeVisible();

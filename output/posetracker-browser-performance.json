@@ -1,0 +1,6 @@
+{
+  "environment": "Desktop Chromium, mocked provider iframe, fake camera; Playwright assertion overhead included",
+  "mockInitializationMs": 201,
+  "mockCounterToUiMs": 6,
+  "liveProviderMeasured": false
+}

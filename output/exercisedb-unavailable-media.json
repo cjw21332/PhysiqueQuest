@@ -1,0 +1,1774 @@
+{
+  "auditFinishedAt": "2026-11-05T17:29:24.268Z",
+  "audited404": 176,
+  "matchedRecords": 176,
+  "officialAlternateFound": false,
+  "permanentStatusKnown": false,
+  "recheckedSamples": [
+    "0I5fUyn",
+    "0MlxeMn",
+    "1IFV9h3"
+  ],
+  "records": [
+    {
+      "exerciseId": "0I5fUyn",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/0I5fUyn.gif",
+      "name": "band underhand pulldown",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "0MlxeMn",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/0MlxeMn.gif",
+      "name": "cable pulldown (pro lat bar)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "1IFV9h3",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/1IFV9h3.gif",
+      "name": "push-up on lower arms",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "1RIkUHT",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/1RIkUHT.gif",
+      "name": "dumbbell iron cross",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "1TVoin7",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/1TVoin7.gif",
+      "name": "barbell lying triceps extension",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "1YUWDNZ",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/1YUWDNZ.gif",
+      "name": "inverted row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "1oE78pm",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/1oE78pm.gif",
+      "name": "barbell upright row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "1u36hhy",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/1u36hhy.gif",
+      "name": "Machine Narrow Grip Seated Row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "2Ty4idJ",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/2Ty4idJ.gif",
+      "name": "dumbbell stiff leg deadlift",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "3QgteDK",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/3QgteDK.gif",
+      "name": "Barbell Wide Reverse-Grip Bench Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "3nvEbbF",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/3nvEbbF.gif",
+      "name": "cable twisting pull",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "3pqGMQj",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/3pqGMQj.gif",
+      "name": "band alternating v-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "4H86mXM",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/4H86mXM.gif",
+      "name": "Sled 45 Degrees Single-Leg Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "4QqYaJW",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/4QqYaJW.gif",
+      "name": "prone twist on stability ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "58rdhvL",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/58rdhvL.gif",
+      "name": "band jack knife sit-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "5ipN0iE",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/5ipN0iE.gif",
+      "name": "assisted pull-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "5lE7XRz",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/5lE7XRz.gif",
+      "name": "smith bent over row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "6Wr0F3W",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/6Wr0F3W.gif",
+      "name": "Twisted Leg Raise",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "6vcvsLS",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/6vcvsLS.gif",
+      "name": "Hanging Straight-Leg Raise",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "7858za8",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/7858za8.gif",
+      "name": "dumbbell step-up lunge",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "79AmJsI",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/79AmJsI.gif",
+      "name": "dumbbell hammer curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "7AnZtSv",
+      "bodyParts": [
+        "lower arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/7AnZtSv.gif",
+      "name": "Dumbbell Over Bench Single-Arm Wrist Curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "7R4NIjL",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/7R4NIjL.gif",
+      "name": "assisted standing triceps extension (with towel)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "7WcQgkm",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/7WcQgkm.gif",
+      "name": "Smith Machine Incline Triceps Extension",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "7i4msxz",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/7i4msxz.gif",
+      "name": "cocoons",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "7y9JIMj",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/7y9JIMj.gif",
+      "name": "Machine Reverse-Grip Preacher Curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "89HVjEp",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/89HVjEp.gif",
+      "name": "kettlebell seated press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "8IbNZwc",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/8IbNZwc.gif",
+      "name": "band hip lift",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "8gQo5Ss",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/8gQo5Ss.gif",
+      "name": "cable standing crunch (with rope attachment)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "8yBgwBS",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/8yBgwBS.gif",
+      "name": "cable concentration curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "9Z23cLE",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/9Z23cLE.gif",
+      "name": "barbell incline bench press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "9ZGnq1w",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/9ZGnq1w.gif",
+      "name": "triceps dip (between benches)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "9fCHfSc",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/9fCHfSc.gif",
+      "name": "cable palm rotational row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "9tvVVM9",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/9tvVVM9.gif",
+      "name": "cable triceps pushdown (v-bar)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "9vz4JlC",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/9vz4JlC.gif",
+      "name": "weighted lunge with swing",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "A3P4O0R",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/A3P4O0R.gif",
+      "name": "cable seated row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "AdxxqfF",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/AdxxqfF.gif",
+      "name": "Barbell Standing Reverse-Grip Curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Aj9vWh7",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Aj9vWh7.gif",
+      "name": "assisted seated pectoralis major stretch with stability ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "AwAIlSo",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/AwAIlSo.gif",
+      "name": "Reverse-Grip Machine Lat Pulldown",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "BeReYBf",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/BeReYBf.gif",
+      "name": "side-to-side chin",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "C8Crfa4",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/C8Crfa4.gif",
+      "name": "smith close-grip bench press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "CUmLRTA",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/CUmLRTA.gif",
+      "name": "cable kneeling crunch",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "DICPHtq",
+      "bodyParts": [
+        "lower legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/DICPHtq.gif",
+      "name": "single leg calf raise (on a dumbbell)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "DoEYq4s",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/DoEYq4s.gif",
+      "name": "sissy squat",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Dx2RIva",
+      "bodyParts": [
+        "lower legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Dx2RIva.gif",
+      "name": "Sled Single-Leg Calf Press On Leg Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "EnPivTL",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/EnPivTL.gif",
+      "name": "barbell bent arm pullover",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "EpKrFiv",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/EpKrFiv.gif",
+      "name": "incline push up depth jump",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "EqHIIjJ",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/EqHIIjJ.gif",
+      "name": "barbell reverse preacher curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "F56Xpw3",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/F56Xpw3.gif",
+      "name": "weighted straight bar dip",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "FSF9WOs",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/FSF9WOs.gif",
+      "name": "wide-grip chest dip on high parallel bars",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "G1qWW6M",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/G1qWW6M.gif",
+      "name": "Weighted One Hand Pull-Up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Gu2ENkm",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Gu2ENkm.gif",
+      "name": "Smith Machine Reverse Decline Close-Grip Bench Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "HZgQPxh",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/HZgQPxh.gif",
+      "name": "suspended abdominal fallout",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "I6Ca0a7",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/I6Ca0a7.gif",
+      "name": "EZ-Bar Lying Close-Grip Triceps Extension Behind Head",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "IBj3nsn",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/IBj3nsn.gif",
+      "name": "quick feet",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "IH2kr7n",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/IH2kr7n.gif",
+      "name": "dumbbell decline shrug",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "IU4QNJ6",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/IU4QNJ6.gif",
+      "name": "chin-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "IxsFgRT",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/IxsFgRT.gif",
+      "name": "cable judo flip",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "J1vH2X0",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/J1vH2X0.gif",
+      "name": "Weighted One Hand Pull-Up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "JxrY9mC",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/JxrY9mC.gif",
+      "name": "Band Kneeling Single-Arm Pulldown",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "KQfySvS",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/KQfySvS.gif",
+      "name": "Dumbbell Reverse-Grip Row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "KWyEjtI",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/KWyEjtI.gif",
+      "name": "Machine Bent-Over Row With V-Bar",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "KenZJQV",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/KenZJQV.gif",
+      "name": "barbell high bar squat",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "L68dTQj",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/L68dTQj.gif",
+      "name": "band seated twist",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "LFIOery",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/LFIOery.gif",
+      "name": "dumbbell sumo pull through",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "LlSe9IK",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/LlSe9IK.gif",
+      "name": "assisted standing chin-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "LzX8YEz",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/LzX8YEz.gif",
+      "name": "all fours squad stretch",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "M8IolhQ",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/M8IolhQ.gif",
+      "name": "EZ-Bar Close-Grip Preacher Curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "MDFxU4b",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/MDFxU4b.gif",
+      "name": "quads (bodyweight squat)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "MRaFiZP",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/MRaFiZP.gif",
+      "name": "smith seated shoulder press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "MqNdIbe",
+      "bodyParts": [
+        "lower arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/MqNdIbe.gif",
+      "name": "wrist rollerer",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Mr8d4KA",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Mr8d4KA.gif",
+      "name": "kettlebell arnold press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "N3EirIW",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/N3EirIW.gif",
+      "name": "Machine Assisted Pull-Up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "N6dZN2I",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/N6dZN2I.gif",
+      "name": "cable high row (kneeling)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "O3INw8V",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/O3INw8V.gif",
+      "name": "sphinx",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "OJFgZJ0",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/OJFgZJ0.gif",
+      "name": "Barbell Lying Back Of The Head Triceps Extension",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "P7zSvul",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/P7zSvul.gif",
+      "name": "push up on bosu ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "PCUYOMs",
+      "bodyParts": [
+        "cardio"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/PCUYOMs.gif",
+      "name": "walk elliptical cross trainer",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "PDHE73u",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/PDHE73u.gif",
+      "name": "band straight back stiff leg deadlift",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "PKlXuJW",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/PKlXuJW.gif",
+      "name": "band push sit-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "QQwxa8g",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/QQwxa8g.gif",
+      "name": "dumbbell preacher curl over exercise ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Qj0HRAZ",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Qj0HRAZ.gif",
+      "name": "Band Seated Hip Abduction",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Ql4g5s8",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Ql4g5s8.gif",
+      "name": "Forward Lunge",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "QoSZo2Y",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/QoSZo2Y.gif",
+      "name": "Cable Single-Arm Incline Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Rsxr3xl",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Rsxr3xl.gif",
+      "name": "Single-Arm Against Wall",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Sa8mzWc",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Sa8mzWc.gif",
+      "name": "hanging pike",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "TBNaSNs",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/TBNaSNs.gif",
+      "name": "EZ-Bar Decline Close-Grip Face Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "UI81amT",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/UI81amT.gif",
+      "name": "band alternating v-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "UOphC6N",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/UOphC6N.gif",
+      "name": "cable side bend",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Ul5OFSV",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Ul5OFSV.gif",
+      "name": "Band Leg Extension",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Um8xUAc",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Um8xUAc.gif",
+      "name": "barbell prone incline curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "UoX77uR",
+      "bodyParts": [
+        "lower legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/UoX77uR.gif",
+      "name": "Dumbbell Seated Single-Leg Calf Raise - Hammer Grip",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Uywa4S5",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Uywa4S5.gif",
+      "name": "dumbbell lunge",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "V7rWsT5",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/V7rWsT5.gif",
+      "name": "Machine Military Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "VRBGPHB",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/VRBGPHB.gif",
+      "name": "smith shoulder press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "VsopqcV",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/VsopqcV.gif",
+      "name": "close-grip push-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "W1p7BND",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/W1p7BND.gif",
+      "name": "chest stretch with exercise ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "W7yh3Yo",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/W7yh3Yo.gif",
+      "name": "Dumbbell Single-Arm French Press On Exercise Ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "WFucoe6",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/WFucoe6.gif",
+      "name": "hanging straight twisting leg hip raise",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "WM6TvvW",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/WM6TvvW.gif",
+      "name": "cable low seated row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "XE93sQZ",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/XE93sQZ.gif",
+      "name": "Dumbbell Step Up Single Leg Balance With Biceps Curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Xd65M9w",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Xd65M9w.gif",
+      "name": "dumbbell around pullover",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "XqYQ9JA",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/XqYQ9JA.gif",
+      "name": "Dumbbell Single-Arm Prone Hammer Curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "Y8dOJlH",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/Y8dOJlH.gif",
+      "name": "cable squat row (with rope attachment)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "YA2HKGz",
+      "bodyParts": [
+        "lower arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/YA2HKGz.gif",
+      "name": "barbell reverse wrist curl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "afv0ZAS",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/afv0ZAS.gif",
+      "name": "smith incline bench press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "b5uBMv2",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/b5uBMv2.gif",
+      "name": "exercise ball alternating arm ups",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "cuC7529",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/cuC7529.gif",
+      "name": "Single-Leg Squat",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "dAJscVq",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/dAJscVq.gif",
+      "name": "cable incline bench row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "dVeWXf2",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/dVeWXf2.gif",
+      "name": "chin-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "drfGhTV",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/drfGhTV.gif",
+      "name": "cable incline fly",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "eZ79rbI",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/eZ79rbI.gif",
+      "name": "Cable Kneeling Rear Delt Row (With Rope)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "echClj7",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/echClj7.gif",
+      "name": "barbell squat (on knees)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "fBnPpzd",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/fBnPpzd.gif",
+      "name": "assisted prone hamstring",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "fF6GKVh",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/fF6GKVh.gif",
+      "name": "chair leg extended stretch",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "fjjY3N4",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/fjjY3N4.gif",
+      "name": "inverse leg curl (on pull-up cable machine)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "gMyx3Qn",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/gMyx3Qn.gif",
+      "name": "scapula push-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "gSO0KpB",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/gSO0KpB.gif",
+      "name": "sit-up with arms on chest",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "gTGciXz",
+      "bodyParts": [
+        "cardio"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/gTGciXz.gif",
+      "name": "bear crawl",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "gWcZD4q",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/gWcZD4q.gif",
+      "name": "dumbbell standing alternate overhead press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "gdPIyyO",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/gdPIyyO.gif",
+      "name": "hanging pike",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "hTLtkXL",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/hTLtkXL.gif",
+      "name": "Band Seated Shoulder Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "hVzPY5j",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/hVzPY5j.gif",
+      "name": "Battling Ropes",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "hjWjJEm",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/hjWjJEm.gif",
+      "name": "exercise ball hip flexor stretch",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "iCPqbki",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/iCPqbki.gif",
+      "name": "Machine Narrow Grip Seated Row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "iDGtjyi",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/iDGtjyi.gif",
+      "name": "chest and front of shoulder stretch",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "iFsqlCD",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/iFsqlCD.gif",
+      "name": "Medicine Ball Close-Grip Push Up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "iqH55N8",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/iqH55N8.gif",
+      "name": "Forward Lunge",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "j6uIfep",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/j6uIfep.gif",
+      "name": "Kettlebell Extended Range Single-Arm Press On Floor",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "jCBOdh0",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/jCBOdh0.gif",
+      "name": "cable decline fly",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "jvEXp4N",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/jvEXp4N.gif",
+      "name": "Single-Arm Dip",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "kKYTkjJ",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/kKYTkjJ.gif",
+      "name": "Exercise Ball Single-Leg Prone Lower Body Rotation",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "kLiIFdB",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/kLiIFdB.gif",
+      "name": "band vertical pallof press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "kk39rUy",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/kk39rUy.gif",
+      "name": "push-up to side plank",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "lFBTISi",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/lFBTISi.gif",
+      "name": "hanging oblique knee raise",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "lRcrlH8",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/lRcrlH8.gif",
+      "name": "Band Straight-Leg Deadlift",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "mAYqY4M",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/mAYqY4M.gif",
+      "name": "full planche push-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "mpYUPkA",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/mpYUPkA.gif",
+      "name": "lying leg-hip raise",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "myJeTAe",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/myJeTAe.gif",
+      "name": "Cable Single-Arm Lateral Raise",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "nFHk9fU",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/nFHk9fU.gif",
+      "name": "cable lateral pulldown (with rope attachment)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "ninBEOY",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/ninBEOY.gif",
+      "name": "side-to-side chin",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "ntjtCfu",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/ntjtCfu.gif",
+      "name": "Barbell Seated Alternate Leg Raise",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "numr601",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/numr601.gif",
+      "name": "Machine Standing Chest Press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "o6LqKKP",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/o6LqKKP.gif",
+      "name": "barbell romanian deadlift",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "o80Xu9C",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/o80Xu9C.gif",
+      "name": "Kettlebell Extended Range Single-Arm Press On Floor",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "oMwyl17",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/oMwyl17.gif",
+      "name": "Barbell Straight-Leg Deadlift",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "omsF3RN",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/omsF3RN.gif",
+      "name": "band side triceps extension",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "ookVu2D",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/ookVu2D.gif",
+      "name": "dumbbell pullover hip extension on exercise ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "p0OCXGb",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/p0OCXGb.gif",
+      "name": "sled 45° leg wide press",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "p5v6rdT",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/p5v6rdT.gif",
+      "name": "iron cross stretch",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "pFuK3by",
+      "bodyParts": [
+        "cardio"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/pFuK3by.gif",
+      "name": "walk elliptical cross trainer",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "pNIKolI",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/pNIKolI.gif",
+      "name": "exercise ball seated triceps stretch",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "pgIdT6i",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/pgIdT6i.gif",
+      "name": "Band Single-Arm Standing Low Row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "qBl14UC",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/qBl14UC.gif",
+      "name": "push-up (wall)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "qFHvMnv",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/qFHvMnv.gif",
+      "name": "barbell speed squat",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "qU8bYp7",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/qU8bYp7.gif",
+      "name": "Cable Standing Single-Arm Triceps Extension",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "qlZUaZ8",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/qlZUaZ8.gif",
+      "name": "Dumbbell Incline Single-Arm Press On Exercise Ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "r4RZKpF",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/r4RZKpF.gif",
+      "name": "Dumbbell Single-Arm Fly On Exercise Ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "sJElUUI",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/sJElUUI.gif",
+      "name": "Dumbbell Incline Single-Arm Press On Exercise Ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "syUwUKY",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/syUwUKY.gif",
+      "name": "dumbbell pronate-grip triceps extension",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "tuIZFDt",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/tuIZFDt.gif",
+      "name": "Kneeling Plank Tap Shoulder",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "u1iHcoD",
+      "bodyParts": [
+        "shoulders"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/u1iHcoD.gif",
+      "name": "dumbbell upright shoulder external rotation",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "u3UuCZu",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/u3UuCZu.gif",
+      "name": "Kettlebell Two-Arm Row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "v6EKk0O",
+      "bodyParts": [
+        "cardio"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/v6EKk0O.gif",
+      "name": "Half Knee Bends",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "vN5HB0s",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/vN5HB0s.gif",
+      "name": "cable standing crunch",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "vNPJbDA",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/vNPJbDA.gif",
+      "name": "Cable Rope Incline Triceps Extension",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "vobtVkm",
+      "bodyParts": [
+        "lower legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/vobtVkm.gif",
+      "name": "calf push stretch with hands against wall",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "vocve3e",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/vocve3e.gif",
+      "name": "Dumbbell Single-Leg Fly On Exercise Ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "vpleANJ",
+      "bodyParts": [
+        "upper legs"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/vpleANJ.gif",
+      "name": "pelvic tilt into bridge",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "w44vFvP",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/w44vFvP.gif",
+      "name": "Smith Single-Arm Row",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "w7obpWd",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/w7obpWd.gif",
+      "name": "cable pushdown",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "woLo1QN",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/woLo1QN.gif",
+      "name": "incline push-up (on box)",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "xOXZJRZ",
+      "bodyParts": [
+        "chest"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/xOXZJRZ.gif",
+      "name": "clock push-up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "xcLntTC",
+      "bodyParts": [
+        "waist"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/xcLntTC.gif",
+      "name": "leg pull in flat bench",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "xmWQIlT",
+      "bodyParts": [
+        "upper arms"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/xmWQIlT.gif",
+      "name": "Dumbbell Alternating Seated Biceps Curl On Exercise Ball",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    },
+    {
+      "exerciseId": "znf7t8E",
+      "bodyParts": [
+        "back"
+      ],
+      "gifUrl": "https://static.exercisedb.dev/media/znf7t8E.gif",
+      "name": "kipping muscle up",
+      "observedStatus": 404,
+      "observedAt": "2026-11-05T17:29:24.268Z"
+    }
+  ]
+}

@@ -16,5 +16,6 @@ it('keeps API watch, Coach watch and production compiler outputs separate', () =
   });
   expect(new Set(outputs).size).toBe(3);
   expect(scripts['start:debug']).toContain('--path tsconfig.dev.json');
-  expect(relative(root, outputs[2])).toBe('dist');
+  expect(outputs[2]).toBeDefined();
+  expect(relative(root, outputs[2]!)).toBe('dist');
 });

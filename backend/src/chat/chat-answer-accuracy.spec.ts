@@ -8,6 +8,22 @@ function setup(scenario: 'populated' | 'empty' | 'partial' = 'populated') {
   return { ...fixture, ask, generate };
 }
 describe('independent factual answer checks', () => {
+  it('formats the saved Coach program as readable days and exercise lines', async () => {
+    const { ask, generate } = setup();
+    const answer = await ask('Tell me about my current Coach program');
+    expect(answer).toContain('Your saved Coach program\nGoal: Build muscle\nSession length: 45 min');
+    expect(answer).toContain('Monday — Strength day\n  1. Squat — 3 × 8');
+    expect(answer).toContain('Tuesday — Recovery day (rest/recovery)');
+    expect(answer).toContain('up to four exercises per day');
+    expect(answer).toContain('may predate newer preferences');
+    expect(generate).not.toHaveBeenCalled();
+  });
+  it('shows only the selected weekday when asked for that day', async () => {
+    const { ask } = setup();
+    const answer = await ask('What exercises are in my saved workout program on Monday?');
+    expect(answer).toContain('Monday — Strength day\n  1. Squat — 3 × 8');
+    expect(answer).not.toContain('Tuesday —');
+  });
   it('uses the saved dietary plan before independent nutrition settings and profile goal', async () => {
     const { ask } = setup();
     const answer = await ask("what's my current diet plan?");

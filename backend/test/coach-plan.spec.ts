@@ -144,8 +144,8 @@ describe('coach plan', () => {
     const plan = await new CoachService(profileModel({ ...profile, goal: 'General fitness' }), settingsModel(), exercisesModel(rows)).getPlan(USER);
     const day = plan.days.find(item => item.isWorkoutDay)!;
     expect(day.exercises[0]).toMatchObject({ prescription: '3 × 45 s', equipment: 'Bodyweight', tracking: 'Manual' });
-    expect(day.formTip).toEqual({ exerciseName: 'Plank', text: 'Keep hips level.' });
-    expect(day.equipmentLabel).toBe('Bodyweight');
+    expect('formTip' in day && day.formTip).toEqual({ exerciseName: 'Plank', text: 'Keep hips level.' });
+    expect('equipmentLabel' in day && day.equipmentLabel).toBe('Bodyweight');
   });
 
   it('does not silently treat missing equipment as available or invent filler for an empty focus', async () => {

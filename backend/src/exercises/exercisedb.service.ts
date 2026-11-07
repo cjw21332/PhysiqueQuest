@@ -5,9 +5,9 @@ import { commonMovementScore } from '../coach/movement-curation.js';
 export const SOURCE = 'ExerciseDB V1';
 const PARTS: Record<string, string[]> = { Chest: ['chest'], Back: ['back'], Legs: ['upper legs', 'lower legs'], Core: ['waist'], Shoulders: ['shoulders'], Arms: ['upper arms', 'lower arms'], Cardio: ['cardio'] };
 const EQUIPMENT: Record<string, string[]> = { Dumbbells: ['dumbbell'], Barbell: ['barbell', 'olympic barbell', 'EZ bar', 'trap bar'], Bodyweight: ['bodyweight'], 'Resistance bands': ['resistance band'], Cable: ['cable'], Machine: ['leverage machine', 'smith machine', 'sled machine', 'elliptical machine', 'stepmill machine', 'stationary bike'], Kettlebell: ['kettlebell'] };
-type RawExercise = { exerciseId: string; name: string; gifUrl: string; bodyParts: string[]; equipments: string[]; targetMuscles: string[]; secondaryMuscles: string[]; instructions: string[] };
+export type RawExercise = { exerciseId: string; name: string; gifUrl: string; bodyParts: string[]; equipments: string[]; targetMuscles: string[]; secondaryMuscles: string[]; instructions: string[] };
 type Envelope = { success: boolean; data: RawExercise[] | RawExercise; meta?: { total?: number; hasNextPage?: boolean; nextCursor?: string } };
-export type CatalogQuery = { search?: string; muscle?: string; equipment?: string; page?: number; limit?: number };
+export type CatalogQuery = { search?: string; muscle?: string; equipment?: string; bodyPart?: string; target?: string; secondary?: string; sort?: 'name-asc' | 'name-desc' | 'body-part' | 'equipment' | 'recent'; page?: number; limit?: number };
 const words = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean);
 function closeWord(query: string, candidate: string): boolean {
   if (candidate.includes(query)) return true;
@@ -22,9 +22,11 @@ function closeWord(query: string, candidate: string): boolean {
 }
 const commonScore = commonMovementScore;
 export function normalizeExercise(row: RawExercise) {
-  if (!row || typeof row.exerciseId !== 'string' || typeof row.name !== 'string' || typeof row.gifUrl !== 'string' || ![row.bodyParts, row.equipments, row.targetMuscles, row.secondaryMuscles, row.instructions].every(value => Array.isArray(value) && value.every(item => typeof item === 'string'))) {
+  if (!row || typeof row.exerciseId !== 'string' || !row.exerciseId || typeof row.name !== 'string' || !row.name) {
     throw new HttpException({ message: 'ExerciseDB returned invalid exercise metadata', source: SOURCE }, 502);
   }
+  const strings = (value: unknown): string[] => Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+  row = { ...row, gifUrl: typeof row.gifUrl === 'string' ? row.gifUrl : '', bodyParts: strings(row.bodyParts), equipments: strings(row.equipments), targetMuscles: strings(row.targetMuscles), secondaryMuscles: strings(row.secondaryMuscles), instructions: strings(row.instructions) };
   const targetMuscle = Object.entries(PARTS).find(([, parts]) => row.bodyParts.some(part => parts.includes(part)))?.[0] ?? row.bodyParts[0] ?? 'General';
   const equipment = Object.entries(EQUIPMENT).find(([, names]) => row.equipments.some(name => names.includes(name)))?.[0] ?? row.equipments.join(' + ');
   const instructions = row.instructions.map(step => step.replace(/^Step\s*:\s*\d+\s*/i, '').trim()).filter(Boolean);
@@ -33,6 +35,15 @@ export function normalizeExercise(row: RawExercise) {
 
 @Injectable()
 export class ExerciseDbService {
+  private persistent?: { list: (query: CatalogQuery) => Promise<any>; detail: (id: string) => Promise<any> };
+  attachPersistent(store: NonNullable<ExerciseDbService['persistent']>) { this.persistent = store; }
+  async providerPage(cursor?: string) {
+    const params = new URLSearchParams({ limit: '25' });
+    if (cursor) params.set('after', cursor);
+    const result = await this.request(`/exercises?${params}`, Date.now() + 30000);
+    if (!Array.isArray(result.data)) throw new Error('Invalid exercise page');
+    return { rows: result.data, meta: result.meta };
+  }
   private nextRequestAt = 0;
   private readonly inFlight = new Map<string, Promise<Envelope>>();
   private readonly cache = new Map<string, { expiresAt: number; value: Envelope }>();
@@ -42,8 +53,8 @@ export class ExerciseDbService {
     const existing = this.inFlight.get(path);
     if (existing) return existing;
     const pending = this.requestActual(path, deadline).then(value => {
-      if (this.cache.size >= 100) this.cache.delete(this.cache.keys().next().value!);
-      this.cache.set(path, { expiresAt: Date.now() + 30_000, value });
+      if (this.cache.size >= 500) this.cache.delete(this.cache.keys().next().value!);
+      this.cache.set(path, { expiresAt: Date.now() + 300_000, value });
       return value;
     }).finally(() => this.inFlight.delete(path));
     this.inFlight.set(path, pending);
@@ -72,8 +83,13 @@ export class ExerciseDbService {
     }
   }
 
-  async findAll(query: CatalogQuery = {}, pageBudget = 4, deadline = Date.now() + 20000) {
-    const page = Number.isFinite(query.page) ? Math.min(9, Math.max(1, Math.floor(query.page!))) : 1;
+  async findAll(query: CatalogQuery = {}, pageBudget?: number, deadline = Date.now() + 120000) {
+    if (this.persistent && pageBudget === undefined) {
+      const result = await this.persistent.list(query);
+      if (result) return result;
+    }
+    if (query.bodyPart || query.target || query.secondary || query.sort) throw new HttpException('The exercise catalog is still loading. Please try again shortly.', 503);
+    const page = Number.isFinite(query.page) ? Math.max(1, Math.floor(query.page!)) : 1;
     const limit = Number.isFinite(query.limit) ? Math.min(100, Math.max(1, Math.floor(query.limit!))) : 12;
     const search = query.search?.trim().slice(0, 100) ?? '';
     const params = new URLSearchParams({ limit: '25' });
@@ -83,13 +99,16 @@ export class ExerciseDbService {
     if (equipment.length) params.set('equipments', equipment.join(','));
     let rows: RawExercise[] = [];
     let more = false;
+    let providerTotal: number | undefined;
+    const budget = pageBudget ?? (search ? Math.max(4, Math.ceil(page * limit / 25)) : Math.ceil(page * limit / 25));
     if (search) {
       const tokens = words(search);
       params.set('name', search);
       const pool: RawExercise[] = [];
-      for (let index = 0; index < pageBudget; index++) {
+      for (let index = 0; index < budget; index++) {
         const result = await this.request(`/exercises?${params}`, deadline);
         pool.push(...(Array.isArray(result.data) ? result.data : []));
+        providerTotal = result.meta?.total;
         more = Boolean(result.meta?.hasNextPage && result.meta.nextCursor);
         if (!more) break;
         params.set('after', result.meta!.nextCursor!);
@@ -108,21 +127,24 @@ export class ExerciseDbService {
       }
       rows.sort((a, b) => Number(b.name.toLowerCase() === search.toLowerCase()) - Number(a.name.toLowerCase() === search.toLowerCase()) || commonScore(b.name) - commonScore(a.name) || a.name.localeCompare(b.name));
     } else {
-      for (let index = 0; index < pageBudget; index++) {
+      for (let index = 0; index < budget; index++) {
         const result = await this.request(`/exercises?${params}`, deadline);
         rows.push(...(Array.isArray(result.data) ? result.data : []));
+        providerTotal = result.meta?.total;
         more = Boolean(result.meta?.hasNextPage && result.meta.nextCursor);
         if (!more) break;
         params.set('after', result.meta!.nextCursor!);
       }
-      rows.sort((a, b) => commonScore(b.name) - commonScore(a.name) || a.name.localeCompare(b.name));
+
     }
     const unique = [...new Map(rows.map(row => [row.exerciseId, row])).values()];
-    return { items: unique.slice((page - 1) * limit, page * limit).map(normalizeExercise), total: unique.length, page, limit, pages: Math.ceil(unique.length / limit), source: SOURCE, coverageNote: more ? 'Showing a bounded selection from ExerciseDB; totals describe this selection, not the complete catalog.' : undefined };
+    const total = !search && pageBudget === undefined && providerTotal !== undefined ? providerTotal : unique.length;
+    return { items: unique.slice((page - 1) * limit, page * limit).map(normalizeExercise), total, page, limit, pages: Math.ceil(total / limit), source: SOURCE, coverageNote: more && (search || pageBudget !== undefined || providerTotal === undefined) ? 'Showing a bounded selection from ExerciseDB; totals describe this selection, not the complete catalog.' : undefined };
   }
 
   async findBySlug(id: string) {
     if (!/^[a-zA-Z0-9_-]{1,80}$/.test(id.trim())) throw new NotFoundException('Exercise not found');
+    if (this.persistent) { const cached = await this.persistent.detail(id.trim()); if (cached) return cached; }
     return normalizeExercise((await this.request(`/exercises/${encodeURIComponent(id.trim())}`)).data as RawExercise);
   }
 

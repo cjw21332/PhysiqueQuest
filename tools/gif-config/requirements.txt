@@ -1,0 +1,28 @@
+# GIF Config Pipeline - Pinned versions for reproducibility
+# Python 3.10 - 3.12
+
+# Core scientific stack
+numpy==1.26.4
+scipy==1.13.0
+
+# MediaPipe for pose landmark detection
+mediapipe==0.10.14
+
+# Image processing
+opencv-python==4.9.0.80
+Pillow==10.3.0
+imageio==2.35.1
+imageio-ffmpeg==0.4.9
+
+# MongoDB driver
+pymongo==4.7.1
+
+# Progress bars and utilities
+tqdm==4.66.4
+python-dotenv==1.0.1
+
+# Data handling
+pandas==2.2.1
+
+# Type checking (optional)
+typing-extensions==4.11.0

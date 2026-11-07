@@ -9,8 +9,11 @@ import { titleCase } from './title-case-helper.mjs';
 
 const load = async () => {
   const source = await readFile(new URL('../sections/Scan/nutritionPresentation.ts', import.meta.url), 'utf8');
-  const { outputText } = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } });
-  return import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`);
+  const dependency = await readFile(new URL('../sections/Scan/nutrientTotal.ts', import.meta.url), 'utf8');
+  const compile = text => ts.transpileModule(text, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+  const run = (text, imports) => { const module = { exports: {} }; new Function('require', 'module', 'exports', compile(text))(imports, module, module.exports); return module.exports; };
+  const nutrientTotal = run(dependency, createRequire(import.meta.url));
+  return run(source, name => name === './nutrientTotal' ? nutrientTotal : createRequire(import.meta.url)(name));
 };
 test('preview is allowed only for a successful, genuinely empty nutrition response', async () => {
   const { canPreviewNutrition } = await load();

@@ -27,7 +27,7 @@ describe('Sentry privacy boundary', () => {
     const send = vi.fn(async () => ({ statusCode: 200 }));
     Sentry.init({ ...sentryOptions('https://public@example.invalid/1'), defaultIntegrations: false, transport: () => ({ send, flush: async () => true }) });
     const privateValue = 'private-health-token-email@example.invalid';
-    Sentry.captureException(new Error(privateValue), { tags: { request_id: 'request-3' }, extra: { healthNotes: privateValue }, user: { email: privateValue }, attachments: [{ filename: 'private.txt', data: privateValue }] });
+    Sentry.captureException(new Error(privateValue), { tags: { request_id: 'request-3' }, extra: { healthNotes: privateValue }, user: { email: privateValue }, attachments: [{ filename: 'private.txt', data: privateValue }] } as unknown as Parameters<typeof Sentry.captureException>[1]);
     await Sentry.flush(1000);
     const envelope = JSON.stringify(send.mock.calls);
     expect(send).toHaveBeenCalled();

@@ -3,6 +3,7 @@ import { jointIndices, type TrackingKind, type TrackingSide } from '../../shared
 
 type Command = { type: 'init'; baseUrl: string } | { type: 'dispose' } |
   { type: 'frame'; bitmap: ImageBitmap; timestamp: number; kind: TrackingKind; side: TrackingSide } |
+  { type: 'generic-frame'; bitmap: ImageBitmap; timestamp: number } |
   { type: 'readiness-frame'; bitmap: ImageBitmap; timestamp: number; sessionId: string; frameId: number };
 const scope = self as unknown as { onmessage: ((event: MessageEvent<Command>) => void) | null; postMessage: (data: unknown) => void };
 let detector: PoseLandmarker | undefined;
@@ -31,6 +32,10 @@ scope.onmessage = async event => {
     const start = performance.now();
     const result = detector.detectForVideo(command.bitmap, command.timestamp);
     const landmarks = result.landmarks[0] ?? [];
+    if(command.type === 'generic-frame') {
+      scope.postMessage({type:'generic-result',frame:{landmarks,aspect:command.bitmap.width / command.bitmap.height,timestamp:command.timestamp},durationMs:performance.now()-start});
+      return;
+    }
     if(command.type === 'readiness-frame') {
       let luminance: number | undefined;
       try {

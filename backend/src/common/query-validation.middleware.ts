@@ -5,7 +5,7 @@ const allowedQueries: Record<string, string[]> = {
   '/api/activity/state': ['timezone'], '/api/progress': ['metric', 'limit'], '/api/leaderboard': ['period'],
   '/api/leaderboard/strength': ['exerciseId', 'metric'],
   '/api/admin/analytics': ['days'], '/api/admin/alerts': ['days', 'status'], '/api/admin/exercises': ['limit'],
-  '/api/exercises': ['search', 'muscle', 'equipment', 'page', 'limit'], '/api/nutrition/foods/search': ['q'],
+  '/api/exercises': ['search', 'muscle', 'equipment', 'bodyPart', 'target', 'secondary', 'sort', 'page', 'limit'], '/api/nutrition/foods/search': ['q'],
 };
 export function queryValidationMiddleware(req: Request, res: Response, next: NextFunction) {
   // Preflight carries the target URL's query but must reach CORS before validation.

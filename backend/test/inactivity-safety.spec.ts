@@ -30,7 +30,7 @@ function makeModel(store: any[] = []) {
 function makeProvider(confirmed = true, available = true) {
   return {
     isAvailable: () => available,
-    send: vi.fn(async () => ({ confirmed, providerReference: confirmed ? 'accepted-1' : undefined })),
+    send: vi.fn(async (_payload: Parameters<import('../src/providers/alert-delivery.provider.js').AlertDeliveryProvider['send']>[0]) => ({ confirmed, providerReference: confirmed ? 'accepted-1' : undefined })),
   };
 }
 
@@ -41,7 +41,7 @@ describe('cancelled events', () => {
     const add = vi.fn();
     const service = new SafetyService(model as any, withContact as any, { add } as any, provider as any, {} as any);
     const result = await service.send(USER, { idempotencyKey: 'cancel-test-123456', eventType: 'cancelled' });
-    expect(result.status).toBe('cancelled');
+    expect(result?.status).toBe('cancelled');
     expect(provider.send).not.toHaveBeenCalled();
     expect(add).not.toHaveBeenCalled();
   });
@@ -60,7 +60,7 @@ describe('inactivity alert payload', () => {
       workoutSessionId: WORKOUT,
       exerciseId: 'exercise-2',
     });
-    expect(result.status).toBe('delivered');
+    expect(result?.status).toBe('delivered');
     const payload = provider.send.mock.calls[0][0] as any;
     expect(payload.to).toBe('+15555550123');
     expect(payload.location).toEqual(location);
@@ -92,8 +92,8 @@ describe('inactivity alert payload', () => {
     const provider = makeProvider(true);
     const service = new SafetyService(model as any, withoutContact as any, { add: vi.fn() } as any, provider as any, {} as any);
     const result = await service.send(USER, { idempotencyKey: 'nocontact-test-1234', eventType: 'inactivity' });
-    expect(result.status).toBe('failed');
-    expect(result.errorCode).toBe('CONTACT_NOT_CONFIGURED');
+    expect(result?.status).toBe('failed');
+    expect(result?.errorCode).toBe('CONTACT_NOT_CONFIGURED');
     expect(provider.send).not.toHaveBeenCalled();
   });
 
@@ -105,7 +105,7 @@ describe('inactivity alert payload', () => {
     const body = { idempotencyKey: 'retry-test-1234567', eventType: 'inactivity' as const };
     await service.send(USER, body);
     const second = await service.send(USER, body);
-    expect(second.status).toBe('delivered');
+    expect(second?.status).toBe('delivered');
     expect(model.create).toHaveBeenCalledOnce();
     expect(provider.send).toHaveBeenCalledOnce();
   });
@@ -116,11 +116,11 @@ describe('resolve', () => {
     const model = makeModel();
     const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any, {} as any);
     const created = await service.send(USER, { idempotencyKey: 'resolve-test-123456', eventType: 'inactivity' });
-    const first = await service.resolve(USER, String(created._id));
+    const first = await service.resolve(USER, String(created?._id));
     expect(first.flagged).toBe(true);
     expect(first.resolvedAt).toBeInstanceOf(Date);
     const stamp = first.resolvedAt;
-    const second = await service.resolve(USER, String(created._id));
+    const second = await service.resolve(USER, String(created?._id));
     expect(second.resolvedAt).toBe(stamp);
   });
 
@@ -128,13 +128,13 @@ describe('resolve', () => {
     const model = makeModel();
     const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any, {} as any);
     const created = await service.send(USER, { idempotencyKey: 'owner-test-1234567', eventType: 'inactivity' });
-    await expect(service.resolve(OTHER_USER, String(created._id))).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.resolve(OTHER_USER, String(created?._id))).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('rejects resolving a manual alert', async () => {
     const model = makeModel();
     const service = new SafetyService(model as any, withContact as any, { add: vi.fn() } as any, makeProvider(true) as any, {} as any);
     const created = await service.send(USER, { idempotencyKey: 'manual-test-1234567', eventType: 'manual' });
-    await expect(service.resolve(USER, String(created._id))).rejects.toBeInstanceOf(BadRequestException);
+    await expect(service.resolve(USER, String(created?._id))).rejects.toBeInstanceOf(BadRequestException);
   });
 });

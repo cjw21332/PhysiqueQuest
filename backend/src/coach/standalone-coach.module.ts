@@ -6,6 +6,7 @@ import { ExerciseDbService, SOURCE } from '../exercises/exercisedb.service.js';
 import { CoachPlanner } from './coach-planner.js';
 import { parseCatalogQuery } from '../exercises/catalog-query.js';
 import { CoachRateLimitGuard } from './coach-rate-limit.guard.js';
+import { CatalogSyncService } from '../exercises/catalog-sync.service.js';
 
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const;
 const indexedDays: Record<string, string> = Object.fromEntries(['m-0', 't-1', 'w-2', 't-3', 'f-4', 's-5', 's-6'].map((id, index) => [id, weekdays[index]]));
@@ -54,7 +55,11 @@ export class StandaloneCoachController {
 @Controller('exercises')
 @UseGuards(CoachRateLimitGuard)
 export class StandaloneExercisesController {
-  constructor(private readonly catalog: ExerciseDbService) {}
+  constructor(private readonly catalog: ExerciseDbService, private readonly sync: CatalogSyncService) {}
+  @Get('sync-status')
+  status() { return this.sync.status(); }
+  @Get('filters')
+  filters() { return this.sync.filters(); }
   @Get()
   @Header('Cache-Control', 'public, max-age=30')
   list(@Query() query: { search?: string; muscle?: string; equipment?: string; page?: string; limit?: string }) {

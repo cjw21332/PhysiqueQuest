@@ -20,6 +20,24 @@ async function setup(page, catalog, detailHandler) {
   await page.getByRole('button', { name: /Exercise library/ }).click();
 }
 
+test('saved exercises survive reload and remain searchable when catalog requests fail', async ({ page }) => {
+  let offline = false;
+  await setup(page, (route, url, headers) => offline
+    ? route.fulfill({ status: 503, json: { message: 'Unavailable' }, headers })
+    : route.fulfill({ json: { items: [exercise], total: 1, page: 1, limit: 12, pages: 1 }, headers }));
+  await expect(page.getByRole('button', { name: /Backend seated press/i })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => new Promise((resolve, reject) => {
+    const open = indexedDB.open('physiquequest-exercise-catalog');
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => { const db = open.result; const count = db.transaction('exercises').objectStore('exercises').count(); count.onsuccess = () => { db.close(); resolve(count.result); }; };
+  }))).toBe(1);
+  offline = true;
+  await page.reload();
+  await expect(page.getByText(/Offline: showing saved exercises/)).toBeVisible();
+  await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('seated');
+  await expect(page.getByRole('button', { name: /Backend seated press/i })).toBeVisible();
+});
+
 test('Coach library loads API records, searches, filters, pages and opens real details', async ({ page }) => {
   const queries = [];
   await setup(page, (route, url, headers) => {
@@ -48,11 +66,8 @@ test('Coach library loads API records, searches, filters, pages and opens real d
   await page.getByRole('button', { name: 'Close exercise details' }).click();
   await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('seated');
   await expect.poll(() => queries.at(-1)?.search).toBe('seated');
-  await page.getByRole('button', { name: 'Shoulders', exact: true }).click();
-  await page.locator('.library-equipment-panel summary').click();
-  await page.getByRole('button', { name: 'Dumbbells', exact: true }).click();
+  await page.getByLabel('Equipment type').selectOption('Dumbbells');
   await expect.poll(() => queries.at(-1)?.equipment).toBe('Dumbbells');
-  expect(queries.at(-1).muscle).toBe('Shoulders');
   await page.getByRole('button', { name: 'Next page' }).click();
   await expect(page.getByRole('button', { name: /Second page press/i })).toBeVisible();
 });
@@ -88,7 +103,7 @@ test('details failure retries the provider and Escape returns focus to the exerc
   const row = page.getByRole('button', { name: /Backend seated press/i });
   await row.click();
   await expect(page.getByRole('dialog').getByRole('alert')).toContainText('Exercise details unavailable');
-  await expect(page.getByText('Press overhead slowly.')).toHaveCount(0);
+  await expect(page.getByText('Press overhead slowly.')).toBeVisible();
   await page.getByRole('button', { name: 'Retry details' }).click();
   await expect(page.getByText('Press overhead slowly.')).toBeVisible();
   expect(attempts).toBe(2);
@@ -116,7 +131,7 @@ test('library and bottom sheet fit narrow phones and desktop', async ({ page }) 
   await setup(page, (route, url, headers) => route.fulfill({ json: { items: [exercise], total: 1, page: 1, limit: 12, pages: 1 }, headers }));
   for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 844 });
-    await expect(page.locator('.library-equipment-panel summary')).toContainText('Any equipment');
+    await expect(page.getByLabel('Equipment type')).toHaveValue('Any equipment');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.getByRole('button', { name: /Backend seated press/i }).click();
     await expect(page.getByText('Fresh detail: press overhead slowly.')).toBeVisible();
@@ -127,6 +142,46 @@ test('library and bottom sheet fit narrow phones and desktop', async ({ page }) 
     expect(await page.getByRole('dialog').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     await page.getByRole('button', { name: 'Close exercise details' }).click();
   }
+});
+
+test('filters and repeated detail navigation remain usable on slow mobile and tablet layouts', async ({ page }) => {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Network.enable');
+  await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 125000, uploadThroughput: 62500 });
+  await setup(page, async (route, url, headers) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return route.fulfill({ json: { items: [exercise], total: 1500, page: 1, limit: 12, pages: 125 }, headers });
+  });
+  for (const width of [360, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(page.locator('.library-item')).toHaveCount(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.getByLabel('Equipment type').selectOption('Dumbbells');
+    await expect(page.getByRole('button', { name: 'Clear filters' })).toBeVisible();
+    await page.getByRole('button', { name: 'Clear filters' }).click();
+    await expect(page.getByLabel('Equipment type')).toHaveValue('Any equipment');
+    await page.getByRole('button', { name: /Backend seated press/i }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.getByRole('button', { name: 'Close exercise details' }).click();
+  }
+  await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('x'.repeat(100));
+  await expect(page.getByRole('searchbox', { name: 'Search Exercise' })).toHaveValue('x'.repeat(100));
+  await page.getByRole('button', { name: 'Clear filters' }).click();
+  await expect(page.getByRole('searchbox', { name: 'Search Exercise' })).toHaveValue('');
+});
+
+test('storage quota failures leave the library usable', async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function (...args) {
+      if (this.name === 'exercises') throw new DOMException('Quota exceeded', 'QuotaExceededError');
+      return original.apply(this, args);
+    };
+  });
+  await setup(page, (route, url, headers) => route.fulfill({ json: { items: [exercise], total: 1, page: 1, limit: 12, pages: 1 }, headers }));
+  await expect(page.getByText('Offline saving is unavailable.')).toBeVisible();
+  await page.getByRole('button', { name: /Backend seated press/i }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
 });
 
 test('API failure stays visible, retry loads an honest empty library', async ({ page }) => {
@@ -147,18 +202,18 @@ test('full exercise names and wrapped filters remain usable across library sizes
   for (const [width,height] of [[320,568],[390,844],[844,390],[1280,900]]) {
     await page.setViewportSize({ width,height });
     expect(await row.locator('b').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
-    for (const button of await page.getByRole('group', { name: 'Muscle group' }).getByRole('button').all()) {
-      const box = await button.boundingBox();expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(width);
+    for (const select of await page.locator('.library-discovery-controls select').all()) {
+      const box = await select.boundingBox();expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(width);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: info.outputPath(`library-layout-${width}.png`), animations:'disabled', fullPage:true });
   }
-  const equipment = page.locator('.library-equipment-panel summary');
-  await equipment.focus();await page.keyboard.press('Enter');
-  await expect(page.getByRole('button', { name:'Resistance bands',exact:true })).toBeVisible();
-  await page.getByRole('button', { name:'Resistance bands',exact:true }).click();
+  const equipment = page.getByLabel('Equipment type');
+  await equipment.selectOption('Resistance bands');
   await page.getByRole('button', { name:'Clear filters',exact:true }).click();
-  await expect(equipment).toContainText('Any equipment');
+  await expect(equipment).toHaveValue('Any equipment');
+  await expect(page.getByRole('group', { name: 'Muscle group' })).toHaveCount(0);
+  await expect(page.locator('.library-equipment-panel')).toHaveCount(0);
 });
 
 test('Me opens the backend admin catalog and saves muscle/equipment before refreshing', async ({ page }) => {

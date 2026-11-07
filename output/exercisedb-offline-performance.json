@@ -1,0 +1,17 @@
+{
+  "firstExerciseMs": 1505,
+  "deviceSyncMs": 9540,
+  "storage": {
+    "quota": 10743529866,
+    "usage": 6111626,
+    "usageDetails": {
+      "caches": 4555248,
+      "indexedDB": 1552854,
+      "serviceWorkerRegistrations": 3524
+    }
+  },
+  "jsHeapBytes": 21700000,
+  "offlineSearchMs": 391,
+  "offlineFilterMs": 41,
+  "scrollFrameP95Ms": 16.700000000000045
+}

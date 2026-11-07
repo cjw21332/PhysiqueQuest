@@ -20,7 +20,7 @@ export function useRepTracking(options: { kind: TrackingKind; side: TrackingSide
       if (stopped) return;
       lastResult = performance.now();
       const next = counter.update(frame);
-      setSnapshot(previous => previous.reps === next.reps && previous.phase === next.phase ? previous : next);
+      setSnapshot(previous => previous.reps === next.reps && previous.phase === next.phase && previous.message === next.message ? previous : next);
       setStatus('Camera tracking · prototype');
     };
     const staleTimer = window.setInterval(() => {

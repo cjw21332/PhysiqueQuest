@@ -10,9 +10,9 @@ export function securityHeaders(development, env = process.env) {
   const policy = [`default-src 'self'`, `base-uri 'self'`, `object-src 'none'`, `frame-ancestors 'none'`, `form-action 'self'`,
     `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${development ? " 'unsafe-eval'" : ''}`,
     `style-src 'self' 'unsafe-inline'`, `img-src 'self' data: blob: https:`, `font-src 'self'`, `worker-src 'self' blob:`,
-    `media-src 'self' blob:`, `connect-src 'self' ${development ? 'http: https: ws: wss:' : origins.join(' ')}`].join('; ');
+    `frame-src 'self' https://app.posetracker.com`, `media-src 'self' blob:`, `connect-src 'self' ${development ? 'http: https: ws: wss:' : origins.join(' ')}`].join('; ');
   return [{ key: 'Content-Security-Policy', value: policy }, { key: 'X-Content-Type-Options', value: 'nosniff' },
     { key: 'X-Frame-Options', value: 'DENY' }, { key: 'Referrer-Policy', value: 'no-referrer' },
-    { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=(self)' },
+    { key: 'Permissions-Policy', value: 'camera=(self "https://app.posetracker.com"), microphone=(self), geolocation=(self)' },
     ...(!development ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' }] : [])];
 }

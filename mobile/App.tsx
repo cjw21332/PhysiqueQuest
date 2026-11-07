@@ -21,10 +21,11 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { isTrustedWebViewUrl, resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
+import { isTrustedWebViewUrl, isTrustedWebViewNavigation, resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
 import { performanceGuardScript } from './performance-guard.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
+import PoseTrackerNative from './PoseTrackerNative';
 import { readinessMessageLimit, readinessScript, validateNativeReadinessContext, validateReadinessCheck, type NativeReadinessContext, type ReadinessCheck } from '../shared/cameraReadiness';
 
 Notifications.setNotificationHandler({ handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }) });
@@ -169,6 +170,11 @@ function AppContent() {
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
   const [cameraPreview, setCameraPreview] = useState<NativeCameraPreview | null>(null);
+  const [providerSession, setProviderSession] = useState<{token:string;exercise:string;name:string}|null>(null);
+  const closeProviderSession = useCallback(() => {
+    setProviderSession(null);
+    webRef.current?.injectJavaScript("window.dispatchEvent(new CustomEvent('physiquequest-posetracker-closed'));true;");
+  }, []);
   const [foodCamera, setFoodCamera] = useState<FoodCameraRequest | null>(null);
   const [framing,setFraming]=useState<ReadinessCheck>({status:'unknown',reason:'pending'});
   const cameraRequestId = useRef(0);
@@ -352,8 +358,8 @@ function AppContent() {
         source={{ uri: loadedAddress }}
         style={StyleSheet.absoluteFill}
         containerStyle={styles.webContainer}
-        originWhitelist={[new URL(loadedAddress).origin]}
-        onShouldStartLoadWithRequest={request => isTrustedWebViewUrl(request.url, loadedAddress)}
+        originWhitelist={[new URL(loadedAddress).origin, 'https://app.posetracker.com']}
+        onShouldStartLoadWithRequest={request => isTrustedWebViewNavigation(request.url, loadedAddress, request.isTopFrame)}
         injectedJavaScriptBeforeContentLoaded={insetScript}
         javaScriptEnabled
         domStorageEnabled
@@ -384,11 +390,11 @@ function AppContent() {
           setFoodCamera(null);
           monitor.current?.stop();
           stopNativeCamera();
-          console.error('WebView error:', e.nativeEvent);
+          console.error('WebView error:', e.nativeEvent.code);
           setError(true);
         }}
         onHttpError={e => {
-          console.error('HTTP error:', e.nativeEvent);
+          console.error('HTTP error:', e.nativeEvent.statusCode);
           if (e.nativeEvent.statusCode >= 500) {stopNativeCamera();setError(true);}
         }}
         onMessage={(e) => {
@@ -407,7 +413,15 @@ function AppContent() {
               sessionId?: string;
               geometryGeneration?: number;
               framing?: unknown;
+              token?: string;
+              exercise?: string;
+              name?: string;
             };
+            if (message.type === 'posetracker-native-start' && typeof message.token === 'string' && message.token.length <= 200 && typeof message.exercise === 'string' && /^[a-z_]{1,60}$/.test(message.exercise) && typeof message.name === 'string' && message.name.length <= 160) {
+              stopNativeCamera();
+              setProviderSession({token:message.token,exercise:message.exercise,name:message.name});
+            }
+            if (message.type === 'posetracker-native-stop') closeProviderSession();
             if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
             if (message.type === 'food-camera-start' && typeof message.requestId === 'string' && message.requestId.length <= 100 && ['photo', 'barcode'].includes(message.mode ?? '') && isCameraFrame(message.frame)) {
               stopNativeCamera();
@@ -485,6 +499,7 @@ function AppContent() {
           setError(true);
         }}
       /> : null}
+      {providerSession && <PoseTrackerNative key={`${providerSession.exercise}:${providerSession.token}`} {...providerSession} close={closeProviderSession}/>}
       {foodCamera && <FoodScannerCamera key={foodCamera.requestId} request={foodCamera} finish={result => {
         const detail = JSON.stringify({ ...result, requestId: foodCamera.requestId }).replace(/</g, '\\u003c');
         if (result.type !== 'ready') setFoodCamera(null);

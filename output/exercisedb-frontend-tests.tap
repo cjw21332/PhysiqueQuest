@@ -1,0 +1,1052 @@
+TAP version 13
+# Subtest: admin analytics preserves API mode and selects mock data only through the explicit preview flag
+ok 1 - admin analytics preserves API mode and selects mock data only through the explicit preview flag
+  ---
+  duration_ms: 8.6336
+  type: 'test'
+  ...
+# Subtest: admin exercise library uses protected API records and reports denied access
+ok 2 - admin exercise library uses protected API records and reports denied access
+  ---
+  duration_ms: 9.8944
+  type: 'test'
+  ...
+# Subtest: API client exposes LAN-safe URL derivation and 401 session clearing
+ok 3 - API client exposes LAN-safe URL derivation and 401 session clearing
+  ---
+  duration_ms: 9.316
+  type: 'test'
+  ...
+# Subtest: auth utilities expose a safe session clear operation
+ok 4 - auth utilities expose a safe session clear operation
+  ---
+  duration_ms: 1.8053
+  type: 'test'
+  ...
+# Subtest: prefers an explicit frontend build API URL over the Expo runtime value
+ok 5 - prefers an explicit frontend build API URL over the Expo runtime value
+  ---
+  duration_ms: 1.793
+  type: 'test'
+  ...
+# Subtest: uses the API address injected by the Expo WebView before host inference
+ok 6 - uses the API address injected by the Expo WebView before host inference
+  ---
+  duration_ms: 0.3178
+  type: 'test'
+  ...
+# Subtest: uses the frontend origin proxy by default on LAN and HTTPS
+ok 7 - uses the frontend origin proxy by default on LAN and HTTPS
+  ---
+  duration_ms: 1.1878
+  type: 'test'
+  ...
+# Subtest: uses localhost during server rendering only when no explicit API address exists
+ok 8 - uses localhost during server rendering only when no explicit API address exists
+  ---
+  duration_ms: 0.2377
+  type: 'test'
+  ...
+# Subtest: rejects malformed or non-HTTP API origins instead of making a malformed request
+ok 9 - rejects malformed or non-HTTP API origins instead of making a malformed request
+  ---
+  duration_ms: 0.4799
+  type: 'test'
+  ...
+# Subtest: does not silently fall back when Expo explicitly injects an invalid or unavailable API address
+ok 10 - does not silently fall back when Expo explicitly injects an invalid or unavailable API address
+  ---
+  duration_ms: 0.2263
+  type: 'test'
+  ...
+# Subtest: API client uses the runtime address injected by the mobile WebView
+ok 11 - API client uses the runtime address injected by the mobile WebView
+  ---
+  duration_ms: 9.354
+  type: 'test'
+  ...
+# Subtest: labels a rejected fetch as backend connectivity failure
+ok 12 - labels a rejected fetch as backend connectivity failure
+  ---
+  duration_ms: 1.4648
+  type: 'test'
+  ...
+# Subtest: preserves server errors with status codes and caller aborts
+ok 13 - preserves server errors with status codes and caller aborts
+  ---
+  duration_ms: 0.3506
+  type: 'test'
+  ...
+# Subtest: account requests include credentials; independent Coach requests omit them and account-only headers
+ok 14 - account requests include credentials; independent Coach requests omit them and account-only headers
+  ---
+  duration_ms: 440.3915
+  type: 'test'
+  ...
+# Subtest: failed data refresh reports its endpoint and a successful retry clears the cached error
+ok 15 - failed data refresh reports its endpoint and a successful retry clears the cached error
+  ---
+  duration_ms: 172.5423
+  type: 'test'
+  ...
+# Subtest: private chat defaults to guide-only requests and preserves consent on a same-account token refresh
+ok 16 - private chat defaults to guide-only requests and preserves consent on a same-account token refresh
+  ---
+  duration_ms: 71.714
+  type: 'test'
+  ...
+# Subtest: chat is not replayed after a refresh replaces id
+ok 17 - chat is not replayed after a refresh replaces id
+  ---
+  duration_ms: 154.5404
+  type: 'test'
+  ...
+# Subtest: chat is not sent after a preflight refresh replaces id
+ok 18 - chat is not sent after a preflight refresh replaces id
+  ---
+  duration_ms: 107.5972
+  type: 'test'
+  ...
+# Subtest: chat is not replayed after a refresh replaces sessionKey
+ok 19 - chat is not replayed after a refresh replaces sessionKey
+  ---
+  duration_ms: 42.8205
+  type: 'test'
+  ...
+# Subtest: chat is not sent after a preflight refresh replaces sessionKey
+ok 20 - chat is not sent after a preflight refresh replaces sessionKey
+  ---
+  duration_ms: 64.5588
+  type: 'test'
+  ...
+# Subtest: chat is not replayed if the API origin changes during refresh
+ok 21 - chat is not replayed if the API origin changes during refresh
+  ---
+  duration_ms: 46.0679
+  type: 'test'
+  ...
+# Subtest: chat sends only the pathname context and composes real cancellation with its timeout
+ok 22 - chat sends only the pathname context and composes real cancellation with its timeout
+  ---
+  duration_ms: 50.1443
+  type: 'test'
+  ...
+# Subtest: an already cancelled chat is never sent or refreshed
+ok 23 - an already cancelled chat is never sent or refreshed
+  ---
+  duration_ms: 54.5883
+  type: 'test'
+  ...
+# Subtest: calibration evidence accepts a complete pending matrix and unresolved flags stay disabled
+ok 24 - calibration evidence accepts a complete pending matrix and unresolved flags stay disabled
+  ---
+  duration_ms: 4.5574
+  type: 'test'
+  ...
+# Subtest: calibration guard rejects unsupported versions, private evidence, missing matrix rows and invented hardware passes
+ok 25 - calibration guard rejects unsupported versions, private evidence, missing matrix rows and invented hardware passes
+  ---
+  duration_ms: 10.3428
+  type: 'test'
+  ...
+# Subtest: calibration guard rejects missing trial support, numeric ranges and policy disagreement
+ok 26 - calibration guard rejects missing trial support, numeric ranges and policy disagreement
+  ---
+  duration_ms: 133.9617
+  type: 'test'
+  ...
+# Subtest: synthetic validator fixture accepts supported values then rejects mismatches and unresolved native OS coverage
+ok 27 - synthetic validator fixture accepts supported values then rejects mismatches and unresolved native OS coverage
+  ---
+  duration_ms: 12.4313
+  type: 'test'
+  ...
+# Subtest: calibration remains false and normal use cannot pass body brightness or framing
+ok 28 - calibration remains false and normal use cannot pass body brightness or framing
+  ---
+  duration_ms: 5.4894
+  type: 'test'
+  ...
+# Subtest: complete body gives independent synthetic evidence; zero person still allows brightness
+ok 29 - complete body gives independent synthetic evidence; zero person still allows brightness
+  ---
+  duration_ms: 0.9742
+  type: 'test'
+  ...
+# Subtest: head hand foot and bilateral missing/uncertain evidence cannot pass
+ok 30 - head hand foot and bilateral missing/uncertain evidence cannot pass
+  ---
+  duration_ms: 4.1743
+  type: 'test'
+  ...
+# Subtest: bounds and malformed evidence reject without guessing confidence
+ok 31 - bounds and malformed evidence reject without guessing confidence
+  ---
+  duration_ms: 0.8228
+  type: 'test'
+  ...
+# Subtest: cover crop, portrait/landscape and a single mirror match visible coordinates
+ok 32 - cover crop, portrait/landscape and a single mirror match visible coordinates
+  ---
+  duration_ms: 1.4296
+  type: 'test'
+  ...
+# Subtest: small whole upright body may request closer; bent ambiguous body never does
+ok 33 - small whole upright body may request closer; bent ambiguous body never does
+  ---
+  duration_ms: 0.3532
+  type: 'test'
+  ...
+# Subtest: brightness limits are inclusive and invalid sampling affects lighting only
+ok 34 - brightness limits are inclusive and invalid sampling affects lighting only
+  ---
+  duration_ms: 0.5666
+  type: 'test'
+  ...
+# Subtest: fake clock dwell needs advancing frames and duplicate input cannot extend expiry
+ok 35 - fake clock dwell needs advancing frames and duplicate input cannot extend expiry
+  ---
+  duration_ms: 0.9945
+  type: 'test'
+  ...
+# Subtest: generation change late reply invalid evidence and backwards clock clear affected passes
+ok 36 - generation change late reply invalid evidence and backwards clock clear affected passes
+  ---
+  duration_ms: 5.8588
+  type: 'test'
+  ...
+# Subtest: new generation waits for evidence only within its initial freshness window
+ok 37 - new generation waits for evidence only within its initial freshness window
+  ---
+  duration_ms: 0.5737
+  type: 'test'
+  ...
+# Subtest: Coach uses the same-origin proxy and explicit deployment override
+ok 38 - Coach uses the same-origin proxy and explicit deployment override
+  ---
+  duration_ms: 1.2796
+  type: 'test'
+  ...
+# Subtest: coach plan is generated by the backend and rendered from its response
+ok 39 - coach plan is generated by the backend and rendered from its response
+  ---
+  duration_ms: 9.2872
+  type: 'test'
+  ...
+# Subtest: the API client exposes the coach plan and leaderboard endpoints
+ok 40 - the API client exposes the coach plan and leaderboard endpoints
+  ---
+  duration_ms: 1.7079
+  type: 'test'
+  ...
+# Subtest: training preferences store canonical weekdays and report failed saves
+ok 41 - training preferences store canonical weekdays and report failed saves
+  ---
+  duration_ms: 7.0965
+  type: 'test'
+  ...
+# Subtest: coach plan shows the saved weekday schedule with full accessible day names
+ok 42 - coach plan shows the saved weekday schedule with full accessible day names
+  ---
+  duration_ms: 1.7035
+  type: 'test'
+  ...
+# Subtest: restores successful responses across app restarts, scoped to user and API
+ok 43 - restores successful responses across app restarts, scoped to user and API
+  ---
+  duration_ms: 4.0681
+  type: 'test'
+  ...
+# Subtest: deduplicates reads and keeps cached data when refresh fails
+ok 44 - deduplicates reads and keeps cached data when refresh fails
+  ---
+  duration_ms: 0.9895
+  type: 'test'
+  ...
+# Subtest: an old read cannot overwrite a confirmed write or resurrect an invalidated plan
+ok 45 - an old read cannot overwrite a confirmed write or resurrect an invalidated plan
+  ---
+  duration_ms: 0.5295
+  type: 'test'
+  ...
+# Subtest: logout and account switches ignore late responses and errors
+ok 46 - logout and account switches ignore late responses and errors
+  ---
+  duration_ms: 0.4858
+  type: 'test'
+  ...
+# Subtest: expires old snapshots, rolls over daily missions, and ignores damaged storage
+ok 47 - expires old snapshots, rolls over daily missions, and ignores damaged storage
+  ---
+  duration_ms: 34.6203
+  type: 'test'
+  ...
+# Subtest: storage failures and oversized records never break successful API responses
+ok 48 - storage failures and oversized records never break successful API responses
+  ---
+  duration_ms: 3.4602
+  type: 'test'
+  ...
+# Subtest: parallel resources resolve independently and notify subscribers
+ok 49 - parallel resources resolve independently and notify subscribers
+  ---
+  duration_ms: 0.7148
+  type: 'test'
+  ...
+# Subtest: rejects valid JSON with an invalid resource shape and does not reuse old sessions
+ok 50 - rejects valid JSON with an invalid resource shape and does not reuse old sessions
+  ---
+  duration_ms: 0.8105
+  type: 'test'
+  ...
+# Subtest: expiry clears yesterday's failed refresh so today's quests can load
+ok 51 - expiry clears yesterday's failed refresh so today's quests can load
+  ---
+  duration_ms: 1.0691
+  type: 'test'
+  ...
+# Subtest: reuses recently confirmed data, refreshes when stale, and respects invalidation
+ok 52 - reuses recently confirmed data, refreshes when stale, and respects invalidation
+  ---
+  duration_ms: 0.6572
+  type: 'test'
+  ...
+# Subtest: exercise library snapshots are scoped to the signed-in account
+ok 53 - exercise library snapshots are scoped to the signed-in account
+  ---
+  duration_ms: 0.2319
+  type: 'test'
+  ...
+# Subtest: Android below 12 or an unavailable OS version never passes Android 12 readiness
+ok 54 - Android below 12 or an unavailable OS version never passes Android 12 readiness
+  ---
+  duration_ms: 2.2889
+  type: 'test'
+  ...
+# Subtest: iOS and browsers do not claim Android compatibility
+ok 55 - iOS and browsers do not claim Android compatibility
+  ---
+  duration_ms: 0.3694
+  type: 'test'
+  ...
+# (node:17124) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/MY%20PC/Desktop/Projects/PhysiqueQuest/frontend/sections/Scan/nutrientTotal.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to \\\\?\\C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: each nutrient is complete only when all included entries supply it
+ok 56 - each nutrient is complete only when all included entries supply it
+  ---
+  duration_ms: 2.3624
+  type: 'test'
+  ...
+# Subtest: a native alarm reveals stop controls after a late cancellation and stays stopped while location arrives
+ok 57 - a native alarm reveals stop controls after a late cancellation and stays stopped while location arrives
+  ---
+  duration_ms: 312.0896
+  type: 'test'
+  ...
+# Subtest: new accounts and accounts without a saved threshold default to 30 seconds
+ok 58 - new accounts and accounts without a saved threshold default to 30 seconds
+  ---
+  duration_ms: 370.1645
+  type: 'test'
+  ...
+# Subtest: saved preferences survive loading and users can change the threshold
+ok 59 - saved preferences survive loading and users can change the threshold
+  ---
+  duration_ms: 74.2749
+  type: 'test'
+  ...
+# Subtest: the reference preview contains six dumbbell exercises in the supplied order
+ok 60 - the reference preview contains six dumbbell exercises in the supplied order
+  ---
+  duration_ms: 78.0428
+  type: 'test'
+  ...
+# Subtest: search combines with muscle and equipment filters, including a true any-equipment reset
+ok 61 - search combines with muscle and equipment filters, including a true any-equipment reset
+  ---
+  duration_ms: 27.1337
+  type: 'test'
+  ...
+# Subtest: the independent sample library stays reachable during loading, plan errors, and rest days
+ok 62 - the independent sample library stays reachable during loading, plan errors, and rest days
+  ---
+  duration_ms: 348.7785
+  type: 'test'
+  ...
+# (node:12456) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/MY%20PC/Desktop/Projects/PhysiqueQuest/shared/foodCamera.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to \\\\?\\C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: photo crop excludes pixels outside the visible scan frame with cover scaling
+ok 63 - photo crop excludes pixels outside the visible scan frame with cover scaling
+  ---
+  duration_ms: 1.9252
+  type: 'test'
+  ...
+# Subtest: barcode bounds must be fully inside the frame; missing bounds never match
+ok 64 - barcode bounds must be fully inside the frame; missing bounds never match
+  ---
+  duration_ms: 0.3334
+  type: 'test'
+  ...
+# Subtest: food history aggregates only saved meal dates and has a true empty state
+ok 65 - food history aggregates only saved meal dates and has a true empty state
+  ---
+  duration_ms: 12.2649
+  type: 'test'
+  ...
+# Subtest: text fields avoid the extra focus outline while interactive controls retain focus visibility
+ok 66 - text fields avoid the extra focus outline while interactive controls retain focus visibility
+  ---
+  duration_ms: 21.9488
+  type: 'test'
+  ...
+# Subtest: home cards reflect saved activity and route actions to real screens
+ok 67 - home cards reflect saved activity and route actions to real screens
+  ---
+  duration_ms: 14.0564
+  type: 'test'
+  ...
+# Subtest: countdown and hold-to-stop constants match the spec
+ok 68 - countdown and hold-to-stop constants match the spec
+  ---
+  duration_ms: 1.7413
+  type: 'test'
+  ...
+# Subtest: "Delivered" appears only for backend delivered status
+ok 69 - "Delivered" appears only for backend delivered status
+  ---
+  duration_ms: 0.4236
+  type: 'test'
+  ...
+# Subtest: failed status shows the reason from the error code
+ok 70 - failed status shows the reason from the error code
+  ---
+  duration_ms: 0.1929
+  type: 'test'
+  ...
+# Subtest: pending shows sending, cancelled shows not sent
+ok 71 - pending shows sending, cancelled shows not sent
+  ---
+  duration_ms: 0.267
+  type: 'test'
+  ...
+# Subtest: admin badges: open, resolved, false alarm
+ok 72 - admin badges: open, resolved, false alarm
+  ---
+  duration_ms: 2.3989
+  type: 'test'
+  ...
+# Subtest: formats device-local year, month, and day without converting through UTC
+ok 73 - formats device-local year, month, and day without converting through UTC
+  ---
+  duration_ms: 2.4803
+  type: 'test'
+  ...
+# Subtest: pads single-digit calendar parts for stable API date keys
+ok 74 - pads single-digit calendar parts for stable API date keys
+  ---
+  duration_ms: 0.242
+  type: 'test'
+  ...
+# Subtest: all five reference editors render saved profile values with shared header and footer
+ok 75 - all five reference editors render saved profile values with shared header and footer
+  ---
+  duration_ms: 704.5021
+  type: 'test'
+  ...
+# Subtest: every profile editor stays open after a rejected save and returns only after confirmation
+ok 76 - every profile editor stays open after a rejected save and returns only after confirmation
+  ---
+  duration_ms: 323.6863
+  type: 'test'
+  ...
+# Subtest: account presentation remains dynamic and unit-aware rather than replacing user data with the reference identity
+ok 77 - account presentation remains dynamic and unit-aware rather than replacing user data with the reference identity
+  ---
+  duration_ms: 540.4972
+  type: 'test'
+  ...
+# Subtest: admin mock catalog and analytics match the supplied reference
+ok 78 - admin mock catalog and analytics match the supplied reference
+  ---
+  duration_ms: 117.0666
+  type: 'test'
+  ...
+# Subtest: New exercise form validates, saves locally in preview mode and Cancel returns to the list
+ok 79 - New exercise form validates, saves locally in preview mode and Cancel returns to the list
+  ---
+  duration_ms: 46.5267
+  type: 'test'
+  ...
+# Subtest: explicit admin previews make no API requests, while denied live requests never become mock results
+ok 80 - explicit admin previews make no API requests, while denied live requests never become mock results
+  ---
+  duration_ms: 163.8271
+  type: 'test'
+  ...
+# Subtest: shared Home calorie progress handles empty, partial, and exceeded targets
+ok 81 - shared Home calorie progress handles empty, partial, and exceeded targets
+  ---
+  duration_ms: 185.7687
+  type: 'test'
+  ...
+# Subtest: typed food names use debounced backend search and ignore obsolete results
+ok 82 - typed food names use debounced backend search and ignore obsolete results
+  ---
+  duration_ms: 912.1857
+  type: 'test'
+  ...
+# Subtest: today log displays source, edited flag and original time, with an edit action and empty meal state
+not ok 83 - today log displays source, edited flag and original time, with an edit action and empty meal state
+  ---
+  duration_ms: 103.847
+  type: 'test'
+  location: 'C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\tests\\meal-edit.test.mjs:77:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Cannot find module '../Scan/AdditionalNutrition'
+    Require stack:
+    - C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\frontend\tests\meal-edit.test.mjs
+  code: 'MODULE_NOT_FOUND'
+  stack: |-
+    Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)
+    wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)
+    defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)
+    resolveForCJSWithHooks (node:internal/modules/cjs/loader:1122:12)
+    Module._load (node:internal/modules/cjs/loader:1294:5)
+    wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    Module.require (node:internal/modules/cjs/loader:1617:12)
+    require (node:internal/modules/helpers:153:16)
+    file:///C:/Users/MY%20PC/Desktop/Projects/PhysiqueQuest/frontend/tests/meal-edit.test.mjs:23:291
+    eval (eval at load (file:///C:/Users/MY%20PC/Desktop/Projects/PhysiqueQuest/frontend/tests/meal-edit.test.mjs:15:3), <anonymous>:11:45)
+  ...
+# Subtest: meal editor supports individual foods in a multi-item meal and retains the Scan form theme
+ok 84 - meal editor supports individual foods in a multi-item meal and retains the Scan form theme
+  ---
+  duration_ms: 96.2194
+  type: 'test'
+  ...
+# Subtest: scan logging sends the device-local logging time rather than leaving it empty
+ok 85 - scan logging sends the device-local logging time rather than leaving it empty
+  ---
+  duration_ms: 3.4943
+  type: 'test'
+  ...
+# Subtest: editor awaits persistence, preserves entry identity, and shows failed saves for retry
+ok 86 - editor awaits persistence, preserves entry identity, and shows failed saves for retry
+  ---
+  duration_ms: 73.1801
+  type: 'test'
+  ...
+# Subtest: progress displays saved measurement history and honest empty states
+ok 87 - progress displays saved measurement history and honest empty states
+  ---
+  duration_ms: 25.2657
+  type: 'test'
+  ...
+# Subtest: notifications use account records and display an honest empty state
+ok 88 - notifications use account records and display an honest empty state
+  ---
+  duration_ms: 3.3883
+  type: 'test'
+  ...
+# Subtest: notification read actions use account-backed hooks
+ok 89 - notification read actions use account-backed hooks
+  ---
+  duration_ms: 1.3607
+  type: 'test'
+  ...
+# Subtest: notifications pin real safety alerts and preserve truthful actions
+ok 90 - notifications pin real safety alerts and preserve truthful actions
+  ---
+  duration_ms: 3.3836
+  type: 'test'
+  ...
+# Subtest: Me keeps persistence and root navigation
+ok 91 - Me keeps persistence and root navigation
+  ---
+  duration_ms: 1.521
+  type: 'test'
+  ...
+# Subtest: launch actions use client navigation without reloading the WebView
+ok 92 - launch actions use client navigation without reloading the WebView
+  ---
+  duration_ms: 1.6469
+  type: 'test'
+  ...
+# Subtest: nutrition and settings screens use server-backed state
+ok 93 - nutrition and settings screens use server-backed state
+  ---
+  duration_ms: 2.0379
+  type: 'test'
+  ...
+# Subtest: quests and notifications use server-backed state
+ok 94 - quests and notifications use server-backed state
+  ---
+  duration_ms: 2.09
+  type: 'test'
+  ...
+# Subtest: camera and scan capabilities never present fabricated AI results
+ok 95 - camera and scan capabilities never present fabricated AI results
+  ---
+  duration_ms: 4.2082
+  type: 'test'
+  ...
+# Subtest: a scan waits visibly, then offers a retry once it hits the limit
+ok 96 - a scan waits visibly, then offers a retry once it hits the limit
+  ---
+  duration_ms: 3.358
+  type: 'test'
+  ...
+# Subtest: coach plan renders a library-backed workout dashboard
+ok 97 - coach plan renders a library-backed workout dashboard
+  ---
+  duration_ms: 1.1933
+  type: 'test'
+  ...
+# Subtest: native wrapper reports backend connectivity and can retry it
+ok 98 - native wrapper reports backend connectivity and can retry it
+  ---
+  duration_ms: 1.0747
+  type: 'test'
+  ...
+# Subtest: launch readiness renders live device, network, and camera state
+ok 99 - launch readiness renders live device, network, and camera state
+  ---
+  duration_ms: 1.5414
+  type: 'test'
+  ...
+# Subtest: Expo shell uses native readiness APIs and bridges camera permission
+ok 100 - Expo shell uses native readiness APIs and bridges camera permission
+  ---
+  duration_ms: 1.1002
+  type: 'test'
+  ...
+# Subtest: Expo camera preview uses the native camera instead of insecure WebView media APIs
+ok 101 - Expo camera preview uses the native camera instead of insecure WebView media APIs
+  ---
+  duration_ms: 2.3996
+  type: 'test'
+  ...
+# Subtest: Camera Check waits for its visible frame, supports both cameras, and uses local live readiness
+ok 102 - Camera Check waits for its visible frame, supports both cameras, and uses local live readiness
+  ---
+  duration_ms: 5.3375
+  type: 'test'
+  ...
+# Subtest: camera readiness displays only results actually present in provider analysis
+ok 103 - camera readiness displays only results actually present in provider analysis
+  ---
+  duration_ms: 174.6179
+  type: 'test'
+  ...
+# Subtest: safety phases replace the session, cancel stale phases, and restore the selected camera
+ok 104 - safety phases replace the session, cancel stale phases, and restore the selected camera
+  ---
+  duration_ms: 5.8293
+  type: 'test'
+  ...
+# Subtest: Live Session uses a proper pause icon and hides duplicate native-preview labels
+ok 105 - Live Session uses a proper pause icon and hides duplicate native-preview labels
+  ---
+  duration_ms: 4.3148
+  type: 'test'
+  ...
+# Subtest: live inactivity countdown and alarm have connected safety UI and persistent resolution
+ok 106 - live inactivity countdown and alarm have connected safety UI and persistent resolution
+  ---
+  duration_ms: 5.386
+  type: 'test'
+  ...
+# Subtest: auth boundaries and signed-in tabs use client navigation without a startup interstitial
+ok 107 - auth boundaries and signed-in tabs use client navigation without a startup interstitial
+  ---
+  duration_ms: 4.5056
+  type: 'test'
+  ...
+# Subtest: scan errors keep the backend message instead of a generic fallback
+ok 108 - scan errors keep the backend message instead of a generic fallback
+  ---
+  duration_ms: 45.2981
+  type: 'test'
+  ...
+# Subtest: preview is allowed only for a successful, genuinely empty nutrition response
+not ok 109 - preview is allowed only for a successful, genuinely empty nutrition response
+  ---
+  duration_ms: 143.0184
+  type: 'test'
+  location: 'C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\tests\\nutrition-presentation.test.mjs:15:1'
+  failureType: 'testCodeFailure'
+  error: 'Failed to resolve module specifier "./nutrientTotal" from "data:text/javascript;base64,dmFyIF9fYXNzaWduID0gKHRoaXMgJiYgdGhpcy5fX2Fzc2lnbikgfHwgZnVuY3Rpb24gKCkgewogICAgX19hc3NpZ24gPSBPYmplY3QuYXNzaWduIHx8IGZ1bmN0aW9uKHQpIHsKICAgICAgICBmb3IgKHZhciBzLCBpID0gMSwgbiA9IGFyZ3VtZW50cy5sZW5ndGg7IGkgPCBuOyBpKyspIHsKICAgICAgICAgICAgcyA9IGFyZ3VtZW50c1tpXTsKICAgICAgICAgICAgZm9yICh2YXIgcCBpbiBzKSBpZiAoT2JqZWN0LnByb3RvdHlwZS5oYXNPd25Qcm9wZXJ0eS5jYWxsKHMsIHApKQogICAgICAgICAgICAgICAgdFtwXSA9IHNbcF07CiAgICAgICAgfQogICAgICAgIHJldHVybiB0OwogICAgfTsKICAgIHJldHVybiBfX2Fzc2lnbi5hcHBseSh0aGlzLCBhcmd1bWVudHMpOwp9OwppbXBvcnQgeyBudXRyaWVudFRvdGFsIH0gZnJvbSAnLi9udXRyaWVudFRvdGFsJzsKZXhwb3J0IGZ1bmN0aW9uIGNhblByZXZpZXdOdXRyaXRpb24obG9hZGluZywgZXJyb3IsIG1lYWxzLCB3YXRlcikgewogICAgcmV0dXJuICFsb2FkaW5nICYmICFlcnJvciAmJiBtZWFscy5sZW5ndGggPT09IDAgJiYgd2F0ZXIgPT09IDA7Cn0KdmFyIGRhdGVLZXkgPSBmdW5jdGlvbiAoZGF0ZSkgeyByZXR1cm4gIiIuY29uY2F0KGRhdGUuZ2V0RnVsbFllYXIoKSwgIi0iKS5jb25jYXQoU3RyaW5nKGRhdGUuZ2V0TW9udGgoKSArIDEpLnBhZFN0YXJ0KDIsICcwJyksICItIikuY29uY2F0KFN0cmluZyhkYXRlLmdldERhdGUoKSkucGFkU3RhcnQoMiwgJzAnKSk7IH07Ci8vIERlbGliZXJhdGUgcmVmZXJlbmNlIGZpeHR1cmVzLiBUaGVzZSBJRHMgbXVzdCBuZXZlciBiZSBzZW50IHRvIHBlcnNpc3RlbmNlIEFQSXMuCmV4cG9ydCBmdW5jdGlvbiBjcmVhdGVOdXRyaXRpb25QcmV2aWV3KG5vdykgewogICAgaWYgKG5vdyA9PT0gdm9pZCAwKSB7IG5vdyA9IG5ldyBEYXRlKCk7IH0KICAgIHZhciBkYXRlID0gZGF0ZUtleShub3cpOwogICAgdmFyIG1lYWxzID0gWwogICAgICAgIHsgaWQ6ICdwcmV2aWV3LWJyZWFrZmFzdCcsIG5hbWU6ICdPYXRzIGFuZCBlZ2dzJywgbWVhbDogJ0JyZWFrZmFzdCcsIGNhbG9yaWVzOiA0MjAsIGRldGFpbDogJ1JvbGxlZCBvYXRzIMK3IDEgY3VwIMK3IEVnZyDCtyAyIGxhcmdlJywgdGltZTogJzA3OjIwJywgc291cmNlOiAnU2Nhbm5lZCcsIHByb3RlaW46IDI4LCBjYXJiczogNTQsIGZhdDogMTIsIGRhdGU6IGRhdGUgfSwKICAgICAgICB7IGlkOiAncHJldmlldy1sdW5jaCcsIG5hbWU6ICdDaGlja2VuIHJpY2UgYm93bCcsIG1lYWw6ICdMdW5jaCcsIGNhbG9yaWVzOiA2ODAsIGRldGFpbDogJ0NoaWNrZW4gYnJlYXN0IMK3IDE1MCBnIMK3IFdoaXRlIHJpY2UgwrcgMSBjdXAnLCB0aW1lOiAnMTI6NDAnLCBzb3VyY2U6ICdTY2FubmVkJywgZWRpdGVkOiB0cnVlLCBwcm90ZWluOiA0NSwgY2FyYnM6IDgyLCBmYXQ6IDE1LCBkYXRlOiBkYXRlIH0sCiAgICAgICAgeyBpZDogJ3ByZXZpZXctc25hY2snLCBuYW1lOiAnUHJvdGVpbiBzaGFrZScsIG1lYWw6ICdTbmFjaycsIGNhbG9yaWVzOiAzMjAsIGRldGFpbDogJ1doZXkgcHJvdGVpbiDCtyAxIHNjb29wIMK3IEJhbmFuYSDCtyAxIG1lZGl1bScsIHRpbWU6ICcxNToxMCcsIHNvdXJjZTogJ01hbnVhbCcsIHByb3RlaW46IDIzLCBjYXJiczogNDQsIGZhdDogMTUsIGRhdGU6IGRhdGUgfSwKICAgIF07CiAgICBbMjE2MCwgMTk5MCwgMjU1MCwgMTc2MCwgMjE2MCwgMTU4OV0uZm9yRWFjaChmdW5jdGlvbiAoY2Fsb3JpZXMsIGluZGV4KSB7CiAgICAgICAgdmFyIGRheSA9IG5ldyBEYXRlKG5vdyk7CiAgICAgICAgZGF5LnNldERhdGUoZGF5LmdldERhdGUoKSAtICg2IC0gaW5kZXgpKTsKICAgICAgICBtZWFscy5wdXNoKHsgaWQ6ICJwcmV2aWV3LWhpc3RvcnktIi5jb25jYXQoaW5kZXgpLCBuYW1lOiAnRGFpbHkgbWVhbCB0b3RhbCcsIG1lYWw6ICdEaW5uZXInLCBjYWxvcmllczogY2Fsb3JpZXMsIGRldGFpbDogJ1JlZmVyZW5jZSBtZWFsIGxvZycsIHRpbWU6ICcxODozMCcsIHNvdXJjZTogJ01hbnVhbCcsIHByb3RlaW46IGNhbG9yaWVzICogLjI4IC8gNCwgY2FyYnM6IGNhbG9yaWVzICogLjQ3IC8gNCwgZmF0OiBjYWxvcmllcyAqIC4yNSAvIDksIGRhdGU6IGRhdGVLZXkoZGF5KSB9KTsKICAgIH0pOwogICAgcmV0dXJuIHsgbWVhbHM6IG1lYWxzLCB3YXRlcjogNSB9Owp9CmV4cG9ydCBmdW5jdGlvbiBzdW1tYXJpemVIaXN0b3J5KG1lYWxzLCByYW5nZSwgbm93KSB7CiAgICBpZiAobm93ID09PSB2b2lkIDApIHsgbm93ID0gbmV3IERhdGUoKTsgfQogICAgdmFyIGRheXMgPSBBcnJheS5mcm9tKHsgbGVuZ3RoOiByYW5nZSB9LCBmdW5jdGlvbiAoXywgaW5kZXgpIHsgdmFyIGRheSA9IG5ldyBEYXRlKG5vdyk7IGRheS5zZXREYXRlKGRheS5nZXREYXRlKCkgLSAocmFuZ2UgLSBpbmRleCAtIDEpKTsgcmV0dXJuIGRhdGVLZXkoZGF5KTsgfSk7CiAgICB2YXIgdmlzaWJsZSA9IG1lYWxzLmZpbHRlcihmdW5jdGlvbiAoZW50cnkpIHsgcmV0dXJuICEhZW50cnkuZGF0ZSAmJiBkYXlzLmluY2x1ZGVzKGVudHJ5LmRhdGUpOyB9KTsKICAgIHZhciBkYWlseSA9IGRheXMubWFwKGZ1bmN0aW9uIChkYXRlKSB7CiAgICAgICAgdmFyIGVudHJpZXMgPSB2aXNpYmxlLmZpbHRlcihmdW5jdGlvbiAoZW50cnkpIHsgcmV0dXJuIGVudHJ5LmRhdGUgPT09IGRhdGU7IH0pOwogICAgICAgIHJldHVybiB7IGRhdGU6IGRhdGUsIGNvdW50OiBlbnRyaWVzLmxlbmd0aCwgY2Fsb3JpZXM6IG51dHJpZW50VG90YWwoZW50cmllcywgZnVuY3Rpb24gKGVudHJ5KSB7IHJldHVybiBlbnRyeS5jYWxvcmllczsgfSkgfTsKICAgIH0pOwogICAgdmFyIGxvZ2dlZCA9IGRhaWx5LmZpbHRlcihmdW5jdGlvbiAoZGF5KSB7IHJldHVybiBkYXkuY291bnQ7IH0pOwogICAgdmFyIHN1bSA9IG51dHJpZW50VG90YWwobG9nZ2VkLCBmdW5jdGlvbiAoZGF5KSB7IHJldHVybiBkYXkuY2Fsb3JpZXM7IH0pOwogICAgdmFyIGF2ZXJhZ2UgPSBzdW0gPT09IG51bGwgPyBudWxsIDogbG9nZ2VkLmxlbmd0aCA/IE1hdGgucm91bmQoc3VtIC8gbG9nZ2VkLmxlbmd0aCkgOiAwOwogICAgdmFyIGdyYW1zID0geyBwcm90ZWluOiBudXRyaWVudFRvdGFsKHZpc2libGUsIGZ1bmN0aW9uICh4KSB7IHJldHVybiB4LnByb3RlaW47IH0pLCBjYXJiczogbnV0cmllbnRUb3RhbCh2aXNpYmxlLCBmdW5jdGlvbiAoeCkgeyByZXR1cm4geC5jYXJiczsgfSksIGZhdDogbnV0cmllbnRUb3RhbCh2aXNpYmxlLCBmdW5jdGlvbiAoeCkgeyByZXR1cm4geC5mYXQ7IH0pIH07CiAgICB2YXIgZW5lcmd5ID0gZ3JhbXMucHJvdGVpbiA9PT0gbnVsbCB8fCBncmFtcy5jYXJicyA9PT0gbnVsbCB8fCBncmFtcy5mYXQgPT09IG51bGwgPyBudWxsIDogZ3JhbXMucHJvdGVpbiAqIDQgKyBncmFtcy5jYXJicyAqIDQgKyBncmFtcy5mYXQgKiA5OwogICAgdmFyIHNoYXJlID0gZnVuY3Rpb24gKHZhbHVlLCBmYWN0b3IpIHsgcmV0dXJuIGVuZXJneSA9PT0gbnVsbCB8fCB2YWx1ZSA9PT0gbnVsbCA/IG51bGwgOiBlbmVyZ3kgPyBNYXRoLnJvdW5kKHZhbHVlICogZmFjdG9yIC8gZW5lcmd5ICogMTAwKSA6IDA7IH07CiAgICB2YXIgc3BsaXQgPSB7IHByb3RlaW46IHNoYXJlKGdyYW1zLnByb3RlaW4sIDQpLCBjYXJiczogc2hhcmUoZ3JhbXMuY2FyYnMsIDQpLCBmYXQ6IHNoYXJlKGdyYW1zLmZhdCwgOSkgfTsKICAgIHJldHVybiB7IGRhaWx5OiBkYWlseSwgdmlzaWJsZTogdmlzaWJsZSwgYXZlcmFnZTogYXZlcmFnZSwgc3BsaXQ6IHNwbGl0LCBncmFtczogZ3JhbXMgfTsKfQpleHBvcnQgdmFyIHByZXZpZXdGb29kcyA9IFsKICAgIFsnQ2hpY2tlbiBicmVhc3QsIGdyaWxsZWQnLCAnUG91bHRyeScsIDE2NSwgMzEsIDAsIDMuNl0sCiAgICBbJ0NoaWNrZW4gdGhpZ2gnLCAnUG91bHRyeScsIDIwOSwgMjYsIDAsIDEwLjldLAogICAgWydDaGlja2VuIGFkb2JvJywgJ0Nvb2tlZCBkaXNoJywgMTkwLCAyMywgNCwgOF0sCiAgICBbJ1doaXRlIHJpY2UsIGNvb2tlZCcsICdHcmFpbnMnLCAxMzAsIDIuNywgMjgsIC4zXSwKICAgIFsnRWdnLCB3aG9sZScsICdEYWlyeSAmIGVnZ3MnLCAxNDMsIDEyLjYsIC44LCA5LjZdLAogICAgWydCYW5hbmEnLCAnRnJ1aXQnLCA4OSwgMS4xLCAyMywgLjNdLApdLm1hcChmdW5jdGlvbiAoX2EsIGluZGV4KSB7CiAgICB2YXIgbmFtZSA9IF9hWzBdLCBncm91cCA9IF9hWzFdLCBrY2FsID0gX2FbMl0sIHByb3RlaW4gPSBfYVszXSwgY2FyYnMgPSBfYVs0XSwgZmF0ID0gX2FbNV07CiAgICByZXR1cm4gKHsKICAgICAgICBmZGNfaWQ6IC0xMDAgLSBpbmRleCwgZGVzY3JpcHRpb246IFN0cmluZyhuYW1lKSwgZGF0YV90eXBlOiBTdHJpbmcoZ3JvdXApLAogICAgICAgIGRldGFpbDogeyByZXF1ZXN0X2lkOiAnbG9jYWwtcHJldmlldycsIGZkY19pZDogLTEwMCAtIGluZGV4LCBkZXNjcmlwdGlvbjogU3RyaW5nKG5hbWUpLCBkYXRhX3R5cGU6IFN0cmluZyhncm91cCksIHNlcnZpbmdfc2l6ZV9nOiAxMDAsCiAgICAgICAgICAgIHBlcl8xMDBnOiB7IGtjYWw6IE51bWJlcihrY2FsKSwgcHJvdGVpbl9nOiBOdW1iZXIocHJvdGVpbiksIGNhcmJzX2c6IE51bWJlcihjYXJicyksIGZhdF9nOiBOdW1iZXIoZmF0KSB9IH0sCiAgICB9KTsKfSk7CmV4cG9ydCB2YXIgcHJldmlld1NjYW4gPSB7CiAgICByZXF1ZXN0X2lkOiAnbG9jYWwtcHJldmlldycsIG1vZGVsOiAnUmVmZXJlbmNlIHByZXZpZXcnLCB1bm1hdGNoZWQ6IFtdLCBkZWdyYWRlZDogZmFsc2UsCiAgICBpdGVtczogWwogICAgICAgIHsgZm9vZF9uYW1lOiAnR3JpbGxlZCBjaGlja2VuIGJyZWFzdCcsIGZvdW5kOiB0cnVlLCBmZGNfaWQ6IC0xMDAsIGVzdF93ZWlnaHRfZzogMTUwLCBjb25maWRlbmNlOiAuOTIsIGtjYWw6IDI0OCwgcHJvdGVpbl9nOiA0MCwgY2FyYnNfZzogMCwgZmF0X2c6IDggfSwKICAgICAgICB7IGZvb2RfbmFtZTogJ1N0ZWFtZWQgcmljZScsIGZvdW5kOiB0cnVlLCBmZGNfaWQ6IC0xMDMsIGVzdF93ZWlnaHRfZzogMTU4LCBkZXNjcmlwdGlvbjogJzEgY3VwJywgY29uZmlkZW5jZTogLjg1LCBrY2FsOiAyMDUsIHByb3RlaW5fZzogNCwgY2FyYnNfZzogNDUsIGZhdF9nOiAyIH0sCiAgICAgICAgeyBmb29kX25hbWU6ICdNaXhlZCB2ZWdldGFibGVzJywgZm91bmQ6IHRydWUsIGZkY19pZDogLTEwNiwgZXN0X3dlaWdodF9nOiA4MCwgY29uZmlkZW5jZTogLjYxLCBrY2FsOiAxNjcsIHByb3RlaW5fZzogNCwgY2FyYnNfZzogMjMsIGZhdF9nOiAxMCB9LAogICAgXSwgdG90YWxzOiB7IGtjYWw6IDYyMCwgcHJvdGVpbl9nOiA0OCwgY2FyYnNfZzogNjgsIGZhdF9nOiAyMCB9LAp9OwpleHBvcnQgZnVuY3Rpb24gc2NhbGVTY2FubmVkSXRlbXMoaXRlbXMsIGZhY3RvcikgewogICAgdmFyIHNjYWxlID0gZnVuY3Rpb24gKHZhbHVlKSB7IHJldHVybiB2YWx1ZSA9PT0gbnVsbCA/IG51bGwgOiB2YWx1ZSAqIGZhY3RvcjsgfTsKICAgIHJldHVybiBpdGVtcy5tYXAoZnVuY3Rpb24gKGl0ZW0pIHsgcmV0dXJuIChfX2Fzc2lnbihfX2Fzc2lnbih7fSwgaXRlbSksIHsgZXN0X3dlaWdodF9nOiBpdGVtLmVzdF93ZWlnaHRfZyAqIGZhY3Rvciwga2NhbDogc2NhbGUoaXRlbS5rY2FsKSwgcHJvdGVpbl9nOiBzY2FsZShpdGVtLnByb3RlaW5fZyksIGNhcmJzX2c6IHNjYWxlKGl0ZW0uY2FyYnNfZyksIGZhdF9nOiBzY2FsZShpdGVtLmZhdF9nKSB9KSk7IH0pOwp9Cg==": Invalid relative URL or base scheme is not hierarchical.'
+  code: 'ERR_UNSUPPORTED_RESOLVE_REQUEST'
+  name: 'TypeError'
+  stack: |-
+    moduleResolve (node:internal/modules/esm/resolve:843:21)
+    defaultResolve (node:internal/modules/esm/resolve:992:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    #resolve (node:internal/modules/esm/loader:683:17)
+    ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    ModuleJob.link (node:internal/modules/esm/module_job:253:17)
+    new ModuleJob (node:internal/modules/esm/module_job:232:26)
+  ...
+# Subtest: reference preview agrees across dashboard, log, history, and food portions
+not ok 110 - reference preview agrees across dashboard, log, history, and food portions
+  ---
+  duration_ms: 66.0838
+  type: 'test'
+  location: 'C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\tests\\nutrition-presentation.test.mjs:23:1'
+  failureType: 'testCodeFailure'
+  error: 'Failed to resolve module specifier "./nutrientTotal" from "data:text/javascript;base64,dmFyIF9fYXNzaWduID0gKHRoaXMgJiYgdGhpcy5fX2Fzc2lnbikgfHwgZnVuY3Rpb24gKCkgewogICAgX19hc3NpZ24gPSBPYmplY3QuYXNzaWduIHx8IGZ1bmN0aW9uKHQpIHsKICAgICAgICBmb3IgKHZhciBzLCBpID0gMSwgbiA9IGFyZ3VtZW50cy5sZW5ndGg7IGkgPCBuOyBpKyspIHsKICAgICAgICAgICAgcyA9IGFyZ3VtZW50c1tpXTsKICAgICAgICAgICAgZm9yICh2YXIgcCBpbiBzKSBpZiAoT2JqZWN0LnByb3RvdHlwZS5oYXNPd25Qcm9wZXJ0eS5jYWxsKHMsIHApKQogICAgICAgICAgICAgICAgdFtwXSA9IHNbcF07CiAgICAgICAgfQogICAgICAgIHJldHVybiB0OwogICAgfTsKICAgIHJldHVybiBfX2Fzc2lnbi5hcHBseSh0aGlzLCBhcmd1bWVudHMpOwp9OwppbXBvcnQgeyBudXRyaWVudFRvdGFsIH0gZnJvbSAnLi9udXRyaWVudFRvdGFsJzsKZXhwb3J0IGZ1bmN0aW9uIGNhblByZXZpZXdOdXRyaXRpb24obG9hZGluZywgZXJyb3IsIG1lYWxzLCB3YXRlcikgewogICAgcmV0dXJuICFsb2FkaW5nICYmICFlcnJvciAmJiBtZWFscy5sZW5ndGggPT09IDAgJiYgd2F0ZXIgPT09IDA7Cn0KdmFyIGRhdGVLZXkgPSBmdW5jdGlvbiAoZGF0ZSkgeyByZXR1cm4gIiIuY29uY2F0KGRhdGUuZ2V0RnVsbFllYXIoKSwgIi0iKS5jb25jYXQoU3RyaW5nKGRhdGUuZ2V0TW9udGgoKSArIDEpLnBhZFN0YXJ0KDIsICcwJyksICItIikuY29uY2F0KFN0cmluZyhkYXRlLmdldERhdGUoKSkucGFkU3RhcnQoMiwgJzAnKSk7IH07Ci8vIERlbGliZXJhdGUgcmVmZXJlbmNlIGZpeHR1cmVzLiBUaGVzZSBJRHMgbXVzdCBuZXZlciBiZSBzZW50IHRvIHBlcnNpc3RlbmNlIEFQSXMuCmV4cG9ydCBmdW5jdGlvbiBjcmVhdGVOdXRyaXRpb25QcmV2aWV3KG5vdykgewogICAgaWYgKG5vdyA9PT0gdm9pZCAwKSB7IG5vdyA9IG5ldyBEYXRlKCk7IH0KICAgIHZhciBkYXRlID0gZGF0ZUtleShub3cpOwogICAgdmFyIG1lYWxzID0gWwogICAgICAgIHsgaWQ6ICdwcmV2aWV3LWJyZWFrZmFzdCcsIG5hbWU6ICdPYXRzIGFuZCBlZ2dzJywgbWVhbDogJ0JyZWFrZmFzdCcsIGNhbG9yaWVzOiA0MjAsIGRldGFpbDogJ1JvbGxlZCBvYXRzIMK3IDEgY3VwIMK3IEVnZyDCtyAyIGxhcmdlJywgdGltZTogJzA3OjIwJywgc291cmNlOiAnU2Nhbm5lZCcsIHByb3RlaW46IDI4LCBjYXJiczogNTQsIGZhdDogMTIsIGRhdGU6IGRhdGUgfSwKICAgICAgICB7IGlkOiAncHJldmlldy1sdW5jaCcsIG5hbWU6ICdDaGlja2VuIHJpY2UgYm93bCcsIG1lYWw6ICdMdW5jaCcsIGNhbG9yaWVzOiA2ODAsIGRldGFpbDogJ0NoaWNrZW4gYnJlYXN0IMK3IDE1MCBnIMK3IFdoaXRlIHJpY2UgwrcgMSBjdXAnLCB0aW1lOiAnMTI6NDAnLCBzb3VyY2U6ICdTY2FubmVkJywgZWRpdGVkOiB0cnVlLCBwcm90ZWluOiA0NSwgY2FyYnM6IDgyLCBmYXQ6IDE1LCBkYXRlOiBkYXRlIH0sCiAgICAgICAgeyBpZDogJ3ByZXZpZXctc25hY2snLCBuYW1lOiAnUHJvdGVpbiBzaGFrZScsIG1lYWw6ICdTbmFjaycsIGNhbG9yaWVzOiAzMjAsIGRldGFpbDogJ1doZXkgcHJvdGVpbiDCtyAxIHNjb29wIMK3IEJhbmFuYSDCtyAxIG1lZGl1bScsIHRpbWU6ICcxNToxMCcsIHNvdXJjZTogJ01hbnVhbCcsIHByb3RlaW46IDIzLCBjYXJiczogNDQsIGZhdDogMTUsIGRhdGU6IGRhdGUgfSwKICAgIF07CiAgICBbMjE2MCwgMTk5MCwgMjU1MCwgMTc2MCwgMjE2MCwgMTU4OV0uZm9yRWFjaChmdW5jdGlvbiAoY2Fsb3JpZXMsIGluZGV4KSB7CiAgICAgICAgdmFyIGRheSA9IG5ldyBEYXRlKG5vdyk7CiAgICAgICAgZGF5LnNldERhdGUoZGF5LmdldERhdGUoKSAtICg2IC0gaW5kZXgpKTsKICAgICAgICBtZWFscy5wdXNoKHsgaWQ6ICJwcmV2aWV3LWhpc3RvcnktIi5jb25jYXQoaW5kZXgpLCBuYW1lOiAnRGFpbHkgbWVhbCB0b3RhbCcsIG1lYWw6ICdEaW5uZXInLCBjYWxvcmllczogY2Fsb3JpZXMsIGRldGFpbDogJ1JlZmVyZW5jZSBtZWFsIGxvZycsIHRpbWU6ICcxODozMCcsIHNvdXJjZTogJ01hbnVhbCcsIHByb3RlaW46IGNhbG9yaWVzICogLjI4IC8gNCwgY2FyYnM6IGNhbG9yaWVzICogLjQ3IC8gNCwgZmF0OiBjYWxvcmllcyAqIC4yNSAvIDksIGRhdGU6IGRhdGVLZXkoZGF5KSB9KTsKICAgIH0pOwogICAgcmV0dXJuIHsgbWVhbHM6IG1lYWxzLCB3YXRlcjogNSB9Owp9CmV4cG9ydCBmdW5jdGlvbiBzdW1tYXJpemVIaXN0b3J5KG1lYWxzLCByYW5nZSwgbm93KSB7CiAgICBpZiAobm93ID09PSB2b2lkIDApIHsgbm93ID0gbmV3IERhdGUoKTsgfQogICAgdmFyIGRheXMgPSBBcnJheS5mcm9tKHsgbGVuZ3RoOiByYW5nZSB9LCBmdW5jdGlvbiAoXywgaW5kZXgpIHsgdmFyIGRheSA9IG5ldyBEYXRlKG5vdyk7IGRheS5zZXREYXRlKGRheS5nZXREYXRlKCkgLSAocmFuZ2UgLSBpbmRleCAtIDEpKTsgcmV0dXJuIGRhdGVLZXkoZGF5KTsgfSk7CiAgICB2YXIgdmlzaWJsZSA9IG1lYWxzLmZpbHRlcihmdW5jdGlvbiAoZW50cnkpIHsgcmV0dXJuICEhZW50cnkuZGF0ZSAmJiBkYXlzLmluY2x1ZGVzKGVudHJ5LmRhdGUpOyB9KTsKICAgIHZhciBkYWlseSA9IGRheXMubWFwKGZ1bmN0aW9uIChkYXRlKSB7CiAgICAgICAgdmFyIGVudHJpZXMgPSB2aXNpYmxlLmZpbHRlcihmdW5jdGlvbiAoZW50cnkpIHsgcmV0dXJuIGVudHJ5LmRhdGUgPT09IGRhdGU7IH0pOwogICAgICAgIHJldHVybiB7IGRhdGU6IGRhdGUsIGNvdW50OiBlbnRyaWVzLmxlbmd0aCwgY2Fsb3JpZXM6IG51dHJpZW50VG90YWwoZW50cmllcywgZnVuY3Rpb24gKGVudHJ5KSB7IHJldHVybiBlbnRyeS5jYWxvcmllczsgfSkgfTsKICAgIH0pOwogICAgdmFyIGxvZ2dlZCA9IGRhaWx5LmZpbHRlcihmdW5jdGlvbiAoZGF5KSB7IHJldHVybiBkYXkuY291bnQ7IH0pOwogICAgdmFyIHN1bSA9IG51dHJpZW50VG90YWwobG9nZ2VkLCBmdW5jdGlvbiAoZGF5KSB7IHJldHVybiBkYXkuY2Fsb3JpZXM7IH0pOwogICAgdmFyIGF2ZXJhZ2UgPSBzdW0gPT09IG51bGwgPyBudWxsIDogbG9nZ2VkLmxlbmd0aCA/IE1hdGgucm91bmQoc3VtIC8gbG9nZ2VkLmxlbmd0aCkgOiAwOwogICAgdmFyIGdyYW1zID0geyBwcm90ZWluOiBudXRyaWVudFRvdGFsKHZpc2libGUsIGZ1bmN0aW9uICh4KSB7IHJldHVybiB4LnByb3RlaW47IH0pLCBjYXJiczogbnV0cmllbnRUb3RhbCh2aXNpYmxlLCBmdW5jdGlvbiAoeCkgeyByZXR1cm4geC5jYXJiczsgfSksIGZhdDogbnV0cmllbnRUb3RhbCh2aXNpYmxlLCBmdW5jdGlvbiAoeCkgeyByZXR1cm4geC5mYXQ7IH0pIH07CiAgICB2YXIgZW5lcmd5ID0gZ3JhbXMucHJvdGVpbiA9PT0gbnVsbCB8fCBncmFtcy5jYXJicyA9PT0gbnVsbCB8fCBncmFtcy5mYXQgPT09IG51bGwgPyBudWxsIDogZ3JhbXMucHJvdGVpbiAqIDQgKyBncmFtcy5jYXJicyAqIDQgKyBncmFtcy5mYXQgKiA5OwogICAgdmFyIHNoYXJlID0gZnVuY3Rpb24gKHZhbHVlLCBmYWN0b3IpIHsgcmV0dXJuIGVuZXJneSA9PT0gbnVsbCB8fCB2YWx1ZSA9PT0gbnVsbCA/IG51bGwgOiBlbmVyZ3kgPyBNYXRoLnJvdW5kKHZhbHVlICogZmFjdG9yIC8gZW5lcmd5ICogMTAwKSA6IDA7IH07CiAgICB2YXIgc3BsaXQgPSB7IHByb3RlaW46IHNoYXJlKGdyYW1zLnByb3RlaW4sIDQpLCBjYXJiczogc2hhcmUoZ3JhbXMuY2FyYnMsIDQpLCBmYXQ6IHNoYXJlKGdyYW1zLmZhdCwgOSkgfTsKICAgIHJldHVybiB7IGRhaWx5OiBkYWlseSwgdmlzaWJsZTogdmlzaWJsZSwgYXZlcmFnZTogYXZlcmFnZSwgc3BsaXQ6IHNwbGl0LCBncmFtczogZ3JhbXMgfTsKfQpleHBvcnQgdmFyIHByZXZpZXdGb29kcyA9IFsKICAgIFsnQ2hpY2tlbiBicmVhc3QsIGdyaWxsZWQnLCAnUG91bHRyeScsIDE2NSwgMzEsIDAsIDMuNl0sCiAgICBbJ0NoaWNrZW4gdGhpZ2gnLCAnUG91bHRyeScsIDIwOSwgMjYsIDAsIDEwLjldLAogICAgWydDaGlja2VuIGFkb2JvJywgJ0Nvb2tlZCBkaXNoJywgMTkwLCAyMywgNCwgOF0sCiAgICBbJ1doaXRlIHJpY2UsIGNvb2tlZCcsICdHcmFpbnMnLCAxMzAsIDIuNywgMjgsIC4zXSwKICAgIFsnRWdnLCB3aG9sZScsICdEYWlyeSAmIGVnZ3MnLCAxNDMsIDEyLjYsIC44LCA5LjZdLAogICAgWydCYW5hbmEnLCAnRnJ1aXQnLCA4OSwgMS4xLCAyMywgLjNdLApdLm1hcChmdW5jdGlvbiAoX2EsIGluZGV4KSB7CiAgICB2YXIgbmFtZSA9IF9hWzBdLCBncm91cCA9IF9hWzFdLCBrY2FsID0gX2FbMl0sIHByb3RlaW4gPSBfYVszXSwgY2FyYnMgPSBfYVs0XSwgZmF0ID0gX2FbNV07CiAgICByZXR1cm4gKHsKICAgICAgICBmZGNfaWQ6IC0xMDAgLSBpbmRleCwgZGVzY3JpcHRpb246IFN0cmluZyhuYW1lKSwgZGF0YV90eXBlOiBTdHJpbmcoZ3JvdXApLAogICAgICAgIGRldGFpbDogeyByZXF1ZXN0X2lkOiAnbG9jYWwtcHJldmlldycsIGZkY19pZDogLTEwMCAtIGluZGV4LCBkZXNjcmlwdGlvbjogU3RyaW5nKG5hbWUpLCBkYXRhX3R5cGU6IFN0cmluZyhncm91cCksIHNlcnZpbmdfc2l6ZV9nOiAxMDAsCiAgICAgICAgICAgIHBlcl8xMDBnOiB7IGtjYWw6IE51bWJlcihrY2FsKSwgcHJvdGVpbl9nOiBOdW1iZXIocHJvdGVpbiksIGNhcmJzX2c6IE51bWJlcihjYXJicyksIGZhdF9nOiBOdW1iZXIoZmF0KSB9IH0sCiAgICB9KTsKfSk7CmV4cG9ydCB2YXIgcHJldmlld1NjYW4gPSB7CiAgICByZXF1ZXN0X2lkOiAnbG9jYWwtcHJldmlldycsIG1vZGVsOiAnUmVmZXJlbmNlIHByZXZpZXcnLCB1bm1hdGNoZWQ6IFtdLCBkZWdyYWRlZDogZmFsc2UsCiAgICBpdGVtczogWwogICAgICAgIHsgZm9vZF9uYW1lOiAnR3JpbGxlZCBjaGlja2VuIGJyZWFzdCcsIGZvdW5kOiB0cnVlLCBmZGNfaWQ6IC0xMDAsIGVzdF93ZWlnaHRfZzogMTUwLCBjb25maWRlbmNlOiAuOTIsIGtjYWw6IDI0OCwgcHJvdGVpbl9nOiA0MCwgY2FyYnNfZzogMCwgZmF0X2c6IDggfSwKICAgICAgICB7IGZvb2RfbmFtZTogJ1N0ZWFtZWQgcmljZScsIGZvdW5kOiB0cnVlLCBmZGNfaWQ6IC0xMDMsIGVzdF93ZWlnaHRfZzogMTU4LCBkZXNjcmlwdGlvbjogJzEgY3VwJywgY29uZmlkZW5jZTogLjg1LCBrY2FsOiAyMDUsIHByb3RlaW5fZzogNCwgY2FyYnNfZzogNDUsIGZhdF9nOiAyIH0sCiAgICAgICAgeyBmb29kX25hbWU6ICdNaXhlZCB2ZWdldGFibGVzJywgZm91bmQ6IHRydWUsIGZkY19pZDogLTEwNiwgZXN0X3dlaWdodF9nOiA4MCwgY29uZmlkZW5jZTogLjYxLCBrY2FsOiAxNjcsIHByb3RlaW5fZzogNCwgY2FyYnNfZzogMjMsIGZhdF9nOiAxMCB9LAogICAgXSwgdG90YWxzOiB7IGtjYWw6IDYyMCwgcHJvdGVpbl9nOiA0OCwgY2FyYnNfZzogNjgsIGZhdF9nOiAyMCB9LAp9OwpleHBvcnQgZnVuY3Rpb24gc2NhbGVTY2FubmVkSXRlbXMoaXRlbXMsIGZhY3RvcikgewogICAgdmFyIHNjYWxlID0gZnVuY3Rpb24gKHZhbHVlKSB7IHJldHVybiB2YWx1ZSA9PT0gbnVsbCA/IG51bGwgOiB2YWx1ZSAqIGZhY3RvcjsgfTsKICAgIHJldHVybiBpdGVtcy5tYXAoZnVuY3Rpb24gKGl0ZW0pIHsgcmV0dXJuIChfX2Fzc2lnbihfX2Fzc2lnbih7fSwgaXRlbSksIHsgZXN0X3dlaWdodF9nOiBpdGVtLmVzdF93ZWlnaHRfZyAqIGZhY3Rvciwga2NhbDogc2NhbGUoaXRlbS5rY2FsKSwgcHJvdGVpbl9nOiBzY2FsZShpdGVtLnByb3RlaW5fZyksIGNhcmJzX2c6IHNjYWxlKGl0ZW0uY2FyYnNfZyksIGZhdF9nOiBzY2FsZShpdGVtLmZhdF9nKSB9KSk7IH0pOwp9Cg==": Invalid relative URL or base scheme is not hierarchical.'
+  code: 'ERR_UNSUPPORTED_RESOLVE_REQUEST'
+  name: 'TypeError'
+  stack: |-
+    moduleResolve (node:internal/modules/esm/resolve:843:21)
+    defaultResolve (node:internal/modules/esm/resolve:992:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    #resolve (node:internal/modules/esm/loader:683:17)
+    ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    ModuleJob.link (node:internal/modules/esm/module_job:253:17)
+    new ModuleJob (node:internal/modules/esm/module_job:232:26)
+  ...
+# Subtest: portion scaling preserves backend scan keys without mutating source values
+not ok 111 - portion scaling preserves backend scan keys without mutating source values
+  ---
+  duration_ms: 21.1348
+  type: 'test'
+  location: 'C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\tests\\nutrition-presentation.test.mjs:39:1'
+  failureType: 'testCodeFailure'
+  error: 'Failed to resolve module specifier "./nutrientTotal" from "data:text/javascript;base64,dmFyIF9fYXNzaWduID0gKHRoaXMgJiYgdGhpcy5fX2Fzc2lnbikgfHwgZnVuY3Rpb24gKCkgewogICAgX19hc3NpZ24gPSBPYmplY3QuYXNzaWduIHx8IGZ1bmN0aW9uKHQpIHsKICAgICAgICBmb3IgKHZhciBzLCBpID0gMSwgbiA9IGFyZ3VtZW50cy5sZW5ndGg7IGkgPCBuOyBpKyspIHsKICAgICAgICAgICAgcyA9IGFyZ3VtZW50c1tpXTsKICAgICAgICAgICAgZm9yICh2YXIgcCBpbiBzKSBpZiAoT2JqZWN0LnByb3RvdHlwZS5oYXNPd25Qcm9wZXJ0eS5jYWxsKHMsIHApKQogICAgICAgICAgICAgICAgdFtwXSA9IHNbcF07CiAgICAgICAgfQogICAgICAgIHJldHVybiB0OwogICAgfTsKICAgIHJldHVybiBfX2Fzc2lnbi5hcHBseSh0aGlzLCBhcmd1bWVudHMpOwp9OwppbXBvcnQgeyBudXRyaWVudFRvdGFsIH0gZnJvbSAnLi9udXRyaWVudFRvdGFsJzsKZXhwb3J0IGZ1bmN0aW9uIGNhblByZXZpZXdOdXRyaXRpb24obG9hZGluZywgZXJyb3IsIG1lYWxzLCB3YXRlcikgewogICAgcmV0dXJuICFsb2FkaW5nICYmICFlcnJvciAmJiBtZWFscy5sZW5ndGggPT09IDAgJiYgd2F0ZXIgPT09IDA7Cn0KdmFyIGRhdGVLZXkgPSBmdW5jdGlvbiAoZGF0ZSkgeyByZXR1cm4gIiIuY29uY2F0KGRhdGUuZ2V0RnVsbFllYXIoKSwgIi0iKS5jb25jYXQoU3RyaW5nKGRhdGUuZ2V0TW9udGgoKSArIDEpLnBhZFN0YXJ0KDIsICcwJyksICItIikuY29uY2F0KFN0cmluZyhkYXRlLmdldERhdGUoKSkucGFkU3RhcnQoMiwgJzAnKSk7IH07Ci8vIERlbGliZXJhdGUgcmVmZXJlbmNlIGZpeHR1cmVzLiBUaGVzZSBJRHMgbXVzdCBuZXZlciBiZSBzZW50IHRvIHBlcnNpc3RlbmNlIEFQSXMuCmV4cG9ydCBmdW5jdGlvbiBjcmVhdGVOdXRyaXRpb25QcmV2aWV3KG5vdykgewogICAgaWYgKG5vdyA9PT0gdm9pZCAwKSB7IG5vdyA9IG5ldyBEYXRlKCk7IH0KICAgIHZhciBkYXRlID0gZGF0ZUtleShub3cpOwogICAgdmFyIG1lYWxzID0gWwogICAgICAgIHsgaWQ6ICdwcmV2aWV3LWJyZWFrZmFzdCcsIG5hbWU6ICdPYXRzIGFuZCBlZ2dzJywgbWVhbDogJ0JyZWFrZmFzdCcsIGNhbG9yaWVzOiA0MjAsIGRldGFpbDogJ1JvbGxlZCBvYXRzIMK3IDEgY3VwIMK3IEVnZyDCtyAyIGxhcmdlJywgdGltZTogJzA3OjIwJywgc291cmNlOiAnU2Nhbm5lZCcsIHByb3RlaW46IDI4LCBjYXJiczogNTQsIGZhdDogMTIsIGRhdGU6IGRhdGUgfSwKICAgICAgICB7IGlkOiAncHJldmlldy1sdW5jaCcsIG5hbWU6ICdDaGlja2VuIHJpY2UgYm93bCcsIG1lYWw6ICdMdW5jaCcsIGNhbG9yaWVzOiA2ODAsIGRldGFpbDogJ0NoaWNrZW4gYnJlYXN0IMK3IDE1MCBnIMK3IFdoaXRlIHJpY2UgwrcgMSBjdXAnLCB0aW1lOiAnMTI6NDAnLCBzb3VyY2U6ICdTY2FubmVkJywgZWRpdGVkOiB0cnVlLCBwcm90ZWluOiA0NSwgY2FyYnM6IDgyLCBmYXQ6IDE1LCBkYXRlOiBkYXRlIH0sCiAgICAgICAgeyBpZDogJ3ByZXZpZXctc25hY2snLCBuYW1lOiAnUHJvdGVpbiBzaGFrZScsIG1lYWw6ICdTbmFjaycsIGNhbG9yaWVzOiAzMjAsIGRldGFpbDogJ1doZXkgcHJvdGVpbiDCtyAxIHNjb29wIMK3IEJhbmFuYSDCtyAxIG1lZGl1bScsIHRpbWU6ICcxNToxMCcsIHNvdXJjZTogJ01hbnVhbCcsIHByb3RlaW46IDIzLCBjYXJiczogNDQsIGZhdDogMTUsIGRhdGU6IGRhdGUgfSwKICAgIF07CiAgICBbMjE2MCwgMTk5MCwgMjU1MCwgMTc2MCwgMjE2MCwgMTU4OV0uZm9yRWFjaChmdW5jdGlvbiAoY2Fsb3JpZXMsIGluZGV4KSB7CiAgICAgICAgdmFyIGRheSA9IG5ldyBEYXRlKG5vdyk7CiAgICAgICAgZGF5LnNldERhdGUoZGF5LmdldERhdGUoKSAtICg2IC0gaW5kZXgpKTsKICAgICAgICBtZWFscy5wdXNoKHsgaWQ6ICJwcmV2aWV3LWhpc3RvcnktIi5jb25jYXQoaW5kZXgpLCBuYW1lOiAnRGFpbHkgbWVhbCB0b3RhbCcsIG1lYWw6ICdEaW5uZXInLCBjYWxvcmllczogY2Fsb3JpZXMsIGRldGFpbDogJ1JlZmVyZW5jZSBtZWFsIGxvZycsIHRpbWU6ICcxODozMCcsIHNvdXJjZTogJ01hbnVhbCcsIHByb3RlaW46IGNhbG9yaWVzICogLjI4IC8gNCwgY2FyYnM6IGNhbG9yaWVzICogLjQ3IC8gNCwgZmF0OiBjYWxvcmllcyAqIC4yNSAvIDksIGRhdGU6IGRhdGVLZXkoZGF5KSB9KTsKICAgIH0pOwogICAgcmV0dXJuIHsgbWVhbHM6IG1lYWxzLCB3YXRlcjogNSB9Owp9CmV4cG9ydCBmdW5jdGlvbiBzdW1tYXJpemVIaXN0b3J5KG1lYWxzLCByYW5nZSwgbm93KSB7CiAgICBpZiAobm93ID09PSB2b2lkIDApIHsgbm93ID0gbmV3IERhdGUoKTsgfQogICAgdmFyIGRheXMgPSBBcnJheS5mcm9tKHsgbGVuZ3RoOiByYW5nZSB9LCBmdW5jdGlvbiAoXywgaW5kZXgpIHsgdmFyIGRheSA9IG5ldyBEYXRlKG5vdyk7IGRheS5zZXREYXRlKGRheS5nZXREYXRlKCkgLSAocmFuZ2UgLSBpbmRleCAtIDEpKTsgcmV0dXJuIGRhdGVLZXkoZGF5KTsgfSk7CiAgICB2YXIgdmlzaWJsZSA9IG1lYWxzLmZpbHRlcihmdW5jdGlvbiAoZW50cnkpIHsgcmV0dXJuICEhZW50cnkuZGF0ZSAmJiBkYXlzLmluY2x1ZGVzKGVudHJ5LmRhdGUpOyB9KTsKICAgIHZhciBkYWlseSA9IGRheXMubWFwKGZ1bmN0aW9uIChkYXRlKSB7CiAgICAgICAgdmFyIGVudHJpZXMgPSB2aXNpYmxlLmZpbHRlcihmdW5jdGlvbiAoZW50cnkpIHsgcmV0dXJuIGVudHJ5LmRhdGUgPT09IGRhdGU7IH0pOwogICAgICAgIHJldHVybiB7IGRhdGU6IGRhdGUsIGNvdW50OiBlbnRyaWVzLmxlbmd0aCwgY2Fsb3JpZXM6IG51dHJpZW50VG90YWwoZW50cmllcywgZnVuY3Rpb24gKGVudHJ5KSB7IHJldHVybiBlbnRyeS5jYWxvcmllczsgfSkgfTsKICAgIH0pOwogICAgdmFyIGxvZ2dlZCA9IGRhaWx5LmZpbHRlcihmdW5jdGlvbiAoZGF5KSB7IHJldHVybiBkYXkuY291bnQ7IH0pOwogICAgdmFyIHN1bSA9IG51dHJpZW50VG90YWwobG9nZ2VkLCBmdW5jdGlvbiAoZGF5KSB7IHJldHVybiBkYXkuY2Fsb3JpZXM7IH0pOwogICAgdmFyIGF2ZXJhZ2UgPSBzdW0gPT09IG51bGwgPyBudWxsIDogbG9nZ2VkLmxlbmd0aCA/IE1hdGgucm91bmQoc3VtIC8gbG9nZ2VkLmxlbmd0aCkgOiAwOwogICAgdmFyIGdyYW1zID0geyBwcm90ZWluOiBudXRyaWVudFRvdGFsKHZpc2libGUsIGZ1bmN0aW9uICh4KSB7IHJldHVybiB4LnByb3RlaW47IH0pLCBjYXJiczogbnV0cmllbnRUb3RhbCh2aXNpYmxlLCBmdW5jdGlvbiAoeCkgeyByZXR1cm4geC5jYXJiczsgfSksIGZhdDogbnV0cmllbnRUb3RhbCh2aXNpYmxlLCBmdW5jdGlvbiAoeCkgeyByZXR1cm4geC5mYXQ7IH0pIH07CiAgICB2YXIgZW5lcmd5ID0gZ3JhbXMucHJvdGVpbiA9PT0gbnVsbCB8fCBncmFtcy5jYXJicyA9PT0gbnVsbCB8fCBncmFtcy5mYXQgPT09IG51bGwgPyBudWxsIDogZ3JhbXMucHJvdGVpbiAqIDQgKyBncmFtcy5jYXJicyAqIDQgKyBncmFtcy5mYXQgKiA5OwogICAgdmFyIHNoYXJlID0gZnVuY3Rpb24gKHZhbHVlLCBmYWN0b3IpIHsgcmV0dXJuIGVuZXJneSA9PT0gbnVsbCB8fCB2YWx1ZSA9PT0gbnVsbCA/IG51bGwgOiBlbmVyZ3kgPyBNYXRoLnJvdW5kKHZhbHVlICogZmFjdG9yIC8gZW5lcmd5ICogMTAwKSA6IDA7IH07CiAgICB2YXIgc3BsaXQgPSB7IHByb3RlaW46IHNoYXJlKGdyYW1zLnByb3RlaW4sIDQpLCBjYXJiczogc2hhcmUoZ3JhbXMuY2FyYnMsIDQpLCBmYXQ6IHNoYXJlKGdyYW1zLmZhdCwgOSkgfTsKICAgIHJldHVybiB7IGRhaWx5OiBkYWlseSwgdmlzaWJsZTogdmlzaWJsZSwgYXZlcmFnZTogYXZlcmFnZSwgc3BsaXQ6IHNwbGl0LCBncmFtczogZ3JhbXMgfTsKfQpleHBvcnQgdmFyIHByZXZpZXdGb29kcyA9IFsKICAgIFsnQ2hpY2tlbiBicmVhc3QsIGdyaWxsZWQnLCAnUG91bHRyeScsIDE2NSwgMzEsIDAsIDMuNl0sCiAgICBbJ0NoaWNrZW4gdGhpZ2gnLCAnUG91bHRyeScsIDIwOSwgMjYsIDAsIDEwLjldLAogICAgWydDaGlja2VuIGFkb2JvJywgJ0Nvb2tlZCBkaXNoJywgMTkwLCAyMywgNCwgOF0sCiAgICBbJ1doaXRlIHJpY2UsIGNvb2tlZCcsICdHcmFpbnMnLCAxMzAsIDIuNywgMjgsIC4zXSwKICAgIFsnRWdnLCB3aG9sZScsICdEYWlyeSAmIGVnZ3MnLCAxNDMsIDEyLjYsIC44LCA5LjZdLAogICAgWydCYW5hbmEnLCAnRnJ1aXQnLCA4OSwgMS4xLCAyMywgLjNdLApdLm1hcChmdW5jdGlvbiAoX2EsIGluZGV4KSB7CiAgICB2YXIgbmFtZSA9IF9hWzBdLCBncm91cCA9IF9hWzFdLCBrY2FsID0gX2FbMl0sIHByb3RlaW4gPSBfYVszXSwgY2FyYnMgPSBfYVs0XSwgZmF0ID0gX2FbNV07CiAgICByZXR1cm4gKHsKICAgICAgICBmZGNfaWQ6IC0xMDAgLSBpbmRleCwgZGVzY3JpcHRpb246IFN0cmluZyhuYW1lKSwgZGF0YV90eXBlOiBTdHJpbmcoZ3JvdXApLAogICAgICAgIGRldGFpbDogeyByZXF1ZXN0X2lkOiAnbG9jYWwtcHJldmlldycsIGZkY19pZDogLTEwMCAtIGluZGV4LCBkZXNjcmlwdGlvbjogU3RyaW5nKG5hbWUpLCBkYXRhX3R5cGU6IFN0cmluZyhncm91cCksIHNlcnZpbmdfc2l6ZV9nOiAxMDAsCiAgICAgICAgICAgIHBlcl8xMDBnOiB7IGtjYWw6IE51bWJlcihrY2FsKSwgcHJvdGVpbl9nOiBOdW1iZXIocHJvdGVpbiksIGNhcmJzX2c6IE51bWJlcihjYXJicyksIGZhdF9nOiBOdW1iZXIoZmF0KSB9IH0sCiAgICB9KTsKfSk7CmV4cG9ydCB2YXIgcHJldmlld1NjYW4gPSB7CiAgICByZXF1ZXN0X2lkOiAnbG9jYWwtcHJldmlldycsIG1vZGVsOiAnUmVmZXJlbmNlIHByZXZpZXcnLCB1bm1hdGNoZWQ6IFtdLCBkZWdyYWRlZDogZmFsc2UsCiAgICBpdGVtczogWwogICAgICAgIHsgZm9vZF9uYW1lOiAnR3JpbGxlZCBjaGlja2VuIGJyZWFzdCcsIGZvdW5kOiB0cnVlLCBmZGNfaWQ6IC0xMDAsIGVzdF93ZWlnaHRfZzogMTUwLCBjb25maWRlbmNlOiAuOTIsIGtjYWw6IDI0OCwgcHJvdGVpbl9nOiA0MCwgY2FyYnNfZzogMCwgZmF0X2c6IDggfSwKICAgICAgICB7IGZvb2RfbmFtZTogJ1N0ZWFtZWQgcmljZScsIGZvdW5kOiB0cnVlLCBmZGNfaWQ6IC0xMDMsIGVzdF93ZWlnaHRfZzogMTU4LCBkZXNjcmlwdGlvbjogJzEgY3VwJywgY29uZmlkZW5jZTogLjg1LCBrY2FsOiAyMDUsIHByb3RlaW5fZzogNCwgY2FyYnNfZzogNDUsIGZhdF9nOiAyIH0sCiAgICAgICAgeyBmb29kX25hbWU6ICdNaXhlZCB2ZWdldGFibGVzJywgZm91bmQ6IHRydWUsIGZkY19pZDogLTEwNiwgZXN0X3dlaWdodF9nOiA4MCwgY29uZmlkZW5jZTogLjYxLCBrY2FsOiAxNjcsIHByb3RlaW5fZzogNCwgY2FyYnNfZzogMjMsIGZhdF9nOiAxMCB9LAogICAgXSwgdG90YWxzOiB7IGtjYWw6IDYyMCwgcHJvdGVpbl9nOiA0OCwgY2FyYnNfZzogNjgsIGZhdF9nOiAyMCB9LAp9OwpleHBvcnQgZnVuY3Rpb24gc2NhbGVTY2FubmVkSXRlbXMoaXRlbXMsIGZhY3RvcikgewogICAgdmFyIHNjYWxlID0gZnVuY3Rpb24gKHZhbHVlKSB7IHJldHVybiB2YWx1ZSA9PT0gbnVsbCA/IG51bGwgOiB2YWx1ZSAqIGZhY3RvcjsgfTsKICAgIHJldHVybiBpdGVtcy5tYXAoZnVuY3Rpb24gKGl0ZW0pIHsgcmV0dXJuIChfX2Fzc2lnbihfX2Fzc2lnbih7fSwgaXRlbSksIHsgZXN0X3dlaWdodF9nOiBpdGVtLmVzdF93ZWlnaHRfZyAqIGZhY3Rvciwga2NhbDogc2NhbGUoaXRlbS5rY2FsKSwgcHJvdGVpbl9nOiBzY2FsZShpdGVtLnByb3RlaW5fZyksIGNhcmJzX2c6IHNjYWxlKGl0ZW0uY2FyYnNfZyksIGZhdF9nOiBzY2FsZShpdGVtLmZhdF9nKSB9KSk7IH0pOwp9Cg==": Invalid relative URL or base scheme is not hierarchical.'
+  code: 'ERR_UNSUPPORTED_RESOLVE_REQUEST'
+  name: 'TypeError'
+  stack: |-
+    moduleResolve (node:internal/modules/esm/resolve:843:21)
+    defaultResolve (node:internal/modules/esm/resolve:992:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    #resolve (node:internal/modules/esm/loader:683:17)
+    ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    ModuleJob.link (node:internal/modules/esm/module_job:253:17)
+    new ModuleJob (node:internal/modules/esm/module_job:232:26)
+  ...
+# Subtest: review renders only matched scan totals and keeps saving disabled on analysis errors
+not ok 112 - review renders only matched scan totals and keeps saving disabled on analysis errors
+  ---
+  duration_ms: 20.2757
+  type: 'test'
+  location: 'C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\tests\\nutrition-presentation.test.mjs:49:1'
+  failureType: 'testCodeFailure'
+  error: 'Failed to resolve module specifier "./nutrientTotal" from "data:text/javascript;base64,dmFyIF9fYXNzaWduID0gKHRoaXMgJiYgdGhpcy5fX2Fzc2lnbikgfHwgZnVuY3Rpb24gKCkgewogICAgX19hc3NpZ24gPSBPYmplY3QuYXNzaWduIHx8IGZ1bmN0aW9uKHQpIHsKICAgICAgICBmb3IgKHZhciBzLCBpID0gMSwgbiA9IGFyZ3VtZW50cy5sZW5ndGg7IGkgPCBuOyBpKyspIHsKICAgICAgICAgICAgcyA9IGFyZ3VtZW50c1tpXTsKICAgICAgICAgICAgZm9yICh2YXIgcCBpbiBzKSBpZiAoT2JqZWN0LnByb3RvdHlwZS5oYXNPd25Qcm9wZXJ0eS5jYWxsKHMsIHApKQogICAgICAgICAgICAgICAgdFtwXSA9IHNbcF07CiAgICAgICAgfQogICAgICAgIHJldHVybiB0OwogICAgfTsKICAgIHJldHVybiBfX2Fzc2lnbi5hcHBseSh0aGlzLCBhcmd1bWVudHMpOwp9OwppbXBvcnQgeyBudXRyaWVudFRvdGFsIH0gZnJvbSAnLi9udXRyaWVudFRvdGFsJzsKZXhwb3J0IGZ1bmN0aW9uIGNhblByZXZpZXdOdXRyaXRpb24obG9hZGluZywgZXJyb3IsIG1lYWxzLCB3YXRlcikgewogICAgcmV0dXJuICFsb2FkaW5nICYmICFlcnJvciAmJiBtZWFscy5sZW5ndGggPT09IDAgJiYgd2F0ZXIgPT09IDA7Cn0KdmFyIGRhdGVLZXkgPSBmdW5jdGlvbiAoZGF0ZSkgeyByZXR1cm4gIiIuY29uY2F0KGRhdGUuZ2V0RnVsbFllYXIoKSwgIi0iKS5jb25jYXQoU3RyaW5nKGRhdGUuZ2V0TW9udGgoKSArIDEpLnBhZFN0YXJ0KDIsICcwJyksICItIikuY29uY2F0KFN0cmluZyhkYXRlLmdldERhdGUoKSkucGFkU3RhcnQoMiwgJzAnKSk7IH07Ci8vIERlbGliZXJhdGUgcmVmZXJlbmNlIGZpeHR1cmVzLiBUaGVzZSBJRHMgbXVzdCBuZXZlciBiZSBzZW50IHRvIHBlcnNpc3RlbmNlIEFQSXMuCmV4cG9ydCBmdW5jdGlvbiBjcmVhdGVOdXRyaXRpb25QcmV2aWV3KG5vdykgewogICAgaWYgKG5vdyA9PT0gdm9pZCAwKSB7IG5vdyA9IG5ldyBEYXRlKCk7IH0KICAgIHZhciBkYXRlID0gZGF0ZUtleShub3cpOwogICAgdmFyIG1lYWxzID0gWwogICAgICAgIHsgaWQ6ICdwcmV2aWV3LWJyZWFrZmFzdCcsIG5hbWU6ICdPYXRzIGFuZCBlZ2dzJywgbWVhbDogJ0JyZWFrZmFzdCcsIGNhbG9yaWVzOiA0MjAsIGRldGFpbDogJ1JvbGxlZCBvYXRzIMK3IDEgY3VwIMK3IEVnZyDCtyAyIGxhcmdlJywgdGltZTogJzA3OjIwJywgc291cmNlOiAnU2Nhbm5lZCcsIHByb3RlaW46IDI4LCBjYXJiczogNTQsIGZhdDogMTIsIGRhdGU6IGRhdGUgfSwKICAgICAgICB7IGlkOiAncHJldmlldy1sdW5jaCcsIG5hbWU6ICdDaGlja2VuIHJpY2UgYm93bCcsIG1lYWw6ICdMdW5jaCcsIGNhbG9yaWVzOiA2ODAsIGRldGFpbDogJ0NoaWNrZW4gYnJlYXN0IMK3IDE1MCBnIMK3IFdoaXRlIHJpY2UgwrcgMSBjdXAnLCB0aW1lOiAnMTI6NDAnLCBzb3VyY2U6ICdTY2FubmVkJywgZWRpdGVkOiB0cnVlLCBwcm90ZWluOiA0NSwgY2FyYnM6IDgyLCBmYXQ6IDE1LCBkYXRlOiBkYXRlIH0sCiAgICAgICAgeyBpZDogJ3ByZXZpZXctc25hY2snLCBuYW1lOiAnUHJvdGVpbiBzaGFrZScsIG1lYWw6ICdTbmFjaycsIGNhbG9yaWVzOiAzMjAsIGRldGFpbDogJ1doZXkgcHJvdGVpbiDCtyAxIHNjb29wIMK3IEJhbmFuYSDCtyAxIG1lZGl1bScsIHRpbWU6ICcxNToxMCcsIHNvdXJjZTogJ01hbnVhbCcsIHByb3RlaW46IDIzLCBjYXJiczogNDQsIGZhdDogMTUsIGRhdGU6IGRhdGUgfSwKICAgIF07CiAgICBbMjE2MCwgMTk5MCwgMjU1MCwgMTc2MCwgMjE2MCwgMTU4OV0uZm9yRWFjaChmdW5jdGlvbiAoY2Fsb3JpZXMsIGluZGV4KSB7CiAgICAgICAgdmFyIGRheSA9IG5ldyBEYXRlKG5vdyk7CiAgICAgICAgZGF5LnNldERhdGUoZGF5LmdldERhdGUoKSAtICg2IC0gaW5kZXgpKTsKICAgICAgICBtZWFscy5wdXNoKHsgaWQ6ICJwcmV2aWV3LWhpc3RvcnktIi5jb25jYXQoaW5kZXgpLCBuYW1lOiAnRGFpbHkgbWVhbCB0b3RhbCcsIG1lYWw6ICdEaW5uZXInLCBjYWxvcmllczogY2Fsb3JpZXMsIGRldGFpbDogJ1JlZmVyZW5jZSBtZWFsIGxvZycsIHRpbWU6ICcxODozMCcsIHNvdXJjZTogJ01hbnVhbCcsIHByb3RlaW46IGNhbG9yaWVzICogLjI4IC8gNCwgY2FyYnM6IGNhbG9yaWVzICogLjQ3IC8gNCwgZmF0OiBjYWxvcmllcyAqIC4yNSAvIDksIGRhdGU6IGRhdGVLZXkoZGF5KSB9KTsKICAgIH0pOwogICAgcmV0dXJuIHsgbWVhbHM6IG1lYWxzLCB3YXRlcjogNSB9Owp9CmV4cG9ydCBmdW5jdGlvbiBzdW1tYXJpemVIaXN0b3J5KG1lYWxzLCByYW5nZSwgbm93KSB7CiAgICBpZiAobm93ID09PSB2b2lkIDApIHsgbm93ID0gbmV3IERhdGUoKTsgfQogICAgdmFyIGRheXMgPSBBcnJheS5mcm9tKHsgbGVuZ3RoOiByYW5nZSB9LCBmdW5jdGlvbiAoXywgaW5kZXgpIHsgdmFyIGRheSA9IG5ldyBEYXRlKG5vdyk7IGRheS5zZXREYXRlKGRheS5nZXREYXRlKCkgLSAocmFuZ2UgLSBpbmRleCAtIDEpKTsgcmV0dXJuIGRhdGVLZXkoZGF5KTsgfSk7CiAgICB2YXIgdmlzaWJsZSA9IG1lYWxzLmZpbHRlcihmdW5jdGlvbiAoZW50cnkpIHsgcmV0dXJuICEhZW50cnkuZGF0ZSAmJiBkYXlzLmluY2x1ZGVzKGVudHJ5LmRhdGUpOyB9KTsKICAgIHZhciBkYWlseSA9IGRheXMubWFwKGZ1bmN0aW9uIChkYXRlKSB7CiAgICAgICAgdmFyIGVudHJpZXMgPSB2aXNpYmxlLmZpbHRlcihmdW5jdGlvbiAoZW50cnkpIHsgcmV0dXJuIGVudHJ5LmRhdGUgPT09IGRhdGU7IH0pOwogICAgICAgIHJldHVybiB7IGRhdGU6IGRhdGUsIGNvdW50OiBlbnRyaWVzLmxlbmd0aCwgY2Fsb3JpZXM6IG51dHJpZW50VG90YWwoZW50cmllcywgZnVuY3Rpb24gKGVudHJ5KSB7IHJldHVybiBlbnRyeS5jYWxvcmllczsgfSkgfTsKICAgIH0pOwogICAgdmFyIGxvZ2dlZCA9IGRhaWx5LmZpbHRlcihmdW5jdGlvbiAoZGF5KSB7IHJldHVybiBkYXkuY291bnQ7IH0pOwogICAgdmFyIHN1bSA9IG51dHJpZW50VG90YWwobG9nZ2VkLCBmdW5jdGlvbiAoZGF5KSB7IHJldHVybiBkYXkuY2Fsb3JpZXM7IH0pOwogICAgdmFyIGF2ZXJhZ2UgPSBzdW0gPT09IG51bGwgPyBudWxsIDogbG9nZ2VkLmxlbmd0aCA/IE1hdGgucm91bmQoc3VtIC8gbG9nZ2VkLmxlbmd0aCkgOiAwOwogICAgdmFyIGdyYW1zID0geyBwcm90ZWluOiBudXRyaWVudFRvdGFsKHZpc2libGUsIGZ1bmN0aW9uICh4KSB7IHJldHVybiB4LnByb3RlaW47IH0pLCBjYXJiczogbnV0cmllbnRUb3RhbCh2aXNpYmxlLCBmdW5jdGlvbiAoeCkgeyByZXR1cm4geC5jYXJiczsgfSksIGZhdDogbnV0cmllbnRUb3RhbCh2aXNpYmxlLCBmdW5jdGlvbiAoeCkgeyByZXR1cm4geC5mYXQ7IH0pIH07CiAgICB2YXIgZW5lcmd5ID0gZ3JhbXMucHJvdGVpbiA9PT0gbnVsbCB8fCBncmFtcy5jYXJicyA9PT0gbnVsbCB8fCBncmFtcy5mYXQgPT09IG51bGwgPyBudWxsIDogZ3JhbXMucHJvdGVpbiAqIDQgKyBncmFtcy5jYXJicyAqIDQgKyBncmFtcy5mYXQgKiA5OwogICAgdmFyIHNoYXJlID0gZnVuY3Rpb24gKHZhbHVlLCBmYWN0b3IpIHsgcmV0dXJuIGVuZXJneSA9PT0gbnVsbCB8fCB2YWx1ZSA9PT0gbnVsbCA/IG51bGwgOiBlbmVyZ3kgPyBNYXRoLnJvdW5kKHZhbHVlICogZmFjdG9yIC8gZW5lcmd5ICogMTAwKSA6IDA7IH07CiAgICB2YXIgc3BsaXQgPSB7IHByb3RlaW46IHNoYXJlKGdyYW1zLnByb3RlaW4sIDQpLCBjYXJiczogc2hhcmUoZ3JhbXMuY2FyYnMsIDQpLCBmYXQ6IHNoYXJlKGdyYW1zLmZhdCwgOSkgfTsKICAgIHJldHVybiB7IGRhaWx5OiBkYWlseSwgdmlzaWJsZTogdmlzaWJsZSwgYXZlcmFnZTogYXZlcmFnZSwgc3BsaXQ6IHNwbGl0LCBncmFtczogZ3JhbXMgfTsKfQpleHBvcnQgdmFyIHByZXZpZXdGb29kcyA9IFsKICAgIFsnQ2hpY2tlbiBicmVhc3QsIGdyaWxsZWQnLCAnUG91bHRyeScsIDE2NSwgMzEsIDAsIDMuNl0sCiAgICBbJ0NoaWNrZW4gdGhpZ2gnLCAnUG91bHRyeScsIDIwOSwgMjYsIDAsIDEwLjldLAogICAgWydDaGlja2VuIGFkb2JvJywgJ0Nvb2tlZCBkaXNoJywgMTkwLCAyMywgNCwgOF0sCiAgICBbJ1doaXRlIHJpY2UsIGNvb2tlZCcsICdHcmFpbnMnLCAxMzAsIDIuNywgMjgsIC4zXSwKICAgIFsnRWdnLCB3aG9sZScsICdEYWlyeSAmIGVnZ3MnLCAxNDMsIDEyLjYsIC44LCA5LjZdLAogICAgWydCYW5hbmEnLCAnRnJ1aXQnLCA4OSwgMS4xLCAyMywgLjNdLApdLm1hcChmdW5jdGlvbiAoX2EsIGluZGV4KSB7CiAgICB2YXIgbmFtZSA9IF9hWzBdLCBncm91cCA9IF9hWzFdLCBrY2FsID0gX2FbMl0sIHByb3RlaW4gPSBfYVszXSwgY2FyYnMgPSBfYVs0XSwgZmF0ID0gX2FbNV07CiAgICByZXR1cm4gKHsKICAgICAgICBmZGNfaWQ6IC0xMDAgLSBpbmRleCwgZGVzY3JpcHRpb246IFN0cmluZyhuYW1lKSwgZGF0YV90eXBlOiBTdHJpbmcoZ3JvdXApLAogICAgICAgIGRldGFpbDogeyByZXF1ZXN0X2lkOiAnbG9jYWwtcHJldmlldycsIGZkY19pZDogLTEwMCAtIGluZGV4LCBkZXNjcmlwdGlvbjogU3RyaW5nKG5hbWUpLCBkYXRhX3R5cGU6IFN0cmluZyhncm91cCksIHNlcnZpbmdfc2l6ZV9nOiAxMDAsCiAgICAgICAgICAgIHBlcl8xMDBnOiB7IGtjYWw6IE51bWJlcihrY2FsKSwgcHJvdGVpbl9nOiBOdW1iZXIocHJvdGVpbiksIGNhcmJzX2c6IE51bWJlcihjYXJicyksIGZhdF9nOiBOdW1iZXIoZmF0KSB9IH0sCiAgICB9KTsKfSk7CmV4cG9ydCB2YXIgcHJldmlld1NjYW4gPSB7CiAgICByZXF1ZXN0X2lkOiAnbG9jYWwtcHJldmlldycsIG1vZGVsOiAnUmVmZXJlbmNlIHByZXZpZXcnLCB1bm1hdGNoZWQ6IFtdLCBkZWdyYWRlZDogZmFsc2UsCiAgICBpdGVtczogWwogICAgICAgIHsgZm9vZF9uYW1lOiAnR3JpbGxlZCBjaGlja2VuIGJyZWFzdCcsIGZvdW5kOiB0cnVlLCBmZGNfaWQ6IC0xMDAsIGVzdF93ZWlnaHRfZzogMTUwLCBjb25maWRlbmNlOiAuOTIsIGtjYWw6IDI0OCwgcHJvdGVpbl9nOiA0MCwgY2FyYnNfZzogMCwgZmF0X2c6IDggfSwKICAgICAgICB7IGZvb2RfbmFtZTogJ1N0ZWFtZWQgcmljZScsIGZvdW5kOiB0cnVlLCBmZGNfaWQ6IC0xMDMsIGVzdF93ZWlnaHRfZzogMTU4LCBkZXNjcmlwdGlvbjogJzEgY3VwJywgY29uZmlkZW5jZTogLjg1LCBrY2FsOiAyMDUsIHByb3RlaW5fZzogNCwgY2FyYnNfZzogNDUsIGZhdF9nOiAyIH0sCiAgICAgICAgeyBmb29kX25hbWU6ICdNaXhlZCB2ZWdldGFibGVzJywgZm91bmQ6IHRydWUsIGZkY19pZDogLTEwNiwgZXN0X3dlaWdodF9nOiA4MCwgY29uZmlkZW5jZTogLjYxLCBrY2FsOiAxNjcsIHByb3RlaW5fZzogNCwgY2FyYnNfZzogMjMsIGZhdF9nOiAxMCB9LAogICAgXSwgdG90YWxzOiB7IGtjYWw6IDYyMCwgcHJvdGVpbl9nOiA0OCwgY2FyYnNfZzogNjgsIGZhdF9nOiAyMCB9LAp9OwpleHBvcnQgZnVuY3Rpb24gc2NhbGVTY2FubmVkSXRlbXMoaXRlbXMsIGZhY3RvcikgewogICAgdmFyIHNjYWxlID0gZnVuY3Rpb24gKHZhbHVlKSB7IHJldHVybiB2YWx1ZSA9PT0gbnVsbCA/IG51bGwgOiB2YWx1ZSAqIGZhY3RvcjsgfTsKICAgIHJldHVybiBpdGVtcy5tYXAoZnVuY3Rpb24gKGl0ZW0pIHsgcmV0dXJuIChfX2Fzc2lnbihfX2Fzc2lnbih7fSwgaXRlbSksIHsgZXN0X3dlaWdodF9nOiBpdGVtLmVzdF93ZWlnaHRfZyAqIGZhY3Rvciwga2NhbDogc2NhbGUoaXRlbS5rY2FsKSwgcHJvdGVpbl9nOiBzY2FsZShpdGVtLnByb3RlaW5fZyksIGNhcmJzX2c6IHNjYWxlKGl0ZW0uY2FyYnNfZyksIGZhdF9nOiBzY2FsZShpdGVtLmZhdF9nKSB9KSk7IH0pOwp9Cg==": Invalid relative URL or base scheme is not hierarchical.'
+  code: 'ERR_UNSUPPORTED_RESOLVE_REQUEST'
+  name: 'TypeError'
+  stack: |-
+    moduleResolve (node:internal/modules/esm/resolve:843:21)
+    defaultResolve (node:internal/modules/esm/resolve:992:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    #resolve (node:internal/modules/esm/loader:683:17)
+    ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    ModuleJob.link (node:internal/modules/esm/module_job:253:17)
+    new ModuleJob (node:internal/modules/esm/module_job:232:26)
+  ...
+# Subtest: password recovery uses server-issued 6-digit codes and shows provider setup state
+ok 113 - password recovery uses server-issued 6-digit codes and shows provider setup state
+  ---
+  duration_ms: 38.4044
+  type: 'test'
+  ...
+# Subtest: local camera keeps explicit upload provider status and reports never fabricate a score
+ok 114 - local camera keeps explicit upload provider status and reports never fabricate a score
+  ---
+  duration_ms: 15.9491
+  type: 'test'
+  ...
+# Subtest: progress history comes from API reads and measurements save before appearing
+ok 115 - progress history comes from API reads and measurements save before appearing
+  ---
+  duration_ms: 29.9352
+  type: 'test'
+  ...
+# Subtest: quest progress is derived from server records and cannot be tapped into completion
+ok 116 - quest progress is derived from server records and cannot be tapped into completion
+  ---
+  duration_ms: 19.5825
+  type: 'test'
+  ...
+# Subtest: quests screen opens a period-switchable leaderboard with an account ranking
+ok 117 - quests screen opens a period-switchable leaderboard with an account ranking
+  ---
+  duration_ms: 64.1589
+  type: 'test'
+  ...
+# Subtest: leaderboard layout adapts its ranked list and podium to narrow screens
+ok 118 - leaderboard layout adapts its ranked list and podium to narrow screens
+  ---
+  duration_ms: 7.0501
+  type: 'test'
+  ...
+# Subtest: leaderboard is fed by the ranking API instead of sample data
+ok 119 - leaderboard is fed by the ranking API instead of sample data
+  ---
+  duration_ms: 4.7141
+  type: 'test'
+  ...
+# Subtest: squats and curls count only complete straight-bent-straight cycles
+ok 120 - squats and curls count only complete straight-bent-straight cycles
+  ---
+  duration_ms: 2.0728
+  type: 'test'
+  ...
+# Subtest: partial motion and boundary jitter never count a rep
+ok 121 - partial motion and boundary jitter never count a rep
+  ---
+  duration_ms: 0.3307
+  type: 'test'
+  ...
+# Subtest: missing, uncertain, offscreen and stale joints discard the unfinished movement
+ok 122 - missing, uncertain, offscreen and stale joints discard the unfinished movement
+  ---
+  duration_ms: 0.5061
+  type: 'test'
+  ...
+# Subtest: pausing and camera changes preserve completed reps but reset motion history
+ok 123 - pausing and camera changes preserve completed reps but reset motion history
+  ---
+  duration_ms: 0.303
+  type: 'test'
+  ...
+# Subtest: out-of-order frames cannot advance the counter
+ok 124 - out-of-order frames cannot advance the counter
+  ---
+  duration_ms: 0.296
+  type: 'test'
+  ...
+# Subtest: joint geometry respects portrait/landscape aspect and rejects invalid confidence
+ok 125 - joint geometry respects portrait/landscape aspect and rejects invalid confidence
+  ---
+  duration_ms: 1.0915
+  type: 'test'
+  ...
+# Subtest: request keys work with UUID, HTTP-only crypto, and no crypto object
+ok 126 - request keys work with UUID, HTTP-only crypto, and no crypto object
+  ---
+  duration_ms: 2.6035
+  type: 'test'
+  ...
+# Subtest: session subscribers see login, verification refresh and logout
+ok 127 - session subscribers see login, verification refresh and logout
+  ---
+  duration_ms: 5.8412
+  type: 'test'
+  ...
+# Subtest: migrates legacy storage once, deletes stored tokens immediately and keeps access only in memory
+ok 128 - migrates legacy storage once, deletes stored tokens immediately and keeps access only in memory
+  ---
+  duration_ms: 0.9748
+  type: 'test'
+  ...
+# Subtest: deduplicates simultaneous silent refreshes and includes credentials
+ok 129 - deduplicates simultaneous silent refreshes and includes credentials
+  ---
+  duration_ms: 0.422
+  type: 'test'
+  ...
+# Subtest: retries an interrupted legacy migration using memory, without restoring the localStorage token
+ok 130 - retries an interrupted legacy migration using memory, without restoring the localStorage token
+  ---
+  duration_ms: 1.2793
+  type: 'test'
+  ...
+# Subtest: logout cannot be undone by a late refresh response
+ok 131 - logout cannot be undone by a late refresh response
+  ---
+  duration_ms: 0.4746
+  type: 'test'
+  ...
+# Subtest: rotation preserves session identity while a new login changes it
+ok 132 - rotation preserves session identity while a new login changes it
+  ---
+  duration_ms: 0.4478
+  type: 'test'
+  ...
+# Subtest: does not forward a retained legacy credential to a different API
+ok 133 - does not forward a retained legacy credential to a different API
+  ---
+  duration_ms: 0.7426
+  type: 'test'
+  ...
+# Subtest: rejects refresh credentials in JSON and clears invalid sessions
+ok 134 - rejects refresh credentials in JSON and clears invalid sessions
+  ---
+  duration_ms: 0.7617
+  type: 'test'
+  ...
+# Subtest: Me omits the removed manual alert test while retaining persisted safety settings and the alert API
+ok 135 - Me omits the removed manual alert test while retaining persisted safety settings and the alert API
+  ---
+  duration_ms: 23.5379
+  type: 'test'
+  ...
+# Subtest: scan images are downscaled before upload and release their bitmap
+ok 136 - scan images are downscaled before upload and release their bitmap
+  ---
+  duration_ms: 124.1544
+  type: 'test'
+  ...
+# Subtest: meal scanning offers camera capture and photo upload into the same analysis flow
+ok 137 - meal scanning offers camera capture and photo upload into the same analysis flow
+  ---
+  duration_ms: 13.9523
+  type: 'test'
+  ...
+# Subtest: photo inputs stay mounted during nutrition refresh and the review opens immediately
+ok 138 - photo inputs stay mounted during nutrition refresh and the review opens immediately
+  ---
+  duration_ms: 1.7939
+  type: 'test'
+  ...
+# Subtest: today log shows calorie and macro targets with live meals and water controls
+ok 139 - today log shows calorie and macro targets with live meals and water controls
+  ---
+  duration_ms: 6.3542
+  type: 'test'
+  ...
+# Subtest: section back controls render as icon-only buttons without circular surfaces
+ok 140 - section back controls render as icon-only buttons without circular surfaces
+  ---
+  duration_ms: 10.725
+  type: 'test'
+  ...
+# Subtest: every nested section header places its back control before the page heading
+ok 141 - every nested section header places its back control before the page heading
+  ---
+  duration_ms: 50.1734
+  type: 'test'
+  ...
+# Subtest: Scan and Exercise Library visually keep back controls beside the title
+ok 142 - Scan and Exercise Library visually keep back controls beside the title
+  ---
+  duration_ms: 3.982
+  type: 'test'
+  ...
+# Subtest: standalone Goals and Progress pages return to the Home dashboard
+ok 143 - standalone Goals and Progress pages return to the Home dashboard
+  ---
+  duration_ms: 2.1916
+  type: 'test'
+  ...
+# Subtest: Scan Today log returns to Nutrition and retains its history action
+ok 144 - Scan Today log returns to Nutrition and retains its history action
+  ---
+  duration_ms: 1.9594
+  type: 'test'
+  ...
+# Subtest: Me alert log and Coach workout report return to their section roots
+ok 145 - Me alert log and Coach workout report return to their section roots
+  ---
+  duration_ms: 4.0787
+  type: 'test'
+  ...
+# Subtest: production CSP forbids object/frame/eval and preserves local camera workers
+ok 146 - production CSP forbids object/frame/eval and preserves local camera workers
+  ---
+  duration_ms: 2.7488
+  type: 'test'
+  ...
+# Subtest: Sentry remains disabled without a public DSN
+ok 147 - Sentry remains disabled without a public DSN
+  ---
+  duration_ms: 1.1441
+  type: 'test'
+  ...
+# Subtest: Sentry removes private values and retains only correlation tag and safe error structure
+ok 148 - Sentry removes private values and retains only correlation tag and safe error structure
+  ---
+  duration_ms: 1.3912
+  type: 'test'
+  ...
+# Subtest: goals and progress are standalone authenticated routes with shared app navigation
+ok 149 - goals and progress are standalone authenticated routes with shared app navigation
+  ---
+  duration_ms: 33.512
+  type: 'test'
+  ...
+# Subtest: sample-only progress insights are distinguished from API-backed workout data
+ok 150 - sample-only progress insights are distinguished from API-backed workout data
+  ---
+  duration_ms: 8.0046
+  type: 'test'
+  ...
+# Subtest: a slower old request cannot overwrite the Coach program after a profile invalidation
+ok 151 - a slower old request cannot overwrite the Coach program after a profile invalidation
+  ---
+  duration_ms: 153.7477
+  type: 'test'
+  ...
+# Subtest: workout UI only opens a report after the API confirms completion
+ok 152 - workout UI only opens a report after the API confirms completion
+  ---
+  duration_ms: 18.5224
+  type: 'test'
+  ...
+# Each child in a list should have a unique "key" prop.
+# Check the top-level render call using <li>. See https://react.dev/link/warning-keys for more information.
+# Each child in a list should have a unique "key" prop.
+# Check the top-level render call using <li>. See https://react.dev/link/warning-keys for more information.
+# Subtest: reference report preserves saved duration, exercise count, status and confirmed results
+ok 153 - reference report preserves saved duration, exercise count, status and confirmed results
+  ---
+  duration_ms: 42.4751
+  type: 'test'
+  ...
+# Subtest: reference report explains missing results without fabricated metrics
+ok 154 - reference report explains missing results without fabricated metrics
+  ---
+  duration_ms: 2.1931
+  type: 'test'
+  ...
+# Subtest: report calculates volume from completed sets instead of aggregate peak loads
+ok 155 - report calculates volume from completed sets instead of aggregate peak loads
+  ---
+  duration_ms: 16.0827
+  type: 'test'
+  ...
+# Subtest: report does not invent a volume from aggregate-only records
+ok 156 - report does not invent a volume from aggregate-only records
+  ---
+  duration_ms: 1.6558
+  type: 'test'
+  ...
+# Subtest: routine snapshots retain prescribed sets and timed sets do not fabricate reps
+ok 157 - routine snapshots retain prescribed sets and timed sets do not fabricate reps
+  ---
+  duration_ms: 113.7479
+  type: 'test'
+  ...
+# Subtest: progress distinguishes skipped from done and revisiting uses the same set slot
+ok 158 - progress distinguishes skipped from done and revisiting uses the same set slot
+  ---
+  duration_ms: 16.4621
+  type: 'test'
+  ...
+1..158
+# tests 158
+# suites 0
+# pass 153
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3005.0182

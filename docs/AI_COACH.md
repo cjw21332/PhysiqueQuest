@@ -1,5 +1,17 @@
 # Independent AI Coach and ExerciseDB V1
 
+## Persistent catalog
+
+The Coach service uses `MONGODB_URI` by default and stores ExerciseDB records in separate `exercisedb_catalog` and `exercisedb_sync` collections. Set `EXERCISE_CATALOG_MONGODB_URI` to isolate those collections in another database, or set `EXERCISE_CATALOG_ENABLED=false` to use the live-provider fallback. The worker retrieves one cursor page at a time, checkpoints progress, applies exponential retry delays, and starts another full pass after 24 hours. Existing records are retained when a request fails. Only enable use within the provider's permitted terms below.
+
+`GET /api/exercises/sync-status` reports the provider total, local record count, status, consecutive failures, and last successful pass. While a pass is incomplete, search results cover only the records already saved and indicate partial coverage. The browser stores metadata in IndexedDB and installs a public offline library shell; account data and authenticated API responses are not stored in Cache Storage. The shell supports cached exercise details but does not guarantee offline GIF playback. Browser storage may be evicted or unavailable. No GIF collection is downloaded by the catalog worker.
+
+After a provider GIF actually loads in the detail sheet, the service worker can retain that viewed response locally. It keeps at most six demonstrations, evicts the least recently viewed entry, and skips new entries when reported origin storage is at least 80% full. Cache failures do not block exercise details. Cross-origin media responses may be opaque, so the worker only retains a response after the browser reports a successful image load. A label indicates whether the demonstration is stored; an unviewed or evicted GIF still needs connectivity. Browser storage limits and eviction remain outside the application's control.
+
+The offline shell is installed after an online visit in a secure context (HTTPS or localhost). A fully offline navigation opens this public shell; workouts and account features still require a connection. Once connectivity returns, the shell returns to the online exercise route, where device synchronization can resume. The browser commits catalog version metadata only after it receives the expected number of distinct records.
+
+For a resumable, metadata-only media audit, set `EXERCISE_AUDIT_MONGODB_URI` and `EXERCISE_AUDIT_OUTPUT`, then run `node scripts/audit-exercisedb-media.mjs` from `backend`. The audit uses a single request at a time, a minimum 1.2-second delay, HEAD requests, and pauses on rate limits or access denial. Results are JSON Lines and do not contain GIF bodies. A successful HEAD response does not replace representative browser-rendering checks. `scripts/verify-exercisedb-recovery.mjs` exercises checkpoint recovery in a separate local verification database with synthetic fixtures.
+
 AI Coach's library and exercise suggestions use the **free ExerciseDB V1 API**, not the old seeded MongoDB catalog. V1 currently exposes about 1,500 exercises with 180p animated GIFs and step-by-step instructions. It requires no API key. This is a different dataset from the subscription V2 catalog of 11,000+ exercises.
 
 ## Run the service
@@ -17,9 +29,9 @@ For automatic rebuilding during development:
 npm run coach:dev
 ```
 
-The standalone service listens on `http://localhost:4050/api`. It imports only Coach planning and the ExerciseDB provider: it does not connect to MongoDB or boot authentication, nutrition, notifications, safety or other feature modules. `GET /api/coach/status` reports the local service/source; it is not a guarantee that the external provider is reachable.
+The standalone service listens on `http://localhost:4050/api`. It imports Coach planning and the ExerciseDB provider, and uses the configured catalog database; it does not boot authentication, nutrition, notifications, safety or other feature modules. `GET /api/coach/status` reports the local service/source; it is not a guarantee that the external provider is reachable.
 
-The frontend derives the Coach URL from the loaded page's hostname and port 4050, including LAN/Expo pages. For separate hosting, set `NEXT_PUBLIC_COACH_API_URL` to the public Coach API URL before building the frontend. Runtime overrides use the `physiquequest-runtime-coach-url` browser setting. Configure `COACH_PORT` and comma-separated `COACH_FRONTEND_URL` in `backend/.env` for service deployment. Development CORS also accepts private LAN frontend addresses on port 3000; production origins must be explicit.
+The frontend uses the same-origin `/api/coach-service` proxy by default; `COACH_BACKEND_URL` points the Next server to the Coach service (default `http://127.0.0.1:4050`). For separate hosting, set `NEXT_PUBLIC_COACH_API_URL` to the public Coach API URL before building the frontend. Runtime overrides use the `physiquequest-runtime-coach-url` browser setting. Configure `COACH_PORT` and comma-separated `COACH_FRONTEND_URL` in `backend/.env` for direct service deployment.
 
 `/exercises` is a standalone frontend library route with bottom navigation. Coach also offers Browse exercise library if the account/profile service cannot load. Saved personalized programs and workout persistence use the authenticated account API on port 4000; catalog browsing remains independent on port 4050.
 
@@ -33,16 +45,16 @@ The server reads profile/settings directly; clients cannot choose another user's
 
 ## API contract
 
-- `GET /api/exercises?muscle=Chest&equipment=Dumbbells&page=1&limit=12`: common exercise selection, provider IDs, GIF URL, instructions and metadata. UI categories map to provider body-part/equipment names. Results and pagination describe the bounded returned selection, not all 1,500 records.
-- `GET /api/exercises?search=barbell%20bench%20press`: name-specific search across the provider. Exact/all-word matches rank first; narrowly matched typo suggestions are used only when precise matches are absent. Unrelated fuzzy suggestions are excluded.
-- `GET /api/exercises/:exerciseId`: current provider details and GIF URL. Opening or retrying a detail sheet refreshes this data.
+- `GET /api/exercises?muscle=Chest&equipment=Dumbbells&page=1&limit=12`: paginated catalog records with provider IDs, GIF URL, instructions and metadata. Filters and search operate on the synchronized catalog.
+- `GET /api/exercises?search=barbell%20bench%20press`: searches synchronized names, muscles, equipment and instructions. Additional parameters `bodyPart`, `target`, `secondary`, and `sort` support combined discovery.
+- `GET /api/exercises/:exerciseId`: synchronized exercise details and original GIF URL. The server falls back to the provider for an ID not yet present in its catalog.
 - `POST /api/coach/plan`: validated `{ "profile": { "goal": "Build muscle", "days": ["Monday", "Wednesday", "Friday"], "duration": "45 min", "equipment": ["Dumbbells"], "conditions": [] } }` context. Suggestions, prescriptions and cues come from the shared planner and live ExerciseDB candidates. No profile records are written by this service.
 
 List and detail data are normalized at the server. V1 does not supply difficulty levels, personalized loads, AI form scores, or a video duration; the UI does not invent them. Recommendations are general program prescriptions. Form cues are drawn from actual provider instructions and do not imply live AI form assessment. The GIF controls display the real animation and freeze its current frame when paused; they are not MP4 playback controls.
 
 ## Availability and attribution
 
-The free provider applies strict rate limits. Requests are bounded, paced and deduplicated while in flight; upstream failures and rate limits remain visible with retry. User program snapshots are persisted; no full provider catalog or media is downloaded/stored, and the old local exercise catalog is never an error fallback. Categories with inadequate provider coverage must show the available results rather than invent ten exercises. The initial selection favors common names; it does not claim measured popularity statistics.
+The free provider applies strict rate limits. Requests are paced and deduplicated while in flight; failures are retried from the saved checkpoint. Metadata is persisted, but media is not mirrored. The old local exercise catalog is never an error fallback.
 
 Exercise data is provided by [AscendAPI](https://ascendapi.com), using the [ExerciseDB free V1 API](https://oss.exercisedb.dev/docs). Its documented free-use restriction is non-commercial/personal/educational use with attribution. Commercial use requires appropriate provider access.
 

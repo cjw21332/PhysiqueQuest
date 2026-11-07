@@ -49,6 +49,7 @@ test('the independent sample library stays reachable during loading, plan errors
       if (name.endsWith('useCoachPlan')) return { useCoachPlan: () => ({ ...state, refresh: () => {} }) };
       if (name.endsWith('/icons')) return actualIcons;
       if (name.endsWith('/titleCase')) return { titleCase };
+      if (name.endsWith('/PoseTrackerEntry')) return { default: () => null };
       return require(name);
     });
     const html = renderToStaticMarkup(React.createElement(CoachPlan, { profile: {}, onStart: () => {}, onLibrary: () => {} }));

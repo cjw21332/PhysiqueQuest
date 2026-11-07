@@ -81,8 +81,11 @@ export interface ExerciseRecord {
   difficulty?: string; pictureUrl?: string; videoUrl?: string; instructions?: string[];
   trackingStatus?: string; pose?: 'missing' | 'ready' | 'training';
   gifUrl?: string; description?: string; checks?: string[]; recommended?: string; source?: string;
+  bodyParts?: string[]; equipments?: string[]; targetMuscles?: string[]; secondaryMuscles?: string[];
 }
 export interface ExerciseCatalog { items: ExerciseRecord[]; total: number; page: number; limit: number; pages: number; source?: string; coverageNote?: string; }
+export type ExerciseDiscoveryQuery = { search?: string; muscle?: string; equipment?: string; bodyPart?: string; target?: string; secondary?: string; sort?: 'name-asc' | 'name-desc' | 'body-part' | 'equipment'; page?: number; limit?: number };
+export type ExerciseFilters = { bodyParts: string[]; equipments: string[]; targetMuscles: string[]; secondaryMuscles: string[] };
 export interface ProgressRecord { _id: string; metric: 'weight' | 'waist' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
 export interface WorkoutExerciseSnapshot { exerciseId: string; name: string; equipment: string; prescription?: string; sets: number; }
 export interface WorkoutSetResult { setId: string; exerciseId: string; setIndex: number; reps: number; durationSeconds?: number; loadKg?: number; status: 'completed' | 'skipped'; source: 'manual' | 'local-video'; }
@@ -594,15 +597,20 @@ class ApiClient {
     return this.request<AdminAlertRow[]>(`/admin/alerts?${qs.toString()}`);
   }
 
-  async getExercises(query?: { search?: string; muscle?: string; equipment?: string; page?: number; limit?: number }) {
+  async getExercises(query?: ExerciseDiscoveryQuery) {
     const qs = new URLSearchParams();
     if (query?.search) qs.set('search', query.search);
     if (query?.muscle) qs.set('muscle', query.muscle);
     if (query?.equipment) qs.set('equipment', query.equipment);
+    if (query?.bodyPart) qs.set('bodyPart', query.bodyPart);
+    if (query?.target) qs.set('target', query.target);
+    if (query?.secondary) qs.set('secondary', query.secondary);
+    if (query?.sort) qs.set('sort', query.sort);
     if (query?.page) qs.set('page', String(query.page));
     qs.set('limit', String(query?.limit ?? 12));
     return this.request<ExerciseCatalog>(`/exercises?${qs.toString()}`, { timeoutMs: 60_000 }, getCoachApiBaseUrl());
   }
+  async getExerciseFilters() { return this.request<ExerciseFilters>('/exercises/filters', { timeoutMs: 30_000 }, getCoachApiBaseUrl()); }
   async getExercise(slug: string) { return this.request<ExerciseRecord>(`/exercises/${encodeURIComponent(slug)}`, { timeoutMs: 30_000 }, getCoachApiBaseUrl()); }
   async getIndependentCoachPlan(profile: Record<string, unknown>) {
     const { goal, days, duration, equipment, conditions, createdAt } = profile;
@@ -639,6 +647,11 @@ class ApiClient {
   }
 
   async getPoseStatus() { return this.request<any>('/pose/status'); }
+  async getPoseTrackerConfig(id: string) { return this.request<import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig>(`/pose-tracker/exercises/${encodeURIComponent(id)}`, { timeoutMs: 15000 }); }
+  async getPoseTrackerConfigs(ids: string[]) { return this.request<import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig[]>('/pose-tracker/configurations', { method: 'POST', body: JSON.stringify({ids}), timeoutMs: 15000 }); }
+  async launchPoseTracker(id: string, adminTest = false) { return this.request<{ config: import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig; token: string; developerOutputs: boolean }>(adminTest ? `/admin/pose-tracker/exercises/${encodeURIComponent(id)}/test` : `/pose-tracker/exercises/${encodeURIComponent(id)}/launch`, { method: 'POST', timeoutMs: 15000 }); }
+  async getPoseTrackerCoverage() { return this.request<ReturnType<typeof import('../../backend/src/pose-tracker/exercise-registry').auditCoverage>>('/admin/pose-tracker/coverage'); }
+  async savePoseTrackerConfig(id: string, config: import('../../backend/src/pose-tracker/exercise-registry').ConfigOverride) { return this.request<import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig>(`/admin/pose-tracker/exercises/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(config) }); }
   async analyzePose(data: PoseAnalysisInput) { return this.request<unknown>('/pose/analyze', { method: 'POST', body: JSON.stringify(data), timeoutMs: 95000 }); }
   async pauseWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/pause`, { method: 'PATCH', body: JSON.stringify(data) }); }
   async completeWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/complete`, { method: 'POST', body: JSON.stringify(data) }); }

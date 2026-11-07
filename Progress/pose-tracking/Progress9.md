@@ -1,0 +1,7 @@
+# Local evaluator checkpoint
+
+`tools/eval/run_eval.mjs` adds an environment-gated, offline replay evaluator for local JSON input, grouped rep-count MAE, within-one accuracy, and event-window partial and fault precision/recall. `tools/eval/run_eval.test.mjs` evaluates two synthetic empty-frame recordings and tests missed ground truth handling. `rtk proxy node --test tools/eval/run_eval.test.mjs` returned `tests 1; pass 1; fail 0`. No real recording or populated movement trace was evaluated. A consent-gated recorder and deletion flow are not implemented; README explicitly says not to collect participant data yet.
+
+Security status supplied in chat is not evidenced by the present source: `rtk rg -n 'POSETRACKER_API_TOKEN|return \{ config, token|searchParams.set\(.token' backend/src/pose-tracker frontend/services/poseTracker` returns `pose-tracker.module.ts:90` reading the provider token, `:92` returning `{ config, token, ... }`, and `bridge.ts:8` inserting the token into the URL. No token proxy, provider-enforced expiry, scope restriction or PoseTracker-specific rate limiter was found in the inspected files. CSP and no-referrer are present in `frontend/lib/securityHeaders.mjs`. Token exposure remains unresolved.
+
+Actual-user readiness remains blocked by missing generated configurations, disabled import writes, unavailable GIF pilot, absent consent recorder, and no real-camera end-to-end or accuracy validation. No real-person test was performed.

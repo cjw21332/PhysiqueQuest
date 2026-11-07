@@ -1,0 +1,27 @@
+import { spawn } from 'node:child_process';
+import { createConnection } from 'mongoose';
+const uri = `mongodb://127.0.0.1:27017/physiquequest_exercisedb_crash_${Date.now()}`;
+const child = spawn(process.execPath, ['scripts/exercisedb-crash-worker.mjs', uri, 'interrupt'], { stdio: ['ignore', 'pipe', 'pipe'] });
+let log = '', errors = '';
+child.stderr.on('data', chunk => { errors += chunk; });
+await new Promise((resolve, reject) => {
+  const timer = setTimeout(() => { child.kill('SIGKILL'); reject(new Error('Worker did not enter write')); }, 20000);
+  child.stdout.on('data', chunk => { log += chunk; if (log.includes('WRITE_IN_PROGRESS')) { clearTimeout(timer); child.kill('SIGKILL'); resolve(); } });
+  child.on('exit', code => { if (!log.includes('WRITE_IN_PROGRESS')) { clearTimeout(timer); reject(new Error(`Worker exited early ${code}: ${errors}`)); } });
+});
+await new Promise(resolve => child.once('exit', resolve));
+const db = await createConnection(uri).asPromise();
+const records = db.collection('exercisedb_catalog'), state = db.collection('exercisedb_sync');
+const saved = await state.findOne({ _id: 'catalog' });
+const before = await records.find({}).toArray();
+if (saved?.cursor !== 'page-3' || saved.processed !== 4 || before.length !== 5) throw new Error('Unexpected interrupted checkpoint');
+const remaining = Math.max(0, saved.leaseUntil.getTime() - Date.now()) + 1000;
+await new Promise(resolve => setTimeout(resolve, remaining));
+const resumed = spawn(process.execPath, ['scripts/exercisedb-crash-worker.mjs', uri, 'resume'], { stdio: ['ignore', 'pipe', 'pipe'] });
+let output = '', stderr = ''; resumed.stdout.on('data', chunk => { output += chunk; }); resumed.stderr.on('data', chunk => { stderr += chunk; });
+const code = await new Promise(resolve => resumed.on('exit', resolve));
+const after = await records.find({}).toArray(), end = await state.findOne({ _id: 'catalog' });
+const ids = new Set(after.map(row => row.exerciseId));
+if (code !== 0 || end?.status !== 'complete' || after.length !== 6 || ids.size !== 6 || !before.every(row => ids.has(row.exerciseId))) throw new Error(`Recovery failed: ${stderr} ${output}`);
+console.log(JSON.stringify({ terminatedDuringBulkWrite: true, checkpoint: saved.cursor, processed: saved.processed, partialRecords: before.length, finalRecords: after.length, unique: ids.size, retained: before.length, status: end.status, leaseWaitMs: remaining }));
+await db.close();

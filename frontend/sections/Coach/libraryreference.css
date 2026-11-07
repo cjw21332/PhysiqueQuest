@@ -37,6 +37,9 @@
 .library-preview-note a { text-decoration: underline; color: inherit; }
 .library-dialog .library-media-retry { margin-top: 10px; }
 .library-intro { margin: 0 0 20px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.library-discovery-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.library-discovery-controls label { display: grid; gap: 5px; font-size: 12px; color: var(--muted); }
+.library-discovery-controls select { width: 100%; min-width: 0; min-height: 42px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
 .library-filter-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 18px 0 4px; }
 .library-filter-heading h3 { font-size: 13px; font-weight: 600; color: var(--ink); }
 .library-filter-heading button { min-height: 44px; padding: 6px 0 6px 12px; color: var(--green); background: transparent; font-size: 12px; }

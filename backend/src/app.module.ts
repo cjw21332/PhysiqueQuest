@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PoseTrackerModule } from './pose-tracker/pose-tracker.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller.js';
@@ -31,6 +32,7 @@ import { ChatModule } from './chat/chat.module.js';
 
 @Module({
   imports: [
+    PoseTrackerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

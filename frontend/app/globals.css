@@ -9647,8 +9647,6 @@ button, input, select, textarea { max-width: 100%; }
 /* Saved API data remains visible while independent sections refresh. */
 .signed-in-layout { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 .signed-in-layout > .scene { height: auto; min-height: 0; flex: 1; }
-.cache-notice { flex-shrink: 0; padding: 8px 16px; background: var(--soft); color: var(--ink); font-size: 13px; line-height: 1.5; }
-.cache-notice button { min-height: 44px; padding: 8px 12px; border: 1px solid currentColor; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
 .section-placeholder { width: min(100%, 320px); height: 80px; margin: 24px auto; border-radius: 12px; background: var(--soft); }
 
 :root[data-theme='dark'] .launch { overflow: clip; }
