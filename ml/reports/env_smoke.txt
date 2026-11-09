@@ -1,0 +1,22 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794205746.886478   28376 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794205749.011601   28376 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+Python: 3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]
+PyTorch: 2.6.0+cu124 CUDA: True
+GPU: NVIDIA GeForce RTX 3050
+NumPy: 2.2.6
+OpenCV: 4.13.0
+MediaPipe: 1.2.2
+ONNX: 1.20.1
+ONNX Runtime: 1.26.0
+ONNX Simplifier: v0.6.5
+Matplotlib: 3.11.2
+
+[OK] All imports successful
+[OK] PyTorch forward/backward on cuda successful
+[OK] ONNX export successful
+[OK] ONNX simplification successful
+[OK] ONNX Runtime inference successful
+
+=== ALL SMOKE TESTS PASSED ===

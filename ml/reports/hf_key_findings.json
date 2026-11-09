@@ -1,0 +1,52 @@
+{
+  "pushupbench": {
+    "repo": "anonymousatom/pushupbench",
+    "license": "CC-BY-4.0",
+    "modality": "video",
+    "relevant": "push-up rep counting",
+    "downloads": 653,
+    "paper": "arXiv:2604.23407"
+  },
+  "bench_deadlift": {
+    "repo": "Mayank022/bench-press-deadlift-exercises",
+    "license": "other (need verification)",
+    "modality": "video",
+    "relevant": "bench press, deadlift",
+    "downloads": 136
+  },
+  "esk": {
+    "repo": "amathislab/ESK_action_recognition",
+    "license": "CC-BY-4.0",
+    "modality": "video",
+    "relevant": "kitchen actions, some exercise-like",
+    "downloads": 319
+  },
+  "repcounta": {
+    "repo": "lmms-lab-eval/repcounta-lance",
+    "license": "other (need verification)",
+    "modality": "video (Lance format)",
+    "relevant": "rep counting dataset",
+    "downloads": 1389
+  },
+  "penn_action": {
+    "repo": "urzsi/Penn-Action-Lossless-MKV-Test-Subset",
+    "license": "unknown",
+    "modality": "video",
+    "relevant": "human pose, action recognition",
+    "downloads": 181
+  },
+  "mpii": {
+    "repo": "Voxel51/MPII_Human_Pose_Dataset",
+    "license": "BSD-2-Clause",
+    "modality": "image (not video)",
+    "relevant": "25K pose images",
+    "downloads": 48223
+  },
+  "ucf101": {
+    "repo": "MichiganNLP/ucf-101",
+    "license": "unknown on HF (official: research use)",
+    "modality": "video",
+    "relevant": "101 action classes, some exercise",
+    "downloads": 1874
+  }
+}

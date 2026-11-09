@@ -1,0 +1,82 @@
+# Augmentation config for keypoint-based training
+# Applied on-the-fly during training to prevent overfitting to GIF cleanliness
+
+# Mirror (left-right flip) with landmark index swap
+mirror:
+  enabled: true
+  probability: 0.5
+  # MediaPipe landmark swap pairs for horizontal flip
+  swap_pairs:
+    - [1, 2]   # eyes
+    - [3, 4]   # ears
+    - [5, 6]   # mouth
+    - [7, 8]   # eyes/ears outer
+    - [9, 10]  # shoulders
+    - [11, 12] # shoulders
+    - [13, 14] # elbows
+    - [15, 16] # wrists
+    - [17, 18] # pinky
+    - [19, 20] # index
+    - [21, 22] # thumb
+    - [23, 24] # hips
+    - [25, 26] # knees
+    - [27, 28] # ankles
+    - [29, 30] # heels
+    - [31, 32] # foot index
+
+# In-plane rotation (simulate camera tilt)
+rotation:
+  enabled: true
+  max_degrees: 25
+  probability: 0.5
+
+# Scale (simulate distance from camera)
+scale:
+  enabled: true
+  min_factor: 0.8
+  max_factor: 1.2
+  probability: 0.5
+
+# Translation (simulate person moving in frame)
+translation:
+  enabled: true
+  max_fraction: 0.1  # 10% of normalized coordinate range
+  probability: 0.5
+
+# Gaussian landmark noise (sensor noise)
+landmark_noise:
+  enabled: true
+  std: 0.01  # in normalized coordinate space
+  probability: 0.5
+
+# Per-joint dropout (occlusion simulation)
+joint_dropout:
+  enabled: true
+  max_joints: 3
+  probability: 0.3
+
+# Visibility drops (temporary occlusion)
+visibility_drop:
+  enabled: true
+  max_joints: 5
+  min_visibility: 0.1
+  probability: 0.3
+
+# Speed variation (temporal stretching)
+speed:
+  enabled: true
+  min_factor: 0.7
+  max_factor: 1.4
+  probability: 0.5
+
+# Temporal crop/jitter (random start/end)
+temporal_crop:
+  enabled: true
+  max_crop_fraction: 0.2
+  probability: 0.5
+
+# Simulated camera yaw (3D rotation around vertical axis)
+camera_yaw:
+  enabled: true
+  max_degrees: 30
+  probability: 0.3

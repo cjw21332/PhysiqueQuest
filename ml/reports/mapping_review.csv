@@ -1,0 +1,443 @@
+exerciseId,name,pattern,source,equipments,bodyParts,targetMuscles
+01qpYSe,upward facing dog,squat,equipment_hint,bodyweight,back,erector spinae
+0CXGHya,Cable Crossover,horizontal_pull,equipment_hint,cable,chest,pectorals
+0dCyly0,barbell seated bradford rocky press,squat,equipment_hint,barbell,shoulders,deltoids
+0I5fUyn,band underhand pulldown,horizontal_pull,equipment_hint,resistance band,back,latissimus dorsi
+0L2KwtI,roller hip lat stretch,squat,body_part_hint,roller,upper legs,glutes
+0mB6wHO,runners stretch,squat,equipment_hint,bodyweight,upper legs,hamstrings
+0MlxeMn,cable pulldown (pro lat bar),horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+0xDpB4L,Band Seated Hip Abduction,horizontal_pull,equipment_hint,resistance band,upper legs,abductors
+10Z2DXU,sled 45° leg press,carry_locomotion,equipment_hint,sled machine,upper legs,glutes
+11wrviz,isometric wipers,squat,equipment_hint,bodyweight,chest,pectorals
+196HJGw,hip raise (bent knee),squat,equipment_hint,bodyweight,waist,abdominals
+1cTf2Ux,EZ-Bar Standing French Press,curl,body_part_hint,EZ bar,upper arms,triceps
+1g5bPpA,Jack Jump,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+1IG6gVF,prone twist on stability ball,core_isometric,body_part_hint,stability ball,waist,abdominals
+1jXLYEw,standing lateral stretch,squat,equipment_hint,bodyweight,back,latissimus dorsi
+1LVFcEn,calf stretch with rope,calf_raise,body_part_hint,rope,lower legs,calves
+1qrWgZ2,dumbbell decline hammer press,curl,equipment_hint,dumbbell,chest,pectorals
+1RIkUHT,dumbbell iron cross,curl,equipment_hint,dumbbell,shoulders,deltoids
+2Dk4xQV,rocking frog stretch,squat,equipment_hint,bodyweight,upper legs,glutes
+2jl9K55,spine twist,squat,equipment_hint,bodyweight,waist,abdominals
+2LQkNPW,exercise ball hip flexor stretch,squat,body_part_hint,stability ball,upper legs,glutes
+2Qh2J1e,Sled 45° Leg Press,carry_locomotion,equipment_hint,sled machine,upper legs,glutes
+2Ryn564,assisted prone rectus femoris stretch,core_isometric,body_part_hint,assisted,waist,abdominals
+2zNKRUB,wrist circles,squat,equipment_hint,bodyweight,lower arms,forearms
+3d7wHyd,dumbbell bench seated press,curl,equipment_hint,dumbbell,shoulders,deltoids
+3nvEbbF,cable twisting pull,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+3uj0Ozg,Dynamic Chest Stretch,squat,equipment_hint,bodyweight,chest,pectorals
+4c9BhzB,cable lateral pulldown with v-bar,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+4H86mXM,Sled 45 Degrees Single-Leg Press,carry_locomotion,equipment_hint,sled machine,upper legs,glutes
+4IKbhHV,alternate lateral pulldown,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+4KJEpzb,kettlebell bottoms up clean from the hang position,hinge,equipment_hint,kettlebell,upper arms,biceps
+4Leypho,barbell skier,squat,equipment_hint,barbell,shoulders,deltoids
+4LoWllp,Band Fixed Back Close-Grip Pulldown,horizontal_pull,equipment_hint,resistance band,back,latissimus dorsi
+4QqYaJW,prone twist on stability ball,core_isometric,body_part_hint,stability ball,waist,abdominals
+4U7iLb5,Machine Pullover,horizontal_push,equipment_hint,leverage machine,back,latissimus dorsi
+5KLbZWx,kettlebell alternating press,hinge,equipment_hint,kettlebell,shoulders,deltoids
+5MRH8H2,ski step,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+5vfAI0I,dumbbell scott press,curl,equipment_hint,dumbbell,shoulders,deltoids
+641mIfk,barbell incline reverse-grip press,squat,equipment_hint,barbell,upper arms,triceps
+6bOA1Oi,weighted side bend (on stability ball),core_isometric,body_part_hint,weighted; stability ball,waist,abdominals
+6e2DcYX,dumbbell incline shoulder raise,curl,equipment_hint,dumbbell,chest,serratus anterior
+6pTkI99,Dumbbell Single-Arm Snatch,curl,equipment_hint,dumbbell,upper legs,glutes
+6sYyrRX,Bent Knee Lying Twist,squat,equipment_hint,bodyweight,upper legs,glutes
+78VqWQK,smith incline reverse-grip press,squat,equipment_hint,smith machine,chest,pectorals
+7aolH9D,medicine ball chest push multiple response,horizontal_push,body_part_hint,medicine ball,chest,pectorals
+7B4F5nZ,Machine Calf Press,horizontal_push,equipment_hint,leverage machine,lower legs,calves
+7Ba7bQ2,Kettlebell Two-Arm Clean,hinge,equipment_hint,kettlebell,shoulders,deltoids
+7F1DVzn,Machine Front Pulldown,horizontal_push,equipment_hint,leverage machine,back,latissimus dorsi
+7f2jsqP,Dumbbell Seated Single-Arm Rotate,curl,equipment_hint,dumbbell,lower arms,forearms
+7gdLIXa,dumbbell lying hammer press,curl,equipment_hint,dumbbell,chest,pectorals
+7Hg55JG,dumbbell clean,curl,equipment_hint,dumbbell,upper legs,glutes
+7i4msxz,cocoons,squat,equipment_hint,bodyweight,waist,abdominals
+7jGOBF3,Dumbbell Close-Grip Press,curl,equipment_hint,dumbbell,upper arms,triceps
+7M66AVi,Barbell Rollout,squat,equipment_hint,barbell,waist,abdominals
+7RWNjiB,dumbbell lying pronation on floor,curl,equipment_hint,dumbbell,lower arms,forearms
+7uFJuXp,weighted kneeling step with swing,vertical_push,body_part_hint,weighted,shoulders,deltoids
+7w6i0vE,kettlebell alternating press on floor,hinge,equipment_hint,kettlebell,chest,pectorals
+7WaDzyL,side hip abduction,squat,equipment_hint,bodyweight,upper legs,abductors
+7zdxRTl,smith leg press,squat,equipment_hint,smith machine,upper legs,glutes
+89HVjEp,kettlebell seated press,hinge,equipment_hint,kettlebell,shoulders,deltoids
+8ARQ9Hw,kettlebell sumo high pull,hinge,equipment_hint,kettlebell,back,trapezius
+8coXSYU,Seated Roller Shoulder Flexion And Retraction,horizontal_push,body_part_hint,roller,chest,pectorals
+8IbNZwc,band hip lift,horizontal_pull,equipment_hint,resistance band,upper legs,glutes
+99rWm7w,hamstring stretch,squat,equipment_hint,bodyweight,upper legs,hamstrings
+9IxJdtC,lying leg-hip raise,squat,equipment_hint,bodyweight,waist,abdominals
+9KU9TYF,Machine Horizontal Single-Leg Press,horizontal_push,equipment_hint,leverage machine,upper legs,glutes
+9sgNE2O,barbell decline pullover,squat,equipment_hint,barbell,chest,pectorals
+9XjtHvS,dumbbell pullover,curl,equipment_hint,dumbbell,chest,pectorals
+a4F9Oyc,kettlebell double alternating hang clean,hinge,equipment_hint,kettlebell,upper arms,biceps
+a8VDgLw,stationary bike walk,horizontal_push,equipment_hint,leverage machine,cardio,cardiovascular system
+aDoFKrE,medicine ball chest pass,horizontal_push,body_part_hint,medicine ball,chest,pectorals
+Af0EW2I,muscle-up (on vertical bar),squat,equipment_hint,bodyweight,back,latissimus dorsi
+aHDy5O5,band y-raise,horizontal_pull,equipment_hint,resistance band,shoulders,deltoids
+Aj9vWh7,assisted seated pectoralis major stretch with stability ball,horizontal_push,body_part_hint,assisted; stability ball,chest,pectorals
+AQIhRjM,lying elbow to knee,squat,equipment_hint,bodyweight,waist,abdominals
+aVs3BR3,cable twist,horizontal_pull,equipment_hint,cable,waist,abdominals
+AX1kB0o,twist hip lift,squat,equipment_hint,bodyweight,upper legs,glutes
+aXcUyKb,Kettlebell Single-Arm Snatch,hinge,equipment_hint,kettlebell,shoulders,deltoids
+aXtJhlg,dumbbell step-up,curl,equipment_hint,dumbbell,upper legs,glutes
+ayAHcEm,smith incline shoulder raises,squat,equipment_hint,smith machine,chest,serratus anterior
+b5uBMv2,exercise ball alternating arm ups,horizontal_pull,body_part_hint,stability ball,back,latissimus dorsi
+bd5b860,wrist rollerer,curl,body_part_hint,weighted,lower arms,forearms
+BeReYBf,side-to-side chin,squat,equipment_hint,bodyweight,back,latissimus dorsi
+Bg5JKSH,Dumbbell Incline Single-Arm Press On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,chest,pectorals
+bjqbauy,weighted standing hand squeeze,curl,body_part_hint,weighted,lower arms,forearms
+BkxB8LW,kettlebell seated press,hinge,equipment_hint,kettlebell,shoulders,deltoids
+BL3GHeY,straddle planche,squat,equipment_hint,bodyweight,waist,abdominals
+bLyQokI,london bridge,horizontal_pull,body_part_hint,rope,back,upper back
+BmrwWzo,dumbbell sumo pull through,curl,equipment_hint,dumbbell,upper legs,glutes
+bmwlYvD,gorilla chin,squat,equipment_hint,bodyweight,waist,abdominals
+bndCa3Q,barbell pin presses,squat,equipment_hint,barbell,upper arms,triceps
+BqgCRif,dumbbell cuban press,curl,equipment_hint,dumbbell,shoulders,deltoids
+bQHPBU3,Dumbbell Single-Arm Pullover On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,chest,pectorals
+bRlbdjK,dumbbell decline shrug,curl,equipment_hint,dumbbell,back,trapezius
+BWnJR72,lying (side) quads stretch,squat,equipment_hint,bodyweight,upper legs,quadriceps
+c3Pfhti,roller side lat stretch,horizontal_pull,body_part_hint,roller,back,latissimus dorsi
+c3QQLPi,cable rear drive,horizontal_pull,equipment_hint,cable,upper arms,triceps
+c8f5cSY,Side-Lying Hip Adduction,squat,equipment_hint,bodyweight,upper legs,adductors
+c9MnDRp,dumbbell raise,curl,equipment_hint,dumbbell,shoulders,deltoids
+cA9FuWG,barbell bent arm pullover,squat,equipment_hint,barbell,back,latissimus dorsi
+cALkHHX,dumbbell iron cross,curl,equipment_hint,dumbbell,shoulders,deltoids
+cbuFJrn,Machine Gripless Shrug,horizontal_push,equipment_hint,leverage machine,back,trapezius
+CcWEoWV,short stride run,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+CFN9P8G,EZ-Bar French Press On Exercise Ball,curl,body_part_hint,EZ bar; stability ball,upper arms,triceps
+chfnQnM,back pec stretch,squat,equipment_hint,bodyweight,back,latissimus dorsi
+CHpahtl,Machine Seated Hip Abduction,horizontal_push,equipment_hint,leverage machine,upper legs,abductors
+CI6baTY,bottoms-up,squat,equipment_hint,bodyweight,waist,abdominals
+CjETvlw,Roller Seated Single Leg Shoulder Flexor Depressor Retractor,horizontal_push,body_part_hint,roller,chest,pectorals
+CmEr4pM,Cable Wide-Grip Rear Pulldown Behind Neck,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+CqhoytW,smith hip raise,squat,equipment_hint,smith machine,waist,abdominals
+CuaWCmC,cable lateral pulldown (with rope attachment),horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+cuKYxhu,standing pelvic tilt,squat,equipment_hint,bodyweight,back,erector spinae
+CvPn9WV,cable standing pulldown (with rope),horizontal_pull,equipment_hint,cable,upper arms,biceps
+cwsAI4G,dumbbell decline shrug,curl,equipment_hint,dumbbell,back,trapezius
+d5bTEPV,band step-up,horizontal_pull,equipment_hint,resistance band,upper legs,glutes
+d7z1Y7V,exercise ball hug,horizontal_pull,body_part_hint,stability ball,back,erector spinae
+D9qe7CM,pelvic tilt into bridge,squat,equipment_hint,bodyweight,upper legs,glutes
+dCJnuVq,medicine ball chest push from 3 point stance,horizontal_push,body_part_hint,medicine ball,chest,pectorals
+dCPESfR,barbell standing bradford press,squat,equipment_hint,barbell,shoulders,deltoids
+DeDThfG,seated glute stretch,squat,equipment_hint,bodyweight,upper legs,glutes
+DEEqoI2,posterior tibialis stretch,calf_raise,body_part_hint,rope,lower legs,calves
+DFGXwZr,world greatest stretch,squat,equipment_hint,bodyweight,upper legs,hamstrings
+dFSNDOA,barbell seated twist,squat,equipment_hint,barbell,waist,abdominals
+dG5Smob,snatch pull,squat,equipment_hint,barbell,upper legs,quadriceps
+dG7tG5y,barbell shrug,squat,equipment_hint,barbell,back,trapezius
+DgZQ11d,EZ-Bar Decline Close-Grip Face Press,curl,body_part_hint,EZ bar,upper arms,triceps
+DIVyqrU,sphinx,squat,equipment_hint,bodyweight,back,erector spinae
+DptumMx,band close-grip pulldown,horizontal_pull,equipment_hint,resistance band,back,latissimus dorsi
+DT14T9T,cable straight arm pulldown (with rope),horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+Dx2RIva,Sled Single-Leg Calf Press On Leg Press,carry_locomotion,equipment_hint,sled machine,lower legs,calves
+E4R8Hz1,band hip lift,horizontal_pull,equipment_hint,resistance band,upper legs,glutes
+ealLwvX,high knee against wall,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+EcaV7aL,barbell lying close-grip press,squat,equipment_hint,barbell,upper arms,triceps
+Eg98Ft9,cable shrug,horizontal_pull,equipment_hint,cable,back,trapezius
+Eh2v5Iu,Scissor Jumps,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+EnPivTL,barbell bent arm pullover,squat,equipment_hint,barbell,back,latissimus dorsi
+eOCOwIR,dumbbell lying elbow press,curl,equipment_hint,dumbbell,upper arms,triceps
+ErqK3UL,posterior step to overhead reach,squat,equipment_hint,bodyweight,waist,abdominals
+eVxAzgz,incline leg hip raise (leg straight),squat,equipment_hint,bodyweight,waist,abdominals
+EyLrNC2,exercise ball alternating arm ups,horizontal_pull,body_part_hint,stability ball,back,latissimus dorsi
+eYnzaCm,cable bar lateral pulldown,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+f38OEuO,kneeling lat stretch,squat,equipment_hint,bodyweight,back,latissimus dorsi
+f7Y9eDZ,barbell thruster,squat,equipment_hint,barbell,shoulders,deltoids
+f91FwXG,Machine Gripless Shrug,horizontal_push,equipment_hint,leverage machine,back,trapezius
+f9lVSSI,Astride Jumps,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+fBnPpzd,assisted prone hamstring,squat,body_part_hint,assisted,upper legs,hamstrings
+fF6GKVh,chair leg extended stretch,squat,equipment_hint,bodyweight,upper legs,quadriceps
+fhZQPlV,cable twist (up-down),horizontal_pull,equipment_hint,cable,waist,abdominals
+fNGumX0,back and forth step,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+fprd84i,EZ-Bar Anti Gravity Press,vertical_push,body_part_hint,EZ bar,shoulders,deltoids
+FSD6PGL,dumbbell pullover on exercise ball,curl,equipment_hint,dumbbell; stability ball,chest,pectorals
+fTlkJop,Dumbbell Side-Lying One Hand Raise,curl,equipment_hint,dumbbell,shoulders,deltoids
+g376LuL,sled lying calf press,carry_locomotion,equipment_hint,sled machine,lower legs,calves
+GaSzzuh,back lever,squat,equipment_hint,bodyweight,back,upper back
+gdPIyyO,hanging pike,squat,equipment_hint,bodyweight,waist,abdominals
+Gpn4ADc,smith behind neck press,squat,equipment_hint,smith machine,shoulders,deltoids
+GSDioYu,upper back stretch,squat,equipment_hint,bodyweight,back,upper back
+gSw59a4,Dumbbell Lying Single-Arm Deltoid Rear,curl,equipment_hint,dumbbell,shoulders,deltoids
+GxDwDX0,assisted lying calves stretch,calf_raise,body_part_hint,assisted,lower legs,calves
+Gxg9lDc,Barbell Rollout From Bench,squat,equipment_hint,barbell,waist,abdominals
+H1PESYI,stationary bike run,cardio_dynamic,equipment_hint,stationary bike,cardio,cardiovascular system
+hBGWILP,cable hip adduction,horizontal_pull,equipment_hint,cable,upper legs,adductors
+HbSG1Pw,isometric chest squeeze,squat,equipment_hint,bodyweight,chest,pectorals
+hbY9wqG,front lever reps,squat,equipment_hint,bodyweight,back,upper back
+hC6oYY5,Assisted Side-Lying Adductor Stretch,squat,body_part_hint,assisted,upper legs,adductors
+HfqciZF,straddle maltese,squat,equipment_hint,bodyweight,waist,abdominals
+HIgYKAB,seated wide angle pose sequence,squat,equipment_hint,bodyweight,upper legs,hamstrings
+Hj4FOCd,barbell decline wide-grip pullover,squat,equipment_hint,barbell,back,latissimus dorsi
+hjWjJEm,exercise ball hip flexor stretch,squat,body_part_hint,stability ball,upper legs,glutes
+hl8DUh8,barbell decline wide-grip press,squat,equipment_hint,barbell,chest,pectorals
+hMEptv0,barbell decline bent arm pullover,squat,equipment_hint,barbell,back,latissimus dorsi
+hoXt6wv,left hook (boxing),squat,equipment_hint,bodyweight,shoulders,deltoids
+HtfCpfi,Star Jump,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+hvHhCv8,cable forward raise,horizontal_pull,equipment_hint,cable,shoulders,deltoids
+hVzPY5j,Battling Ropes,vertical_push,body_part_hint,rope,shoulders,deltoids
+Hy9D21L,45° side bend,squat,equipment_hint,bodyweight,waist,abdominals
+HZgQPxh,suspended abdominal fallout,squat,equipment_hint,bodyweight; suspension trainer,waist,abdominals
+I1OBLnn,weighted svend press,horizontal_push,body_part_hint,weighted,chest,pectorals
+i4JkUaL,barbell side bent,squat,equipment_hint,barbell,waist,abdominals
+I4tibZG,kettlebell alternating hang clean,hinge,equipment_hint,kettlebell,lower arms,forearms
+i6LWjok,barbell pullover,squat,equipment_hint,barbell,back,latissimus dorsi
+i8BdLTK,dumbbell straight arm pullover,curl,equipment_hint,dumbbell,chest,pectorals
+ia6kIIl,Half Knee Bends,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+IBj3nsn,quick feet,squat,equipment_hint,bodyweight,upper legs,quadriceps
+iDGtjyi,chest and front of shoulder stretch,squat,equipment_hint,bodyweight,chest,pectorals
+IH2kr7n,dumbbell decline shrug,curl,equipment_hint,dumbbell,back,trapezius
+iK59oEA,dumbbell lying pullover on exercise ball,curl,equipment_hint,dumbbell; stability ball,chest,pectorals
+iPm26QU,Box Jump Down With Single-Leg Stabilization,squat,equipment_hint,bodyweight,lower legs,calves
+IpONWYv,dumbbell side bend,curl,equipment_hint,dumbbell,waist,abdominals
+isAAZWA,side-to-side chin,squat,equipment_hint,bodyweight,back,latissimus dorsi
+isofgzg,roller back stretch,horizontal_pull,body_part_hint,roller,back,erector spinae
+IxsFgRT,cable judo flip,horizontal_pull,equipment_hint,cable,waist,abdominals
+izMnLqz,dumbbell alternate side press,curl,equipment_hint,dumbbell,shoulders,deltoids
+j6uIfep,Kettlebell Extended Range Single-Arm Press On Floor,hinge,equipment_hint,kettlebell,chest,pectorals
+j7XMAyn,cable upper chest crossovers,horizontal_pull,equipment_hint,cable,chest,pectorals
+j9Q5crt,walking on stepmill,cardio_dynamic,equipment_hint,stepmill machine,cardio,cardiovascular system
+JbC2iaV,spine stretch,squat,equipment_hint,bodyweight,back,erector spinae
+jCrtE9b,Single-Arm Slam (With Medicine Ball),core_isometric,body_part_hint,medicine ball,waist,abdominals
+jDnrkar,Dumbbell Incline Single-Arm Hammer Press On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,upper arms,triceps
+jDOKRM5,Side-Lying Floor Stretch,squat,equipment_hint,bodyweight,back,latissimus dorsi
+jeHtrlO,medicine ball chest push single response,horizontal_push,body_part_hint,medicine ball,chest,pectorals
+JF8AkMX,standing archer,squat,equipment_hint,bodyweight,back,upper back
+jgbvVJ0,dumbbell incline t-raise,curl,equipment_hint,dumbbell,shoulders,deltoids
+JsOV1SU,weighted muscle up,horizontal_pull,body_part_hint,weighted,back,latissimus dorsi
+jTkSc6o,side hip (on parallel bars),squat,equipment_hint,bodyweight,waist,abdominals
+jvp6DiD,elbow-to-knee,squat,equipment_hint,bodyweight,waist,abdominals
+JxrY9mC,Band Kneeling Single-Arm Pulldown,horizontal_pull,equipment_hint,resistance band,back,latissimus dorsi
+JymLInS,dumbbell incline shrug,curl,equipment_hint,dumbbell,back,trapezius
+K3dIO25,Dumbbell Lying Single-Arm Press,curl,equipment_hint,dumbbell,chest,pectorals
+K5xgdvI,reclining big toe pose with rope,squat,body_part_hint,rope,upper legs,hamstrings
+k6tUeqS,band underhand pulldown,horizontal_pull,equipment_hint,resistance band,back,latissimus dorsi
+KHGNa16,Cable Decline Single-Arm Press,horizontal_pull,equipment_hint,cable,chest,pectorals
+kjE55n5,kettlebell bent press,hinge,equipment_hint,kettlebell,waist,abdominals
+km2Ljzj,wheel run,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+KtRomty,Standing Wheel Rollout,core_isometric,body_part_hint,ab wheel,waist,abdominals
+Kxquu2E,barbell step-up,squat,equipment_hint,barbell,upper legs,glutes
+ky8FLU8,Machine Reverse-Grip Lateral Pulldown,horizontal_push,equipment_hint,leverage machine,back,latissimus dorsi
+L4ay0PW,kettlebell figure 8,hinge,equipment_hint,kettlebell,waist,abdominals
+L68dTQj,band seated twist,horizontal_pull,equipment_hint,resistance band,waist,abdominals
+LFIOery,dumbbell sumo pull through,curl,equipment_hint,dumbbell,upper legs,glutes
+LHWF7us,kettlebell hang clean,hinge,equipment_hint,kettlebell,upper legs,hamstrings
+LL1UiTX,Dumbbell Incline Single-Arm Hammer Press,curl,equipment_hint,dumbbell,upper arms,triceps
+LMGXZn8,Barbell Decline Close-Grip To Skull Press,squat,equipment_hint,barbell,upper arms,triceps
+LNE3wfo,single leg platform slide,squat,equipment_hint,bodyweight,upper legs,hamstrings
+LYJodFS,lean planche,squat,equipment_hint,bodyweight,waist,abdominals
+LzX8YEz,all fours squad stretch,squat,equipment_hint,bodyweight,upper legs,quadriceps
+m0tCHqc,calf stretch with hands against wall,squat,equipment_hint,bodyweight,lower legs,calves
+M2Pm3zj,dumbbell lying supination,curl,equipment_hint,dumbbell,lower arms,forearms
+M74kdvm,kettlebell double snatch,hinge,equipment_hint,kettlebell,shoulders,deltoids
+MCkqdKE,weighted muscle up (on bar),horizontal_pull,body_part_hint,weighted,back,latissimus dorsi
+MKIelrR,Cable Single-Arm Press On Exercise Ball,horizontal_pull,equipment_hint,cable; stability ball,chest,pectorals
+mKwcrHn,Machine Gripper Hands,horizontal_push,equipment_hint,leverage machine,lower arms,forearms
+mpYUPkA,lying leg-hip raise,squat,equipment_hint,bodyweight,waist,abdominals
+mQ1tBXn,Straight-Leg Outer Hip Abductor,squat,equipment_hint,bodyweight,upper legs,abductors
+MqNdIbe,wrist rollerer,curl,body_part_hint,weighted,lower arms,forearms
+MrgP9L6,Machine Rotary Calf,horizontal_push,equipment_hint,leverage machine,lower legs,calves
+MSfvriJ,skin the cat,squat,equipment_hint,bodyweight,back,upper back
+mTT3KLn,cable front shoulder raise,horizontal_pull,equipment_hint,cable,shoulders,deltoids
+MvQPqVW,cable judo flip,horizontal_pull,equipment_hint,cable,waist,abdominals
+mweqJin,quick feet,squat,equipment_hint,bodyweight,upper legs,quadriceps
+MY9P1WA,smith decline reverse-grip press,squat,equipment_hint,smith machine,chest,pectorals
+mym4hJo,dumbbell lying pronation,curl,equipment_hint,dumbbell,lower arms,forearms
+MzNnwx9,smith back shrug,squat,equipment_hint,smith machine,back,trapezius
+NAgVB3t,wheel rollout,core_isometric,body_part_hint,ab wheel,waist,abdominals
+nDK1HJ0,EZ-Bar Lying Bent Arms Pullover,horizontal_pull,body_part_hint,EZ bar,back,latissimus dorsi
+nFHk9fU,cable lateral pulldown (with rope attachment),horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+ninBEOY,side-to-side chin,squat,equipment_hint,bodyweight,back,latissimus dorsi
+NJzBsGJ,dumbbell shrug,curl,equipment_hint,dumbbell,back,trapezius
+NKJ8o6x,pelvic tilt,squat,equipment_hint,bodyweight,waist,abdominals
+nuBF9MO,hanging pike,squat,equipment_hint,bodyweight,waist,abdominals
+nxW6BkN,dumbbell incline raise,curl,equipment_hint,dumbbell,shoulders,deltoids
+O3INw8V,sphinx,squat,equipment_hint,bodyweight,back,erector spinae
+o80Xu9C,Kettlebell Extended Range Single-Arm Press On Floor,hinge,equipment_hint,kettlebell,chest,pectorals
+O95afRA,monster walk,squat,equipment_hint,bodyweight; resistance band,upper legs,glutes
+ocYc6Db,Dumbbell Standing Single-Arm Palm In Press,curl,equipment_hint,dumbbell,shoulders,deltoids
+oHg8eop,medicine ball overhead slam,horizontal_pull,body_part_hint,medicine ball,back,upper back
+oHsrypV,Machine Seated Hip Adduction,horizontal_push,equipment_hint,leverage machine,upper legs,adductors
+oLrKqDH,run,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+OM46QHm,cable pull through (with rope),horizontal_pull,equipment_hint,cable,upper legs,glutes
+oMypNrz,roller hip stretch,squat,body_part_hint,roller,upper legs,glutes
+OQ1otBN,Cable Crossover Lateral Pulldown,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+oQRJYkC,side push neck stretch,squat,equipment_hint,bodyweight,neck,levator scapulae
+OrETs32,reverse hyper on flat bench,squat,equipment_hint,bodyweight,upper legs,glutes
+OUQ0ZyW,smith shrug,squat,equipment_hint,smith machine,back,trapezius
+OVLmUuL,dumbbell incline palm-in press,curl,equipment_hint,dumbbell,chest,pectorals
+OyoZ3Pu,leg pull in flat bench,squat,equipment_hint,bodyweight,waist,abdominals
+oZjMu1t,tire flip,squat,body_part_hint,tire,upper legs,glutes
+p0OCXGb,sled 45° leg wide press,carry_locomotion,equipment_hint,sled machine,upper legs,glutes
+p5v6rdT,iron cross stretch,squat,equipment_hint,bodyweight,upper legs,glutes
+p9cCe2r,spell caster,curl,equipment_hint,dumbbell,waist,abdominals
+pAIWRGu,hands bike,horizontal_push,body_part_hint,upper body ergometer,chest,pectorals
+PbzNu7c,dumbbell incline y-raise,curl,equipment_hint,dumbbell,back,upper back
+PCUYOMs,walk elliptical cross trainer,cardio_dynamic,equipment_hint,elliptical machine,cardio,cardiovascular system
+pFuK3by,walk elliptical cross trainer,cardio_dynamic,equipment_hint,elliptical machine,cardio,cardiovascular system
+PG1kcIb,dumbbell incline hammer press,curl,equipment_hint,dumbbell,chest,pectorals
+pj0X0tF,Hanging Straight-Leg Hip Raise,squat,equipment_hint,bodyweight,waist,abdominals
+PkCN2lv,front lever,squat,equipment_hint,bodyweight,waist,abdominals
+pM07UxU,kipping muscle up,squat,equipment_hint,bodyweight,back,latissimus dorsi
+pmnrOp0,Band Kneeling Single-Arm Pulldown,horizontal_pull,equipment_hint,resistance band,back,latissimus dorsi
+pQ0Mx1Z,flag,squat,equipment_hint,bodyweight,waist,abdominals
+PrQbjvB,push to run,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+pX9Elbe,medicine ball chest push with run release,horizontal_push,body_part_hint,medicine ball,chest,pectorals
+PXTIwgu,Arm Slingers Hanging Straight-Legs,squat,equipment_hint,bodyweight,waist,abdominals
+PzNxakt,calf push stretch with hands against wall,squat,equipment_hint,bodyweight,lower legs,calves
+pZwUsKB,iron cross stretch,squat,equipment_hint,bodyweight,upper legs,glutes
+Q6bvyen,hanging straight twisting leg hip raise,squat,equipment_hint,bodyweight,waist,abdominals
+qaZVsGk,alternate heel touchers,squat,equipment_hint,bodyweight,waist,abdominals
+qBcKorM,all fours squad stretch,squat,equipment_hint,bodyweight,upper legs,quadriceps
+qcNN2FN,butt-ups,squat,equipment_hint,bodyweight,waist,abdominals
+qCNVnaU,sled 45° calf press,carry_locomotion,equipment_hint,sled machine,lower legs,calves
+qdRxqCj,cable pulldown (pro lat bar),horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+QfAKy1G,dumbbell cuban press,curl,equipment_hint,dumbbell,shoulders,deltoids
+QFmz6ch,seated lower back stretch,squat,equipment_hint,bodyweight,back,latissimus dorsi
+qFpAkpP,cable standing lift,horizontal_pull,equipment_hint,cable,waist,abdominals
+Qj0HRAZ,Band Seated Hip Abduction,horizontal_pull,equipment_hint,resistance band,upper legs,abductors
+qlZUaZ8,Dumbbell Incline Single-Arm Press On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,chest,pectorals
+QOA0FD0,weighted hanging leg-hip raise,core_isometric,body_part_hint,weighted,waist,abdominals
+QoHIhPl,behind head chest stretch,horizontal_push,body_part_hint,assisted,chest,pectorals
+qOKcgVP,standing calves calf stretch,squat,equipment_hint,bodyweight,lower legs,calves
+qPEzJjA,farmers walk,curl,equipment_hint,dumbbell,upper legs,quadriceps
+QT5Q0nK,dumbbell seated alternate press,curl,equipment_hint,dumbbell,shoulders,deltoids
+QY39eBr,seated piriformis stretch,squat,equipment_hint,bodyweight,upper legs,glutes
+QZFv5ui,Dumbbell Single-Arm Press On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,chest,pectorals
+rDAiRf9,Dumbbell Incline Single-Arm Press,curl,equipment_hint,dumbbell,chest,pectorals
+rEhi2o5,dumbbell lying supination on floor,curl,equipment_hint,dumbbell,lower arms,forearms
+REXmfVC,sledge hammer,core_isometric,body_part_hint,hammer,waist,abdominals
+RJa4tCo,battling ropes,vertical_push,body_part_hint,rope,shoulders,deltoids
+rjiM4L3,walking on incline treadmill,horizontal_push,equipment_hint,leverage machine,cardio,cardiovascular system
+rjtuP6X,walk elliptical cross trainer,cardio_dynamic,equipment_hint,elliptical machine,cardio,cardiovascular system
+RKjH6Lt,side bridge,squat,equipment_hint,bodyweight,waist,abdominals
+rmEukuS,single leg bridge with outstretched leg,squat,equipment_hint,bodyweight,upper legs,glutes
+RoV1Rfa,assisted seated pectoralis major stretch with stability ball,horizontal_push,body_part_hint,assisted; stability ball,chest,pectorals
+rQhGcin,frog planche,squat,equipment_hint,bodyweight,waist,abdominals
+RQNVT10,assisted lying gluteus and piriformis stretch,squat,body_part_hint,assisted,upper legs,glutes
+rseLfH3,Kettlebell Extended Range Single-Arm Press On Floor,hinge,equipment_hint,kettlebell,chest,pectorals
+RSOsp5d,dumbbell standing around world,curl,equipment_hint,dumbbell,shoulders,deltoids
+Rsxr3xl,Single-Arm Against Wall,squat,equipment_hint,bodyweight,back,latissimus dorsi
+rTbyBYV,exercise ball lying side lat stretch,horizontal_pull,body_part_hint,stability ball,back,latissimus dorsi
+RVwzP10,cable pulldown,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+RxayqAZ,dumbbell close-grip press,curl,equipment_hint,dumbbell,upper arms,triceps
+S1JXDAG,band seated twist,horizontal_pull,equipment_hint,resistance band,waist,abdominals
+s34Y4LR,weighted seated twist (on stability ball),core_isometric,body_part_hint,weighted; stability ball,waist,abdominals
+S37C94C,Kettlebell Single-Arm Jerk,hinge,equipment_hint,kettlebell,shoulders,deltoids
+s5PdDyY,dumbbell tate press,curl,equipment_hint,dumbbell,upper arms,triceps
+Sa8mzWc,hanging pike,squat,equipment_hint,bodyweight,waist,abdominals
+SaDOwk7,backward jump,squat,equipment_hint,bodyweight,upper legs,quadriceps
+SGY8Zui,barbell clean and press,squat,equipment_hint,barbell,upper legs,quadriceps
+SHUMp5H,Dumbbell Decline Single-Arm Hammer Press,curl,equipment_hint,dumbbell,upper arms,triceps
+SiWCcTN,power clean,squat,equipment_hint,barbell,upper legs,hamstrings
+sJElUUI,Dumbbell Incline Single-Arm Press On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,chest,pectorals
+SLKj2pX,cocoons,squat,equipment_hint,bodyweight,waist,abdominals
+sM84pE4,exercise ball lat stretch,horizontal_pull,body_part_hint,stability ball,back,latissimus dorsi
+SNFfUff,barbell lying lifting (on hip),squat,equipment_hint,barbell,upper legs,glutes
+SP3hUez,Swimmer Kicks,squat,equipment_hint,bodyweight,upper legs,glutes
+SpsOSXk,cable rear pulldown,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+sU5BrfP,leg up hamstring stretch,squat,equipment_hint,bodyweight,upper legs,hamstrings
+sVQCCeG,march sit (wall),squat,equipment_hint,bodyweight,upper legs,glutes
+SxHteRW,dumbbell standing alternate raise,curl,equipment_hint,dumbbell,shoulders,deltoids
+sZOR9EV,Machine Kneeling Twist,horizontal_push,equipment_hint,leverage machine,waist,abdominals
+TBNaSNs,EZ-Bar Decline Close-Grip Face Press,curl,body_part_hint,EZ bar,upper arms,triceps
+tFGKm99,intermediate hip flexor and quad stretch,squat,body_part_hint,rope,upper legs,quadriceps
+tj41Nu6,sled 45° leg wide press,carry_locomotion,equipment_hint,sled machine,upper legs,glutes
+tnaj0mT,swing 360,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+trmte8s,band shrug,horizontal_pull,equipment_hint,resistance band,back,trapezius
+tTuZSDT,Machine Single-Arm Lateral Wide Pulldown,horizontal_push,equipment_hint,leverage machine,back,latissimus dorsi
+TV87DNB,inchworm,squat,equipment_hint,bodyweight,waist,abdominals
+TVdivgY,dumbbell incline alternate press,curl,equipment_hint,dumbbell,chest,pectorals
+tznL2Ad,kettlebell double jerk,hinge,equipment_hint,kettlebell,shoulders,deltoids
+u0pLNgz,Sled Single-Leg Calf Press On Leg Press,carry_locomotion,equipment_hint,sled machine,lower legs,calves
+U5INZY6,Cable Single-Arm Pulldown,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+U6G2gk9,body-up,squat,equipment_hint,bodyweight,upper arms,triceps
+UDm6cGl,kettlebell seesaw press,hinge,equipment_hint,kettlebell,shoulders,deltoids
+UEjSrKI,cable seated twist,horizontal_pull,equipment_hint,cable,waist,abdominals
+UGhRD1A,Lying Windshield Wipers,core_isometric,body_part_hint,assisted,waist,abdominals
+UilDHSs,Dumbbell Standing Neutral-Grip Press,curl,equipment_hint,dumbbell,shoulders,deltoids
+UKWTJWR,cable standing up straight crossovers,horizontal_pull,equipment_hint,cable,chest,pectorals
+uL9CsKm,ankle circles,squat,equipment_hint,bodyweight,lower legs,calves
+UOphC6N,cable side bend,horizontal_pull,equipment_hint,cable,waist,abdominals
+UpAlold,rear decline bridge,squat,equipment_hint,bodyweight,upper legs,glutes
+UpWmA5E,l-sit on floor,squat,equipment_hint,bodyweight,waist,abdominals
+UQr48Oi,pull-in (on stability ball),core_isometric,body_part_hint,stability ball,waist,abdominals
+UtmIqcI,side wrist pull stretch,squat,equipment_hint,bodyweight,lower arms,forearms
+Uto7l43,chest and front of shoulder stretch,squat,equipment_hint,bodyweight,chest,pectorals
+UVL20oz,otis up,core_isometric,body_part_hint,weighted,waist,abdominals
+UVo2Qs2,flutter kicks,squat,equipment_hint,bodyweight,upper legs,glutes
+uWpxD4v,arm slingers hanging bent knee legs,squat,equipment_hint,bodyweight,waist,abdominals
+uZKq7lo,forward jump,squat,equipment_hint,bodyweight,upper legs,quadriceps
+V07qpXy,Machine Alternate Leg Press,horizontal_push,equipment_hint,leverage machine,upper legs,quadriceps
+v6EKk0O,Half Knee Bends,squat,equipment_hint,bodyweight,cardio,cardiovascular system
+v7p5bYl,kick out sit,squat,equipment_hint,bodyweight,upper legs,hamstrings
+VEcJRo2,hanging leg hip raise,squat,equipment_hint,bodyweight,waist,abdominals
+VedGSby,assisted prone hamstring,squat,body_part_hint,assisted,upper legs,hamstrings
+vi8EhoE,dumbbell around pullover,curl,equipment_hint,dumbbell,chest,pectorals
+VLYXo8S,weighted round arm,vertical_push,body_part_hint,weighted,shoulders,deltoids
+vmwLyCg,dumbbell w-press,curl,equipment_hint,dumbbell,shoulders,deltoids
+vobtVkm,calf push stretch with hands against wall,squat,equipment_hint,bodyweight,lower legs,calves
+vpleANJ,pelvic tilt into bridge,squat,equipment_hint,bodyweight,upper legs,glutes
+vpQaQkH,ski ergometer,curl,body_part_hint,ski ergometer,upper arms,triceps
+VtTbiP3,band pull through,horizontal_pull,equipment_hint,resistance band,upper legs,glutes
+Vvwjz6N,glute-ham raise,squat,equipment_hint,bodyweight,upper legs,hamstrings
+VYmYxK5,Dumbbell Single-Arm Hammer Press On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,upper arms,triceps
+vzAxBtt,Kettlebell Single-Arm Clean And Jerk,hinge,equipment_hint,kettlebell,shoulders,deltoids
+W1p7BND,chest stretch with exercise ball,horizontal_push,body_part_hint,stability ball,chest,pectorals
+W7yh3Yo,Dumbbell Single-Arm French Press On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,upper arms,triceps
+WFucoe6,hanging straight twisting leg hip raise,squat,equipment_hint,bodyweight,waist,abdominals
+wkgnGfb,dumbbell incline hammer press on exercise ball,curl,equipment_hint,dumbbell; stability ball,upper arms,triceps
+WL4EmxJ,side bridge hip abduction,squat,equipment_hint,bodyweight,upper legs,abductors
+wPypxFY,cable side bend,horizontal_pull,equipment_hint,cable,waist,abdominals
+WWD6FzI,Sled 45 Degrees Single-Leg Press,carry_locomotion,equipment_hint,sled machine,upper legs,glutes
+wXvUZC8,push and pull bodyweight,squat,equipment_hint,bodyweight,chest,pectorals
+x2chWLO,neck side stretch,squat,equipment_hint,bodyweight,neck,levator scapulae
+X3TCNEU,suspended abdominal fallout,squat,equipment_hint,bodyweight; suspension trainer,waist,abdominals
+x69MAlq,cable straight arm pulldown,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+X7jbxra,circles knee stretch,squat,equipment_hint,bodyweight,lower legs,calves
+xAySMB0,balance board,squat,equipment_hint,bodyweight,upper legs,quadriceps
+xBYcQHj,cable underhand pulldown,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+xcLntTC,leg pull in flat bench,squat,equipment_hint,bodyweight,waist,abdominals
+Xd65M9w,dumbbell around pullover,curl,equipment_hint,dumbbell,chest,pectorals
+xDh0lJr,standing behind neck press,squat,equipment_hint,barbell,shoulders,deltoids
+XeMvLgE,roller body saw,core_isometric,body_part_hint,roller,waist,abdominals
+xGgAGPm,chair leg extended stretch,squat,equipment_hint,bodyweight,upper legs,quadriceps
+XhfS1DZ,peroneals stretch,calf_raise,body_part_hint,rope,lower legs,calves
+xHKN2s8,Barbell Single-Arm Snatch,squat,equipment_hint,barbell,shoulders,deltoids
+xi0yckC,barbell incline shoulder raise,squat,equipment_hint,barbell,chest,serratus anterior
+XIHEoCG,standing calves,squat,equipment_hint,bodyweight,lower legs,calves
+xnInPfE,Barbell Standing Ab Rollout,squat,equipment_hint,barbell,waist,abdominals
+XooAdhl,handstand,squat,equipment_hint,bodyweight,upper arms,triceps
+XSCHmiI,cycle cross trainer,horizontal_push,equipment_hint,leverage machine,cardio,cardiovascular system
+xTjr103,standing hamstring and calf stretch with strap,squat,body_part_hint,rope,upper legs,hamstrings
+Y4QlY8z,smith toe raise,squat,equipment_hint,smith machine,lower legs,calves
+y5p0H8a,run (equipment),squat,equipment_hint,bodyweight,cardio,cardiovascular system
+yaAxcQr,rope climb,horizontal_pull,body_part_hint,rope,back,upper back
+yJUHKTn,muscle up,squat,equipment_hint,bodyweight,back,latissimus dorsi
+ykA5tU7,chest stretch with exercise ball,horizontal_push,body_part_hint,stability ball,chest,pectorals
+ykHcWme,sled calf press on leg press,carry_locomotion,equipment_hint,sled machine,lower legs,calves
+yn0LjwL,assisted lying glutes stretch,squat,body_part_hint,assisted,upper legs,glutes
+yn2lLSI,sled 45° leg press (back pov),carry_locomotion,equipment_hint,sled machine,upper legs,glutes
+yQe5HpE,barbell standing twist,squat,equipment_hint,barbell,waist,abdominals
+YRaCa5Y,full maltese,squat,equipment_hint,bodyweight,waist,abdominals
+yRpV5TC,shoulder tap,squat,equipment_hint,bodyweight,waist,abdominals
+yRYyfdA,exercise ball seated hamstring stretch,squat,body_part_hint,stability ball,upper legs,hamstrings
+yU7w7CA,exercise ball lower back stretch (pyramid),horizontal_pull,body_part_hint,stability ball,back,latissimus dorsi
+YUYAMEj,assisted prone lying quads stretch,squat,body_part_hint,assisted,upper legs,quadriceps
+yWxMvB5,kettlebell thruster,hinge,equipment_hint,kettlebell,shoulders,deltoids
+YZ4961r,full planche,squat,equipment_hint,bodyweight,waist,abdominals
+za9Ni4z,barbell rack pull,squat,equipment_hint,barbell,upper legs,glutes
+zCgxPbV,cable twisting pull,horizontal_pull,equipment_hint,cable,back,latissimus dorsi
+zd4P4B2,stalder press,squat,equipment_hint,bodyweight,upper arms,triceps
+Ze7MoIb,Dumbbell Single-Arm Reverse-Grip Press,curl,equipment_hint,dumbbell,chest,pectorals
+zGSIWQi,Dumbbell Lying Single-Arm Press,curl,equipment_hint,dumbbell,chest,pectorals
+ZgsNQ6d,inchworm,squat,equipment_hint,bodyweight,waist,abdominals
+ZH68exZ,band fixed back underhand pulldown,horizontal_pull,equipment_hint,resistance band,back,latissimus dorsi
+zhF9lW4,Band Assisted Wheel Rollout,horizontal_pull,equipment_hint,resistance band,waist,abdominals
+ziFKQXP,Dumbbell Single-Arm French Press On Exercise Ball,curl,equipment_hint,dumbbell; stability ball,upper arms,triceps
+zK8Fu1W,smith reverse-grip press,squat,equipment_hint,smith machine,chest,pectorals
+znf7t8E,kipping muscle up,squat,equipment_hint,bodyweight,back,latissimus dorsi
+znLogoF,barbell pullover to press,squat,equipment_hint,barbell,back,latissimus dorsi
+znP9SIh,hug knees to chest,squat,equipment_hint,bodyweight,upper legs,glutes
+ZuXu4Eq,v-sit on floor,squat,equipment_hint,bodyweight,waist,abdominals
+zYmNaoY,elevator,squat,equipment_hint,bodyweight,back,upper back
+ZZKbeMw,Machine Shrug,horizontal_push,equipment_hint,leverage machine,back,trapezius
+ZZTGMKh,Single-Arm Against Wall,squat,equipment_hint,bodyweight,back,latissimus dorsi

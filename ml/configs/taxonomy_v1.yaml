@@ -1,0 +1,120 @@
+# Taxonomy v1 - Movement Pattern Classes for On-Device Classifier
+# Merged weak classes (few exercises) into coarser groups for training stability
+
+# Original 29 patterns from exercise_ml_map.json, with counts:
+# squat: 3249 windows (strong)
+# curl: 2858 windows (strong)
+# horizontal_push: 2052 windows (strong)
+# horizontal_pull: 1731 windows (strong)
+# triceps_extension: 1347 windows (strong)
+# core_flexion: 1105 windows (strong)
+# hinge: 510 windows (moderate)
+# vertical_push: 488 windows (moderate)
+# calf_raise: 467 windows (moderate)
+# vertical_pull: 351 windows (moderate)
+# lunge: 293 windows (weak)
+# core_isometric: 273 windows (weak)
+# lateral_raise: 243 windows (weak)
+# cardio_dynamic: 225 windows (weak)
+# front_raise: 121 windows (very weak - MERGE)
+# rotation: 121 windows (very weak - MERGE)
+# carry_locomotion: 101 windows (very weak - MERGE)
+# hip_thrust_bridge: 77 windows (very weak - MERGE)
+# rear_delt: 44 windows (very weak - MERGE)
+
+# Merge strategy:
+# - front_raise -> lateral_raise (both shoulder isolation, similar motion)
+# - rear_delt -> lateral_raise (both shoulder isolation)
+# - hip_thrust_bridge -> hinge (both hip extension dominant)
+# - carry_locomotion -> cardio_dynamic (both dynamic movement)
+# - rotation -> core_flexion (both rotational core)
+# - lunge -> squat (both bilateral leg, similar knee/hip motion)
+# - vertical_pull -> horizontal_pull (both pulling)
+# - vertical_push -> horizontal_push (both pushing)
+# - calf_raise -> hinge (ankle/knee/hip chain)
+# - core_isometric -> core_flexion (both core)
+
+# Resulting 13 classes (minimum ~200 windows each):
+# 0: squat (squat + lunge) - ~3542 windows
+# 1: curl (bicep curl, hammer curl, etc.) - ~2858 windows
+# 2: horizontal_push (push-up, bench press, dip, overhead press) - ~2540 windows
+# 3: horizontal_pull (row, pull-up, pulldown, face pull) - ~2082 windows
+# 4: triceps_extension (tricep pushdown, overhead extension, kickback) - ~1347 windows
+# 5: core_flexion (crunch, sit-up, russian twist, rotation) - ~1226 windows
+# 6: hinge (deadlift, RDL, good morning, hip thrust, calf raise) - ~1054 windows
+# 7: lateral_raise (lateral raise, front raise, rear delt fly) - ~408 windows
+# 8: cardio_dynamic (burpee, mountain climber, jumping jack, carry) - ~326 windows
+# 9: core_isometric (plank, side plank, hollow hold) - ~273 windows (keep separate - distinct isometric)
+
+# Actually, let's keep 10 classes by also keeping vertical_pull/vertical_push separate for now
+# since they have different equipment signatures. But merge the very weak ones.
+
+# FINAL 14-CLASS TAXONOMY:
+classes:
+  - name: "squat"
+    includes: ["squat", "lunge"]
+    description: "Bilateral knee/hip flexion-extension (squat, lunge, split squat)"
+    min_windows: 3000
+    
+  - name: "curl"
+    includes: ["curl"]
+    description: "Elbow flexion with shoulder stable (bicep curl, hammer curl, preacher curl)"
+    min_windows: 2500
+    
+  - name: "horizontal_push"
+    includes: ["horizontal_push", "vertical_push"]
+    description: "Horizontal/vertical pushing (push-up, bench press, dip, overhead press)"
+    min_windows: 2500
+    
+  - name: "horizontal_pull"
+    includes: ["horizontal_pull", "vertical_pull"]
+    description: "Horizontal/vertical pulling (row, pull-up, pulldown, face pull)"
+    min_windows: 2000
+    
+  - name: "triceps_extension"
+    includes: ["triceps_extension"]
+    description: "Elbow extension with shoulder stable (pushdown, overhead extension, kickback)"
+    min_windows: 1200
+    
+  - name: "core_flexion"
+    includes: ["core_flexion", "rotation"]
+    description: "Dynamic core flexion/rotation (crunch, sit-up, russian twist, woodchop)"
+    min_windows: 1100
+    
+  - name: "hinge"
+    includes: ["hinge", "hip_thrust_bridge", "calf_raise"]
+    description: "Hip-dominant posterior chain (deadlift, RDL, hip thrust, calf raise)"
+    min_windows: 1000
+    
+  - name: "lateral_raise"
+    includes: ["lateral_raise", "front_raise", "rear_delt"]
+    description: "Shoulder isolation abduction/flexion (lateral raise, front raise, rear delt fly)"
+    min_windows: 350
+    
+  - name: "cardio_dynamic"
+    includes: ["cardio_dynamic", "carry_locomotion"]
+    description: "Dynamic full-body cardio/locomotion (burpee, mountain climber, carry)"
+    min_windows: 300
+    
+  - name: "core_isometric"
+    includes: ["core_isometric"]
+    description: "Static core holds (plank, side plank, hollow hold)"
+    min_windows: 250
+
+# Classes dropped (too few, not in priority exercises):
+# - (none dropped, all merged above)
+
+# Priority exercises (from mapping review) and their class:
+priority_exercises:
+  - exercise_id: "01qpYSe"  # upward facing dog -> squat (bodyweight hinge-like)
+    class: "squat"
+  - exercise_id: "0br45wL"  # push-up inside leg kick -> horizontal_push
+    class: "horizontal_push"
+  - exercise_id: "0IgNjSM"  # dumbbell standing reverse curl -> curl
+    class: "curl"
+  - exercise_id: "53Ttlck"  # dumbbell lying rear lateral raise -> lateral_raise
+    class: "lateral_raise"
+  - exercise_id: "13VW2VO"  # weighted stretch lunge -> squat
+    class: "squat"
+  - exercise_id: "1IG6gVF"  # prone twist on stability ball -> core_flexion
+    class: "core_flexion"

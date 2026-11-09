@@ -1,0 +1,126 @@
+{
+  "version": "1.0.0",
+  "date": "2026-11-09",
+  "git_hash": "unknown",
+  "pose_model": {
+    "file": "pose_landmarker_lite.task",
+    "sha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a"
+  },
+  "data_inventory_hash": "bfc1ba6305f4d33c1920260cd85470d569a56c2786ab4064f19234adac81c2f5",
+  "feature_spec_ref": "docs/FEATURE_SPEC.md",
+  "labels": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "curl",
+    "hinge",
+    "horizontal_pull",
+    "horizontal_push",
+    "lateral_raise",
+    "squat",
+    "triceps_extension"
+  ],
+  "class_to_idx": {
+    "cardio_dynamic": 0,
+    "core_flexion": 1,
+    "core_isometric": 2,
+    "curl": 3,
+    "hinge": 4,
+    "horizontal_pull": 5,
+    "horizontal_push": 6,
+    "lateral_raise": 7,
+    "squat": 8,
+    "triceps_extension": 9
+  },
+  "models": {
+    "cnn1d.onnx": {
+      "original": {
+        "file": "cnn1d.onnx",
+        "size_bytes": 673130,
+        "size_kb": 657.4,
+        "sha256": "ebbe0b0b4b16090e2aa5fae287edc9e6355e92ce50c2993779cce92c8db3c064",
+        "input_shape": [
+          -1,
+          48,
+          132
+        ],
+        "output_shape": [
+          -1,
+          10
+        ],
+        "opset": 13
+      },
+      "quantized": {
+        "file": "cnn1d_int8.onnx",
+        "size_bytes": 173865,
+        "size_kb": 169.8,
+        "sha256": "9b444181f55ec481f20e397efb1dcf7d1f9d795df9479d92cfc5a2d614323654",
+        "input_shape": [
+          -1,
+          48,
+          132
+        ],
+        "output_shape": [
+          -1,
+          10
+        ],
+        "opset": 13
+      },
+      "parity": {
+        "top1_agreement": 1.0,
+        "max_logit_diff": 0.0021458566188812256,
+        "mean_logit_diff": 0.00042831417522393167
+      }
+    },
+    "gru.onnx": {
+      "original": {
+        "file": "gru.onnx",
+        "size_bytes": 806942,
+        "size_kb": 788.0,
+        "sha256": "4b3d984fbdfc6da41fede81b5101379885cfcc927a6245afea007a7c50501b0c",
+        "input_shape": [
+          -1,
+          48,
+          132
+        ],
+        "output_shape": [
+          -1,
+          10
+        ],
+        "opset": 13
+      },
+      "quantized": {
+        "file": "gru_int8.onnx",
+        "size_bytes": 805306,
+        "size_kb": 786.4,
+        "sha256": "88b545b9e26abb54d099cf1f1d6bdfe5665d2c66270ff608c27facd83e74c988",
+        "input_shape": [
+          -1,
+          48,
+          132
+        ],
+        "output_shape": [
+          -1,
+          10
+        ],
+        "opset": 13
+      },
+      "parity": {
+        "top1_agreement": 1.0,
+        "max_logit_diff": 0.07459897547960281,
+        "mean_logit_diff": 0.008336634375154972
+      }
+    }
+  },
+  "thresholds": {
+    "classification_confidence": 0.5,
+    "open_set_rejection": 0.3
+  },
+  "mapping_version": "taxonomy_v1",
+  "input_spec": {
+    "window_size": 48,
+    "features_per_frame": 132,
+    "fps": 15,
+    "normalization": "mid_hip_center_torso_length"
+  }
+}
