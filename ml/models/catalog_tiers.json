@@ -1,0 +1,7502 @@
+{
+ "01qpYSe": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "03lzqwk": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "05Cf2v8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0br45wL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0CXGHya": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0dCyly0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0I5fUyn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0IgNjSM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0jp9Rlz": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0JtKWum": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0L2KwtI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0lQnxMZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0mB6wHO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0MlxeMn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0rHfvy9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0S75mYG": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0V2YQjW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0xDpB4L": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "0Yz8WdV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "10Z2DXU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "11wrviz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "13TpY4H": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "13VW2VO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "17bqEXD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "17lJ1kr": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "196HJGw": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1bQkKZK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1cTf2Ux": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1DN3iz4": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1g5bPpA": {
+  "tier": "auto_count_beta",
+  "pooled_n": "41",
+  "pooled_within1_pct": "41.5"
+ },
+ "1gFNTZV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1GPHRyK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1IFV9h3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1IG6gVF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1jXLYEw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1kB3Wmk": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1LVFcEn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1oE78pm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1PK5Uo3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1PLE8e9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1qrWgZ2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1RIkUHT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1TkiAFK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1TVoin7": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1u36hhy": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1V1gj1u": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1VpF8db": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1xHyxys": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1YB40kg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1YUWDNZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "1ZFqTDN": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "225x2Vd": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "25GPyDY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "27NNGFr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2dImyQ8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2Dk4xQV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2DxtqHL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2gPfomN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2IHEa2T": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2IxROQ1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2JCuFTU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2jl9K55": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2kattbR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2KGnL6M": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2kr2lWy": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2LQkNPW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2NImIAG": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2NpxjC1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2ORFMoR": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2Pya1cP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2Qh2J1e": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2qTvJAZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2Ryn564": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2sQGZ5b": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2Ty4idJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "2zNKRUB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "33AzZeV": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3d7wHyd": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3eGE2JC": {
+  "tier": "auto_count_beta",
+  "pooled_n": "37",
+  "pooled_within1_pct": "51.4"
+ },
+ "3nvEbbF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3omWx6P": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3pqGMQj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3QgteDK": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3s4NnTh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3T12T87": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3tAXPQ6": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3TZduzM": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3uj0Ozg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3XFdb1Z": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3xK09Sk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "3ZflifB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4c9BhzB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4CBIBOM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4cWjYEN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4dF3maG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4dUn2iv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4f8RXP8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4GqRrAk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4H86mXM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4hATdoB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4ievMJ9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4IKbhHV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4Jc36XM": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4Jt8QsQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4KJEpzb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4Leypho": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4LIG9xr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4LoWllp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4Ml7QFO": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4OaumBr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4QqYaJW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4U7iLb5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "4x5Okof": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "50BETrz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "53Ttlck": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "58rdhvL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5bpPTHv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5BZHW9s": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5eLRITT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5fKX7wi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5ipN0iE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5KLbZWx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5lE7XRz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5MRH8H2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5uFK1xr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5v7KYld": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5VCj6iH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5vfAI0I": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5VXmnV5": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "5WiFcYk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "61GrD55": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "62Nw60O": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "641mIfk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "67n3r98": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6bOA1Oi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6cKQC5E": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6CKUx7o": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6e2DcYX": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6em2Dxj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6FMU51h": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6HiHHe0": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6HmFgmx": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6kSxYnw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6MaEjVA": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6MfS53i": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6pTkI99": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6sMAmNv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6sYyrRX": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6t00BsF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6TG6x2w": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6vcvsLS": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6Wr0F3W": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "6YUfHPL": {
+  "tier": "auto_count_beta",
+  "pooled_n": "34",
+  "pooled_within1_pct": "52.9"
+ },
+ "6ZCiYWQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "72BC5Za": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "75Bgtjy": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "76vfTdU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7858za8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "78VqWQK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "79AmJsI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7AnZtSv": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7aolH9D": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7aVz15j": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7B4F5nZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7Ba7bQ2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7D5bgLT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7E06s6d": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7ePTw4B": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7F1DVzn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7f2jsqP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7gdLIXa": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7HcfMBP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7Hg55JG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7i4msxz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7I6LNUG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7inpWch": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7jGOBF3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7M66AVi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7OeHptV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7R4NIjL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7RWNjiB": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7saC5zz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7uFJuXp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7vG5o25": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7w6i0vE": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7WaDzyL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7WcQgkm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7xeukSt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7xI5MXA": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7y9JIMj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "7zdxRTl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "82LxxkW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "83HoW9X": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "84RyJf8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "84sESNy": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "89HVjEp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8ARQ9Hw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8coXSYU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8d8qJQI": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8DiFDVA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8eqjhOl": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8fgqP5a": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8gQo5Ss": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8IbNZwc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8K0w2yA": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8K7m2SS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8oYqOt9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8ozhUIZ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8urJS9b": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8xUv4J7": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "8yBgwBS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "903mzG8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "945zpRg": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "99rWm7w": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9Ap7miY": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9c6T1YX": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9E25EOx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9fCHfSc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9gbyYKk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9GXrTE6": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9IxJdtC": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9JprnPh": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9KU9TYF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9n2149Z": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9pa4H5m": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9pQSkH8": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9RT8oQW": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9sgNE2O": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9Tkqa9O": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9tvVVM9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9vz4JlC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9WTm7dq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9XjtHvS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9Z23cLE": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9ZGnq1w": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "9ZGZuOD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "A2upspL": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "A3P4O0R": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "a4F9Oyc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "A6wtbuL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "a8VDgLw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "A9qxk2F": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aaxA3cm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aaXr7ld": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aDoFKrE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "AdxxqfF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ae9UoXQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aee2Fcj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Af0EW2I": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "afv0ZAS": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aHDy5O5": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ainizkb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Aj9vWh7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Al3tP0D": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Am02iPd": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ANbbry2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "AQ0mC4Y": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "AQIhRjM": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aqvSOQE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "AR0ig3o": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "arsYEd3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "arvaszz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aTNKZiC": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aumB2IV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aVs3BR3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "AwAIlSo": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aWedzZX": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "awG04cF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "AX1kB0o": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aXcUyKb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "AxFoqAD": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "aXtJhlg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ayAHcEm": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "B1EVP9F": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "b2Uoz54": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "B3Rxp6L": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "b4b6afT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "b5uBMv2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "B5xca8s": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "b63ZzGe": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "B6dAO1t": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "b6hQYMb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "b9kqlBy": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BaE7O6U": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BbfB8Gb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bBi35y3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bbLR7fB": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BCGQ6J5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BCs0G2F": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BCUR88E": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bd5b860": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bdWcbaU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BeReYBf": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bfiHMpI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Bg5JKSH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BgljGjd": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BIb1tGo": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BJ0Hz5L": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bjqbauy": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bJYHBIN": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BKa8dmT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bKWbrTA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BkxB8LW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BL3GHeY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "blBXysN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BLCvwr2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bLyQokI": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bmBf7LN": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BMMolZ3": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BmrwWzo": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bmwlYvD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Bn6TXyO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bndCa3Q": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bOOdeyc": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bpJL2Qs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Bpkf41o": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BqgCRif": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bQHPBU3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bQy2Eni": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BReCuOn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BRImeP8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bRlbdjK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bTpEUcm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BU15nH4": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bWlZvXh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BWnJR72": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "BwSNDGt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bWxq4op": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ByX0WxV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bZGHsAZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "bZq4bwK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "C0eCeEt": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "C0MA9bC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "c16nYGA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "C31LMnP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "c3Pfhti": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "c3QQLPi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "C5jncD2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "C8Crfa4": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "c8f5cSY": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "c8oybX6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "C9LuR4A": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "c9MnDRp": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ca76jUE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cA9FuWG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cALkHHX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cALKspW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cAvTaSg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CB8WET1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CbFSYC1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cbuFJrn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CcWEoWV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CfKsRbG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CFN9P8G": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CggQhII": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "chfnQnM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CHpahtl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CI6baTY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CjETvlw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cJgSTmh": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CJwa0vD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CMAxnsG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CmEr4pM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CosupLu": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cQ19bBP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CQHoDm0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CqhoytW": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CuaWCmC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cuC7529": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cuKYxhu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CUmLRTA": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "CvPn9WV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cWemPG8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "cwsAI4G": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "d1GgzTU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "D1xYJAU": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "d5bTEPV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "D5yqP2p": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "d7z1Y7V": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "d960PgE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "D9qe7CM": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "d9Xaxq6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "da4cXST": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "daBmy1Y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dAJscVq": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dB07vDu": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DB0n8AG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Db7eEgw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dCJnuVq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dCPESfR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DeDThfG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DEEqoI2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DFGXwZr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dFSNDOA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dG5Smob": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dG7tG5y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DgZQ11d": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DhMl549": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DICPHtq": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DIVyqrU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dK9394r": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DKBwJrL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dmgMp3n": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dNFYIU1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DoEYq4s": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DOoWcnA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DotAgEF": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dPmaUaU": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DptumMx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DpWMFP5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DQ0cqkT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "drfGhTV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dRTfGZT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Dsfz0Id": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DsgkuIt": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DT14T9T": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dTg95eZ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DU5Kkj2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dU605di": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DU7I633": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dVeWXf2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "DwhEmmE": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Dx2RIva": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dXz8zjF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dZl9Q27": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "dzz6BiV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "e1e76I2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "e25F58f": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "e4aFmFY": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "e4ojVhP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "E4PwJqI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "E4R8Hz1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ealLwvX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EAs3xL9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EcaV7aL": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "echClj7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ecl28tP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ecpY0rH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Eg98Ft9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eGDudUV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Eh2v5Iu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eHBlPsa": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EIeI8Vf": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EIsE3u8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EKXOMEh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "elhhVgj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EmlJR2y": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EMpUwRI": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "en550rk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EnPivTL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "enxnJcM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eOCOwIR": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eOG0r6v": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eOrFCnx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EpKrFiv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "epOSYUZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EqHIIjJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ErqK3UL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ESOd5Pl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ETZfAbZ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "euI1BwR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "euq4pwp": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eVxAzgz": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eXFXCY0": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eXMFHww": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EyLrNC2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eYmsEPR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eYnzaCm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eZ79rbI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "EZeDVzO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ezpnw9d": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ezTvXcr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "eZyBC3j": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "f1jf47L": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "F1KxjBa": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "f38OEuO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "F3xgbjF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "f4xtKBj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "F56Xpw3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "f7fnAIB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "F7vjXqT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "f7Y9eDZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "f91FwXG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "f9lVSSI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "faHKVkK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FAoIFMw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fBnPpzd": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ff18ItA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fF6GKVh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ffQsyBj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FFRP97T": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fgc9Xdl": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Fhdtwf3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fhZQPlV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fI18Rbc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fjjY3N4": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FkBIE6a": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fKZgDEO": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fNGumX0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fprd84i": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FQXdXzY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FS63wTN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FSD6PGL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FSF9WOs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fSrPP6B": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fTlkJop": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fUBheHs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FVM1AUZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FVmZVhk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FWdVhcW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fXfqg1E": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FxhcxUW": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "FY3UdNT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fY68AyX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fy7Tgy4": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "fZFZ704": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "G08RZcQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "G1qWW6M": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "g2oKspu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "g376LuL": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "G61cXLk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "G70mEAJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "G7PXMlT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "G7xoEzr": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "G8dXpNG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "g9AsZ8P": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GaSzzuh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gAwDzB3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gchi5Tr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GdMa1ET": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gdPIyyO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gEyURal": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gf3ZjB9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gfk9kD4": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gFyFj9z": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gGNQmVt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gH5fRsC": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gi2BXfK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GibBPPg": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gk1r408": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GKEH6jj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gKozT8X": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gm2Uv1z": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gMyx3Qn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gn5FwYT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gnfo4FM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GNhAeJ0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "goJ6ezq": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GOJKFfO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gpn4ADc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GrO65fd": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gscGLOU": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GSDioYu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gSO0KpB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gSw59a4": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gTGciXz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gtO1ErP": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gu2ENkm": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gu2rNJd": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gUjqdei": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GUT8I22": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "guT8YnS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gVlnLIJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gvsWLQw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gw2HFvW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gw9PqGk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gWcZD4q": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GWoKnIm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GwYwElT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "gx7s7uF": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GxDwDX0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Gxg9lDc": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "GXoaSgn": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "h1ezqSu": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "H1PESYI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "H1XAdpk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "H6ETwO9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "H6ybluc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "h8LFzo9": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "H9y3Dkr": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ha7SZ3y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hacCyUv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hBGWILP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HbSG1Pw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hbY9wqG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HBYyX94": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hC6oYY5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hCjGsRQ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HDYiZcY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HEJ6DIX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hfmQ0Tz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HfqciZF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Hgs6Nl1": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hHy8tQG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HIgYKAB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Hj4FOCd": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HJ63mSO": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HjdqmZa": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hjWjJEm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hl8DUh8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hMEptv0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HMzLjXx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hnOYgH3": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hoXt6wv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HPlPoQA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hq2hyDH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hrrS0Ed": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hrVQWvE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HsjbB1z": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HsvHqgf": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ht8xDrP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HtfCpfi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hTLtkXL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HUEqZ1y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hvHhCv8": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hvV79Si": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hVzPY5j": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hwygydB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Hx1WC8I": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "hxyTtWj": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Hy9D21L": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HYe1ZqR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "HZgQPxh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "i11JWU7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "I1OBLnn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "I3tsCnC": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "I4hDWkc": {
+  "tier": "auto_count_beta",
+  "pooled_n": "34",
+  "pooled_within1_pct": "50.0"
+ },
+ "i4JkUaL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "I4KkPdl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "I4tibZG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "i5cEhka": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "I6Ca0a7": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "i6LWjok": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "i8BdLTK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ia6kIIl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ia7tumC": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iaapw0g": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IaGQCrC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IBj3nsn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iCPqbki": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iDGtjyi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ie9UGty": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IeDEXTe": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IENzBdA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IeTIEqg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iFsqlCD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IGjKj1v": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IGtBdNT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IH2kr7n": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iK59oEA": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IL0JUxR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ila4NZS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IMRsOCn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iny3m5y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ion0XWz": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ioTf098": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iPm26QU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IpONWYv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Iptlv6x": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ipvgBnC": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iQ241UP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iqH55N8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "isAAZWA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "isofgzg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IU4QNJ6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IvV6C9M": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IwX5NqK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IxsFgRT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iYzB0Cz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "izMnLqz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "iZop9xO": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "IZVHb27": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "J1vH2X0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "J60bN17": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "J6Dx1Mu": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "j6uIfep": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "j74M6Zn": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "J74XlNf": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "j7XMAyn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "j9Q5crt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "J9zIWig": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JbC2iaV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jCBOdh0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jCrtE9b": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jdiExfW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jDnrkar": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jDOKRM5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jeHtrlO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JF8AkMX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jFtipLl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jgbvVJ0": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JGKowMS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jHAnWmT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JhYSVwT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jivWf8n": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jjUPrze": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jK2hZ6n": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jl6uxZV": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JmMVpR3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jNU1gFQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JOZhu2h": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jpgqxiS": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jQGwmxN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JrOHAZc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Jsgsc27": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JsKq9so": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JsOV1SU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jtFKbt5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jTkSc6o": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jV65tKx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jvEXp4N": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "jvp6DiD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JWjujiY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JxrY9mC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JymLInS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JzQbv7J": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "JZuApnB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "K1vlode": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "K3dIO25": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "k5IpyHg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "K5xgdvI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "k6tUeqS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "K9VL0Jq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Kal9cQQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KCBKjma": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KenZJQV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kesXOpB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KgI0tqW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KHGNa16": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KhHJ338": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "khlHMqs": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KHPZL0b": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KI1DjNN": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kiJ4Z2K": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kj3hy6W": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kjE55n5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kjJ3VoQ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kk39rUy": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kKYTkjJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kLiIFdB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "km0sQC0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "km2Ljzj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kmVVAfu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kMzUs9Y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kont8Ut": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KOpzGBL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Kpajagk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kprile3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KQfySvS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Krmb3cB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kTbSH9h": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ktf3nvW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KtRomty": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ktsFQAZ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KUaoUV8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KUaZst7": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kuMiR2T": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kuXhl0o": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KWdF2JI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KwFGiEP": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KWyEjtI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "kXaIn5A": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Kxquu2E": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KXyoEtA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ky8FLU8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Kyd9Rz5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KyLtiLT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Kzg30R7": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KZn52RC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "KZXAtKQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "L2V5Nan": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "L4ay0PW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "L68dTQj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "laVRfDf": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "lBDjFxJ": {
+  "tier": "auto_count_beta",
+  "pooled_n": "33",
+  "pooled_within1_pct": "66.7"
+ },
+ "lCKm4Rs": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LCtQPn8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LeaZOIz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LEH9jxP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LEprlgG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "lFBTISi": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "lFhb2Rw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LFIOery": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "lHeUULr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LHWF7us": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "lI7easp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LIGZSTA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LIlE5Tn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "lJJ7Yq8": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LkoAWAE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LL1UiTX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LLNh6q5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LlSe9IK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LmaFNZS": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LMGXZn8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ln9iTbU": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LNE3wfo": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LQFOrMn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "lRcrlH8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LrV4s90": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Lsqrgh4": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LSTChY9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LsZkfU6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Lt3iWnf": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LuBEORI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LWuA3aZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LYJodFS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "lyKCLmK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "LzX8YEz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "m0tCHqc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "M2Pm3zj": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "M5Y7GPg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "M72BExt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "M74kdvm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "M8IolhQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MaMuGH6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mAYqY4M": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mbkgB44": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MCkqdKE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MCUhf1F": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MDFxU4b": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mExgrF9": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mgejmGP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MgKwAAo": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MKIelrR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mKwcrHn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mnzcrIB": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mpKZGWz": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mpYUPkA": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mQ1tBXn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MqNdIbe": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mr7pkqP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Mr8d4KA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MRaFiZP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MrgP9L6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ms7tjSG": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MSfvriJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mTT3KLn": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mtXengz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mu5Guxt": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MU9HnE7": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MUic5zN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MvQPqVW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mWBtgmb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mweqJin": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mWppALS": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mwpPcr1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Mxa7Cr8": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "my33uHU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MY9P1WA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "myfUsKf": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "myJeTAe": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "mym4hJo": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Mz6lLcW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "MzNnwx9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "N3EirIW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "n5cWCsI": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "N6dZN2I": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NAgVB3t": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NAkmgdx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nAuHPcD": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NbVPDMW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NCmbLCw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nCU1Ekp": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NdIb5Z1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nDK1HJ0": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "neonEDL": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nFc4FyV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nFHk9fU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NfP83rA": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nFUwqG6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ngPpyRS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Nh3mvOO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ninBEOY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nIR4Rwl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "niXESDw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NJzBsGJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NKJ8o6x": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NL6YBwN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NlfIbzq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nlJsbkW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NN8nSNT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nnmCTLN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NNoHCEA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nqs5HGV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ns0SIbU": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ntjtCfu": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Nu7jqFE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nuBF9MO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "numr601": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nUwVh7b": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NvfE43H": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nxW6BkN": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "NZ5Qqkz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "nZZZy9m": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "o17Jfkt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "o1HGDSq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "o1ntciW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "O2K9Vb5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "O3INw8V": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "O4oIqQD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "o5Jsk92": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "o6LqKKP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "o80Xu9C": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "o8aOcrz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "O8Aq69u": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "O8o7q4d": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "O95afRA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OaE7CpD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OAguZoG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "obe5LMq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ocYc6Db": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OeL23VY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oHg8eop": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oHsrypV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OIFMAp1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OJFgZJ0": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oLrKqDH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OM46QHm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OmQ8w0p": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "omsF3RN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oMwyl17": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oMypNrz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ookVu2D": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oom75KC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OPqShYN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OQ1otBN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oQRJYkC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oR7O9LW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OrETs32": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oROuvrX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "osdXT3K": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OTgkHwR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "otqIxU4": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OUQ0ZyW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OVIKwsd": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OVLmUuL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OVTZ65k": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OxJk1fg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OYFhXVD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "OyoZ3Pu": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "oZjMu1t": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "p0OCXGb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "P14Dz9D": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "p195zsJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "P2lNrGL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "P2nRiUa": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "P5p0j8B": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "p5v6rdT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "P7zSvul": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "p9cCe2r": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "P9GFBME": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "P9ZRyLT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PAgTVaK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pAIWRGu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PbzNu7c": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PcPe0P5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PCUYOMs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PDaMuyV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PDHE73u": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PdmaD0N": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "peAeMR3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PERjVm8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pFuK3by": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PG1kcIb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pgIdT6i": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pH2x2jj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pj0X0tF": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Pjbc0Kt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PkCN2lv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PKlXuJW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pkSoCW9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pM07UxU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PM1PZjg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pmnrOp0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pNIKolI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PNtsX17": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PnZJIrk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pP8wP2P": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pQ0Mx1Z": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PQ2AtC3": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PQcUlDi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PQStVXH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Pr9Rhf4": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "prbWx1D": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PrQbjvB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PskORrA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PSlvNMs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PsVS1QP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pvBMLHA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pwt0pnM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pX9Elbe": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PXTIwgu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "py1HSzx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PzNxakt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "PzQanLE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "pZwUsKB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "q2ADGqV": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Q2Eu1Ax": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Q497lAE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Q4DSJPC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Q6bvyen": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "q6y3OhV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "q7qkONO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "q8aHNoF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Qa55kX1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qAmNMJY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qatbkEd": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qaZVsGk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qBcKorM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qBl14UC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QChZi3x": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qcNN2FN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qCNVnaU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qcY50ZD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qDnGfDb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qdRxqCj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qEse6fe": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QfAKy1G": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qFHvMnv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QFmz6ch": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qFpAkpP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qg2PGl6": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qi996YS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Qj0HRAZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QjE2DcA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qKBpF7I": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ql4g5s8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QLL2gdc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qLpO4vV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QLRmNeT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qlZUaZ8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qm9veZw": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QOA0FD0": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qOgPVf6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QoHIhPl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qOKcgVP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QoSZo2Y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Qoujh3Q": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qPEzJjA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QpXqiq8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Qqi7bko": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QQwxa8g": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qRZ5S1N": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QsSQWbf": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QT5Q0nK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QTXKWPh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qU8bYp7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QUDd8WS": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qx4fgX7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "qXTaZnJ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QY39eBr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Qyk5J3p": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QyO6Uma": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QYysSLV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "QZFv5ui": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "r0z6xzQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "R1WYG5D": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "r1XNRYB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "r29jP7S": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "r4RZKpF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "r5DgrW9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "R5swFnc": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "r7cT9YD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RaflbWD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rbu5UUb": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rDAiRf9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "reFHapa": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "REGM1dE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rEhi2o5": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "REXmfVC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rg59QCH": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RgJDRR1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RGLscZM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rGwhJ5o": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RJa4tCo": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RJgzwny": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rjiM4L3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rjtuP6X": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rkg41Fb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RKjH6Lt": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rmEukuS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RoV1Rfa": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rQhGcin": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RQNVT10": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RqOtqD7": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rQxwMxO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rR0LJzx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Rr7S3yg": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RrLske5": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RRWFUcw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rseLfH3": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RSOsp5d": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Rsxr3xl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rTbyBYV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RtyAsy1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rUXfn3R": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RVwzP10": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rWoBmi5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RxayqAZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "RYcV1kH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "rZ80Gbp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "s0HKO2I": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "S1JXDAG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "s34Y4LR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "S37C94C": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "S4pwGlc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "s5PdDyY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "s7HX1BY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "S8mo30S": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "s8nrDXF": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "S93zLTG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "s999Hdo": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "S9zHIvU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Sa8mzWc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SaDOwk7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ser9eQp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SGY8Zui": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SHUMp5H": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SiWCcTN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SJAA2IQ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sJElUUI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sJFIDIp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SJqRxOt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SKXQAx3": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "slDvUAU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SLKj2pX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sM84pE4": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Sn8wxAI": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SNFfUff": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Snj1wSv": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "soIB2rj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SP3hUez": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SpsOSXk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SpYC0Kp": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SSsBDwB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sTfvVsG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sTg7iys": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sU5BrfP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sVQCCeG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sVvXT5J": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SxHteRW": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sxY5Biu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sYCcnon": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SYJ4Bkt": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "syUwUKY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "szIn2UK": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "sZOR9EV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "SzX3uzM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "T0yTjgW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "T2fA5Ir": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "T2mxWqc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "t8iSghb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "T8UpLkb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TBNaSNs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tBWXbIT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tc5dYrf": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TDYiji6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TFA88iB": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tFGKm99": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TFqbd8t": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tFToB7l": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tgryw5Y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ThKP69G": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TiaZTxx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tig3PXb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tj41Nu6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tJ5nYqo": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tnaj0mT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Tq6gbK6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "trmte8s": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "trqKQv2": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tTuZSDT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tuIZFDt": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TUZLh71": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TV87DNB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TVdivgY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "TXtXc84": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tZkGYZ9": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "tznL2Ad": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "u0cNiij": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "u0pLNgz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "u1iHcoD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "u27Kcdz": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "u2X71Np": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "U3ffHlY": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "u3UuCZu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "u4bAmKp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "u5ESqzH": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "U5INZY6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "U6G2gk9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "U7D9Fx3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UDlhcO8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UDm6cGl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UEjSrKI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ufaxB52": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UfePqpx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UFGF6gk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UgDm3oy": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UGhRD1A": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UHJlbu3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UI81amT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UIbGx6H": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UilDHSs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uJmK7Z1": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UKWTJWR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uKyN64F": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ul5OFSV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uL9CsKm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UM8mgyG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Um8xUAc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UmpPAAe": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UNAB8ak": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UOphC6N": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uOV3Itw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UoX77uR": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UpAlold": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UpWmA5E": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UQr48Oi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uSkDMYl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uTBt1HV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UtmIqcI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Uto7l43": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uTv34oq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UVL20oz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UVo2Qs2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uWpxD4v": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uX3sUBz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uxJcFUU": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UXpKJoq": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Uywa4S5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "UzkLrem": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "uZKq7lo": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "V07qpXy": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "v1qBec9": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "v2DfH14": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "v3vLFW0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "v3xmPAR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "V4ryaZa": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "v6EKk0O": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "v7p5bYl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "V7rWsT5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VaP75jl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vAwm6rK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VBAWRPG": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vBNyir7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VdLZ3nB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VEcJRo2": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VedGSby": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "veXwo0D": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Vh0GsK4": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VhX2JdE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vi8EhoE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vIICElP": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VjYliFZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vKilzz3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VLYXo8S": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vM5YS2g": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vmwLyCg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vN5HB0s": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VnfUNW7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vNPJbDA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VO2qeJg": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vobtVkm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vocve3e": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vpleANJ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vpp9Ku2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VPPtusI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vpQaQkH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vptOQ4N": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VQ3sNCn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vqsbmL0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vR1vold": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VRBGPHB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vrhHa6D": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vsMcDi9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VsopqcV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vsVoPHt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VtTbiP3": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vtusOWT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VuoerH0": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vUTfFHw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vvNjDJS": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Vvwjz6N": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VW88JNd": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VX5YKR5": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vYk8lqw": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "VYmYxK5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "vzAxBtt": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "w1NOByi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "W1p7BND": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "w2oRpuH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "W31mMjd": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "w44vFvP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "w4dLzSx": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "W6PxUkg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "w7obpWd": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "W7yh3Yo": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "W8KAlkI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "W9pFVv1": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WbNq5Xu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wbUYILZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WCAvOfC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WcHl7ru": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wd4ds3s": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wDN97Ca": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wdRZISl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wDUqY2u": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "weoDEpH": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wEulIzp": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wf24o8S": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wfotm7S": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WFucoe6": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Wgaz7pm": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Wgbn9qo": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WgJnBH5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WhuFnR7": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wi2H9QX": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wigSg76": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wkgnGfb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WKMQzCD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WL4EmxJ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WLvTAv5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WM6TvvW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WME869U": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wnEscH8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wOLmCXc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "woLo1QN": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wpbD28t": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wPypxFY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wQ2c4XD": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wqNPGCg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WrYPP2g": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wSScovH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wt6rwjk": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wu5LXwz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WU9BLIs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WVD66ff": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wVompEp": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WW95auq": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "WWD6FzI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wWFspEi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wXvUZC8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "wyaqzOS": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "x0lwvfq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "x2chWLO": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "x306lCW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "X3cqyXz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "X3TCNEU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "x69MAlq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "X6C6i5Y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "x6KpKpq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "X6ytgYZ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "X7jbxra": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "x825CZm": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XaaRnRn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XalXcvM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xAySMB0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xbkPfaw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xBYcQHj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xcLntTC": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Xd65M9w": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xDh0lJr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XDOiFns": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xdYPUtE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XE93sQZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XeMvLgE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XFc3vpY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xGgAGPm": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xgsGFVM": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XgWyAiA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XhfS1DZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xHKN2s8": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xi0yckC": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xiA6lRr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xifhB5W": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XIHEoCG": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xiHiJcA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xLYSdtg": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XlZ4lAC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xMjBKwn": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xmM75XG": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xmWQIlT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xnInPfE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xNrS20v": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xo6sENf": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XooAdhl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xOXZJRZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XPUDTt7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XqYQ9JA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XsCcxCC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XSCHmiI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xTjr103": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XU3ePuv": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XUUD0Fs": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xUwnBMT": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XVDdcoj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "XVzF3iZ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "xXm4nYq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Xy4jlWA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Y1MsI1l": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Y4BRNQF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Y4QlY8z": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "y5p0H8a": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "y5U5B9Y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Y5X65IB": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Y7YcmIJ": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "y8bYM8w": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Y8dOJlH": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Y9hNPcN": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YA2HKGz": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yaAxcQr": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YAk5dIw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yaMIo4D": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yB9SvIF": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yCvYdi7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ye5Qxb0": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ye84CTU": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Yg7MJAT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yg8Totb": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YIUAtYf": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yJUHKTn": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ykA5tU7": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ykHcWme": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ykUOVze": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yl2IYyy": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yn0LjwL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yn2lLSI": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yn8yg1r": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YPoVrBi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yq3GAJX": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yQe5HpE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YqJw82s": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YRaCa5Y": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yRLPCLu": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yRpV5TC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yRYyfdA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ys97II0": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yT9tk17": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YtaCTYl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YtgD7Xq": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YTur5nR": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yU7w7CA": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yUdIGNs": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YUYAMEj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ywaNfuh": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YwnI4ja": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yWxMvB5": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "YZ4961r": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yz9nUhF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Yza7XrQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "yzYH9pI": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Z5YStHW": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "z6TAHoT": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZA8b5hc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "za9Ni4z": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zCgxPbV": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zd4P4B2": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Ze7MoIb": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZEkjZDi": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zfNHMN9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZfyAGhK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zFzbBfL": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zG0zs85": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Zg3XY7P": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zGSIWQi": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZgsNQ6d": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZgwWBoC": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZH68exZ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zHEpuuc": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zhF9lW4": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zhMwOwE": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ziFKQXP": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zILLZ98": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZIViNh1": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zK8Fu1W": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zkgRrbK": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "znf7t8E": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZNgOYQU": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZnJHhMk": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "znLogoF": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "znP9SIh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "znQUdHY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zoOvPcx": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZOuKWir": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZqNOWQ6": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZsiqXYa": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZSJNetl": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZSY3MsL": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ztAa1RK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZujAdR9": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZuPXtCK": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZuXu4Eq": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "Zwiw7XR": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZX9UZmj": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZXnjcOQ": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zYmNaoY": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZZKbeMw": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "zZlORz6": {
+  "tier": "pose_only",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ },
+ "ZZTGMKh": {
+  "tier": "manual",
+  "pooled_n": "",
+  "pooled_within1_pct": ""
+ }
+}

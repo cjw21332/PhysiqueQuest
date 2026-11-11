@@ -46,6 +46,7 @@ def detect_peaks_valleys(
     distance: int = 8
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
+    Config-generation helper only; never use this to count exercise reps.
     Detect peaks (local maxima) and valleys (local minima) in angle signal.
     Returns indices of peaks and valleys.
     """
@@ -66,75 +67,10 @@ def count_reps(
     fps: float = 15.0
 ) -> Dict:
     """
-    Count reps from primary joint angle signal.
-    Returns dict with count, timestamps, and quality metrics.
+    Deprecated: angle-only peak detection is not the production counter.
+    Use pq_ml.rep_harness.count_landmarks with the original landmark frames.
     """
-    if len(angle_signal) < 10:
-        return {"count": 0, "reps": [], "quality": "insufficient_frames"}
-    
-    # Smooth the signal
-    smooth = smooth_signal(angle_signal, window=5)
-    
-    # Determine if we're looking for peaks or valleys based on direction
-    if config.direction == "flexion":
-        # Angle decreases during flexion -> valleys are reps
-        peaks, valleys = detect_peaks_valleys(smooth)
-        rep_events = valleys  # bottom of squat/curl
-        event_type = "valley"
-    else:
-        # Extension -> peaks are reps
-        peaks, valleys = detect_peaks_valleys(smooth)
-        rep_events = peaks
-        event_type = "peak"
-    
-    # Filter by expected period
-    min_period = int(config.rep_period_range[0] * fps)
-    max_period = int(config.rep_period_range[1] * fps)
-    
-    valid_reps = []
-    for i, idx in enumerate(rep_events):
-        if i == 0:
-            valid_reps.append(idx)
-        else:
-            period = idx - rep_events[i-1]
-            if min_period <= period <= max_period:
-                valid_reps.append(idx)
-            # else: too fast or too slow, might be noise
-    
-    # Calculate ROM for each rep
-    reps_info = []
-    for idx in valid_reps:
-        # Find start and end of this rep (halfway to adjacent events)
-        start_idx = 0 if idx == valid_reps[0] else (valid_reps[valid_reps.index(idx)-1] + idx) // 2
-        end_idx = len(smooth)-1 if idx == valid_reps[-1] else (idx + valid_reps[valid_reps.index(idx)+1]) // 2
-        
-        rep_segment = smooth[start_idx:end_idx+1]
-        if len(rep_segment) < 3:
-            continue
-        
-        rom = np.max(rep_segment) - np.min(rep_segment)
-        expected_rom = abs(config.peak_angle - config.start_angle)
-        rom_fraction = rom / expected_rom if expected_rom > 0 else 0
-        
-        # Tempo: time from start to peak + peak to end
-        rep_time = len(rep_segment) / fps
-        
-        reps_info.append({
-            "peak_frame": int(idx),
-            "start_frame": int(start_idx),
-            "end_frame": int(end_idx),
-            "rom_degrees": float(rom),
-            "rom_fraction": float(rom_fraction),
-            "tempo_seconds": float(rep_time),
-            "quality": "full" if rom_fraction >= config.min_rom_fraction else "partial",
-        })
-    
-    return {
-        "count": len(valid_reps),
-        "reps": reps_info,
-        "total_time": len(smooth) / fps,
-        "avg_tempo": np.mean([r["tempo_seconds"] for r in reps_info]) if reps_info else 0,
-    }
+    raise RuntimeError("Deprecated: use pq_ml.rep_harness.count_landmarks")
 
 
 def generate_angle_configs_from_gifs() -> List[RepConfig]:
@@ -147,9 +83,12 @@ def generate_angle_configs_from_gifs() -> List[RepConfig]:
     
     # Primary joint triplets for each pattern
     pattern_joints = {
-        "squat": [24, 26, 28],          # left hip-knee-ankle
-        "lunge": [24, 26, 28],
-        "curl": [12, 14, 16],           # right shoulder-elbow-wrist
+        "squat": [24, 26, 28],          # left hip-knee-ankle (bilateral default)
+        "lunge": [24, 26, 28],          # left hip-knee-ankle (alternating - min of left/right)
+        "split_squat": [24, 26, 28],    # front leg only
+        "step_up": [24, 26, 28],        # front leg only
+        "single_leg_rdl": [24, 26, 28], # front leg only
+        "curl": [12, 14, 16],           # right shoulder-elbow-wrist (unilateral)
         "horizontal_push": [12, 14, 16],
         "vertical_push": [12, 14, 16],
         "horizontal_pull": [12, 14, 16],
@@ -166,6 +105,16 @@ def generate_angle_configs_from_gifs() -> List[RepConfig]:
         "core_isometric": [11, 23, 25],
         "cardio_dynamic": [24, 26, 28],
         "carry_locomotion": [24, 26, 28],
+    }
+
+    # Alternating exercises where both sides move per rep (e.g. lunges)
+    alternating_patterns = {
+        "lunge", "split_squat", "step_up", "single_leg_rdl",
+    }
+
+    # Unilateral exercises where only one side moves
+    unilateral_patterns = {
+        "single_arm_row", "single_arm_press", "single_leg_curl",
     }
     
     # Expected angle ranges per pattern (start, peak)
@@ -227,6 +176,16 @@ def generate_angle_configs_from_gifs() -> List[RepConfig]:
         start_angle, peak_angle = pattern_angles.get(pattern, (170, 90))
         direction = pattern_direction.get(pattern, "flexion")
         
+        # Determine side_mode based on pattern type
+        if pattern in alternating_patterns:
+            side_mode = "alternating"
+        elif pattern in unilateral_patterns:
+            # Infer from exercise name if available
+            name = entry.get("name", "").lower()
+            side_mode = "unilateral_left" if "left" in name and "right" not in name else "unilateral_right"
+        else:
+            side_mode = "bilateral"
+        
         config = RepConfig(
             exercise_id=ex_id,
             name=entry.get("name", "unknown"),
@@ -236,7 +195,7 @@ def generate_angle_configs_from_gifs() -> List[RepConfig]:
             peak_angle=peak_angle,
             direction=direction,
             rep_period_range=(0.8, 3.0),  # 0.8-3 seconds per rep
-            side_mode="bilateral",
+            side_mode=side_mode,
             min_rom_fraction=0.85,
             validation_status="pending",
         )

@@ -1,0 +1,6 @@
+tiers:
+  beta_family: 539
+  candidate_unvalidated: 846
+  hold_timer: 26
+  no_reps: 28
+  pose_unreliable: 61

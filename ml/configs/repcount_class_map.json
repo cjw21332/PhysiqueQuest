@@ -28,7 +28,10 @@
       "validationStatus": "pending",
       "round_trip": true,
       "rep_period_seconds": 3.0,
-      "parameter_source": "gif"
+      "parameter_source": "gif",
+      "trackingTier": "auto_count_beta",
+      "pooled_n": 34,
+      "pooled_within1_pct": 52.9
     }
   },
   "push_up": {
@@ -60,7 +63,10 @@
       "validationStatus": "pending",
       "round_trip": false,
       "rep_period_seconds": 3.0,
-      "parameter_source": "rule"
+      "parameter_source": "rule",
+      "trackingTier": "auto_count_beta",
+      "pooled_n": 34,
+      "pooled_within1_pct": 50.0
     }
   },
   "pull_up": {
@@ -72,9 +78,9 @@
       "name": "pull-up",
       "pattern": "vertical_pull",
       "primary_joints": [
+        23,
         11,
-        13,
-        15
+        13
       ],
       "start_angle": 160.0,
       "peak_angle": 60.0,
@@ -92,7 +98,10 @@
       "validationStatus": "pending",
       "round_trip": false,
       "rep_period_seconds": 3.0,
-      "parameter_source": "rule"
+      "parameter_source": "rule",
+      "trackingTier": "auto_count_beta",
+      "pooled_n": 33,
+      "pooled_within1_pct": 66.7
     }
   },
   "bench_press": {
@@ -124,7 +133,10 @@
       "validationStatus": "pending",
       "round_trip": true,
       "rep_period_seconds": 3.0,
-      "parameter_source": "gif"
+      "parameter_source": "gif",
+      "trackingTier": "auto_count_beta",
+      "pooled_n": 34,
+      "pooled_within1_pct": 50.0
     }
   },
   "front_raise": {
@@ -156,7 +168,10 @@
       "validationStatus": "pending",
       "round_trip": false,
       "rep_period_seconds": 3.0,
-      "parameter_source": "rule"
+      "parameter_source": "rule",
+      "trackingTier": "auto_count_beta",
+      "pooled_n": 37,
+      "pooled_within1_pct": 51.4
     }
   },
   "situp": {
@@ -188,7 +203,8 @@
       "validationStatus": "pending",
       "round_trip": false,
       "rep_period_seconds": 3.0,
-      "parameter_source": "rule"
+      "parameter_source": "rule",
+      "trackingTier": "candidate_unvalidated"
     }
   },
   "jumping_jack": {
@@ -198,14 +214,14 @@
     "config_snapshot": {
       "exercise_id": "1g5bPpA",
       "name": "Jack Jump",
-      "pattern": "squat",
+      "pattern": "cardio_dynamic",
       "primary_joints": [
         23,
-        25,
-        27
+        11,
+        13
       ],
-      "start_angle": 160.96544263095618,
-      "peak_angle": 49.815815705187454,
+      "start_angle": 160.0,
+      "peak_angle": 40.0,
       "direction": "flexion",
       "rep_period_range": [
         0.8,
@@ -220,7 +236,10 @@
       "validationStatus": "pending",
       "round_trip": true,
       "rep_period_seconds": 5.0,
-      "parameter_source": "gif"
+      "parameter_source": "gif",
+      "trackingTier": "auto_count_beta",
+      "pooled_n": 41,
+      "pooled_within1_pct": 41.5
     }
   }
 }

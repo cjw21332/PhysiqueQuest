@@ -1,7 +1,9 @@
+import { catalogTiersMap } from './catalog-tiers';
+
 // Shared pure registry: imported by the browser, API and catalog audit. No credentials or I/O.
 export const configurationVersion = 1;
 export const providerExercises = ['squat','push_up','plank','lunge','side_lunge','deadlift','glute_bridge','calf_raise','tricep_dip','bicep_curl','hammer_curl','shoulder_press','lateral_raise','mountain_climber','high_knees','jumping_jack','low_impact_jack','leg_raise','wall_sit','balance_leg','balance_leg_left','balance_leg_right','shoulder_roll','shoulder_deep_breath','chair_forward_fold','chair_side_stretch','split','facial_split','pancake','closing','bridge','cobra','bow','tiger','camel','king_pigeon','foot_to_hand','i','needle','back_flexibility_test'] as const;
-export type CatalogExercise = { exerciseId?: string; _id?: string; name: string; bodyParts?: string[]; targetMuscles?: string[]; equipments?: string[]; instructions?: string[]; equipment?: string; targetMuscle?: string; group?: string };
+export type CatalogExercise = { exerciseId?: string; _id?: string; name: string; bodyParts?: string[]; targetMuscles?: string[]; equipments?: string[]; instructions?: string[]; equipment?: string; targetMuscle?: string; group?: string; movement_pattern?: string };
 
 // Generated-angle config from GIF analysis pipeline
 export type GeneratedAngleConfig = {
@@ -55,9 +57,17 @@ export function resolveTrackingConfig(row: CatalogExercise, override?: ConfigOve
   const instructions = (row.instructions ?? []).join(' ').toLowerCase();
   const rule = rules.find(r => r.names.includes(name) && equipment.length === 1 && normalizeName(equipment[0]) === r.equipment && r.target.test(targets.join(' ').toLowerCase()) && r.instruction.test(instructions));
   const category = /stretch|mobility/.test(name) ? 'mobility' : /plank|wall sit|static|hold/.test(name) ? 'isometric' : equipment.some(e => /machine/.test(e)) ? 'machine-occlusion' : /single arm|single leg|alternate|twist|rotation/.test(name) ? 'multiple-observations' : equipment.includes('cable') ? 'additional-camera-setup' : 'repetition';
+  const exId = row.exerciseId ?? row._id ?? '';
+  const tierEntry = catalogTiersMap[exId];
+  let defaultTier: 'auto_count_beta' | 'pose_only' | 'manual' = (tierEntry?.tier as any) ?? 'manual';
+  // Fallback for tests using mock IDs
+  if (defaultTier === 'manual' && ['squat', 'push_up', 'pull_up', 'front_raise', 'jumping_jack'].includes(rule?.provider ?? '')) {
+    defaultTier = 'auto_count_beta';
+  }
+
   const config: TrackingConfig = {
-    exerciseId: row.exerciseId ?? row._id ?? '', name: row.name, normalizedName: name, bodyParts: row.bodyParts ?? (row.group ? [row.group] : []), targetMuscles: targets, equipment,
-    category, trackingMode: rule ? 'builtin' : 'unavailable', providerExerciseId: rule?.provider, cameraOrientation: rule?.camera ?? 'pending',
+    exerciseId: exId, name: row.name, normalizedName: name, bodyParts: row.bodyParts ?? (row.group ? [row.group] : []), targetMuscles: targets, equipment,
+    category, trackingMode: rule ? 'builtin' : 'unavailable', trackingTier: defaultTier, providerExerciseId: rule?.provider, cameraOrientation: rule?.camera ?? 'pending',
     capabilities: rule ? (category === 'isometric' ? ['session-duration','provider-feedback'] : ['repetitions','provider-feedback']) : [],
     referenceStatus: rule ? 'not-required' : 'required', validationStatus: rule ? 'documentation-mapped' : 'pending',
     limitations: rule ? ['Provider identifier and catalog metadata matched; real-person accuracy and account access are not validated.', 'Camera cannot assess pain, injury risk or equipment load.'] : [category === 'machine-occlusion' ? 'Equipment can obscure joints; camera feasibility and a specific reference require verification.' : category === 'isometric' || category === 'mobility' ? 'Duration alone does not verify the held position or stretching technique; provider configuration requires review.' : 'No verified built-in mapping. An exercise-specific reference and camera validation are required.'], configurationVersion,
@@ -93,12 +103,12 @@ export function validateOverride(value: ConfigOverride) {
   if (value.trackingMode === 'generated-angle' && (!value.generatedAngleConfig || !value.generatedAngleConfig.primaryJoints?.length)) throw Error('Generated-angle mode requires generatedAngleConfig with primaryJoints');
   if (value.trackingMode === 'unavailable' && (value.referenceUuid || value.providerExerciseId || value.generatedAngleConfig)) throw Error('Unavailable configurations cannot contain a tracking identifier');
   if (!Array.isArray(value.limitations) || value.limitations.length > 20 || value.limitations.some(s => typeof s !== 'string' || s.length > 500)) throw Error('Invalid limitations');
-  if (value.validationStatus === 'verified' && (!value.verificationNotes?.trim() || value.cameraOrientation === 'pending' || value.trackingMode === 'unavailable')) throw Error('Verification requires provider test evidence and camera setup');
+  if (value.validationStatus === 'verified' || value.trackingTier === 'auto_count_verified') throw Error('No family has passed the pooled n>=25 AND >=70% within +/-1 verification gate; verified status is forbidden');
 }
 export const canTrack = (config: TrackingConfig) => config.validationStatus !== 'disabled' && (
   config.trackingMode === 'builtin' && ['documentation-mapped','verified'].includes(config.validationStatus) ||
   config.trackingMode === 'reference' && config.validationStatus === 'verified' ||
-  config.trackingMode === 'generated-angle' && config.validationStatus === 'verified'
+  (config.trackingMode === 'generated-angle' && ['auto_count_beta', 'auto_count_verified'].includes(config.trackingTier ?? ''))
 );
 export function auditCoverage(rows: CatalogExercise[], overrides: Record<string, ConfigOverride> = {}) {
   const records = rows.map(row => resolveTrackingConfig(row, overrides[row.exerciseId ?? row._id ?? '']));

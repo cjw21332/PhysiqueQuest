@@ -61,7 +61,7 @@
 | Deliverable | Status |
 |-------------|--------|
 | `ml/` code package + `ml/README.md` | ✅ Created |
-| `ml/models/*` artifacts + `manifest.json` | ⚠️ Created (model downloaded, extraction pending) |
+| `ml/models/*` artifacts + `manifest.json` | 🔴 **INVALID: synthetic-trained, do not ship** (deleted, will rebuild) |
 | `ml/reports/STATUS_REPORT.md` | ✅ Created |
 | Integrated code on branch `feat/on-device-pose-ml` | ✅ On feat/on-device-pose-ml branch |
 | `docs/ml/ARCHITECTURE.md` explaining pipeline | ✅ Included in STATUS_REPORT.md |

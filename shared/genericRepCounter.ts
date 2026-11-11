@@ -35,6 +35,12 @@ export type GeneratedAngleConfig = {
   holdStabilityFrames?: number;
   holdAngleStdDevDegrees?: number;
   holdHipDriftThreshold?: number;
+  /** Tracking tier for UI gating and transparency */
+  trackingTier?: 'auto_count_verified' | 'auto_count_beta' | 'pose_only' | 'manual';
+  /** Pooled validation sample size (for beta/verified tiers) */
+  pooled_n?: number;
+  /** Pooled within ±1% (for beta/verified tiers) */
+  pooled_within1_pct?: number;
 };
 
 /** Input landmark per frame (matches MediaPipe 33 landmarks) */
@@ -110,6 +116,12 @@ export const DEFAULT_COUNTER_CONFIG: CounterConfig = {
   emaAlpha: 0.35,
   calibration: true,
   minCalibratedRom: 30,
+  /** Calibration warm-up: ignore first N ms before collecting samples */
+  calibrationWarmupMs: 3000,
+  /** Rolling calibration window size in ms */
+  calibrationWindowMs: 10000,
+  /** Re-sync state on timeout instead of discarding */
+  resyncOnTimeout: true,
 };
 
 /** Device tier detection based on user agent and device capabilities */
@@ -249,6 +261,10 @@ export class GenericRepCounter {
   private holdSamples: Array<{ angle: number; hipX: number; hipY: number }> = [];
   private holdDurationMs = 0;
   
+  // Rolling calibration: track session start for warm-up
+  private sessionStartMs: number | null = null;
+  private lastResyncMs: number | null = null;
+  
   // Callbacks
   private onEvent?: (event: CounterEvent) => void;
   private onProgress?: (progress: ProgressInfo) => void;
@@ -327,6 +343,8 @@ export class GenericRepCounter {
     this.lastTimestamp = null;
     this.visibilityLostMs = null;
     this.resetCalibration();
+    this.sessionStartMs = null;
+    this.lastResyncMs = null;
     this.holdStartMs = null;
     this.holdLastVisibleMs = null;
     this.holdSamples = [];
@@ -360,6 +378,29 @@ export class GenericRepCounter {
     this.driftAnchor = null;
   }
 
+  /** Resync state on timeout: keep rep count, reset motion to current progress */
+  private resyncState(timestamp: number): void {
+    const wasAtPeak = this.state === 'AT_PEAK';
+    const wasMoving = this.state === 'MOVING';
+    
+    this.state = 'AT_START';
+    this.currentRepStartMs = 0;
+    this.currentPeakMs = 0;
+    this.maxProgressInRep = 0;
+    this.emaAngle = null;
+    this.lastAngle = null;
+    this.faultStartMs = {};
+    this.activeFaults.clear();
+    this.observedMin = Infinity;
+    this.observedMax = -Infinity;
+    
+    // Keep calibration but allow it to continue rolling
+    this.calibrationReps = Math.max(this.calibrationReps, 2);
+    this.lastResyncMs = timestamp;
+    
+    this.emitEvent({ type: 'state_change', from: wasAtPeak ? 'AT_PEAK' : wasMoving ? 'MOVING' : 'AT_START', to: 'AT_START' });
+  }
+
   private updateCalibration(angle: number, timestamp: number): void {
     if (!this.config.calibration) return;
     const joint = this.genConfig.primaryJoints[0];
@@ -368,6 +409,13 @@ export class GenericRepCounter {
     if (priorRest === undefined || priorPeak === undefined) return;
     const priorRom = Math.abs(priorPeak - priorRest);
     if (priorRom < 1) return;
+
+    // Skip calibration during warm-up period
+    if (this.sessionStartMs !== null && timestamp - this.sessionStartMs < this.config.calibrationWarmupMs) {
+      return;
+    }
+
+    // Drift detection (only after 2 calibrated reps)
     if (this.calibrationReps >= 2) {
       const distance = this.calibratedRest === null ? 0 : Math.abs(angle - this.calibratedRest);
       if (distance >= 19 && distance <= 35) {
@@ -383,10 +431,12 @@ export class GenericRepCounter {
         this.driftStartMs = null;
         this.driftAnchor = null;
       }
-      if (this.calibrationReps >= 2) return;
+      // After 2 reps, continue rolling calibration (don't return early)
     }
+
     this.calibrationSamples.push({ timestamp, angle });
-    this.calibrationSamples = this.calibrationSamples.filter(sample => timestamp - sample.timestamp <= 8000);
+    // Rolling window: keep samples within calibrationWindowMs
+    this.calibrationSamples = this.calibrationSamples.filter(sample => timestamp - sample.timestamp <= this.config.calibrationWindowMs);
     if (this.calibrationSamples.length < 5) return;
     const values = this.calibrationSamples.map(sample => sample.angle).sort((a, b) => a - b);
     const low = values[Math.floor((values.length - 1) * 0.05)];
@@ -424,10 +474,20 @@ export class GenericRepCounter {
       return this.getProgress();
     }
 
-    // Check for large time gap (reset motion)
+    // Track session start for calibration warm-up
+    if (this.sessionStartMs === null) {
+      this.sessionStartMs = timestamp;
+    }
+
+    // Check for large time gap (reset motion) - but with resync option
     if (this.lastTimestamp !== null && timestamp - this.lastTimestamp > this.config.maxRepDurationMs) {
-      this.resetMotion();
-      this.visibilityLostMs = null;
+      if (this.config.resyncOnTimeout && this.state !== 'AT_START' && this.state !== 'VISIBILITY_LOST') {
+        // Resync: keep rep count, reset motion state to current progress
+        this.resyncState(timestamp);
+      } else {
+        this.resetMotion();
+        this.visibilityLostMs = null;
+      }
     }
     this.lastTimestamp = timestamp;
 
@@ -565,31 +625,68 @@ export class GenericRepCounter {
     return Math.acos(cosAngle) * 180 / Math.PI;
   }
 
-  /** Compute bilateral average angle (avg of left and right joints) */
+  /** Compute bilateral angle with visibility-weighted fusion */
   private computeBilateralAngle(landmarks: Landmark[], aspect: number): number | null {
     const leftJoint = this.genConfig.primaryJoints[0];
     const rightJoint = this.genConfig.primaryJoints[1] ?? leftJoint.replace('left', 'right');
-    const left = this.computeJointAngle(landmarks, leftJoint, aspect);
-    const right = this.computeJointAngle(landmarks, rightJoint, aspect);
-    if (left === null && right === null) return null;
-    if (left === null) return right;
-    if (right === null) return left;
-    return (left + right) / 2;
+    const leftResult = this.computeJointAngleWithVisibility(landmarks, leftJoint, aspect);
+    const rightResult = this.computeJointAngleWithVisibility(landmarks, rightJoint, aspect);
+    
+    if (leftResult === null && rightResult === null) return null;
+    if (leftResult === null) return rightResult.angle;
+    if (rightResult === null) return leftResult.angle;
+    
+    // Visibility-weighted average: higher visibility = more weight
+    const totalVis = leftResult.visibility + rightResult.visibility;
+    if (totalVis <= 0) return (leftResult.angle + rightResult.angle) / 2;
+    return (leftResult.angle * leftResult.visibility + rightResult.angle * rightResult.visibility) / totalVis;
   }
 
-  /** Compute unified angle for alternating exercises (min of both sides).
-   * For lunges: when left knee bends, left angle drops; right stays extended → min drops.
-   * When right knee bends, right angle drops; left stays extended → min drops.
-   * Result: clean valley per rep regardless of which side is active. */
-  private computeAlternatingAngle(landmarks: Landmark[], aspect: number): number | null {
-    const leftJoint = this.genConfig.primaryJoints[0] ?? 'left_knee';
-    const rightJoint = this.genConfig.primaryJoints[1] ?? leftJoint.replace('left', 'right');
-    const left = this.computeJointAngle(landmarks, leftJoint, aspect);
-    const right = this.computeJointAngle(landmarks, rightJoint, aspect);
-    if (left === null && right === null) return null;
-    if (left === null) return right;
-    if (right === null) return left;
-    return Math.min(left, right); // Valley = rep for flexion exercises
+  /** Compute joint angle and return visibility of center joint */
+  private computeJointAngleWithVisibility(landmarks: Landmark[], joint: string, aspect: number): { angle: number; visibility: number } | null {
+    const jointDefs: Record<string, [number, number, number]> = {
+      left_elbow: [11, 13, 15],
+      right_elbow: [12, 14, 16],
+      left_shoulder: [23, 11, 13],
+      right_shoulder: [24, 12, 14],
+      left_hip: [11, 23, 25],
+      right_hip: [12, 24, 26],
+      left_knee: [23, 25, 27],
+      right_knee: [24, 26, 28],
+      left_ankle: [25, 27, 31],
+      right_ankle: [26, 28, 32],
+    };
+
+    const indices = jointDefs[joint];
+    if (!indices) return null;
+
+    const [aIdx, bIdx, cIdx] = indices;
+    if (landmarks.length < 33) return null;
+
+    const a = landmarks[aIdx];
+    const b = landmarks[bIdx];
+    const c = landmarks[cIdx];
+
+    const visThreshold = this.config.visibilityThreshold;
+    if (a.visibility < visThreshold || b.visibility < visThreshold || c.visibility < visThreshold) {
+      return null;
+    }
+
+    const ax = (a.x - b.x) * aspect;
+    const ay = a.y - b.y;
+    const cx = (c.x - b.x) * aspect;
+    const cy = c.y - b.y;
+
+    const normA = Math.hypot(ax, ay);
+    const normC = Math.hypot(cx, cy);
+    if (normA < 1e-6 || normC < 1e-6) return null;
+
+    const dot = ax * cx + ay * cy;
+    const cosAngle = Math.max(-1, Math.min(1, dot / (normA * normC)));
+    const angle = Math.acos(cosAngle) * 180 / Math.PI;
+    
+    // Return angle and center joint visibility
+    return { angle, visibility: b.visibility };
   }
 
   /** Compute the primary angle based on side mode */
@@ -856,5 +953,8 @@ export function trackingConfigToGeneratedAngle(config: any): GeneratedAngleConfi
     holdStabilityFrames: g.holdStabilityFrames,
     holdAngleStdDevDegrees: g.holdAngleStdDevDegrees,
     holdHipDriftThreshold: g.holdHipDriftThreshold,
+    trackingTier: g.trackingTier,
+    pooled_n: g.pooled_n,
+    pooled_within1_pct: g.pooled_within1_pct,
   };
 }

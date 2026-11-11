@@ -2,12 +2,14 @@
   "version": "1.0.0",
   "date": "2026-11-09",
   "git_hash": "unknown",
+  "status": "INVALID: synthetic-trained (sine waves), do not ship",
+  "note": "Models trained on _create_dummy_sequence() synthetic sine waves. Real GIF keypoint training required (R1-R4). This manifest will be rebuilt after real training.",
   "pose_model": {
     "file": "pose_landmarker_lite.task",
     "sha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a"
   },
   "data_inventory_hash": "bfc1ba6305f4d33c1920260cd85470d569a56c2786ab4064f19234adac81c2f5",
-  "feature_spec_ref": "docs/FEATURE_SPEC.md",
+  "feature_spec_ref": "ml/FEATURE_SPEC.md",
   "labels": [
     "cardio_dynamic",
     "core_flexion",
@@ -34,82 +36,12 @@
   },
   "models": {
     "cnn1d.onnx": {
-      "original": {
-        "file": "cnn1d.onnx",
-        "size_bytes": 673130,
-        "size_kb": 657.4,
-        "sha256": "ebbe0b0b4b16090e2aa5fae287edc9e6355e92ce50c2993779cce92c8db3c064",
-        "input_shape": [
-          -1,
-          48,
-          132
-        ],
-        "output_shape": [
-          -1,
-          10
-        ],
-        "opset": 13
-      },
-      "quantized": {
-        "file": "cnn1d_int8.onnx",
-        "size_bytes": 173865,
-        "size_kb": 169.8,
-        "sha256": "9b444181f55ec481f20e397efb1dcf7d1f9d795df9479d92cfc5a2d614323654",
-        "input_shape": [
-          -1,
-          48,
-          132
-        ],
-        "output_shape": [
-          -1,
-          10
-        ],
-        "opset": 13
-      },
-      "parity": {
-        "top1_agreement": 1.0,
-        "max_logit_diff": 0.0021458566188812256,
-        "mean_logit_diff": 0.00042831417522393167
-      }
+      "status": "INVALID: synthetic-trained, do not ship",
+      "note": "Trained on _create_dummy_sequence() sine waves; no generalization to real video"
     },
     "gru.onnx": {
-      "original": {
-        "file": "gru.onnx",
-        "size_bytes": 806942,
-        "size_kb": 788.0,
-        "sha256": "4b3d984fbdfc6da41fede81b5101379885cfcc927a6245afea007a7c50501b0c",
-        "input_shape": [
-          -1,
-          48,
-          132
-        ],
-        "output_shape": [
-          -1,
-          10
-        ],
-        "opset": 13
-      },
-      "quantized": {
-        "file": "gru_int8.onnx",
-        "size_bytes": 805306,
-        "size_kb": 786.4,
-        "sha256": "88b545b9e26abb54d099cf1f1d6bdfe5665d2c66270ff608c27facd83e74c988",
-        "input_shape": [
-          -1,
-          48,
-          132
-        ],
-        "output_shape": [
-          -1,
-          10
-        ],
-        "opset": 13
-      },
-      "parity": {
-        "top1_agreement": 1.0,
-        "max_logit_diff": 0.07459897547960281,
-        "mean_logit_diff": 0.008336634375154972
-      }
+      "status": "INVALID: synthetic-trained, do not ship",
+      "note": "Trained on _create_dummy_sequence() sine waves; no generalization to real video"
     }
   },
   "thresholds": {

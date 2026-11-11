@@ -13,3 +13,11 @@ frontend/playwright-report/
 .env
 .env.*
 !.env.example
+
+*.task
+__pycache__/
+*.pyc
+ml/data/
+ml/.venv/
+ml/reports/repcount/**/*.png
+ml/reports/repcount/**/*.jpg
