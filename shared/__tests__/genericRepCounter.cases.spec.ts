@@ -34,6 +34,16 @@ function run(joint: 'knee' | 'elbow', mode: GeneratedAngleConfig['sideMode'], co
 }
 
 describe('real landmark exercise cases', () => {
+  it('counts all five reps after a one-second rest hold', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral', 170, 90));
+    let timestamp = 0;
+    const send = (angle: number) => counter.update({ landmarks: frame('knee', angle, angle), timestamp: timestamp += 100, aspect: 1 });
+    for (let i = 0; i < 11; i++) send(140);
+    for (let rep = 0; rep < 5; rep++) {
+      for (const angle of [140, 135, 125, 115, 105, 95, 85, 80, 80, 85, 95, 105, 115, 125, 135, 140, 140, 140, 140]) send(angle);
+    }
+    expect(counter.getProgress().repCount).toBe(5);
+  });
   it('alternating lunges: 5 left and 5 right = 10', () => expect(run('knee', 'alternating', 10, 160, 80, true).getProgress().repCount).toBe(10));
   it('bilateral squat: 3', () => expect(run('knee', 'bilateral', 3).getProgress().repCount).toBe(3));
   it('bilateral elbow curl: 3', () => expect(run('elbow', 'bilateral', 3).getProgress().repCount).toBe(3));
