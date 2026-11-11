@@ -1,0 +1,18 @@
+{
+  "squant": "squat",
+  "squat": "squat",
+  "push_up": "push_up",
+  "pushups": "push_up",
+  "pull_up": "pull_up",
+  "pullups": "pull_up",
+  "bench_pressing": "bench_press",
+  "benchpressing": "bench_press",
+  "front_raise": "front_raise",
+  "frontraise": "front_raise",
+  "jump_jack": "jumping_jack",
+  "jumpjacks": "jumping_jack",
+  "situp": "situp",
+  "battle_rope": "excluded",
+  "pommelhorse": "excluded",
+  "others": "excluded"
+}

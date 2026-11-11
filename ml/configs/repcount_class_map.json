@@ -1,0 +1,226 @@
+{
+  "squat": {
+    "exerciseId": "6YUfHPL",
+    "name": "quads (bodyweight squat)",
+    "parameter_source": "gif",
+    "config_snapshot": {
+      "exercise_id": "6YUfHPL",
+      "name": "quads (bodyweight squat)",
+      "pattern": "squat",
+      "primary_joints": [
+        23,
+        25,
+        27
+      ],
+      "start_angle": 115.80018829207245,
+      "peak_angle": 81.27796656670904,
+      "direction": "flexion",
+      "rep_period_range": [
+        0.8,
+        3.0
+      ],
+      "side_mode": "bilateral",
+      "min_rom_fraction": 0.85,
+      "min_visibility": 0.5,
+      "stability_frames": 3,
+      "validation_status": "pending",
+      "source": "gif",
+      "validationStatus": "pending",
+      "round_trip": true,
+      "rep_period_seconds": 3.0,
+      "parameter_source": "gif"
+    }
+  },
+  "push_up": {
+    "exerciseId": "I4hDWkc",
+    "name": "push-up",
+    "parameter_source": "rule",
+    "config_snapshot": {
+      "exercise_id": "I4hDWkc",
+      "name": "push-up",
+      "pattern": "horizontal_push",
+      "primary_joints": [
+        11,
+        13,
+        15
+      ],
+      "start_angle": 170.0,
+      "peak_angle": 90.0,
+      "direction": "flexion",
+      "rep_period_range": [
+        0.8,
+        3.0
+      ],
+      "side_mode": "bilateral",
+      "min_rom_fraction": 0.85,
+      "min_visibility": 0.5,
+      "stability_frames": 3,
+      "validation_status": "pending",
+      "source": "rule",
+      "validationStatus": "pending",
+      "round_trip": false,
+      "rep_period_seconds": 3.0,
+      "parameter_source": "rule"
+    }
+  },
+  "pull_up": {
+    "exerciseId": "lBDjFxJ",
+    "name": "pull-up",
+    "parameter_source": "rule",
+    "config_snapshot": {
+      "exercise_id": "lBDjFxJ",
+      "name": "pull-up",
+      "pattern": "vertical_pull",
+      "primary_joints": [
+        11,
+        13,
+        15
+      ],
+      "start_angle": 160.0,
+      "peak_angle": 60.0,
+      "direction": "flexion",
+      "rep_period_range": [
+        0.8,
+        3.0
+      ],
+      "side_mode": "bilateral",
+      "min_rom_fraction": 0.85,
+      "min_visibility": 0.5,
+      "stability_frames": 3,
+      "validation_status": "pending",
+      "source": "rule",
+      "validationStatus": "pending",
+      "round_trip": false,
+      "rep_period_seconds": 3.0,
+      "parameter_source": "rule"
+    }
+  },
+  "bench_press": {
+    "exerciseId": "EIeI8Vf",
+    "name": "barbell bench press",
+    "parameter_source": "gif",
+    "config_snapshot": {
+      "exercise_id": "EIeI8Vf",
+      "name": "barbell bench press",
+      "pattern": "horizontal_push",
+      "primary_joints": [
+        11,
+        13,
+        15
+      ],
+      "start_angle": 12.542156297339815,
+      "peak_angle": 174.76747064918484,
+      "direction": "extension",
+      "rep_period_range": [
+        0.8,
+        3.0
+      ],
+      "side_mode": "bilateral",
+      "min_rom_fraction": 0.85,
+      "min_visibility": 0.5,
+      "stability_frames": 3,
+      "validation_status": "pending",
+      "source": "gif",
+      "validationStatus": "pending",
+      "round_trip": true,
+      "rep_period_seconds": 3.0,
+      "parameter_source": "gif"
+    }
+  },
+  "front_raise": {
+    "exerciseId": "3eGE2JC",
+    "name": "dumbbell front raise",
+    "parameter_source": "rule",
+    "config_snapshot": {
+      "exercise_id": "3eGE2JC",
+      "name": "dumbbell front raise",
+      "pattern": "front_raise",
+      "primary_joints": [
+        23,
+        11,
+        13
+      ],
+      "start_angle": 10.0,
+      "peak_angle": 120.0,
+      "direction": "extension",
+      "rep_period_range": [
+        0.8,
+        3.0
+      ],
+      "side_mode": "unilateral",
+      "min_rom_fraction": 0.85,
+      "min_visibility": 0.5,
+      "stability_frames": 3,
+      "validation_status": "pending",
+      "source": "rule",
+      "validationStatus": "pending",
+      "round_trip": false,
+      "rep_period_seconds": 3.0,
+      "parameter_source": "rule"
+    }
+  },
+  "situp": {
+    "exerciseId": "Bn6TXyO",
+    "name": "sit-up",
+    "parameter_source": "rule",
+    "config_snapshot": {
+      "exercise_id": "Bn6TXyO",
+      "name": "sit-up",
+      "pattern": "core_flexion",
+      "primary_joints": [
+        11,
+        23,
+        25
+      ],
+      "start_angle": 170.0,
+      "peak_angle": 60.0,
+      "direction": "flexion",
+      "rep_period_range": [
+        0.8,
+        3.0
+      ],
+      "side_mode": "bilateral",
+      "min_rom_fraction": 0.85,
+      "min_visibility": 0.5,
+      "stability_frames": 3,
+      "validation_status": "pending",
+      "source": "rule",
+      "validationStatus": "pending",
+      "round_trip": false,
+      "rep_period_seconds": 3.0,
+      "parameter_source": "rule"
+    }
+  },
+  "jumping_jack": {
+    "exerciseId": "1g5bPpA",
+    "name": "Jack Jump",
+    "parameter_source": "gif",
+    "config_snapshot": {
+      "exercise_id": "1g5bPpA",
+      "name": "Jack Jump",
+      "pattern": "squat",
+      "primary_joints": [
+        23,
+        25,
+        27
+      ],
+      "start_angle": 160.96544263095618,
+      "peak_angle": 49.815815705187454,
+      "direction": "flexion",
+      "rep_period_range": [
+        0.8,
+        3.0
+      ],
+      "side_mode": "bilateral",
+      "min_rom_fraction": 0.85,
+      "min_visibility": 0.5,
+      "stability_frames": 3,
+      "validation_status": "pending",
+      "source": "gif",
+      "validationStatus": "pending",
+      "round_trip": true,
+      "rep_period_seconds": 5.0,
+      "parameter_source": "gif"
+    }
+  }
+}
