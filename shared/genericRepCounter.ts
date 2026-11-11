@@ -335,9 +335,9 @@ export class GenericRepCounter {
     }
     this.lastTimestamp = timestamp;
 
-    // Compute primary joint angle
+    // Compute primary joint angle (handles bilateral avg, alternating min, or single joint)
     const primaryJoint = this.getPrimaryJoint();
-    const angle = this.computeJointAngle(landmarks, primaryJoint, aspect);
+    const angle = this.computePrimaryAngle(landmarks, aspect);
 
     if (angle === null) {
       // Visibility lost
@@ -363,7 +363,9 @@ export class GenericRepCounter {
     }
 
     // Compute normalized progress
-    const progress = this.computeNormalizedProgress(this.emaAngle, primaryJoint);
+    const progress = primaryJoint === '__BILATERAL_AVG__' || primaryJoint === '__ALTERNATING__'
+      ? this.computeNormalizedProgressUnified(this.emaAngle)
+      : this.computeNormalizedProgress(this.emaAngle, primaryJoint);
 
     // Check stability constraints
     this.checkStabilityConstraints(landmarks, aspect, timestamp);
@@ -376,16 +378,25 @@ export class GenericRepCounter {
     return this.getProgress();
   }
 
-  /** Get the primary joint to track (first in primaryJoints with valid config) */
+  /** Get the primary joint to track, with side mode handling */
   private getPrimaryJoint(): string {
-    // For bilateral, average both sides; for now use first valid
-    for (const joint of this.genConfig.primaryJoints) {
+    const sideMode = this.genConfig.sideMode;
+    const joints = this.genConfig.primaryJoints;
+    
+    if (sideMode === 'bilateral' && joints.length >= 2) {
+      return '__BILATERAL_AVG__';
+    }
+    if (sideMode === 'alternating') {
+      return '__ALTERNATING__';
+    }
+    // Unilateral or unknown: use first valid joint
+    for (const joint of joints) {
       if (this.genConfig.startAngles[joint] !== undefined && 
           this.genConfig.peakAngles[joint] !== undefined) {
         return joint;
       }
     }
-    return this.genConfig.primaryJoints[0] || 'left_knee';
+    return joints[0] || 'left_knee';
   }
 
   /** Compute 2D joint angle with aspect correction (matches Python) */
@@ -433,6 +444,46 @@ export class GenericRepCounter {
     return Math.acos(cosAngle) * 180 / Math.PI;
   }
 
+  /** Compute bilateral average angle (avg of left and right joints) */
+  private computeBilateralAngle(landmarks: Landmark[], aspect: number): number | null {
+    const leftJoint = this.genConfig.primaryJoints[0];
+    const rightJoint = this.genConfig.primaryJoints[1] ?? leftJoint.replace('left', 'right');
+    const left = this.computeJointAngle(landmarks, leftJoint, aspect);
+    const right = this.computeJointAngle(landmarks, rightJoint, aspect);
+    if (left === null && right === null) return null;
+    if (left === null) return right;
+    if (right === null) return left;
+    return (left + right) / 2;
+  }
+
+  /** Compute unified angle for alternating exercises (min of both sides).
+   * For lunges: when left knee bends, left angle drops; right stays extended → min drops.
+   * When right knee bends, right angle drops; left stays extended → min drops.
+   * Result: clean valley per rep regardless of which side is active. */
+  private computeAlternatingAngle(landmarks: Landmark[], aspect: number): number | null {
+    const leftJoint = this.genConfig.primaryJoints[0] ?? 'left_knee';
+    const rightJoint = this.genConfig.primaryJoints[1] ?? leftJoint.replace('left', 'right');
+    const left = this.computeJointAngle(landmarks, leftJoint, aspect);
+    const right = this.computeJointAngle(landmarks, rightJoint, aspect);
+    if (left === null && right === null) return null;
+    if (left === null) return right;
+    if (right === null) return left;
+    return Math.min(left, right); // Valley = rep for flexion exercises
+  }
+
+  /** Compute the primary angle based on side mode */
+  private computePrimaryAngle(landmarks: Landmark[], aspect: number): number | null {
+    const primary = this.getPrimaryJoint();
+
+    if (primary === '__BILATERAL_AVG__') {
+      return this.computeBilateralAngle(landmarks, aspect);
+    }
+    if (primary === '__ALTERNATING__') {
+      return this.computeAlternatingAngle(landmarks, aspect);
+    }
+    return this.computeJointAngle(landmarks, primary, aspect);
+  }
+
   /** Compute normalized progress 0-1 (matches Python) */
   private computeNormalizedProgress(angle: number, joint: string): number {
     const start = this.genConfig.startAngles[joint];
@@ -445,11 +496,28 @@ export class GenericRepCounter {
     return (angle - start) / (peak - start);
   }
 
+  /** Compute normalized progress for bilateral/alternating joint configs.
+   * Uses the first joint's angle range as reference. */
+  private computeNormalizedProgressUnified(angle: number): number {
+    const firstJoint = this.genConfig.primaryJoints[0];
+    const start = firstJoint ? this.genConfig.startAngles[firstJoint] : undefined;
+    const peak = firstJoint ? this.genConfig.peakAngles[firstJoint] : undefined;
+    if (start === undefined || peak === undefined) return 0;
+
+    const refRange = Math.abs(peak - start);
+    if (refRange < 1) return 0;
+
+    return (angle - start) / (peak - start);
+  }
+
   /** Compute raw progress for display */
   private computeProgress(): number {
     if (this.emaAngle === null) return 0;
-    const joint = this.getPrimaryJoint();
-    return Math.max(0, Math.min(1, this.computeNormalizedProgress(this.emaAngle, joint)));
+    const primaryJoint = this.getPrimaryJoint();
+    if (primaryJoint === '__BILATERAL_AVG__' || primaryJoint === '__ALTERNATING__') {
+      return Math.max(0, Math.min(1, this.computeNormalizedProgressUnified(this.emaAngle)));
+    }
+    return Math.max(0, Math.min(1, this.computeNormalizedProgress(this.emaAngle, primaryJoint)));
   }
 
   /** Check stability constraints (fault detection) */
