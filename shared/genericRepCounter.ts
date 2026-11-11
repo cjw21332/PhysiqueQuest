@@ -31,6 +31,7 @@ export type GeneratedAngleConfig = {
   referenceRanges: Record<string, number>;
   stabilityConstraints: StabilityConstraint[];
   viewHint: 'front' | 'side' | 'unknown';
+  isIsometric?: boolean;
 };
 
 /** Input landmark per frame (matches MediaPipe 33 landmarks) */
@@ -59,7 +60,7 @@ export type CounterState =
 
 /** Counter events */
 export type CounterEvent = 
-  | { type: 'rep_counted'; count: number; joint: string; durationMs: number }
+  | { type: 'rep_counted'; count: number; joint: string; durationMs: number; romFraction: number; romVsReference: number; quality: 'full' | 'partial'; tempoSec: number }
   | { type: 'rep_partial'; progress: number; joint: string; cue: string }
   | { type: 'rep_rejected_fault'; joint: string; faultJoint: string; cue: string }
   | { type: 'visibility_lost'; joint: string }
@@ -76,6 +77,8 @@ export type ProgressInfo = {
   currentJoint: string | null;  // which joint being tracked
   cue: string | null;           // current cue message
   faults: string[];             // active fault messages
+  currentTempoSec?: number;    // tempo for current rep (seconds)
+  holdDurationMs: number;
 };
 
 /** Configuration for counter behavior (can be overridden per exercise) */
@@ -88,6 +91,8 @@ export type CounterConfig = {
   visibilityThreshold: number;      // default 0.5 - landmark visibility
   visibilityLostMaxMs: number;      // default 500 - pause counting after this
   emaAlpha: number;                 // default 0.35 - EMA smoothing (0-1)
+  calibration: boolean;
+  minCalibratedRom: number;
 };
 
 /** Default configuration */
@@ -100,6 +105,8 @@ export const DEFAULT_COUNTER_CONFIG: CounterConfig = {
   visibilityThreshold: 0.5,
   visibilityLostMaxMs: 500,
   emaAlpha: 0.35,
+  calibration: true,
+  minCalibratedRom: 30,
 };
 
 /** Device tier detection based on user agent and device capabilities */
@@ -225,6 +232,17 @@ export class GenericRepCounter {
   private visibilityLostMs: number | null = null;
   private faultStartMs: Record<string, number> = {};
   private activeFaults: Set<string> = new Set();
+  private calibrationSamples: Array<{ timestamp: number; angle: number }> = [];
+  private calibratedRest: number | null = null;
+  private calibratedPeak: number | null = null;
+  private calibrationReps = 0;
+  private previousCalibrationRom: number | null = null;
+  private driftStartMs: number | null = null;
+  private observedMin = Infinity;
+  private observedMax = -Infinity;
+  private holdStartMs: number | null = null;
+  private holdLastVisibleMs: number | null = null;
+  private holdDurationMs = 0;
   
   // Callbacks
   private onEvent?: (event: CounterEvent) => void;
@@ -270,15 +288,25 @@ export class GenericRepCounter {
 
   /** Get current progress info */
   getProgress(): ProgressInfo {
+    const joint = this.getPrimaryJoint();
+    const isUnresolved = joint === '__BILATERAL_AVG__' || joint === '__ALTERNATING__';
+    const durationMs = this.state === 'AT_PEAK' || this.state === 'AT_START'
+      ? (this.state === 'AT_PEAK' ? (this.currentPeakMs - this.currentRepStartMs) : 0)
+      : this.state === 'MOVING' ? (this.lastTimestamp ?? 0) - this.currentRepStartMs
+      : 0;
+    const currentTempoSec = (durationMs > 0 && this.state === 'AT_PEAK') ? durationMs / 1000 : undefined;
+
     return {
       state: this.state,
       repCount: this.repCount,
       partialCount: this.partialCount,
       currentProgress: this.computeProgress(),
       currentAngle: this.emaAngle,
-      currentJoint: this.getPrimaryJoint(),
+      currentJoint: isUnresolved ? 'primary' : joint,
       cue: this.getCue(),
       faults: Array.from(this.activeFaults),
+      currentTempoSec,
+      holdDurationMs: this.holdDurationMs,
     };
   }
 
@@ -293,6 +321,10 @@ export class GenericRepCounter {
     this.partialCount = 0;
     this.lastTimestamp = null;
     this.visibilityLostMs = null;
+    this.resetCalibration();
+    this.holdStartMs = null;
+    this.holdLastVisibleMs = null;
+    this.holdDurationMs = 0;
     this.emitProgress();
   }
 
@@ -305,6 +337,52 @@ export class GenericRepCounter {
     this.lastAngle = null;
     this.faultStartMs = {};
     this.activeFaults.clear();
+    this.observedMin = Infinity;
+    this.observedMax = -Infinity;
+    this.holdStartMs = null;
+    this.holdLastVisibleMs = null;
+  }
+
+  private resetCalibration(): void {
+    this.calibrationSamples = [];
+    this.calibratedRest = null;
+    this.calibratedPeak = null;
+    this.calibrationReps = 0;
+    this.previousCalibrationRom = null;
+    this.driftStartMs = null;
+  }
+
+  private updateCalibration(angle: number, timestamp: number): void {
+    if (!this.config.calibration) return;
+    const joint = this.genConfig.primaryJoints[0];
+    const priorRest = this.genConfig.startAngles[joint];
+    const priorPeak = this.genConfig.peakAngles[joint];
+    if (priorRest === undefined || priorPeak === undefined) return;
+    const priorRom = Math.abs(priorPeak - priorRest);
+    if (priorRom < 1) return;
+    if (this.calibrationReps >= 2) {
+      if (this.state === 'AT_START' && this.calibratedRest !== null && Math.abs(angle - this.calibratedRest) > 20) {
+        this.driftStartMs ??= timestamp;
+        if (timestamp - this.driftStartMs > 2000) this.resetCalibration();
+      } else {
+        this.driftStartMs = null;
+      }
+      if (this.calibrationReps >= 2) return;
+    }
+    this.calibrationSamples.push({ timestamp, angle });
+    this.calibrationSamples = this.calibrationSamples.filter(sample => timestamp - sample.timestamp <= 8000);
+    if (this.calibrationSamples.length < 5) return;
+    const values = this.calibrationSamples.map(sample => sample.angle).sort((a, b) => a - b);
+    const low = values[Math.floor((values.length - 1) * 0.05)];
+    const high = values[Math.ceil((values.length - 1) * 0.95)];
+    const decreasing = priorPeak < priorRest;
+    const clamp = (value: number, prior: number) => Math.max(0, Math.min(180, Math.max(prior - 45, Math.min(prior + 45, value))));
+    const rest = clamp(decreasing ? high : low, priorRest);
+    const peak = clamp(decreasing ? low : high, priorPeak);
+    const range = decreasing ? rest - peak : peak - rest;
+    if (range < Math.max(this.config.minCalibratedRom, priorRom * 0.4)) return;
+    this.calibratedRest = rest;
+    this.calibratedPeak = peak;
   }
 
   /** Process a single pose frame */
@@ -314,6 +392,8 @@ export class GenericRepCounter {
     if (this.visibilityLostMs === null) this.visibilityLostMs = this.lastTimestamp;
     if (now - this.visibilityLostMs > this.config.visibilityLostMaxMs && this.state !== 'VISIBILITY_LOST') {
       this.state = 'VISIBILITY_LOST';
+      if (this.genConfig.isIsometric) this.holdStartMs = null;
+      this.resetCalibration();
       this.emitEvent({ type: 'visibility_lost', joint: this.getPrimaryJoint() });
       this.emitProgress();
     }
@@ -350,6 +430,7 @@ export class GenericRepCounter {
       if (this.state === 'VISIBILITY_LOST' || timestamp - this.visibilityLostMs > this.config.visibilityLostMaxMs) {
         if (this.state !== 'VISIBILITY_LOST') this.emitEvent({ type: 'visibility_lost', joint: primaryJoint });
         this.resetMotion();
+        this.resetCalibration();
         this.emitEvent({ type: 'visibility_restored', joint: primaryJoint });
       }
       this.visibilityLostMs = null;
@@ -361,6 +442,24 @@ export class GenericRepCounter {
     } else {
       this.emaAngle = this.emaAngle * (1 - this.config.emaAlpha) + angle * this.config.emaAlpha;
     }
+
+    if (this.genConfig.isIsometric) {
+      const joint = this.genConfig.primaryJoints[0];
+      const target = this.genConfig.peakAngles[joint] ?? this.genConfig.startAngles[joint];
+      if (target !== undefined && Math.abs(this.emaAngle - target) <= 10) {
+        if (this.holdLastVisibleMs !== null && timestamp - this.holdLastVisibleMs > this.config.visibilityLostMaxMs) this.holdStartMs = null;
+        if (this.holdStartMs === null) this.holdStartMs = timestamp;
+        if (timestamp - this.holdStartMs >= 500) this.holdDurationMs = timestamp - this.holdStartMs;
+        this.holdLastVisibleMs = timestamp;
+      } else {
+        this.holdStartMs = null;
+        this.holdLastVisibleMs = null;
+      }
+      this.emitProgress();
+      return this.getProgress();
+    }
+
+    this.updateCalibration(this.emaAngle, timestamp);
 
     // Compute normalized progress
     const progress = primaryJoint === '__BILATERAL_AVG__' || primaryJoint === '__ALTERNATING__'
@@ -486,8 +585,8 @@ export class GenericRepCounter {
 
   /** Compute normalized progress 0-1 (matches Python) */
   private computeNormalizedProgress(angle: number, joint: string): number {
-    const start = this.genConfig.startAngles[joint];
-    const peak = this.genConfig.peakAngles[joint];
+    const start = this.calibratedRest ?? this.genConfig.startAngles[joint];
+    const peak = this.calibratedPeak ?? this.genConfig.peakAngles[joint];
     if (start === undefined || peak === undefined) return 0;
 
     const refRange = Math.abs(peak - start);
@@ -500,8 +599,8 @@ export class GenericRepCounter {
    * Uses the first joint's angle range as reference. */
   private computeNormalizedProgressUnified(angle: number): number {
     const firstJoint = this.genConfig.primaryJoints[0];
-    const start = firstJoint ? this.genConfig.startAngles[firstJoint] : undefined;
-    const peak = firstJoint ? this.genConfig.peakAngles[firstJoint] : undefined;
+    const start = this.calibratedRest ?? (firstJoint ? this.genConfig.startAngles[firstJoint] : undefined);
+    const peak = this.calibratedPeak ?? (firstJoint ? this.genConfig.peakAngles[firstJoint] : undefined);
     if (start === undefined || peak === undefined) return 0;
 
     const refRange = Math.abs(peak - start);
@@ -554,10 +653,12 @@ export class GenericRepCounter {
 
   /** Handle visibility loss */
   private handleVisibilityLost(joint: string, timestamp: number): void {
+    if (this.genConfig.isIsometric) { this.holdStartMs = null; this.holdLastVisibleMs = null; }
     if (this.visibilityLostMs === null) {
       this.visibilityLostMs = timestamp;
     } else if (timestamp - this.visibilityLostMs > this.config.visibilityLostMaxMs && this.state !== 'VISIBILITY_LOST') {
       this.state = 'VISIBILITY_LOST';
+      this.resetCalibration();
       this.emitEvent({ type: 'visibility_lost', joint });
     }
   }
@@ -566,12 +667,18 @@ export class GenericRepCounter {
   private updateStateMachine(progress: number, joint: string, timestamp: number): void {
     const fullThreshold = this.config.fullRangeThreshold;
     const startTol = this.config.startTolerance;
+    if (this.emaAngle !== null && this.state !== 'AT_START') {
+      this.observedMin = Math.min(this.observedMin, this.emaAngle);
+      this.observedMax = Math.max(this.observedMax, this.emaAngle);
+    }
 
     switch (this.state) {
       case 'AT_START':
         if (progress > 0.05) { // Left start zone
           this.state = 'MOVING';
           this.currentRepStartMs = timestamp;
+          this.observedMin = Math.min(this.emaAngle ?? 0, this.lastAngle ?? this.emaAngle ?? 0);
+          this.observedMax = Math.max(this.emaAngle ?? 0, this.lastAngle ?? this.emaAngle ?? 0);
           this.emitEvent({ type: 'state_change', from: 'AT_START', to: 'MOVING' });
         }
         break;
@@ -603,22 +710,50 @@ export class GenericRepCounter {
         if (progress <= startTol) {
           // Completed rep!
           const duration = timestamp - this.currentRepStartMs;
-          if (duration >= this.config.minRepDurationMs && duration <= this.config.maxRepDurationMs) {
+          const observedRom = this.observedMax - this.observedMin;
+          const completed = duration >= this.config.minRepDurationMs && duration <= this.config.maxRepDurationMs
+            && (!this.config.calibration || observedRom >= this.config.minCalibratedRom);
+          const firstJoint = this.genConfig.primaryJoints[0];
+          const reference = this.genConfig.referenceRanges[firstJoint] ?? Math.abs(this.genConfig.peakAngles[firstJoint] - this.genConfig.startAngles[firstJoint]);
+          const romVsReference = reference > 0 ? observedRom / reference : 0;
+          const quality: 'full' | 'partial' = romVsReference >= 0.85 ? 'full' : 'partial';
+
+          if (completed) {
             if (this.activeFaults.size === 0) {
               this.repCount++;
               this.emitEvent({
                 type: 'rep_counted',
                 count: this.repCount,
                 joint,
-                durationMs: duration
+                durationMs: duration,
+                romFraction: this.maxProgressInRep,
+                romVsReference,
+                quality,
+                tempoSec: duration / 1000
               });
+              if (this.previousCalibrationRom === null || Math.abs(observedRom - this.previousCalibrationRom) <= Math.max(10, this.previousCalibrationRom * 0.2)) {
+                this.calibrationReps++;
+              } else {
+                this.calibrationReps = 1;
+              }
+              this.previousCalibrationRom = observedRom;
             } else {
               // Fault already emitted during AT_PEAK
             }
+          } else if (this.maxProgressInRep > 0.4) {
+            // Rep completed but was too fast/slow - treat as partial
+            this.partialCount++;
+            this.emitEvent({
+              type: 'rep_partial',
+              progress: this.maxProgressInRep,
+              joint,
+              cue: this.getPartialCue(joint, this.maxProgressInRep)
+            });
           }
           this.state = 'AT_START';
           this.currentRepStartMs = 0;
           this.currentPeakMs = 0;
+          this.maxProgressInRep = 0;
           this.emitEvent({ type: 'state_change', from: 'AT_PEAK', to: 'AT_START' });
         }
         break;
@@ -693,5 +828,6 @@ export function trackingConfigToGeneratedAngle(config: any): GeneratedAngleConfi
     referenceRanges: g.referenceRanges,
     stabilityConstraints: g.stabilityConstraints,
     viewHint: g.viewHint,
+    isIsometric: g.isIsometric,
   };
 }

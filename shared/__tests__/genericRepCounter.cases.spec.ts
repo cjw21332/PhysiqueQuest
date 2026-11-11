@@ -45,13 +45,13 @@ describe('real landmark exercise cases', () => {
   });
   it('extension direction: 3', () => expect(run('elbow', 'bilateral', 3, 80, 160).getProgress().repCount).toBe(3));
   it('partial range is flagged, with zero full reps', () => {
-    const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 }); let t = 0;
+    const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1, calibration: false }); let t = 0;
     for (const a of [160, 140, 120, 105, 105, 120, 140, 160]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
     expect(counter.getProgress().repCount).toBe(0); expect(counter.getProgress().partialCount).toBe(1);
   });
   it('rejects reps faster than 400ms and slower than 10s', () => {
     for (const step of [50, 2000]) {
-      const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 }); let t = 0;
+      const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1, calibration: false }); let t = 0;
       for (const a of [160, 140, 100, 80, 80, 100, 140, 160]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += step, aspect: 1 });
       expect(counter.getProgress().repCount).toBe(0);
     }
@@ -76,10 +76,44 @@ describe('real landmark exercise cases', () => {
       expect(counter.getProgress().repCount).toBe(expected);
     }
   });
-  it.fails('140 degree rest and 60 degree ROM without calibration: expected 3', () => {
+  it('140 degree rest and 60 degree ROM with calibration: 3', () => {
     const counter = new GenericRepCounter(config('knee', 'bilateral', 170, 90), { emaAlpha: 1 }); let t = 0;
     for (let i = 0; i < 3; i++) for (const a of [140, 125, 110, 95, 80, 95, 110, 125, 140, 140]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
     console.log(`140-degree rest: expected=3 actual=${counter.getProgress().repCount}`);
     expect(counter.getProgress().repCount).toBe(3);
+  });
+  it('plank reports a 20 second hold and zero reps', () => {
+    const counter = new GenericRepCounter({ ...config('knee', 'bilateral', 160, 160), isIsometric: true }, { emaAlpha: 1 });
+    for (let t = 0; t <= 20000; t += 100) counter.update({ landmarks: frame('knee', 160, 160), timestamp: t, aspect: 1 });
+    expect(counter.getProgress().holdDurationMs).toBeGreaterThanOrEqual(19000);
+    expect(counter.getProgress().holdDurationMs).toBeLessThanOrEqual(21000);
+    expect(counter.getProgress().repCount).toBe(0);
+  });
+  it('plank does not count time when landmarks are not visible', () => {
+    const counter = new GenericRepCounter({ ...config('knee', 'bilateral', 160, 160), isIsometric: true }, { emaAlpha: 1 });
+    for (let t = 0; t <= 2000; t += 100) counter.update({ landmarks: frame('knee', 160, 160), timestamp: t, aspect: 1 });
+    counter.update({ landmarks: frame('knee', 160, 160, 0), timestamp: 2100, aspect: 1 });
+    expect(counter.getProgress().holdDurationMs).toBe(2000);
+    for (let t = 4000; t <= 5000; t += 100) counter.update({ landmarks: frame('knee', 160, 160), timestamp: t, aspect: 1 });
+    expect(counter.getProgress().holdDurationMs).toBe(1000);
+    expect(counter.getProgress().repCount).toBe(0);
+  });
+  it('jitter at rest never counts', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 });
+    for (let t = 0; t < 30000; t += 100) { const a = 140 + 3 * Math.sin(t / 200); counter.update({ landmarks: frame('knee', a, a), timestamp: t, aspect: 1 }); }
+    expect(counter.getProgress().repCount).toBe(0);
+  });
+  it('deeper than reference range counts 3', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral', 150, 100), { emaAlpha: 1 }); let t = 0;
+    for (let i = 0; i < 3; i++) for (const a of [150, 135, 120, 105, 90, 75, 90, 105, 120, 135, 150, 150]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
+    expect(counter.getProgress().repCount).toBe(3);
+  });
+  it('calibrated shallow reps count and carry partial quality', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral', 160, 60), { emaAlpha: 1 }); let t = 0;
+    const events: Array<{ quality: string; romVsReference: number }> = [];
+    counter.setEventCallback(e => { if (e.type === 'rep_counted') events.push(e); });
+    for (let i = 0; i < 3; i++) for (const a of [160, 150, 140, 130, 120, 110, 100, 110, 120, 130, 140, 150, 160, 160]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
+    expect(counter.getProgress().repCount).toBe(3);
+    expect(events.every(e => e.quality === 'partial' && e.romVsReference < 0.85)).toBe(true);
   });
 });
