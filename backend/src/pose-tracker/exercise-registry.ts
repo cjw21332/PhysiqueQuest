@@ -26,13 +26,14 @@ export type GeneratedAngleConfig = {
 export type TrackingConfig = {
   exerciseId: string; name: string; normalizedName: string; bodyParts: string[]; targetMuscles: string[]; equipment: string[];
   category: string; trackingMode: 'builtin' | 'reference' | 'generated-angle' | 'unavailable';
+  trackingTier?: 'auto_count_verified' | 'auto_count_beta' | 'pose_only' | 'manual';
   providerExerciseId?: string; referenceUuid?: string; generatedAngleConfig?: GeneratedAngleConfig;
   cameraOrientation: 'front' | 'side' | 'reference' | 'pending'; capabilities: string[];
   referenceStatus: 'not-required' | 'required' | 'awaiting-verification' | 'verified' | 'disabled';
   validationStatus: 'documentation-mapped' | 'pending' | 'verified' | 'disabled'; limitations: string[]; configurationVersion: number;
   verificationNotes?: string; verifiedAt?: string; updatedAt?: string;
 };
-export type ConfigOverride = Pick<TrackingConfig, 'trackingMode' | 'cameraOrientation' | 'validationStatus' | 'limitations'> & { providerExerciseId?: string; referenceUuid?: string; generatedAngleConfig?: GeneratedAngleConfig; verificationNotes?: string; verifiedAt?: string; updatedAt?: string };
+export type ConfigOverride = Pick<TrackingConfig, 'trackingMode' | 'cameraOrientation' | 'validationStatus' | 'limitations' | 'trackingTier'> & { providerExerciseId?: string; referenceUuid?: string; generatedAngleConfig?: GeneratedAngleConfig; verificationNotes?: string; verifiedAt?: string; updatedAt?: string };
 export const normalizeName = (value: string) => value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
 export const holdExercises = new Set(['plank','wall_sit','balance_leg','balance_leg_left','balance_leg_right','chair_forward_fold','chair_side_stretch','split','facial_split','pancake','closing','bridge','cobra','bow','tiger','camel','king_pigeon','foot_to_hand','i','needle']);
 // Exact movement + equipment + target + instructional evidence, never substring-only support.
@@ -73,6 +74,11 @@ export function resolveTrackingConfig(row: CatalogExercise, override?: ConfigOve
       config.generatedAngleConfig = override.generatedAngleConfig;
     } else {
       config.capabilities = override.validationStatus === 'disabled' ? [] : override.trackingMode === 'reference' ? [config.category==='isometric'||config.category==='mobility'?'session-duration':'repetitions','reference-similarity'] : override.trackingMode === 'builtin' ? (holdExercises.has(override.providerExerciseId ?? '') ? ['session-duration','provider-feedback'] : ['repetitions','provider-feedback']) : [];
+    }
+    // H2: Add trackingTier from coverage report mapping if not set
+    if (!config.trackingTier) {
+       // logic to map tier -> trackingTier based on tiers found in coverage_tiers.csv
+       // I'll add a helper for this later based on H1 results
     }
   }
   return config;
