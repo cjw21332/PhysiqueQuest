@@ -1,0 +1,85 @@
+import { describe, expect, it } from 'vitest';
+import { GenericRepCounter, type GeneratedAngleConfig, type Landmark } from '../genericRepCounter';
+
+const config = (joint: 'knee' | 'elbow', mode: GeneratedAngleConfig['sideMode'], start = 160, peak = 80): GeneratedAngleConfig => {
+  const joints = [`left_${joint}`, `right_${joint}`];
+  return { primaryJoints: mode === 'unilateral' ? joints.slice(0, 1) : joints, sideMode: mode,
+    startAngles: Object.fromEntries(joints.map(j => [j, start])), peakAngles: Object.fromEntries(joints.map(j => [j, peak])),
+    directions: Object.fromEntries(joints.map(j => [j, peak > start ? 'increasing' : 'decreasing'])),
+    referenceRanges: Object.fromEntries(joints.map(j => [j, Math.abs(peak - start)])), stabilityConstraints: [], viewHint: 'side' };
+};
+
+function frame(joint: 'knee' | 'elbow', left: number, right: number, visibility = 1): Landmark[] {
+  const points = Array.from({ length: 33 }, () => ({ x: 0.5, y: 0.5, z: 0, visibility, presence: visibility }));
+  for (const [side, angle] of [[0, left], [1, right]] as const) {
+    const [a, b, c] = joint === 'knee' ? [23 + side, 25 + side, 27 + side] : [11 + side, 13 + side, 15 + side];
+    const x = side ? 0.7 : 0.3, y = 0.5, r = angle * Math.PI / 180;
+    points[a] = { ...points[a], x: x + 0.15, y };
+    points[b] = { ...points[b], x, y };
+    points[c] = { ...points[c], x: x + 0.15 * Math.cos(r), y: y + 0.15 * Math.sin(r) };
+  }
+  return points;
+}
+
+function run(joint: 'knee' | 'elbow', mode: GeneratedAngleConfig['sideMode'], count: number, start = 160, peak = 80, alternate = false) {
+  const counter = new GenericRepCounter(config(joint, mode, start, peak), { emaAlpha: 1 });
+  let t = 0;
+  const send = (l: number, r: number) => counter.update({ landmarks: frame(joint, l, r), timestamp: t += 100, aspect: 1 });
+  send(start, start);
+  for (let i = 0; i < count; i++) for (const fraction of [0.25, 0.5, 0.75, 1, 1, 0.75, 0.5, 0.25, 0, 0]) {
+    const a = start + (peak - start) * fraction;
+    send(alternate && i % 2 ? start : a, alternate && i % 2 === 0 ? start : a);
+  }
+  return counter;
+}
+
+describe('real landmark exercise cases', () => {
+  it('alternating lunges: 5 left and 5 right = 10', () => expect(run('knee', 'alternating', 10, 160, 80, true).getProgress().repCount).toBe(10));
+  it('bilateral squat: 3', () => expect(run('knee', 'bilateral', 3).getProgress().repCount).toBe(3));
+  it('bilateral elbow curl: 3', () => expect(run('elbow', 'bilateral', 3).getProgress().repCount).toBe(3));
+  it('unilateral curl ignores the other arm', () => {
+    const counter = new GenericRepCounter(config('elbow', 'unilateral'), { emaAlpha: 1 }); let t = 0;
+    const send = (left: number) => counter.update({ landmarks: frame('elbow', left, 80 + (t * 17 % 80)), timestamp: t += 100, aspect: 1 });
+    send(160); for (let i = 0; i < 3; i++) for (const angle of [140, 120, 100, 80, 80, 100, 120, 140, 160, 160]) send(angle);
+    expect(counter.getProgress().repCount).toBe(3);
+  });
+  it('extension direction: 3', () => expect(run('elbow', 'bilateral', 3, 80, 160).getProgress().repCount).toBe(3));
+  it('partial range is flagged, with zero full reps', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 }); let t = 0;
+    for (const a of [160, 140, 120, 105, 105, 120, 140, 160]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
+    expect(counter.getProgress().repCount).toBe(0); expect(counter.getProgress().partialCount).toBe(1);
+  });
+  it('rejects reps faster than 400ms and slower than 10s', () => {
+    for (const step of [50, 2000]) {
+      const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 }); let t = 0;
+      for (const a of [160, 140, 100, 80, 80, 100, 140, 160]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += step, aspect: 1 });
+      expect(counter.getProgress().repCount).toBe(0);
+    }
+  });
+  it('3% Gaussian landmark noise retains exactly 3 reps', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 0.35 }); let t = 0, seed = 12345;
+    const uniform = () => ((seed = (1664525 * seed + 1013904223) >>> 0) + 1) / 4294967297;
+    const gaussian = () => Math.sqrt(-2 * Math.log(uniform())) * Math.cos(2 * Math.PI * uniform());
+    const send = (angle: number) => {
+      const landmarks = frame('knee', angle, angle).map(p => ({ ...p, x: p.x + gaussian() * 0.0045, y: p.y + gaussian() * 0.0045 }));
+      counter.update({ landmarks, timestamp: t += 100, aspect: 1 });
+    };
+    for (let i = 0; i < 3; i++) for (const a of [160, 160, 150, 140, 130, 120, 110, 100, 90, 80, 80, 80, 80, 90, 100, 110, 120, 130, 140, 150, 160, 160, 160, 160]) send(a);
+    expect(counter.getProgress().repCount).toBe(3);
+  });
+  it('brief visibility loss continues; long loss discards the rep', () => {
+    for (const [gap, expected] of [[300, 1], [600, 0]] as const) {
+      const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 });
+      const send = (angle: number, timestamp: number, visibility = 1) => counter.update({ landmarks: frame('knee', angle, angle, visibility), timestamp, aspect: 1 });
+      send(160, 100); send(140, 200); send(100, 300); send(80, 400); send(80, 500); send(80, 600, 0);
+      send(100, 600 + gap); send(140, 700 + gap); send(160, 800 + gap);
+      expect(counter.getProgress().repCount).toBe(expected);
+    }
+  });
+  it.fails('140 degree rest and 60 degree ROM without calibration: expected 3', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral', 170, 90), { emaAlpha: 1 }); let t = 0;
+    for (let i = 0; i < 3; i++) for (const a of [140, 125, 110, 95, 80, 95, 110, 125, 140, 140]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
+    console.log(`140-degree rest: expected=3 actual=${counter.getProgress().repCount}`);
+    expect(counter.getProgress().repCount).toBe(3);
+  });
+});
