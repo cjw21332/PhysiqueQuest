@@ -11,6 +11,9 @@ with open(json_path, encoding='utf-8') as f:
 ts_content = f"""// Auto-generated catalog tiers map from catalog_tiers.json
 export type CatalogTierEntry = {{
   tier: 'auto_count_beta' | 'manual' | 'pose_only';
+  classification: 'beta_family' | 'candidate_unvalidated' | 'pose_unreliable' | 'no_reps' | 'hold_timer' | 'low_rom_2d';
+  tier_source: 'measured' | 'rule' | 'low_rom' | 'unmeasured';
+  reason: string;
   pooled_n?: string;
   pooled_within1_pct?: string;
 }};

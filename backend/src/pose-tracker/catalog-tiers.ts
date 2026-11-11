@@ -1,4512 +1,9022 @@
-export const catalogTiersMap: Record<string, { tier: string; pooled_n?: string; pooled_within1_pct?: string }> = {
+// Auto-generated catalog tiers map from catalog_tiers.json
+export type CatalogTierEntry = {
+  tier: 'auto_count_beta' | 'manual' | 'pose_only';
+  classification: 'beta_family' | 'candidate_unvalidated' | 'pose_unreliable' | 'no_reps' | 'hold_timer' | 'low_rom_2d';
+  tier_source: 'measured' | 'rule' | 'low_rom' | 'unmeasured';
+  reason: string;
+  pooled_n?: string;
+  pooled_within1_pct?: string;
+};
+
+export const catalogTiersMap: Record<string, CatalogTierEntry> = {
   "01qpYSe": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "03lzqwk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "05Cf2v8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "0br45wL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0CXGHya": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0dCyly0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "0I5fUyn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0IgNjSM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0jp9Rlz": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "0JtKWum": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0L2KwtI": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "0lQnxMZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0mB6wHO": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "0MlxeMn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0rHfvy9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0S75mYG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "0V2YQjW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "0xDpB4L": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "0Yz8WdV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "10Z2DXU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "11wrviz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "13TpY4H": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "13VW2VO": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "17bqEXD": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "17lJ1kr": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "196HJGw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "1bQkKZK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1cTf2Ux": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1DN3iz4": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1g5bPpA": {
+    "classification": "beta_family",
+    "tier_source": "measured",
+    "reason": "Measured on RepCount-A; beta only, not verified.",
     "tier": "auto_count_beta",
     "pooled_n": "41",
     "pooled_within1_pct": "41.46341463414634"
   },
   "1gFNTZV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1GPHRyK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1IFV9h3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1IG6gVF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "1jXLYEw": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "1kB3Wmk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "1LVFcEn": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "1oE78pm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1PK5Uo3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1PLE8e9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "1qrWgZ2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1RIkUHT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1TkiAFK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1TVoin7": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "1u36hhy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1V1gj1u": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1VpF8db": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1xHyxys": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1YB40kg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1YUWDNZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "1ZFqTDN": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "225x2Vd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "25GPyDY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "27NNGFr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "2dImyQ8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2Dk4xQV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "2DxtqHL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "2gPfomN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2IHEa2T": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "2IxROQ1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2JCuFTU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2jl9K55": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "2kattbR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2KGnL6M": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2kr2lWy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2LQkNPW": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "2NImIAG": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "2NpxjC1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2ORFMoR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "2Pya1cP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2Qh2J1e": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2qTvJAZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2Ryn564": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "2sQGZ5b": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "2Ty4idJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "2zNKRUB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "33AzZeV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "3d7wHyd": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "3eGE2JC": {
+    "classification": "beta_family",
+    "tier_source": "measured",
+    "reason": "Measured on RepCount-A; beta only, not verified.",
     "tier": "auto_count_beta",
     "pooled_n": "37",
     "pooled_within1_pct": "51.35135135135135"
   },
   "3nvEbbF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "3omWx6P": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "3pqGMQj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "3QgteDK": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "3s4NnTh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "3T12T87": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "3tAXPQ6": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "3TZduzM": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "3uj0Ozg": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "3XFdb1Z": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "3xK09Sk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "3ZflifB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4c9BhzB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4CBIBOM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4cWjYEN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4dF3maG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4dUn2iv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4f8RXP8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4GqRrAk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4H86mXM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4hATdoB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4ievMJ9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4IKbhHV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4Jc36XM": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "4Jt8QsQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4KJEpzb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4Leypho": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4LIG9xr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4LoWllp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4Ml7QFO": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "4OaumBr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4QqYaJW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "4U7iLb5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "4x5Okof": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "50BETrz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "53Ttlck": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "58rdhvL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "5bpPTHv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5BZHW9s": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "5eLRITT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "5fKX7wi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5ipN0iE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5KLbZWx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5lE7XRz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5MRH8H2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5uFK1xr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5v7KYld": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "5VCj6iH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5vfAI0I": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "5VXmnV5": {
+    "classification": "hold_timer",
+    "tier_source": "rule",
+    "reason": "Static hold; use a timer rather than repetition counting.",
     "tier": "manual"
   },
   "5WiFcYk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "61GrD55": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "62Nw60O": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "641mIfk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "67n3r98": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6bOA1Oi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6cKQC5E": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6CKUx7o": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "6e2DcYX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "6em2Dxj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6FMU51h": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6HiHHe0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "6HmFgmx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "6kSxYnw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6MaEjVA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "6MfS53i": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "6pTkI99": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6sMAmNv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6sYyrRX": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "6t00BsF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6TG6x2w": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "6vcvsLS": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "6Wr0F3W": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "6YUfHPL": {
+    "classification": "beta_family",
+    "tier_source": "measured",
+    "reason": "Measured on RepCount-A; beta only, not verified.",
     "tier": "auto_count_beta",
     "pooled_n": "34",
     "pooled_within1_pct": "52.94117647058824"
   },
   "6ZCiYWQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "72BC5Za": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "75Bgtjy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "76vfTdU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7858za8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "78VqWQK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "79AmJsI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7AnZtSv": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "7aolH9D": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7aVz15j": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "7B4F5nZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7Ba7bQ2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7D5bgLT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7E06s6d": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "7ePTw4B": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "7F1DVzn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7f2jsqP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7gdLIXa": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "7HcfMBP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7Hg55JG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7i4msxz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7I6LNUG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7inpWch": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7jGOBF3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7M66AVi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "7OeHptV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7R4NIjL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7RWNjiB": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "7saC5zz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "7uFJuXp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7vG5o25": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7w6i0vE": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "7WaDzyL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "7WcQgkm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7xeukSt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "7xI5MXA": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "7y9JIMj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "7zdxRTl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "82LxxkW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "83HoW9X": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "84RyJf8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "84sESNy": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "89HVjEp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "8ARQ9Hw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "8coXSYU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "8d8qJQI": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "8DiFDVA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "8eqjhOl": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "8fgqP5a": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "8gQo5Ss": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "8IbNZwc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "8K0w2yA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "8K7m2SS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "8oYqOt9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "8ozhUIZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "8urJS9b": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "8xUv4J7": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "8yBgwBS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "903mzG8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "945zpRg": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "99rWm7w": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "9Ap7miY": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "9c6T1YX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "9E25EOx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "9fCHfSc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "9gbyYKk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "9GXrTE6": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "9IxJdtC": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "9JprnPh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "9KU9TYF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "9n2149Z": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "9pa4H5m": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "9pQSkH8": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "9RT8oQW": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "9sgNE2O": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "9Tkqa9O": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "9tvVVM9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "9vz4JlC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "9WTm7dq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "9XjtHvS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "9Z23cLE": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "9ZGnq1w": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "9ZGZuOD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "A2upspL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "A3P4O0R": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "a4F9Oyc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "A6wtbuL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "a8VDgLw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "A9qxk2F": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "aaxA3cm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "aaXr7ld": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "aDoFKrE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "AdxxqfF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ae9UoXQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "aee2Fcj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Af0EW2I": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "afv0ZAS": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "aHDy5O5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "ainizkb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Aj9vWh7": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "Al3tP0D": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Am02iPd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "ANbbry2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "AQ0mC4Y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "AQIhRjM": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "aqvSOQE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "AR0ig3o": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "arsYEd3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "arvaszz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "aTNKZiC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "aumB2IV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "aVs3BR3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "AwAIlSo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "aWedzZX": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "awG04cF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "AX1kB0o": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "aXcUyKb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "AxFoqAD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "aXtJhlg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ayAHcEm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "B1EVP9F": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "b2Uoz54": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "B3Rxp6L": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "b4b6afT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "b5uBMv2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "B5xca8s": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "b63ZzGe": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "B6dAO1t": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "b6hQYMb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "b9kqlBy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BaE7O6U": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "BbfB8Gb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bBi35y3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bbLR7fB": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "BCGQ6J5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BCs0G2F": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "BCUR88E": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bd5b860": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bdWcbaU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BeReYBf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bfiHMpI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Bg5JKSH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BgljGjd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BIb1tGo": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "BJ0Hz5L": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bjqbauy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bJYHBIN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "BKa8dmT": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "bKWbrTA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BkxB8LW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BL3GHeY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "blBXysN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BLCvwr2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bLyQokI": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "bmBf7LN": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "BMMolZ3": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "BmrwWzo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bmwlYvD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Bn6TXyO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bndCa3Q": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bOOdeyc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "bpJL2Qs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Bpkf41o": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "BqgCRif": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bQHPBU3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bQy2Eni": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BReCuOn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BRImeP8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "bRlbdjK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bTpEUcm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "BU15nH4": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bWlZvXh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "BWnJR72": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "BwSNDGt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bWxq4op": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ByX0WxV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bZGHsAZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "bZq4bwK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "C0eCeEt": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "C0MA9bC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "c16nYGA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "C31LMnP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "c3Pfhti": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "c3QQLPi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "C5jncD2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "C8Crfa4": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "c8f5cSY": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "c8oybX6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "C9LuR4A": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "c9MnDRp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Ca76jUE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cA9FuWG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cALkHHX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cALKspW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cAvTaSg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CB8WET1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CbFSYC1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cbuFJrn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CcWEoWV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CfKsRbG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CFN9P8G": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CggQhII": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "chfnQnM": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "CHpahtl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "CI6baTY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CjETvlw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cJgSTmh": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "CJwa0vD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CMAxnsG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CmEr4pM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CosupLu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "cQ19bBP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "CQHoDm0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CqhoytW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "CuaWCmC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cuC7529": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cuKYxhu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "CUmLRTA": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "CvPn9WV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cWemPG8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "cwsAI4G": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "d1GgzTU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "D1xYJAU": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "d5bTEPV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "D5yqP2p": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "d7z1Y7V": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "d960PgE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "D9qe7CM": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "d9Xaxq6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "da4cXST": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "daBmy1Y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "dAJscVq": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "dB07vDu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "DB0n8AG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Db7eEgw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dCJnuVq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dCPESfR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DeDThfG": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "DEEqoI2": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "DFGXwZr": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "dFSNDOA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "dG5Smob": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dG7tG5y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DgZQ11d": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DhMl549": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DICPHtq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "DIVyqrU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dK9394r": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DKBwJrL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "dmgMp3n": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dNFYIU1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DoEYq4s": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DOoWcnA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DotAgEF": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "dPmaUaU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "DptumMx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DpWMFP5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DQ0cqkT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "drfGhTV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "dRTfGZT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Dsfz0Id": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DsgkuIt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "DT14T9T": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dTg95eZ": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "DU5Kkj2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dU605di": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DU7I633": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "dVeWXf2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "DwhEmmE": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Dx2RIva": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dXz8zjF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dZl9Q27": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "dzz6BiV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "e1e76I2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "e25F58f": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "e4aFmFY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "e4ojVhP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "E4PwJqI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "E4R8Hz1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "ealLwvX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "EAs3xL9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "EcaV7aL": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "echClj7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ecl28tP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ecpY0rH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Eg98Ft9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "eGDudUV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Eh2v5Iu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "eHBlPsa": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "EIeI8Vf": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "EIsE3u8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "EKXOMEh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "elhhVgj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "EmlJR2y": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "EMpUwRI": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "en550rk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "EnPivTL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "enxnJcM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "eOCOwIR": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "eOG0r6v": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "eOrFCnx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "EpKrFiv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "epOSYUZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "EqHIIjJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ErqK3UL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ESOd5Pl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "ETZfAbZ": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "euI1BwR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "euq4pwp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "eVxAzgz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "eXFXCY0": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "eXMFHww": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "EyLrNC2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "eYmsEPR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "eYnzaCm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "eZ79rbI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "EZeDVzO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Ezpnw9d": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ezTvXcr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "eZyBC3j": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "f1jf47L": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "F1KxjBa": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "f38OEuO": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "F3xgbjF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "f4xtKBj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "F56Xpw3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "f7fnAIB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "F7vjXqT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "f7Y9eDZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "f91FwXG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "f9lVSSI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "faHKVkK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FAoIFMw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "fBnPpzd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Ff18ItA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "fF6GKVh": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "ffQsyBj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FFRP97T": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "fgc9Xdl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Fhdtwf3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "fhZQPlV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "fI18Rbc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "fjjY3N4": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FkBIE6a": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "fKZgDEO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "fNGumX0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "fprd84i": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FQXdXzY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FS63wTN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FSD6PGL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FSF9WOs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "fSrPP6B": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "fTlkJop": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "fUBheHs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FVM1AUZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FVmZVhk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "FWdVhcW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "fXfqg1E": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "FxhcxUW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "FY3UdNT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "fY68AyX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "fy7Tgy4": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "fZFZ704": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "G08RZcQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "G1qWW6M": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "g2oKspu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "g376LuL": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "G61cXLk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "G70mEAJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "G7PXMlT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "G7xoEzr": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "G8dXpNG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "g9AsZ8P": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "GaSzzuh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gAwDzB3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Gchi5Tr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "GdMa1ET": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gdPIyyO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gEyURal": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "gf3ZjB9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gfk9kD4": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gFyFj9z": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gGNQmVt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gH5fRsC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Gi2BXfK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "GibBPPg": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Gk1r408": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "GKEH6jj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gKozT8X": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Gm2Uv1z": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gMyx3Qn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Gn5FwYT": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Gnfo4FM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "GNhAeJ0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "goJ6ezq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "GOJKFfO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Gpn4ADc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "GrO65fd": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "gscGLOU": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "GSDioYu": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "gSO0KpB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gSw59a4": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "gTGciXz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "gtO1ErP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Gu2ENkm": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Gu2rNJd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gUjqdei": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "GUT8I22": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "guT8YnS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gVlnLIJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gvsWLQw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Gw2HFvW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "gw9PqGk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gWcZD4q": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "GWoKnIm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "GwYwElT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "gx7s7uF": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "GxDwDX0": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "Gxg9lDc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "GXoaSgn": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "h1ezqSu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "H1PESYI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "H1XAdpk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "H6ETwO9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "H6ybluc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "h8LFzo9": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "H9y3Dkr": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Ha7SZ3y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hacCyUv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hBGWILP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HbSG1Pw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hbY9wqG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HBYyX94": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hC6oYY5": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "hCjGsRQ": {
+    "classification": "hold_timer",
+    "tier_source": "rule",
+    "reason": "Static hold; use a timer rather than repetition counting.",
     "tier": "manual"
   },
   "HDYiZcY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HEJ6DIX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hfmQ0Tz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HfqciZF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Hgs6Nl1": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "hHy8tQG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "HIgYKAB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Hj4FOCd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HJ63mSO": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "HjdqmZa": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hjWjJEm": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "hl8DUh8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hMEptv0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HMzLjXx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hnOYgH3": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "hoXt6wv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HPlPoQA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hq2hyDH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hrrS0Ed": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "hrVQWvE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "HsjbB1z": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HsvHqgf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ht8xDrP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HtfCpfi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hTLtkXL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HUEqZ1y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hvHhCv8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "hvV79Si": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hVzPY5j": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hwygydB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Hx1WC8I": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "hxyTtWj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Hy9D21L": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "HYe1ZqR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "HZgQPxh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "i11JWU7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "I1OBLnn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "I3tsCnC": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "I4hDWkc": {
+    "classification": "beta_family",
+    "tier_source": "measured",
+    "reason": "Measured on RepCount-A; beta only, not verified.",
     "tier": "auto_count_beta",
     "pooled_n": "34",
     "pooled_within1_pct": "50.0"
   },
   "i4JkUaL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "I4KkPdl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "I4tibZG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "i5cEhka": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "I6Ca0a7": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "i6LWjok": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "i8BdLTK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ia6kIIl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Ia7tumC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "iaapw0g": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IaGQCrC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IBj3nsn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iCPqbki": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iDGtjyi": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "Ie9UGty": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IeDEXTe": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "IENzBdA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IeTIEqg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iFsqlCD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IGjKj1v": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IGtBdNT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IH2kr7n": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iK59oEA": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "IL0JUxR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ila4NZS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "IMRsOCn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iny3m5y": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Ion0XWz": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ioTf098": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iPm26QU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IpONWYv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Iptlv6x": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ipvgBnC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "iQ241UP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iqH55N8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "isAAZWA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "isofgzg": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "IU4QNJ6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IvV6C9M": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "IwX5NqK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "IxsFgRT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iYzB0Cz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "izMnLqz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "iZop9xO": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "IZVHb27": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "J1vH2X0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "J60bN17": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "J6Dx1Mu": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "j6uIfep": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "j74M6Zn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "J74XlNf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "j7XMAyn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "j9Q5crt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "J9zIWig": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "JbC2iaV": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "jCBOdh0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "jCrtE9b": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "jdiExfW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jDnrkar": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jDOKRM5": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "jeHtrlO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "JF8AkMX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jFtipLl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jgbvVJ0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "JGKowMS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jHAnWmT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "JhYSVwT": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "jivWf8n": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jjUPrze": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jK2hZ6n": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jl6uxZV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "JmMVpR3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jNU1gFQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "JOZhu2h": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "jpgqxiS": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "jQGwmxN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "JrOHAZc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Jsgsc27": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "JsKq9so": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "JsOV1SU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jtFKbt5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jTkSc6o": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jV65tKx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "jvEXp4N": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "jvp6DiD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "JWjujiY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "JxrY9mC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "JymLInS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "JzQbv7J": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "JZuApnB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "K1vlode": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "K3dIO25": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "k5IpyHg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "K5xgdvI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "k6tUeqS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "K9VL0Jq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Kal9cQQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KCBKjma": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "KenZJQV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kesXOpB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KgI0tqW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "KHGNa16": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KhHJ338": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "khlHMqs": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "KHPZL0b": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KI1DjNN": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "kiJ4Z2K": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kj3hy6W": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kjE55n5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kjJ3VoQ": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "kk39rUy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "kKYTkjJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "kLiIFdB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "km0sQC0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "km2Ljzj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kmVVAfu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kMzUs9Y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kont8Ut": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KOpzGBL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Kpajagk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kprile3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "KQfySvS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Krmb3cB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kTbSH9h": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ktf3nvW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KtRomty": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "ktsFQAZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "KUaoUV8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "KUaZst7": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "kuMiR2T": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "kuXhl0o": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KWdF2JI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KwFGiEP": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "KWyEjtI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "kXaIn5A": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Kxquu2E": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KXyoEtA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ky8FLU8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Kyd9Rz5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KyLtiLT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Kzg30R7": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "KZn52RC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "KZXAtKQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "L2V5Nan": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "L4ay0PW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "L68dTQj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "laVRfDf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "lBDjFxJ": {
+    "classification": "beta_family",
+    "tier_source": "measured",
+    "reason": "Measured on RepCount-A; beta only, not verified.",
     "tier": "auto_count_beta",
     "pooled_n": "33",
     "pooled_within1_pct": "66.66666666666666"
   },
   "lCKm4Rs": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "LCtQPn8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LeaZOIz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LEH9jxP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LEprlgG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "lFBTISi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "lFhb2Rw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LFIOery": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "lHeUULr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "LHWF7us": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "lI7easp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LIGZSTA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LIlE5Tn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "lJJ7Yq8": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "LkoAWAE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "LL1UiTX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LLNh6q5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "LlSe9IK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LmaFNZS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "LMGXZn8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Ln9iTbU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "LNE3wfo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LQFOrMn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "lRcrlH8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "LrV4s90": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Lsqrgh4": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "LSTChY9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LsZkfU6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Lt3iWnf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "LuBEORI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LWuA3aZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LYJodFS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "lyKCLmK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "LzX8YEz": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "m0tCHqc": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "M2Pm3zj": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "M5Y7GPg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "M72BExt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "M74kdvm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "M8IolhQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MaMuGH6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mAYqY4M": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mbkgB44": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "MCkqdKE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MCUhf1F": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "MDFxU4b": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mExgrF9": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "mgejmGP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MgKwAAo": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "MKIelrR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mKwcrHn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mnzcrIB": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "mpKZGWz": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "mpYUPkA": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "mQ1tBXn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MqNdIbe": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mr7pkqP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Mr8d4KA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MRaFiZP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MrgP9L6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ms7tjSG": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "MSfvriJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mTT3KLn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "mtXengz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mu5Guxt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "MU9HnE7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "MUic5zN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MvQPqVW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mWBtgmb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mweqJin": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "mWppALS": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "mwpPcr1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Mxa7Cr8": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "my33uHU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MY9P1WA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "myfUsKf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "myJeTAe": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "mym4hJo": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Mz6lLcW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "MzNnwx9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "N3EirIW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "n5cWCsI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "N6dZN2I": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "NAgVB3t": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "NAkmgdx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nAuHPcD": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "NbVPDMW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "NCmbLCw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nCU1Ekp": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "NdIb5Z1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nDK1HJ0": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "neonEDL": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "nFc4FyV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nFHk9fU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "NfP83rA": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "nFUwqG6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ngPpyRS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Nh3mvOO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ninBEOY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nIR4Rwl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "niXESDw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "NJzBsGJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "NKJ8o6x": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "NL6YBwN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "NlfIbzq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nlJsbkW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "NN8nSNT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nnmCTLN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "NNoHCEA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nqs5HGV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ns0SIbU": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ntjtCfu": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Nu7jqFE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nuBF9MO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "numr601": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nUwVh7b": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "NvfE43H": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "nxW6BkN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "NZ5Qqkz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "nZZZy9m": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "o17Jfkt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "o1HGDSq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "o1ntciW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "O2K9Vb5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "O3INw8V": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "O4oIqQD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "o5Jsk92": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "o6LqKKP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "o80Xu9C": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "o8aOcrz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "O8Aq69u": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "O8o7q4d": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "O95afRA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "OaE7CpD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OAguZoG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "obe5LMq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ocYc6Db": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OeL23VY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "oHg8eop": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "oHsrypV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OIFMAp1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OJFgZJ0": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "oLrKqDH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OM46QHm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OmQ8w0p": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "omsF3RN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "oMwyl17": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "oMypNrz": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "ookVu2D": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "oom75KC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "OPqShYN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OQ1otBN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "oQRJYkC": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "oR7O9LW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OrETs32": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "oROuvrX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "osdXT3K": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OTgkHwR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "otqIxU4": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "OUQ0ZyW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OVIKwsd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OVLmUuL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OVTZ65k": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OxJk1fg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OYFhXVD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "OyoZ3Pu": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "oZjMu1t": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "p0OCXGb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "P14Dz9D": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "p195zsJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "P2lNrGL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "P2nRiUa": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "P5p0j8B": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "p5v6rdT": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "P7zSvul": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "p9cCe2r": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "P9GFBME": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "P9ZRyLT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "PAgTVaK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "pAIWRGu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PbzNu7c": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "PcPe0P5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PCUYOMs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "PDaMuyV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PDHE73u": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "PdmaD0N": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "peAeMR3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PERjVm8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pFuK3by": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "PG1kcIb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pgIdT6i": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pH2x2jj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "pj0X0tF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Pjbc0Kt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PkCN2lv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PKlXuJW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pkSoCW9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pM07UxU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PM1PZjg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pmnrOp0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pNIKolI": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "PNtsX17": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PnZJIrk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "pP8wP2P": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "pQ0Mx1Z": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PQ2AtC3": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "PQcUlDi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "PQStVXH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Pr9Rhf4": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "prbWx1D": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "PrQbjvB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PskORrA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PSlvNMs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PsVS1QP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pvBMLHA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pwt0pnM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pX9Elbe": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PXTIwgu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "py1HSzx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "PzNxakt": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "PzQanLE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "pZwUsKB": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "q2ADGqV": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Q2Eu1Ax": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Q497lAE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Q4DSJPC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Q6bvyen": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "q6y3OhV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "q7qkONO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "q8aHNoF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Qa55kX1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qAmNMJY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qatbkEd": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "qaZVsGk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qBcKorM": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "qBl14UC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QChZi3x": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qcNN2FN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qCNVnaU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qcY50ZD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qDnGfDb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qdRxqCj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qEse6fe": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "QfAKy1G": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qFHvMnv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QFmz6ch": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "qFpAkpP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "qg2PGl6": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "qi996YS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Qj0HRAZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "QjE2DcA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qKBpF7I": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Ql4g5s8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QLL2gdc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qLpO4vV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QLRmNeT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qlZUaZ8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qm9veZw": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "QOA0FD0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "qOgPVf6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QoHIhPl": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "qOKcgVP": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "QoSZo2Y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Qoujh3Q": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qPEzJjA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "QpXqiq8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Qqi7bko": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QQwxa8g": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qRZ5S1N": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QsSQWbf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "QT5Q0nK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QTXKWPh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qU8bYp7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QUDd8WS": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "qx4fgX7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "qXTaZnJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QY39eBr": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "Qyk5J3p": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QyO6Uma": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "QYysSLV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "QZFv5ui": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "r0z6xzQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "R1WYG5D": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "r1XNRYB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "r29jP7S": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "r4RZKpF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "r5DgrW9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "R5swFnc": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "r7cT9YD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "RaflbWD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rbu5UUb": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "rDAiRf9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "reFHapa": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "REGM1dE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rEhi2o5": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "REXmfVC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "rg59QCH": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "RgJDRR1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "RGLscZM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rGwhJ5o": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "RJa4tCo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "RJgzwny": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "rjiM4L3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "rjtuP6X": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "rkg41Fb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "RKjH6Lt": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "rmEukuS": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "RoV1Rfa": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "rQhGcin": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "RQNVT10": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "RqOtqD7": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "rQxwMxO": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rR0LJzx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Rr7S3yg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "RrLske5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "RRWFUcw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rseLfH3": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "RSOsp5d": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Rsxr3xl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rTbyBYV": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "RtyAsy1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rUXfn3R": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "RVwzP10": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rWoBmi5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "RxayqAZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "RYcV1kH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "rZ80Gbp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "s0HKO2I": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "S1JXDAG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "s34Y4LR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "S37C94C": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "S4pwGlc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "s5PdDyY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "s7HX1BY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "S8mo30S": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "s8nrDXF": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "S93zLTG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "s999Hdo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "S9zHIvU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Sa8mzWc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SaDOwk7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Ser9eQp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SGY8Zui": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SHUMp5H": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SiWCcTN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SJAA2IQ": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "sJElUUI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "sJFIDIp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SJqRxOt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SKXQAx3": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "slDvUAU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SLKj2pX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "sM84pE4": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "Sn8wxAI": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "SNFfUff": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Snj1wSv": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "soIB2rj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SP3hUez": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SpsOSXk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SpYC0Kp": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "SSsBDwB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "sTfvVsG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "sTg7iys": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "sU5BrfP": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "sVQCCeG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "sVvXT5J": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SxHteRW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "sxY5Biu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "sYCcnon": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "SYJ4Bkt": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "syUwUKY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "szIn2UK": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "sZOR9EV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "SzX3uzM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "T0yTjgW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "T2fA5Ir": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "T2mxWqc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "t8iSghb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "T8UpLkb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "TBNaSNs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "tBWXbIT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "tc5dYrf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "TDYiji6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "TFA88iB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "tFGKm99": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "TFqbd8t": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "tFToB7l": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "tgryw5Y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ThKP69G": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "TiaZTxx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "tig3PXb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "tj41Nu6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "tJ5nYqo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "tnaj0mT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Tq6gbK6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "trmte8s": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "trqKQv2": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "tTuZSDT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "tuIZFDt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "TUZLh71": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "TV87DNB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "TVdivgY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "TXtXc84": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "tZkGYZ9": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "tznL2Ad": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "u0cNiij": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "u0pLNgz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "u1iHcoD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "u27Kcdz": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "u2X71Np": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "U3ffHlY": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "u3UuCZu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "u4bAmKp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "u5ESqzH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "U5INZY6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "U6G2gk9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "U7D9Fx3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UDlhcO8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UDm6cGl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UEjSrKI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "ufaxB52": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UfePqpx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "UFGF6gk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UgDm3oy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UGhRD1A": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "UHJlbu3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UI81amT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UIbGx6H": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "UilDHSs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uJmK7Z1": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UKWTJWR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uKyN64F": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Ul5OFSV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uL9CsKm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UM8mgyG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Um8xUAc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UmpPAAe": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UNAB8ak": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UOphC6N": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uOV3Itw": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "UoX77uR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "UpAlold": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "UpWmA5E": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "UQr48Oi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uSkDMYl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uTBt1HV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UtmIqcI": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "Uto7l43": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "uTv34oq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UVL20oz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UVo2Qs2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uWpxD4v": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uX3sUBz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "uxJcFUU": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "UXpKJoq": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Uywa4S5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "UzkLrem": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "uZKq7lo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "V07qpXy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "v1qBec9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "v2DfH14": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "v3vLFW0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "v3xmPAR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "V4ryaZa": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "v6EKk0O": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "v7p5bYl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "V7rWsT5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VaP75jl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vAwm6rK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VBAWRPG": {
+    "classification": "hold_timer",
+    "tier_source": "rule",
+    "reason": "Static hold; use a timer rather than repetition counting.",
     "tier": "manual"
   },
   "vBNyir7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VdLZ3nB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VEcJRo2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "VedGSby": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "veXwo0D": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Vh0GsK4": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "VhX2JdE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vi8EhoE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vIICElP": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "VjYliFZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vKilzz3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VLYXo8S": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vM5YS2g": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vmwLyCg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vN5HB0s": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "VnfUNW7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vNPJbDA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VO2qeJg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "vobtVkm": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "vocve3e": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "vpleANJ": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "vpp9Ku2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VPPtusI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vpQaQkH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vptOQ4N": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VQ3sNCn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vqsbmL0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vR1vold": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VRBGPHB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vrhHa6D": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vsMcDi9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VsopqcV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vsVoPHt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "VtTbiP3": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vtusOWT": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "VuoerH0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "vUTfFHw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vvNjDJS": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Vvwjz6N": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "VW88JNd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "VX5YKR5": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "vYk8lqw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "VYmYxK5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "vzAxBtt": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "w1NOByi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "W1p7BND": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "w2oRpuH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "W31mMjd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "w44vFvP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "w4dLzSx": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "W6PxUkg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "w7obpWd": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "W7yh3Yo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "W8KAlkI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "W9pFVv1": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "WbNq5Xu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wbUYILZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "WCAvOfC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WcHl7ru": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "wd4ds3s": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wDN97Ca": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wdRZISl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wDUqY2u": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "weoDEpH": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "wEulIzp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "wf24o8S": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wfotm7S": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WFucoe6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Wgaz7pm": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Wgbn9qo": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "WgJnBH5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WhuFnR7": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "wi2H9QX": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "wigSg76": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wkgnGfb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WKMQzCD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WL4EmxJ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "WLvTAv5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WM6TvvW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WME869U": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wnEscH8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wOLmCXc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "woLo1QN": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wpbD28t": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wPypxFY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wQ2c4XD": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "wqNPGCg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WrYPP2g": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wSScovH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wt6rwjk": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "wu5LXwz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WU9BLIs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "WVD66ff": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "wVompEp": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "WW95auq": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "WWD6FzI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wWFspEi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wXvUZC8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "wyaqzOS": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "x0lwvfq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "x2chWLO": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "x306lCW": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "X3cqyXz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "X3TCNEU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "x69MAlq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "X6C6i5Y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "x6KpKpq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "X6ytgYZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "X7jbxra": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "x825CZm": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "XaaRnRn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XalXcvM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xAySMB0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xbkPfaw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xBYcQHj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xcLntTC": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Xd65M9w": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xDh0lJr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XDOiFns": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "xdYPUtE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XE93sQZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XeMvLgE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XFc3vpY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xGgAGPm": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "xgsGFVM": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "XgWyAiA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "XhfS1DZ": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "xHKN2s8": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xi0yckC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "xiA6lRr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xifhB5W": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "XIHEoCG": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xiHiJcA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "xLYSdtg": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "XlZ4lAC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xMjBKwn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "xmM75XG": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "xmWQIlT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xnInPfE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "xNrS20v": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xo6sENf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "XooAdhl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xOXZJRZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XPUDTt7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XqYQ9JA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XsCcxCC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XSCHmiI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "xTjr103": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "XU3ePuv": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "XUUD0Fs": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "xUwnBMT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "XVDdcoj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "XVzF3iZ": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "xXm4nYq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Xy4jlWA": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Y1MsI1l": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Y4BRNQF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Y4QlY8z": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "y5p0H8a": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "y5U5B9Y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Y5X65IB": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Y7YcmIJ": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "y8bYM8w": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Y8dOJlH": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Y9hNPcN": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "YA2HKGz": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yaAxcQr": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "YAk5dIw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yaMIo4D": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "yB9SvIF": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "yCvYdi7": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Ye5Qxb0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ye84CTU": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Yg7MJAT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "yg8Totb": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "YIUAtYf": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "yJUHKTn": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ykA5tU7": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "ykHcWme": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ykUOVze": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "yl2IYyy": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "yn0LjwL": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "yn2lLSI": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yn8yg1r": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "YPoVrBi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "yq3GAJX": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yQe5HpE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "YqJw82s": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "YRaCa5Y": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yRLPCLu": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yRpV5TC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "yRYyfdA": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "Ys97II0": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "yT9tk17": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "YtaCTYl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "YtgD7Xq": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "YTur5nR": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yU7w7CA": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "yUdIGNs": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "YUYAMEj": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "ywaNfuh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "YwnI4ja": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yWxMvB5": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "YZ4961r": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yz9nUhF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "Yza7XrQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "yzYH9pI": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Z5YStHW": {
+    "classification": "no_reps",
+    "tier_source": "rule",
+    "reason": "Mobility or stretching movement; repetition counting is not assigned.",
     "tier": "manual"
   },
   "z6TAHoT": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "ZA8b5hc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "za9Ni4z": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zCgxPbV": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "zd4P4B2": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Ze7MoIb": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZEkjZDi": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zfNHMN9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZfyAGhK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zFzbBfL": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zG0zs85": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "Zg3XY7P": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zGSIWQi": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ZgsNQ6d": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZgwWBoC": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZH68exZ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zHEpuuc": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zhF9lW4": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "Dynamic movement; repetition counting has not been validated.",
     "tier": "manual"
   },
   "zhMwOwE": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ziFKQXP": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zILLZ98": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZIViNh1": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "zK8Fu1W": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zkgRrbK": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "znf7t8E": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZNgOYQU": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ZnJHhMk": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "znLogoF": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "znP9SIh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "znQUdHY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zoOvPcx": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ZOuKWir": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZqNOWQ6": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZsiqXYa": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ZSJNetl": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZSY3MsL": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ztAa1RK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZujAdR9": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZuPXtCK": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZuXu4Eq": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "Zwiw7XR": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Dynamic movement; floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ZX9UZmj": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZXnjcOQ": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zYmNaoY": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "ZZKbeMw": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   },
   "zZlORz6": {
-    "tier": "manual"
+    "classification": "pose_unreliable",
+    "tier_source": "rule",
+    "reason": "Floor position or occlusion may make pose estimation unreliable.",
+    "tier": "pose_only"
   },
   "ZZTGMKh": {
+    "classification": "candidate_unvalidated",
+    "tier_source": "unmeasured",
+    "reason": "No representative validation or range-of-motion measurement available.",
     "tier": "manual"
   }
 };

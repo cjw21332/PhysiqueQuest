@@ -1,78 +1,39 @@
 #!/usr/bin/env python3
-"""
-Generate strict catalog tiers in accordance with K1-K3 requirements:
-- Beta = strictly RepCount-A tested ids: 6YUfHPL (squat), I4hDWkc (push-up), lBDjFxJ (pull-up), 3eGE2JC (front raise), 1g5bPpA (jumping jack)
-- Candidate = everything else
-- Pose Unreliable = lying / bench / floor / bridge / crunch / plank / raise
-- No Reps / Yoga = stretch / yoga / mobility
-"""
-import json, csv
+"""Generate conservative tiers; a name-based rule is not validation evidence."""
+import json
+import re
 from pathlib import Path
-from collections import Counter
 
-ML = Path(__file__).resolve().parents[1]
-DATA = ML / 'data'
-OUT = ML / 'reports' / 'coverage'
-OUT.mkdir(parents=True, exist_ok=True)
+root = Path(__file__).resolve().parents[2]
+catalog = json.loads((root / 'ml/data/exercise_ml_map.json').read_text(encoding='utf-8'))
+report = json.loads((root / 'ml/reports/repcount/FINAL_REPORT.json').read_text(encoding='utf-8'))
+beta = {'6YUfHPL': 'squat', 'I4hDWkc': 'push_up', 'lBDjFxJ': 'pull_up', '3eGE2JC': 'front_raise', '1g5bPpA': 'jumping_jack'}
 
-with open(DATA / 'exercise_ml_map.json', encoding='utf-8') as f:
-    catalog = json.load(f)
+def classify(name):
+    name = name.lower()
+    # A plank with an action is a repetition, not a static hold.
+    dynamic = ('dead bug', 'rollout', 'roll out', 'sledge hammer', 'sledgehammer', 'slam', 'windshield wiper', 'leg raise', 'twist', 'pallof press', 'tap', 'raise', 'lift', 'abduction', 'fly', 'push-up to', 'push up to', 'walk', 'jack', 'climber', 'rotation', 'rock', 'crawl', 'dip')
+    if any(word in name for word in dynamic):
+        if any(word in name for word in ('lying', 'floor', 'dead bug', 'windshield', 'leg raise')):
+            return 'pose_unreliable', 'rule', 'Dynamic movement; floor position or occlusion may make pose estimation unreliable.'
+        return 'candidate_unvalidated', 'unmeasured', 'Dynamic movement; repetition counting has not been validated.'
+    if re.search(r'\b(plank|wall sit|hollow hold|isometric hold)\b', name):
+        return 'hold_timer', 'rule', 'Static hold; use a timer rather than repetition counting.'
+    if any(word in name for word in ('stretch', 'yoga', 'mobility')):
+        return 'no_reps', 'rule', 'Mobility or stretching movement; repetition counting is not assigned.'
+    if any(word in name for word in ('bench', 'lying', 'floor', 'bridge', 'crunch')):
+        return 'pose_unreliable', 'rule', 'Floor position or occlusion may make pose estimation unreliable.'
+    return 'candidate_unvalidated', 'unmeasured', 'No representative validation or range-of-motion measurement available.'
 
-BETA_IDS = {'6YUfHPL', 'I4hDWkc', 'lBDjFxJ', '3eGE2JC', '1g5bPpA'}
-BETA_STATS = {
-    '6YUfHPL': {'n': '34', 'within1': '52.9'},
-    'I4hDWkc': {'n': '34', 'within1': '50.0'},
-    'lBDjFxJ': {'n': '33', 'within1': '66.7'},
-    '3eGE2JC': {'n': '37', 'within1': '51.4'},
-    '1g5bPpA': {'n': '41', 'within1': '41.5'}
-}
-
-tier_map = {}
-rows = []
-tier_counts = Counter()
-
-for ex_id, ex in catalog.items():
-    name = ex.get('name', '').lower()
-    equip = ex.get('equipments', [])
-    body_parts = ex.get('bodyParts', [])
-
-    if 'stretch' in name or 'yoga' in name or 'mobility' in name:
-        tier = 'no_reps'
-        tracking_tier = 'manual'
-    elif ex_id in BETA_IDS:
-        tier = 'beta_family'
-        tracking_tier = 'auto_count_beta'
-    elif any(i in name for i in ['bench', 'lying', 'floor', 'bridge', 'crunch', 'plank', 'raise']) or 'floor' in body_parts:
-        tier = 'pose_unreliable'
-        tracking_tier = 'pose_only'
-    else:
-        tier = 'candidate_unvalidated'
-        tracking_tier = 'manual'
-
-    tier_counts[tier] += 1
-    stats = BETA_STATS.get(ex_id, {})
-
-    tier_map[ex_id] = {
-        'tier': tracking_tier,
-        'pooled_n': stats.get('n', ''),
-        'pooled_within1_pct': stats.get('within1', '')
-    }
-
-    rows.append({
-        'exerciseId': ex_id,
-        'name': ex.get('name', ''),
-        'tier': tier,
-        'trackingTier': tracking_tier,
-        'pooled_n': stats.get('n', ''),
-        'pooled_within1_pct': stats.get('within1', '')
-    })
-
-with open(OUT / 'catalog_tiers.csv', 'w', newline='', encoding='utf-8') as f:
-    writer = csv.DictWriter(f, fieldnames=['exerciseId', 'name', 'tier', 'trackingTier', 'pooled_n', 'pooled_within1_pct'])
-    writer.writeheader()
-    writer.writerows(rows)
-
-with open(ML / 'models' / 'catalog_tiers.json', 'w', encoding='utf-8') as f:
-    json.dump(tier_map, f, indent=1)
-
-print("Strict K1 tier counts:", dict(tier_counts))
+tiers = {}
+for exercise_id, exercise in catalog.items():
+    classification, source, reason = classify(exercise.get('name', ''))
+    entry = {'classification': classification, 'tier_source': source, 'reason': reason,
+             'tier': 'pose_only' if classification == 'pose_unreliable' else 'manual'}
+    if exercise_id in beta:
+        stats = report['per_class'][beta[exercise_id]]['pooled']
+        entry.update(classification='beta_family', tier_source='measured', tier='auto_count_beta',
+                     reason='Measured on RepCount-A; beta only, not verified.', pooled_n=str(stats['n']), pooled_within1_pct=str(stats['within1_pct']))
+    tiers[exercise_id] = entry
+(root / 'ml/models/catalog_tiers.json').write_text(json.dumps(tiers, indent=2) + '\n', encoding='utf-8')
+print(f'Generated {len(tiers)} catalog tiers. No low-ROM measurements were supplied; low_rom source count is zero.')

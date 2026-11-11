@@ -31,7 +31,7 @@ describe('PoseTracker API configuration',()=>{
     const unknown = resolveTrackingConfig({exerciseId:'unknown', name:'unknown'});
     expect(unknown.trackingTier).toBe('manual');
     const bench = resolveTrackingConfig({exerciseId:'EIeI8Vf', name:'barbell bench press', movement_pattern:'horizontal_push'});
-    expect(bench.trackingTier).toBe('manual');
+    expect(bench.trackingTier).toBe('pose_only');
     const yoga = resolveTrackingConfig({exerciseId:'01qpYSe', name:'upward facing dog stretch', movement_pattern:'squat'});
     expect(yoga.trackingTier).not.toBe('auto_count_beta');
   });
@@ -71,6 +71,16 @@ describe('PoseTracker API configuration',()=>{
     const keys = Object.keys(catalogTiersMap);
     expect(keys.length).toBe(1500);
     expect(new Set(keys).size).toBe(1500);
+  });
+  it('marks static planks as holds rather than auto-counted repetitions', () => {
+    expect(catalogTiersMap['VBAWRPG'].classification).toBe('hold_timer');
+    expect(catalogTiersMap['VBAWRPG'].tier).toBe('manual');
+  });
+  it('records explicit evidence source and rationale for every tier', () => {
+    for (const entry of Object.values(catalogTiersMap)) {
+      expect(['measured', 'rule', 'low_rom', 'unmeasured']).toContain(entry.tier_source);
+      expect(entry.reason.length).toBeGreaterThan(0);
+    }
   });
   it('beta_family is exactly {1g5bPpA, 3eGE2JC, 6YUfHPL, I4hDWkc, lBDjFxJ}', () => {
     const betaIds = Object.entries(catalogTiersMap).filter(([k, v]) => v.tier === 'auto_count_beta').map(([k]) => k).sort();
