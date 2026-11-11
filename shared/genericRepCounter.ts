@@ -32,6 +32,9 @@ export type GeneratedAngleConfig = {
   stabilityConstraints: StabilityConstraint[];
   viewHint: 'front' | 'side' | 'unknown';
   isIsometric?: boolean;
+  holdStabilityFrames?: number;
+  holdAngleStdDevDegrees?: number;
+  holdHipDriftThreshold?: number;
 };
 
 /** Input landmark per frame (matches MediaPipe 33 landmarks) */
@@ -238,10 +241,12 @@ export class GenericRepCounter {
   private calibrationReps = 0;
   private previousCalibrationRom: number | null = null;
   private driftStartMs: number | null = null;
+  private driftAnchor: number | null = null;
   private observedMin = Infinity;
   private observedMax = -Infinity;
   private holdStartMs: number | null = null;
   private holdLastVisibleMs: number | null = null;
+  private holdSamples: Array<{ angle: number; hipX: number; hipY: number }> = [];
   private holdDurationMs = 0;
   
   // Callbacks
@@ -324,6 +329,7 @@ export class GenericRepCounter {
     this.resetCalibration();
     this.holdStartMs = null;
     this.holdLastVisibleMs = null;
+    this.holdSamples = [];
     this.holdDurationMs = 0;
     this.emitProgress();
   }
@@ -341,6 +347,7 @@ export class GenericRepCounter {
     this.observedMax = -Infinity;
     this.holdStartMs = null;
     this.holdLastVisibleMs = null;
+    this.holdSamples = [];
   }
 
   private resetCalibration(): void {
@@ -350,6 +357,7 @@ export class GenericRepCounter {
     this.calibrationReps = 0;
     this.previousCalibrationRom = null;
     this.driftStartMs = null;
+    this.driftAnchor = null;
   }
 
   private updateCalibration(angle: number, timestamp: number): void {
@@ -361,11 +369,19 @@ export class GenericRepCounter {
     const priorRom = Math.abs(priorPeak - priorRest);
     if (priorRom < 1) return;
     if (this.calibrationReps >= 2) {
-      if (this.state === 'AT_START' && this.calibratedRest !== null && Math.abs(angle - this.calibratedRest) > 20) {
-        this.driftStartMs ??= timestamp;
-        if (timestamp - this.driftStartMs > 2000) this.resetCalibration();
+      const distance = this.calibratedRest === null ? 0 : Math.abs(angle - this.calibratedRest);
+      if (distance >= 19 && distance <= 35) {
+        if (this.driftAnchor === null || Math.abs(angle - this.driftAnchor) > 3) {
+          this.driftAnchor = angle;
+          this.driftStartMs = timestamp;
+        }
+        if (this.driftStartMs !== null && timestamp - this.driftStartMs > 2000) {
+          this.resetMotion();
+          this.resetCalibration();
+        }
       } else {
         this.driftStartMs = null;
+        this.driftAnchor = null;
       }
       if (this.calibrationReps >= 2) return;
     }
@@ -446,15 +462,21 @@ export class GenericRepCounter {
     if (this.genConfig.isIsometric) {
       const joint = this.genConfig.primaryJoints[0];
       const target = this.genConfig.peakAngles[joint] ?? this.genConfig.startAngles[joint];
-      if (target !== undefined && Math.abs(this.emaAngle - target) <= 10) {
-        if (this.holdLastVisibleMs !== null && timestamp - this.holdLastVisibleMs > this.config.visibilityLostMaxMs) this.holdStartMs = null;
-        if (this.holdStartMs === null) this.holdStartMs = timestamp;
-        if (timestamp - this.holdStartMs >= 500) this.holdDurationMs = timestamp - this.holdStartMs;
-        this.holdLastVisibleMs = timestamp;
-      } else {
-        this.holdStartMs = null;
-        this.holdLastVisibleMs = null;
-      }
+      const hip = landmarks[23];
+      const n = Math.max(2, this.genConfig.holdStabilityFrames ?? 5);
+      if (this.holdLastVisibleMs !== null && timestamp - this.holdLastVisibleMs > this.config.visibilityLostMaxMs) this.holdSamples = [];
+      if (target !== undefined && Math.abs(angle - target) <= 10 && hip && hip.visibility >= this.config.visibilityThreshold) {
+        this.holdSamples.push({ angle, hipX: hip.x * aspect, hipY: hip.y });
+        if (this.holdSamples.length > n) this.holdSamples.shift();
+        const mean = this.holdSamples.reduce((sum, sample) => sum + sample.angle, 0) / this.holdSamples.length;
+        const std = Math.sqrt(this.holdSamples.reduce((sum, sample) => sum + (sample.angle - mean) ** 2, 0) / this.holdSamples.length);
+        const first = this.holdSamples[0];
+        const drift = Math.max(...this.holdSamples.map(sample => Math.hypot(sample.hipX - first.hipX, sample.hipY - first.hipY)));
+        if (this.holdSamples.length === n && std <= (this.genConfig.holdAngleStdDevDegrees ?? 2) && drift <= (this.genConfig.holdHipDriftThreshold ?? 0.02) && this.holdLastVisibleMs !== null) {
+          this.holdDurationMs += timestamp - this.holdLastVisibleMs;
+        }
+      } else this.holdSamples = [];
+      this.holdLastVisibleMs = timestamp;
       this.emitProgress();
       return this.getProgress();
     }
@@ -653,7 +675,7 @@ export class GenericRepCounter {
 
   /** Handle visibility loss */
   private handleVisibilityLost(joint: string, timestamp: number): void {
-    if (this.genConfig.isIsometric) { this.holdStartMs = null; this.holdLastVisibleMs = null; }
+    if (this.genConfig.isIsometric) { this.holdStartMs = null; this.holdLastVisibleMs = null; this.holdSamples = []; }
     if (this.visibilityLostMs === null) {
       this.visibilityLostMs = timestamp;
     } else if (timestamp - this.visibilityLostMs > this.config.visibilityLostMaxMs && this.state !== 'VISIBILITY_LOST') {
@@ -685,7 +707,9 @@ export class GenericRepCounter {
 
       case 'MOVING':
         this.maxProgressInRep = Math.max(this.maxProgressInRep, progress);
-        if (progress >= fullThreshold) {
+        if (progress >= (this.config.calibration && this.calibratedRest !== null && this.calibratedPeak !== null
+          ? Math.max(0.4, this.config.minCalibratedRom / Math.abs(this.calibratedRest - this.calibratedPeak))
+          : fullThreshold)) {
           this.state = 'AT_PEAK';
           this.currentPeakMs = timestamp;
           this.emitEvent({ type: 'state_change', from: 'MOVING', to: 'AT_PEAK' });
@@ -829,5 +853,8 @@ export function trackingConfigToGeneratedAngle(config: any): GeneratedAngleConfi
     stabilityConstraints: g.stabilityConstraints,
     viewHint: g.viewHint,
     isIsometric: g.isIsometric,
+    holdStabilityFrames: g.holdStabilityFrames,
+    holdAngleStdDevDegrees: g.holdAngleStdDevDegrees,
+    holdHipDriftThreshold: g.holdHipDriftThreshold,
   };
 }

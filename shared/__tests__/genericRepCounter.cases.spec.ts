@@ -93,10 +93,23 @@ describe('real landmark exercise cases', () => {
     const counter = new GenericRepCounter({ ...config('knee', 'bilateral', 160, 160), isIsometric: true }, { emaAlpha: 1 });
     for (let t = 0; t <= 2000; t += 100) counter.update({ landmarks: frame('knee', 160, 160), timestamp: t, aspect: 1 });
     counter.update({ landmarks: frame('knee', 160, 160, 0), timestamp: 2100, aspect: 1 });
-    expect(counter.getProgress().holdDurationMs).toBe(2000);
+    expect(counter.getProgress().holdDurationMs).toBe(1700);
     for (let t = 4000; t <= 5000; t += 100) counter.update({ landmarks: frame('knee', 160, 160), timestamp: t, aspect: 1 });
-    expect(counter.getProgress().holdDurationMs).toBe(1000);
+    expect(counter.getProgress().holdDurationMs).toBe(2400);
     expect(counter.getProgress().repCount).toBe(0);
+  });
+  it('plank rejects unstable angles and drifting hips inside tolerance', () => {
+    for (const drift of [false, true]) {
+      const counter = new GenericRepCounter({ ...config('knee', 'bilateral', 160, 160), isIsometric: true, holdStabilityFrames: 5, holdAngleStdDevDegrees: 2, holdHipDriftThreshold: 0.02 }, { emaAlpha: 1 });
+      for (let t = 0; t <= 5000; t += 100) {
+        const a = drift ? 160 : 160 + (t % 200 ? 6 : -6);
+        const landmarks = frame('knee', a, a);
+        if (drift) for (const point of landmarks) point.x += t * 0.0001;
+        counter.update({ landmarks, timestamp: t, aspect: 1 });
+      }
+      expect(counter.getProgress().holdDurationMs).toBe(0);
+      expect(counter.getProgress().repCount).toBe(0);
+    }
   });
   it('jitter at rest never counts', () => {
     const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 });
@@ -115,5 +128,47 @@ describe('real landmark exercise cases', () => {
     for (let i = 0; i < 3; i++) for (const a of [160, 150, 140, 130, 120, 110, 100, 110, 120, 130, 140, 150, 160, 160]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
     expect(counter.getProgress().repCount).toBe(3);
     expect(events.every(e => e.quality === 'partial' && e.romVsReference < 0.85)).toBe(true);
+  });
+  it('five seconds of fidgeting before exercise does not poison calibration', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral', 160, 80), { emaAlpha: 1 }); let t = 0;
+    const send = (a: number) => counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
+    for (let i = 0; i < 50; i++) send(150 + 8 * Math.sin(i / 3));
+    for (let i = 0; i < 3; i++) for (const a of [160, 140, 120, 100, 80, 80, 100, 120, 140, 160, 160]) send(a);
+    expect(counter.getProgress().repCount).toBe(3);
+  });
+  it('slow weight shifts below 30 degrees count zero', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 });
+    for (let t = 0; t < 30000; t += 100) { const a = 150 + 10 * Math.sin(t / 2000); counter.update({ landmarks: frame('knee', a, a), timestamp: t, aspect: 1 }); }
+    expect(counter.getProgress().repCount).toBe(0);
+  });
+  it('mixed full and shallow reps preserve count and quality', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral', 160, 80), { emaAlpha: 1 }); let t = 0;
+    const qualities: string[] = [];
+    counter.setEventCallback(e => { if (e.type === 'rep_counted') qualities.push(e.quality); });
+    for (const peak of [80, 80, 110, 80]) for (const a of [160, 140, 120, peak, peak, 120, 140, 160, 160]) counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
+    expect(counter.getProgress().repCount).toBe(4);
+    expect(qualities).toEqual(['full', 'full', 'partial', 'full']);
+  });
+  it.each(['AT_START', 'MOVING', 'AT_PEAK'] as const)('recalibrates after a sustained 20 degree shift from %s', state => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral', 160, 80), { emaAlpha: 1 }); let t = 0;
+    const send = (a: number) => counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
+    for (let i = 0; i < 2; i++) for (const a of [160, 140, 120, 100, 80, 80, 100, 120, 140, 160, 160]) send(a);
+    expect(counter.getProgress().repCount).toBe(2);
+    if (state !== 'AT_START') send(130);
+    if (state === 'AT_PEAK') { send(80); send(80); }
+    expect(counter.getProgress().state).toBe(state);
+    for (let i = 0; i < 30; i++) send(140);
+    for (let i = 0; i < 3; i++) for (const a of [140, 125, 110, 95, 80, 80, 95, 110, 125, 140, 140]) send(a);
+    expect(counter.getProgress().repCount).toBe(5);
+  });
+  it('does not recalibrate for a brief 20 degree shift', () => {
+    const counter = new GenericRepCounter(config('knee', 'bilateral'), { emaAlpha: 1 }); let t = 0;
+    const send = (a: number) => counter.update({ landmarks: frame('knee', a, a), timestamp: t += 100, aspect: 1 });
+    for (let i = 0; i < 2; i++) for (const a of [160, 140, 120, 100, 80, 80, 100, 120, 140, 160, 160]) send(a);
+    const prior = (counter as any).calibratedRest;
+    for (let i = 0; i < 15; i++) send(140);
+    for (let i = 0; i < 10; i++) send(160);
+    expect((counter as any).calibratedRest).toBe(prior);
+    expect(counter.getProgress().repCount).toBe(2);
   });
 });
