@@ -97,3 +97,40 @@
   .coach-reference .exercise-name { font-size: 13px; }
   .coach-reference .tracking-badge { padding-inline: 7px; font-size: 10px; }
 }
+.program-edit-bar { display:flex; align-items:center; justify-content:space-between; margin:20px 0 12px; color:var(--muted); font-size:13px; font-weight:600; }
+.program-edit-bar button, .program-editor-heading button { min-height:44px; padding:8px 14px; border:1px solid var(--line); border-radius:12px; color:var(--ink); background:var(--surface); font-weight:700; }
+.program-editor { padding:20px; margin:16px 0; border:1px solid var(--line); border-radius:20px; background:var(--surface); }
+.program-editor-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.program-editor-heading p { color:var(--green); font-size:11px; font-weight:800; letter-spacing:.08em; }
+.program-editor-heading h3 { margin-top:5px; font-size:20px; font-weight:750; }
+.program-editor label { display:grid; gap:8px; font-size:14px; font-weight:700; }
+.program-editor input { width:100%; min-height:48px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); }
+.program-editor-help { margin:12px 0; color:var(--muted); font-size:13px; line-height:1.5; }
+.program-editor-list { display:grid; gap:8px; }
+.program-editor-row { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid var(--line); border-radius:12px; }
+.program-editor-row > span { color:var(--muted); font-weight:700; }
+.program-editor-row > .program-editor-exercise { flex:1; min-width:0; display:grid; gap:4px; }
+.program-editor-row strong { overflow-wrap:anywhere; }
+.program-editor-row small, .program-picker-results small { color:var(--muted); }
+.program-editor-row-actions { display:flex; flex:none; align-items:center; gap:2px; }
+.program-editor-row-actions button { display:grid; place-items:center; width:44px; height:44px; padding:0; border-radius:10px; color:var(--ink); }
+.program-editor-row-actions button:hover { background:var(--soft); }
+.program-add { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:48px; margin-top:12px; border:1px dashed var(--green); border-radius:12px; color:var(--green); font-weight:700; }
+.program-picker { margin-top:16px; padding:16px; border:1px solid var(--line); border-radius:14px; }
+.program-picker-results { max-height:260px; overflow:auto; display:grid; gap:6px; margin-top:12px; }
+.program-picker-results button { display:grid; gap:4px; text-align:left; min-height:48px; padding:10px; border:1px solid var(--line); border-radius:10px; }
+.program-editor-actions { display:flex; gap:10px; margin-top:20px; }
+.program-editor-actions button { flex:1; min-height:48px; }
+.program-editor :is(button,input):focus-visible, .program-edit-bar button:focus-visible { outline:3px solid var(--green); outline-offset:2px; }
+@media(max-width:380px) { .program-editor-row { gap:6px; padding:10px; } }
+.session-choice[open] { position:fixed; inset:0; margin:auto; width:min(440px,calc(100% - 32px)); max-height:90dvh; overflow:auto; padding:22px; border:1px solid var(--line); border-radius:22px; background:var(--surface); color:var(--ink); }
+.session-choice::backdrop { background:rgb(0 0 0 / 72%); }
+.session-choice header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px; }
+.session-choice h2 { font-size:20px; font-weight:750; margin:0; }
+.session-choice p { color:var(--muted); font-size:13px; line-height:1.5; margin:6px 0; }
+.session-choice header button { width:44px; height:44px; display:grid; place-items:center; border:1px solid var(--line); border-radius:12px; flex:none; }
+.session-choice-option { width:100%; display:flex; align-items:center; gap:12px; min-height:76px; padding:12px; margin-top:8px; text-align:left; border:1px solid var(--line); border-radius:14px; background:var(--soft); color:var(--ink); }
+.session-choice-option > span:first-child { display:grid; place-items:center; width:42px; height:42px; flex:none; border-radius:12px; background:var(--green-light); color:var(--green); }
+.session-choice-option > span:nth-child(2) { display:grid; gap:4px; flex:1; }
+.session-choice-option small { color:var(--muted); line-height:1.4; }
+.session-choice button:focus-visible { outline:3px solid var(--green); outline-offset:2px; }

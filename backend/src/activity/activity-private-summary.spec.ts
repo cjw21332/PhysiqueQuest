@@ -16,7 +16,8 @@ function fixture() {
     personalRecordDays: vi.fn().mockResolvedValue(['2026-10-29']),
   };
   const leaderboard = { get: vi.fn().mockResolvedValue({ self: { rank: 1, points: 500 } }) };
-  const service = new ActivityService({ findOne, findOneAndUpdate } as never, nutrition as never, workouts as never, leaderboard as never);
+  const users = { findById: vi.fn().mockReturnValue({ select: () => ({ lean: () => ({ exec: async () => ({ createdAt: new Date('2026-10-01T00:00:00Z') }) }) }) }) };
+  const service = new ActivityService({ findOne, findOneAndUpdate } as never, nutrition as never, workouts as never, leaderboard as never, users as never);
   return { service, findOne, findOneAndUpdate, nutrition, workouts, leaderboard };
 }
 
@@ -43,6 +44,8 @@ describe('private assistant quest computation', () => {
     vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-29T06:00:00Z'));
     const { service, leaderboard } = fixture();
     const summary = await service.get(OWNER);
+    expect(summary.state.activityDates).toEqual(['2026-10-28', '2026-10-29']);
+    expect(summary.state.accountCreatedAt).toEqual(new Date('2026-10-01T00:00:00Z'));
     expect(leaderboard.get).toHaveBeenCalledExactlyOnceWith(OWNER, 'all');
     expect(summary.badges.find(badge => badge.id === 'top-10')).toMatchObject({ available: true, earned: true });
   });

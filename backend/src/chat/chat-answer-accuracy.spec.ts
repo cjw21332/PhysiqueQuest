@@ -14,7 +14,7 @@ describe('independent factual answer checks', () => {
     expect(answer).toContain('Your saved Coach program\nGoal: Build muscle\nSession length: 45 min');
     expect(answer).toContain('Monday — Strength day\n  1. Squat — 3 × 8');
     expect(answer).toContain('Tuesday — Recovery day (rest/recovery)');
-    expect(answer).toContain('up to four exercises per day');
+    expect(answer).toContain('up to 50 exercises per day');
     expect(answer).toContain('may predate newer preferences');
     expect(generate).not.toHaveBeenCalled();
   });
@@ -182,10 +182,12 @@ describe('independent factual answer checks', () => {
     }
   });
   it('does not substitute the current page guide for unrelated explanations', async () => {
-    const { service, calls } = setup();
+    const generate = vi.fn().mockResolvedValue({ inScope: true, answer: 'A general answer.', sourceIds: ['general-knowledge'] });
+    const { service, calls } = createChatFixture({ generate } as never);
     for (const text of ['Explain quantum physics', 'What is the capital of France?']) {
       const answer = await service.reply(CHAT_FIXTURE_OWNER, [{ role: 'user', text }], true, '/scan');
-      expect(answer.reply).toContain('Please ask about something in PhysiqueQuest');
+      expect(answer.reply).toBe('A general answer.');
+      expect(answer.privacy.personalDataIncluded).toBe(false);
     }
     expect(calls).toHaveLength(0);
   });

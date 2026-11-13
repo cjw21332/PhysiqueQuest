@@ -16,6 +16,7 @@ import {
   RecordedWorkoutDto,
   SaveSetDto,
   ApplyRecordingDto,
+  UpdateRoutineDto,
 } from './dto/workout.dto.js';
 import { WorkoutSession } from './schemas/workout-session.schema.js';
 import { activityDate, calendarWeekday, plannedDayResults, shiftCalendarDate, validCalendarDate, workoutCalendarDate, workoutCreditFilter, type SetResult, type WorkoutRecord } from './workout-contract.js';
@@ -54,6 +55,13 @@ export class WorkoutsService implements OnModuleInit {
     )
       throw new BadRequestException(`${name} is invalid or in the future`);
     return date;
+  }
+  private validateLoad(result: { loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs' }) {
+    if ((result.loadValue === undefined) !== (result.loadUnit === undefined) ||
+        (result.loadValue !== undefined && (result.loadKg === undefined ||
+          Math.abs(result.loadKg - result.loadValue / (result.loadUnit === 'lbs' ? 2.2046226218 : 1)) > 0.001))) {
+      throw new BadRequestException('Weight and unit must match the saved kilogram value.');
+    }
   }
   private async insertOnce(
     userId: string,
@@ -101,6 +109,7 @@ export class WorkoutsService implements OnModuleInit {
       );
     return this.insertOnce(userId, dto.requestKey, {
       exerciseIds: dto.exerciseIds,
+      routineName: dto.routineName?.trim(),
       exercises: dto.exercises ?? [],
       startedAt,
       status: 'active',
@@ -118,6 +127,7 @@ export class WorkoutsService implements OnModuleInit {
   }
   async record(userId: string, dto: RecordedWorkoutDto) {
     const performedAt = this.validTime(dto.performedAt, 'Activity time');
+    this.validateLoad(dto.result);
     if (
       dto.exercise.exerciseId !== dto.result.exerciseId ||
       dto.result.setIndex !== 0 ||
@@ -240,6 +250,32 @@ export class WorkoutsService implements OnModuleInit {
       );
     return saved;
   }
+  async updateRoutine(userId: string, id: string, dto: UpdateRoutineDto) {
+    const workout = await this.owned(userId, id);
+    if (workout.status !== 'active') throw new BadRequestException('This workout is already completed.');
+    if ((workout.revision ?? 0) !== dto.expectedRevision) throw new ConflictException('Reload this workout before retrying.');
+    const original = workout.exercises ?? [];
+    const ids = dto.exercises.map(item => item.exerciseId);
+    if (new Set(ids).size !== ids.length) throw new BadRequestException('Invalid workout exercise list.');
+    const removed = original.filter(item => !ids.includes(item.exerciseId));
+    if (removed.some(item => (workout.sets ?? []).some(set => set.exerciseId === item.exerciseId))) throw new BadRequestException('Exercises with saved sets cannot be removed.');
+    const exercises = dto.exercises.map(item => {
+      const previous = original.find(row => row.exerciseId === item.exerciseId);
+      if (!previous && (!item.name?.trim() || !item.sets || item.equipment === undefined)) throw new BadRequestException('New exercises need a name, equipment and set count.');
+      const next = { ...previous, ...item, name: (item.name ?? previous?.name ?? '').trim(), equipment: item.equipment ?? previous?.equipment ?? '', sets: item.sets ?? previous?.sets ?? 1 };
+      if ((workout.sets ?? []).some(set => set.exerciseId === item.exerciseId && set.setIndex >= next.sets)) throw new BadRequestException('Cannot remove saved sets.');
+      return next;
+    });
+    return this.change(userId, id, dto.expectedRevision, { exercises, exerciseIds: ids, ...(dto.routineName !== undefined ? { routineName: dto.routineName.trim() } : {}) });
+  }
+  async cancel(userId: string, id: string, expectedRevision: number) {
+    const workout = await this.owned(userId, id);
+    if (workout.status !== 'active') throw new BadRequestException('Only an active workout can be cancelled.');
+    if ((workout.revision ?? 0) !== expectedRevision) throw new ConflictException('Reload this workout before retrying.');
+    const result = await this.model.deleteOne({ _id: workout._id, userId: new Types.ObjectId(userId), status: 'active', ...(expectedRevision === 0 ? { $or: [{ revision: 0 }, { revision: { $exists: false } }] } : { revision: expectedRevision }) });
+    if (!result.deletedCount) throw new ConflictException('Workout changed. Reload before cancelling.');
+    return { cancelled: true };
+  }
   async saveSet(userId: string, id: string, dto: SaveSetDto) {
     const workout = await this.owned(userId, id);
     if (workout.status !== 'active')
@@ -248,6 +284,7 @@ export class WorkoutsService implements OnModuleInit {
       exercise = workout.exercises?.find(
         (item) => item.exerciseId === incoming.exerciseId,
       );
+    this.validateLoad(incoming);
     const existing = workout.sets?.find((item) => item.setId === incoming.setId);
     // Association is assigned only by applyRecording; ordinary edits cannot
     // detach it and make the same original recording count a second time.
@@ -478,7 +515,7 @@ export class WorkoutsService implements OnModuleInit {
           ],
           personalRecords: [
             { $unwind: '$sets' },
-            { $match: { 'sets.status': 'completed' } },
+            { $match: { 'sets.status': 'completed', 'sets.reps': { $gt: 0 }, 'sets.loadKg': { $gt: 0 } } },
             {
               $sort: {
                 'sets.loadKg': -1,
@@ -521,9 +558,18 @@ export class WorkoutsService implements OnModuleInit {
                 reps: '$best.reps',
                 durationSeconds: '$best.durationSeconds',
                 loadKg: '$best.loadKg',
+                loadValue: '$best.loadValue',
+                loadUnit: '$best.loadUnit',
                 date: 1,
               },
             },
+          ],
+          volumes: [
+            { $unwind: '$sets' },
+            { $match: { 'sets.status': 'completed', 'sets.reps': { $gt: 0 }, 'sets.loadKg': { $gt: 0 }, 'sets.setType': { $nin: ['warmup'] } } },
+            { $group: { _id: { session: '$_id', exercise: '$sets.exerciseId' }, volumeKg: { $sum: { $multiply: ['$sets.loadKg', '$sets.reps'] } }, day: { $first: '$day' } } },
+            { $sort: { volumeKg: -1, day: -1 } },
+            { $group: { _id: '$_id.exercise', volumeKg: { $first: '$volumeKg' }, date: { $first: '$day' } } },
           ],
         },
       },
@@ -532,7 +578,10 @@ export class WorkoutsService implements OnModuleInit {
       trainingDates: (result?.dates ?? []).map(
         (row: { _id: string }) => row._id,
       ),
-      personalRecords: result?.personalRecords ?? [],
+      personalRecords: (result?.personalRecords ?? []).map((record: { exerciseId: string }) => {
+        const volume = (result?.volumes ?? []).find((row: { _id: string }) => row._id === record.exerciseId);
+        return { ...record, volumeKg: volume?.volumeKg, volumeDate: volume?.date };
+      }),
       policyVersion: 2,
     };
   }

@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import { api } from '../../lib/api';
-import { PROFILE_STORAGE_KEY } from '../../lib/auth';
+import { getCurrentUser, PROFILE_STORAGE_KEY } from '../../lib/auth';
 import type { Profile } from '../Home/types';
 import AdminExerciseLibrary from './AdminExerciseLibrary';
+import PersonalExercises from './PersonalExercises';
 import EngagementAnalytics from './EngagementAnalytics';
 import PersonalDataEdit from './PersonalDataEdit';
 import GoalsEdit from './GoalsEdit';
@@ -18,8 +19,9 @@ import { normalizeTrainingDays } from '../../lib/trainingDays';
 import ForgotPasswordFlow from '../Forgot Password/ForgotPasswordFlow';
 import { useScreenRoute } from '../../hooks/useScreenRoute';
 import ProfilePhoto from './ProfilePhoto';
+import { updateNutritionForProfile } from '../../lib/weightUpdate';
 
-type MeView = 'settings' | 'exercises' | 'engagement' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
+type MeView = 'settings' | 'exercises' | 'personal-exercises' | 'engagement' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
 
 function Switch({ label, checked, onChange, tone = 'green' }: { label: string; checked: boolean; onChange: () => void; tone?: 'green' | 'red' }) {
   return <button className={`me-switch ${tone} ${checked ? 'on' : ''}`} type="button" role="switch" aria-label={label} aria-checked={checked} onClick={onChange}><i/></button>;
@@ -38,7 +40,8 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [photoOpen, setPhotoOpen] = useState(false);
   const [currentProfile, setCurrentProfile] = useState(profile);
-  const [view, setView] = useScreenRoute<MeView>('/me', { settings: '', exercises: '/exercises', engagement: '/engagement', 'edit-personal': '/personal-data', 'edit-goals': '/goals', 'edit-training': '/training', 'edit-health': '/health', 'edit-emergency': '/emergency-contact' }, 'settings');
+  const accountEmail = currentProfile.email || getCurrentUser()?.email || '';
+  const [view, setView] = useScreenRoute<MeView>('/me', { settings: '', exercises: '/exercises', 'personal-exercises': '/personal-exercises', engagement: '/engagement', 'edit-personal': '/personal-data', 'edit-goals': '/goals', 'edit-training': '/training', 'edit-health': '/health', 'edit-emergency': '/emergency-contact' }, 'settings');
   const [notice, setNotice] = useState('');
   const [saveError, setSaveError] = useState('');
   const [level, setLevel] = useState<number | null>(null);
@@ -71,7 +74,12 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       setCurrentProfile(merged);
       try { localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged)); } catch { /* The server-confirmed profile remains saved. */ }
       window.dispatchEvent(new Event('physiquequest-profile-updated'));
-      setNotice(`${featureName} saved`);
+      let message = `${featureName} saved`;
+      if (patch.goal && patch.goal !== currentProfile.goal) {
+        try { message = await updateNutritionForProfile(merged, true); }
+        catch { message = 'Goal saved, but the nutrition target could not be updated. Check your connection and review your dietary plan.'; }
+      }
+      setNotice(message);
       return true;
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : 'Could not save. Please try again.');
@@ -88,6 +96,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   if (view === 'exercises') {
     return <AdminExerciseLibrary onBack={() => setView('settings')} />;
   }
+  if (view === 'personal-exercises') return <PersonalExercises onBack={() => setView('settings')} />;
   if (view === 'engagement') {
     return <EngagementAnalytics preview onBack={() => setView('settings')} />;
   }
@@ -103,6 +112,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
 
       <h3 className="me-group-title">Profile</h3>
       <div className="me-list">
+        <SettingRow icon="exercise-books" title="My exercises" detail="Create exercises on this device" onClick={() => setView('personal-exercises')}/>
         <SettingRow icon="user" title="Personal data" detail="Age, height, weight, measurements" onClick={() => setView('edit-personal')}/>
         <SettingRow icon="target" title="Goals" detail={goalDetail} onClick={() => setView('edit-goals')}/>
         <SettingRow icon="library-dumbbells" title="Training preference" detail={`${equipment} · ${daysPerWeek} day${daysPerWeek === 1 ? '' : 's'} · ${currentProfile.duration || '—'}`} onClick={() => { setSaveError(''); setView('edit-training'); }}/>
@@ -129,7 +139,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <h3 className="me-group-title me-privacy-title">Privacy</h3>
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
-      <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail={`Verified with a code sent to ${currentProfile.email}`} onClick={() => setPasswordOpen(true)}/></div>
+      <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail={accountEmail ? `Verified with a code sent to ${accountEmail}` : 'Verified with a code sent to your account email'} onClick={() => setPasswordOpen(true)}/></div>
       <h3 className="me-group-title me-admin-title">Admin tools</h3><div className="me-list">
         <SettingRow icon="exercise-books" title="Exercise library" detail="Publish exercises and pose templates" onClick={() => setView('exercises')}/>
         <SettingRow icon="chart-bars" title="Engagement analytics" detail="Users, sessions, safety events" onClick={() => setView('engagement')}/>
@@ -139,7 +149,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
     </div>
     <BottomNav />
     {photoOpen && <ProfilePhoto photo={currentProfile.photo} onClose={() => setPhotoOpen(false)} onSaved={saved => { setCurrentProfile(current => ({ ...current, ...saved })); setNotice('Profile photo saved'); }}/>}
-    {passwordOpen && <ForgotPasswordFlow mode="change" accountEmail={currentProfile.email} onClose={() => setPasswordOpen(false)} onSuccess={() => { setPasswordOpen(false); setNotice('Password updated. Sign in again with your new password.'); onLogoutRequest?.(); }}/>}
+    {passwordOpen && <ForgotPasswordFlow mode="change" accountEmail={accountEmail} onClose={() => setPasswordOpen(false)} onSuccess={() => { setPasswordOpen(false); setNotice('Password updated. Sign in again with your new password.'); onLogoutRequest?.(); }}/>}
     {notice && <div className="home-toast me-toast" role="status">{notice}</div>}
   </section>;
 }

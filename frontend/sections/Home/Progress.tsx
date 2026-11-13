@@ -1,31 +1,29 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useProgress } from '../../hooks/useProgress';
-import type { ProgressRecord, WorkoutSessionRecord } from '../../lib/api';
+import type { ProgressRecord } from '../../lib/api';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
+import { useWorkoutSummary } from '../../hooks/useWorkoutSummary';
 import { Icon } from './icons';
 import { useRouter } from 'next/navigation';
+import DeleteConfirmation from '../../components/DeleteConfirmation';
+import WeightModal from '../../components/WeightModal';
+import { useCurrentProfile } from '../../hooks/useCurrentProfile';
+import TrainingProgress from './TrainingProgress';
+import PersonalRecords from './PersonalRecords';
+import { titleCase } from '../../lib/titleCase';
+import { useActivity } from '../../hooks/useActivity';
+import { endOfDay, localDate, localDateString, progressRange, validCustomRange } from '../../lib/progressDates';
+import MeasurementChart from './MeasurementChart';
+import OutcomeDialog from '../../components/OutcomeDialog';
 
 const choices: { metric: ProgressRecord['metric']; label: string; unit: ProgressRecord['unit'] }[] = [
   { metric: 'weight', label: 'Weight', unit: 'kg' },
+  { metric: 'chest', label: 'Chest', unit: 'cm' },
   { metric: 'waist', label: 'Waist', unit: 'cm' },
-  { metric: 'benchPress', label: 'Bench press', unit: 'kg' },
+  { metric: 'arms', label: 'Arms', unit: 'cm' },
 ];
-
-const samplePersonalRecords = [
-  { label: 'Bench press', value: '62.5 kg', date: 'Set Nov 18' },
-  { label: 'Squat', value: '90 kg', date: 'Set Nov 16' },
-  { label: 'Deadlift', value: '110 kg', date: 'Set Nov 09' },
-];
-
-const sampleSessions = [
-  { title: 'Upper Body — Push', date: 'Nov 18', score: 88 },
-  { title: 'Lower Body', date: 'Nov 16', score: 84 },
-  { title: 'Upper Body — Pull', date: 'Nov 14', score: 81 },
-];
-
-const sampleFormScores = [35, 42, 49, 57, 64, 71, 80, 88];
 
 function shortDate(value?: string) {
   if (!value) return 'Date unavailable';
@@ -39,25 +37,6 @@ function formatValue(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
-function personalRecords(workouts: WorkoutSessionRecord[]) {
-  const records = new Map<string, { label: string; load: number; date: string }>();
-  for (const workout of workouts) {
-    for (const result of workout.exerciseResults ?? []) {
-      if (!result.loadKg || result.loadKg <= 0 || /^[a-f\d]{24}$/i.test(result.exerciseId)) continue;
-      const label = result.exerciseId
-        .replace(/[-_]+/g, ' ')
-        .replace(/\b\w/g, character => character.toUpperCase());
-      const current = records.get(result.exerciseId);
-      if (!current || result.loadKg > current.load) {
-        records.set(result.exerciseId, { label, load: result.loadKg, date: shortDate(workout.startedAt) });
-      }
-    }
-  }
-  return [...records.values()]
-    .sort((left, right) => right.load - left.load)
-    .slice(0, 3);
-}
-
 export default function Progress() {
   const { push: navigate } = useRouter();
   const [metric, setMetric] = useState<ProgressRecord['metric']>('weight');
@@ -65,27 +44,48 @@ export default function Progress() {
   const [saving, setSaving] = useState(false);
   const [showEntryForm, setShowEntryForm] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [deleting, setDeleting] = useState<ProgressRecord | null>(null);
+  const [weightOpen, setWeightOpen] = useState(false);
+  const [weightNotice, setWeightNotice] = useState('');
+  const [view, setView] = useState<'overview' | 'exercise' | 'muscle' | 'records'>('overview');
+  const { profile } = useCurrentProfile();
+  const { activity, loading: activityLoading, error: activityError, refresh: refreshActivity } = useActivity();
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const update = () => setNow(new Date());
+    const timer = window.setInterval(update, 60_000);
+    window.addEventListener('focus', update);
+    document.addEventListener('visibilitychange', update);
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', update); document.removeEventListener('visibilitychange', update); };
+  }, []);
+  const [period, setPeriod] = useState<'day'|'week'|'month'|'custom'>('month');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
   const { workouts, workoutLoading, workoutError } = useWorkoutHistory();
+  const { summary, loading: summaryLoading, error: summaryError, refresh: refreshSummary } = useWorkoutSummary();
   const weight = useProgress('weight');
+  const chest = useProgress('chest');
   const waist = useProgress('waist');
-  const benchPress = useProgress('benchPress');
+  const arms = useProgress('arms');
   const selected = choices.find(choice => choice.metric === metric)!;
-  const selectedProgress = metric === 'weight' ? weight : metric === 'waist' ? waist : benchPress;
+  const selectedProgress = metric === 'weight' ? weight : metric === 'chest' ? chest : metric === 'waist' ? waist : arms;
   const { entries, loading, error, refresh, addMeasurement, deleteMeasurement } = selectedProgress;
-  const sortedEntries = [...entries].sort((a, b) =>
+  const sortedEntries = entries.map(entry => ({ ...entry, value: selected.unit === 'kg' && entry.unit === 'lb' ? entry.value * 0.45359237 : selected.unit === 'cm' && entry.unit === 'in' ? entry.value * 2.54 : entry.value, unit: selected.unit })).sort((a, b) =>
     new Date(a.measuredAt ?? a.date ?? 0).getTime() - new Date(b.measuredAt ?? b.date ?? 0).getTime(),
   );
-  const chartEntries = sortedEntries.slice(-8);
+  const todayKey = localDateString(now);
+  const accountDate = activity.accountCreatedAt ? new Date(activity.accountCreatedAt) : null;
+  const accountKey = accountDate && !Number.isNaN(accountDate.getTime()) ? localDateString(accountDate) : '';
+  const validAccount = Boolean(accountKey && accountKey <= todayKey);
+  const customValid = validCustomRange(from, to, accountKey, todayKey);
+  const rangeDates = period === 'custom' ? (customValid ? { start: localDate(from)!, end: localDate(to)! } : null) : progressRange(period, now);
+  const fromTime = rangeDates?.start.getTime() ?? Infinity;
+  const toTime = rangeDates ? Math.min(endOfDay(rangeDates.end).getTime(), endOfDay(now).getTime()) : -Infinity;
+  const chartEntries = sortedEntries.filter(entry => { const date = new Date(entry.measuredAt ?? entry.date ?? '').getTime(); return date >= fromTime && date <= toTime; });
   const firstValue = chartEntries[0]?.value;
   const latestValue = chartEntries.at(-1)?.value;
-  const firstDate = new Date(chartEntries[0]?.measuredAt ?? chartEntries[0]?.date ?? '');
-  const lastDate = new Date(chartEntries.at(-1)?.measuredAt ?? chartEntries.at(-1)?.date ?? '');
-  const elapsedWeeks = Number.isNaN(firstDate.getTime()) || Number.isNaN(lastDate.getTime())
-    ? chartEntries.length
-    : Math.max(1, Math.round((lastDate.getTime() - firstDate.getTime()) / (7 * 24 * 60 * 60 * 1000)));
-  const range = chartEntries.length > 1
-    ? Math.max(...chartEntries.map(entry => entry.value)) - Math.min(...chartEntries.map(entry => entry.value))
-    : 0;
+  const chartStart = rangeDates?.start.getTime() ?? 0;
+  const chartEnd = rangeDates ? endOfDay(rangeDates.end).getTime() : 0;
 
 
   const submit = async (event: FormEvent) => {
@@ -97,6 +97,7 @@ export default function Progress() {
       await addMeasurement(amount, selected.unit);
       setValue('');
       setShowEntryForm(false);
+      setWeightNotice(`${selected.label} measurement saved to your history.`);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Could not save measurement.');
     } finally {
@@ -106,115 +107,42 @@ export default function Progress() {
 
   const remove = async (id: string) => {
     setActionError('');
-    try { await deleteMeasurement(id); }
+    try { await deleteMeasurement(id); setWeightNotice('Measurement removed from your history.'); }
     catch (err) { setActionError(err instanceof Error ? err.message : 'Could not delete measurement.'); }
   };
 
   const completedWorkouts = workouts
     .filter(workout => workout.status === 'completed' && workout.endedAt)
     .sort((left, right) => new Date(right.startedAt).getTime() - new Date(left.startedAt).getTime());
-  const realRecords = personalRecords(completedWorkouts);
-  const showSampleRecords = realRecords.length === 0 && !workoutLoading && !workoutError;
-  const showSampleSessions = completedWorkouts.length === 0 && !workoutLoading && !workoutError;
 
-  return <div className="home-ref-subview home-ref-progress home-ref-progress-page">
-    <header className="section-page-head home-ref-page-head">
-      <div className="section-back-title">
-        <button type="button" className="coach-back" onClick={() => navigate('/home')} aria-label="Back to Home"><Icon name="arrow" size={20}/></button>
-        <h2>Progress</h2>
-      </div>
-      <button type="button" className="home-ref-edit" aria-expanded={showEntryForm} onClick={() => { setShowEntryForm(open => !open); setActionError(''); }}>
-        <Icon name="edit" size={14}/>{showEntryForm ? 'Close' : 'Add measurement'}
-      </button>
-    </header>
+  return <div className="home-ref-subview pq-progress">
+    <header className="pq-progress-header"><button type="button" className="pq-progress-back" onClick={() => navigate('/home')} aria-label="Back to Home"><Icon name="arrow" size={20}/></button><div><span className="pq-progress-eyebrow">YOUR JOURNEY</span><h1>Progress</h1></div></header>
+    <nav className="pq-progress-nav" aria-label="Progress sections">{([['overview','Overview'],['exercise','Exercises'],['muscle','Muscles'],['records','Records']] as const).map(([key,label]) => <button type="button" key={key} aria-pressed={view === key} onClick={() => setView(key)}>{label}</button>)}</nav>
 
-    <section className="progress-overview home-ref-progress-overview">
-      <div className="metric-tabs home-ref-metric-tabs" role="group" aria-label="Choose a measurement">
-        {choices.map(choice => <button type="button" key={choice.metric} aria-pressed={metric === choice.metric} className={metric === choice.metric ? 'active' : ''} onClick={() => { setMetric(choice.metric); setActionError(''); }}>
-          {choice.label}
-        </button>)}
-      </div>
+    {view === 'overview' && <div className="pq-progress-content">
+      <section className="pq-progress-intro"><div><span className="pq-progress-eyebrow">THE BIG PICTURE</span><h2>Your progress, in perspective.</h2><p>Your consistency and milestones, all in one place.</p></div><span className="pq-progress-intro-icon"><Icon name="chart-bars" size={23}/></span></section>
+      <section className="pq-progress-stats" aria-label="Your activity summary"><div><span>Completed workouts</span><strong>{workoutLoading ? '—' : completedWorkouts.length}</strong><small>All recorded sessions</small></div><div><span>Personal records</span><strong>{summaryLoading ? '—' : summary?.personalRecords.filter(record => typeof record.loadKg === 'number' && record.loadKg > 0).length ?? 0}</strong><small>Exercises with records</small></div></section>
+      <section className="pq-progress-card pq-progress-measurement"><div className="pq-progress-card-head"><div><span className="pq-progress-eyebrow">BODY &amp; MEASUREMENTS</span><h2>Track your trend</h2><p>Small changes tell a bigger story.</p></div><button type="button" className="pq-progress-add" onClick={() => { if (metric === 'weight' && profile) setWeightOpen(true); else setShowEntryForm(open => !open); setActionError(''); }}><Icon name="plus" size={16}/> Add</button></div>
+        <div className="pq-progress-chips" role="group" aria-label="Choose a measurement">{choices.map(choice => <button type="button" key={choice.metric} aria-pressed={metric === choice.metric} onClick={() => { setMetric(choice.metric); setActionError(''); setShowEntryForm(false); }}>{choice.label}</button>)}</div>
+        {error && <div role="alert">{error} <button type="button" onClick={() => void refresh()}>Retry</button></div>}
+        <div className="pq-progress-value"><span>{selected.label}</span><strong>{latestValue === undefined ? '—' : formatValue(latestValue)} <small>{latestValue === undefined ? '' : selected.unit}</small></strong><p>{chartEntries.length > 1 && firstValue !== undefined && latestValue !== undefined ? `${latestValue === firstValue ? 'No change' : `${latestValue > firstValue ? '+' : '−'}${formatValue(Math.abs(latestValue - firstValue))} ${selected.unit}`} across selected period` : entries.length ? 'No comparison for this period' : 'Add your first measurement to see your trend'}</p></div>
+        <div className="pq-progress-periods" role="group" aria-label="Progress date range">{(['day','week','month','custom'] as const).map(option => <button key={option} type="button" aria-pressed={period === option} onClick={() => setPeriod(option)}>{option === 'day' ? 'Day' : option === 'week' ? 'Week' : option === 'month' ? 'Month' : 'Custom'}</button>)}</div>
+        {period === 'custom' && <div className="pq-progress-dates"><label>From<input type="date" value={from} min={validAccount ? accountKey : undefined} max={to && to <= todayKey ? to : todayKey} disabled={!validAccount} onChange={e => setFrom(e.target.value)}/></label><label>To<input type="date" value={to} min={from && from >= accountKey ? from : accountKey} max={todayKey} disabled={!validAccount} onChange={e => setTo(e.target.value)}/></label>{!validAccount ? <p role="status">{activityLoading ? 'Loading your account date…' : 'Your account date is unavailable. '}{!activityLoading && <button type="button" onClick={() => void refreshActivity()}>Retry</button>}</p> : from && to && !customValid ? <p role="alert">Choose dates from your account creation date through today, with From on or before To.</p> : !from || !to ? <p>Choose a start and end date.</p> : null}{activityError && !validAccount && <p role="alert">{activityError}</p>}</div>}
+        {rangeDates && <p className="pq-progress-range" aria-label="Selected date range">{shortDate(rangeDates.start.toISOString())}{period === 'day' ? '' : ` – ${shortDate(rangeDates.end.toISOString())}`}{period === 'month' ? ' (Today)' : ''}</p>}
+        {loading ? <p role="status">Loading measurements…</p> : chartEntries.length ? <MeasurementChart entries={chartEntries} label={selected.label} unit={selected.unit} period={period} start={chartStart} end={chartEnd} now={now}/> : <div className="pq-progress-empty">{period === 'custom' && !customValid ? 'Select a valid date range to see measurements.' : 'No measurements in this period.'}</div>}
+        {showEntryForm && metric !== 'weight' && <form onSubmit={event => void submit(event)} className="pq-progress-form"><label>Log {selected.label.toLowerCase()} ({selected.unit})<input inputMode="decimal" type="number" min="0.1" step="any" value={value} onChange={event => setValue(event.target.value)} required /></label><button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save measurement'}</button></form>}
+        {!!entries.length && <details className="pq-progress-history"><summary>Measurement history ({entries.length})</summary>{[...sortedEntries].reverse().map(entry => <div key={entry._id}><span><b>{formatValue(entry.value)} {entry.unit}</b><small>{shortDate(entry.measuredAt ?? entry.date)}</small></span><button type="button" aria-label={`Delete ${entry.value} ${entry.unit} measurement`} onClick={() => setDeleting(entry)}>Delete</button></div>)}</details>}
+      </section>
+      <section className="pq-progress-card"><div className="pq-progress-section-title"><div><span className="pq-progress-eyebrow">KEEP SHOWING UP</span><h2>Recent sessions</h2></div></div>{workoutError ? <p role="alert">{workoutError}</p> : workoutLoading ? <p role="status">Loading sessions…</p> : completedWorkouts.length ? <div className="pq-progress-list">{completedWorkouts.slice(0,3).map(workout => <article key={workout._id}><span className="pq-progress-row-icon"><Icon name="strength" size={17}/></span><span><b>{titleCase(workout.routineName || 'Workout session')}</b><small>{shortDate(workout.startedAt)} · {workout.exerciseIds.length} exercises</small></span><strong>{workout.durationSeconds === undefined ? '' : `${Math.round(workout.durationSeconds / 60)} min`}</strong></article>)}</div> : <div className="pq-progress-empty">Your completed workouts will appear here.</div>}</section>
+      <button type="button" className="pq-progress-link" onClick={() => setView('records')}><span><b>Personal records</b><small>Celebrate your best performances</small></span><Icon name="arrow" size={17}/></button>
+    </div>}
 
-      {error && <div role="alert" className="scan-warning">{error}<button type="button" onClick={() => void refresh()}>Retry</button></div>}
-      {actionError && <p className="error" role="alert">{actionError}</p>}
-      {loading ? <p role="status">Loading {selected.label.toLowerCase()} history…</p> : <section className="home-ref-trend" aria-label={`${selected.label} trend`}>
-        <div className="home-ref-measurement">
-          <strong>{latestValue === undefined ? '—' : `${formatValue(latestValue)} ${selected.unit}`}</strong>
-          {chartEntries.length > 1 && firstValue !== undefined && latestValue !== undefined
-            ? <span className="home-ref-change">{latestValue === firstValue ? 'No change' : `${latestValue > firstValue ? '+' : '−'}${formatValue(Math.abs(latestValue - firstValue))} ${selected.unit}`} in {elapsedWeeks} {elapsedWeeks === 1 ? 'week' : 'weeks'}</span>
-            : <span className="home-ref-change">{entries.length ? 'Latest saved measurement' : 'Your history will appear after your first measurement'}</span>}
-        </div>
-        {chartEntries.length ? <div className="home-ref-chart" role="img" aria-label={`${selected.label} values from ${shortDate(chartEntries[0]?.measuredAt ?? chartEntries[0]?.date)} to ${shortDate(chartEntries.at(-1)?.measuredAt ?? chartEntries.at(-1)?.date)}`}>
-          {chartEntries.map((entry, index) => {
-            const barHeight = range > 0 ? 42 + ((entry.value - Math.min(...chartEntries.map(item => item.value)))/range) * 50 : 58;
-            return <div className="home-ref-chart-column" key={entry._id}>
-              <span className={index === chartEntries.length - 1 ? 'latest' : ''} style={{ height: `${barHeight}%` }} />
-              <small>{index % 2 === 0 || index === chartEntries.length - 1 ? `W${index + 1}` : ''}</small>
-            </div>;
-          })}
-        </div> : <div className="home-ref-chart-empty">Log your first {selected.label.toLowerCase()} to start a trend.</div>}
+    {(view === 'exercise' || view === 'muscle') && <div className="pq-progress-content">{workoutLoading ? <p role="status">Loading training history…</p> : workoutError ? <p role="alert">{workoutError}</p> : <TrainingProgress workouts={workouts} tab={view}/>}</div>}
 
-      </section>}
-
-      {showEntryForm && <form onSubmit={event => void submit(event)} className="progress-entry-form home-ref-entry-form">
-        <label>Log {selected.label.toLowerCase()} ({selected.unit})<input inputMode="decimal" type="number" min="0.1" step="any" value={value} onChange={event => setValue(event.target.value)} placeholder={`Enter ${selected.unit}`} required /></label>
-        <button className="primary" disabled={saving}>{saving ? 'Saving…' : 'Save measurement'}</button>
-      </form>}
-    </section>
-
-    <section className="subsection home-ref-records" aria-labelledby="progress-records-heading">
-      <div className="section-head">
-        <h3 id="progress-records-heading">Personal records</h3>
-        {showSampleRecords && <span className="home-ref-sample-label">Sample data</span>}
-      </div>
-      {workoutError ? <p className="error" role="alert">{workoutError}</p> : workoutLoading ? <p role="status">Loading personal records…</p> : <div className="home-ref-record-list">
-        {(showSampleRecords ? samplePersonalRecords : realRecords).map(record => {
-          const date = 'date' in record ? record.date : '';
-          const detail = 'value' in record ? record.value : `${formatValue(record.load)} kg`;
-          return <article className="home-ref-record home-ref-personal-record" key={record.label}>
-            <span className="record-icon"><Icon name="trophy" size={16}/></span>
-            <span className="home-ref-record-copy"><b>{record.label}</b><small>{date}</small></span>
-            <strong>{detail}</strong>
-          </article>;
-        })}
-      </div>}
-    </section>
-
-    <section className="subsection home-ref-accuracy" aria-labelledby="form-accuracy-heading">
-      <div className="section-head">
-        <h3 id="form-accuracy-heading">Form accuracy</h3>
-        <span>8 weeks <span className="home-ref-sample-label">Sample</span></span>
-      </div>
-      <div className="home-ref-accuracy-card"><div className="home-ref-accuracy-chart" role="img" aria-label="Sample form accuracy trend improves from 35 percent in week one to 88 percent in week eight">
-        {sampleFormScores.map((score, index) => <div className="home-ref-accuracy-column" key={index}>
-          <span className={index === sampleFormScores.length - 1 ? 'latest' : ''} style={{ height: `${score}%` }} />
-          <small>{index === 0 ? 'W1' : index === 2 ? 'W3' : index === 4 ? 'W5' : index === 6 ? 'W7' : index === 7 ? 'W8' : ''}</small>
-        </div>)}
-      </div>
-      <p>Average form score improved from <b>58%</b> to <b>88%</b>.</p></div>
-    </section>
-
-    <section className="subsection home-ref-sessions" aria-labelledby="recent-sessions-heading">
-      <div className="section-head">
-        <h3 id="recent-sessions-heading">Recent sessions</h3>
-        {showSampleSessions && <span className="home-ref-sample-label">Sample data</span>}
-      </div>
-      {workoutError ? <p className="error" role="alert">{workoutError}</p> : workoutLoading ? <p role="status">Loading recent sessions…</p> : showSampleSessions
-        ? <div className="home-ref-session-list">{sampleSessions.map(session => <article className="home-ref-session-row" key={session.title}>
-          <span><b>{session.title}</b><small>{session.date}</small></span>
-          <span className="home-ref-session-detail">{session.score}% form<Icon name="arrow" size={13}/></span>
-        </article>)}</div>
-        : <div className="home-ref-session-list">{completedWorkouts.slice(0, 3).map(workout => <article className="home-ref-session-row" key={workout._id}>
-          <span><b>Workout session</b><small>{shortDate(workout.startedAt)}</small></span>
-          <span className="home-ref-session-detail">{workout.exerciseIds.length} exercises{workout.durationSeconds === undefined ? '' : ` · ${Math.round(workout.durationSeconds / 60)} min`}<Icon name="arrow" size={13}/></span>
-        </article>)}</div>}
-    </section>
-        {!!entries.length && <details className="home-ref-history">
-          <summary>{selected.label} history ({entries.length})</summary>
-          <div className="history-records">{[...sortedEntries].reverse().map(entry => <div className="history-entry" key={entry._id}>
-            <span><b>{formatValue(entry.value)} {entry.unit}</b><small>{entry.measuredAt ? new Date(entry.measuredAt).toLocaleString() : shortDate(entry.date)}</small></span>
-            <button type="button" aria-label={`Delete ${entry.value} ${entry.unit} measurement`} onClick={() => void remove(entry._id)}>Delete</button>
-          </div>)}</div>
-        </details>}
+    {view === 'records' && <div className="pq-progress-content"><PersonalRecords records={summary?.personalRecords ?? []} loading={summaryLoading} error={summaryError} retry={() => void refreshSummary()}/></div>}
+    {deleting && <DeleteConfirmation title="Delete this measurement?" description={`${deleting.value} ${deleting.unit} will be removed from your progress history.`} confirmLabel="Delete measurement" onCancel={() => setDeleting(null)} onConfirm={() => { void remove(deleting._id); setDeleting(null); }}/>}
+    {weightOpen && profile && <WeightModal profile={profile} onClose={() => setWeightOpen(false)} onSaved={message => { setWeightOpen(false); setWeightNotice(message); void weight.refresh(); }}/>}
+    {actionError && <OutcomeDialog kind="error" title="Could not complete your request" message={actionError} onClose={() => setActionError('')} actionLabel="Try again"/>}
+    {weightNotice && <OutcomeDialog kind={/but|not changed|choose|review/i.test(weightNotice) ? 'info' : 'success'} title={/but|not changed|choose|review/i.test(weightNotice) ? 'Update details' : 'Measurement updated'} message={weightNotice} onClose={() => setWeightNotice('')}/>}
   </div>;
 }

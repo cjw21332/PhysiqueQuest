@@ -101,6 +101,11 @@ export function fastRecordAnswer(question: string, sources: Source[], page?: str
   const add = (id: string, reply: string) => { answers.push(reply); ids.add(id); };
   const profile = data('user-profile'), nutrition = data('user-nutrition'), settings = data('user-settings');
   const activity = data('user-activity'), workouts = data('user-workouts'), program = data('user-program');
+  const personalRecords = data('user-records');
+  if (personalRecords && /\b(?:my|mine|i)\b.{0,50}\b(?:personal records?|personal bests?|best lifts?)\b/.test(q)) {
+    const records = rows(personalRecords.records);
+    return { reply: records.length ? 'Your saved personal records: ' + records.map(record => display(record.name) + ': ' + (numeric(record.loadValue) && record.loadUnit ? quantity(record.loadValue, record.loadUnit) : quantity(record.loadKg, 'kg')) + (record.date ? ' on ' + display(record.date) : '')).join('; ') + (personalRecords.truncated ? '. Showing at most 30 exercises.' : '.') : 'No weighted personal records are saved yet.', sourceIds: ['user-records'] };
+  }
   const notifications = data('user-notifications'), safety = data('user-safety'), progress = data('user-progress');
   const privateProfile = data('user-private-profile');
 
@@ -207,7 +212,7 @@ export function fastRecordAnswer(question: string, sources: Source[], page?: str
     };
   }
   if (progress && interpretation && /\b(?:trend|history)\b/.test(q)) {
-    const metric = /\bwaist\b/.test(q) ? 'waist' : /\bbench/.test(q) ? 'benchPress' : 'weight';
+    const metric = /\bwaist\b/.test(q) ? 'waist' : /\bchest\b/.test(q) ? 'chest' : /\barms?\b/.test(q) ? 'arms' : /\bbench/.test(q) ? 'benchPress' : 'weight';
     const records = rows(progress.measurements).filter(record => record.metric === metric && numeric(record.value) && present(record.unit));
     return {
       reply: records.length ? 'Available saved ' + metric + ' check-ins: ' + records.map(record => quantity(record.value, record.unit) + ' measured ' + display(record.measuredAt)).join('; ') + '.\n' + (records.length === 1 ? 'Only one comparable check-in is available, so these records cannot establish a trend.' : 'These are a bounded recent excerpt. A trend requires multiple comparable dated measurements in the same units and conditions; missing or older records remain unknown.') + ' Profile values and targets are separate from Progress check-ins; do not treat them as extra dated observations.' : 'No valid comparable check-ins are available to establish that trend. Missing records do not prove that your weight or strength changed.',
@@ -271,8 +276,8 @@ export function fastRecordAnswer(question: string, sources: Source[], page?: str
     for (const metric of ['waist', 'chest', 'arms']) if (new RegExp('\\b' + (metric === 'arms' ? 'arms?' : metric) + '\\b').test(q)) pieces.push('Your saved ' + metric + ' measurement is ' + quantity(profile[metric], profile[metric + 'Unit']) + '.');
     if (pieces.length) add('user-profile', pieces.join('\n'));
   }
-  if (progress && /\b(?:latest|recent|progress|check.in|bench)\b/.test(q) && /\b(?:weight|waist|bench|measurements?|progress)\b/.test(q)) {
-    const requested = [['weight', /\bweight\b/], ['waist', /\bwaist\b/], ['benchPress', /\bbench/]] as const;
+  if (progress && /\b(?:latest|recent|progress|check.in|bench)\b/.test(q) && /\b(?:weight|waist|chest|arms?|bench|measurements?|progress)\b/.test(q)) {
+    const requested = [['weight', /\bweight\b/], ['waist', /\bwaist\b/], ['chest', /\bchest\b/], ['arms', /\barms?\b/], ['benchPress', /\bbench/]] as const;
     const metrics = requested.filter(([, pattern]) => pattern.test(q)).map(([metric]) => metric);
     for (const metric of metrics.length ? metrics : requested.map(([metric]) => metric)) {
       const record = rows(progress.measurements).find(record => record.metric === metric);
@@ -297,7 +302,7 @@ export function fastRecordAnswer(question: string, sources: Source[], page?: str
         if (/\bexercises?\b/.test(q)) pieces.push('Exercises in the saved workout excerpt: ' + rows(record.exercises).map(exercise => display(exercise.name)).join(', ') + '. The excerpt may omit other exercises.');
         if (/\b(?:sets|reps|load)\b/.test(q)) {
           const sets = rows(record.completedSets);
-          pieces.push(sets.length ? 'Saved completed sets: ' + sets.map(set => display(set.exercise) + ': ' + display(set.reps) + ' reps, ' + quantity(set.loadKg, 'kg')).join('; ') + '.' : 'No completed set results are available in this saved excerpt.');
+          pieces.push(sets.length ? 'Saved completed sets: ' + sets.map(set => display(set.exercise) + (set.setType === 'warmup' ? ' (warm-up)' : '') + ': ' + display(set.reps) + ' reps, ' + (numeric(set.loadValue) && set.loadUnit ? quantity(set.loadValue, set.loadUnit) : quantity(set.loadKg, 'kg'))).join('; ') + '.' : 'No completed set results are available in this saved excerpt.');
         }
       }
       add('user-workouts', pieces.join('\n'));
@@ -320,7 +325,7 @@ export function fastRecordAnswer(question: string, sources: Source[], page?: str
           }).join('\n');
         });
         const selection = lines.length ? lines.join('\n\n') : 'No matching days were found in the saved snapshot.';
-        add('user-program', 'Your saved Coach program\nGoal: ' + display(program.goal) + '\nSession length: ' + display(program.duration) + '\n\n' + selection + '\n\nThis saved snapshot may predate newer preferences. It includes up to four exercises per day; open Coach for the full program.');
+        add('user-program', 'Your saved Coach program\nGoal: ' + display(program.goal) + '\nSession length: ' + display(program.duration) + '\n\n' + selection + '\n\nThis saved snapshot may predate newer preferences. It includes up to 50 exercises per day.');
       }
     }
   }

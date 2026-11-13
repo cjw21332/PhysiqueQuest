@@ -253,6 +253,7 @@ describe('read costs and shared credit rules', () => {
       { read: async () => ({ meals: [], water: [] }) } as any,
       { creditHistory, personalRecordDays: async () => [] } as any,
       { get: async () => ({ self: { rank: 1, points: 0 } }) } as any,
+      { findById: () => ({ select: () => ({ lean: () => ({ exec: async () => ({ createdAt: new Date('2026-01-01') }) }) }) }) } as any,
     );
     const result = await activity.get(owner, 'Asia/Taipei');
     expect(write).not.toHaveBeenCalled();

@@ -18,18 +18,17 @@ test('goals and progress are standalone authenticated routes with shared app nav
   assert.match(navigation, /'\/goals', '\/progress'/);
 });
 
-test('sample-only progress insights are distinguished from API-backed workout data', async () => {
+test('progress uses account data and does not present sample personal records', async () => {
   const progress = await source('sections/Home/Progress.tsx');
   const goals = await source('sections/Home/GoalsMilestones.tsx');
   const styles = await source('app/globals.css');
 
-  assert.match(progress, /Sample data/);
+  assert.doesNotMatch(progress, /samplePersonalRecords|sampleFormScores/);
   assert.match(progress, /useWorkoutHistory/);
-  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getWorkouts/);
+  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getAllWorkouts/);
   assert.match(progress, /addMeasurement/);
-  assert.match(goals, /2 of 4 reached · sample plan/);
+  assert.match(goals, /useWorkoutSummary/);
   assert.match(goals, /conic-gradient/);
   assert.match(styles, /border-radius: 50%/);
-  assert.match(styles, /padding-top: 4px/);
-  assert.match(styles, /padding-bottom: 6px/);
+  assert.match(styles, /pq-progress/);
 });

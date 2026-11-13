@@ -92,12 +92,12 @@ async function fixture(page, { plan = { goal: 'Maintenance', calories: 2000, pro
 async function ask(dialog, question) {
   const replies = dialog.locator('.coach-chat-message.assistant p');
   const previousCount = await replies.count();
-  await dialog.getByLabel('Ask Phiq about PhysiqueQuest').fill(question);
+  await dialog.getByLabel('Ask Phiq a question').fill(question);
   await dialog.getByRole('button', { name: 'Send message' }).click();
   await expect(replies).toHaveCount(previousCount + 1);
   const reply = replies.last();
   await expect(reply).toBeVisible();
-  await expect(dialog.getByLabel('Ask Phiq about PhysiqueQuest')).toBeEnabled();
+  await expect(dialog.getByLabel('Ask Phiq a question')).toBeEnabled();
   return reply;
 }
 
@@ -210,7 +210,7 @@ test('keeps consent and chat controls usable on narrow mobile and desktop layout
   const { dialog } = await fixture(page);
   const consent = dialog.getByRole('checkbox', { name: 'Use my saved fitness data' });
   const dock = dialog.locator('.coach-chat-dock');
-  const composer = dialog.getByLabel('Ask Phiq about PhysiqueQuest');
+  const composer = dialog.getByLabel('Ask Phiq a question');
   const disclosure = dialog.getByText('What can Phiq access?');
 
   await page.setViewportSize({ width: 320, height: 720 });

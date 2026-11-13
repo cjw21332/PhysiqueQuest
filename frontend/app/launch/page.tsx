@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../sections/Home/icons';
 import { deviceOsStatus } from '../../lib/deviceReadiness.mjs';
+import { session } from '../../lib/session';
+import { getApiBaseUrl } from '../../lib/api';
+import { useRouter } from 'next/navigation';
 
 type CameraPermission = 'granted' | 'denied' | 'prompt' | 'unavailable';
 type DeviceReadiness = {
@@ -52,11 +55,14 @@ function browserReadiness(): DeviceReadiness {
 function isNativeBridgeAvailable() { return typeof window !== 'undefined' && Boolean(window.ReactNativeWebView); }
 
 export default function LaunchPage() {
+  const router = useRouter();
+  const returningUser = Boolean(session.current(getApiBaseUrl())?.token);
   const [readiness, setReadiness] = useState<DeviceReadiness>(emptyReadiness);
   const [notice, setNotice] = useState('');
   const [cameraRequesting, setCameraRequesting] = useState(false);
 
   useEffect(() => {
+    if (returningUser) { router.replace('/home'); return; }
     setReadiness(browserReadiness());
     const onReadiness = (event: Event) => {
       const detail = (event as CustomEvent<DeviceReadiness>).detail;
@@ -65,7 +71,7 @@ export default function LaunchPage() {
     window.addEventListener('physiquequest-device-readiness', onReadiness);
     if (isNativeBridgeAvailable()) window.ReactNativeWebView?.postMessage(JSON.stringify({ type: 'request-device-readiness' }));
     return () => window.removeEventListener('physiquequest-device-readiness', onReadiness);
-  }, []);
+  }, [returningUser, router]);
 
   const osStatus = deviceOsStatus(readiness.platform, readiness.osVersion);
   const readyCount = useMemo(() => [deviceOsStatus(readiness.platform, readiness.osVersion).ready, readiness.wifiConnected, readiness.cameraPermission === 'granted'].filter(Boolean).length, [readiness]);
@@ -99,6 +105,7 @@ export default function LaunchPage() {
   const networkLabel = readiness.wifiConnected ? `Connected${readiness.wifiSpeedMbps == null ? '' : ` · ${isNativeBridgeAvailable() ? '' : 'Estimated · '}${readiness.wifiSpeedMbps} Mbps`}` : readiness.networkType === 'unknown' ? 'Connection details unavailable' : `${readiness.networkType} · Wi-Fi not confirmed`;
   const deviceLabel = readiness.osVersion ? `${readiness.osName ?? readiness.platform} ${readiness.osVersion} detected` : `${readiness.osName ?? readiness.platform} version unavailable`;
 
+  if (returningUser) return null;
   return (
     <main className="scene">
       <div className="app-shell">

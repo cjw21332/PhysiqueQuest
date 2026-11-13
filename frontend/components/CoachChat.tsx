@@ -157,7 +157,7 @@ export default function CoachChat() {
       </header>
       <div className="coach-chat-messages">
         {!messages.length && <div className="coach-chat-welcome">
-          <div className="coach-chat-message"><span className="coach-chat-avatar"><img src="/phiq-logo.png" alt="" /></span><p>Hi, I’m Phiq. I can explain this page, help you find a feature, or answer questions about your saved fitness data.</p></div>
+          <div className="coach-chat-message"><span className="coach-chat-avatar"><img src="/phiq-logo.png" alt="" /></span><p>Hi, I’m Phiq. Ask me a question, explore the app, or turn on access to discuss your saved fitness data.</p></div>
           <div className="coach-chat-prompts" role="group" aria-label="Suggested questions">
             <button type="button" disabled={busy} onClick={() => void ask('How do I use this page?')}>Explain this page</button>
             <button type="button" disabled={busy} onClick={() => void ask('Where can I find the features in PhysiqueQuest?')}>Find a feature</button>
@@ -185,7 +185,7 @@ export default function CoachChat() {
             <p>With access on, Phiq uses relevant records linked to your signed-in account: profile, goals, training, nutrition, progress, Quests, health profile and emergency contact. Health and contact details are included only when access is on and you ask for them. Messages are processed by PhysiqueQuest’s private AI service, not an external AI provider. Other accounts, passwords, photos and videos are never included. Chat history is not saved or used to train the assistant. Turning access off or changing accounts clears this chat.</p>
           </details>
         </div>
-        <form className="coach-chat-composer" onSubmit={send}><label className="visually-hidden" htmlFor="coach-chat-input">Ask Phiq about PhysiqueQuest</label><input ref={input} id="coach-chat-input" placeholder="Ask Phiq a question…" maxLength={2000} value={text} onChange={event => setText(event.target.value)} disabled={busy} /><button type="submit" aria-label="Send message" disabled={busy || !text.trim()}><Icon name="arrow-up" size={20}/></button></form>
+        <form className="coach-chat-composer" onSubmit={send}><label className="visually-hidden" htmlFor="coach-chat-input">Ask Phiq a question</label><input ref={input} id="coach-chat-input" placeholder="Ask Phiq a question…" maxLength={2000} value={text} onChange={event => setText(event.target.value)} disabled={busy} /><button type="submit" aria-label="Send message" disabled={busy || !text.trim()}><Icon name="arrow-up" size={20}/></button></form>
       </footer>
     </dialog>
   </>;

@@ -1,4 +1,99 @@
 import { test, expect } from '@playwright/test';
+test('manual workout scrolls to the final exercise and back to its controls', async ({ page }) => {
+  await fixture(page);
+  await resume(page);
+  const scroller = page.locator('.manual-session');
+  const bounds = await scroller.boundingBox();
+  expect(bounds).not.toBeNull();
+  await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  await page.mouse.wheel(0, 2500);
+  await expect.poll(() => scroller.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+  await expect(page.getByRole('button', { name: 'Cancel Workout', exact: true })).toBeInViewport();
+  await page.getByRole('button', { name: 'View Plank', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Current exercise' })).toContainText('45 sec');
+  await page.mouse.wheel(0, -2500);
+  await expect.poll(() => scroller.evaluate(element => element.scrollTop)).toBe(0);
+  await expect(page.getByRole('button', { name: 'End session', exact: true })).toBeInViewport();
+});
+test('revisiting a skipped set saves the displayed prescription and clearing weight leaves it blank', async ({ page }) => {
+  const state = await fixture(page);
+  await resume(page);
+  await page.getByRole('button', { name: 'Options for Push-up' }).click();
+  await page.getByRole('button', { name: 'Skip exercise', exact: true }).click();
+  await page.getByRole('button', { name: 'Revisit Push-up' }).click();
+  await expect(page.getByLabel('Reps, set 1', { exact: true })).toHaveValue('12');
+  await page.getByRole('button', { name: 'Save set 1', exact: true }).click();
+  await expect.poll(() => state.workout.sets.find(row => row.setId === 'push:0')?.reps).toBe(12);
+  await page.getByRole('button', { name: 'View Dumbbell Row' }).click();
+  await page.getByLabel('Weight (lbs), set 1').click();
+  const keypad = page.getByRole('region', { name: 'Weight', exact: true });
+  await keypad.getByRole('button', { name: 'Clear' }).click();
+  await keypad.getByRole('button', { name: 'Done' }).click();
+  await page.getByRole('button', { name: 'Save set 1', exact: true }).click();
+  await expect.poll(() => state.workout.sets.find(row => row.setId === 'row:0')?.status).toBe('completed');
+  expect(state.workout.sets.find(row => row.setId === 'row:0')).not.toHaveProperty('loadKg');
+});
+test('manual workout replaces an unlogged exercise and confirms cancellation', async ({ page }) => {
+  const state = await fixture(page);
+  await page.route('**/exercises?*', route => route.fulfill({ headers, json: { items: [{ _id: 'press', name: 'Chest press', equipment: 'Dumbbells' }], total: 1 } }));
+  await resume(page);
+  await page.getByRole('button', { name: 'Options for Dumbbell Row' }).click();
+  await page.getByRole('button', { name: 'Replace exercise', exact: true }).click();
+  await page.getByRole('button', { name: 'Chest press Dumbbells' }).click();
+  await expect(page.getByRole('button', { name: 'Options for Chest Press' })).toBeVisible();
+  expect(state.workout.exerciseIds).toEqual(['push', 'press', 'plank']);
+  await page.getByRole('button', { name: 'Cancel Workout', exact: true }).click();
+  const confirm = page.getByRole('dialog', { name: 'Cancel workout?' });
+  await expect(confirm).toBeVisible();
+  await confirm.getByRole('button', { name: 'Discard workout' }).click();
+  await expect(page.getByRole('button', { name: 'Cancel Workout', exact: true })).toHaveCount(0);
+  expect(state.workout.status).toBe('cancelled');
+});
+test('manual redesign supports numeric keypad, ordinary added sets and persistent names', async ({ page }) => {
+  const state = await fixture(page);
+  await resume(page);
+  await page.getByRole('button', { name: 'View Dumbbell Row', exact: true }).click();
+  const weight = page.getByLabel('Weight (lbs), set 1');
+  await expect(weight).toBeVisible();
+  await weight.click();
+  const keypad = page.getByRole('region', { name: 'Weight', exact: true });
+  await keypad.getByRole('button', { name: '2', exact: true }).click();
+  await keypad.getByRole('button', { name: '0', exact: true }).click();
+  await keypad.getByRole('button', { name: 'kg', exact: true }).click();
+  await expect(keypad.locator('output')).toContainText('9.07');
+  await keypad.getByRole('button', { name: 'lbs', exact: true }).click();
+  await expect(keypad.locator('output')).toContainText('20');
+  await keypad.getByRole('button', { name: 'kg', exact: true }).click();
+  await keypad.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(page.getByLabel('Weight (kg), set 1')).toHaveValue('9.07');
+  await page.getByLabel('Reps, set 1', { exact: true }).click();
+  const reps = page.getByRole('region', { name: 'Reps', exact: true });
+  await expect(reps.getByRole('button', { name: 'kg', exact: true })).toHaveCount(0);
+  await page.keyboard.type('8e.-');
+  await reps.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(page.getByLabel('Reps, set 1', { exact: true })).toHaveValue('8');
+  await page.getByRole('button', { name: '+ Add Set', exact: true }).click();
+  await expect(page.getByLabel('Set type for set 2')).toHaveValue('normal');
+  expect(state.workout.exercises.find(row => row.exerciseId === 'row').sets).toBe(2);
+  await page.getByRole('button', { name: 'Save set 2', exact: true }).click();
+  await expect.poll(() => state.workout.sets.find(row => row.setId === 'row:1')?.setType).toBe('normal');
+  await page.locator('.manual-title-edit').getByRole('button', { name: 'Edit', exact: true }).click();
+  await page.getByLabel('Workout session name').fill('Strength Day');
+  await page.locator('.manual-title-edit').getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Strength Day' })).toBeVisible();
+  await page.getByRole('button', { name: 'Options for Dumbbell Row' }).click();
+  await page.getByRole('button', { name: 'Rename exercise', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Rename exercise' }).getByLabel('Name', { exact: true }).fill('My Row');
+  await page.getByRole('button', { name: 'Save name', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Options for My Row' })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Strength Day' })).toBeVisible();
+  await expect(page.getByLabel('Set type for set 2')).toHaveValue('normal');
+  for (const viewport of [{ width: 375, height: 812 }, { width: 812, height: 375 }]) {
+    await page.setViewportSize(viewport);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});
 test('PoseTracker options in an active workout preserve manual draft values',async({page})=>{
   const state=await fixture(page);await resume(page);
   await page.getByLabel('Reps, set 1',{exact:true}).fill('17');
@@ -25,9 +120,30 @@ test('manual logging converts pounds to kilograms and starts rest after saving',
   await page.getByLabel('Weight (lbs), set 1').fill('22.0462');
   await page.getByRole('button', { name: 'Save set 1', exact: true }).click();
   await expect.poll(() => state.workout.sets.find(set => set.exerciseId === 'row')?.loadKg).toBeCloseTo(10, 2);
+  expect(state.workout.sets.find(set => set.exerciseId === 'row')).toMatchObject({ loadValue: 22.0462, loadUnit: 'lbs' });
   await expect(page.getByRole('timer', { name: 'Rest time remaining' })).toBeVisible();
   await page.getByRole('button', { name: 'End rest' }).click();
   await expect(page.getByRole('dialog', { name: 'Rest time' })).not.toBeVisible();
+});
+test('manual session saves set type, exercise order and per-exercise rest', async ({ page }) => {
+  const state = await fixture(page);
+  await resume(page);
+  await expect(page.getByLabel('Weight unit for Push-up')).toBeVisible();
+  await page.getByLabel('Set type for set 1').selectOption('warmup');
+  await page.getByRole('button', { name: 'Save set 1', exact: true }).click();
+  await expect.poll(() => state.workout.sets[0]?.setType).toBe('warmup');
+  await page.getByRole('button', { name: 'Reorder Dumbbell Row' }).click();
+  await page.getByRole('button', { name: 'Move up' }).click();
+  await expect.poll(() => state.workout.exerciseIds).toEqual(['row', 'push', 'plank']);
+  await page.getByRole('button', { name: 'Options for Dumbbell Row' }).click();
+  await page.getByRole('button', { name: 'Increase between sets rest for Dumbbell Row' }).click();
+  await expect.poll(() => state.workout.exercises.find(item => item.exerciseId === 'row')?.restBetweenSets).toBe(105);
+  await page.getByRole('button', { name: 'Remove exercise', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Remove this exercise?' }).getByRole('button', { name: 'Remove exercise' }).click();
+  await expect.poll(() => state.workout.exerciseIds).toEqual(['push', 'plank']);
+  await page.reload();
+  await expect(page.getByLabel('Set type for set 1')).toHaveValue('warmup');
+  await expect(page.getByRole('button', { name: 'Options for Dumbbell Row' })).toHaveCount(0);
 });
 test('lost completion response recovers the completed report',async({page})=>{
   const state=await fixture(page,{loseCompletionReply:true});
@@ -91,6 +207,8 @@ async function fixture(page, { fail = false, conflict = false, failComplete = fa
       if (data.expectedRevision !== workout.revision) return route.fulfill({ status: 409, headers, json: { message: 'Revision conflict' } });
       workout = { ...workout, sets: [...workout.sets.filter(s => s.setId !== data.result.setId), data.result], revision: workout.revision + 1 }; json = workout;
     }
+    if (path.endsWith('/routine')) { const data = request.postDataJSON(); const saved = workout.exercises; workout = { ...workout, routineName: data.routineName ?? workout.routineName, exercises: data.exercises.map(item => ({ ...saved.find(row => row.exerciseId === item.exerciseId), ...item })), exerciseIds: data.exercises.map(item => item.exerciseId), revision: workout.revision + 1 }; json = workout; }
+    if (path.endsWith('/cancel')) { workout = { ...workout, status: 'cancelled' }; json = { cancelled: true }; }
     if (path.endsWith('/complete')) { if(failComplete){failComplete=false;return route.fulfill({status:503,headers,json:{message:'Completion unavailable. Retry.'}});}workout = { ...workout, ...request.postDataJSON(), status: 'completed' }; if(loseCompletionReply){loseCompletionReply=false;return route.fulfill({status:503,headers,json:{message:'Response lost'}});}json = workout; }
     return route.fulfill({ headers, json });
   });
@@ -118,7 +236,7 @@ test('Phiq keeps data sharing optional, hides sources and clears its conversatio
   await launcher.click();
   const dialog = page.getByRole('dialog', { name: 'Phiq' });
   await expect(dialog).toBeVisible();
-  const input = dialog.getByLabel('Ask Phiq about PhysiqueQuest');
+  const input = dialog.getByLabel('Ask Phiq a question');
   const consent = dialog.getByRole('checkbox', { name: 'Use my saved fitness data' });
   for (const size of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(size);
@@ -179,19 +297,19 @@ test('Phiq drops an in-flight response when consent changes', async ({ page }) =
   const dialog = page.getByRole('dialog', { name: 'Phiq' });
   const consent = dialog.getByRole('checkbox', { name: 'Use my saved fitness data' });
   await consent.check();
-  await dialog.getByLabel('Ask Phiq about PhysiqueQuest').fill('Show my progress');
+  await dialog.getByLabel('Ask Phiq a question').fill('Show my progress');
   await dialog.getByRole('button', { name: 'Send message' }).click();
   await expect(dialog.getByRole('status')).toContainText('thinking');
   await consent.uncheck();
   release();
   await completed;
-  await dialog.getByLabel('Ask Phiq about PhysiqueQuest').fill('How does Scan work?');
+  await dialog.getByLabel('Ask Phiq a question').fill('How does Scan work?');
   await dialog.getByRole('button', { name: 'Send message' }).click();
   await expect(dialog.getByText('Fresh guide response')).toBeVisible();
   expect(requests.at(-1)).toEqual({ messages: [{ role: 'user', text: 'How does Scan work?' }], includePersonalData: false, page: '/coach' });
   await expect(dialog.getByText('Old private response')).toHaveCount(0);
   await expect(dialog.getByText('Show my progress', { exact: true })).toHaveCount(0);
-  await expect(dialog.getByLabel('Ask Phiq about PhysiqueQuest')).toBeEnabled();
+  await expect(dialog.getByLabel('Ask Phiq a question')).toBeEnabled();
 });
 test('Phiq resets consent and history when a refreshed session belongs to another account', async ({ page }) => {
   await fixture(page);
@@ -206,7 +324,7 @@ test('Phiq resets consent and history when a refreshed session belongs to anothe
   await launcher.click();
   const dialog = page.getByRole('dialog', { name: 'Phiq' });
   await dialog.getByRole('checkbox', { name: 'Use my saved fitness data' }).check();
-  await dialog.getByLabel('Ask Phiq about PhysiqueQuest').fill('Private account question');
+  await dialog.getByLabel('Ask Phiq a question').fill('Private account question');
   await dialog.getByRole('button', { name: 'Send message' }).click();
   await expect(dialog).not.toBeVisible();
   await launcher.click();
@@ -228,7 +346,7 @@ test('Phiq cancels waiting, restores the draft and ignores a late response', asy
   await page.goto('/coach');
   await page.getByRole('button', { name: 'Open Phiq coach' }).click();
   const dialog = page.getByRole('dialog', { name: 'Phiq' });
-  const input = dialog.getByLabel('Ask Phiq about PhysiqueQuest');
+  const input = dialog.getByLabel('Ask Phiq a question');
   await input.fill('Explain my current workout');
   await dialog.getByRole('button', { name: 'Send message' }).click();
   await expect(dialog.getByRole('status')).toHaveText('Phiq is thinking…');

@@ -15,9 +15,11 @@ frontend/playwright-report/
 !.env.example
 
 *.task
+!mobile/assets/pose_landmarker_lite.task
 __pycache__/
 *.pyc
 ml/data/
 ml/.venv/
 ml/reports/repcount/**/*.png
 ml/reports/repcount/**/*.jpg
+.tools/

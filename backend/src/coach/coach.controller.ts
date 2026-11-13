@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CoachService } from './coach.service.js';
@@ -16,5 +16,9 @@ export class CoachController {
   @Get('plan')
   getPlan(@Req() req: AuthenticatedRequest) {
     return this.service.getPlan(req.user.userId);
+  }
+  @Put('plan/day')
+  updateDay(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
+    return this.service.updateDay(req.user.userId, body);
   }
 }

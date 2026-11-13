@@ -12,12 +12,7 @@ import { useRouter } from 'next/navigation';
 import { formatLocalDate } from '../../lib/localDate.mjs';
 import type { Profile } from './types';
 import { nutritionTargets } from '../Scan/types';
-
-const macroTargets = {
-  Protein: nutritionTargets.protein,
-  Carbs: nutritionTargets.carbs,
-  Fats: nutritionTargets.fats,
-} as const;
+import { planTargets } from '../Scan/DietaryPlan';
 
 export default function HomeDashboard({ profile, onNotify }: {
   profile: Profile;
@@ -26,14 +21,16 @@ export default function HomeDashboard({ profile, onNotify }: {
 }) {
   const { push: navigate } = useRouter();
   const { activity, dailyMissions, loading: activityLoading, error: activityError } = useActivity();
-  const { meals, water, loading: nutritionLoading, error: nutritionError } = useNutrition();
+  const { meals, dietaryPlan, loading: nutritionLoading, error: nutritionError } = useNutrition();
+  const targets = dietaryPlan ? planTargets(dietaryPlan) : nutritionTargets;
+  const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
   const { plan, loading: planLoading, error: planError } = useCoachPlan();
   const { items: notifications } = useNotifications();
   const unread = notifications.filter(item => item.unread).length;
   const now = new Date();
   const today = formatLocalDate(now);
   const todayIndex = (now.getDay() + 6) % 7;
-  const todayPlan = plan?.days[todayIndex];
+  const todayPlan = plan?.days.find(day => day.index === todayIndex);
   const todayMeals = meals.filter(meal => meal.date === today);
   const totals = {
     calories: nutrientTotal(todayMeals, item => item.calories),
@@ -62,27 +59,27 @@ export default function HomeDashboard({ profile, onNotify }: {
 
     <section className="workout-card home-ref-workout" aria-label="Today's session">
       <div className="home-ref-session-top">
-        <small className="workout-label">{planLoading ? 'Today’s session' : todayPlan?.isWorkoutDay ? 'Today’s session' : 'Recovery day'}</small>
+        <small className="workout-label">{planLoading || planError || !todayPlan || todayPlan.isWorkoutDay ? 'Today’s session' : 'Recovery day'}</small>
         {todayPlan?.isWorkoutDay && <span className="workout-duration"><Icon name="clock" size={13} />{plan?.duration || profile.duration}</span>}
       </div>
       {planError
         ? <p className="home-ref-inline-error" role="alert">{planError}</p>
         : <h2 className="workout-title">{planLoading ? 'Preparing your plan…' : todayPlan?.isWorkoutDay ? todayPlan.title : todayPlan?.title || 'Your plan is ready'}</h2>}
       <div className="home-ref-session-meta">
-        <span><Icon name="dumbbell" size={13} />{planLoading ? 'Loading exercises' : `${todayPlan?.exercises.length ?? 0} exercises`}</span>
+        <span><Icon name="dumbbell" size={13} />{planLoading ? 'Loading exercises' : planError || !todayPlan ? 'Plan unavailable' : `${todayPlan.exercises.length} exercises`}</span>
         <span>{profile.equipment?.[0] || 'Equipment not set'}</span>
-        {todayPlan?.isWorkoutDay && <span><Icon name="coach" size={13} />{todayPlan.exercises.some(exercise => exercise.tracking === 'AI tracked') ? 'AI form tracking' : 'Exercise tracking'}</span>}
+        {todayPlan?.isWorkoutDay && todayPlan.exercises.length > 0 && <span><Icon name="coach" size={13} />{todayPlan.exercises.some(exercise => exercise.tracking === 'AI tracked') ? 'AI form tracking' : 'Exercise tracking'}</span>}
       </div>
-      <button className="start-button" onClick={() => navigate('/coach')}><Icon name="play" size={14} />Start workout</button>
-      <button className="link-text" onClick={() => navigate('/coach')}>View full plan</button>
+      <button className="start-button" onClick={() => navigate('/coach')}><Icon name="play" size={14} />{todayPlan?.isWorkoutDay && todayPlan.exercises.length > 0 ? 'Start workout' : 'View plan'}</button>
+      {todayPlan?.isWorkoutDay && todayPlan.exercises.length > 0 && <button className="link-text" onClick={() => navigate('/coach')}>View full plan</button>}
     </section>
 
     <section className="stats-row home-ref-stats" aria-label="Activity summary">
-      <div className="stat-box"><div className="stat-number"><Icon name="fire" size={15}/>{activityLoading ? '…' : activity.dayStreak}</div><div className="stat-text">day streak</div></div>
+      <div className="stat-box"><div className="stat-number"><Icon name="fire" size={15}/>{activityLoading ? '…' : activityError ? '—' : activity.dayStreak}</div><div className="stat-text">day streak</div></div>
       <div className="stat-separator" />
-      <div className="stat-box"><div className="stat-number">{activityLoading ? '…' : activity.earnedPoints.toLocaleString()}</div><div className="stat-text">points</div></div>
+      <div className="stat-box"><div className="stat-number">{activityLoading ? '…' : activityError ? '—' : activity.earnedPoints.toLocaleString()}</div><div className="stat-text">points</div></div>
       <div className="stat-separator" />
-      <div className="stat-box stat-level-box"><div className="stat-number">Lv {activityLoading ? '…' : activity.level}</div><div className="level-bar-container"><div className="level-bar-fill" style={{ width: `${levelPercent}%` }} /></div></div>
+      <div className="stat-box stat-level-box"><div className="stat-number">Lv {activityLoading ? '…' : activityError ? '—' : activity.level}</div><div className="level-bar-container"><div className="level-bar-fill" style={{ width: `${activityError ? 0 : levelPercent}%` }} /></div></div>
     </section>
 
     <section className="content-section home-ref-section">
@@ -93,12 +90,13 @@ export default function HomeDashboard({ profile, onNotify }: {
     <section className="content-section home-ref-section">
       <div className="section-title-row"><h3 className="section-title">Nutrition today</h3><button className="scan-link" onClick={() => navigate('/scan')}><Icon name="scan" size={12} />Scan meal</button></div>
       {nutritionError ? <p role="alert" className="error">{nutritionError}</p> : nutritionLoading ? <p role="status">Loading your nutrition…</p> : <div className="nutrition-overview home-ref-nutrition">
-        <CalorieProgress calories={totals.calories} target={nutritionTargets.calories}/>
+        <CalorieProgress calories={totals.calories} target={targets.calories}/>
       <AdditionalNutrition entries={todayMeals}/>
         <div className="macros-list">
           {(Object.keys(macroTargets) as (keyof typeof macroTargets)[]).map(label => <MacroProgress key={label} label={label} value={totals[label]} target={macroTargets[label]} />)}
         </div>
       </div>}
+      {!nutritionLoading && !nutritionError && !dietaryPlan && <p className="home-target-note">Using default targets. <button type="button" onClick={() => navigate('/scan/plan')}>Set your dietary plan</button></p>}
     </section>
 
     <section className="content-section home-ref-section home-ref-journey">

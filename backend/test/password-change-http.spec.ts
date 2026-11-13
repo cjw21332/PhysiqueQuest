@@ -9,6 +9,7 @@ import { AuthService } from '../src/auth/auth.service.js';
 import { PasswordRecoveryService } from '../src/auth/password-recovery.service.js';
 import { JwtAuthGuard } from '../src/auth/jwt-auth.guard.js';
 import { SessionService } from '../src/auth/session.service.js';
+import { GoogleAuthService } from '../src/auth/google-auth.service.js';
 
 describe('authenticated password change HTTP boundary', () => {
   let app: INestApplication;
@@ -23,6 +24,7 @@ describe('authenticated password change HTTP boundary', () => {
       { provide: EmailVerificationService, useValue: { request: async () => ({ accepted: true }) } },
       { provide: AuthService, useValue: {} }, { provide: PasswordRecoveryService, useValue: recovery },
       { provide: SessionService, useValue: {} },
+      { provide: GoogleAuthService, useValue: {} },
     ] }).overrideGuard(JwtAuthGuard).useValue({ canActivate(context: any) {
       const req = context.switchToHttp().getRequest();
       if (req.headers.authorization !== 'Bearer fixture-token') throw new UnauthorizedException();

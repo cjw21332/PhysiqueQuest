@@ -308,7 +308,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
               <div className="equipment-grid">
                 {equipmentOptions.map((option) => {
                   const selected = data.equipment.includes(option);
-                  return <button type="button" key={option} className={`equipment ${selected ? 'on' : ''}`} aria-pressed={selected} onClick={() => toggleEquipment(option)}><span className="checkbox">{selected ? '✓' : ''}</span>{option}</button>;
+                  return <button type="button" key={option} className={`equipment ${selected ? 'on' : ''}`} aria-pressed={selected} onClick={() => toggleEquipment(option)}><span className="checkbox">{selected && <Icon name="check" size={13} />}</span>{option}</button>;
                 })}
               </div>
             </div>

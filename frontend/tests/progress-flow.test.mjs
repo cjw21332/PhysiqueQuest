@@ -10,13 +10,11 @@ test('progress history comes from API reads and measurements save before appeari
   assert.match(screen, /useProgress/);
   assert.match(screen, /addMeasurement/);
   assert.match(screen, /deleteMeasurement/);
-  assert.match(screen, /Log your first .* to start a trend/);
-  assert.match(screen, /samplePersonalRecords/);
-  assert.match(screen, /sampleFormScores/);
-  assert.match(screen, /Sample form accuracy trend/);
-  assert.match(screen, /showSampleRecords/);
+  assert.match(screen, /Add your first measurement to see your trend/);
+  assert.match(screen, /PersonalRecords/);
+  assert.doesNotMatch(screen, /samplePersonalRecords|sampleFormScores/);
   assert.match(screen, /useWorkoutHistory/);
-  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getWorkouts/);
+  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getAllWorkouts/);
   assert.match(hook, /api\.getProgress/);
   assert.match(hook, /await api\.addProgress/);
   assert.match(api, /\/progress/);

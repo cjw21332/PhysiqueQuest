@@ -3,6 +3,8 @@ import { useState, useMemo } from 'react';
 import type { Profile } from '../Home/types';
 import MeEditLayout from './MeEditLayout';
 import { Icon } from '../Home/icons';
+import { recordWeightChange } from '../../lib/weightUpdate';
+import WeightModal from '../../components/WeightModal';
 
 type Props = {
   profile: Profile;
@@ -25,6 +27,9 @@ export default function PersonalDataEdit({ profile, onBack, onSave, error }: Pro
     activity: profile.activity || '',
   });
   const [saving, setSaving] = useState(false);
+  const [weightError, setWeightError] = useState('');
+  const [weightOpen, setWeightOpen] = useState(false);
+  const [weightNotice, setWeightNotice] = useState('');
 
   const isDirty = data.name !== (profile.name || '') ||
     data.age !== (profile.age || '') ||
@@ -47,7 +52,7 @@ export default function PersonalDataEdit({ profile, onBack, onSave, error }: Pro
 
   const handleSave = async () => {
     setSaving(true);
-    try { if (await onSave(data)) onBack(); } finally { setSaving(false); }
+    try { if (await onSave(data)) { if (data.weight !== profile.weight) { try { await recordWeightChange({ ...profile, ...data }); } catch { setWeightError('Your profile was saved, but weight history or the calorie target could not be updated.'); return; } } onBack(); } } finally { setSaving(false); }
   };
 
   const activityOptions = ['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete'];
@@ -61,7 +66,7 @@ export default function PersonalDataEdit({ profile, onBack, onSave, error }: Pro
       onSave={handleSave}
       isDirty={isDirty}
       isSaving={saving}
-      error={error}
+      error={weightError || error}
     >
       <label className="field">
         <span>Full name</span>
@@ -88,14 +93,16 @@ export default function PersonalDataEdit({ profile, onBack, onSave, error }: Pro
         </label>
       </div>
 
-      <label className="field">
+      <div className="field">
         <span>Weight</span>
         <div className="input-wrap">
-          <input type="number" inputMode="decimal" value={data.weight} min={25} max={350} step="0.1" onChange={e => setField('weight', e.target.value)} />
-          <small>{profile.weightUnit || 'kg'}</small>
+          <span>{data.weight}</span><small>{profile.weightUnit || 'kg'}</small><button type="button" onClick={() => setWeightOpen(true)}>Update weight</button>
         </div>
-      </label>
+      </div>
+      {weightNotice && <p role="status">{weightNotice}</p>}
+      {weightOpen && <WeightModal profile={{ ...profile, weight: data.weight }} onClose={() => setWeightOpen(false)} onSaved={(message, weight) => { setWeightOpen(false); setField('weight', weight); setWeightNotice(message); void onSave({ weight }); }}/>}
       <p className="bmi">{bmi ? `BMI ${bmi}` : 'BMI calculated from your height and weight'}</p>
+      <p className="weight-guidance">For a consistent reading, weigh in the morning after using the toilet and before food or drink, using the same scale on a firm floor.</p>
 
       <div className="choice-group">
         <b>Gender</b>

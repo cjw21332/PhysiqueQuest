@@ -4,15 +4,16 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "expo": "npx expo start --go --lan",
-    "start": "npx expo start --go --lan",
-    "start:tracking": "expo start --dev-client --lan",
+    "expo": "node start-local.mjs --go",
+    "start": "node start-local.mjs --go",
+    "start:tracking": "node start-local.mjs --dev-client",
     "android": "expo run:android --device",
     "ios": "expo run:ios --device"
   },
   "dependencies": {
     "@pose-tracker/react-native-pose-estimation-light": "^0.3.8",
     "@react-native-community/netinfo": "12.0.1",
+    "@react-native-google-signin/google-signin": "^17.0.0",
     "effect": "^3.21.4",
     "expo": "~58.0.21",
     "expo-asset": "~58.0.19",

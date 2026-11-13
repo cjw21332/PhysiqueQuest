@@ -9,6 +9,7 @@ import { AuthService } from '../src/auth/auth.service.js';
 import { SessionService } from '../src/auth/session.service.js';
 import { PasswordRecoveryService } from '../src/auth/password-recovery.service.js';
 import { sessionCookieOptions } from '../src/auth/session-cookie.js';
+import { GoogleAuthService } from '../src/auth/google-auth.service.js';
 
 describe('httpOnly session cookie boundary', () => {
   let app: INestApplication;
@@ -20,6 +21,7 @@ describe('httpOnly session cookie boundary', () => {
       { provide: EmailVerificationService, useValue: { request: async () => ({ accepted: true }) } },
       { provide: AuthService, useValue: { login: async () => ({ user: { id: 'owner' } }), validateUser: async () => result.user } },
       { provide: PasswordRecoveryService, useValue: {} }, { provide: SessionService, useValue: sessions },
+      { provide: GoogleAuthService, useValue: {} },
     ] }).compile();
     app = module.createNestApplication(); app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));

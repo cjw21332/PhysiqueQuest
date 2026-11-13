@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-type ModalKind = 'login-failed' | 'email-registered' | 'account-created';
+type ModalKind = 'login-failed' | 'email-registered' | 'registration-verified';
 
 type Props = {
   kind: ModalKind;
@@ -28,10 +28,10 @@ const content: Record<ModalKind, { title: string; description: string; primary: 
     secondary: 'Use another email',
     icon: 'user-remove',
   },
-  'account-created': {
-    title: 'Account created',
+  'registration-verified': {
+    title: 'Email verified',
     description: '',
-    primary: 'Start calibration',
+    primary: 'Continue setup',
     icon: 'user-check',
   },
 };
@@ -49,8 +49,8 @@ export default function AuthOutcomeModal({ kind, name, email, locked = false, on
     ? 'Too many attempts. Sign-in is paused for 15 minutes. Reset your password to get back into your account sooner.'
     : kind === 'email-registered'
     ? `${email || 'This email'} already has a PhysiqueQuest account. Log in instead, or use a different email address you can access.`
-    : kind === 'account-created'
-      ? `Welcome to PhysiqueQuest, ${name?.trim() || 'there'}. Next, four quick steps to calibrate your plan — about two minutes.`
+    : kind === 'registration-verified'
+      ? `Welcome to PhysiqueQuest, ${name?.trim() || 'there'}. Registration is not complete until you finish your profile. Continue with four quick setup steps — about two minutes.`
       : item.description;
 
   return <dialog ref={dialogRef} className="auth-outcome-overlay" aria-modal="true" aria-labelledby="auth-outcome-title" aria-describedby="auth-outcome-description" onCancel={event => { event.preventDefault(); onClose?.(); }}>

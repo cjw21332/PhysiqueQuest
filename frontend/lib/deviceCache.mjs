@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'physiquequest-device-cache-v1';
-const RESOURCES = ['profile', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:waist', 'progress:benchPress', 'workouts', 'exercise-library'];
+const RESOURCES = ['profile', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:chest', 'progress:waist', 'progress:arms', 'progress:benchPress', 'workouts', 'workout-summary', 'exercise-library'];
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const MAX_BYTES = 512_000;
 const day = time => new Date(time).toLocaleDateString('en-CA');
@@ -72,6 +72,17 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
     persist();
     notify();
   };
+  const invalidateExternal = keys => {
+    if (!activate()) return;
+    let changed = false;
+    for (const key of new Set(keys)) {
+      if (!RESOURCES.includes(key)) continue;
+      entries[key] = { revision: (entries[key]?.revision ?? 0) + 1 };
+      changed = true;
+    }
+    // The other tab already wrote its snapshot; do not overwrite it with ours.
+    if (changed) notify();
+  };
   const fetch = (key, load, force = false) => {
     if (!RESOURCES.includes(key)) return Promise.reject(new Error('Unknown cached resource'));
     const owner = activate();
@@ -103,5 +114,5 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
     notify();
     return request;
   };
-  return { get, publish, invalidate, fetch, subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); } };
+  return { get, publish, invalidate, invalidateExternal, fetch, subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); } };
 }

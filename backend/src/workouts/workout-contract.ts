@@ -5,6 +5,8 @@ export type WorkoutExercise = {
   prescription?: string;
   sets: number;
   trackingPresetId?: string;
+  restBetweenSets?: number;
+  restAfterExercise?: number;
 };
 export type SetResult = {
   setId: string;
@@ -13,8 +15,11 @@ export type SetResult = {
   reps: number;
   durationSeconds?: number;
   loadKg?: number;
+  loadValue?: number;
+  loadUnit?: 'kg' | 'lbs';
   status: 'completed' | 'skipped';
   source: 'manual' | 'local-video';
+  setType?: 'normal' | 'warmup' | 'drop' | 'failure';
   detectedReps?: number;
   side?: 'left' | 'right';
   algorithmVersion?: string;

@@ -5,6 +5,7 @@ import { canTrack, resolveTrackingConfig, type TrackingConfig } from '../../../b
 import { initialTrackingState, reduceProviderEvent, safeProviderError, trackingUrl, trustedProviderEvent } from '../../services/poseTracker/bridge';
 import './posetracker.css';
 import GenericTrackingSession from './GenericTrackingSession';
+import { titleCase } from '../../lib/titleCase';
 const metricLabels: Record<string,string> = {score:'Movement score',avg_score:'Average score',grade:'Grade',overallScore:'Overall similarity',nccScore:'Shape similarity',dtwScore:'Alignment similarity',timingScore:'Timing similarity',distScore:'Stability similarity'};
 const describeScores=(values:Record<string,number|string>)=>Object.entries(values).map(([key,value])=>`${metricLabels[key]??key}: ${value}`).join(' · ');
 
@@ -75,7 +76,7 @@ export default function PoseTrackerSession({exercise,onExit,adminTest=false,onVe
   const allowed=canTrack(config)||(adminTest&&config.trackingMode!=='unavailable'&&config.validationStatus!=='disabled');
   if(config.trackingMode==='generated-angle' && config.generatedAngleConfig && allowed) return <GenericTrackingSession name={exercise.name} config={config.generatedAngleConfig} onExit={onExit}/>;
   return <section className="pose-tracker-session" aria-label="PoseTracker exercise tracking">
-    <header><button type="button" className="secondary" onClick={()=>{finish();onExit();}}>Back to exercise</button><h2>{exercise.name}</h2><span>Powered by PoseTracker</span></header>
+    <header><button type="button" className="secondary" onClick={()=>{finish();onExit();}}>Back to exercise</button><h2>{titleCase(exercise.name)}</h2><span>Powered by PoseTracker</span></header>
     {exercise.gifUrl&&<img className="pose-exercise-thumb" src={exercise.gifUrl} alt={`${exercise.name} demonstration`}/>}
     <p>{config.targetMuscles.join(', ')} · {config.equipment.join(', ')}</p>
     <p>Camera: {config.cameraOrientation === 'reference' ? 'Match the configured reference angle' : config.cameraOrientation}. Keep your whole body visible with good lighting.</p>

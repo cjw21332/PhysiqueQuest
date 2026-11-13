@@ -8,13 +8,12 @@ test('progress displays saved measurement history and honest empty states', asyn
   const file = await source('sections/Home/Progress.tsx');
   assert.match(file, /useProgress/);
   assert.match(file, /Save measurement/);
-  assert.match(file, /Log your first .* to start a trend/);
+  assert.match(file, /Add your first measurement to see your trend/);
   assert.match(file, /useWorkoutHistory/);
-  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getWorkouts\(20, force\)/);
+  assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getAllWorkouts\(force\)/);
   assert.match(file, /completedWorkouts/);
-  assert.match(file, /samplePersonalRecords/);
-  assert.match(file, /Sample data/);
-  assert.match(file, /Form accuracy/);
+  assert.match(file, /PersonalRecords/);
+  assert.doesNotMatch(file, /samplePersonalRecords/);
 });
 
 test('notifications use account records and display an honest empty state', async () => {
@@ -135,7 +134,7 @@ test('coach plan renders a library-backed workout dashboard', async () => {
 test('native wrapper reports backend connectivity and can retry it', async () => {
   const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
   assert.match(mobile, /backend-status/);
-  assert.match(mobile, /Retry backend check/);
+  assert.match(mobile, /Change server address/);
   assert.match(mobile, /injectJavaScript/);
 });
 

@@ -9,6 +9,14 @@ const atomicModel = (doc: any) => ({
 }) as unknown as Model<WorkoutSession>;
 
 describe('workout persistence', () => {
+  it('retains the entered unit and rejects inconsistent converted weights', async () => {
+    const doc: any = { _id: new Types.ObjectId(), status: 'active', revision: 0, exercises: [{ exerciseId: 'press', sets: 1 }], sets: [] };
+    const service = new WorkoutsService(atomicModel(doc));
+    const result = { setId: 'press:0', exerciseId: 'press', setIndex: 0, reps: 8, loadKg: 10 / 2.2046226218, loadValue: 10, loadUnit: 'lbs' as const, status: 'completed' as const, source: 'manual' as const };
+    await expect(service.saveSet('507f1f77bcf86cd799439011', String(doc._id), { expectedRevision: 0, result: { ...result, loadKg: 10 } })).rejects.toThrow('Weight and unit');
+    await service.saveSet('507f1f77bcf86cd799439011', String(doc._id), { expectedRevision: 0, result });
+    expect(doc.sets[0]).toMatchObject({ loadValue: 10, loadUnit: 'lbs', loadKg: result.loadKg });
+  });
   it('creates an authenticated owner session and reloads it', async () => {
     const saved = { _id: new Types.ObjectId(), userId: new Types.ObjectId('507f1f77bcf86cd799439011'), exerciseIds: ['press'], status: 'active', startedAt: new Date('2026-10-04T10:00:00Z') };
     const create = vi.fn().mockResolvedValue(saved);

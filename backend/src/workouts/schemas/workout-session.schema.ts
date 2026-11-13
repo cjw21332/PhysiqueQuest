@@ -11,6 +11,7 @@ export class ExerciseResult {
 
 @Schema({ timestamps: true, collection: 'workout_sessions' })
 export class WorkoutSession {
+  @Prop({ maxlength: 120 }) routineName?: string;
   @Prop({
     type: MongooseSchema.Types.ObjectId,
     ref: 'User',

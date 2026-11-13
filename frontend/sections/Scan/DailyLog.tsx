@@ -1,11 +1,12 @@
 'use client';
 import AdditionalNutrition from '../Scan/AdditionalNutrition';
 import { nutrientTotal, nutrientLabel } from '../Scan/nutrientTotal';
-import { titleCase } from '../../lib/titleCase';
 
 import { Icon } from '../Home/icons';
 import CalorieProgress from '../Home/CalorieProgress';
-import { mealNames, nutritionTargets as defaultTargets, type FoodEntry, type MealName } from './types';
+import { nutritionTargets as defaultTargets, type FoodEntry, type MealName } from './types';
+import MealDiary from './MealDiary';
+import WaterTracker from './WaterTracker';
 
 type DailyLogProps = {
   targets?: typeof defaultTargets;
@@ -15,7 +16,7 @@ type DailyLogProps = {
   onHistory: () => void;
   onAdd: (meal: MealName) => void;
   onEdit: (entries: FoodEntry[]) => void;
-  onWater: (value: number) => void;
+  onWater: (value: number) => Promise<void>;
 };
 
 
@@ -54,57 +55,11 @@ export default function DailyLog({ meals, water, onBack, onHistory, onAdd, onEdi
           <h3 id="target-log-meals-heading">Today&apos;s meals</h3>
           <button type="button" onClick={() => onAdd('Dinner')}>＋ Add</button>
         </div>
-        <div className="target-log-meal-list">
-          {mealNames.map((meal) => {
-            const entries = meals.filter((item) => item.meal === meal);
-            const total = nutrientTotal(entries, item => item.calories);
-            const names = entries.map((item) => titleCase(item.name)).join(' · ');
-            const times = entries.map((item) => [item.source, item.edited ? 'edited' : '', item.time].filter(Boolean).join(' · ')).join(' / ');
-
-            return (
-              <article className="target-log-meal" key={meal}>
-                {entries.length ? <button type="button" className="target-log-meal-copy target-log-meal-edit" onClick={() => onEdit(entries)} aria-label={`Edit ${meal}: ${names}`}>
-                  <p><strong>{meal}</strong>{names && <> · {names}</>} <Icon name="edit" size={13}/></p>
-                  <small>{times}</small>
-                </button> : <div className="target-log-meal-copy"><p><strong>{meal}</strong></p><small>Not logged yet</small></div>}
-                {entries.length
-                  ? <strong className="target-log-meal-calories">{nutrientLabel(total, 'kcal')}</strong>
-                  : <button
-                      type="button"
-                      className="target-log-meal-add"
-                      aria-label={`Log ${meal}`}
-                      onClick={() => onAdd(meal)}
-                    >Log</button>}
-              </article>
-            );
-          })}
-        </div>
+        <p className="meal-multiple-hint">Open a meal to see and edit each food.</p>
+        <MealDiary meals={meals} onAdd={onAdd} onEdit={onEdit}/>
       </section>
 
-      <section className="target-log-water" aria-labelledby="target-log-water-heading">
-        <div className="target-log-section-head">
-          <h3 id="target-log-water-heading">Water intake</h3>
-          <small>{water} / 8 glasses</small>
-        </div>
-        <div className="target-log-water-glasses">
-          {Array.from({ length: 8 }, (_, index) => {
-            const glass = index + 1;
-            const filled = index < water;
-            return (
-              <button
-                key={glass}
-                type="button"
-                className={filled ? 'filled' : ''}
-                aria-label={`Set water intake to ${glass} glass${glass === 1 ? '' : 'es'}`}
-                aria-pressed={filled}
-                onClick={() => onWater(glass === water ? glass - 1 : glass)}
-              >
-                <Icon name="glass" size={15} />
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      <WaterTracker water={water} onWater={onWater}/>
     </>
   );
 }

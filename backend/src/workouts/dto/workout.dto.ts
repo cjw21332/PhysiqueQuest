@@ -31,6 +31,7 @@ export class WorkoutExerciseDto {
 }
 
 export class CreateWorkoutDto {
+  @IsOptional() @IsString() @Matches(/\S/) @MaxLength(120) routineName?: string;
   @IsArray()
   @ArrayMinSize(1)
   @ArrayUnique()
@@ -62,12 +63,15 @@ export class PauseWorkoutDto {
 }
 
 export class SetResultDto {
+  @IsOptional() @IsIn(['normal', 'warmup', 'drop', 'failure']) setType?: 'normal' | 'warmup' | 'drop' | 'failure';
   @IsOptional() @IsInt() @Min(0) @Max(86400) durationSeconds?: number;
   @IsString() @MinLength(1) @MaxLength(100) setId: string;
   @IsString() @MinLength(1) @MaxLength(80) exerciseId: string;
   @IsInt() @Min(0) @Max(9) setIndex: number;
   @IsInt() @Min(0) @Max(1000) reps: number;
   @IsOptional() @IsNumber() @Min(0) @Max(1000) loadKg?: number;
+  @IsOptional() @IsNumber() @Min(0) @Max(2204.63) loadValue?: number;
+  @IsOptional() @IsIn(['kg', 'lbs']) loadUnit?: 'kg' | 'lbs';
   @IsIn(['completed', 'skipped']) status: 'completed' | 'skipped';
   @IsIn(['manual', 'local-video']) source: 'manual' | 'local-video';
   @IsOptional() @IsInt() @Min(0) @Max(1000) detectedReps?: number;
@@ -79,6 +83,24 @@ export class SetResultDto {
 export class SaveSetDto {
   @IsInt() @Min(0) expectedRevision: number;
   @IsDefined() @ValidateNested() @Type(() => SetResultDto) result: SetResultDto;
+}
+export class RoutineItemDto {
+  @IsOptional() @IsString() @Matches(/\S/) @MaxLength(120) name?: string;
+  @IsOptional() @IsString() @MaxLength(80) equipment?: string;
+  @IsOptional() @IsString() @MaxLength(80) prescription?: string;
+  @IsOptional() @IsInt() @Min(1) @Max(10) sets?: number;
+  @IsString() @MinLength(1) @MaxLength(80) exerciseId: string;
+  @IsInt() @Min(0) @Max(600) restBetweenSets: number;
+  @IsInt() @Min(0) @Max(600) restAfterExercise: number;
+}
+export class UpdateRoutineDto {
+  @IsOptional() @IsString() @Matches(/\S/) @MaxLength(120) routineName?: string;
+  @IsInt() @Min(0) expectedRevision: number;
+  @IsArray() @ArrayMinSize(1) @ArrayMaxSize(50) @ValidateNested({ each: true }) @Type(() => RoutineItemDto) exercises: RoutineItemDto[];
+}
+
+export class CancelWorkoutDto {
+  @IsInt() @Min(0) expectedRevision: number;
 }
 
 export class ApplyRecordingDto {

@@ -4,7 +4,7 @@ import { api, type ProgressRecord } from '../lib/api';
 import { useAppResource } from './useAppResource';
 
 export function useProgress(metric: ProgressRecord['metric']) {
-  const load = useCallback((force?: boolean) => api.getProgress(metric, 90, force), [metric]);
+  const load = useCallback((force?: boolean) => api.getProgress(metric, 365, force), [metric]);
   const { data, loading, error, refresh } = useAppResource<ProgressRecord[]>(`progress:${metric}`, load);
   const [actionError, setActionError] = useState('');
   const addMeasurement = useCallback(async (value: number, unit: ProgressRecord['unit']) => {

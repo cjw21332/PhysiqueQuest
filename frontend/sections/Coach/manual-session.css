@@ -1,0 +1,65 @@
+.coach-section .routine-session { max-width: 640px; height: 100%; min-height: 0; display: flex; flex-direction: column; }
+.coach-section .routine-session .manual-session { flex: 1 1 0; height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; padding: 16px 16px max(24px, env(safe-area-inset-bottom)); background: var(--surface); color: var(--ink); display: flex; flex-direction: column; gap: 0; }
+.coach-section .routine-session .manual-session .session-controls { display: flex; justify-content: space-between; gap: 24px; margin: 0 0 28px; }
+.coach-section .routine-session .manual-session .session-controls button { flex: none; min-height: 44px; height: 44px; padding: 0 18px; font-size: 14px; border-radius: 12px; background: var(--soft); color: var(--ink); border: 1px solid var(--line); }
+.coach-section .routine-session .manual-session .session-controls .end-button { background: var(--green); color: var(--surface); border-color: var(--green); font-weight: 700; }
+.coach-section .routine-session .manual-session .live-session-head { height: auto; flex: none; display: grid; gap: 10px; padding: 0; margin-bottom: 22px; }
+.coach-section .routine-session .manual-session .session-meta { white-space: normal; overflow: visible; }
+.manual-eyebrow { display: block; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; margin-bottom: 8px; }
+.routine-session .manual-title-edit { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; border: 0; background: transparent; padding: 0; text-align: left; color: var(--ink); }
+.manual-title-edit h1 { font-size: clamp(23px, 5vw, 30px); line-height: 1.2; margin: 0; overflow-wrap: anywhere; }
+.manual-title-edit span { color: var(--green); font-size: 13px; }
+.routine-session .manual-title-edit h1, .routine-session .manual-title-edit input { flex: 1 1 auto; min-width: 0; }
+.routine-session .manual-title-edit input { width: 100%; padding: 0; border: 0; border-bottom: 1px solid var(--green); border-radius: 0; background: transparent; color: var(--ink); font: inherit; font-size: clamp(23px, 5vw, 30px); line-height: 1.2; }
+.routine-session .manual-title-edit button { flex: none; min-width: 0; min-height: 44px; padding: 4px; border: 0; background: transparent; color: var(--green); font-size: 13px; }
+.manual-title-actions { display: flex; flex: none; align-items: center; gap: 8px; }
+.routine-session form.manual-title-edit { flex-wrap: wrap; }
+.manual-title-error { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 13px; }
+.coach-section .routine-session .manual-session .session-time { color: var(--ink); font-size: 22px; font-variant-numeric: tabular-nums; font-weight: 500; }
+.manual-session .session-time small { font-size: 12px; color: var(--muted); margin-left: 8px; }
+.manual-session .manual-exercises-title { margin: 0; font-size: 17px; }
+.manual-session .routine-progress { font-size: 13px; padding: 8px 0 18px; }
+.routine-session .manual-session nav ol { gap: 16px; }
+.routine-session .manual-session nav li { border: 1px solid var(--line); border-radius: 18px; background: var(--surface); overflow: hidden; }
+.routine-session .manual-session nav li > button:first-child { padding: 16px 106px 12px 12px; min-height: 80px; border: 0; background: transparent; border-radius: 0; }
+.routine-session .manual-session .routine-exercise-label strong { font-size: 16px; color: var(--ink); overflow-wrap: normal; word-break: normal; }
+.routine-session .manual-session .routine-row-actions { right: 6px; top: 14px; }
+.routine-session .manual-session .routine-row-actions .routine-reorder { width: 44px; font-size: 18px; }
+.routine-reorder-actions { display: flex; gap: 8px; padding: 0 12px 12px; }
+.routine-reorder-actions button { flex: 1; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--ink); }
+.routine-session .manual-session .routine-current { padding: 8px 12px 12px; border: 0; margin: 0; }
+.routine-session .manual-session .manual-unit { font-size: 12px; border: 0; padding-bottom: 0; }
+.routine-session .manual-session .routine-help { font-size: 12px; line-height: 1.5; color: var(--muted); margin: 8px 0 16px; }
+.routine-session .manual-session .routine-set-heading { display: grid; padding: 0 0 8px; font-size: 12px; color: var(--muted); }
+.routine-session .manual-session .routine-set { display: grid; align-items: center; gap: 8px; border: 0; padding: 6px 0; margin: 0; }
+.routine-session .manual-session .routine-set input { width: 100%; min-width: 0; min-height: 46px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--ink); font-size: 17px; text-align: center; padding: 6px; }
+.routine-session .manual-session .routine-set p { font-size: 11px; margin: 0; color: var(--muted); }
+.routine-session .manual-session .routine-set button { min-width: 44px; min-height: 46px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--ink); }
+.routine-session .manual-session .routine-set .is-saved { background: var(--green); color: var(--surface); }
+.routine-session .manual-session .manual-add-set { width: 100%; min-height: 46px; border-radius: 10px; background: var(--green-light); color: var(--green); border: 1px solid var(--line); font-weight: 700; margin-top: 8px; }
+.routine-session .manual-session .manual-skip { font-size: 12px; color: var(--muted); background: transparent; border: 0; min-height: 44px; }
+.routine-session .manual-session .manual-cancel { min-height: 48px; width: 100%; margin-top: 24px; background: var(--soft); border: 1px solid var(--line); border-radius: 12px; color: #d24444; font-size: 14px; font-weight: 600; }
+.routine-session .manual-session .paused-banner { position: static; transform: none; order: -1; margin-bottom: 12px; text-align: center; }
+.workout-keypad, .workout-editor { color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 20px; width: min(420px, calc(100vw - 24px)); max-height: calc(100dvh - 32px); overflow-y: auto; }
+.workout-keypad { position: fixed; z-index: 100; left: 50%; bottom: 0; transform: translateX(-50%); margin: 0; width: min(100%, 480px); border-radius: 20px 20px 0 0; padding-bottom: max(16px, env(safe-area-inset-bottom)); box-shadow: 0 -8px 32px #0004; }
+.workout-keypad::backdrop, .workout-editor::backdrop { background: #0009; }
+.workout-keypad header, .workout-editor header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.workout-keypad h2, .workout-editor h2 { font-size: 20px; margin: 0; }
+.workout-keypad button, .workout-editor button { min-width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--soft); font: inherit; }
+.workout-keypad output { display: block; padding: 12px; font-size: 32px; text-align: right; font-variant-numeric: tabular-nums; }
+.workout-keypad output small { font-size: 15px; color: var(--muted); }
+.keypad-units, .workout-keypad footer { display: flex; gap: 8px; margin: 12px 0; }
+.keypad-units button, .workout-keypad footer button { flex: 1; }
+.keypad-units button[aria-pressed='true'], .workout-keypad .keypad-done { background: var(--green); color: var(--surface); }
+.keypad-digits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.keypad-digits button { min-height: 52px; font-size: 23px; }
+.keypad-digits button:disabled { visibility: hidden; }
+.workout-editor label { display: grid; gap: 8px; font-size: 14px; }
+.workout-editor input { min-height: 48px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--ink); padding: 10px; width: 100%; font-size: 16px; }
+.workout-editor form > button { width: 100%; margin-top: 16px; }
+.workout-search-results { display: grid; gap: 8px; margin-top: 12px; }
+.workout-search-results button { display: grid; gap: 4px; padding: 12px; text-align: left; }
+.workout-search-results small { color: var(--muted); }
+.manual-session :is(button, input, select):focus-visible, :is(.workout-keypad, .workout-editor) :is(button, input):focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+.manual-session button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-height: 600px) { .keypad-digits button { min-height: 40px; } .workout-keypad { padding: 12px; } .workout-keypad header { margin-bottom: 0; } }

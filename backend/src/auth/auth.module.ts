@@ -18,6 +18,8 @@ import { SessionService } from './session.service.js';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthThrottleGuard } from './auth-throttle.guard.js';
 import { EmailVerificationService } from './email-verification.service.js';
+import { GoogleIdentityService } from './google-identity.service.js';
+import { GoogleAuthService } from './google-auth.service.js';
 
 @Module({
   imports: [
@@ -36,7 +38,7 @@ import { EmailVerificationService } from './email-verification.service.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, PasswordRecoveryService, EmailDeliveryProvider, EmailVerificationService, SessionService, { provide: APP_GUARD, useClass: AuthThrottleGuard }],
+  providers: [GoogleIdentityService, GoogleAuthService, AuthService, JwtStrategy, PasswordRecoveryService, EmailDeliveryProvider, EmailVerificationService, SessionService, { provide: APP_GUARD, useClass: AuthThrottleGuard }],
   exports: [AuthService, PasswordRecoveryService],
 })
 export class AuthModule {}

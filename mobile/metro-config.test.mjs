@@ -9,6 +9,13 @@ const require = createRequire(import.meta.url);
 const config = require('./metro.config.js');
 const mobile = path.dirname(fileURLToPath(import.meta.url));
 
+test('both Expo entry directories support the bundled pose model', () => {
+  const rootConfig = require('../metro.config.js');
+  assert.ok(config.resolver.assetExts.includes('task'));
+  assert.ok(rootConfig.resolver.assetExts.includes('task'));
+  assert.ok(existsSync(path.join(mobile, 'assets/pose_landmarker_lite.task')));
+});
+
 test('Metro can see every shared source imported by the native camera entry points', () => {
   const roots = [config.projectRoot, ...config.watchFolders];
   const imports = ['App.tsx', 'NativeTrackingCamera.tsx'].flatMap(file =>

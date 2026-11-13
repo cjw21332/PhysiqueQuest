@@ -49,7 +49,7 @@ test('portion scaling preserves backend scan keys without mutating source values
   assert.deepEqual(summarizeHistory([], 7, new Date(2026, 9, 14)).split, { protein: 0, carbs: 0, fat: 0 });
 });
 
-test('review renders only matched scan totals and keeps saving disabled on analysis errors', async () => {
+test('review marks unmatched food nutrition incomplete and keeps saving disabled on analysis errors', async () => {
   const helper = await load();
   const require = createRequire(import.meta.url);
   const compile = async (path, imports = require) => {
@@ -60,10 +60,12 @@ test('review renders only matched scan totals and keeps saving disabled on analy
     return module.exports;
   };
   const icons = await compile('sections/Home/icons.tsx');
+  const outcomeDialog = await compile('components/OutcomeDialog.tsx', name => name.endsWith('/icons') ? icons : require(name));
   const types = await compile('sections/Scan/types.ts');
   const { default: Review } = await compile('sections/Scan/ReviewEstimate.tsx', name => {
     if (name.endsWith('/api')) return { SCAN_TIMEOUT_MS: 60_000 };
     if (name.endsWith('/icons')) return icons;
+    if (name.endsWith('/OutcomeDialog')) return outcomeDialog;
     if (name === './types') return types;
     if (name === './nutritionPresentation') return helper;
     if (name.endsWith('/titleCase')) return { titleCase };
@@ -72,8 +74,8 @@ test('review renders only matched scan totals and keeps saving disabled on analy
   const props = { imageUrl: '', onBack() {}, onRetake() {}, onRetry() {}, onAddManual() {}, onSave() {} };
   const analysis = { ...helper.previewScan, items: [helper.previewScan.items[0], { ...helper.previewScan.items[1], found: false, kcal: 999 }] };
   const ready = renderToStaticMarkup(React.createElement(Review, { ...props, status: 'ready', analysis, error: '' }));
-  assert.match(ready, /<b>248<\/b>/);
-  assert.match(ready, /cannot be saved/);
+  assert.match(ready, /Incomplete total/);
+  assert.match(ready, /Nutrition unavailable; edit it after saving/);
   assert.doesNotMatch(ready, /<b>1247<\/b>/);
   const failure = renderToStaticMarkup(React.createElement(Review, { ...props, status: 'error', analysis: null, error: 'Provider unavailable' }));
   assert.match(failure, /Provider unavailable/);

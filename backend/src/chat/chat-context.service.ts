@@ -4,9 +4,11 @@ import { Model, Types } from 'mongoose';
 import { Profile } from '../profile/schemas/profile.schema.js';
 import { Nutrition } from '../nutrition/schemas/nutrition.schema.js';
 import { WorkoutSession } from '../workouts/schemas/workout-session.schema.js';
+import { WorkoutsService } from '../workouts/workouts.service.js';
 import { Activity } from '../activity/schemas/activity.schema.js';
 import { ActivityService } from '../activity/activity.service.js';
 import { CoachProgram } from '../coach/coach-program.schema.js';
+import { coachProgramContext } from '../coach/coach.service.js';
 import { ProgressEntry } from '../progress/schemas/progress-entry.schema.js';
 import { Settings } from '../settings/schemas/settings.schema.js';
 import { Notifications } from '../notifications/schemas/notification.schema.js';
@@ -97,6 +99,7 @@ export class ChatContextService {
     private readonly activitySummary: ActivityService,
     @Optional() @InjectModel(Notifications.name) private readonly notifications?: Model<Notifications>,
     @Optional() @InjectModel(AlertEvent.name) private readonly safetyEvents?: Model<AlertEvent>,
+    @Optional() private readonly workoutSummary?: WorkoutsService,
   ) {}
 
   async build(userId: string, question: string, includePersonalData: boolean, page?: string): Promise<{ sources: ContextSource[]; personalDataIncluded: boolean }> {
@@ -125,6 +128,7 @@ export class ChatContextService {
     const safety = intent.topics.includes('safety');
     const preferences = intent.topics.includes('settings');
     const overview = intent.topics.includes('overview');
+    const recordsRequested = /\b(?:my|mine|i)\b.{0,50}\b(?:personal records?|personal bests?|best lifts?)\b/i.test(normalized);
     const identityNameRequested = /\b(?:my name|name did i save|name in my profile|who am i)\b/i.test(topic);
     const identityAgeRequested = /\b(?:my age|age did i save|how old am i)\b/i.test(topic);
     const identityGenderRequested = /\b(?:my gender|gender did i save|my sex|sex did i save)\b/i.test(topic);
@@ -144,9 +148,9 @@ export class ChatContextService {
     const needNutrition = scan || quests || overview;
     const needWorkouts = coach || quests || overview;
     const needProfile = profile || coach || overview;
-    const needSettings = scan || preferences || overview || safetyEventsRequested || settingsRequested;
-    const namedMetrics = [ /\bweight\b/i.test(topic) ? 'weight' : '', /\bwaist\b/i.test(topic) ? 'waist' : '', /\bbench(?:.?press)?\b/i.test(topic) ? 'benchPress' : '' ].filter(Boolean);
-    const requestedMetrics = namedMetrics.length ? namedMetrics : ['weight', 'waist', 'benchPress'];
+    const needSettings = scan || coach || preferences || overview || safetyEventsRequested || settingsRequested;
+    const namedMetrics = [ /\bweight\b/i.test(topic) ? 'weight' : '', /\bwaist\b/i.test(topic) ? 'waist' : '', /\bchest\b/i.test(topic) ? 'chest' : '', /\barms?\b/i.test(topic) ? 'arms' : '', /\bbench(?:.?press)?\b/i.test(topic) ? 'benchPress' : '' ].filter(Boolean);
+    const requestedMetrics = namedMetrics.length ? namedMetrics : ['weight', 'waist', 'chest', 'arms', 'benchPress'];
 
     try {
       const needsActivityDate = needNutrition || quests || overview;
@@ -155,7 +159,7 @@ export class ChatContextService {
       const today = activityDate(now, timezone);
       const selectedDate = nutritionSelectedDate(normalized, today);
       const period = scan ? nutritionPeriod(normalized, today) : undefined;
-      const [profileRecord, nutritionRecord, workoutRecords, programRecord, progressRecords, settingsRecord, questSummary, notificationRecord, safetyRecords] = await Promise.all([
+      const [profileRecord, nutritionRecord, workoutRecords, progressRecords, settingsRecord, questSummary, notificationRecord, safetyRecords] = await Promise.all([
         needProfile ? this.profiles.collection.findOne(owner, { projection: {
           _id: 0, goal: 1, targetWeight: 1, targetDate: 1, height: 1, heightInches: 1, heightUnit: 1,
           weight: 1, weightUnit: 1, chest: 1, chestUnit: 1, waist: 1, waistUnit: 1, arms: 1, armsUnit: 1,
@@ -163,7 +167,7 @@ export class ChatContextService {
           ...(identityNameRequested ? { name: 1 } : {}),
           ...(identityAgeRequested ? { age: 1 } : {}),
           ...(identityGenderRequested ? { gender: 1 } : {}),
-          ...(healthConditionsRequested ? { conditions: 1 } : {}),
+          ...(healthConditionsRequested || coach || overview ? { conditions: 1 } : {}),
           ...(healthNotesRequested ? { healthNotes: 1 } : {}),
           ...(contactAllRequested || contactNameRequested ? { contactName: 1 } : {}),
           ...(contactAllRequested || contactPhoneRequested ? { contactPhone: 1 } : {}),
@@ -171,13 +175,26 @@ export class ChatContextService {
         }, maxTimeMS: 3000 }) : null,
         needNutrition ? this.nutrition.collection.findOne(owner, { projection: { _id: 0, meals: { $slice: -90 }, water: { $slice: -45 }, dietaryPlan: 1, chatToday: nutritionDayProjection(today), chatSelectedDay: nutritionDayProjection(selectedDate), ...(period ? { chatPeriod: nutritionDayProjection(period.start, period.end) } : {}) }, maxTimeMS: 3000 }) : null,
         needWorkouts ? this.workouts.collection.find({ ...owner, $or: [{ status: 'active' }, { status: 'completed', endedAt: { $gte: cutoff, $lte: now } }] }, { projection: { _id: 0, startedAt: 1, endedAt: 1, pausedAt: 1, pausedSeconds: 1, durationSeconds: 1, status: 1, origin: 1, activityDate: 1, scheduledDate: 1, dayIndex: 1, timezone: 1, exercises: { $slice: 12 }, sets: { $slice: 80 }, exerciseResults: { $slice: 12 } } }).sort({ startedAt: -1 }).limit(12).toArray() : [],
-        coach || overview ? this.programs.collection.findOne(owner, { projection: { _id: 0, plan: 1, createdAt: 1 }, sort: { createdAt: -1 } }) : null,
         progressRequested ? Promise.all(requestedMetrics.map(metric => this.progress.collection.find({ ...owner, metric, measuredAt: { $lte: now } }, { projection: { _id: 0, metric: 1, value: 1, unit: 1, measuredAt: 1 } }).sort({ measuredAt: -1 }).limit(9).toArray())).then(groups => groups.flat().sort((a, b) => new Date(b.measuredAt).getTime() - new Date(a.measuredAt).getTime())) : [],
-        needSettings ? this.settings.collection.findOne(owner, { projection: { _id: 0, 'values.nutritionTargets': 1, 'values.showLeaderboard': 1, 'values.inactivity': 1, 'values.alarmVolume': 1, 'values.threshold': 1, 'values.notifications': 1 } }) : null,
+        needSettings ? this.settings.collection.findOne(owner, { projection: { _id: 0, 'values.nutritionTargets': 1, 'values.showLeaderboard': 1, 'values.inactivity': 1, 'values.alarmVolume': 1, 'values.threshold': 1, 'values.notifications': 1, 'values.equipment': 1, 'values.duration': 1 } }) : null,
         quests || overview ? this.activitySummary.getForAssistant(userId) : null,
         notices && this.notifications ? this.notifications.collection.findOne(owner, { projection: { _id: 0, items: { $slice: -12 }, reminder: 1, unreadCount: { $size: { $filter: { input: { $ifNull: ['$items', []] }, as: 'item', cond: { $eq: ['$$item.unread', true] } } } } } }) : null,
         safetyEventsRequested && this.safetyEvents ? this.safetyEvents.collection.find(owner, { projection: { _id: 0, eventType: 1, status: 1, occurredAt: 1, resolvedAt: 1 } }).sort({ occurredAt: -1 }).limit(6).toArray() : [],
       ]);
+      const programHash = (coach || overview) && profileRecord ? coachProgramContext(profileRecord as unknown as Profile, object(object(settingsRecord).values)).contextHash : null;
+      const programRecord = programHash ? await this.programs.collection.findOne({ ...owner, contextHash: programHash }, { projection: { _id: 0, plan: 1, createdAt: 1 }, maxTimeMS: 3000 }) : null;
+      if (recordsRequested && this.workoutSummary) {
+        const summary = await this.workoutSummary.summary(userId, timezone);
+        const records = rows(summary.personalRecords, 30).map(record => ({
+          name: text(record.name, 120), loadKg: number(record.loadKg, 1000),
+          loadValue: number(record.loadValue, 2205), loadUnit: choice(record.loadUnit, ['kg', 'lbs']),
+          volumeKg: number(record.volumeKg, Number.MAX_SAFE_INTEGER), date: calendarDate(record.date),
+        }));
+        sources.push({ id: 'user-records', label: 'Your personal records', data: {
+          records, truncated: summary.personalRecords.length > 30,
+          note: 'All-time best loaded set per exercise; at most 30 records listed. Volume is the largest single-workout total excluding warm-ups, in kilograms.',
+        } });
+      }
 
       if (needProfile) {
         const p = profileRecord ? object(decryptProfile({ ...object(profileRecord), userId: owner.userId })) : {};
@@ -257,8 +274,8 @@ export class ChatContextService {
           pausedAt: date(w.pausedAt), pausedSeconds: number(w.pausedSeconds, 365 * 86400),
           durationSeconds: number(w.durationSeconds, 86400), origin: choice(w.origin, ['planned', 'standalone', 'recorded-set']),
           scheduledDate: calendarDate(w.scheduledDate), dayIndex: number(w.dayIndex, 6),
-          exercises: exercises.slice(0, 4).map(e => ({ name: text(e.name, 70), equipment: text(e.equipment, 45), prescription: text(e.prescription, 40) })),
-          completedSets: sets.filter(s => s.status === 'completed').slice(0, 12).map(s => ({ exercise: exerciseName(s.exerciseId), reps: number(s.reps, 1000), loadKg: number(s.loadKg, 1000), durationSeconds: number(s.durationSeconds, 86400) })),
+          exercises: exercises.map(e => ({ name: text(e.name, 70), equipment: text(e.equipment, 45), prescription: text(e.prescription, 40) })),
+          completedSets: sets.filter(s => s.status === 'completed').map(s => ({ exercise: exerciseName(s.exerciseId), reps: number(s.reps, 1000), loadKg: number(s.loadKg, 1000), loadValue: number(s.loadValue, 2205), loadUnit: choice(s.loadUnit, ['kg', 'lbs']), setType: choice(s.setType, ['normal', 'warmup', 'drop', 'failure']), durationSeconds: number(s.durationSeconds, 86400) })),
           skippedSetsInExcerpt: sets.filter(s => s.status === 'skipped').length,
           legacyResults: rows(w.exerciseResults, 4).map(result => ({
             exercise: exerciseName(result.exerciseId) ?? (typeof result.exerciseId === 'string' && !/^[a-f\d]{24}$/i.test(result.exerciseId) ? text(result.exerciseId.replace(/[-_]+/g, ' '), 70) : null),
@@ -268,7 +285,7 @@ export class ChatContextService {
       };
       if (needWorkouts) sources.push({ id: 'user-workouts', label: 'Your recent completed workouts', data: {
         since: cutoff.toISOString(), status: workouts.length ? 'available' : 'missing', truncated: workouts.length > 10,
-        note: 'Inspected up to12 active/recent completed sessions; completed excerpts are within30days. Up to10 completed sessions,4 exercise names,12 completed sets and4 legacy results are shown. Counts from excerpts are lower bounds, not all-time personal records. Active workout data is server-saved; device drafts/timers are unavailable.',
+        note: 'Inspected up to 12 active/recent sessions within 30 days. Up to 10 completed sessions, 12 exercises and 80 sets per session are shown. Counts from excerpts are lower bounds, not all-time records. Active workout data is server-saved; device drafts/timers are unavailable.',
         activeWorkout: activeWorkout ? mapWorkout(activeWorkout) : null,
         sessions: workouts.slice(0, 10).map(mapWorkout),
       } });
@@ -305,7 +322,7 @@ export class ChatContextService {
           savedAt: date(object(programRecord).createdAt), note: 'Saved snapshot only; may be older than current profile preferences. No program is generated or changed by chat.',
           goal: text(plan.goal), duration: text(plan.duration, 30), sessionCount: number(plan.sessionCount, 7), sets: text(plan.sets, 30),
           days: rows(plan.days, 7).map(day => ({ name: text(day.name, 15), title: text(day.title, 80), isWorkoutDay: typeof day.isWorkoutDay === 'boolean' ? day.isWorkoutDay : null,
-            exercises: rows(day.exercises, 4).map(e => ({ name: text(e.name, 70), equipment: text(e.equipment, 45), prescription: text(e.prescription, 40),
+            exercises: rows(day.exercises, 50).map(e => ({ name: text(e.name, 70), equipment: text(e.equipment, 45), prescription: text(e.prescription, 40),
               ...(instructionsRequested ? { formTip: text(e.formTip, 180), instructions: Array.isArray(e.instructions) ? e.instructions.slice(0, 5).map((instruction: unknown) => text(instruction, 180)).filter(Boolean) : [] } : {}),
             })),
           })),
@@ -313,7 +330,7 @@ export class ChatContextService {
       }
 
       if (progressRequested) {
-        const measurements = rows(progressRecords, 27).map(p => ({ metric: choice(p.metric, ['weight', 'waist', 'benchPress']), value: number(p.value, 1000), unit: choice(p.unit, ['kg', 'lb', 'cm', 'in']), measuredAt: date(p.measuredAt) }));
+        const measurements = rows(progressRecords, 45).map(p => ({ metric: choice(p.metric, ['weight', 'waist', 'chest', 'arms', 'benchPress']), value: number(p.value, 1000), unit: choice(p.unit, ['kg', 'lb', 'cm', 'in']), measuredAt: date(p.measuredAt) }));
         sources.push({ id: 'user-progress', label: 'Your recent saved measurements', data: {
           status: progressRecords.length ? 'available' : 'missing', note: 'Up to9 newest saved values per requested metric; not complete measurement history. Profile weight and newer weight check-ins are separate saved fields.',
           latestByMetric: Object.fromEntries(requestedMetrics.map(metric => [metric, measurements.find(item => item.metric === metric) ?? null])),

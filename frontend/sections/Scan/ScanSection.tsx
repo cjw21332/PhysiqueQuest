@@ -20,6 +20,7 @@ import { toScanImage } from '../../lib/scanImage';
 import { api, ApiRequestError, ApiTimeoutError, type ScanAnalysis, type ScannedItem } from '../../lib/api';
 import { formatLocalDate } from '../../lib/localDate.mjs';
 import { useScreenRoute } from '../../hooks/useScreenRoute';
+import OutcomeDialog from '../../components/OutcomeDialog';
 
 type View = 'nutrition' | 'review' | 'add' | 'logs' | 'history' | 'edit' | 'plan';
 type ScanStatus = 'loading' | 'ready' | 'error';
@@ -32,11 +33,12 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const [cameraOpen,setCameraOpen]=useState(false);
   const [addReturnView,setAddReturnView]=useState<View>('nutrition');
   const [historyReturnView,setHistoryReturnView]=useState<View>('nutrition');
-  const { dietaryPlan, meals, water, loading, error, addMeal, addMealsFromScan, updateMeal, setWater: saveWater, refresh } = useNutrition();
+  const { dietaryPlan, meals, water, loading, error, addMeal, addMealsFromScan, updateMeal, deleteMeal, setWater: saveWater, refresh } = useNutrition();
   const targets = dietaryPlan ? planTargets(dietaryPlan) : undefined;
   const [editingEntries, setEditingEntries] = useState<FoodEntry[]>([]);
   const [editingPreview, setEditingPreview] = useState(false);
-  const edit = (entries: FoodEntry[]) => { setActionError(''); setEditingEntries(entries); setEditingPreview(preview); setView('edit'); };
+  const [editReturnView, setEditReturnView] = useState<View>('logs');
+  const edit = (entries: FoodEntry[]) => { setActionError(''); setEditingEntries(entries); setEditingPreview(preview); setEditReturnView(view); setView('edit'); };
   const saveEdit = async (entry: FoodEntry) => {
     if (editingPreview) {
       setPreviewSnapshot(current => ({ ...current, meals: current.meals.map(item => item.id === entry.id ? { ...entry, edited: true } : item) }));
@@ -45,7 +47,7 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
       // Send only editable DTO fields. Preserve provenance and original log time on the server.
       await updateMeal(entry.id, { name: entry.name, meal: entry.meal, calories: entry.calories, protein: entry.protein, carbs: entry.carbs, fat: entry.fat, ...(entry.fdcId && entry.fdcId > 0 ? { fdcId: entry.fdcId } : {}) });
     }
-    setView('logs');
+    setView(editReturnView);
   };
   const [previewSnapshot, setPreviewSnapshot] = useState(() => createNutritionPreview());
   const [previewEligible,setPreviewEligible]=useState(false);
@@ -59,7 +61,6 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const todayMeals = displayMeals.filter(meal => meal.date === formatLocalDate());
   const [sampleReview, setSampleReview] = useState(false);
   const [notice,setNotice]=useState('');
-  useEffect(()=>{if(!notice)return;const timer=window.setTimeout(()=>setNotice(''),3000);return()=>window.clearTimeout(timer);},[notice]);
   const setWater = async (value:number) => {
     if (preview) { setPreviewSnapshot(current=>({...current,water:value})); setNotice('Sample water updated. Your account was not changed.'); return; }
     await saveWater(value);
@@ -123,14 +124,14 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const saveScan=async(meal:MealName,items:ScannedItem[])=>{
     setActionError('');
     if(sampleReview){addPreviewEntries(items.map((item,index)=>({id:`preview-scan-${Date.now()}-${index}`,name:item.food_name,meal,calories:item.kcal!,detail:`${item.food_name} · ${Math.round(item.est_weight_g)} g`,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}),source:'Scanned',protein:item.protein_g!,carbs:item.carbs_g!,fat:item.fat_g!,date:formatLocalDate()})));return;}
-    try{await addMealsFromScan({items,meal});setView('logs');}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');throw err;}
+    try{await addMealsFromScan({items,meal});setView('logs');setNotice(`Saved to ${meal}. Your meal diary has been updated.`);}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');throw err;}
   };
   const saveFood=async(food:{name:string;calories:number|null;protein:number|null;carbs:number|null;fat:number|null;fdcId:number;servingSizeG:number},meal:MealName,amount:number,unit:'grams'|'servings')=>{
     const grams=unit==='grams'?amount:amount*food.servingSizeG;const now=new Date();
     const entry={name:food.name,meal,calories:food.calories,detail:`${food.name} · ${unit==='grams'?`${amount} g`:`${amount} serving(s) (${Math.round(grams)} g)`}`,time:now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}),source:'Manual' as const,protein:food.protein,carbs:food.carbs,fat:food.fat,fdcId:food.fdcId};
     setActionError('');
     if(preview || food.fdcId < 0){addPreviewEntries([{...entry,id:`preview-food-${Date.now()}`,date:formatLocalDate()}]);return;}
-    try{await addMeal(entry);setView('logs');}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');throw err;}
+    try{await addMeal(entry);setView('logs');setNotice(`Saved to ${meal}. Your meal diary has been updated.`);}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');throw err;}
   };
   const openSampleReview=()=>{setPhotoSourceOpen(false);setSampleReview(true);setImageUrl('/scan-meal-reference.png');setScanStatus('ready');setScanError('');setAnalysis(previewScan);setView('review');};
   const retake=()=>{setView('nutrition');setPhotoSourceOpen(true);};
@@ -160,19 +161,21 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
     </div>}
     <div ref={contentRef} className="scan-content">
     {loading && view === 'nutrition' ? <div className="profile-load-state" role="status" aria-label="Loading nutrition" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div> : <>
-    {(error || actionError) && <p className="error" role="alert">{actionError || error}</p>}
+    {error && <p className="error" role="alert">{error}</p>}
     {preview && (view!=='review'||sampleReview) && <p className="scan-preview-label">Sample preview · not your saved nutrition data <button type="button" onClick={()=>{setPreviewRequested(false);setSampleReview(false);setNotice('');setActionError('');setView('nutrition');}}>Start my log</button></p>}
     {!preview && previewEligible && !loading && !error && meals.length===0 && water===0 && view==='nutrition' && <button type="button" className="scan-preview-toggle" onClick={()=>{setPreviewSnapshot(createNutritionPreview());setPreviewRequested(true);}}>View sample nutrition</button>}
-    {notice&&<p className="scan-preview-notice" role="status">{notice}</p>}
     {error&&<button type="button" className="scan-retry" onClick={()=>void refresh()}>Retry nutrition</button>}
-    {view==='nutrition'&&<NutritionDashboard targets={targets} onPlan={()=>setView('plan')} meals={todayMeals} historyMeals={displayMeals} water={displayWater} onScan={scan} onAdd={add} onLogs={()=>{if(!preview)void refresh();setView('logs');}} onHistory={openHistory}/>}
+    {view==='nutrition'&&<NutritionDashboard targets={targets} onPlan={()=>setView('plan')} meals={todayMeals} historyMeals={displayMeals} water={displayWater} onWater={setWater} onScan={scan} onAdd={add} onEdit={edit} onLogs={()=>{if(!preview)void refresh();setView('logs');}} onHistory={openHistory}/>}
     {view==='plan'&&<DietaryPlan saved={dietaryPlan} profile={profile} meals={todayMeals} onBack={()=>setView('nutrition')}/>}
     {view==='review'&&<ReviewEstimate imageUrl={imageUrl} preview={sampleReview} status={scanStatus} analysis={analysis} error={scanError} onBack={()=>setView('nutrition')} onRetake={retake} onRetry={retryScan} onAddManual={add} onSave={saveScan}/>}
 
     {view==='add'&&<AddFood preview={preview} initialMeal={selectedMeal} onBack={()=>setView(addReturnView)} onSave={saveFood}/>}
-    {view==='logs'&&<DailyLog targets={targets} meals={todayMeals} water={displayWater} onBack={()=>setView('nutrition')} onHistory={openHistory} onAdd={add} onEdit={edit} onWater={value=>{void setWater(value).then(()=>setActionError('')).catch(err=>setActionError(err instanceof Error?err.message:'Could not update water intake.'));}}/>}
-    {view==='edit'&&editingEntries.length>0&&<EditMeal key={editingEntries[0].id} entries={editingEntries} onBack={()=>setView('logs')} onSave={saveEdit}/>}
+    {view==='logs'&&<DailyLog targets={targets} meals={todayMeals} water={displayWater} onBack={()=>setView('nutrition')} onHistory={openHistory} onAdd={add} onEdit={edit} onWater={setWater}/>}
+    {view==='edit'&&editingEntries.length>0&&<EditMeal key={editingEntries[0].id} entries={editingEntries} onBack={()=>setView(editReturnView)} onSave={saveEdit} onDelete={async entry => { if(editingPreview){setPreviewSnapshot(current => ({ ...current, meals: current.meals.filter(item => item.id !== entry.id) }));} else await deleteMeal(entry.id); setView(editReturnView); }}/>}
     {view==='history'&&<FoodHistory targets={targets} meals={displayMeals} backLabel={historyReturnView==='logs' ? "Back to Today's Log" : 'Back to Nutrition'} onBack={()=>setView(historyReturnView)}/>}
     </>}
-    </div>{(view === 'nutrition' || view === 'logs' || view === 'history' || view === 'plan') && <BottomNav />}</section>;
+    </div>{(view === 'nutrition' || view === 'logs' || view === 'history' || view === 'plan') && <BottomNav />}
+    {actionError && <OutcomeDialog kind="error" title="Could not save meal" message={actionError} onClose={()=>setActionError('')} actionLabel="Try again"/>}
+    {notice && !actionError && <OutcomeDialog kind={notice.includes('Sample') ? 'info' : 'success'} title={notice.includes('Sample') ? 'Sample updated' : 'Meal saved'} message={notice} onClose={()=>setNotice('')}/>}
+  </section>;
 }

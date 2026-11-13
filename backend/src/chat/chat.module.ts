@@ -8,6 +8,7 @@ import { CoachProgram, CoachProgramSchema } from '../coach/coach-program.schema.
 import { ProgressEntry, ProgressEntrySchema } from '../progress/schemas/progress-entry.schema.js';
 import { Settings, SettingsSchema } from '../settings/schemas/settings.schema.js';
 import { ActivityModule } from '../activity/activity.module.js';
+import { WorkoutsModule } from '../workouts/workouts.module.js';
 import { ChatController } from './chat.controller.js';
 import { ChatService } from './chat.service.js';
 import { ChatContextService } from './chat-context.service.js';
@@ -24,5 +25,5 @@ import { AuthRateLimit, AuthRateLimitSchema } from '../auth/auth-rate-limit.sche
   { name: Settings.name, schema: SettingsSchema },
   { name: Notifications.name, schema: NotificationsSchema }, { name: AlertEvent.name, schema: AlertEventSchema },
   { name: AuthRateLimit.name, schema: AuthRateLimitSchema },
-]), ActivityModule], controllers: [ChatController], providers: [ChatService, ChatContextService, LocalChatProvider, ChatRateLimitGuard] })
+]), ActivityModule, WorkoutsModule], controllers: [ChatController], providers: [ChatService, ChatContextService, LocalChatProvider, ChatRateLimitGuard] })
 export class ChatModule {}

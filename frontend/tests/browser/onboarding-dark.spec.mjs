@@ -22,8 +22,10 @@ test('dark reference onboarding preserves registration, calibration, scrolling, 
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
     const pathname = new URL(request.url()).pathname;
+    if (pathname.endsWith('/auth/session/refresh')) return route.fulfill({ status: 401, headers, json: { message: 'No active session' } });
     let json = {};
-    if (pathname.endsWith('/auth/register')) json = { access_token: 'visual-test', user: { id: 'visual-user', name: 'Juan Dela Cruz', email: 'juan@example.test' } };
+    if (pathname.endsWith('/auth/registration-code/request')) json = { requestId: 'a'.repeat(64) };
+    if (pathname.endsWith('/auth/session/register')) json = { access_token: 'visual-test', expires_in: 900, user: { id: 'visual-user', name: 'Juan Dela Cruz', email: 'juan@example.test' } };
     if (pathname.endsWith('/profile') && request.method() === 'POST') { savedProfile = request.postDataJSON(); json = savedProfile; }
     return route.fulfill({ json, headers });
   });
@@ -73,7 +75,10 @@ test('dark reference onboarding preserves registration, calibration, scrolling, 
   await page.getByRole('checkbox').check();
   await expect(page.getByLabel('Full name')).toHaveValue('Juan Dela Cruz');
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
-  await page.getByRole('button', { name: 'Start calibration', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Verification code' })).toBeVisible();
+  await page.getByLabel('Digit 1 of 6').fill('123456');
+  await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+  await page.getByRole('button', { name: 'Continue setup', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Personal data' })).toBeVisible();
   await expectReferenceLayout(page, ['.calibration-wizard', '.wizard-heading', '.step-content', '.calibration-footer']);
   await page.getByRole('button', { name: 'Next: Goals', exact: true }).click();

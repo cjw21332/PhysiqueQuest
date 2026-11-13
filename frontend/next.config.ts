@@ -7,7 +7,7 @@ const nextConfig = (phase: string): NextConfig => ({
   output: 'standalone',
   outputFileTracingRoot: process.cwd().replace(/[\\/]frontend$/, ''),
   allowedDevOrigins: ['localhost', '*.*.*.*', ...(process.env.DEV_ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean)],
-  distDir: phase === PHASE_DEVELOPMENT_SERVER ? '.next-dev' : '.next',
+  distDir: phase === PHASE_DEVELOPMENT_SERVER ? (process.env.NEXT_DEV_DIST_DIR || '.next-dev') : '.next',
   devIndicators: false,
   experimental: { proxyClientMaxBodySize: '28mb' },
   async headers() {

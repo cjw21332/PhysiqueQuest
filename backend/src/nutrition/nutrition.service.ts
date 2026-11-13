@@ -76,35 +76,28 @@ export class NutritionService {
   }
 
   /**
-   * Writes one meal row per item a scan actually priced.
-   *
-   * Items with `found: false` carry no USDA match and therefore no meaningful
-   * macros, so they are skipped rather than stored as a zero-calorie meal. If
-   * that leaves nothing to write the whole request is rejected: silently
-   * recording an empty meal would look like a successful save.
+   * Writes one row per selected food. Unmatched items retain null nutrition
+   * so they can be reviewed later without inventing zero-calorie values.
    */
   async addMealsFromScan(userId: string, dto: MealFromScanDto): Promise<NutritionDocument> {
-    const matched = dto.items.filter((item) => item.found);
-    if (matched.length === 0) {
-      throw new BadRequestException('None of the scanned items matched a nutrition record');
-    }
+    if (dto.items.length === 0) throw new BadRequestException('Select at least one food to save');
 
     const date = dto.date || new Date().toISOString().slice(0, 10);
-    const meals = matched.map((item) => ({
+    const meals = dto.items.map((item) => ({
       id: randomUUID(),
       name: item.food_name,
       meal: dto.meal,
-      calories: item.kcal,
+      calories: item.found ? item.kcal ?? null : null,
       detail: item.description ?? '',
       time: dto.time ?? '',
       source: 'Scanned',
-      protein: item.protein_g,
-      carbs: item.carbs_g,
-      fat: item.fat_g,
+      protein: item.found ? item.protein_g ?? null : null,
+      carbs: item.found ? item.carbs_g ?? null : null,
+      fat: item.found ? item.fat_g ?? null : null,
       date,
       // Spread conditionally so an unmatched optional field is absent from the
       // document rather than persisted as an explicit null.
-      ...(item.fdc_id === undefined ? {} : { fdcId: item.fdc_id }),
+      ...(!item.found || item.fdc_id === undefined ? {} : { fdcId: item.fdc_id }),
       ...(item.confidence === undefined ? {} : { confidence: item.confidence }),
       ...(item.est_weight_g === undefined ? {} : { estWeightG: item.est_weight_g }),
     }));

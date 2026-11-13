@@ -5,11 +5,13 @@ import { useState } from 'react';
 import { Icon } from '../Home/icons';
 import { mealNames, type FoodEntry } from './types';
 import FoodNameSearch from './FoodNameSearch';
+import DeleteConfirmation from '../../components/DeleteConfirmation';
 
-export default function EditMeal({ entries, onBack, onSave }: { entries: FoodEntry[]; onBack: () => void; onSave: (entry: FoodEntry) => Promise<void> }) {
+export default function EditMeal({ entries, onBack, onSave, onDelete }: { entries: FoodEntry[]; onBack: () => void; onSave: (entry: FoodEntry) => Promise<void>; onDelete: (entry: FoodEntry) => Promise<void> }) {
   const [entry, setEntry] = useState(entries[0]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState(false);
   const save = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (saving) return;
@@ -27,6 +29,8 @@ export default function EditMeal({ entries, onBack, onSave }: { entries: FoodEnt
     <h3>Nutrition</h3>
     <div className="meal-edit-grid">{([{ key: 'calories', label: 'Calories', unit: 'kcal' }, { key: 'protein', label: 'Protein', unit: 'g' }, { key: 'carbs', label: 'Carbohydrates', unit: 'g' }, { key: 'fat', label: 'Fat', unit: 'g' }] as const).map(({ key, label, unit }) => <label className="meal-edit-field" key={key}>{label} ({unit})<input type="number" placeholder="Unavailable" min="0" step="any" inputMode="decimal" disabled={saving} value={entry[key] ?? ''} onChange={event => setEntry({ ...entry, [key]: event.target.value === '' ? null : Number(event.target.value) })}/></label>)}</div>
     {error && <p className="error" role="alert">{error}</p>}
+    <button type="button" disabled={saving} onClick={() => setDeleting(true)}>Delete entry</button>
+    {deleting && <DeleteConfirmation title="Delete this entry?" description={`${entry.meal} · ${entry.name}${entry.calories == null ? '' : ` (${entry.calories} kcal)`} will be removed and today's totals recalculated.`} confirmLabel="Delete entry" busy={saving} onCancel={() => setDeleting(false)} onConfirm={() => { setSaving(true); void onDelete(entry).catch(err => { setError(err instanceof Error ? err.message : 'Could not delete entry.'); setDeleting(false); }).finally(() => setSaving(false)); }}/>}
     <footer className="scan-footer split-footer"><button type="button" className="secondary" onClick={onBack} disabled={saving}>Cancel</button><button type="submit" className="primary" disabled={saving || !entry.name.trim() || [entry.calories, entry.protein, entry.carbs, entry.fat].some(value => value !== null && (!Number.isFinite(value) || value < 0))}>{saving ? 'Saving…' : 'Save changes'}</button></footer>
   </form>;
 }

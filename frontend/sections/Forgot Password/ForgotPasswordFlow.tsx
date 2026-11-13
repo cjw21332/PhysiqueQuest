@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent, type KeyboardEvent } from 'react';
 import { api } from '../../lib/api';
+import { Icon } from '../Home/icons';
 
 type Step = 'reset' | 'verify' | 'password' | 'success';
 type Props = { onClose: () => void; onSuccess: () => void; mode?: 'reset' | 'change' | 'register' | 'verify-email'; accountEmail?: string; initialRequestId?: string; onRegister?: (requestId: string, code: string) => Promise<void> };
@@ -275,7 +276,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     </>}
 
     {step === 'success' && <>
-      <div className="success-modal-content"><div className="success-icon">✓</div><h3 className="success-title">Password updated</h3><p className="success-description">Your password was changed successfully. Sign in with your new password.</p></div>
+      <div className="success-modal-content"><div className="success-icon"><Icon name="check" size={32} /></div><h3 className="success-title">Password updated</h3><p className="success-description">Your password was changed successfully. Sign in with your new password.</p></div>
       <div className="modal-footer"><button className="btn-primary" onClick={() => { onSuccess(); onClose(); }}>Return to sign in</button></div>
     </>}
   </div></dialog>;

@@ -5,7 +5,24 @@ import {
   isTrustedWebViewUrl,
   resolveApiUrl,
   resolveFrontendUrl,
+  selectConfiguredUrl,
 } from './connection.mjs';
+
+test('local sessions do not fall back to release URLs embedded in the manifest', () => {
+  const release = 'https://old-tunnel.example.com';
+  assert.equal(selectConfiguredUrl(true, undefined, release), undefined);
+  assert.equal(selectConfiguredUrl(true, '', release), undefined);
+  assert.equal(resolveFrontendUrl(selectConfiguredUrl(true, undefined, release), '192.168.100.5:8081'), 'http://192.168.100.5:3000');
+  assert.equal(selectConfiguredUrl(true, 'https://dev.example.com', release), 'https://dev.example.com');
+  assert.equal(selectConfiguredUrl(false, undefined, release), release);
+});
+
+test('the installable preview profile explicitly uses its packaged server configuration', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const eas = JSON.parse(await readFile(new URL('./eas.json', import.meta.url), 'utf8'));
+  assert.equal(eas.build.preview.env.EXPO_PUBLIC_PQ_LOCAL_DEV, '0');
+  assert.equal(selectConfiguredUrl(false, undefined, 'https://preview.example.com'), 'https://preview.example.com');
+});
 
 test('native messages and navigation are restricted to the configured frontend origin', () => {
   assert.equal(isTrustedWebViewUrl('http://192.168.1.42:3000/home', 'http://192.168.1.42:3000'), true);

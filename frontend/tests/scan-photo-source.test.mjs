@@ -44,8 +44,8 @@ test('today log shows calorie and macro targets with live meals and water contro
   assert.match(log, /<CalorieProgress calories=\{calories\} target=\{nutritionTargets.calories\}/);
   assert.match(log, /role="progressbar"/);
   assert.match(log, /onClick=\{onHistory\}/);
-  assert.match(log, /onAdd\(meal\)/);
-  assert.match(log, /Array\.from\(\{ length: 8 \}/);
-  assert.match(scan, /onWater=\{value=>\{void setWater\(value\).*catch/);
+  assert.match(log, /<MealDiary meals=\{meals\} onAdd=\{onAdd\} onEdit=\{onEdit\}/);
+  assert.match(log, /<WaterTracker water=\{water\} onWater=\{onWater\}/);
+  assert.match(scan, /onWater=\{setWater\}/);
   assert.match(scan, /view === 'logs'.*<BottomNav/);
 });

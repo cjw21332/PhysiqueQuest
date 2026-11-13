@@ -40,3 +40,11 @@ openapi.json
 *.temp
 .data/
 index-snapshot.json
+ml/data/
+ml/.venv/
+.opencode/
+*.task
+ml/**/*.mp4
+ml/**/*.gif
+ml/data/raw/
+ml/data/keypoints_cached/

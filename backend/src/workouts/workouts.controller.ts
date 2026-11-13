@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Header, Patch, Post, Query, Param, Req, Res, UseGuards, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { ApplyRecordingDto, CompleteWorkoutDto, CreateWorkoutDto, PauseWorkoutDto, RecordedWorkoutDto, SaveSetDto } from './dto/workout.dto.js';
+import { ApplyRecordingDto, CompleteWorkoutDto, CreateWorkoutDto, PauseWorkoutDto, RecordedWorkoutDto, SaveSetDto, UpdateRoutineDto } from './dto/workout.dto.js';
 import { WorkoutsService } from './workouts.service.js';
+import { CancelWorkoutDto } from './dto/workout.dto.js';
 
 type AuthenticatedRequest = Request & { user: { userId: string } };
 @Controller('workouts')
@@ -21,6 +22,8 @@ export class WorkoutsController {
   @Post('recorded') record(@Req() req: AuthenticatedRequest, @Body() dto: RecordedWorkoutDto) { return this.service.record(req.user.userId, dto); }
   @Post('recorded/:id/apply') applyRecording(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: ApplyRecordingDto) { return this.service.applyRecording(req.user.userId, id, dto); }
   @Patch(':id/sets') saveSet(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: SaveSetDto) { return this.service.saveSet(req.user.userId, id, dto); }
+  @Patch(':id/routine') updateRoutine(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: UpdateRoutineDto) { return this.service.updateRoutine(req.user.userId, id, dto); }
   @Patch(':id/pause') pause(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: PauseWorkoutDto) { return this.service.setPaused(req.user.userId, id, dto); }
   @Post(':id/complete') complete(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: CompleteWorkoutDto) { return this.service.complete(req.user.userId, id, dto); }
+  @Post(':id/cancel') cancel(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: CancelWorkoutDto) { return this.service.cancel(req.user.userId, id, dto.expectedRevision); }
 }

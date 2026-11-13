@@ -8,7 +8,9 @@ async function account(page, { failSave = false, lostReply = false, failRecovery
   await page.context().route('**/api/**',async route=>{
     const request=route.request(), path=new URL(request.url()).pathname;
     if(request.method()==='OPTIONS')return route.fulfill({status:204,headers});
-    if(path.endsWith('/auth/login'))return route.fulfill({headers,json:{access_token:'test',user:{id:'calibration-user',name:'Student',email:'student@example.test'}}});
+    if(path.endsWith('/auth/session/migrate'))return route.fulfill({headers,json:{access_token:'test',expires_in:900,user:{id:'calibration-user',name:'Student',email:'student@example.test'}}});
+    if(path.endsWith('/auth/session/refresh'))return route.fulfill({status:401,headers,json:{message:'No active session'}});
+    if(path.endsWith('/auth/session/login'))return route.fulfill({headers,json:{access_token:'test',expires_in:900,user:{id:'calibration-user',name:'Student',email:'student@example.test'}}});
     if(path.endsWith('/profile')) {
       if(request.method()==='POST') {
         writes++;
@@ -151,12 +153,14 @@ test('an incomplete account without a device draft returns to calibration after 
   await page.locator('button[type="submit"]').click();
   await expect(page.getByRole('heading',{name:'Personal data'})).toBeVisible();
 });
-test('account-created dialog rechecks identity before opening calibration',async({page})=>{
+test('email verification does not complete registration before profile setup',async({page})=>{
   let saved;
   await page.route('**/api/**',async route=>{
     const request=route.request(),path=new URL(request.url()).pathname;
     if(request.method()==='OPTIONS')return route.fulfill({status:204,headers});
-    if(path.endsWith('/auth/register'))return route.fulfill({headers,json:{access_token:'first-token',user:{id:'first-user',name:'First',email:'first@example.test'}}});
+    if(path.endsWith('/auth/session/refresh'))return route.fulfill({status:401,headers,json:{message:'No active session'}});
+    if(path.endsWith('/auth/registration-code/request'))return route.fulfill({headers,json:{requestId:'a'.repeat(64)}});
+    if(path.endsWith('/auth/session/register'))return route.fulfill({headers,json:{access_token:'first-token',expires_in:900,user:{id:'first-user',name:'First',email:'first@example.test'}}});
     if(path.endsWith('/profile')){
       if(request.method()==='POST')saved=request.postDataJSON();
       return route.fulfill({status:saved?200:404,headers,json:saved??{message:'Profile not found'}});
@@ -170,10 +174,14 @@ test('account-created dialog rechecks identity before opening calibration',async
   await page.getByLabel('Confirm password',{exact:true}).fill('Testing123!');
   await page.getByRole('checkbox').check();
   await page.getByRole('button',{name:'Create account',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Start calibration',exact:true})).toBeVisible();
-  await page.evaluate(()=>localStorage.setItem('physiquequest-auth',JSON.stringify({id:'second-user',token:'second-token',name:'Second',email:'second@example.test'})));
-  await page.getByRole('button',{name:'Start calibration',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Verification code'})).toBeVisible();
+  await page.getByLabel('Digit 1 of 6').fill('123456');
+  await page.getByRole('button',{name:'Confirm',exact:true}).click();
+  await expect(page.getByText(/Registration is not complete until you finish your profile/)).toBeVisible();
+  await expect(page.getByRole('button',{name:'Continue setup',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Continue setup',exact:true}).click();
   await toLastStep(page,false);
   await page.getByRole('button',{name:'Save profile & continue',exact:true}).click();
-  await expect.poll(()=>saved?.name).toBe('Second');
+  await expect(page).toHaveURL(/\/home$/);
+  expect(saved?.name).toBe('First');
 });

@@ -148,10 +148,10 @@ test('missing native module, model failure, background/blur and late model promi
 });
 test('native host executes bounded context/frame and fixed-vocabulary status validation',()=>{
   const host=compile('mobile/App.tsx',{
-    'expo-constants':{},'expo-camera':{},'expo-device':{},'expo-network':{},'expo-notifications':{setNotificationHandler(){}},react:{},
+    'expo-constants':{},'expo-camera':{},'expo-device':{},'expo-network':{},'expo-notifications':{setNotificationHandler(){}},react:{},'./googleSignInError':{},
     'react-native':{StyleSheet:{create:s=>s},Platform:{OS:'android'}},'@react-native-community/netinfo':{},
     'react-native-safe-area-context':{},'react-native-webview':{},'./connection.mjs':{},'./inactivity/nativeMonitor':{},
-    './NativeTrackingCamera':{},'./FoodScannerCamera':{},'./performance-guard.mjs':{},'../shared/cameraReadiness':shared,
+    './NativeTrackingCamera':{},'./PoseTrackerNative':{},'./FoodScannerCamera':{},'./performance-guard.mjs':{},'../shared/cameraReadiness':shared,
     'react/jsx-runtime':{},
   });
   assert.equal(host.isNativeCameraContext({screen:'camera-check',readiness:context}),true);

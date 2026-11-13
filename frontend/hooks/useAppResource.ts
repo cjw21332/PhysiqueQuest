@@ -32,8 +32,9 @@ export function useAppResource<T>(key: CachedResource, load: (force?: boolean) =
     window.addEventListener('pageshow', reload);
     window.addEventListener('physiquequest:session-ended', onSessionEnded);
     document.addEventListener('visibilitychange', reload);
-    // Re-check daily missions and today's water after midnight, including an idle open tab.
-    const rollover = window.setInterval(update, 60_000);
+    // Refresh visible views so changes made on another device eventually appear.
+    // Cached requests are deduplicated and keep the last good data on failure.
+    const rollover = window.setInterval(() => { update(); reload(); }, 60_000);
     return () => {
       active = false;
       unsubscribe();

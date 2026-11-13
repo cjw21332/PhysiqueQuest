@@ -6,9 +6,10 @@ import { api } from '../../lib/api';
 import { useCameraStream } from '../../hooks/useCameraStream';
 import { useCameraReadiness } from '../../hooks/useCameraReadiness';
 import type { ReadinessCheck } from '../../../shared/cameraReadiness';
+import OutcomeDialog from '../../components/OutcomeDialog';
 
-export default function CameraCheck({ onBack, onStart }: { onBack: () => void; onStart: () => void }) {
-  const [mode, setMode] = useState<'live' | 'upload'>('live');
+export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: { onBack: () => void; onStart: (mode: 'live' | 'manual') => void; initialMode?: 'live' | 'upload' }) {
+  const [mode] = useState<'live' | 'upload'>(initialMode);
   const [fileUrl, setFileUrl] = useState('');
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -57,9 +58,8 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
     } catch (error) { if (analysisGeneration.current === generation) setAnalysisError(error instanceof Error ? error.message : 'Pose analysis did not complete.'); }
     finally { if (analysisGeneration.current === generation) setAnalysisBusy(false); }
   };
-  const switchToUpload = () => { live.stop(true); setMode('upload'); };
-  const startSession = () => { live.stop(); onStart(); };
-  const continueWithoutCamera = () => { live.stop(true); onStart(); };
+  const startSession = () => { live.stop(); onStart('live'); };
+  const continueWithoutCamera = () => { live.stop(true); onStart('manual'); };
 
   if (reportOpen && analysis) return <AnalysisReport value={analysis} fileName={fileName} exerciseHint={exerciseHint} onBack={() => setReportOpen(false)} onStart={continueWithoutCamera} onRetry={() => void analyzeVideo()} retrying={analysisBusy} retryError={analysisError}/>;
 
@@ -67,13 +67,8 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
     <>
       <header className="coach-header">
         <button className="coach-back" onClick={() => { live.stop(); onBack(); }} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
-        <h2>Camera check</h2>
+        <h2>{mode === 'live' ? 'Live camera setup' : 'Review a video'}</h2>
       </header>
-
-      <div className="camera-tabs" role="group" aria-label="Camera input">
-        <button type="button" aria-pressed={mode==='live'} className={mode==='live'?'active':''} onClick={()=>setMode('live')}>Live feed</button>
-        <button type="button" aria-pressed={mode==='upload'} className={mode==='upload'?'active':''} onClick={switchToUpload}>Upload video</button>
-      </div>
 
       {mode === 'live' ? (
         <>
@@ -136,7 +131,6 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
                   <select value={exerciseHint} disabled={analysisBusy} onChange={event => { setExerciseHint(event.target.value as '' | 'chest_press' | 'squat'); setAnalysis(null); }}><option value="">Identify automatically</option><option value="chest_press">Chest press</option><option value="squat">Squat</option></select>
                 </label>
                 {poseAvailable && <button type="button" className="secondary" disabled={analysisBusy} onClick={() => void analyzeVideo()}>{analysisBusy ? 'Analyzing…' : 'Analyze video'}</button>}
-                {analysisError && <p role="alert" className="error">{analysisError}</p>}
                 {analysis && <button type="button" className="quiet-link" onClick={() => setReportOpen(true)}>View recording report</button>}
                 <button className="quiet-link" onClick={() => { analysisGeneration.current++; URL.revokeObjectURL(fileUrl); setFileUrl(''); setFileName(''); setSelectedFile(null); setDuration(null); setAnalysisBusy(false); setAnalysis(null); setAnalysisError(''); }}>
                   Choose a different video
@@ -166,6 +160,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
           </footer>
         </>
       )}
+      {analysisError && !reportOpen && <OutcomeDialog kind="error" title="Video analysis unavailable" message={analysisError} actionLabel="Choose another video" onAction={() => { setAnalysisError(''); videoInputRef.current?.click(); }} secondaryLabel="Go back" onSecondary={() => setAnalysisError('')} onClose={() => setAnalysisError('')}/>}
     </>
   );
 }

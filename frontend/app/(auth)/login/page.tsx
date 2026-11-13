@@ -4,8 +4,9 @@ import { useState } from 'react';
 import AuthForm from '../../../sections/Auth/AuthForm';
 import ForgotPasswordFlow from '../../../sections/Forgot Password/ForgotPasswordFlow';
 import AuthOutcomeModal from '../../../sections/Auth/AuthOutcomeModal';
-import { login } from '../../../lib/auth';
-import { ApiRequestError } from '../../../lib/api';
+import { login, loginWithGoogle } from '../../../lib/auth';
+import { ApiRequestError, api } from '../../../lib/api';
+import { requestGoogleIdentity } from '../../../lib/googleAuth';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -17,6 +18,16 @@ export default function LoginPage() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [loginDialog, setLoginDialog] = useState<{ locked: boolean } | null>(null);
   const [notice, setNotice] = useState('');
+
+  const routeSignedInUser = async () => {
+    try {
+      const profile = await api.getProfile(true);
+      navigate(profile?.name ? '/home' : '/register');
+    } catch (profileError) {
+      if (profileError instanceof ApiRequestError && profileError.statusCode === 404) navigate('/register');
+      else navigate('/home');
+    }
+  };
 
   const handleContinue = async (password: string) => {
     if (!email.trim()) {
@@ -31,8 +42,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      // Recovery checks the server profile before routing to home or unfinished setup.
-      navigate('/register');
+      await routeSignedInUser();
     } catch (err) {
       if (err instanceof ApiRequestError && (err.statusCode === 401 || err.statusCode === 429)) {
         setError('');
@@ -41,6 +51,12 @@ export default function LoginPage() {
         setError(err instanceof Error ? err.message : 'Login failed. Please check your credentials.');
       }
     }
+  };
+
+  const handleGoogleAuth = async () => {
+    const idToken = await requestGoogleIdentity('login');
+    await loginWithGoogle(idToken);
+    await routeSignedInUser();
   };
 
   const handleForgotPasswordSuccess = () => {
@@ -68,6 +84,7 @@ export default function LoginPage() {
             consent={consent}
             onConsentChange={setConsent}
             onForgotPassword={() => setShowForgotPassword(true)}
+            onGoogleAuth={handleGoogleAuth}
           />
           {notice && (
             <div className="toast" role="status">

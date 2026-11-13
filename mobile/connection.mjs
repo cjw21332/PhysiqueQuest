@@ -23,6 +23,12 @@ function isPrivateIpv4(hostname) {
   return hostname.split('.').every(part => Number(part) >= 0 && Number(part) <= 255);
 }
 
+// app.json can contain release URLs; a local Expo session must never fall back
+// to them when its intentionally blank development URL is omitted by Metro.
+export function selectConfiguredUrl(localDev, publicUrl, releaseUrl) {
+  return localDev ? (publicUrl || undefined) : (publicUrl ?? releaseUrl);
+}
+
 /** @param {string} input @returns {string | null} */
 export function normalizeFrontendUrl(input) {
   const value = input.trim();

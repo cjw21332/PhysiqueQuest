@@ -9,6 +9,6 @@ type AuthenticatedRequest = Request & { user: { userId: string } };
 export class ProgressController {
   constructor(private readonly service: ProgressService) {}
   @Post() add(@Req() req: AuthenticatedRequest, @Body() dto: CreateProgressDto) { return this.service.add(req.user.userId, dto); }
-  @Get() list(@Req() req: AuthenticatedRequest, @Query('metric') metric = '', @Query('limit', new DefaultValuePipe(90), ParseIntPipe) limit: number) { return this.service.list(req.user.userId, metric, limit); }
+  @Get() list(@Req() req: AuthenticatedRequest, @Query('metric') metric = '', @Query('limit', new DefaultValuePipe(90), ParseIntPipe) limit: number, @Query('skip', new DefaultValuePipe(0), ParseIntPipe) skip: number) { return this.service.list(req.user.userId, metric, limit, skip); }
   @Delete(':id') remove(@Req() req: AuthenticatedRequest, @Param('id') id: string) { return this.service.remove(req.user.userId, id); }
 }

@@ -102,6 +102,9 @@ export type CounterConfig = {
   emaAlpha: number;                 // default 0.35 - EMA smoothing (0-1)
   calibration: boolean;
   minCalibratedRom: number;
+  calibrationWarmupMs: number;
+  calibrationWindowMs: number;
+  resyncOnTimeout: boolean;
 };
 
 /** Default configuration */
@@ -633,13 +636,23 @@ export class GenericRepCounter {
     const rightResult = this.computeJointAngleWithVisibility(landmarks, rightJoint, aspect);
     
     if (leftResult === null && rightResult === null) return null;
-    if (leftResult === null) return rightResult.angle;
+    if (leftResult === null) return rightResult?.angle ?? null;
     if (rightResult === null) return leftResult.angle;
     
     // Visibility-weighted average: higher visibility = more weight
     const totalVis = leftResult.visibility + rightResult.visibility;
     if (totalVis <= 0) return (leftResult.angle + rightResult.angle) / 2;
     return (leftResult.angle * leftResult.visibility + rightResult.angle * rightResult.visibility) / totalVis;
+  }
+
+  /** Use the side furthest through its movement; averaging hides alternating reps. */
+  private computeAlternatingAngle(landmarks: Landmark[], aspect: number): number | null {
+    const left = this.genConfig.primaryJoints[0];
+    if (!left) return null;
+    const right = this.genConfig.primaryJoints[1] ?? left.replace('left', 'right');
+    const angles = [this.computeJointAngle(landmarks, left, aspect), this.computeJointAngle(landmarks, right, aspect)].filter((angle): angle is number => angle !== null);
+    if (!angles.length) return null;
+    return angles.reduce((best, angle) => this.computeNormalizedProgressUnified(angle) > this.computeNormalizedProgressUnified(best) ? angle : best);
   }
 
   /** Compute joint angle and return visibility of center joint */

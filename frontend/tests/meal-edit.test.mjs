@@ -22,7 +22,10 @@ const components = async (file, react = React) => {
   const nutrientTotal = await load('sections/Scan/nutrientTotal.ts');
   const additionalNutrition = await load('sections/Scan/AdditionalNutrition.tsx', name => name === './nutrientTotal' ? nutrientTotal : require(name));
   const foodNameSearch = await load('sections/Scan/FoodNameSearch.tsx', name => name === '../../lib/api' ? { api: {} } : name.endsWith('/titleCase') ? { titleCase } : require(name));
-  return load(`sections/Scan/${file}.tsx`, name => name === 'react' ? react : name === '../Home/icons' ? icons : name === './types' ? types : name === '../Home/CalorieProgress' ? calorieProgress : name === './FoodNameSearch' ? foodNameSearch : name === '../Scan/AdditionalNutrition' ? additionalNutrition : name === '../Scan/nutrientTotal' ? nutrientTotal : name.endsWith('/titleCase') ? { titleCase } : require(name));
+  const mealDiary = await load('sections/Scan/MealDiary.tsx', name => name === '../Home/icons' ? icons : name === './types' ? types : name === './nutrientTotal' ? nutrientTotal : name.endsWith('/titleCase') ? { titleCase } : require(name));
+  const waterTracker = await load('sections/Scan/WaterTracker.tsx', name => name === '../Home/icons' ? icons : require(name));
+  const deleteConfirmation = await load('components/DeleteConfirmation.tsx', name => name === '../sections/Home/icons' ? icons : require(name));
+  return load(`sections/Scan/${file}.tsx`, name => name === 'react' ? react : name === '../Home/icons' ? icons : name === './types' ? types : name === '../Home/CalorieProgress' ? calorieProgress : name === './FoodNameSearch' ? foodNameSearch : name === './MealDiary' ? mealDiary : name === './WaterTracker' ? waterTracker : name === '../../components/DeleteConfirmation' ? deleteConfirmation : name === '../Scan/AdditionalNutrition' ? additionalNutrition : name === '../Scan/nutrientTotal' ? nutrientTotal : name.endsWith('/titleCase') ? { titleCase } : require(name));
 };
 
 test('shared Home calorie progress handles empty, partial, and exceeded targets', async () => {
@@ -38,7 +41,7 @@ test('shared Home calorie progress handles empty, partial, and exceeded targets'
     if (calories > 2300) assert.equal(circle.props.strokeDashoffset, 0);
     assert.match(renderToStaticMarkup(tree), /home-calorie-progress/);
   }
-  for (const file of ['sections/Home/HomeDashboard.tsx', 'sections/Scan/DailyLog.tsx', 'sections/Scan/NutritionDashboard.tsx']) {
+  for (const file of ['sections/Home/HomeDashboard.tsx', 'sections/Scan/DailyLog.tsx']) {
     assert.match(await readFile(new URL(`../${file}`, import.meta.url), 'utf8'), /<CalorieProgress/);
   }
 });
@@ -83,9 +86,9 @@ test('today log displays source, edited flag and original time, with an edit act
   assert.match(html, /Scanned · 07:20/);
   assert.match(html, /Scanned · edited · 12:40/);
   assert.match(html, /Manual · 15:10/);
-  assert.match(html, /Not logged yet/);
-  assert.match(html, /aria-label="Edit Breakfast: Oats and eggs"/i);
-  assert.doesNotMatch(html, /aria-label="Edit Dinner/);
+  assert.match(html, /No foods logged yet/);
+  assert.match(html, /aria-label="Edit Oats And Eggs in Breakfast"/i);
+  assert.doesNotMatch(html, /aria-label="Edit .* in Dinner/);
 });
 test('meal editor supports individual foods in a multi-item meal and retains the Scan form theme', async () => {
   const { default: Editor } = await components('EditMeal');

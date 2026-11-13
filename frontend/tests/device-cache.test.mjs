@@ -157,3 +157,22 @@ test('exercise library snapshots are scoped to the signed-in account', () => {
   f.setContext({ scope: 'api:user-b', session: 'session-b' });
   assert.equal(f.cache.get('exercise-library').data, undefined);
 });
+
+test('external changes invalidate dependent views without overwriting the other tab or accepting a late response', async () => {
+  const f = fixture();
+  const other = createDeviceCache(f.options);
+  f.cache.publish('profile', { name: 'Old' });
+  assert.equal(other.get('profile').data.name, 'Old');
+  let finish;
+  const reading = other.fetch('profile', () => new Promise(resolve => { finish = resolve; }), true);
+  await Promise.resolve();
+  f.cache.publish('profile', { name: 'New' });
+  const snapshot = [...f.values.values()][0];
+  other.invalidateExternal(['profile', 'settings', 'not-a-resource']);
+  assert.equal([...f.values.values()][0], snapshot);
+  finish({ name: 'Stale' });
+  await reading;
+  assert.equal(other.get('profile').data, undefined);
+  await other.fetch('profile', async () => ({ name: 'New' }));
+  assert.equal(other.get('profile').data.name, 'New');
+});

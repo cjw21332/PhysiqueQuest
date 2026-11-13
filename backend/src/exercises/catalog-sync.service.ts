@@ -66,7 +66,12 @@ export class CatalogSyncService implements OnModuleInit, OnModuleDestroy {
         ...(complete ? { lastSuccessfulSync: new Date() } : {}),
       }, $unset: { owner: '', leaseUntil: '' } });
     } catch (error) {
-      this.logger.warn(`Exercise catalog page failed: ${error instanceof Error ? error.message : 'unknown error'}`);
+      const msg = error instanceof Error ? error.message : 'unknown error';
+      if (/timeout|abort/i.test(msg)) {
+        this.logger.debug(`Exercise catalog page timed out (transient): ${msg}`);
+      } else {
+        this.logger.warn(`Exercise catalog page failed: ${msg}`);
+      }
       const current = await state.findOne({ _id: 'catalog' } as any);
       const failures = Number(current?.failures || 0) + 1;
       const response = error && typeof error === 'object' && 'getResponse' in error && typeof error.getResponse === 'function' ? error.getResponse() as { retryAfter?: string } : undefined;

@@ -104,6 +104,47 @@ Review dependency upgrades against the Expo SDK compatibility requirements.
 
 ## Running the Application
 
+### Development alongside a deployed production app
+
+Run each command in a separate terminal. The first command runs from `backend`;
+run the others from the repository root:
+
+```bash
+cd backend
+npm run start:dev
+```
+
+```bash
+npm run coach:dev
+```
+
+```bash
+npm run ai:warmup
+```
+
+```bash
+npm run dev
+```
+
+```bash
+npm run expo
+```
+
+The API, Coach, web and Expo servers normally use ports 4000, 4050, 3000
+and 8081 respectively. A deployed production service can remain online, but
+two local processes cannot bind the same port. Reuse an existing development
+server or stop the process occupying the required port before starting another.
+The AI warmup is a one-time command, not a server: it requires a running local
+Ollama service and the model installed via `npm run ai:setup`.
+
+Local Expo starts with automatic LAN discovery, even if `mobile/.env` contains
+production URLs. For a tunnel or another development host, set
+`PQ_DEV_WEB_APP_URL` and optionally `PQ_DEV_API_URL` in the terminal before
+starting Expo. Builds continue to use their normal `EXPO_PUBLIC_*` settings.
+The local backend reads `backend/.env`; use a separate development MongoDB
+database and credentials if production data must remain isolated. A separate
+running process alone does not isolate a shared database.
+
 You need to run all three components simultaneously in separate terminal windows. For Expo Go, all devices must be on the same Wi-Fi network. The Next.js and NestJS servers listen on the computer's network interfaces; the app uses the computer's LAN address for both the page (port 3000) and API (port 4000). MongoDB Atlas remains a cloud database and is reached by the backend, not by the phone.
 
 ### Terminal 1: Backend Server
@@ -228,14 +269,14 @@ ip addr show
 
 ### Mobile URLs (optional)
 
-Leave both values unset for automatic LAN discovery. If the frontend and API are hosted at known reachable addresses, set these in `mobile/.env` before starting Expo:
+For local Expo sessions, set these development-only values in the terminal if automatic LAN discovery is unsuitable:
 
 ```env
-EXPO_PUBLIC_WEB_APP_URL=http://192.168.1.10:3000
-EXPO_PUBLIC_API_URL=http://192.168.1.10:4000/api
+PQ_DEV_WEB_APP_URL=http://192.168.1.10:3000
+PQ_DEV_API_URL=http://192.168.1.10:4000/api
 ```
 
-Replace those example addresses with your actual reachable host. These are public URLs, not credentials. Restart Expo after editing `mobile/.env`. Never place MongoDB, JWT, email, alert-provider, or AI-provider secrets in a mobile environment file; those belong in `backend/.env`.
+Replace those example addresses with your actual reachable host. These are public URLs, not credentials. Restart Expo after changing them. Production builds use the `EXPO_PUBLIC_*` settings in their build environment. Never place MongoDB, JWT, email, alert-provider, or AI-provider secrets in a mobile environment file; those belong in `backend/.env`.
 
 ### Backend (.env)
 

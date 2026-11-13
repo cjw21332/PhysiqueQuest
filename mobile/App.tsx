@@ -1,11 +1,13 @@
 import Constants from 'expo-constants';
+import { googleSignInError } from './googleSignInError';
 import FoodScannerCamera, { type FoodCameraRequest } from './FoodScannerCamera';
 import { Camera, CameraView } from 'expo-camera';
+import type { GoogleSignin as GoogleSigninApi } from '@react-native-google-signin/google-signin';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
 import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, Platform } from 'react-native';
+import { AppState, Platform, TurboModuleRegistry } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
@@ -21,7 +23,7 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { isTrustedWebViewUrl, isTrustedWebViewNavigation, resolveApiUrl, resolveFrontendUrl } from './connection.mjs';
+import { isTrustedWebViewUrl, isTrustedWebViewNavigation, normalizeFrontendUrl, resolveApiUrl, resolveFrontendUrl, selectConfiguredUrl } from './connection.mjs';
 import { performanceGuardScript } from './performance-guard.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
@@ -30,7 +32,8 @@ import { readinessMessageLimit, readinessScript, validateNativeReadinessContext,
 
 Notifications.setNotificationHandler({ handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }) });
 
-declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string } };
+declare const process: { env: { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string; EXPO_PUBLIC_PQ_LOCAL_DEV?: string } };
+type RuntimeExtra = { EXPO_PUBLIC_WEB_APP_URL?: string; EXPO_PUBLIC_API_URL?: string; googleWebClientId?: string; googleIosClientId?: string };
 
 type DeviceReadiness = {
   platform: string;
@@ -79,7 +82,7 @@ export function nativeFramingText(check:ReadinessCheck) {
 
 function getInitialAddress() {
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_WEB_APP_URL?: string } | undefined;
-  return resolveFrontendUrl(process.env.EXPO_PUBLIC_WEB_APP_URL ?? extra?.EXPO_PUBLIC_WEB_APP_URL, Constants.expoConfig?.hostUri);
+  return resolveFrontendUrl(selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_WEB_APP_URL, extra?.EXPO_PUBLIC_WEB_APP_URL), Constants.expoConfig?.hostUri);
 }
 
 /**
@@ -109,7 +112,8 @@ function buildInsetsScript(insets: { top: number; bottom: number; left: number; 
 }
 
 function buildBackendCheckScript(apiUrl: string) {
-  return `(function(){fetch(${JSON.stringify(apiUrl)},{credentials:'include'}).then(function(r){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:r.ok,status:r.status}));}).catch(function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:false}));});})();true;`;
+  const readinessUrl = apiUrl.replace(/\/api\/?$/i, '/ready');
+  return `(function(){fetch(${JSON.stringify(readinessUrl)},{credentials:'include'}).then(function(r){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:r.ok,status:r.status}));}).catch(function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:false}));});})();true;`;
 }
 
 /** Delivers a host event to the WebView as the `physiquequest-inactivity` CustomEvent. */
@@ -121,6 +125,11 @@ function buildInactivityScript(detail: Record<string, unknown>) {
 function buildReadinessScript(readiness: DeviceReadiness) {
   const payload = JSON.stringify(readiness).replace(/</g, '\\u003c');
   return `(function(){window.dispatchEvent(new CustomEvent('physiquequest-device-readiness',{detail:${payload}}));})();true;`;
+}
+
+function buildGoogleAuthScript(result: { requestId: string; idToken?: string; error?: string; cancelled?: boolean }) {
+  const payload = JSON.stringify(result).replace(/</g, '\\u003c');
+  return `(function(){window.dispatchEvent(new CustomEvent('physiquequest-google-auth-result',{detail:${payload}}));})();true;`;
 }
 
 function buildCameraScript(detail: {
@@ -138,20 +147,22 @@ function buildCameraScript(detail: {
 function AppContent() {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView<object>>(null);
+  const googleConfigured = useRef(false);
+  const googleSignin = useRef<typeof GoogleSigninApi | null>(null);
   const pendingNotificationOpen = useRef(false);
   const requestPush = useCallback(async () => {
     let detail: { token?: string; error?: string };
     try {
       if (!Device.isDevice) throw new Error('Phone notifications require a physical device.');
+      const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+      if (!projectId) throw new Error('Phone notifications are not configured for this build.');
       if (Platform.OS === 'android') await Notifications.setNotificationChannelAsync('default', { name: 'Notifications', importance: Notifications.AndroidImportance.DEFAULT });
       const existing = await Notifications.getPermissionsAsync();
       const permission = existing.granted ? existing : await Notifications.requestPermissionsAsync();
       if (!permission.granted) throw new Error('Notification permission is off. Enable it in your phone settings.');
-      const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
-      if (!projectId) throw new Error('Phone notifications are not configured for this build.');
       detail = { token: (await Notifications.getExpoPushTokenAsync({ projectId })).data };
     } catch (error) { detail = { error: error instanceof Error ? error.message : 'Could not enable phone notifications.' }; }
-    webRef.current?.injectJavaScript(`window.dispatchEvent(new CustomEvent('physiquequest-push-registration',{detail:${JSON.stringify(detail)}}));true;`);
+    webRef.current?.injectJavaScript(`window.dispatchEvent(new CustomEvent('physiquequest-push-registration',{detail:${JSON.stringify(detail).replace(/</g, '\\u003c')}}));true;`);
   }, []);
   useEffect(() => {
     const received = Notifications.addNotificationReceivedListener(() => webRef.current?.injectJavaScript("window.dispatchEvent(new Event('physiquequest-notification-received'));true;"));
@@ -161,10 +172,27 @@ function AppContent() {
   }, []);
   const { width, fontScale } = useWindowDimensions();
   const inferredAddress = useMemo(getInitialAddress, []);
-  const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_API_URL?: string } | undefined;
+  const extra = Constants.expoConfig?.extra as RuntimeExtra | undefined;
+  useEffect(() => {
+    googleConfigured.current = false;
+    googleSignin.current = null;
+    // Expo Go does not include this native module. Never evaluate its package
+    // until the host confirms it exists: the package uses getEnforcing on import.
+    if (Constants.appOwnership === 'expo' || !TurboModuleRegistry.get('RNGoogleSignin')) return;
+    const webClientId = extra?.googleWebClientId;
+    const iosClientId = extra?.googleIosClientId;
+    if (!webClientId || (Platform.OS === 'ios' && !iosClientId)) return;
+    try {
+      const { GoogleSignin } = require('@react-native-google-signin/google-signin') as { GoogleSignin: typeof GoogleSigninApi };
+      GoogleSignin.configure({ webClientId, ...(iosClientId ? { iosClientId } : {}) });
+      googleSignin.current = GoogleSignin;
+      googleConfigured.current = true;
+    } catch { /* Keep password sign-in available in an incompatible host. */ }
+  }, [extra?.googleIosClientId, extra?.googleWebClientId]);
   const [address, setAddress] = useState(inferredAddress ?? '');
   const [loadedAddress, setLoadedAddress] = useState(inferredAddress);
-  const apiUrl = useMemo(() => loadedAddress ? resolveApiUrl(process.env.EXPO_PUBLIC_API_URL ?? extra?.EXPO_PUBLIC_API_URL, loadedAddress) : null, [extra?.EXPO_PUBLIC_API_URL, loadedAddress]);
+  const [manualApiUrl, setManualApiUrl] = useState<string | null>(null);
+  const apiUrl = useMemo(() => loadedAddress ? resolveApiUrl(manualApiUrl ?? selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_API_URL, extra?.EXPO_PUBLIC_API_URL), loadedAddress) : null, [extra?.EXPO_PUBLIC_API_URL, loadedAddress, manualApiUrl]);
   const [error, setError] = useState(!inferredAddress);
   const [key, setKey] = useState(0);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
@@ -328,14 +356,15 @@ function AppContent() {
   };
 
   const connect = () => {
-    const normalized = address.trim().replace(/\/$/, '');
-    if (!normalized) {
+    const normalized = normalizeFrontendUrl(address);
+    const nextApiUrl = normalized ? resolveApiUrl(undefined, normalized) : null;
+    if (!normalized || !nextApiUrl) {
       setError(true);
       return;
     }
-    const withProtocol = /^https?:\/\//i.test(normalized) ? normalized : `http://${normalized}`;
-    setAddress(withProtocol);
-    setLoadedAddress(withProtocol);
+    setAddress(normalized);
+    setLoadedAddress(normalized);
+    setManualApiUrl(nextApiUrl);
     setError(false);
     setBackendStatus('checking');
     setKey(c => c + 1);
@@ -390,11 +419,11 @@ function AppContent() {
           setFoodCamera(null);
           monitor.current?.stop();
           stopNativeCamera();
-          console.error('WebView error:', e.nativeEvent.code);
+          console.log('WebView connection failed:', e.nativeEvent.code);
           setError(true);
         }}
         onHttpError={e => {
-          console.error('HTTP error:', e.nativeEvent.statusCode);
+          console.log('WebView HTTP error:', e.nativeEvent.statusCode);
           if (e.nativeEvent.statusCode >= 500) {stopNativeCamera();setError(true);}
         }}
         onMessage={(e) => {
@@ -414,9 +443,35 @@ function AppContent() {
               geometryGeneration?: number;
               framing?: unknown;
               token?: string;
+              intent?: string;
               exercise?: string;
               name?: string;
             };
+            if (message.type === 'google-sign-in' && typeof message.requestId === 'string' &&
+              /^[a-zA-Z0-9-]{8,100}$/.test(message.requestId) && ['login', 'register'].includes(message.intent ?? '')) {
+              const requestId = message.requestId;
+              if (!googleSignin.current) {
+                webRef.current?.injectJavaScript(buildGoogleAuthScript({ requestId, error: 'Google sign-in requires the PhysiqueQuest development or installed app. In Expo Go, use email and password.' }));
+                return;
+              }
+              void (async () => {
+                try {
+                  const GoogleSignin = googleSignin.current!;
+                  if (!googleConfigured.current) throw new Error('Google sign-in is not configured in this build.');
+                  if (Platform.OS === 'android') await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+                  const result = await GoogleSignin.signIn();
+                  if (result.type === 'cancelled') {
+                    webRef.current?.injectJavaScript(buildGoogleAuthScript({ requestId, cancelled: true }));
+                  } else if (result.data.idToken) {
+                    webRef.current?.injectJavaScript(buildGoogleAuthScript({ requestId, idToken: result.data.idToken }));
+                  } else {
+                    webRef.current?.injectJavaScript(buildGoogleAuthScript({ requestId, error: 'Google did not return an identity token. Please try again.' }));
+                  }
+                } catch (error) {
+                  webRef.current?.injectJavaScript(buildGoogleAuthScript({ requestId, ...googleSignInError(error) }));
+                }
+              })();
+            }
             if (message.type === 'posetracker-native-start' && typeof message.token === 'string' && message.token.length <= 200 && typeof message.exercise === 'string' && /^[a-z_]{1,60}$/.test(message.exercise) && typeof message.name === 'string' && message.name.length <= 160) {
               stopNativeCamera();
               setProviderSession({token:message.token,exercise:message.exercise,name:message.name});
@@ -495,7 +550,7 @@ function AppContent() {
           setFoodCamera(null);
           monitor.current?.stop();
           stopNativeCamera();
-          console.error('WebView process terminated');
+          console.log('WebView process terminated');
           setError(true);
         }}
       /> : null}
@@ -616,7 +671,7 @@ function AppContent() {
       {loadedAddress && !error && backendStatus === 'offline' && (
         <View style={[styles.backendBanner, { top: insets.top + 8, left: insets.left + 12, right: insets.right + 12 }]}>
           <Text style={styles.backendBannerText}>Backend unavailable · server-backed features cannot sync</Text>
-          <Pressable accessibilityRole="button" accessibilityLabel="Retry backend connection check" style={styles.retryButton} onPress={checkBackend}><Text style={styles.retryText}>Retry backend check</Text></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Change server address" style={styles.retryButton} onPress={() => { setAddress(loadedAddress); setError(true); }}><Text style={styles.retryText}>Change server</Text></Pressable>
         </View>
       )}
       {loadedAddress && !error && readiness?.cameraPermission === 'denied' && (
@@ -642,13 +697,13 @@ function AppContent() {
               Can't reach PhysiqueQuest
             </Text>
             <Text style={[styles.body, { fontSize: bodySize, lineHeight: bodySize * 1.6 }]}>
-              Start the web app, backend, and database connection on your computer. Keep your phone and
-              computer on the same Wi-Fi network, then enter the computer's LAN address on port 3000.
+              Start the web app and backend on your computer. On the same Wi-Fi, enter the computer's
+              network address with port 3000. On another network, enter a reachable HTTPS address.
             </Text>
-            <Text style={[styles.label, { fontSize: bodySize - 1 }]}>Computer address</Text>
+            <Text style={[styles.label, { fontSize: bodySize - 1 }]}>Server address</Text>
             <TextInput
-              accessibilityLabel="Computer address"
-              accessibilityHint="Enter the frontend server URL to connect PhysiqueQuest"
+              accessibilityLabel="Server address"
+              accessibilityHint="Enter your computer's network address or a reachable HTTPS server URL"
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="url"
@@ -667,7 +722,8 @@ function AppContent() {
               <Text style={[styles.buttonText, { fontSize: bodySize }]}>Connect</Text>
             </Pressable>
             <Text style={[styles.hint, { fontSize: bodySize - 2, lineHeight: (bodySize - 2) * 1.55 }]}>
-              The computer address is usually printed beside "Network" when Next.js starts.
+              The app uses this address for both the website and its /api backend. If the temporary tunnel
+              address changes, tap Change server and enter the new HTTPS address.
             </Text>
           </View>
         </ScrollView>

@@ -71,7 +71,7 @@ export class ExerciseDbService {
       if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait));
       const remaining = deadline - Date.now();
       if (remaining <= 0) throw new DOMException('ExerciseDB deadline exceeded', 'TimeoutError');
-      const response = await outboundFetch(`https://oss.exercisedb.dev/api/v1${path}`, { signal: AbortSignal.timeout(Math.min(8000, remaining)) });
+      const response = await outboundFetch(`https://oss.exercisedb.dev/api/v1${path}`, { signal: AbortSignal.timeout(Math.min(15000, remaining)) });
       if (response.status === 404) throw new NotFoundException('Exercise not found');
       if (!response.ok) throw new HttpException({ message: response.status === 429 ? 'ExerciseDB is rate limited. Please retry later.' : 'ExerciseDB is unavailable', source: SOURCE, ...(response.headers.get('retry-after') ? { retryAfter: response.headers.get('retry-after') } : {}) }, response.status === 429 ? 429 : response.status === 503 ? 503 : 502);
       const body = await response.json() as Envelope;

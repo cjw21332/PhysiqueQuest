@@ -77,7 +77,7 @@ export class ScannedMacrosDto {
 export class ScannedMealItemDto {
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   @IsString() @MinLength(1) @MaxLength(120) food_name: string;
-  /** False when no USDA record matched; such items are skipped on write. */
+  /** False when no USDA record matched; nutrition remains unavailable. */
   @IsBoolean() found: boolean;
   @IsOptional() @IsInt() @Min(1) fdc_id?: number;
   @IsOptional() @IsString() @MaxLength(240) description?: string;
@@ -98,7 +98,7 @@ export class ScannedMealItemDto {
 }
 
 export class MealFromScanDto {
-  /** One meal row is written per matched item. */
+  /** One meal row is written per selected item. */
   @IsArray()
   @ArrayMaxSize(50)
   @ValidateNested({ each: true })

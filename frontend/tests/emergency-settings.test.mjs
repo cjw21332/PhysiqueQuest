@@ -29,7 +29,8 @@ async function settingsHook(savedValues) {
   const { outputText } = ts.transpileModule(readFileSync(new URL('../hooks/useSettings.ts', import.meta.url), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS },
   });
-  new Function('require', 'module', 'exports', outputText)(name => name === 'react' ? react : { api }, module, module.exports);
+  const window = { addEventListener() {}, removeEventListener() {}, setInterval: () => 1, clearInterval() {} };
+  new Function('require', 'module', 'exports', 'window', outputText)(name => name === 'react' ? react : { api }, module, module.exports, window);
   const render = () => { cursor = 0; return module.exports.useSettings(); };
   const initial = render();
   effect();

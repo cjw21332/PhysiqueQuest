@@ -17,14 +17,15 @@ function client(fetcher, { initialUser = {}, refresh = async current => current 
     './session': { appVersionHeaders: () => ({ 'X-App-Version': '1.0.0' }), clearAuthSession: () => { current = null; }, session: { current: () => current, refresh: async () => { current = await refresh(current); return current; } } },
     './apiBaseUrl.mjs': { resolveApiBaseUrl }, './coachBaseUrl.mjs': { resolveCoachBaseUrl },
     './deviceCache.mjs': { createDeviceCache }, './apiErrors.mjs': errors,
+    './dataChanges.mjs': { announceDataChange: () => {} },
   };
   const output = ts.transpileModule(readFileSync(new URL('../lib/api.ts', import.meta.url), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
-  runInNewContext(output, { exports, require: name => modules[name], fetch: fetcher, URL, URLSearchParams, Intl, AbortController,
+  runInNewContext(output, { exports, require: name => modules[name], fetch: fetcher, URL, URLSearchParams, Intl, AbortController, Event,
     setTimeout, clearTimeout, TypeError, Error, process: { env: {} },
     console: { error: (...args) => warnings.push(args), warn: (...args) => warnings.push(args) },
-    window: { location: { protocol: 'http:', hostname: 'localhost', port: '3000' }, localStorage: { getItem: key => key === 'physiquequest-runtime-api-url' ? runtimeApiUrl : null } },
+    window: { dispatchEvent: () => {}, location: { protocol: 'http:', hostname: 'localhost', port: '3000' }, localStorage: { getItem: key => key === 'physiquequest-runtime-api-url' ? runtimeApiUrl : null } },
   });
   return { ...exports, warnings, setRuntimeApiUrl: value => { runtimeApiUrl = value; } };
 }

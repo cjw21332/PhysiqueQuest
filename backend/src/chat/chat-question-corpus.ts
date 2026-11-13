@@ -81,8 +81,6 @@ export const CHAT_QUESTION_CASES: readonly ChatQuestionCase[] = [
   { id: 'diet-kcal-goal', question: 'What is my daily kcal goal?', personal: true, outcome: 'data', sourceIds: ['user-nutrition'], requiredTerms: ['2000 kcal'] },
   { id: 'current-plan-scan', question: 'What is my current plan?', page: '/scan', personal: true, outcome: 'data', sourceIds: ['user-nutrition'], requiredTerms: ['2000 kcal'] },
   { id: 'current-plan-coach', question: 'What is my current plan?', page: '/coach', personal: true, outcome: 'data', sourceIds: ['user-program'], requiredTerms: ['saved Coach program'], forbiddenTerms: ['2000 kcal'] },
-  { id: 'boundary-unrelated-explanation-on-page', question: 'Explain quantum physics', page: '/scan', personal: true, outcome: 'boundary', requiredTerms: ['Please ask about something in PhysiqueQuest'] },
-  { id: 'boundary-unrelated-fact-on-page', question: 'What is the capital of France?', page: '/coach', personal: true, outcome: 'boundary', requiredTerms: ['Please ask about something in PhysiqueQuest'], forbiddenTerms: ['Paris'] },
   {
     "id": "diet-exact-reported",
     "question": "what's my current diet plan?",

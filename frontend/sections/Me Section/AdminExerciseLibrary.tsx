@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { api, type ApiError } from '../../lib/api';
 import { Icon } from '../Home/icons';
 import { adminExercisesPreview, filterAdminExercises, type AdminExercise, type ExerciseFilter } from './adminPreview';
+import DeleteConfirmation from '../../components/DeleteConfirmation';
+import OutcomeDialog from '../../components/OutcomeDialog';
 
 function errorMessage(error: unknown) {
   if ((error as ApiError & { statusCode?: number })?.statusCode === 403) return 'Not authorized. Admin access is required.';
@@ -22,6 +24,20 @@ export default function AdminExerciseLibrary({ onBack, preview = false }: { onBa
   const [loading, setLoading] = useState(!preview);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState<AdminExercise | null>(null);
+  const [deleteError, setDeleteError] = useState('');
+  const [notice, setNotice] = useState('');
+  const remove = async () => {
+    if (!deleting || busy) return;
+    setBusy(true); setDeleteError('');
+    try {
+      if (!preview) await api.deleteAdminExercise(deleting._id);
+      setExercises(current => current.filter(item => item._id !== deleting._id));
+      setNotice(preview ? 'Sample exercise removed from this preview. No account data was changed.' : 'The exercise was removed from the admin library.');
+      setDeleting(null);
+    } catch (err) { setDeleteError(errorMessage(err)); }
+    finally { setBusy(false); }
+  };
   const refresh = useCallback(async () => {
     if (preview) return;
     setLoading(true); setError('');
@@ -57,8 +73,10 @@ export default function AdminExerciseLibrary({ onBack, preview = false }: { onBa
         <div className="admin-publish-row"><span><b>Published</b><small>Visible to all users in the library</small></span><button type="button" className={`admin-publish-switch ${published ? 'on' : ''}`} role="switch" aria-label="Published" aria-checked={published} disabled={busy} onClick={() => setPublished(value => !value)}><i/></button></div>
         <div className="admin-form-actions"><button type="button" className="secondary" disabled={busy} onClick={closeForm}>Cancel</button><button className="primary" disabled={busy || !name.trim() || !equipment.trim()} type="submit">{busy ? 'Saving…' : 'Save'}</button></div>
       </form> : <><label className="admin-search"><Icon name="search" size={17}/><span className="visually-hidden">Search exercises</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search content"/></label><div className="admin-filters" role="group" aria-label="Filter exercise records">{(['All', 'published', 'draft', 'missing'] as ExerciseFilter[]).map(option => <button type="button" key={option} className={filter === option ? 'active' : ''} aria-pressed={filter === option} onClick={() => setFilter(option)}>{option === 'missing' ? 'Missing pose' : option[0].toUpperCase() + option.slice(1)}</button>)}</div></>}
-      <div className="admin-list-caption"><span>Exercise {preview && <small>Sample data</small>}</span><span>Status</span><span>Pose</span></div>
-      <div className="admin-exercise-list">{loading ? <p role="status">Loading exercises…</p> : visible.map(item => <article className="admin-exercise-row" key={item._id}><div className="admin-exercise-copy"><b>{titleCase(item.name)}</b><small>{item.group}</small></div><span className={`admin-status ${item.status}`}>{item.status === 'published' ? 'Published' : 'Draft'}</span><span className={`admin-pose ${item.pose}`}>{item.pose[0].toUpperCase() + item.pose.slice(1)}</span></article>)}{!loading && !visible.length && !error && <p className="admin-empty-state">No exercises match this search.</p>}</div>
+      <div className="admin-list-caption"><span>Exercise {preview && <small>Sample data</small>}</span><span>Status</span><span>Pose</span><span aria-hidden="true"/></div>
+      <div className="admin-exercise-list">{loading ? <p role="status">Loading exercises…</p> : visible.map(item => <article className="admin-exercise-row" key={item._id}><div className="admin-exercise-copy"><b>{titleCase(item.name)}</b><small>{item.group}</small></div><span className={`admin-status ${item.status}`}>{item.status === 'published' ? 'Published' : 'Draft'}</span><span className={`admin-pose ${item.pose}`}>{item.pose[0].toUpperCase() + item.pose.slice(1)}</span>{!showForm && <button type="button" className="admin-exercise-delete" aria-label={`Delete ${titleCase(item.name)}`} disabled={busy} onClick={() => { setDeleteError(''); setDeleting(item); }}><Icon name="trash" size={18}/></button>}</article>)}{!loading && !visible.length && !error && <p className="admin-empty-state">No exercises match this search.</p>}</div>
     </div>
+    {deleting && <DeleteConfirmation title={`Delete ${titleCase(deleting.name)}?`} description={preview ? 'This removes the exercise from this sample preview only.' : 'This removes the exercise from the admin library. Existing workout records and saved programs are not automatically changed.'} confirmLabel="Delete exercise" busy={busy} error={deleteError} onCancel={() => { setDeleting(null); setDeleteError(''); }} onConfirm={() => void remove()}/>}
+    {notice && <OutcomeDialog kind={preview ? 'info' : 'success'} title={preview ? 'Sample updated' : 'Exercise deleted'} message={notice} onClose={() => setNotice('')}/>}
   </section>;
 }

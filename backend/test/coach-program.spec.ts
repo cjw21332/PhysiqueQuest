@@ -12,10 +12,14 @@ function setup() {
   const query = (read: () => any) => ({ lean: () => ({ exec: async () => read() }) });
   const programs = {
     findOne: vi.fn(filter => query(() => records.get(key(filter)) ?? null)),
-    findOneAndUpdate: vi.fn((filter, update) => query(() => {
-      if (!records.has(key(filter))) records.set(key(filter), { _id: `saved-${records.size}`, ...update.$setOnInsert, createdAt: new Date() });
-      return records.get(key(filter));
-    })),
+    findOneAndUpdate: vi.fn((filter, update) => {
+      const write = () => {
+        if (!records.has(key(filter))) records.set(key(filter), { _id: `saved-${records.size}`, ...update.$setOnInsert, ...filter, createdAt: new Date() });
+        if (update.$set) Object.assign(records.get(key(filter)), update.$set);
+        return records.get(key(filter));
+      };
+      return { ...query(write), exec: async () => write() };
+    }),
   };
   const provider = { getForPlan: vi.fn(async () => [{ _id: 'provider-bench', name: 'Dumbbell bench press', group: 'Chest', targetMuscle: 'Chest', equipment: 'Dumbbell', pose: 'missing', instructions: ['Keep wrists straight.'], gifUrl: 'https://example.com/fresh.gif' }]) };
   const profiles = { findOne: () => query(() => current) };
@@ -25,6 +29,25 @@ function setup() {
 }
 
 describe('saved per-user Coach programs', () => {
+  it('saves an edited day for its owner and reloads it without changing another account', async () => {
+    const test = setup(), service = test.service();
+    const first = await service.getPlan(user);
+    await service.getPlan(otherUser);
+    const exercise = { exerciseId: 'custom-one', name: 'My exercise', group: 'Back', targetMuscle: 'Back', equipment: 'Dumbbells', tracking: 'Manual', prescription: '3 × 10' };
+    await service.updateDay(user, { programVersion: first.programVersion, dayIndex: 0, title: 'Pull', exercises: [exercise] });
+    expect((await test.service().getPlan(user)).days[0]).toMatchObject({ title: 'Pull', exercises: [exercise] });
+    expect((await test.service().getPlan(otherUser)).days[0].title).not.toBe('Pull');
+    await service.updateDay(user, { programVersion: first.programVersion, dayIndex: 0, title: 'Rest', exercises: [] });
+    expect((await service.getPlan(user)).days[0]).toMatchObject({ title: 'Rest', exercises: [], isWorkoutDay: false });
+  });
+  it('rejects malformed, duplicate and stale edits', async () => {
+    const test = setup(), service = test.service();
+    const first = await service.getPlan(user);
+    const exercise = { exerciseId: 'one', name: 'Row', group: 'Back', targetMuscle: 'Back', equipment: '', tracking: 'Manual' };
+    await expect(service.updateDay(user, { programVersion: first.programVersion, dayIndex: 0, title: 'Pull', exercises: [exercise, exercise] })).rejects.toThrow();
+    test.change({ goal: 'Strength' });
+    await expect(service.updateDay(user, { programVersion: first.programVersion, dayIndex: 0, title: 'Pull', exercises: [exercise] })).rejects.toThrow('plan changed');
+  });
   it('persists daily prescriptions and reuses them after service restart without provider calls', async () => {
     const test = setup();
     const first = await test.service().getPlan(user);

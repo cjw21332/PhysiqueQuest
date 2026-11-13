@@ -16,6 +16,7 @@ type Props = {
   consent: boolean;
   onConsentChange: (value: boolean) => void;
   onForgotPassword: () => void;
+  onGoogleAuth?: () => void | Promise<void>;
   busy?: boolean;
   emailInputRef?: Ref<HTMLInputElement>;
 };
@@ -24,15 +25,29 @@ function EyeIcon({ visible }: { visible: boolean }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true">{visible ? <><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 002.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0112 5c5.5 0 9 7 9 7a15.6 15.6 0 01-3.1 3.8M6.2 6.2C4.1 7.5 3 12 3 12s3.5 7 9 7a9 9 0 003-.5"/></> : <><path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z"/><circle cx="12" cy="12" r="3"/></>}</svg>;
 }
 
-export default function AuthForm({ mode, onModeChange, name, email, onNameChange, onEmailChange, onContinue, error, onErrorChange, consent, onConsentChange, onForgotPassword, busy = false, emailInputRef }: Props) {
+export default function AuthForm({ mode, onModeChange, name, email, onNameChange, onEmailChange, onContinue, error, onErrorChange, consent, onConsentChange, onForgotPassword, onGoogleAuth, busy = false, emailInputRef }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const submitting = useRef(false);
   const [pending, setPending] = useState(false);
-  const working = busy || pending;
+  const [googlePending, setGooglePending] = useState(false);
+  const working = busy || pending || googlePending;
   const register = mode === 'register';
+
+  const handleGoogleAuth = async () => {
+    if (!onGoogleAuth || working) return;
+    setGooglePending(true);
+    onErrorChange('');
+    try {
+      await onGoogleAuth();
+    } catch (err) {
+      onErrorChange(err instanceof Error ? err.message : 'Google sign-in could not be completed. Please try again.');
+    } finally {
+      setGooglePending(false);
+    }
+  };
 
   const passwordField = (label: string, value: string, onChange: (value: string) => void, visible: boolean, toggle: () => void, confirm = false) => (
     <>
@@ -133,6 +148,15 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
               <span>I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" aria-label="Terms (opens in a new tab)">terms</a>, <a href="/privacy" target="_blank" rel="noopener noreferrer" aria-label="Privacy policy (opens in a new tab)">privacy policy</a>, and <a href="/camera-consent" target="_blank" rel="noopener noreferrer" aria-label="Camera-based health data processing (opens in a new tab)">camera-based health data processing</a>. These documents are drafts pending team review.</span>
             </label>
           </>
+        )}
+        {onGoogleAuth && (
+          <div className="google-auth-action">
+            <div className="google-auth-divider"><span>or</span></div>
+            <button type="button" className="google-auth-button" disabled={working} onClick={() => void handleGoogleAuth()}>
+              <span className="google-auth-mark" aria-hidden="true">G</span>
+              {googlePending ? 'Connecting to Google…' : `${register ? 'Register' : 'Log in'} with Google`}
+            </button>
+          </div>
         )}
         {error && <p className="error" role="alert">{error}</p>}
       </div>

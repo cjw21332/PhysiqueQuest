@@ -57,6 +57,34 @@ export async function login(email: string, password: string): Promise<User> {
   }
 }
 
+export async function loginWithGoogle(idToken: string): Promise<User> {
+  const response = await api.googleLogin(idToken);
+  session.set(response, getApiBaseUrl());
+  return {
+    id: response.user.id,
+    name: response.user.name,
+    email: response.user.email,
+    token: response.access_token,
+  };
+}
+
+export async function registerWithGoogle(data: {
+  idToken: string;
+  password: string;
+  requestId: string;
+  code: string;
+  name: string;
+}): Promise<User> {
+  const response = await api.googleRegister(data);
+  session.set(response, getApiBaseUrl());
+  return {
+    id: response.user.id,
+    name: response.user.name,
+    email: response.user.email,
+    token: response.access_token,
+  };
+}
+
 export async function logout() {
   const deviceId = typeof window === 'undefined' ? null : localStorage.getItem('physiquequest-push-device');
   if (deviceId) { await api.revokePushDevice(deviceId); localStorage.removeItem('physiquequest-push-device'); }

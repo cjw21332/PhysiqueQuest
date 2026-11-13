@@ -1,4 +1,5 @@
 'use client';
+import { Icon } from '../Home/icons';
 import { useEffect, useState } from 'react';
 import { useCameraStream } from '../../hooks/useCameraStream';
 import { useRepTracking } from '../../hooks/useRepTracking';
@@ -29,7 +30,7 @@ export default function SquatFormPreview({ onExit }: { onExit: () => void }) {
   const label = camera.status !== 'on' || tracking.observation === 'unknown' ? 'Insufficient visual information' : tracking.observation === 'adjustment' ? 'Movement needs adjustment for the counter' : 'Movement detected';
 
   return <section className="coach-library squat-preview">
-    <header className="coach-header library-header"><button className="coach-back" type="button" onClick={() => { camera.stop(true); onExit(); }} aria-label="Back to exercise library">←</button><h2>Squat movement preview</h2></header>
+    <header className="coach-header library-header"><button className="coach-back" type="button" onClick={() => { camera.stop(true); onExit(); }} aria-label="Back to exercise library"><Icon name="arrow-left" size={20}/></button><h2>Squat movement preview</h2></header>
     <p>Experimental · partially supported. This checks one knee angle, not overall form or injury risk. It is not medical advice.</p>
     {stage !== 'summary' ? <>
       <p>Place the camera side-on. Keep your selected hip, knee and ankle in frame, start standing, then bend and stand at a comfortable pace.</p>

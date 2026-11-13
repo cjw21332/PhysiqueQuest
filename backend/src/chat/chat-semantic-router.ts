@@ -44,7 +44,7 @@ export const CHAT_SEMANTIC_ROUTES: readonly Route[] = [
     ['contact-relationship', 'Only explicitly requested emergency contact relationship', 'What is my emergency contact relationship?'],
     ['contact-details', 'Explicitly requested full emergency contact details: name, phone and relationship', 'What are my emergency contact details?'],
   ].map(([id, description, question]) => record('profile.' + id, description, question)),
-  ...['weight', 'waist', 'bench press'].map(metric => record('progress.' + metric.replace(' ', '-'), 'Latest dated Progress ' + metric + ' check-in; separate from profile fields', 'What is my latest ' + (metric === 'bench press' ? 'bench' : metric) + ' measurement?')),
+  ...['weight', 'waist', 'chest', 'arms', 'bench press'].map(metric => record('progress.' + metric.replace(' ', '-'), 'Latest dated Progress ' + metric + ' check-in; separate from profile fields', 'What is my latest ' + (metric === 'bench press' ? 'bench' : metric) + ' measurement?')),
   record('training.preferences', 'Saved equipment, selected training weekdays and planned session duration', 'What are my saved training preferences?'),
   record('training.equipment', 'Own available training equipment, implements, weights, machines or gear, not body measurements', 'What is my saved equipment?'),
   record('training.days', 'Weekdays the user selected for training in their profile preferences', 'Which training days did I select in my profile?'),

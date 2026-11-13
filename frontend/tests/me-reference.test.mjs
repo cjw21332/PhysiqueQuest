@@ -116,7 +116,8 @@ test('admin mock catalog and analytics match the supplied reference', async () =
   assert.match(catalog, /Bulgarian split squat/i);
   assert.match(catalog, /Kettlebell swing/i);
   assert.match(catalog, /Sample data/);
-  assert.doesNotMatch(catalog, /Delete|Unpublish/);
+  assert.match(catalog, /Delete/);
+  assert.doesNotMatch(catalog, /Unpublish/);
   const analytics = renderToStaticMarkup(React.createElement(load('EngagementAnalytics').default, { preview: true, onBack() {} }));
   assert.match(analytics, /1,284/);
   assert.match(analytics, /Cancelled in countdown/);

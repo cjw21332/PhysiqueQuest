@@ -31,6 +31,8 @@ type Props = {
   initialPaused?: boolean;
   onCheckpoint?: () => void;
   controlsDisabled?: boolean;
+  routineTitle?: ReactNode;
+  onCancel?: () => void;
   renderRoutine?: (paused: boolean) => ReactNode;
 };
 
@@ -44,7 +46,7 @@ function newKey() {
   return globalThis.crypto?.randomUUID?.() ?? `inactivity-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-export default function LiveSession({ exercise, workoutId, thresholdSeconds, contactName, contactPhone, onEnd, onPause, initialSeconds = 0, initialPaused = false, onCheckpoint, controlsDisabled = false, renderRoutine }: Props) {
+export default function LiveSession({ exercise, workoutId, thresholdSeconds, contactName, contactPhone, onEnd, onPause, initialSeconds = 0, initialPaused = false, onCheckpoint, controlsDisabled = false, renderRoutine, routineTitle, onCancel }: Props) {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [paused, setPaused] = useState(initialPaused);
   useEffect(() => { setPaused(initialPaused); }, [initialPaused]);
@@ -91,6 +93,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   }, [phase]);
 
   useEffect(() => {
+    if (renderRoutine) return;
     let active = true;
     api.getAuthMe()
       .then(user => {
@@ -104,7 +107,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
         setAdminAccessError('Administrator access could not be verified. The alert log is unavailable.');
       });
     return () => { active = false; };
-  }, []);
+  }, [Boolean(renderRoutine)]);
 
   useEffect(() => {
     if (renderRoutine) camera.stop(true);
@@ -115,6 +118,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   // Native host events arrive through the WebView bridge.
   useEffect(() => {
     const onNative = (event: Event) => {
+      if (renderRoutine) return;
       const detail = (event as CustomEvent<NativeEvent>).detail;
       if (!detail) return;
       if (detail.type === 'motion-status') setMotionAvailable(detail.available);
@@ -141,11 +145,11 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
     return () => window.removeEventListener('physiquequest-inactivity', onNative);
     // raiseAlarm and stopSound read refs and stable setters; camera.stop is stable.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [camera.stop, workoutId]);
+  }, [camera.stop, workoutId, Boolean(renderRoutine)]);
 
   // Start the host's inactivity monitor when the session mounts; stop it on unmount.
   useEffect(() => {
-    if (paused) { postToHost({ type: 'inactivity-stop' }); return; }
+    if (renderRoutine || paused) { postToHost({ type: 'inactivity-stop' }); return; }
     postToHost({ type: 'inactivity-start', thresholdMs: thresholdSeconds * 1000 });
     postToHost({ type: 'inactivity-request-motion-status' });
     return () => {
@@ -153,7 +157,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       stopSound();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [thresholdSeconds, paused]);
+  }, [thresholdSeconds, paused, Boolean(renderRoutine)]);
 
   const playSound = () => startAlarm();
   const stopSound = () => stopAlarm();
@@ -275,10 +279,14 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
   }
 
   return (
-    <section className="live-session">
+    <section className={`live-session ${renderRoutine ? 'manual-session' : ''}`}>
+      {renderRoutine && <div className="session-controls">
+        <button type="button" className="pause-button" aria-label={paused ? 'Resume workout' : 'Pause workout'} disabled={busy || controlsDisabled} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <Icon name="pause" size={16}/>}{paused ? 'Resume' : 'Pause'}</button>
+        <button className="end-button" disabled={busy || controlsDisabled} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
+      </div>}
       <header className="live-session-head">
-        <span className="session-meta">{titleCase(exercise.name)}</span>
-        <b className="session-time" aria-label="Elapsed time">{time}</b>
+        <div className="session-meta">{renderRoutine ? routineTitle : titleCase(exercise.name)}</div>
+        <b className="session-time" aria-label="Elapsed time">{time}{renderRoutine && <small> Total workout time</small>}</b>
       </header>
       {renderRoutine?.(paused)}
       {!renderRoutine && <><div ref={camera.frameRef} className="live-video">
@@ -304,14 +312,15 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
           {camera.message && <p role="alert">{camera.message}</p>}
         </div>
       )}
-      <p className="live-notice" role="note">Keep the app open and the screen on during your workout. Detection pauses when the phone is locked.</p>
+      <p className="live-notice" role="note">Live video is a preview and does not automatically save sets or reps. Keep the app open and the screen on during your workout.</p>
       <div className="session-progress-label"><span>Elapsed time</span><b>{time}</b></div>
       <div className="session-progress-track"><i style={{width: `${Math.min(seconds / 1800 * 100, 100)}%`}}/></div></>}
-      {motionAvailable === false && <p className="scan-warning" role="status">Movement detection needs the phone app with an accelerometer. Countdown is off on this device.</p>}
-      <div className="session-controls">
+      {!renderRoutine && motionAvailable === false && <p className="scan-warning" role="status">Movement detection needs the phone app with an accelerometer. Countdown is off on this device.</p>}
+      {!renderRoutine && <div className="session-controls">
         <button type="button" className="pause-button" aria-label={paused ? 'Resume workout' : 'Pause workout'} disabled={busy || controlsDisabled} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <Icon name="pause" size={16}/>}{paused ? 'Resume' : 'Pause'}</button>
         <button className="end-button" disabled={busy || controlsDisabled} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
-      </div>
+      </div>}
+      {renderRoutine && <button type="button" className="manual-cancel" disabled={busy || controlsDisabled} onClick={onCancel}>Cancel Workout</button>}
       {paused && <div className="paused-banner">Session paused</div>}
       {error && <p className="scan-warning" role="alert">{error}</p>}
     </section>

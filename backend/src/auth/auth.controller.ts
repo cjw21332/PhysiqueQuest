@@ -12,11 +12,19 @@ import { ApiCreatedResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger
 import { SessionResponseDto } from './dto/auth.dto.js';
 import { EmailVerificationService } from './email-verification.service.js';
 import { ConfirmVerificationDto, ResendVerificationDto } from './dto/email-verification.dto.js';
+import { GoogleAuthService } from './google-auth.service.js';
+import { GoogleCheckDto, GoogleLoginDto, GoogleRegisterDto } from './dto/google-auth.dto.js';
 
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
-  constructor(private readonly authService: AuthService, private readonly recovery: PasswordRecoveryService, private readonly sessions: SessionService, private readonly verification: EmailVerificationService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly recovery: PasswordRecoveryService,
+    private readonly sessions: SessionService,
+    private readonly verification: EmailVerificationService,
+    private readonly googleAuth: GoogleAuthService,
+  ) {}
 
   @Post('session/login')
   @ApiOkResponse({ type: SessionResponseDto })
@@ -37,6 +45,31 @@ export class AuthController {
     const result = await this.authService.register(dto);
     req.user = { userId: result.user.id };
     return this.deliver(await this.sessions.issue(await this.authService.validateUser(result.user.id)), res);
+  }
+
+  @Post('google/check')
+  @HttpCode(HttpStatus.OK)
+  googleCheck(@Body() dto: GoogleCheckDto) {
+    return this.googleAuth.check(dto.idToken, dto.intent);
+  }
+
+  @Post('session/google/login')
+  @ApiOkResponse({ type: SessionResponseDto })
+  @HttpCode(HttpStatus.OK)
+  async sessionGoogleLogin(@Body() dto: GoogleLoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    assertSessionRequest(req);
+    const user = await this.googleAuth.login(dto);
+    req.user = { userId: String(user._id) };
+    return this.deliver(await this.sessions.issue(user), res);
+  }
+
+  @Post('session/google/register')
+  @ApiCreatedResponse({ type: SessionResponseDto })
+  async sessionGoogleRegister(@Body() dto: GoogleRegisterDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    assertSessionRequest(req);
+    const user = await this.googleAuth.register(dto);
+    req.user = { userId: String(user._id) };
+    return this.deliver(await this.sessions.issue(user), res);
   }
 
   private deliver(result: Awaited<ReturnType<SessionService['issue']>>, res: Response) {

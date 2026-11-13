@@ -10,11 +10,14 @@ import { Icon } from '../Home/icons';
 import './libraryreference.css';
 import { canTrack, resolveTrackingConfig, type TrackingConfig } from '../../../backend/src/pose-tracker/exercise-registry';
 import PoseTrackerSession from './PoseTrackerSession';
+import { readPersonalExercises, type PersonalExercise } from '../../lib/personalExercises';
 
 const equipmentOptions = ['Any equipment', 'Dumbbells', 'Barbell', 'Bodyweight', 'Cable', 'Machine', 'Kettlebell', 'Resistance bands'];
 const metadata = (item: ExerciseRecord) => [item.targetMuscle || item.group, item.equipment, item.difficulty].filter(Boolean).join(' · ');
 
-export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { onBack: () => void; selectedEquipment?: string[] }) {
+export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStartPersonal }: { onBack: () => void; selectedEquipment?: string[]; onStartPersonal?: (item: PersonalExercise) => void }) {
+  const [personal, setPersonal] = useState<PersonalExercise[]>([]);
+  useEffect(() => { try { setPersonal(readPersonalExercises()); } catch { setPersonal([]); } }, []);
   const [searchTerm, setSearchTerm] = useState('');
   const [equipment, setEquipment] = useState(() => selectedEquipment.length === 1 ? equipmentOptions.find(option => option.toLowerCase().replace(/s$/, '') === selectedEquipment[0].toLowerCase().replace(/s$/, '')) || 'Any equipment' : 'Any equipment');
   const [page, setPage] = useState(1);
@@ -200,6 +203,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [] }: { on
       <label>Secondary muscle<select value={secondary} onChange={event => { setSecondary(event.target.value); setPage(1); }}><option value="">All secondary muscles</option>{filters.secondaryMuscles.map(value => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
       <label>Sort by<select value={sort || ''} onChange={event => { setSort((event.target.value || undefined) as ExerciseDiscoveryQuery['sort']); setPage(1); }}><option value="">Default</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="body-part">Body part</option><option value="equipment">Equipment</option></select></label>
     </div>
+    {personal.length > 0 && <section className="personal-library"><h3>My exercises</h3><p>Saved on this device · manual tracking</p>{personal.filter(item => item.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) && (equipment === 'Any equipment' || item.equipment.toLowerCase() === equipment.toLowerCase()) && (!target || item.targetMuscle.toLowerCase() === target.toLowerCase()) && !bodyPart && !secondary).map(item => <article className="personal-exercise-row" key={item._id}><div><b>{titleCase(item.name)}</b><small>{titleCase(item.targetMuscle)} · {titleCase(item.equipment)}</small></div>{onStartPersonal && <button type="button" className="secondary" onClick={() => onStartPersonal(item)}>Start workout</button>}</article>)}</section>}
     {loading && <p role="status">Loading exercises…</p>}
     {error && <div className="empty-library" role="alert"><p>{error}</p><button type="button" className="secondary" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
     {!loading && catalog && <>

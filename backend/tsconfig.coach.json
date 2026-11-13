@@ -2,6 +2,6 @@
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "outDir": "./dist-coach",
-    "tsBuildInfoFile": "./dist-coach/tsconfig.tsbuildinfo"
+    "incremental": false
   }
 }

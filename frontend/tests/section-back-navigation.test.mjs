@@ -14,11 +14,11 @@ test('every nested section header places its back control before the page headin
   ];
   for (const page of pages) {
     const content = await source(`sections/${page}.tsx`);
-    const back = content.search(/<button\b[^>]*(?:className="(?:coach-back|leaderboard-back|ghost back-btn)"|aria-label="Back to AI Coach")/);
+    const back = content.search(/<button\b[^>]*(?:className="(?:coach-back|leaderboard-back|ghost back-btn|pq-progress-back)"|aria-label="Back to AI Coach")/);
     assert.ok(back >= 0, `${page} has a back control`);
     const headerStart = content.lastIndexOf('<header', back);
     const headerEnd = content.indexOf('</header>', back);
-    const heading = content.indexOf('<h2', headerStart);
+    const heading = content.slice(headerStart, headerEnd).search(/<h[12]\b/) + headerStart;
     assert.ok(headerStart >= 0 && heading > back && heading < headerEnd, `${page}: back icon precedes heading in its header`);
   }
 });

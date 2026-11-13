@@ -106,7 +106,7 @@ describe('NutritionService.addMealsFromScan', () => {
     expect(a.id).not.toBe(b.id);
   });
 
-  it('skips items that matched no nutrition record', async () => {
+  it('stores each unmatched item with unavailable nutrition instead of zero', async () => {
     await service.addMealsFromScan(USER_ID, payload({
       items: [
         ...payload().items,
@@ -114,15 +114,15 @@ describe('NutritionService.addMealsFromScan', () => {
       ],
     }));
 
-    expect(pushedMeals()).toHaveLength(1);
+    expect(pushedMeals()).toHaveLength(2);
     expect(pushedMeals()[0].name).toBe('chicken breast');
+    expect(pushedMeals()[1]).toMatchObject({ name: 'mystery paste', calories: null, protein: null, carbs: null, fat: null });
   });
 
-  it('rejects the request when nothing matched', async () => {
-    // Recording an empty meal would look like a successful save.
+  it('rejects an empty selection', async () => {
     await expect(
       service.addMealsFromScan(USER_ID, payload({
-        items: [{ food_name: 'mystery paste', found: false, kcal: 0, protein_g: 0, carbs_g: 0, fat_g: 0 }],
+        items: [],
       }))
     ).rejects.toThrow(BadRequestException);
     expect(findOneAndUpdate).not.toHaveBeenCalled();

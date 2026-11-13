@@ -13,6 +13,7 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
@@ -30,7 +31,9 @@
     "next-env.d.ts",
     ".next-dev/types/**/*.ts",
     ".next-dev/dev/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next-progress-test/types/**/*.ts",
+    ".next-progress-test/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

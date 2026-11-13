@@ -45,11 +45,14 @@ const responseSchema = {
 };
 
 const PROMPT = `You are a food recognition system for a calorie & macro tracker.
-Analyze the image and identify every distinct edible food item visible.
-For each item estimate its edible weight in grams based on typical plate,
-utensil, and portion sizes visible in the image. Be realistic and conservative.
-If the image contains no clear food, return an empty items array.
-Identify only foods, not drinks, unless a drink is clearly the main item.`;
+Analyze the image and identify every distinct edible food item visible, even when several foods share one plate or bowl.
+
+For each item:
+- food_name: a specific, common English name (e.g. "grilled chicken breast", "white rice", "fried egg"). Use the same name for the same food across images so nutrition records match consistently.
+- est_weight_g: estimate the edible weight of this one item in grams based on the plate, utensils, and portion sizes visible. Be realistic and conservative.
+- confidence: your confidence in the identification, 0 to 1.
+
+Treat each visually separate food as its own item — do not merge a mixed plate into a single entry. Identify only foods, not drinks, unless a drink is clearly the main item. If the image contains no clear food, return an empty items array.`;
 
 const MODEL_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9.]+)*$/;
 

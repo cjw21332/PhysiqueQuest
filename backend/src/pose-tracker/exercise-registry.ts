@@ -1,4 +1,4 @@
-import { catalogTiersMap } from './catalog-tiers';
+import { catalogTiersMap } from './catalog-tiers.ts';
 
 // Shared pure registry: imported by the browser, API and catalog audit. No credentials or I/O.
 export const configurationVersion = 1;

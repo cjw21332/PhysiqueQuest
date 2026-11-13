@@ -320,7 +320,7 @@ describe('Phiq owner-scoped context', () => {
     expect(JSON.stringify(nutrition)).not.toContain('PRIVATE-PLAN');
   });
   it('keeps procedures guide-only but loads own current Coach program, settings and goal status', async () => {
-    const { service, calls } = fixture();
+    const { service, calls } = fixture({ profiles: [owned({ goal: 'Build muscle', days: ['Monday'], equipment: [], duration: '45 min', conditions: [] })] });
     for (const question of ['How do I change my goal?', 'How do I set my reminder?', 'How do I update my diet plan?']) {
       expect((await service.build(OWNER, question, true)).personalDataIncluded).toBe(false);
     }
@@ -329,6 +329,7 @@ describe('Phiq owner-scoped context', () => {
       expect((await service.build(OWNER, question, true)).personalDataIncluded).toBe(true);
     }
     expect(calls.some(call => call.collection === 'programs')).toBe(true);
+    expect(calls.find(call => call.collection === 'programs')?.filter.contextHash).toMatch(/^[a-f0-9]{64}$/);
     expect(calls.some(call => call.collection === 'settings')).toBe(true);
     expect(calls.some(call => call.collection === 'profiles')).toBe(true);
   });

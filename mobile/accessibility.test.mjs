@@ -10,6 +10,6 @@ test('WebView follows system font scale and reinjects updates without remounting
 });
 test('connection fallback scrolls and names its input; native camera has a 48dp target',()=>{
   assert.match(source,/<ScrollView[\s\S]*contentContainerStyle=\{styles.errorScroll\}/);
-  assert.match(source,/accessibilityLabel="Computer address"/);
+  assert.match(source,/accessibilityLabel="Server address"/);
   assert.match(source,/nativeCameraFacing: \{[\s\S]*?minHeight: 48,[\s\S]*?minWidth: 48/);
 });

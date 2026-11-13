@@ -4,6 +4,8 @@ import { useCameraStream } from '../../hooks/useCameraStream';
 import { useGenericRepTracking } from '../../hooks/useGenericRepTracking';
 import type { GeneratedAngleConfig } from '../../../backend/src/pose-tracker/exercise-registry';
 import './posetracker.css';
+import { Icon } from '../Home/icons';
+import { titleCase } from '../../lib/titleCase';
 
 export default function GenericTrackingSession({name,config,onExit}:{name:string;config:GeneratedAngleConfig;onExit:()=>void}) {
   const [stage,setStage]=useState<'setup'|'active'|'summary'>('setup');
@@ -14,7 +16,7 @@ export default function GenericTrackingSession({name,config,onExit}:{name:string
   useEffect(()=>{const hide=()=>{if(document.hidden)camera.stop(true);};document.addEventListener('visibilitychange',hide);return()=>document.removeEventListener('visibilitychange',hide);},[camera.stop]);
   const finish=()=>{setSummary({reps:tracking.repCount,partial:tracking.partialCount});camera.stop(true);setStage('summary');};
   return <section className="generic-tracking" aria-label="Experimental movement tracking">
-    <header className="generic-tracking-head"><div><span className="generic-tracking-tag">Experimental tracking</span><h3>{name}</h3></div><button className="secondary" type="button" onClick={()=>{camera.stop(true);onExit();}}>Close</button></header>
+    <header className="generic-tracking-head"><div><span className="generic-tracking-tag">Experimental tracking</span><h3>{titleCase(name)}</h3></div><button className="secondary" type="button" aria-label="Close tracking" onClick={()=>{camera.stop(true);onExit();}}><Icon name="close" size={19}/></button></header>
     <p className="generic-tracking-note">Counts are unvalidated. Tracking cannot assess safe form, pain, injury risk, or load. Fault checks are off.</p>
     {stage!=='summary'?<>
       <div ref={camera.frameRef} className="live-video generic-tracking-camera"><video ref={camera.videoRef} className={`live-camera ${camera.facing==='front'?'front-facing':''}`} autoPlay muted playsInline />{camera.status!=='on'&&<div className="generic-camera-placeholder">Your camera preview will appear here.</div>}</div>

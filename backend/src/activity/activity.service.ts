@@ -7,6 +7,7 @@ import { UpdateActivityDto } from './dto/activity.dto.js';
 import { Activity } from './schemas/activity.schema.js';
 import { activityDate, earnsWorkoutCredit } from '../workouts/workout-contract.js';
 import { LeaderboardService } from '../leaderboard/leaderboard.service.js';
+import { User } from '../auth/schemas/user.schema.js';
 
 const missionRules = [
   { key: 'workout', title: 'Complete one workout', target: 1, points: 100 },
@@ -33,6 +34,7 @@ export class ActivityService {
     private readonly nutrition: NutritionService,
     private readonly workouts: WorkoutsService,
     private readonly leaderboard: LeaderboardService,
+    @InjectModel(User.name) private readonly users: Model<User>,
   ) {}
 
   private async userState(userId: string) {
@@ -55,7 +57,7 @@ export class ActivityService {
   private async summary(userId: string, requestedTimezone: string | undefined, includeLeaderboard: boolean) {
     const record = await this.model.findOne({ userId: new Types.ObjectId(userId) }).exec();
     const timezone = resolveTimezone(requestedTimezone ?? record?.state?.timezone);
-    const [nutrition, workouts, records, ranking] = await Promise.all([this.nutrition.read(userId, 'userId meals.date meals.protein meals.carbs meals.fat water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? this.leaderboard.get(userId, 'all').catch(() => null) : Promise.resolve(null)]);
+    const [nutrition, workouts, records, ranking, user] = await Promise.all([this.nutrition.read(userId, 'userId meals.date meals.protein meals.carbs meals.fat water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? this.leaderboard.get(userId, 'all').catch(() => null) : Promise.resolve(null), this.users.findById(userId).select('createdAt').lean().exec()]);
     const today = zoneDate(new Date(), timezone);
 
     const mealDates = nutrition.meals.map(meal => meal.date).filter((date): date is string => typeof date === 'string');
@@ -86,6 +88,8 @@ export class ActivityService {
         currentExp: currentExp % 100,
         nextLevelExp: 100,
         dayStreak,
+        activityDates: [...activityDates].sort(),
+        accountCreatedAt: user?.createdAt ?? null,
         earnedPoints,
       },
       dailyMissions,

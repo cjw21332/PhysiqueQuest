@@ -14,7 +14,7 @@ describe('user-owned progress measurements', () => {
   it('returns ascending caller-owned history and scopes deletion', async () => {
     const userId = '507f1f77bcf86cd799439011';
     const rows = [{ measuredAt: new Date('2026-10-01') }, { measuredAt: new Date('2026-10-03') }];
-    const find = vi.fn().mockReturnValue({ sort: () => ({ limit: async () => rows }) });
+    const find = vi.fn().mockReturnValue({ sort: () => ({ skip: () => ({ limit: async () => rows }) }) });
     const findOneAndDelete = vi.fn().mockResolvedValue(null);
     const service = new ProgressService({ find, findOneAndDelete } as unknown as Model<ProgressEntry>);
     expect(await service.list(userId, 'weight')).toEqual(rows);
@@ -25,7 +25,7 @@ describe('user-owned progress measurements', () => {
 
   it('creates records with owner derived from authentication and supports empty history', async () => {
     const create = vi.fn().mockImplementation(async row => row);
-    const find = vi.fn().mockReturnValue({ sort: () => ({ limit: async () => [] }) });
+    const find = vi.fn().mockReturnValue({ sort: () => ({ skip: () => ({ limit: async () => [] }) }) });
     const service = new ProgressService({ create, find } as unknown as Model<ProgressEntry>);
     const entry = await service.add('507f1f77bcf86cd799439011', { metric: 'benchPress', value: 62.5, unit: 'kg', measuredAt: '2026-10-04T10:00:00Z' });
     expect(entry.userId).toEqual(new Types.ObjectId('507f1f77bcf86cd799439011'));

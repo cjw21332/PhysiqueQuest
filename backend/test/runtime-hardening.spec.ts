@@ -34,6 +34,18 @@ describe('request protection', () => {
     queryValidationMiddleware({ path: '/api/v1/progress', method: 'GET', query: { metric: 'weight', limit: '10' } } as any, res, next);
     expect(next).toHaveBeenCalledOnce();
   });
+  it('allows progress history pagination but still rejects unsafe and unrelated parameters', () => {
+    const next = vi.fn(); const res: any = { status: vi.fn().mockReturnThis(), json: vi.fn() };
+    for (const path of ['/api/progress', '/api/v1/progress']) {
+      queryValidationMiddleware({ path, method: 'GET', query: { metric: 'weight', limit: '365', skip: '0' } } as any, res, next);
+    }
+    expect(next).toHaveBeenCalledTimes(2);
+    for (const query of [{ metric: 'weight', skip: { $ne: '0' } }, { metric: 'weight', extra: 'x' }]) {
+      queryValidationMiddleware({ path: '/api/progress', method: 'GET', query } as any, res, next);
+      expect(res.status).toHaveBeenLastCalledWith(400);
+    }
+    expect(next).toHaveBeenCalledTimes(2);
+  });
   function run(headers: Record<string, string> = {}, env = {}) {
     const sent: Record<string, string> = {};
     const res: any = { setHeader: (key: string, value: string) => { sent[key] = value; }, status: vi.fn().mockReturnThis(), json: vi.fn(), redirect: vi.fn() };

@@ -135,7 +135,7 @@ test('dark quests retain leaderboard period selection and return navigation', as
   await capture(page, info, 'leaderboard-dark');
   await page.getByRole('button', { name: /Strength/ }).click();
   await expect(page.getByRole('region', { name: 'Top three lifters' })).toContainText('Levi M.');
-  await page.getByRole('button', { name: 'Deadlift', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Exercise', exact: true }).selectOption('deadlift');
   await page.getByRole('button', { name: /Pound for pound/ }).click();
   await expect(page.getByRole('button', { name: /Submit.*video/i })).toHaveCount(0);
   await page.getByRole('button', { name: /Quests Points earned/ }).click();

@@ -77,6 +77,9 @@ try {
     ? 'Warmup sent an empty message list only; it did not access the database or send personal data.'
     : 'This check reads model metadata only; it does not access the database or send personal data.');
 } catch (error) {
-  console.error(error instanceof Error ? error.message : 'Local model setup failed.');
+  const message = error instanceof Error ? error.message : 'Local model setup failed.';
+  console.error(message === 'fetch failed'
+    ? `Cannot reach Ollama at ${origin}. Start the Ollama application or run "ollama serve", then retry npm run ai:warmup.`
+    : message);
   process.exitCode = 1;
 }

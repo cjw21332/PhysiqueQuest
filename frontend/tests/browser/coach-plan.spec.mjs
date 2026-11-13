@@ -10,6 +10,54 @@ const prescribed = [
 ];
 const plan = { goal: 'Build muscle', weekLabel: 'Week 3 · 4 sessions planned', duration: '45 min', libraryReady: true, sets: '3 × 10', days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((name, index) => ({ index, label: name.slice(0, 3), name, isWorkoutDay: [0, 2, 4, 5].includes(index), title: index === 0 ? 'Upper Body — Push' : 'Recovery day', exercises: index === 0 ? prescribed : [], equipmentLabel: 'Dumbbell + Bodyweight', formTip: index === 0 ? { exerciseName: 'Dumbbell bench press', text: 'Keep your wrists stacked over your elbows.' } : null })) };
 
+test('a restored session opens Home instead of account setup', async ({ page }) => {
+  await page.route('**/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    let json = {};
+    if (path.endsWith('/auth/session/refresh')) json = { access_token: 'test', expires_in: 3600, user: { id: 'returning-user', name: 'Test', email: 'test@example.test', emailVerified: true } };
+    if (path.endsWith('/profile')) json = { name: 'Test', equipment: [], days: [], goal: 'General fitness' };
+    if (path.endsWith('/coach/plan')) json = plan;
+    if (path.endsWith('/nutrition')) json = { meals: [], water: [] };
+    if (path.endsWith('/activity/state')) json = { state: {}, dailyMissions: [] };
+    if (path.endsWith('/notifications')) json = { items: [] };
+    if (path.endsWith('/workouts')) json = [];
+    await route.fulfill({ json });
+  });
+  await page.goto('/launch');
+  await expect(page).toHaveURL(/\/home$/);
+  await expect(page.getByText('Continue setup')).toHaveCount(0);
+  await page.goto('/launch');
+  await expect(page).toHaveURL(/\/home$/);
+});
+
+test('session choices open separate live and video preparation screens', async ({ page }) => {
+  await page.route('**/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    let json = {};
+    if (path.endsWith('/auth/session/refresh')) json = { access_token: 'test', expires_in: 3600, user: { id: 'choice-user', name: 'Test', email: 'test@example.test', emailVerified: true } };
+    if (path.endsWith('/profile')) json = { name: 'Test', equipment: [], days: [], goal: 'General fitness' };
+    if (path.endsWith('/coach/plan')) json = plan;
+    if (path.endsWith('/workouts/active')) json = null;
+    if (path.endsWith('/settings')) json = { values: {} };
+    if (path.endsWith('/nutrition')) json = { meals: [], water: [] };
+    if (path.endsWith('/activity/state')) json = { state: {}, dailyMissions: [] };
+    if (path.endsWith('/notifications')) json = { items: [] };
+    if (path.endsWith('/workouts')) json = [];
+    await route.fulfill({ json });
+  });
+  await page.goto('/coach');
+  await page.getByRole('button', { name: 'Monday, workout day' }).click();
+  await page.getByRole('button', { name: 'Start session', exact: true }).click();
+  await page.getByRole('button', { name: /Review a video/ }).click();
+  await expect(page.getByRole('heading', { name: 'Review a video' })).toBeVisible();
+  await expect(page.getByText('Upload a recorded set')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Enable camera' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Back to AI Coach' }).click();
+  await page.getByRole('button', { name: /Live session/ }).click();
+  await expect(page.getByRole('heading', { name: 'Live camera setup' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Enable camera' })).toBeVisible();
+});
+
 test('reference Coach layout renders server prescriptions and starts the chosen catalog exercises', async ({ page }) => {
   let started;
   await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'test', token: 'test' })));
@@ -47,6 +95,9 @@ test('reference Coach layout renders server prescriptions and starts the chosen 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.getByRole('button', { name: 'Start session', exact: true }).click();
-  await page.getByRole('button', { name: 'Start session', exact: true }).click();
+  const choices = page.getByRole('dialog', { name: 'Choose how to train' });
+  await expect(choices.getByRole('button', { name: /Live session/ })).toBeVisible();
+  await expect(choices.getByRole('button', { name: /Review a video/ })).toBeVisible();
+  await choices.getByRole('button', { name: /Log manually/ }).click();
   await expect.poll(() => started?.exerciseIds).toEqual(prescribed.map(item => item.exerciseId));
 });
