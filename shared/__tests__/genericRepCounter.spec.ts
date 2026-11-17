@@ -21,6 +21,30 @@ const createLandmarksWithVisibility = (vis = 1.0): Landmark[] => {
   return Array(33).fill(null).map(() => ({ x: 0.5, y: 0.5, z: 0, visibility: vis, presence: vis }));
 };
 
+// Software fixtures: normalized image coordinates, x right / y down, aspect 1.
+// The knee-to-hip ray points up; the knee-to-ankle ray is rotated by `angle`.
+function squatLandmarks(angle: number, visibility = 1, hipAngle = 140): Landmark[] {
+  const points = Array.from({ length: 33 }, (_, i) => ({ x: 0.05 + (i % 10) * 0.008, y: 0.05 + Math.floor(i / 10) * 0.008, z: 0, visibility, presence: visibility }));
+  for (const side of [0, 1]) {
+    const x = side ? 0.62 : 0.38, y = 0.55, len = 0.16;
+    const r = (-90 + angle) * Math.PI / 180;
+    points[25 + side] = { ...points[25 + side], x, y };
+    points[23 + side] = { ...points[23 + side], x, y: y - len };
+    points[27 + side] = { ...points[27 + side], x: x + len * Math.cos(r), y: y + len * Math.sin(r) };
+    const h = (90 + hipAngle) * Math.PI / 180;
+    points[11 + side] = { ...points[11 + side], x: x + len * Math.cos(h), y: y - len + len * Math.sin(h) };
+  }
+  return points;
+}
+
+function squatFrame(counter: GenericRepCounter, angle: number, timestamp: number, visibility = 1): PoseFrame {
+  const landmarks = squatLandmarks(angle, visibility);
+  const measured = (counter as any).computeBilateralAngle(landmarks, 1);
+  if (visibility >= 0.5) expect(measured).toBeCloseTo(angle, 5);
+  else expect(measured).toBeNull();
+  return { landmarks, timestamp, aspect: 1 };
+}
+
 const createMockFrame = (angle: number, timestamp: number, aspect = 1.0): PoseFrame => {
   // Create landmarks that produce the given angle for left_knee
   // left_knee = hip(23) - knee(25) - ankle(27)
@@ -172,266 +196,139 @@ describe('GenericRepCounter', () => {
     });
   });
 
-  describe('Rep Counting', () => {
+  describe('Rep Counting — synthetic bilateral landmarks', () => {
+    const base = { ...SQUAT_CONFIG, stabilityConstraints: [] };
     it('counts a full rep for squat', () => {
-      const counter = new GenericRepCounter(SQUAT_CONFIG, { 
-        emaAlpha: 1.0, // No smoothing for deterministic test
-        fullRangeThreshold: 0.8,
-        startTolerance: 0.15,
-      });
-      
-      let events: CounterEvent[] = [];
-      counter.setEventCallback((e) => events.push(e));
-
-      // Simulate squat: 150 (start) -> 90 (peak) -> 150 (return)
-      const frames = [
-        { angle: 150, timestamp: 0 },
-        { angle: 140, timestamp: 100 },
-        { angle: 120, timestamp: 200 },
-        { angle: 100, timestamp: 300 },
-        { angle: 90, timestamp: 400 },  // Peak
-        { angle: 100, timestamp: 500 },
-        { angle: 120, timestamp: 600 },
-        { angle: 140, timestamp: 700 },
-        { angle: 150, timestamp: 800 }, // Return to start
-      ];
-
-      // Mock computeJointAngle to return test angle for primary joint
-      let currentFrameIndex = 0;
-      const originalCompute = (counter as any).computeJointAngle.bind(counter);
-      (counter as any).computeJointAngle = (landmarks: any, joint: string) => {
-        if (joint === 'left_knee' || joint === 'right_knee') {
-          return frames[currentFrameIndex]?.angle ?? 150;
-        }
-        return originalCompute(landmarks, joint);
-      };
-
-      for (const f of frames) {
-        counter.update({
-          landmarks: createLandmarksWithVisibility(1.0),
-          timestamp: f.timestamp,
-          aspect: 1.0,
-        });
-        currentFrameIndex++;
-      }
-
-      const repCounted = events.filter(e => e.type === 'rep_counted');
-      expect(repCounted.length).toBe(1);
-      expect(repCounted[0].count).toBe(1);
-      expect(counter.getProgress().repCount).toBe(1);
+      const c = new GenericRepCounter(base, { emaAlpha: 1, fullRangeThreshold: 0.8, startTolerance: 0.15 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      [150, 140, 120, 100, 90, 100, 120, 140, 150].forEach((a, i) => c.update(squatFrame(c, a, i * 100)));
+      expect(events.filter(e => e.type === 'rep_counted')).toHaveLength(1);
+      expect(events.find(e => e.type === 'rep_counted')?.count).toBe(1);
+      expect(c.getProgress().repCount).toBe(1);
     });
-
     it('detects partial rep when not reaching full threshold', () => {
-      const counter = new GenericRepCounter(SQUAT_CONFIG, {
-        emaAlpha: 1.0,
-        fullRangeThreshold: 0.85,
-        startTolerance: 0.2,
-      });
-      
-      let events: CounterEvent[] = [];
-      counter.setEventCallback((e) => events.push(e));
-
-      // Partial: 150 -> 110 (not deep enough) -> 150
-      const frames = [
-        { angle: 150, timestamp: 0 },
-        { angle: 130, timestamp: 100 },
-        { angle: 110, timestamp: 200 }, // Only 0.67 progress
-        { angle: 130, timestamp: 300 },
-        { angle: 150, timestamp: 400 },
-      ];
-
-      let currentFrameIndex = 0;
-      const originalCompute = (counter as any).computeJointAngle.bind(counter);
-      (counter as any).computeJointAngle = (landmarks: any, joint: string) => {
-        if (joint === 'left_knee' || joint === 'right_knee') {
-          return frames[currentFrameIndex]?.angle ?? 150;
-        }
-        return originalCompute(landmarks, joint);
-      };
-
-      for (const f of frames) {
-        counter.update({
-          landmarks: createLandmarksWithVisibility(1.0),
-          timestamp: f.timestamp,
-          aspect: 1.0,
-        });
-        currentFrameIndex++;
-      }
-
+      const c = new GenericRepCounter(base, { emaAlpha: 1, fullRangeThreshold: 0.85, startTolerance: 0.2 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      [150, 130, 110, 130, 150].forEach((a, i) => c.update(squatFrame(c, a, i * 100)));
       const partials = events.filter(e => e.type === 'rep_partial');
-      expect(partials.length).toBe(1);
+      expect(partials).toHaveLength(1);
       expect(partials[0].cue).toContain('deeper');
-      expect(counter.getProgress().partialCount).toBe(1);
-      expect(counter.getProgress().repCount).toBe(0);
+      expect(c.getProgress().partialCount).toBe(1);
+      expect(c.getProgress().repCount).toBe(0);
     });
-
     it('rejects rep when stability constraint violated', () => {
-      const config = {
-        ...SQUAT_CONFIG,
-        stabilityConstraints: [
-          { joint: 'left_hip', meanAngle: 170, tolerance: 10 },
-        ],
-      };
-      const counter = new GenericRepCounter(config, {
-        emaAlpha: 1.0,
-        fullRangeThreshold: 0.8,
-        faultMinMs: 100, // Short for testing
+      const c = new GenericRepCounter({ ...base, stabilityConstraints: [{ joint: 'left_hip', meanAngle: 170, tolerance: 10 }] }, { emaAlpha: 1, fullRangeThreshold: 0.8, faultMinMs: 100 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      [150, 130, 100, 90, 100, 130, 150].forEach((a, i) => {
+        const f = squatFrame(c, a, (i + 1) * 100);
+        expect((c as any).computeJointAngle(f.landmarks, 'left_hip', 1)).toBeCloseTo(140, 5);
+        c.update(f);
       });
-      
-      let events: CounterEvent[] = [];
-      counter.setEventCallback((e) => events.push(e));
-
-      // Simulate full rep but with hip moving too much
-      let timestamp = 0;
-      for (const angle of [150, 130, 100, 90, 100, 130, 150]) {
-        (counter as any).computeJointAngle = (landmarks: any, joint: string) => {
-          if (joint === 'left_knee') return angle;
-          if (joint === 'left_hip') return 140; // Violates tolerance (170 ± 10)
-          return 150;
-        };
-        counter.update({
-          landmarks: Array(33).fill(null).map(() => ({ x: 0.5, y: 0.5, z: 0, visibility: 1.0, presence: 1.0 })),
-          timestamp: timestamp += 100,
-          aspect: 1.0,
-        });
-      }
-
-      const faults = events.filter(e => e.type === 'rep_rejected_fault');
-      expect(faults.length).toBeGreaterThanOrEqual(1);
-      expect(counter.getProgress().repCount).toBe(0);
+      expect(events.filter(e => e.type === 'rep_rejected_fault').length).toBeGreaterThanOrEqual(1);
+      expect(c.getProgress().repCount).toBe(0);
     });
   });
 
-  describe('Visibility Handling', () => {
+  describe('Visibility Handling — synthetic bilateral landmarks', () => {
+    const base = { ...SQUAT_CONFIG, stabilityConstraints: [] };
     it('declares visibility lost when frames stall and restores without counting interrupted motion', () => {
-      const counter = new GenericRepCounter({ ...SQUAT_CONFIG, stabilityConstraints: [] }, { emaAlpha: 1, visibilityLostMaxMs: 500 });
-      const events: CounterEvent[] = []; counter.setEventCallback(e => events.push(e));
-      let angle = 150; (counter as any).computeJointAngle = () => angle;
-      const frame = (timestamp: number) => counter.update({ landmarks: createLandmarksWithVisibility(1), timestamp, aspect: 1 });
-      frame(1); angle = 90; frame(101); frame(201);
-      counter.tick(701); expect(counter.getProgress().state).not.toBe('VISIBILITY_LOST');
-      counter.tick(702); expect(counter.getProgress().state).toBe('VISIBILITY_LOST');
-      angle = 150; frame(800);
-      expect(counter.getProgress().state).toBe('AT_START');
-      expect(counter.getProgress().repCount).toBe(0);
+      const c = new GenericRepCounter(base, { emaAlpha: 1, visibilityLostMaxMs: 500 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      c.update(squatFrame(c, 150, 1)); c.update(squatFrame(c, 90, 101)); c.update(squatFrame(c, 90, 201));
+      c.tick(701); expect(c.getProgress().state).not.toBe('VISIBILITY_LOST');
+      c.tick(702); expect(c.getProgress().state).toBe('VISIBILITY_LOST');
+      c.update(squatFrame(c, 150, 800));
+      expect(c.getProgress().state).toBe('AT_START'); expect(c.getProgress().repCount).toBe(0);
       expect(events.filter(e => e.type === 'visibility_lost')).toHaveLength(1);
       expect(events.filter(e => e.type === 'visibility_restored')).toHaveLength(1);
     });
     it('discards an interrupted rep and emits loss and restoration exactly once', () => {
-      const counter = new GenericRepCounter({ ...SQUAT_CONFIG, stabilityConstraints: [] }, { emaAlpha: 1, visibilityLostMaxMs: 500 });
-      const events: CounterEvent[] = [];
-      counter.setEventCallback(e => events.push(e));
-      let angle: number | null = 150;
-      (counter as any).computeJointAngle = () => angle;
-      const frame = (timestamp: number) => counter.update({ landmarks: createLandmarksWithVisibility(1), timestamp, aspect: 1 });
-      frame(1); angle = 90; frame(101); frame(201);
-      angle = null; frame(301); frame(802); frame(900);
-      expect(counter.getProgress().state).toBe('VISIBILITY_LOST');
-      angle = 150; frame(1000); frame(1100);
-      expect(counter.getProgress().state).toBe('AT_START');
-      expect(counter.getProgress().repCount).toBe(0);
+      const c = new GenericRepCounter(base, { emaAlpha: 1, visibilityLostMaxMs: 500 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      for (const [a,t,v] of [[150,1,1],[90,101,1],[90,201,1],[90,301,0],[90,802,0],[90,900,0]] as const) c.update(squatFrame(c,a,t,v));
+      expect(c.getProgress().state).toBe('VISIBILITY_LOST');
+      c.update(squatFrame(c,150,1000)); c.update(squatFrame(c,150,1100));
+      expect(c.getProgress().state).toBe('AT_START'); expect(c.getProgress().repCount).toBe(0);
       expect(events.filter(e => e.type === 'visibility_lost')).toHaveLength(1);
       expect(events.filter(e => e.type === 'visibility_restored')).toHaveLength(1);
     });
-
     it('preserves completed totals across a long timestamp gap and clears them only on session reset', () => {
-      const counter = new GenericRepCounter({ ...SQUAT_CONFIG, stabilityConstraints: [] }, { emaAlpha: 1, minRepDurationMs: 100, maxRepDurationMs: 1000 });
-      let angle = 150;
-      (counter as any).computeJointAngle = () => angle;
-      const frame = (timestamp: number) => counter.update({ landmarks: createLandmarksWithVisibility(1), timestamp, aspect: 1 });
-      frame(1); angle = 90; frame(101); frame(201); angle = 150; frame(401);
-      expect(counter.getProgress().repCount).toBe(1);
-      frame(2000);
-      expect(counter.getProgress().repCount).toBe(1);
-      counter.resetSession();
-      expect(counter.getProgress().repCount).toBe(0);
+      const c = new GenericRepCounter(base, { emaAlpha: 1, minRepDurationMs: 100, maxRepDurationMs: 1000 });
+      for (const [a,t] of [[150,1],[90,101],[90,201],[150,401]] as const) c.update(squatFrame(c,a,t));
+      expect(c.getProgress().repCount).toBe(1);
+      c.update(squatFrame(c,150,2000)); expect(c.getProgress().repCount).toBe(1);
+      c.resetSession(); expect(c.getProgress().repCount).toBe(0);
     });
-
     it('continues an in-progress rep after a brief visibility dip', () => {
-      const counter = new GenericRepCounter({ ...SQUAT_CONFIG, stabilityConstraints: [] }, { emaAlpha: 1, minRepDurationMs: 100, visibilityLostMaxMs: 500 });
-      const events: CounterEvent[] = []; counter.setEventCallback(e => events.push(e));
-      let angle: number | null = 150; (counter as any).computeJointAngle = () => angle;
-      const frame = (timestamp: number) => counter.update({ landmarks: createLandmarksWithVisibility(1), timestamp, aspect: 1 });
-      frame(1); angle = 90; frame(101); frame(201); angle = null; frame(301);
-      angle = 150; frame(501);
-      expect(counter.getProgress().repCount).toBe(1);
+      const c = new GenericRepCounter(base, { emaAlpha: 1, minRepDurationMs: 100, visibilityLostMaxMs: 500 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      for (const [a,t,v] of [[150,1,1],[90,101,1],[90,201,1],[90,301,0],[150,501,1]] as const) c.update(squatFrame(c,a,t,v));
+      expect(c.getProgress().repCount).toBe(1);
       expect(events.filter(e => e.type === 'visibility_lost' || e.type === 'visibility_restored')).toHaveLength(0);
     });
     it('pauses counting when visibility lost', () => {
-      const counter = new GenericRepCounter(SQUAT_CONFIG, {
-        visibilityLostMaxMs: 500,
-        emaAlpha: 1.0,
-      });
-      
-      let events: CounterEvent[] = [];
-      counter.setEventCallback((e) => events.push(e));
-
-      let angle: number | null = 150;
-      const originalCompute = (counter as any).computeJointAngle.bind(counter);
-      (counter as any).computeJointAngle = (landmarks: any, joint: string) => {
-        if (joint === 'left_knee' || joint === 'right_knee') {
-          return angle;
-        }
-        return originalCompute(landmarks, joint);
-      };
-
-      // Start with good visibility - use high visibility landmarks
-      counter.update({
-        landmarks: createLandmarksWithVisibility(1.0),
-        timestamp: 0,
-        aspect: 1.0,
-      });
-
-      // Lose visibility (return null from computeJointAngle)
-      angle = null;
-      // Update at timestamp 600 (> 500ms visibilityLostMaxMs)
-      counter.update({
-        landmarks: createLandmarksWithVisibility(0.0),
-        timestamp: 600,
-        aspect: 1.0,
-      });
-      counter.update({ landmarks: createLandmarksWithVisibility(0.0), timestamp: 1101, aspect: 1.0 });
-
-      expect(events.some(e => e.type === 'visibility_lost')).toBe(true);
-      expect(counter.getProgress().state).toBe('VISIBILITY_LOST');
+      const c = new GenericRepCounter(base, { visibilityLostMaxMs: 500, emaAlpha: 1 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      c.update(squatFrame(c,150,0)); c.update(squatFrame(c,150,600,0)); c.update(squatFrame(c,150,1101,0));
+      expect(events.some(e => e.type === 'visibility_lost')).toBe(true); expect(c.getProgress().state).toBe('VISIBILITY_LOST');
     });
-
     it('restores counting when visibility returns', () => {
-      const counter = new GenericRepCounter(SQUAT_CONFIG, {
-        visibilityLostMaxMs: 500,
-        emaAlpha: 1.0,
-      });
+      const c = new GenericRepCounter(base, { visibilityLostMaxMs: 500, emaAlpha: 1 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      c.update(squatFrame(c,150,0,0)); c.update(squatFrame(c,150,501,0)); c.update(squatFrame(c,150,600));
+      expect(events.some(e => e.type === 'visibility_restored')).toBe(true); expect(c.getProgress().state).toBe('AT_START');
+    });
+  });
 
-      let events: CounterEvent[] = [];
-      counter.setEventCallback((e) => events.push(e));
-
-      let angle: number | null = null;
-      const originalCompute = (counter as any).computeJointAngle.bind(counter);
-      (counter as any).computeJointAngle = (landmarks: any, joint: string) => {
-        if (joint === 'left_knee' || joint === 'right_knee') {
-          return angle;
-        }
-        return originalCompute(landmarks, joint);
-      };
-
-      // Lose visibility first
-      counter.update({
-        landmarks: createLandmarksWithVisibility(0.0),
-        timestamp: 0,
-        aspect: 1.0,
-      });
-      counter.update({ landmarks: createLandmarksWithVisibility(0.0), timestamp: 501, aspect: 1.0 });
-
-      // Restore visibility
-      angle = 150;
-      counter.update({
-        landmarks: createLandmarksWithVisibility(1.0),
-        timestamp: 600,
-        aspect: 1.0,
-      });
-
-      expect(events.some(e => e.type === 'visibility_restored')).toBe(true);
-      expect(counter.getProgress().state).toBe('AT_START');
+  describe('Bilateral timing and state traces — synthetic software tests', () => {
+    const base = { ...SQUAT_CONFIG, stabilityConstraints: [] };
+    const setup = () => {
+      const c = new GenericRepCounter(base, { emaAlpha: 1, calibration: false, minRepDurationMs: 100, maxRepDurationMs: 1000, visibilityLostMaxMs: 500 });
+      const events: CounterEvent[] = []; c.setEventCallback(e => events.push(e));
+      return { c, events };
+    };
+    it('traces a normal rep through movement and peak', () => {
+      const { c, events } = setup();
+      const states = [[150,0],[130,100],[90,200],[120,300],[150,500]].map(([a,t]) => c.update(squatFrame(c,a,t)).state);
+      expect(states).toEqual(['AT_START','MOVING','AT_PEAK','AT_PEAK','AT_START']);
+      expect(events.filter(e => e.type === 'rep_counted')).toHaveLength(1);
+    });
+    it('documents a single peak sample being missed even with valid duration', () => {
+      const { c, events } = setup();
+      const states = [[150,0],[90,200],[150,500]].map(([a,t]) => c.update(squatFrame(c,a,t)).state);
+      expect(states).toEqual(['AT_START','MOVING','AT_START']);
+      expect(c.getProgress().repCount).toBe(0);
+      expect(events.filter(e => e.type === 'rep_counted')).toHaveLength(0);
+    });
+    it('counts a fast cycle when the peak is sampled twice and duration is valid', () => {
+      const { c } = setup();
+      for (const [a,t] of [[150,0],[90,100],[90,150],[150,250]]) c.update(squatFrame(c,a,t));
+      expect(c.getProgress().repCount).toBe(1);
+    });
+    it('does not count an unfinished or insufficient-range movement', () => {
+      const { c } = setup();
+      for (const [a,t] of [[150,0],[130,100],[110,200]]) c.update(squatFrame(c,a,t));
+      expect(c.getProgress().repCount).toBe(0);
+      c.update(squatFrame(c,130,300)); c.update(squatFrame(c,150,400));
+      expect(c.getProgress().repCount).toBe(0); expect(c.getProgress().partialCount).toBe(1);
+    });
+    it('marks loss only beyond the timeout measured from the first missing frame', () => {
+      const { c, events } = setup();
+      c.update(squatFrame(c,150,1)); c.update(squatFrame(c,130,101));
+      c.update(squatFrame(c,130,201,0)); c.update(squatFrame(c,130,701,0));
+      expect(c.getProgress().state).not.toBe('VISIBILITY_LOST');
+      c.update(squatFrame(c,130,702,0)); expect(c.getProgress().state).toBe('VISIBILITY_LOST');
+      c.update(squatFrame(c,150,800)); c.update(squatFrame(c,150,900));
+      expect(c.getProgress().repCount).toBe(0);
+      expect(events.filter(e => e.type === 'visibility_lost')).toHaveLength(1);
+      expect(events.filter(e => e.type === 'visibility_restored')).toHaveLength(1);
+    });
+    it('discards in-progress motion on a gap beyond maximum duration', () => {
+      const { c } = setup();
+      c.update(squatFrame(c,150,1)); c.update(squatFrame(c,130,101)); c.update(squatFrame(c,90,201));
+      c.update(squatFrame(c,150,1400));
+      expect(c.getProgress().repCount).toBe(0);
+      c.resetSession(); expect(c.getProgress().state).toBe('AT_START'); expect(c.getProgress().repCount).toBe(0);
     });
   });
 

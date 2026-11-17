@@ -68,6 +68,8 @@ test('review marks unmatched food nutrition incomplete and keeps saving disabled
     if (name.endsWith('/OutcomeDialog')) return outcomeDialog;
     if (name === './types') return types;
     if (name === './nutritionPresentation') return helper;
+    if (name === './FoodNameSearch') return { default: () => null };
+    if (name === './reviewEstimate.css') return {};
     if (name.endsWith('/titleCase')) return { titleCase };
     return require(name);
   });

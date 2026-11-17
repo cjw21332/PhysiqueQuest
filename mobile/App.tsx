@@ -29,6 +29,7 @@ import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
 import PoseTrackerNative from './PoseTrackerNative';
 import { readinessMessageLimit, readinessScript, validateNativeReadinessContext, validateReadinessCheck, type NativeReadinessContext, type ReadinessCheck } from '../shared/cameraReadiness';
+import type { ExerciseConfigOverride } from '../shared/exerciseEngine';
 
 Notifications.setNotificationHandler({ handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }) });
 
@@ -198,7 +199,7 @@ function AppContent() {
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
   const [cameraPreview, setCameraPreview] = useState<NativeCameraPreview | null>(null);
-  const [providerSession, setProviderSession] = useState<{token:string;exercise:string;name:string}|null>(null);
+  const [providerSession, setProviderSession] = useState<{token?:string;exercise:string;name:string;pattern:string;support:string;override?:ExerciseConfigOverride}|null>(null);
   const closeProviderSession = useCallback(() => {
     setProviderSession(null);
     webRef.current?.injectJavaScript("window.dispatchEvent(new CustomEvent('physiquequest-posetracker-closed'));true;");
@@ -236,6 +237,12 @@ function AppContent() {
     if (apiUrl) webRef.current?.injectJavaScript(buildBackendCheckScript(apiUrl));
     else setBackendStatus('offline');
   }, [apiUrl]);
+
+  useEffect(() => {
+    if (backendStatus !== 'offline' || !apiUrl) return;
+    const retry = setTimeout(checkBackend, 10000);
+    return () => clearTimeout(retry);
+  }, [apiUrl, backendStatus, checkBackend]);
 
   const collectReadiness = useCallback(async () => {
     const network = await Network.getNetworkStateAsync();
@@ -446,6 +453,9 @@ function AppContent() {
               intent?: string;
               exercise?: string;
               name?: string;
+              pattern?: string;
+              support?: string;
+              override?: unknown;
             };
             if (message.type === 'google-sign-in' && typeof message.requestId === 'string' &&
               /^[a-zA-Z0-9-]{8,100}$/.test(message.requestId) && ['login', 'register'].includes(message.intent ?? '')) {
@@ -472,15 +482,15 @@ function AppContent() {
                 }
               })();
             }
-            if (message.type === 'posetracker-native-start' && typeof message.token === 'string' && message.token.length <= 200 && typeof message.exercise === 'string' && /^[a-z_]{1,60}$/.test(message.exercise) && typeof message.name === 'string' && message.name.length <= 160) {
+            if (message.type === 'posetracker-native-start' && typeof message.exercise === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(message.exercise) && typeof message.name === 'string' && message.name.length <= 160 && typeof message.pattern === 'string' && /^[a-z_]{1,40}$/.test(message.pattern) && ['FULLY_SUPPORTED','PARTIALLY_SUPPORTED','NOT_YET_VALIDATED'].includes(message.support ?? '')) {
               stopNativeCamera();
-              setProviderSession({token:message.token,exercise:message.exercise,name:message.name});
+              setProviderSession({token:typeof message.token === 'string' && message.token.length <= 200 ? message.token : undefined,exercise:message.exercise,name:message.name,pattern:message.pattern,support:message.support!,override:message.override&&typeof message.override==='object'&&!Array.isArray(message.override)?message.override as ExerciseConfigOverride:undefined});
             }
             if (message.type === 'posetracker-native-stop') closeProviderSession();
             if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
-            if (message.type === 'food-camera-start' && typeof message.requestId === 'string' && message.requestId.length <= 100 && ['photo', 'barcode'].includes(message.mode ?? '') && isCameraFrame(message.frame)) {
+            if (message.type === 'food-camera-start' && typeof message.requestId === 'string' && message.requestId.length <= 100 && message.mode === 'photo' && isCameraFrame(message.frame)) {
               stopNativeCamera();
-              setFoodCamera({ requestId: message.requestId, mode: message.mode as 'photo' | 'barcode', frame: message.frame!, facing: message.facing === 'front' ? 'front' : 'back', capture: 0 });
+              setFoodCamera({ requestId: message.requestId, mode: 'photo', frame: message.frame!, facing: message.facing === 'front' ? 'front' : 'back', capture: 0 });
             }
             if (message.type === 'food-camera-frame' && isCameraFrame(message.frame)) setFoodCamera(current => current && current.requestId === message.requestId ? { ...current, frame: message.frame! } : current);
             if (message.type === 'food-camera-capture') setFoodCamera(current => current && current.requestId === message.requestId && current.mode === 'photo' ? { ...current, capture: current.capture + 1 } : current);
@@ -554,7 +564,7 @@ function AppContent() {
           setError(true);
         }}
       /> : null}
-      {providerSession && <PoseTrackerNative key={`${providerSession.exercise}:${providerSession.token}`} {...providerSession} close={closeProviderSession}/>}
+      {providerSession && <PoseTrackerNative key={`${providerSession.exercise}:${providerSession.pattern}`} {...providerSession} close={closeProviderSession}/>}
       {foodCamera && <FoodScannerCamera key={foodCamera.requestId} request={foodCamera} finish={result => {
         const detail = JSON.stringify({ ...result, requestId: foodCamera.requestId }).replace(/</g, '\\u003c');
         if (result.type !== 'ready') setFoodCamera(null);

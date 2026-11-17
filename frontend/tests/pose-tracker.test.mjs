@@ -5,7 +5,11 @@ import ts from 'typescript';
 const transpile=source=>ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
 const tiersSource = await readFile(new URL('../../backend/src/pose-tracker/catalog-tiers.ts', import.meta.url), 'utf8');
 const tiersUrl = `data:text/javascript;base64,${Buffer.from(transpile(tiersSource)).toString('base64')}`;
-const registrySource = (await readFile(new URL('../../backend/src/pose-tracker/exercise-registry.ts',import.meta.url),'utf8')).replace(/\.\/catalog-tiers\.(?:js|ts)/, tiersUrl);
+const trackingSource = await readFile(new URL('../../backend/src/pose-tracker/catalog-tracking.generated.ts', import.meta.url), 'utf8');
+const trackingUrl = `data:text/javascript;base64,${Buffer.from(transpile(trackingSource)).toString('base64')}`;
+const registrySource = (await readFile(new URL('../../backend/src/pose-tracker/exercise-registry.ts',import.meta.url),'utf8'))
+  .replace(/\.\/catalog-tiers\.(?:js|ts)/, tiersUrl)
+  .replace(/\.\/catalog-tracking\.generated\.(?:js|ts)/, trackingUrl);
 const registryUrl=`data:text/javascript;base64,${Buffer.from(transpile(registrySource)).toString('base64')}`;
 const registry=await import(registryUrl);
 const bridgeSource=(await readFile(new URL('../services/poseTracker/bridge.ts',import.meta.url),'utf8')).replace('../../../backend/src/pose-tracker/exercise-registry',registryUrl);

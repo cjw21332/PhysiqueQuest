@@ -36,7 +36,7 @@ export default function PersonalExercises({ onBack }: { onBack: () => void }) {
     <div className="admin-tools-scroll"><p className="personal-exercise-intro">Exercises you create stay on this device and are only visible to your account here. If you log a workout, its exercise name and results are saved to your account.</p>
       {error && <p className="error" role="alert">{error}</p>}
       {showForm ? <form className="admin-reference-form" onSubmit={save}><h3>New exercise</h3>
-        <label>Exercise name<input autoFocus required maxLength={80} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Bulgarian split squat"/></label>
+        <label>Exercise name<input required maxLength={80} value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Bulgarian split squat"/></label>
         <label>Target muscle group<select value={muscle} onChange={e => setMuscle(e.target.value)}>{muscleGroups.map(value => <option key={value}>{value}</option>)}</select></label>
         <label>Equipment needed<select value={equipment} onChange={e => setEquipment(e.target.value)}>{options.map(value => <option key={value}>{value}</option>)}</select></label>
         <p className="personal-exercise-intro">Manual tracking only. No pose upload is needed.</p><div className="admin-form-actions"><button type="button" className="secondary" onClick={() => setShowForm(false)}>Cancel</button><button className="primary" type="submit">Save exercise</button></div>

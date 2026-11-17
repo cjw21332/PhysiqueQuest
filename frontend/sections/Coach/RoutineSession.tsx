@@ -11,9 +11,7 @@ import WorkoutKeypad from './WorkoutKeypad';
 import WorkoutEditor from './WorkoutEditor';
 import DeleteConfirmation from '../../components/DeleteConfirmation';
 import { useWorkoutHistory } from '../../hooks/useWorkoutHistory';
-import { useCurrentProfile } from '../../hooks/useCurrentProfile';
-import { nextTrainingSuggestion } from '../../lib/trainingProgress';
-import { useNutrition } from '../../hooks/useNutrition';
+import { suggestedWorkingSet } from '../../lib/trainingProgress';
 
 type SetType = 'normal' | 'warmup' | 'drop' | 'failure';
 type Draft = { selected: number; values: Record<string, { reps: string; weight: string }>; checkpoint?: string; unit?: 'kg' | 'lbs'; units?: Record<string, 'kg' | 'lbs'>; setTypes?: Record<string, SetType> };
@@ -41,9 +39,8 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
   onSaved: (record: WorkoutSessionRecord) => void; onComplete: (record: WorkoutSessionRecord) => void;
 }) {
   const [record, setRecord] = useState(workout);
+  const [barWeights, setBarWeights] = useState<Record<string, string>>({});
   const { workouts: history, workoutLoading: historyLoading, workoutError: historyError } = useWorkoutHistory();
-  const { profile } = useCurrentProfile();
-  const { dietaryPlan } = useNutrition();
   const recordRef = useRef(workout);
   const [draft, setDraft] = useState(() => readWorkoutDraft(workout._id));
   const draftRef = useRef(draft);
@@ -80,7 +77,30 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
   const exercises = record.exercises ?? [];
   const selected = Math.min(draft.selected, Math.max(0, exercises.length - 1));
   const exercise = exercises[selected];
-  const unit = (exercise && draft.units?.[exercise.exerciseId]) || record.sets?.find(set => set.exerciseId === exercise?.exerciseId && set.loadUnit)?.loadUnit || draft.unit || 'lbs';
+  const barDescription = `${exercise?.name ?? ''} ${exercise?.equipment ?? ''}`;
+  const usesEstimatedBar = /smith|ez.?bar|barbell/i.test(barDescription) && !/t.?bar/i.test(barDescription);
+  const suggestion = exercise && !historyLoading && !historyError && !prescribedWork(exercise.prescription).durationSeconds
+    ? suggestedWorkingSet(history, exercise.exerciseId, exercise.equipment, record.startedAt, usesEstimatedBar) : null;
+  const hasExerciseDraft = exercise && Object.keys(draft.values).some(key => key.startsWith(`${exercise.exerciseId}:`));
+  const unit = (exercise && draft.units?.[exercise.exerciseId]) || record.sets?.find(set => set.exerciseId === exercise?.exerciseId && set.loadUnit)?.loadUnit || (hasExerciseDraft ? draft.unit : suggestion?.preferredUnit) || draft.unit || 'lbs';
+  const defaultBarKg = /smith/i.test(barDescription) ? 20 : /ez.?bar/i.test(barDescription) ? 10 : 20;
+  const barInput = exercise ? (barWeights[exercise.exerciseId] ?? String(record.sets?.find(set => set.exerciseId === exercise.exerciseId && set.barWeightKg !== undefined)?.barWeightKg ?? defaultBarKg)) : String(defaultBarKg);
+  const estimatedBarKg = Number(barInput);
+  const displayedLoad = (set: WorkoutSetResult) => set.barWeightKg !== undefined && set.loadKg !== undefined ? Math.max(0, set.loadKg - set.barWeightKg) * (unit === 'lbs' ? 2.2046226218 : 1) : set.loadUnit === unit && set.loadValue !== undefined ? set.loadValue : (set.loadKg ?? 0) * (unit === 'lbs' ? 2.2046226218 : 1);
+  const defaultSetValues = (saved: WorkoutSetResult | undefined, input: { reps: string; weight: string } | undefined, setType: SetType, index: number) => {
+    const prescribed = prescribedWork(exercise?.prescription);
+    const workingIndex = Array.from({ length: index }, (_, i) => {
+      const id = `${exercise.exerciseId}:${i}`;
+      return draft.setTypes?.[id] ?? record.sets?.find(set => set.setId === id)?.setType ?? 'normal';
+    }).filter(type => type === 'normal').length;
+    const suggest = !saved && setType === 'normal' && suggestion
+      ? suggestedWorkingSet(history, exercise.exerciseId, exercise.equipment, record.startedAt, usesEstimatedBar, workingIndex) : null;
+    const suggestedWeight = suggest?.weightKg === undefined ? '' : String(Number((suggest.weightKg * (unit === 'lbs' ? 2.2046226218 : 1)).toFixed(2)));
+    return {
+      reps: input?.reps ?? String(saved?.status === 'completed' ? saved.reps : suggest?.reps ?? (prescribed.reps || '')),
+      weight: input?.weight ?? (saved?.loadKg === undefined ? suggestedWeight : String(Number(displayedLoad(saved).toFixed(2)))),
+    };
+  };
   useEffect(() => { setKeypad(null); setMenu(null); setReordering(null); }, [exercise?.exerciseId]);
   const sets = record.sets ?? [];
   const total = exercises.reduce((sum, row) => sum + row.sets, 0);
@@ -146,15 +166,18 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
     const prescribed = prescribedWork(exercise.prescription);
     const existing = sets.find(set => set.setId === setId);
     const input = draftRef.current.values[setId];
-    const reps = prescribed.durationSeconds ? 0 : Number(input?.reps ?? (existing?.status === 'completed' ? existing.reps : prescribed.reps));
-    const weight = input?.weight ?? (existing?.loadKg === undefined ? '' : String(existing.loadUnit === unit && existing.loadValue !== undefined ? existing.loadValue : existing.loadKg * (unit === 'lbs' ? 2.2046226218 : 1)));
-    const loadKg = weight === '' ? undefined : Number(weight) / (unit === 'lbs' ? 2.2046226218 : 1);
+    const values = defaultSetValues(existing, input, draftRef.current.setTypes?.[setId] ?? existing?.setType ?? 'normal', index);
+    const reps = prescribed.durationSeconds ? 0 : Number(values.reps);
+    const weight = values.weight;
+    const addedKg = weight === '' ? undefined : Number(weight) / (unit === 'lbs' ? 2.2046226218 : 1);
+    if (usesEstimatedBar && (!barInput.trim() || !Number.isFinite(estimatedBarKg) || estimatedBarKg < 0 || estimatedBarKg > 100)) throw new Error('Enter a bar weight between 0 and 100 kg.');
+    const loadKg = addedKg === undefined ? undefined : addedKg + (usesEstimatedBar ? estimatedBarKg : 0);
     if ((!prescribed.durationSeconds && (input?.reps === '' || !Number.isInteger(reps) || reps < 1 || reps > 1000)) || (loadKg !== undefined && (!Number.isFinite(loadKg) || loadKg < 0 || loadKg > 1000))) throw new Error('Enter 1–1000 whole reps and a valid weight, or leave weight blank.');
-    await writeSet({ setId, exerciseId: exercise.exerciseId, setIndex: index, reps, setType: draftRef.current.setTypes?.[setId] ?? existing?.setType ?? 'normal', ...(prescribed.durationSeconds ? { durationSeconds: prescribed.durationSeconds } : {}), ...(loadKg !== undefined ? { loadKg, loadValue: Number(weight), loadUnit: unit } : {}), status: 'completed', source: 'manual' });
+    await writeSet({ setId, exerciseId: exercise.exerciseId, setIndex: index, reps, setType: draftRef.current.setTypes?.[setId] ?? existing?.setType ?? 'normal', ...(prescribed.durationSeconds ? { durationSeconds: prescribed.durationSeconds } : {}), ...(loadKg !== undefined ? { loadKg, loadValue: loadKg * (unit === 'lbs' ? 2.2046226218 : 1), loadUnit: unit, ...(usesEstimatedBar ? { barWeightKg: estimatedBarKg } : {}) } : {}), status: 'completed', source: 'manual' });
     if (existing?.status !== 'completed') { const seconds = exerciseProgress(exercise, recordRef.current.sets ?? []) === 'completed' ? exercise.restAfterExercise ?? 120 : exercise.restBetweenSets ?? 90; const now = Date.now(); setRestNow(now); setRestUntil(seconds > 0 ? now + seconds * 1000 : 0); }
-    const values = { ...draftRef.current.values }; delete values[setId];
+    const remainingValues = { ...draftRef.current.values }; delete remainingValues[setId];
     const setTypes = { ...draftRef.current.setTypes }; delete setTypes[setId];
-    changeDraft({ ...draftRef.current, values, setTypes });
+    changeDraft({ ...draftRef.current, values: remainingValues, setTypes });
     setNotice(`Set ${index + 1} saved to your account.`);
     if (exerciseProgress(exercise, recordRef.current.sets ?? []) === 'completed' && existing?.status !== 'completed') advance();
   });
@@ -210,19 +233,19 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
           return <li key={row.exerciseId} className={index === selected && expanded ? 'routine-exercise-open' : ''}><button type="button" aria-current={index === selected ? 'step' : undefined} aria-expanded={index === selected && expanded} disabled={saving} onClick={()=>{ if (index === selected) setExpanded(value => !value); else { changeDraft({ ...draftRef.current, selected: index }); setExpanded(true); } }} aria-label={`${status === 'completed' || status === 'skipped' ? 'Revisit' : 'View'} ${titleCase(row.name)}`}><span className="routine-exercise-number">{index + 1}</span><span className="routine-exercise-label"><strong>{titleCase(row.name)}</strong><small>{row.sets} sets · {prescribedWork(row.prescription).durationSeconds ? `${prescribedWork(row.prescription).durationSeconds} sec` : `${prescribedWork(row.prescription).reps || "—"} reps`}</small></span><small>{sets.filter(set => set.exerciseId === row.exerciseId && set.status === 'completed').length}/{row.sets}</small><span aria-hidden="true"><Icon name="chevron-down" size={18}/></span></button><div className="routine-row-actions"><button type="button" className="routine-reorder" aria-label={`Reorder ${titleCase(row.name)}`} aria-expanded={reordering === row.exerciseId} disabled={saving || paused || exercises.length < 2} onClick={() => { setMenu(null); setReordering(reordering === row.exerciseId ? null : row.exerciseId); }}><Icon name="reorder" size={20}/></button><button type="button" disabled={saving || paused} aria-label={`Options for ${titleCase(row.name)}`} aria-expanded={menu === row.exerciseId} onClick={() => { setMenu(menu === row.exerciseId ? null : row.exerciseId); }}><Icon name="more" size={20}/></button></div>
           {reordering === row.exerciseId && <div className="routine-reorder-actions"><button type="button" disabled={saving || paused || index === 0} onClick={() => moveExercise(index, -1)}>Move up</button><button type="button" disabled={saving || paused || index === exercises.length - 1} onClick={() => moveExercise(index, 1)}>Move down</button></div>}
           {menu === row.exerciseId && <div className="routine-row-menu"><button type="button" disabled={saving || paused} onClick={() => { setError(''); setEditor({ kind: 'rename', id: row.exerciseId }); }}>Rename exercise</button><button type="button" disabled={saving || paused || sets.some(set => set.exerciseId === row.exerciseId)} onClick={() => { setError(''); setEditor({ kind: 'replace', id: row.exerciseId }); }}>Replace exercise</button><button type="button" disabled={saving || paused || index !== selected} onClick={() => void skip()}>Skip exercise</button><strong>Rest for {titleCase(row.name)}</strong>{([['Between sets', 'restBetweenSets', row.restBetweenSets ?? 90], ['Before next exercise', 'restAfterExercise', row.restAfterExercise ?? 120]] as const).map(([label,key,seconds]) => <div className="routine-rest-setting" key={key}><span>{label}</span><button type="button" aria-label={`Decrease ${label.toLowerCase()} rest for ${titleCase(row.name)}`} disabled={saving || paused || seconds <= 0} onClick={() => void changeRoutine(exercises.map(item => item.exerciseId === row.exerciseId ? { ...item, [key]: Math.max(0, seconds - 15) } : item))}><Icon name="minus" size={18}/></button><b>{Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2,'0')}</b><button type="button" aria-label={`Increase ${label.toLowerCase()} rest for ${titleCase(row.name)}`} disabled={saving || paused || seconds >= 600} onClick={() => void changeRoutine(exercises.map(item => item.exerciseId === row.exerciseId ? { ...item, [key]: Math.min(600, seconds + 15) } : item))}>+</button></div>)}<button type="button" disabled={saving || paused || exercises.length <= 1 || sets.some(set => set.exerciseId === row.exerciseId)} onClick={() => setRemoving(row.exerciseId)}>Remove exercise</button><small>Exercises with saved sets cannot be removed or replaced.</small></div>}
-          {index === selected && expanded && <section aria-label="Current exercise" className="routine-current"><div className="manual-unit"><strong>Weight unit</strong><div role="group" aria-label={`Weight unit for ${titleCase(row.name)}`}>{(['lbs', 'kg'] as const).map(value => <button type="button" key={value} aria-pressed={unit === value} disabled={paused || saving} onClick={() => setUnit(value)}>{value}</button>)}</div></div><p className="routine-help">Tap a number to log your set. Blank weight means no added load.</p>
-          {!prescribedWork(exercise.prescription).durationSeconds && <aside className="training-suggestion"><strong>Next-session guidance</strong><p>{historyLoading ? 'Loading workout history…' : historyError ? 'Workout history is unavailable.' : nextTrainingSuggestion(history, exercise.exerciseId, exercise.equipment, profile?.goal ?? '', exercise.sets, dietaryPlan?.goal)}</p><small>{dietaryPlan?.goal ? `Dietary goal: ${dietaryPlan.goal}. ` : 'Set a dietary goal in Scan to include your nutrition phase. '}Suggestion only. Adjust for technique, recovery and available equipment; stop if you feel pain.</small></aside>}
+          {index === selected && expanded && <section aria-label="Current exercise" className="routine-current"><div className="manual-unit"><strong>Weight unit</strong><div role="group" aria-label={`Weight unit for ${titleCase(row.name)}`}>{(['lbs', 'kg'] as const).map(value => <button type="button" key={value} aria-pressed={unit === value} disabled={paused || saving} onClick={() => setUnit(value)}>{value}</button>)}</div></div><p className="routine-help">{usesEstimatedBar ? 'Enter added plates. Total includes the estimated bar.' : 'Tap a number to log your set. Blank weight means no added load.'}</p>{usesEstimatedBar && <label className="routine-bar-estimate">Bar estimate (kg) <input type="number" min="0" max="100" step="0.1" inputMode="decimal" value={barInput} disabled={paused || saving} onChange={event => setBarWeights(current => ({ ...current, [exercise.exerciseId]: event.target.value }))}/></label>}
+          {!prescribedWork(exercise.prescription).durationSeconds && <aside className="training-suggestion"><strong>Suggested starting point</strong><p>{historyLoading ? 'Loading your last workout…' : historyError ? 'History is unavailable. Enter your own values.' : suggestion ? suggestion.unknownBar ? 'Check the bar weight and enter your added plates.' : suggestion.note : 'No previous working set. Enter your own values.'}</p>{suggestion && <small>Suggestions are editable. Adjust to how you feel.</small>}</aside>}
           <div className="routine-set-heading" aria-hidden="true"><span>Set</span><span>{/body\s*weight|bodyweight|none/i.test(exercise.equipment) ? 'Load' : unit}</span><span>{prescribedWork(exercise.prescription).durationSeconds ? 'Time' : 'Reps'}</span><span /></div>
           {Array.from({ length: exercise.sets }, (_, index) => {
             const setId = `${exercise.exerciseId}:${index}`, saved = sets.find(set => set.setId === setId), input = draft.values[setId], prescribed = prescribedWork(exercise.prescription);
-            const values = { reps: input?.reps ?? String(saved?.status === 'completed' ? saved.reps : prescribed.reps || ''), weight: input?.weight ?? (saved?.loadKg === undefined ? '' : String(saved.loadUnit === unit && saved.loadValue !== undefined ? saved.loadValue : Math.round(saved.loadKg * (unit === 'lbs' ? 2.2046226218 : 1) * 100) / 100)) };
+            const values = defaultSetValues(saved, input, draft.setTypes?.[setId] ?? saved?.setType ?? 'normal', index);
             const bodyweight = /body\s*weight|bodyweight|none/i.test(exercise.equipment);
             const change = (key: 'reps' | 'weight', value: string) => changeDraft({ ...draftRef.current, values: { ...draftRef.current.values, [setId]: { ...values, [key]: value } } });
             return <form key={setId} className="routine-set" onSubmit={event=>{event.preventDefault();void save(index);}}><label><span className="visually-hidden">Set type for set {index + 1}</span><select aria-label={`Set type for set ${index + 1}`} disabled={paused || saving} value={draft.setTypes?.[setId] ?? saved?.setType ?? 'normal'} onChange={event=>changeDraft({ ...draftRef.current, setTypes: { ...draftRef.current.setTypes, [setId]: event.target.value as SetType } })}><option value="normal" aria-label="Normal set">{index + 1}</option><option value="warmup" aria-label="Warm-up set">W</option><option value="drop" aria-label="Drop set">D</option><option value="failure" aria-label="Failure set">F</option></select></label>
               {!bodyweight && <label><span className="visually-hidden">Weight ({unit})</span><input type="text" inputMode="none" onClick={() => setKeypad({ setId, field: 'weight', values })} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); setKeypad({ setId, field: 'weight', values }); } }} min={0} max={unit === 'kg' ? 1000 : 2204.62} step="any" value={values.weight} disabled={paused || saving} aria-label={`Weight (${unit}), set ${index + 1}`} onChange={event=>{ if (/^\d*(\.\d*)?$/.test(event.target.value) && event.target.value.length <= 8) change('weight',event.target.value); }}/></label>}
               {bodyweight && <p>Bodyweight · no added load</p>}
               {prescribed.durationSeconds ? <p>{prescribed.durationSeconds} sec</p> : <label><span className="visually-hidden">Reps</span><input type="text" inputMode="none" onClick={() => setKeypad({ setId, field: 'reps', values })} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); setKeypad({ setId, field: 'reps', values }); } }} min={1} max={1000} step={1} required value={values.reps} disabled={paused || saving} aria-label={`Reps, set ${index + 1}`} onChange={event=>{ if (/^\d*$/.test(event.target.value) && event.target.value.length <= 4) change('reps',event.target.value); }}/></label>}
-              <button type="submit" className={saved?.status === 'completed' ? 'is-saved' : undefined} aria-label={`${saved?.status === 'completed' ? 'Update' : 'Save'} set ${index + 1}`} disabled={paused || saving}><Icon name="check" size={18}/></button>
+              <button type="submit" className={saved?.status === 'completed' ? 'is-saved' : undefined} aria-label={`${saved?.status === 'completed' ? 'Update' : 'Save'} set ${index + 1}`} disabled={paused || saving || (historyLoading && !saved && !input)}><Icon name="check" size={18}/></button>
             </form>;
           })}
           <button type="button" className="manual-add-set" disabled={paused || saving || exercise.sets >= 10} onClick={() => void changeRoutine(exercises.map(item => item.exerciseId === exercise.exerciseId ? { ...item, sets: item.sets + 1 } : item))}>{exercise.sets >= 10 ? '10-set limit reached' : '+ Add Set'}</button>

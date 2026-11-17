@@ -25,7 +25,7 @@ async function fixtures(page) {
     let json = {};
     if (path.endsWith('/profile/photo')) { profile.photo = req.method() === 'DELETE' ? '' : req.postDataJSON().photo; json = profile; }
     if (path.endsWith('/auth/session/migrate') || path.endsWith('/auth/session/refresh')) json = { access_token: 'visual-test', expires_in: 3600, user: { id: 'visual', name: 'Toji', email: 'toji@example.test', emailVerified: true } };
-    if (path.endsWith('/profile')) json = profile;
+    if (path.endsWith('/profile')) { if (req.method() === 'PATCH') Object.assign(profile, req.postDataJSON()); json = profile; }
     if (path.endsWith('/workouts')) json = [];
     if (path.endsWith('/settings')) json = { values: {} };
     if (path.endsWith('/activity/state')) json = { state: { level: 7, dayStreak: 12, earnedPoints: 1840, currentExp: 600, nextLevelExp: 1000 }, dailyMissions: [
@@ -157,15 +157,15 @@ test('dark dashboard, goals and progress match reference layouts and preserve me
   await page.getByRole('button', { name: /Goals & milestones/ }).click();
   await expect(page.getByRole('heading', { name: 'Goals', exact: true })).toBeVisible();
   await expectHomeBack(page);
-  await expectReferenceLayout(page, ['.home-ref-goals-page', '.section-page-head', '.home-ref-goal', '.home-ref-milestones']);
-  await expect(page.getByRole('progressbar', { name: 'Progress toward target weight' })).toHaveAttribute('aria-valuenow', '62');
+  await expectReferenceLayout(page, ['.pq-goals', '.pq-goals-header', '.pq-goals-hero', '.pq-goals-training']);
+  await expect(page.locator('.pq-goals-metrics')).toContainText('74');
   await capture(page, info, '03-goals');
   await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
   await page.getByRole('button', { name: /Progress Review saved measurements/ }).click();
   await expect(page.getByText('68.5 kg', { exact: true }).first()).toBeVisible();
   await expectHomeBack(page);
-  await expect(page.locator('.section-page-head').getByRole('button', { name: 'Add measurement', exact: true })).toBeVisible();
-  await expectReferenceLayout(page, ['.home-ref-progress-page', '.section-page-head', '.home-ref-metric-tabs', '.home-ref-chart', '.home-ref-history']);
+  await expect(page.locator('.pq-progress-measurement').getByRole('button', { name: 'Add', exact: true })).toBeVisible();
+  await expectReferenceLayout(page, ['.pq-progress', '.pq-progress-header', '.pq-progress-chips', '.pq-progress-measurement', '.pq-progress-history']);
   await capture(page, info, '04-progress');
   await page.locator('.home-content').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await capture(page, info, '05-progress-scrolled');
@@ -175,14 +175,17 @@ test('dark dashboard, goals and progress match reference layouts and preserve me
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole('button', { name: 'Add measurement', exact: true }).click();
-  await page.getByLabel('Log weight (kg)').fill('69');
-  await page.getByRole('button', { name: 'Save measurement', exact: true }).click();
+  await page.locator('.pq-progress-measurement').getByRole('button', { name: 'Add', exact: true }).click();
+  await page.getByLabel('Current weight (kg)').fill('69');
+  await page.getByRole('button', { name: 'Save weight', exact: true }).click();
   await expect.poll(() => state.saved?.value).toBe(69);
-  await expect(page.locator('.home-ref-measurement strong')).toHaveText('69 kg');
-  await page.locator('.home-ref-history summary').click();
+  await page.getByRole('dialog', { name: /Measurement updated|Update details/ }).getByRole('button', { name: 'Done' }).click();
+  await expect(page.locator('.pq-progress-value strong')).toContainText('69');
+  await page.locator('.pq-progress-history summary').click();
   await page.getByRole('button', { name: 'Delete 69 kg measurement', exact: true }).click();
-  await expect(page.locator('.home-ref-measurement strong')).toHaveText('68.5 kg');
+  await page.getByRole('dialog', { name: 'Delete this measurement?' }).getByRole('button', { name: 'Delete measurement', exact: true }).click();
+  await expect(page.locator('.pq-progress-value strong')).toContainText('68.5');
+  await page.getByRole('dialog', { name: 'Measurement updated' }).getByRole('button', { name: 'Done' }).click();
   await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toBeVisible();
 });
@@ -196,8 +199,8 @@ test('dark notifications preserve individual and mark-all read actions', async (
   await expectReferenceLayout(page, ['.home-notifications', '.section-page-head', '.notification-safety-card', '.notification-item']);
   await expect(page.getByRole('region', { name: 'Pinned safety notice' })).toBeVisible();
   await capture(page, info, '06-notifications');
-  await page.getByRole('button', { name: '2 missions left, unread', exact: true }).click();
-  await expect(page.getByRole('button', { name: '2 missions left', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '2 missions left, Finish before midnight to keep your 12-day streak, unread, mark as read', exact: true }).click();
+  await expect(page.getByRole('button', { name: '2 missions left, Finish before midnight to keep your 12-day streak', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Mark all read', exact: true }).click();
   await expect.poll(() => state.marks).toBe(1);
   await expect(page.locator('.unread-dot')).toHaveCount(0);
@@ -278,7 +281,8 @@ test('Scan add, edit, and history views use readable dark type and semantic colo
 
   await page.getByRole('button', { name: 'Back', exact: true }).click();
   await page.getByRole('button', { name: 'Log & water intake' }).click();
-  await page.getByRole('button', { name: 'Edit Breakfast: Oats and eggs' }).click();
+  await page.getByRole('button', { name: /Breakfast.*Oats and eggs/i }).click();
+  await page.getByRole('button', { name: 'Edit Oats And Eggs in Breakfast' }).click();
   await expect(page.getByRole('heading', { name: 'Edit meal' })).toBeVisible();
   await expect(page.locator('.meal-edit-caption')).toHaveCSS('font-size', '14px');
   await expect(page.getByRole('searchbox', { name: 'Food name' })).toHaveCSS('font-size', '16px');

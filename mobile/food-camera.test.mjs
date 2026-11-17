@@ -3,9 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
-import { barcodeInsideFoodFrame } from '../shared/foodCamera.ts';
 
-function cameraHarness(mode='barcode',granted=true) {
+function cameraHarness(mode='photo',granted=true) {
   const effects=[],results=[],listeners=[],refs=[];
   const jsx=(type,props)=>({type,props});
   const dependencies={
@@ -13,7 +12,6 @@ function cameraHarness(mode='barcode',granted=true) {
     'react/jsx-runtime':{jsx,jsxs:jsx},
     'expo-camera':{CameraView:'Camera',useCameraPermissions:()=>[{granted},async()=>({granted})]},
     'react-native':{View:'View',Text:'Text',StyleSheet:{create:s=>s},AppState:{addEventListener:(_,fn)=>{listeners.push(fn);return {remove(){}};}}},
-    '../shared/foodCamera':{barcodeInsideFoodFrame},
   };
   const module={exports:{}};
   const source=ts.transpileModule(fs.readFileSync('mobile/FoodScannerCamera.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
@@ -23,24 +21,28 @@ function cameraHarness(mode='barcode',granted=true) {
   return {effects,results,listeners,refs,tree,camera:tree.props.children[0]?.props};
 }
 
-test('native surface preserves layout and rejects out-of-frame and duplicate barcode callbacks',()=>{
+test('native photo surface preserves embedded layout',()=>{
   const h=cameraHarness();
   assert.equal(h.tree.type,'View'); // Embedded preview, never a replacement Modal/screen.
   assert.equal(h.tree.props.pointerEvents,'none');
   const cleanup=h.effects[0]();
-  const result={type:'ean13',data:'4006381333931',bounds:{origin:{x:0,y:0},size:{width:100,height:100}}};
-  h.camera.onBarcodeScanned(result);assert.equal(h.results.length,0);
-  result.bounds.origin={x:200,y:300};
-  h.camera.onBarcodeScanned(result);h.camera.onBarcodeScanned(result);
-  assert.equal(h.results.length,1);assert.equal(h.results[0].format,'ean_13');
+  assert.equal(h.camera.onBarcodeScanned,undefined);
   cleanup();
 });
 test('native permission denial reports error and background cancels the active camera',async()=>{
   const denied=cameraHarness('photo',false);denied.effects[0]();
   await new Promise(resolve=>setImmediate(resolve));
   assert.equal(denied.results[0].type,'error');
-  const active=cameraHarness();active.effects[0]();active.listeners[0]('background');
+  const active=cameraHarness();active.effects[0]();await new Promise(resolve=>setImmediate(resolve));active.listeners[0]('background');
   assert.equal(active.results[0].type,'cancel');
+});
+test('opening the system permission prompt does not cancel the photo camera',async()=>{
+  const h=cameraHarness();h.effects[0]();
+  h.listeners[0]('background');
+  assert.equal(h.results.some(result=>result.type==='cancel'),false);
+  await new Promise(resolve=>setImmediate(resolve));
+  h.camera.onCameraReady();
+  assert.equal(h.results.at(-1).type,'ready');
 });
 test('native shutter waits for ready and returns one photo only',async()=>{
   const h=cameraHarness('photo');h.effects[0]();

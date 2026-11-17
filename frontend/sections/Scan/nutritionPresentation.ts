@@ -61,5 +61,10 @@ export const previewScan: ScanAnalysis = {
 };
 export function scaleScannedItems(items: ScannedItem[], factor: number) {
   const scale = (value: number | null) => value === null ? null : value * factor;
-  return items.map(item => ({ ...item, est_weight_g: item.est_weight_g * factor, kcal: scale(item.kcal), protein_g: scale(item.protein_g), carbs_g: scale(item.carbs_g), fat_g: scale(item.fat_g) }));
+  return items.map(item => {
+    const weight = item.est_weight_g * factor;
+    const nutrient = (key: 'kcal' | 'protein_g' | 'carbs_g' | 'fat_g') => item.per_100g ? scaleByWeight(item.per_100g[key], weight) : scale(item[key]);
+    return { ...item, est_weight_g: weight, kcal: nutrient('kcal'), protein_g: nutrient('protein_g'), carbs_g: nutrient('carbs_g'), fat_g: nutrient('fat_g') };
+  });
 }
+function scaleByWeight(value: number | null, weight: number) { return value === null ? null : value * weight / 100; }

@@ -345,8 +345,8 @@ dialog.forgot-password-overlay::backdrop, dialog.auth-outcome-overlay::backdrop 
 .training-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .training-tabs button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: inherit; }
 .training-tabs button[aria-pressed="true"] { color: var(--green); border-color: var(--green); }
-.training-chart { height: 130px; width: 100%; color: var(--green); }
-.training-chart svg { width: 100%; height: 100%; }
+.training-chart { max-height: 360px; overflow-y: auto; width: 100%; color: var(--green); }
+.training-chart svg { display: block; width: 100%; }
 @media (max-width: 380px) {
   .scan-dashboard-header { flex-wrap: wrap; gap: 10px; }
   .scan-dashboard-summary { min-width: 0; }
@@ -8800,13 +8800,13 @@ button, input, select, textarea { max-width: 100%; }
 .journey-dark-theme.journey-dark-theme .notification-bell { width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--ink); box-shadow: none; }
 .journey-dark-theme.journey-dark-theme .home-ref-workout { margin: 0 0 16px; padding: 20px 19px 12px; border: 0; border-radius: 23px; background: var(--green-light); box-shadow: none; }
 .journey-dark-theme.journey-dark-theme .home-ref-session-top { margin-bottom: 9px; }
-.journey-dark-theme.journey-dark-theme .home-ref-session-top :is(.workout-label, .workout-duration) { color: #a7f3b8; font-size: 12px; font-weight: 500; }
+.journey-dark-theme.journey-dark-theme .home-ref-session-top :is(.workout-label, .workout-duration) { color: var(--green); font-size: 12px; font-weight: 500; }
 .journey-dark-theme.journey-dark-theme .home-ref-workout .workout-title { color: var(--ink); font-size: 23px; line-height: 1.35; font-weight: 700; letter-spacing: -.6px; margin-bottom: 12px; }
-.journey-dark-theme.journey-dark-theme .home-ref-session-meta { margin-bottom: 16px; gap: 6px; font-size: 12px; line-height: 1.5; color: #d1ded5; }
+.journey-dark-theme.journey-dark-theme .home-ref-session-meta { margin-bottom: 16px; gap: 6px; font-size: 12px; line-height: 1.5; color: var(--ink); }
 .journey-dark-theme.journey-dark-theme .home-ref-session-meta > span:nth-child(2)::before { content: '·'; margin-inline: 1px 3px; }
 .journey-dark-theme.journey-dark-theme .home-ref-session-meta > span:nth-child(3) { flex-basis: 100%; }
 .journey-dark-theme.journey-dark-theme .home-ref-workout .start-button { min-height: 54px; border: 0; border-radius: 15px; background: var(--green); color: var(--surface); font-size: 15px; font-weight: 600; }
-.journey-dark-theme.journey-dark-theme .home-ref-workout .link-text { min-height: 40px; padding: 9px 0 0; color: #a7f3b8; font-size: 13px; font-weight: 500; }
+.journey-dark-theme.journey-dark-theme .home-ref-workout .link-text { min-height: 40px; padding: 9px 0 0; color: var(--green); font-size: 13px; font-weight: 500; }
 .journey-dark-theme.journey-dark-theme .home-ref-stats { min-height: 74px; margin: 0 0 26px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); box-shadow: none; }
 .journey-dark-theme.journey-dark-theme .home-ref-stats .stat-number { display: flex; align-items: center; justify-content: center; gap: 4px; color: var(--ink); font-size: 18px; font-weight: 650; }
 .journey-dark-theme.journey-dark-theme .home-ref-stats .stat-number svg { color: var(--red-dark); }
@@ -9073,7 +9073,7 @@ button, input, select, textarea { max-width: 100%; }
 .coach-dark-theme.coach-dark-theme .readiness-list h3 { color: var(--ink); font-size: 14px; font-weight: 500; }
 .coach-dark-theme.coach-dark-theme .readiness-list small { color: var(--muted); font-size: 12px; }
 .coach-dark-theme.coach-dark-theme .readiness-row { min-height: 47px; border-color: var(--line); color: var(--ink); font-size: 13px; }
-.coach-dark-theme.coach-dark-theme .readiness-row i { width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; background: var(--soft); }
+.coach-dark-theme.coach-dark-theme .readiness-row i { width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; background: var(--soft); color: var(--muted); }
 .coach-dark-theme.coach-dark-theme .readiness-row b { font-size: 12px; font-weight: 400; color: var(--muted); }
 .coach-dark-theme.coach-dark-theme .readiness-row.ready i { background: var(--green); color: var(--surface); }
 .coach-dark-theme.coach-dark-theme .readiness-row.ready b { color: var(--green); }
@@ -9894,6 +9894,8 @@ html { -webkit-tap-highlight-color: transparent; }
 
 /* Phiq support panel */
 .coach-chat-launcher { position: fixed; z-index: 20; right: max(16px, calc((100vw - 480px) / 2 + 20px)); bottom: calc(88px + var(--sab, 0px)); display: grid; place-items: center; width: 54px; height: 54px; padding: 8px; border: 2px solid var(--surface); border-radius: 50%; background: var(--green); box-shadow: 0 3px 12px rgb(0 0 0 / 28%); cursor: pointer; }
+/* Keep the assistant from covering the exercise editor's action buttons. */
+body:has(.admin-reference-form) .coach-chat-launcher { display: none; }
 .coach-chat-launcher img, .coach-chat-avatar img { display: block; width: 100%; height: 100%; object-fit: contain; filter: brightness(0); }
 .coach-chat-avatar { display: grid; place-items: center; box-sizing: border-box; aspect-ratio: 1; overflow: hidden; border-radius: 50%; background: var(--green); }
 .coach-chat-launcher > span { position: absolute; top: 0; right: 0; width: 11px; height: 11px; border: 2px solid var(--surface); border-radius: 50%; background: var(--green-dark); }
@@ -9972,14 +9974,6 @@ html { -webkit-tap-highlight-color: transparent; }
   .coach-chat-launcher, .coach-chat-dialog, .coach-chat-dialog *, .coach-chat-launcher * { scroll-behavior: auto; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
 
-.barcode-review[open] { position:fixed; inset:0; margin:auto; width:min(420px,94vw); max-height:90dvh; overflow:auto; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:16px; padding:20px; display:grid; gap:12px }
-.barcode-review::backdrop { background:rgb(0 0 0 / 70%) }
-.barcode-review header { display:flex; justify-content:space-between; align-items:center }
-.barcode-review form,.barcode-review label { display:grid; gap:8px }
-.barcode-review :is(button,input,select) { min-height:44px; background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:8px }
-.barcode-review img { max-width:120px }
-.barcode-review th,.barcode-review td { padding:5px;text-align:left;font-size:13px }
-.barcode-review button.primary { background:var(--green);color:var(--surface) }
 .personal-exercise-intro { color:var(--muted); line-height:1.5; margin:16px 0 20px; }
 .delete-confirmation[open] { position:fixed; inset:0; margin:auto; width:min(360px,calc(100% - 40px)); padding:20px; border:0; border-radius:24px; background:#171e28; color:#f8fafc; box-shadow:0 24px 80px #0008; }
 .delete-confirmation::backdrop { background:rgb(0 0 0 / 68%); }
@@ -10030,18 +10024,18 @@ html { -webkit-tap-highlight-color: transparent; }
 .home-target-note button { color:var(--green); text-decoration:underline; min-height:36px; }
 .scan-reference .water-tracker { margin:18px 0; padding:16px; border:1px solid var(--line); border-radius:18px; background:var(--surface); color:var(--ink); }
 .water-tracker-head { display:flex; align-items:center; gap:10px; }
-.water-tracker-icon { flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:14px; background:rgba(81,173,221,.15); color:#54b5e9; }
+.water-tracker-icon { flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:14px; background:var(--green-light); color:var(--green); }
 .water-tracker-head > div { flex:1; min-width:0; }
 .water-tracker-head h3 { margin:0; font-size:15px; font-weight:700; }
 .water-tracker-head p { margin:4px 0 0; font-size:12px; color:var(--muted); }
 .water-tracker-head > strong { font-size:20px; white-space:nowrap; }
 .water-tracker-head strong small { font-size:11px; color:var(--muted); font-weight:500; }
 .water-tracker-progress { height:8px; margin:16px 0; border-radius:99px; background:var(--soft); overflow:hidden; }
-.water-tracker-progress span { display:block; height:100%; background:#54b5e9; border-radius:inherit; }
+.water-tracker-progress span { display:block; height:100%; background:var(--green); border-radius:inherit; }
 .water-tracker-actions { display:flex; align-items:center; gap:10px; }
 .water-tracker-actions > span { flex:1; color:var(--muted); font-size:12px; }
 .water-tracker-actions button { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:44px; min-width:44px; padding:0 14px; border:1px solid var(--line); border-radius:12px; color:var(--ink); background:var(--soft); font-weight:700; }
-.water-tracker-actions button:last-child { background:#54b5e9; border-color:#54b5e9; color:#0b1f2d; }
+.water-tracker-actions button:last-child { background:var(--green); border-color:var(--green); color:var(--surface); }
 .water-tracker-actions button:disabled { opacity:.45; }
 .water-tracker-actions button:focus-visible { outline:3px solid var(--green); outline-offset:2px; }
 .water-tracker-error { margin:10px 0 0; color:var(--red); font-size:13px; }
@@ -10094,22 +10088,6 @@ html { -webkit-tap-highlight-color: transparent; }
 .personal-library > p { margin:4px 0 12px; font-size:.875rem; }
 .admin-reference-form select { width:100%; min-height:48px; border:1px solid var(--line); border-radius:10px; padding:10px; background:var(--surface); color:var(--ink); }
 .personal-exercise-row button:focus-visible, .admin-reference-form select:focus-visible { outline:3px solid var(--green); outline-offset:2px; }
-.barcode-review[open] { width:min(540px, calc(100% - 32px)); max-height:min(90dvh, 900px); padding:24px; display:block; border-radius:24px; box-shadow:0 24px 80px rgb(0 0 0 / 30%); }
-.barcode-review header { align-items:flex-start; gap:16px; padding-bottom:20px; margin-bottom:20px; }
-.barcode-review h2 { font-size:1.4rem; line-height:1.2; font-weight:750; margin:4px 0 8px; }
-.barcode-eyebrow { color:var(--green); font-size:0.7rem; font-weight:800; letter-spacing:.12em; }
-.barcode-intro, .barcode-help { color:var(--ink); opacity:.72; line-height:1.5; font-size:.875rem; }
-.barcode-review .barcode-close { flex:none; width:44px; font-size:1.5rem; line-height:1; }
-.barcode-review form { display:block; }
-.barcode-review #barcode-code { min-width:0; background:var(--surface); }
-.barcode-review form button[type=submit], .barcode-review form button:not([type]) { background:var(--green); color:var(--surface); font-weight:700; padding-inline:18px; }
-.barcode-help { margin-top:8px; }
-.barcode-format { margin-top:12px; font-size:.875rem; font-weight:600; }
-.barcode-alternatives { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px; }
-.barcode-review .barcode-option { font-weight:650; padding:12px; }
-.barcode-review :is(button,input,select):focus-visible { outline:3px solid var(--green); outline-offset:2px; }
-.barcode-review :is(button,input,select):disabled { opacity:.55; cursor:not-allowed; }
-@media (max-width:420px) { .barcode-review[open] { padding:20px; } .barcode-alternatives { grid-template-columns:1fr; } }
 
 /* Notifications: readable activity and compact, touch-friendly settings */
 .journey-dark-theme.journey-dark-theme .home-notifications { max-width: 560px; padding-bottom: 24px; }
@@ -10285,6 +10263,35 @@ html { -webkit-tap-highlight-color: transparent; }
 .pq-progress-dates > p { grid-column: 1 / -1; line-height: 1.5; }
 .pq-progress-dates input { min-width: 0; font-size: 16px; }
 .pq-progress .training-progress { gap: 12px; }
+.training-analytics { display: grid; gap: 14px; min-width: 0; }
+.training-analytics-heading, .training-trend-heading, .training-chart-dates { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.training-analytics-heading h4 { margin: 4px 0 0; font-size: 17px; overflow-wrap: anywhere; }
+.training-analytics-heading > span, .training-trend-heading span, .training-chart-dates { color: var(--muted); font-size: 12px; }
+.training-analytics-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.training-analytics-stats > div, .training-trend, .training-history-row { min-width: 0; border: 1px solid var(--line); background: var(--soft); border-radius: 12px; padding: 12px; }
+.training-analytics-stats small, .training-analytics-stats strong, .training-history-row span, .training-history-row small { display: block; overflow-wrap: anywhere; }
+.training-analytics-stats small, .training-history-row span, .training-history-row small { color: var(--muted); font-size: 12px; }
+.training-analytics-stats strong { margin-top: 5px; font-size: 15px; }
+.training-metric { display: flex; flex-wrap: wrap; gap: 6px; }
+.training-metric button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--soft); }
+.training-metric button[aria-pressed='true'] { border-color: var(--green); color: var(--green); }
+.training-volume-filter { display: grid; gap: 6px; color: var(--muted); font-size: 12px; }
+.training-volume-menu { position: relative; color: var(--ink); font-size: 14px; }
+.training-volume-menu summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); cursor: pointer; list-style: none; }
+.training-volume-menu summary::-webkit-details-marker { display: none; }
+.training-volume-menu[open] summary { border-color: var(--green); }
+.training-volume-chevron { color: var(--green); font-size: 20px; line-height: 1; }
+.training-volume-options { position: absolute; z-index: 5; top: calc(100% + 6px); left: 0; right: 0; padding: 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); box-shadow: 0 8px 24px #0006; }
+.training-volume-options button { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 44px; padding: 8px 10px; border: 0; border-radius: 8px; text-align: left; color: var(--ink); background: transparent; font: inherit; }
+.training-volume-options button[aria-pressed='true'] { color: var(--green); background: var(--green-tint, #143b26); }
+.training-trend { display: grid; gap: 10px; }
+.training-trend-heading strong, .training-history h5 { font-size: 14px; }
+.training-baseline { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.training-change { color: var(--green); font-weight: 700; }
+.training-change span { color: var(--muted); font-size: 12px; font-weight: 400; }
+.training-history { display: grid; gap: 8px; }
+.training-history h5 { margin: 0; }
+.training-history-row { display: grid; gap: 4px; font-size: 13px; }
 .pq-progress .progress-picker-label:not(:first-child) { margin-top: 4px; }
 .pq-progress .progress-picker-trigger { gap: 12px; }
 .progress-picker-options button > span:first-child { min-width: 0; overflow-wrap: anywhere; }
@@ -10323,3 +10330,27 @@ html { -webkit-tap-highlight-color: transparent; }
 .records-message { padding:20px; border:1px solid var(--line); border-radius:16px; color:var(--muted); font-size:13px; line-height:1.5; }
 .records-footnote { color:var(--muted); font-size:12px; line-height:1.5; }
 @media (max-width:340px) { .records-controls { grid-template-columns:1fr; } }
+/* Exercise filter names must remain readable on narrow phones. */
+@media (max-width: 400px) {
+  .coach-library .library-discovery-controls { grid-template-columns: minmax(0, 1fr); }
+  .coach-library .library-discovery-controls select { min-height: 48px; }
+}
+
+/* Keep the full brand centered inside the launch artwork on short screens too. */
+:root[data-theme="dark"] .launch .launch-logo {
+  display: grid;
+  place-items: center;
+  width: clamp(96px, 26vw, 124px);
+  height: auto;
+  aspect-ratio: 1;
+  flex-basis: auto;
+  overflow: hidden;
+}
+:root[data-theme="dark"] .launch .launch-logo .brand-logo {
+  position: static;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  object-fit: contain;
+}

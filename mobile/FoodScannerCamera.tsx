@@ -1,16 +1,16 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useEffect, useRef } from 'react';
 import { AppState, StyleSheet, Text, View } from 'react-native';
-import { barcodeInsideFoodFrame, type FoodPreviewFrame } from '../shared/foodCamera';
+import type { FoodPreviewFrame } from '../shared/foodCamera';
 
-export type FoodCameraRequest = { requestId: string; mode: 'photo' | 'barcode'; frame: FoodPreviewFrame; facing: 'back' | 'front'; capture: number };
-export type FoodCameraResult = { type: 'photo' | 'barcode' | 'cancel' | 'ready' | 'error'; base64?: string; code?: string; format?: string; message?: string };
+export type FoodCameraRequest = { requestId: string; mode: 'photo'; frame: FoodPreviewFrame; facing: 'back' | 'front'; capture: number };
+export type FoodCameraResult = { type: 'photo' | 'cancel' | 'ready' | 'error'; base64?: string; message?: string };
 
 /** Native surface only; scanner controls remain in the existing web layout. */
 export default function FoodScannerCamera({ request, finish }: { request: FoodCameraRequest; finish: (result: FoodCameraResult) => void }) {
   const camera = useRef<CameraView>(null);
   const [permission, requestPermission] = useCameraPermissions();
-  const ready = useRef(false), done = useRef(false), capturing = useRef(false);
+  const ready = useRef(false), done = useRef(false), capturing = useRef(false), requestingPermission = useRef(false);
   const finishRef = useRef(finish); finishRef.current = finish;
   const complete = (result: FoodCameraResult) => {
     if (done.current) return;
@@ -19,11 +19,15 @@ export default function FoodScannerCamera({ request, finish }: { request: FoodCa
   };
   useEffect(() => {
     done.current = false;
+    requestingPermission.current = true;
     void requestPermission().then(p => {
       if (!p.granted) complete({ type: 'error', message: 'Allow camera access in your phone settings, then reopen the scanner.' });
-    }).catch(() => complete({ type: 'error', message: 'Could not request camera permission. Reopen the scanner to try again.' }));
+    }).catch(() => complete({ type: 'error', message: 'Could not request camera permission. Reopen the scanner to try again.' })).finally(() => {
+      requestingPermission.current = false;
+      if (AppState.currentState === 'background') complete({ type: 'cancel' });
+    });
     const listener = AppState.addEventListener('change', state => {
-      if (state === 'background') complete({ type: 'cancel' });
+      if (state === 'background' && !requestingPermission.current) complete({ type: 'cancel' });
     });
     return () => { done.current = true; listener.remove(); };
   }, []);
@@ -42,14 +46,9 @@ export default function FoodScannerCamera({ request, finish }: { request: FoodCa
   return <View pointerEvents="none" style={[styles.surface, { left: frame.x, top: frame.y, width: frame.width, height: frame.height }]}>
     {permission?.granted && <CameraView ref={camera} style={StyleSheet.absoluteFill} facing={request.facing}
       onCameraReady={() => { ready.current = true; if (!done.current) finishRef.current({ type: 'ready' }); }}
-      onMountError={() => complete({ type: 'error', message: 'Camera could not start. Close other camera apps and reopen the scanner.' })}
-      barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e'] }}
-      onBarcodeScanned={request.mode === 'barcode' ? result => {
-        const format = ({ ean13: 'ean_13', ean8: 'ean_8', upc_a: 'upc_a', upc_e: 'upc_e' } as Record<string, string>)[result.type];
-        if (format && /^\d{8,13}$/.test(result.data) && barcodeInsideFoodFrame(result.bounds, frame.width, frame.height)) complete({ type: 'barcode', code: result.data, format });
-      } : undefined} />}
+      onMountError={() => complete({ type: 'error', message: 'Camera could not start. Close other camera apps and reopen the scanner.' })} />}
     <View style={styles.scanFrame} />
-    <Text style={styles.guide}>{request.mode === 'barcode' ? 'Keep the barcode inside the frame' : 'Only food inside the frame is scanned'}</Text>
+    <Text style={styles.guide}>Only food inside the frame is scanned</Text>
   </View>;
 }
 const styles = StyleSheet.create({

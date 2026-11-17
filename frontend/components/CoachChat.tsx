@@ -145,7 +145,7 @@ export default function CoachChat() {
   };
 
   return <>
-    <button ref={opener} type="button" className="coach-chat-launcher" aria-label="Open Phiq coach" onClick={() => { dialog.current?.showModal(); input.current?.focus(); }}>
+    <button ref={opener} type="button" className="coach-chat-launcher" aria-label="Open Phiq coach" onClick={() => { dialog.current?.showModal(); }}>
       <img src="/phiq-logo.png" alt="" /><span aria-hidden="true" />
     </button>
     <dialog ref={dialog} className="coach-chat-dialog" aria-labelledby="coach-chat-title" onClose={() => opener.current?.focus()}>
@@ -153,7 +153,7 @@ export default function CoachChat() {
         <span className="coach-chat-avatar"><img src="/phiq-logo.png" alt="" /></span>
         <div><h2 id="coach-chat-title">Phiq</h2><p>Your PhysiqueQuest guide</p></div>
         <button type="button" className="coach-chat-clear" onClick={clearChat}>Clear chat</button>
-        <button type="button" aria-label="Close Phiq" onClick={() => dialog.current?.close()}><Icon name="close" size={20}/></button>
+        <button type="button" aria-label="Close Phiq" autoFocus onClick={() => dialog.current?.close()}><Icon name="close" size={20}/></button>
       </header>
       <div className="coach-chat-messages">
         {!messages.length && <div className="coach-chat-welcome">
@@ -174,7 +174,8 @@ export default function CoachChat() {
         <div ref={bottom}/>
       </div>
       <footer className="coach-chat-dock">
-        <div className={`coach-chat-access ${includePersonalData ? 'is-enabled' : ''}`}>
+          <div className={`coach-chat-access ${includePersonalData ? 'is-enabled' : ''}`}>
+            <p className="coach-chat-consent-note">Messages are processed by OpenAI. With saved data enabled, relevant fitness records may also be sent to OpenAI.</p>
           <div className="coach-chat-access-row">
             <label className="coach-chat-consent"><input type="checkbox" checked={includePersonalData} onChange={event => { clearChat(); setIncludePersonalData(event.target.checked); }} aria-describedby="coach-chat-consent-note" /><span>Use my saved fitness data</span></label>
             <span className="coach-chat-access-state" aria-live="polite">{includePersonalData ? 'On' : 'Off'}</span>
@@ -182,7 +183,7 @@ export default function CoachChat() {
           <p className="coach-chat-consent-note" id="coach-chat-consent-note">{includePersonalData ? 'Only relevant records from your account' : 'Turn on to ask about your saved records'}</p>
           <details className="coach-chat-access-details">
             <summary>What can Phiq access?</summary>
-            <p>With access on, Phiq uses relevant records linked to your signed-in account: profile, goals, training, nutrition, progress, Quests, health profile and emergency contact. Health and contact details are included only when access is on and you ask for them. Messages are processed by PhysiqueQuest’s private AI service, not an external AI provider. Other accounts, passwords, photos and videos are never included. Chat history is not saved or used to train the assistant. Turning access off or changing accounts clears this chat.</p>
+            <p>Messages are sent to OpenAI for processing. With access on, relevant saved fitness records may also be sent to OpenAI to answer your question. Health and emergency contact details are handled separately by PhysiqueQuest when requested. Other accounts, passwords, photos and videos are excluded. PhysiqueQuest does not save chat history. Turning access off or changing accounts clears this chat.</p>
           </details>
         </div>
         <form className="coach-chat-composer" onSubmit={send}><label className="visually-hidden" htmlFor="coach-chat-input">Ask Phiq a question</label><input ref={input} id="coach-chat-input" placeholder="Ask Phiq a question…" maxLength={2000} value={text} onChange={event => setText(event.target.value)} disabled={busy} /><button type="submit" aria-label="Send message" disabled={busy || !text.trim()}><Icon name="arrow-up" size={20}/></button></form>

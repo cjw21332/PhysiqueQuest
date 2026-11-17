@@ -62,7 +62,7 @@ export default function Notifications({ onBack }: { onBack: () => void }) {
   const remaining = sorted.filter(item => item.id !== safety?.id);
   return <div className="home-notifications">
     <header className="section-page-head home-notifications-head">
-      <div className="section-back-title"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="chevron-left" size={24}/></button><h2>Notifications</h2></div>
+      <div className="section-back-title"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="chevron-right" size={24}/></button><h2>Notifications</h2></div>
       {unread > 0 && <button type="button" className="mark-all-btn" onClick={() => void markAllRead()}>Mark all read</button>}
     </header>
     <div className="notification-intro"><div><h3>Your updates</h3><p>Keep track of your activity and safety notices.</p></div><span className="notification-count">{unread ? `${unread} unread` : 'All caught up'}</span></div>

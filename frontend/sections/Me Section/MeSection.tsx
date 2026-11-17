@@ -134,7 +134,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
           {([30, 45, 60] as const).map(value => <button type="button" key={value} aria-pressed={settings.threshold === value} className={settings.threshold === value ? 'selected' : ''} onClick={() => { setSaveError(''); void updateSettings({ threshold: value }).catch(error => setSaveError(error instanceof Error ? error.message : 'Could not save threshold.')); }}>{value} s</button>)}
         </div>
       </section>
-      <div className="me-setting-row"><span><b>Emergency alarm volume</b><small>Maximum volume in the Android app. Device volume applies on iOS, web, and Expo Go; system restrictions may limit sound.</small></span></div>
+      <div className="me-setting-row"><span><b>Emergency alarm volume</b><small>Android uses maximum available volume. On other devices, your volume settings apply; system restrictions may limit sound.</small></span></div>
 
       <h3 className="me-group-title me-privacy-title">Privacy</h3>
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} onChange={() => void toggle('showLeaderboard')}/></div></>}

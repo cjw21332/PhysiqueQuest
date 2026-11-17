@@ -37,7 +37,7 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
     api.getPoseStatus().then(status => {
       if (!active) return;
       setPoseAvailable(status.available);
-      setCameraMessage(status.available ? 'When you choose Analyze video, the video is sent to the configured pose provider and sampled images may be sent to Google Gemini for exercise review.' : 'Pose analysis is not configured. Use the local video as a reference for manual logging.');
+      setCameraMessage(status.available ? 'When you choose Analyze video, the video is sent to the configured pose provider and sampled images may be sent to OpenAI for exercise review.' : 'Pose analysis is not configured. Use the local video as a reference for manual logging.');
     }).catch(error => { if (active) setCameraMessage(error instanceof Error ? error.message : 'Could not check pose-analysis availability.'); });
     return () => { active = false; };
   }, [mode]);

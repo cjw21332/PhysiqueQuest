@@ -6,7 +6,7 @@ import type { PoseCameraViewProps, PoseFrame, PosePerformanceMetrics } from 'exp
 import { jointIndices, type TrackingKind, type TrackingSide } from '../shared/repCounter';
 import { readinessPolicy, validateReadinessObservation, type NativeReadinessContext, type ReadinessReason } from '../shared/cameraReadiness';
 
-export type NativeTrackingOptions = { mode?: 'tracking'; requestId: string; kind: TrackingKind; side: TrackingSide; active: boolean };
+export type NativeTrackingOptions = { mode?: 'tracking'; requestId: string; kind: TrackingKind; side: TrackingSide; active: boolean; fullLandmarks?: boolean };
 export type NativeReadinessOptions = NativeReadinessContext;
 export const nativePoseAvailable = !isRunningInExpoGo() && !!requireOptionalNativeModule('ExpoMediaPipePose');
 // Expo Go keeps the normal camera usable without loading an unavailable native view.
@@ -60,7 +60,9 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
           !validateReadinessObservation({...observation,receivedAt:at})){fail();return;}
         send({type:'observation',observation});
       } else {
-        send({type:'frame',frame:{joints:frame.landmarks.length?jointIndices(options.kind,options.side).map(index=>frame.landmarks[index]):[],aspect:data.width/data.height,timestamp:at}});
+        // Exercise engine patterns need all 33 points; legacy preview modes keep the four joints.
+        const joints = options.fullLandmarks ? frame.landmarks : frame.landmarks.length ? jointIndices(options.kind,options.side).map(index=>frame.landmarks[index]) : [];
+        send({type:'frame',frame:{joints,aspect:data.width/data.height,width:data.width,height:data.height,timestamp:at}});
       }
       lastFrame=data.frameNumber;lastAt=at;
     },

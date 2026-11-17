@@ -16,6 +16,8 @@ export function Icon({ name, size = 18 }: { name: string; size?: number }) {
     user: <><circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0114 0"/></>,
     fire: <><path d="M12 22a7 7 0 007-7c0-4-3-6-4-10-2 2-2 4-2 5-2-2-3-4-3-7-4 4-5 8-5 12a7 7 0 007 7z"/><path d="M12 22a3 3 0 003-3c0-2-2-3-3-5-1 2-3 3-3 5a3 3 0 003 3z"/></>,
     clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+    calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></>,
+    scale: <><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8a4 4 0 0 1 8 0M12 8l2-2M8 16h8"/></>,
     dumbbell: <><path d="M6.5 8v8M4 9.5v5M17.5 8v8M20 9.5v5M6.5 12h11"/></>,
     'library-dumbbells': <><path d="m4 12 8 8m-9-5 4-4m2 10 4-4m-9-2 3 3m0-8 3 3m4-10 8 8m-9-5 4-4m2 10 4-4m-9-2 3 3m0-8 3 3"/></>,
     close: <><path d="m6 6 12 12M18 6 6 18"/></>,

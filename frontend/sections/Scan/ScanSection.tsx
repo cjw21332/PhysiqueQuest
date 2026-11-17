@@ -6,7 +6,6 @@ import ReviewEstimate from './ReviewEstimate';
 import AddFood from './AddFood';
 import DailyLog from './DailyLog';
 import FoodHistory from './FoodHistory';
-import BarcodeMeal from './BarcodeMeal';
 import FoodCamera from './FoodCamera';
 import EditMeal from './EditMeal';
 import DietaryPlan, { planTargets } from './DietaryPlan';
@@ -21,6 +20,7 @@ import { api, ApiRequestError, ApiTimeoutError, type ScanAnalysis, type ScannedI
 import { formatLocalDate } from '../../lib/localDate.mjs';
 import { useScreenRoute } from '../../hooks/useScreenRoute';
 import OutcomeDialog from '../../components/OutcomeDialog';
+import { beginPendingScanSave, clearPendingScanSave, readPendingScanSave, scanSaveScope, withScanSaveLock, type PendingScanSave } from '../../lib/scanSaveRecovery';
 
 type View = 'nutrition' | 'review' | 'add' | 'logs' | 'history' | 'edit' | 'plan';
 type ScanStatus = 'loading' | 'ready' | 'error';
@@ -29,7 +29,6 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const contentRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{contentRef.current?.scrollTo(0,0);},[view]);
   const [photoSourceOpen,setPhotoSourceOpen]=useState(false);
-  const [barcodeOpen,setBarcodeOpen]=useState(false);
   const [cameraOpen,setCameraOpen]=useState(false);
   const [addReturnView,setAddReturnView]=useState<View>('nutrition');
   const [historyReturnView,setHistoryReturnView]=useState<View>('nutrition');
@@ -70,6 +69,12 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   // The File is kept alongside the preview URL: analysis runs on the photo
   // itself, and an object URL cannot be re-read once its File is gone.
   const photo=useRef<File|null>(null);
+  const [pendingSave,setPendingSave]=useState<PendingScanSave|null>(null);
+  const [recoveryError,setRecoveryError]=useState('');
+  const [recovering,setRecovering]=useState(false);
+  const loadRecovery=useCallback(()=>{ try { const scope=scanSaveScope(); setPendingSave(scope ? readPendingScanSave(scope) : null); setRecoveryError(''); } catch { setRecoveryError('A previous meal save cannot be read. Do not save it again until it can be checked.'); } },[]);
+  useEffect(()=>{if(!loading)loadRecovery();},[loading,loadRecovery]);
+  useEffect(()=>{window.addEventListener('storage',loadRecovery);return()=>window.removeEventListener('storage',loadRecovery);},[loadRecovery]);
   const [scanStatus,setScanStatus]=useState<ScanStatus>('loading');
   const [analysis,setAnalysis]=useState<ScanAnalysis|null>(null);
   useEffect(() => {
@@ -124,7 +129,30 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const saveScan=async(meal:MealName,items:ScannedItem[])=>{
     setActionError('');
     if(sampleReview){addPreviewEntries(items.map((item,index)=>({id:`preview-scan-${Date.now()}-${index}`,name:item.food_name,meal,calories:item.kcal!,detail:`${item.food_name} · ${Math.round(item.est_weight_g)} g`,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}),source:'Scanned',protein:item.protein_g!,carbs:item.carbs_g!,fat:item.fat_g!,date:formatLocalDate()})));return;}
-    try{await addMealsFromScan({items,meal});setView('logs');setNotice(`Saved to ${meal}. Your meal diary has been updated.`);}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');throw err;}
+    try{
+      const scope=scanSaveScope(); if(!scope)throw new Error('Sign in again before saving this meal.');
+      await withScanSaveLock(scope,async()=>{
+        const pending=beginPendingScanSave(scope,meal,items,formatLocalDate(),new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}));
+        setPendingSave(pending);
+        await addMealsFromScan({...pending.payload,meal:pending.payload.meal as MealName});
+        clearPendingScanSave(scope,pending.key);setPendingSave(null);
+      });
+      setView('logs');setNotice(`Saved to ${meal}. Your meal diary has been updated.`);
+    }catch(err){setActionError(err instanceof Error?err.message:'Could not confirm the meal save.');throw err;}
+  };
+  const recoverSave=async()=>{
+    const scope=scanSaveScope(); if(!scope || recovering)return;
+    setRecovering(true);setRecoveryError('');
+    try{
+      await withScanSaveLock(scope,async()=>{
+        const pending=readPendingScanSave(scope);if(!pending){setPendingSave(null);return;}
+        const receipt=await api.getScanSaveReceipt(pending.key);
+        if(receipt.status!=='confirmed')await addMealsFromScan({...pending.payload,meal:pending.payload.meal as MealName});
+        clearPendingScanSave(scope,pending.key);setPendingSave(null);
+      });
+      await refresh();setNotice('The previous meal save is confirmed. Your meal diary has been updated.');
+    }catch(err){setRecoveryError(err instanceof Error?err.message:'Could not confirm the previous meal save. Try again.');}
+    finally{setRecovering(false);}
   };
   const saveFood=async(food:{name:string;calories:number|null;protein:number|null;carbs:number|null;fat:number|null;fdcId:number;servingSizeG:number},meal:MealName,amount:number,unit:'grams'|'servings')=>{
     const grams=unit==='grams'?amount:amount*food.servingSizeG;const now=new Date();
@@ -138,12 +166,10 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
   const retryScan=()=>{if(photo.current)void analyse(photo.current);};
   return <section className={`scan-section scan-reference scan-view-${view}`}>
     <input ref={uploadInput} className="visually-hidden" type="file" accept="image/*" aria-label="Upload a meal photo" onChange={e=>{onPhoto(e.target.files?.[0]);e.target.value='';}}/>
-    {barcodeOpen && <BarcodeMeal search={()=>{setBarcodeOpen(false);setPreviewRequested(false);add('Dinner');}} close={()=>setBarcodeOpen(false)} save={async entry=>{await addMeal(entry);setNotice('Product saved to your diary.');setPreviewRequested(false);setBarcodeOpen(false);setView('logs');}}/>}
     {cameraOpen && <FoodCamera onClose={()=>setCameraOpen(false)} onCapture={file=>{setCameraOpen(false);onPhoto(file);}} onGallery={()=>{setCameraOpen(false);uploadInput.current?.click();}} />}
     {photoSourceOpen&&<div className="scan-source-overlay" onClick={()=>setPhotoSourceOpen(false)}>
       <section className="scan-source-dialog" role="dialog" aria-modal="true" aria-labelledby="scan-source-title" onClick={event=>event.stopPropagation()}>
         <h2 id="scan-source-title">Add a meal photo</h2>
-        <button className="scan-source-option" onClick={()=>{setPhotoSourceOpen(false);setBarcodeOpen(true);}}>Scan product barcode</button>
         <p>Take a new photo or choose one from your device.</p>
         <button type="button" className="scan-source-option" autoFocus onClick={()=>{setPhotoSourceOpen(false);setCameraOpen(true);}}>
           <span className="scan-source-icon"><Icon name="camera" size={21}/></span>
@@ -162,6 +188,8 @@ export default function ScanSection({ profile, onLogoutRequest }: { profile: Pro
     <div ref={contentRef} className="scan-content">
     {loading && view === 'nutrition' ? <div className="profile-load-state" role="status" aria-label="Loading nutrition" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div> : <>
     {error && <p className="error" role="alert">{error}</p>}
+    {pendingSave && <section className="scan-warning" aria-label="Meal save recovery"><p><strong>Previous meal save needs checking</strong><br/>Its outcome is unknown. Check it before saving another scan.</p><button className="scan-retry" type="button" disabled={recovering} onClick={()=>void recoverSave()}>{recovering?'Checking…':'Check and recover'}</button></section>}
+    {recoveryError && <p className="error" role="alert">{recoveryError}</p>}
     {preview && (view!=='review'||sampleReview) && <p className="scan-preview-label">Sample preview · not your saved nutrition data <button type="button" onClick={()=>{setPreviewRequested(false);setSampleReview(false);setNotice('');setActionError('');setView('nutrition');}}>Start my log</button></p>}
     {!preview && previewEligible && !loading && !error && meals.length===0 && water===0 && view==='nutrition' && <button type="button" className="scan-preview-toggle" onClick={()=>{setPreviewSnapshot(createNutritionPreview());setPreviewRequested(true);}}>View sample nutrition</button>}
     {error&&<button type="button" className="scan-retry" onClick={()=>void refresh()}>Retry nutrition</button>}

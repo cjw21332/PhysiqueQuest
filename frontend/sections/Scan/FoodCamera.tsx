@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { foodPhotoCrop } from '../../../shared/foodCamera';
 
-export default function FoodCamera({ onClose, onCapture, onGallery, onBarcode }: {
-  onBarcode?: (code:string,format:string) => void;
+export default function FoodCamera({ onClose, onCapture, onGallery }: {
   onClose: () => void; onCapture: (file: File) => void; onGallery: () => void;
 }) {
   const video = useRef<HTMLVideoElement>(null);
@@ -15,8 +14,8 @@ export default function FoodCamera({ onClose, onCapture, onGallery, onBarcode }:
   const [previewUrl, setPreviewUrl] = useState('');
   const [error, setError] = useState('');
   const [ready, setReady] = useState(false);
-  const callbacks = useRef({ onClose, onGallery, onBarcode });
-  callbacks.current = { onClose, onGallery, onBarcode };
+  const callbacks = useRef({ onClose, onGallery });
+  callbacks.current = { onClose, onGallery };
 
   useEffect(() => {
     if (preview) return;
@@ -40,7 +39,7 @@ export default function FoodCamera({ onClose, onCapture, onGallery, onBarcode }:
         if (detail.type === 'error') { setReady(false); setError(detail.message || 'Could not open the camera.'); return; }
         if (detail.type === 'cancel') callbacks.current.onClose();
         else if (detail.type === 'manual') callbacks.current.onGallery();
-        else if (detail.type === 'barcode' && typeof detail.code === 'string' && typeof detail.format === 'string') callbacks.current.onBarcode?.(detail.code, detail.format);
+
         else if (detail.type === 'photo' && typeof detail.base64 === 'string' && detail.base64.length <= 24_000_000) {
           try {
             const photo = new Image();
@@ -60,7 +59,7 @@ export default function FoodCamera({ onClose, onCapture, onGallery, onBarcode }:
         }
       };
       window.addEventListener('physiquequest-food-camera', receive);
-      bridge.postMessage(JSON.stringify({ type: 'food-camera-start', requestId, frame: frame(), facing: facing === 'user' ? 'front' : 'back', mode: callbacks.current.onBarcode ? 'barcode' : 'photo' }));
+      bridge.postMessage(JSON.stringify({ type: 'food-camera-start', requestId, frame: frame(), facing: facing === 'user' ? 'front' : 'back', mode: 'photo' }));
       nativeCapture.current = () => { setReady(false); bridge.postMessage(JSON.stringify({ type: 'food-camera-capture', requestId })); };
       const resize = new ResizeObserver(() => bridge.postMessage(JSON.stringify({ type: 'food-camera-frame', requestId, frame: frame() })));
       resize.observe(viewport.current!);
@@ -105,52 +104,6 @@ export default function FoodCamera({ onClose, onCapture, onGallery, onBarcode }:
     return () => window.removeEventListener('keydown', close);
   }, [onClose]);
 
-  useEffect(() => {
-    if (!onBarcode || !ready) return;
-    if (nativeCapture.current) return;
-    type Reader = { detect(video:HTMLCanvasElement):Promise<{rawValue:string;format:string}[]> };
-    const Detector = (window as Window & {BarcodeDetector?:{new(options:{formats:string[]}):Reader;getSupportedFormats():Promise<string[]>}}).BarcodeDetector;
-    let stopped = false;
-    let timer:ReturnType<typeof setTimeout>;
-    async function fallbackReader():Promise<Reader> {
-      const {default:quagga}=await import('@ericblade/quagga2');
-      const canvas=document.createElement('canvas');
-      return { async detect(frame) {
-        if (!frame.width) return [];
-        canvas.width=Math.min(800,frame.width);
-        canvas.height=Math.round(frame.height*canvas.width/frame.width);
-        canvas.getContext('2d')!.drawImage(frame,0,0,canvas.width,canvas.height);
-        const result=await quagga.decodeSingle({src:canvas.toDataURL('image/jpeg'),numOfWorkers:0,decoder:{readers:['ean_reader','ean_8_reader','upc_reader','upc_e_reader']}});
-        const hit=result?.codeResult;
-        const names:Record<string,string>={ean_13:'ean_13',ean_8:'ean_8',upc_a:'upc_a',upc_e:'upc_e'};
-        return hit?.code && names[hit.format] ? [{rawValue:hit.code,format:names[hit.format]}] : [];
-      }};
-    }
-    async function start() {
-
-      const formats = (await Detector?.getSupportedFormats().catch(()=>[]) ?? []).filter(f=>['ean_13','ean_8','upc_a','upc_e'].includes(f));
-      const reader = Detector && formats.length === 4 ? new Detector({formats}) : await fallbackReader();
-      if (stopped) return;
-      const scan = async () => {
-        if (stopped || !video.current) return;
-        const source=video.current;
-        if (!source.videoWidth || !viewport.current) { timer=setTimeout(()=>void scan().catch(fail),250); return; }
-        const rect=viewport.current.getBoundingClientRect();
-        const crop=foodPhotoCrop(source.videoWidth,source.videoHeight,rect.width,rect.height);
-        const region=document.createElement('canvas');
-        region.width=Math.round(crop.width);region.height=Math.round(crop.height);
-        region.getContext('2d')!.drawImage(source,crop.x,crop.y,crop.width,crop.height,0,0,region.width,region.height);
-        const [hit] = await reader.detect(region);
-        if (stopped) return;
-        if (hit?.rawValue) onBarcode!(hit.rawValue,hit.format);
-        else timer=setTimeout(()=>void scan().catch(fail),250);
-      };
-      await scan();
-    }
-    function fail() { if (!stopped) setError('Automatic detection unavailable. Enter the barcode below.'); }
-    void start().catch(fail);
-    return ()=>{ stopped=true; clearTimeout(timer); };
-  },[onBarcode,ready]);
 
   const capture = () => {
     if (nativeCapture.current) { nativeCapture.current(); return; }
@@ -171,12 +124,13 @@ export default function FoodCamera({ onClose, onCapture, onGallery, onBarcode }:
       <header><button type="button" onClick={onClose} aria-label="Close camera">×</button><h2 id="food-camera-title">Food Scanner</h2><button type="button" disabled={!!preview} onClick={() => setFacing(value => value === 'environment' ? 'user' : 'environment')}>Switch</button></header>
       <div ref={viewport} className="food-camera-viewport">
         {previewUrl ? <img src={previewUrl} alt="Captured meal preview" /> : <video ref={video} playsInline muted aria-label="Live camera preview" />}
-        {!preview && !error && <><div className="food-camera-scan-frame" aria-hidden="true" /><span className="food-camera-guide">{onBarcode ? 'Keep the barcode inside the frame.' : 'Only food inside the frame is scanned.'}</span></>}
+        {!preview && !error && <><div className="food-camera-scan-frame" aria-hidden="true" /><span className="food-camera-guide">Only food inside the frame is scanned.</span></>}
         {!ready && !error && !preview && <p role="status">Opening camera…</p>}
         {error && <p role="alert">{error}</p>}
       </div>
       <div className="food-camera-actions">
-        {onBarcode ? <button type="button" onClick={onGallery}>Enter barcode manually</button> : preview ? <><button type="button" onClick={() => setPreview(null)}>Retake</button><button type="button" className="primary" onClick={() => onCapture(new File([preview], 'meal.jpg', { type: 'image/jpeg' }))}>Confirm and analyse</button></> : <><button type="button" onClick={onGallery}>Choose photo</button><button type="button" className="food-camera-shutter" disabled={!ready} onClick={capture} aria-label="Capture photo" /><button type="button" onClick={() => setFacing(value => value === 'environment' ? 'user' : 'environment')}>Switch camera</button></>}
+        {preview && <p>Confirming sends this food photo to OpenAI for analysis.</p>}
+        {preview ? <><button type="button" onClick={() => setPreview(null)}>Retake</button><button type="button" className="primary" onClick={() => onCapture(new File([preview], 'meal.jpg', { type: 'image/jpeg' }))}>Confirm and analyse</button></> : <><button type="button" onClick={onGallery}>Choose photo</button><button type="button" className="food-camera-shutter" disabled={!ready} onClick={capture} aria-label="Capture photo" /><button type="button" onClick={() => setFacing(value => value === 'environment' ? 'user' : 'environment')}>Switch camera</button></>}
       </div>
     </div>
   </div>;

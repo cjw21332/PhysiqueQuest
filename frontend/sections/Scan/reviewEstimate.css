@@ -1,0 +1,11 @@
+.scan-reference .detected-items > li { padding: 12px 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.scan-reference .review-item-actions { display: flex; gap: 12px; }
+.scan-reference .review-item-actions button, .scan-reference .detected-foods > button, .scan-reference .meal-edit > button { min-height: 40px; color: var(--green); background: transparent; border: 0; text-decoration: underline; }
+.scan-reference .detected-items .review-item-weight { align-items: center; justify-content: flex-start; min-height: 44px; }
+.scan-reference .review-item-weight input { width: 90px; max-width: 100%; padding: 8px; color: inherit; background: transparent; border: 1px solid var(--muted); border-radius: 6px; }
+.scan-reference .detected-items > li > small { display: block; line-height: 1.4; }
+.scan-reference .detected-foods .meal-edit { display: grid; gap: 8px; min-width: 0; }
+.scan-reference .detected-foods .meal-edit input { max-width: 100%; }
+.scan-reference .detected-foods { display: grid; grid-template-columns: 116px minmax(0, 1fr); align-items: start; }
+.scan-reference .detected-foods > .detected-list { min-width: 0; }
+.scan-reference .detected-foods > button, .scan-reference .detected-foods > .meal-edit { grid-column: 1 / -1; }

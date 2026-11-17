@@ -15,8 +15,8 @@ export function useNutrition() {
   const addMeal = useCallback(async (meal: Omit<FoodEntry, 'id' | 'date'>) => {
     await api.addMeal({ ...meal, date: formatLocalDate() });
   }, []);
-  const addMealsFromScan = useCallback(async (payload: { items: ScannedItem[]; meal: MealName }) => {
-    await api.addMealsFromScan({ ...payload, date: formatLocalDate(), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) });
+  const addMealsFromScan = useCallback(async (payload: { items: ScannedItem[]; meal: MealName; idempotency_key?: string; date?: string; time?: string }) => {
+    await api.addMealsFromScan({ ...payload, date: payload.date ?? formatLocalDate(), time: payload.time ?? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) });
   }, []);
   const updateMeal = useCallback(async (id: string, meal: Partial<FoodEntry>) => { await api.updateMeal(id, meal); }, []);
   const deleteMeal = useCallback(async (id: string) => { await api.deleteMeal(id); }, []);

@@ -13,7 +13,7 @@ export default function GoalsPage() {
   return <main className="scene">
     <div className="app-shell">
       <JourneyPageShell>
-        <GoalsMilestones profile={profile} />
+        <GoalsMilestones profile={profile} refreshProfile={retry} />
       </JourneyPageShell>
     </div>
   </main>;

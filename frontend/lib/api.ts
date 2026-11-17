@@ -90,8 +90,8 @@ export type ExerciseDiscoveryQuery = { search?: string; muscle?: string; equipme
 export type ExerciseFilters = { bodyParts: string[]; equipments: string[]; targetMuscles: string[]; secondaryMuscles: string[] };
 export interface ProgressRecord { _id: string; metric: 'weight' | 'chest' | 'waist' | 'arms' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
 export interface WorkoutExerciseSnapshot { exerciseId: string; name: string; equipment: string; prescription?: string; sets: number; restBetweenSets?: number; restAfterExercise?: number; }
-export interface WorkoutSetResult { setId: string; exerciseId: string; setIndex: number; reps: number; durationSeconds?: number; loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs'; status: 'completed' | 'skipped'; source: 'manual' | 'local-video'; setType?: 'normal' | 'warmup' | 'drop' | 'failure'; }
-export interface WorkoutSessionRecord { routineName?: string; _id: string; exerciseIds: string[]; exercises?: WorkoutExerciseSnapshot[]; revision?: number; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: WorkoutSetResult[]; }
+export interface WorkoutSetResult { setId: string; exerciseId: string; setIndex: number; reps: number; durationSeconds?: number; loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs'; barWeightKg?: number; status: 'completed' | 'skipped'; source: 'manual' | 'local-video'; setType?: 'normal' | 'warmup' | 'drop' | 'failure'; }
+export interface WorkoutSessionRecord { routineName?: string; _id: string; exerciseIds: string[]; exercises?: WorkoutExerciseSnapshot[]; dayIndex?: number; scheduledDate?: string; origin?: 'planned' | 'standalone' | 'recorded-set'; revision?: number; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: WorkoutSetResult[]; }
 export type WorkoutSummary = { trainingDates: string[]; personalRecords: { exerciseId: string; name: string; loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs'; volumeKg?: number; volumeDate?: string; date: string }[] };
 export type AlertRecord = {
   _id?: string;
@@ -206,11 +206,6 @@ export interface FoodCandidate {
   data_type: string;
 }
 
-export interface BarcodeProduct {
-  code:string; name:string; brand:string; image:string; quantity:string; servingLabel:string; packageAmount:number|null; basis:string; serving:number|null;
-  ingredients:string; allergens:string; categories:string; countries:string; grade:string;
-  per100:Record<'calories'|'protein'|'carbs'|'fat'|'saturatedFat'|'fiber'|'sugars'|'sodium'|'transFat'|'addedSugar'|'cholesterol',number|null>;
-}
 export interface FoodDetail {
   request_id: string;
   fdc_id: number;
@@ -240,6 +235,13 @@ export interface ScannedItem {
   est_weight_g: number;
   confidence: number;
   per_100g?: ScannedMacros;
+  identification_method?: 'ai' | 'manual' | 'corrected';
+  weight_corrected?: boolean;
+  portion_method?: 'visual_estimate';
+  portion_confidence?: null;
+  region_confidence?: null;
+  weight_min_g?: null;
+  weight_max_g?: null;
 }
 
 export interface ScanAnalysis {
@@ -543,9 +545,10 @@ class ApiClient {
   async getStrengthLeaderboard(exerciseId: string, metric: 'heaviest' | 'relative') { const params = new URLSearchParams({ metric }); if (exerciseId) params.set('exerciseId', exerciseId); return this.request<StrengthLeaderboardRecord>(`/leaderboard/strength?${params}`); }
   async saveProfilePhoto(photo: string | null) { const profile = await this.request<any>('/profile/photo', photo ? { method: 'PUT', body: JSON.stringify({ photo }) } : { method: 'DELETE' }); deviceCache.publish('profile', profile); return profile; }
   async chat(messages: { role: 'user' | 'assistant'; text: string }[], includePersonalData = false, page?: string, signal?: AbortSignal) {
-    return this.request<{ reply: string; sources?: { id: string; label: string }[]; privacy: { personalDataIncluded: boolean; historyStored: false; provider: 'self-hosted' } }>('/chat', { method: 'POST', body: JSON.stringify({ messages, includePersonalData, page }), timeoutMs: 60000, signal });
+    return this.request<{ reply: string; sources?: { id: string; label: string }[]; privacy: { personalDataIncluded: boolean; historyStored: false; provider: 'openai' } }>('/chat', { method: 'POST', body: JSON.stringify({ messages, includePersonalData, page }), timeoutMs: 60000, signal });
   }
   async getCoachPlan(force = false) { return deviceCache.fetch('coach', () => this.request<CoachPlanRecord>('/coach/plan', { timeoutMs: 30_000 }), force); }
+  async getWorkoutAiSummary(id: string) { return this.request<{ summary: string; suggestion: string }>(`/workouts/${encodeURIComponent(id)}/ai-summary`, { method: 'POST', timeoutMs: 25000 }); }
   async updateCoachDay(data: { programVersion: string; dayIndex: number; title: string; exercises: CoachExercise[] }) {
     const plan = await this.request<CoachPlanRecord>('/coach/plan/day', { method: 'PUT', body: JSON.stringify(data) });
     deviceCache.publish('coach', plan);
@@ -716,7 +719,6 @@ class ApiClient {
     return this.request<{ request_id: string; candidates: FoodCandidate[] }>(`/nutrition/foods/search?q=${encodeURIComponent(query)}`);
   }
 
-  async lookupBarcode(code:string,format:string) { return this.request<BarcodeProduct>('/nutrition/foods/barcode/'+encodeURIComponent(code)+'?format='+encodeURIComponent(format)); }
 
   async getFoodDetail(fdcId: number) {
     return this.request<FoodDetail>(`/nutrition/foods/${encodeURIComponent(fdcId)}`);
@@ -733,11 +735,14 @@ class ApiClient {
   async completeWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/complete`, { method: 'POST', body: JSON.stringify(data) }); }
 
   /** Writes one meal row per selected item; unmatched nutrition stays unavailable. */
-  async addMealsFromScan(data: { items: ScannedItem[]; meal: string; date?: string; time?: string }) {
+  async addMealsFromScan(data: { items: ScannedItem[]; meal: string; date?: string; time?: string; idempotency_key?: string }) {
     return this.request<any>('/nutrition/meals/from-scan', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  }
+  async getScanSaveReceipt(key: string) {
+    return this.request<{ status: 'confirmed' | 'unknown'; save_id?: string; meal_ids?: string[] }>(`/nutrition/meals/from-scan/receipts/${encodeURIComponent(key)}`);
   }
 }
 

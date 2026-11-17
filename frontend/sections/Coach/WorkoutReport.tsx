@@ -4,8 +4,13 @@ import './workout-report.css';
 import { Icon } from '../Home/icons';
 import type { CoachExercise, WorkoutSessionRecord } from '../../lib/api';
 import { titleCase } from '../../lib/titleCase';
+import { useState } from 'react';
+import { api } from '../../lib/api';
 
 export default function WorkoutReport({ workout, title = 'Workout session', exercises = [], onBack, onHome }: { workout: WorkoutSessionRecord; title?: string; exercises?: CoachExercise[]; onBack: () => void; onHome: () => void; onShare: () => void }) {
+  const [insight, setInsight] = useState<{ summary: string; suggestion: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
   const duration = workout.durationSeconds ?? 0;
   const elapsed = `${Math.floor(duration / 60)}:${String(duration % 60).padStart(2, '0')}`;
   const startedAt = new Date(workout.startedAt);
@@ -24,6 +29,7 @@ export default function WorkoutReport({ workout, title = 'Workout session', exer
     <div className="manual-report-content">
       <section className="manual-report-hero"><span className="manual-report-badge"><Icon name="check" size={16}/> {finished}</span><p className="manual-report-date">{startedAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · {startedAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p><h1>{title}</h1><p>Your workout is saved. Here’s what you logged.</p></section>
       <section className="manual-report-overview" aria-label="Workout summary"><div><span>Duration</span><strong>{elapsed}</strong><small>minutes</small></div><div><span>Sets logged</span><strong>{completed.length}{expected > 0 && <small> / {expected}</small>}</strong><small>{skipped ? `${skipped} skipped` : 'completed'}</small></div><div><span>Volume</span><strong>{hasVolume ? Math.round(volume).toLocaleString() : '—'}</strong><small>{hasVolume ? 'kg lifted' : 'no load logged'}</small></div></section>
+      <section className="manual-report-exercise" aria-label="AI workout insight"><h3>AI workout insight</h3><p>Requesting an insight sends this workout's exercises and sets to OpenAI.</p>{insight ? <><p>{insight.summary}</p><p>{insight.suggestion}</p></> : <button type="button" disabled={busy} onClick={async () => { setBusy(true); setError(''); try { setInsight(await api.getWorkoutAiSummary(workout._id)); } catch { setError('AI insight is unavailable. Please try again.'); } finally { setBusy(false); } }}>{busy ? 'Preparing insight…' : 'Get workout insight'}</button>}{error && <p role="alert">{error}</p>}</section>
       <section className="manual-report-exercises" aria-label="Confirmed results"><div className="manual-report-section-title"><div><span>YOUR SESSION</span><h3>Exercise breakdown</h3></div><small>{rows.length} {rows.length === 1 ? 'exercise' : 'exercises'}</small></div>
         {rows.map((row, index) => <article className="manual-report-exercise" key={row.id}><div className="manual-report-exercise-head"><span className="manual-report-number">{index + 1}</span><div><h4>{titleCase(row.name)}</h4><p>{row.sets.filter(set => set.status === 'completed').length} {row.sets.filter(set => set.status === 'completed').length === 1 ? 'set' : 'sets'} logged</p></div></div>{row.sets.length > 0 ? <ul>{row.sets.map(set => <li key={set.setId}><span>{set.setType === 'warmup' ? 'Warm-up' : set.setType === 'drop' ? 'Drop' : set.setType === 'failure' ? 'Failure' : 'Set ' + (set.setIndex + 1)}</span><strong>{set.status === 'skipped' ? 'Skipped' : <>{set.durationSeconds ? `${set.durationSeconds} sec` : `${set.reps} reps`} <span>·</span> {set.loadKg === undefined ? 'Bodyweight / no load' : `${set.loadValue ?? Math.round(set.loadKg * 100) / 100} ${set.loadUnit ?? 'kg'}`}</>}</strong></li>)}</ul> : <p className="manual-report-empty">{row.result ? `${row.result.reps} reps recorded${row.result.loadKg === undefined ? '' : ` · ${row.result.loadKg} kg`}` : 'No sets logged'}</p>}</article>)}
       </section>

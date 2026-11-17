@@ -10,6 +10,60 @@ const prescribed = [
 ];
 const plan = { goal: 'Build muscle', weekLabel: 'Week 3 · 4 sessions planned', duration: '45 min', libraryReady: true, sets: '3 × 10', days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((name, index) => ({ index, label: name.slice(0, 3), name, isWorkoutDay: [0, 2, 4, 5].includes(index), title: index === 0 ? 'Upper Body — Push' : 'Recovery day', exercises: index === 0 ? prescribed : [], equipmentLabel: 'Dumbbell + Bodyweight', formTip: index === 0 ? { exerciseName: 'Dumbbell bench press', text: 'Keep your wrists stacked over your elbows.' } : null })) };
 
+test('personal exercises fit the library and offer manual or video options without live tracking', async ({ page }) => {
+  const item = { _id: 'personal-test', name: 'Machine Pec Deck Fly With An Extra Long Exercise Name', targetMuscle: 'Chest', equipment: 'Machine', pose: 'missing' };
+  let started;
+  await page.addInitScript(value => {
+    const key = `physiquequest-personal-exercises:${encodeURIComponent(location.origin + '/api')}:choice-user`;
+    localStorage.setItem(key, JSON.stringify([value]));
+  }, item);
+  const customPlan = { ...plan, days: plan.days.map(day => day.index === 0 ? { ...day, exercises: [{ exerciseId: item._id, name: item.name, group: 'Chest', targetMuscle: 'Chest', equipment: 'Machine', tracking: 'Manual', prescription: '3 × 10' }] } : day) };
+  await page.route('**/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    let json = {};
+    if (path.endsWith('/auth/session/refresh')) json = { access_token: 'test', expires_in: 3600, user: { id: 'choice-user', name: 'Test', email: 'test@example.test', emailVerified: true } };
+    else if (path.endsWith('/profile')) json = { name: 'Test', equipment: [], days: [], goal: 'General fitness' };
+    else if (path.endsWith('/coach/plan')) json = customPlan;
+    else if (path.endsWith('/workouts/active')) json = null;
+    else if (path.endsWith('/exercises')) json = { items: [], total: 0, page: 1, limit: 12, pages: 1 };
+    else if (path.endsWith('/nutrition')) json = { meals: [], water: [] };
+    else if (path.endsWith('/activity/state')) json = { state: {}, dailyMissions: [] };
+    else if (path.endsWith('/notifications')) json = { items: [] };
+    else if (path.endsWith('/workouts') && route.request().method() === 'POST') { started = route.request().postDataJSON(); json = { _id: 'manual-personal', status: 'active', revision: 0, startedAt: started.startedAt, exerciseIds: started.exerciseIds, exercises: started.exercises, sets: [], pausedSeconds: 0 }; }
+    else if (path.endsWith('/workouts')) json = [];
+    await route.fulfill({ json });
+  });
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto('/coach');
+  await page.getByRole('button', { name: 'Monday, workout day' }).click();
+  await page.getByRole('button', { name: 'Start session', exact: true }).click();
+  const choices = page.getByRole('dialog', { name: 'Choose how to train' });
+  await expect(choices.getByRole('button', { name: /Live session/ })).toHaveCount(0);
+  await expect(choices.getByRole('button', { name: /Review a video/ })).toBeVisible();
+  await expect(choices.getByRole('button', { name: /Log manually/ })).toBeVisible();
+  await choices.getByRole('button', { name: 'Close' }).click();
+  await page.getByRole('button', { name: /Exercise library/ }).click();
+  const card = page.locator('.personal-exercise-card');
+  await expect(card.getByRole('heading', { name: item.name })).toBeVisible();
+  await expect(card.getByRole('button', { name: /Log .* manually/ })).toBeVisible();
+  await expect(card.getByRole('button', { name: /Review a video/ })).toBeVisible();
+  await expect(card.getByRole('button', { name: 'Start workout' })).toHaveCount(0);
+  expect(await card.locator('h4').evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(150);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  await card.screenshot({ path: test.info().outputPath('personal-exercise-card.png') });
+  await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('not a match');
+  await expect(page.getByText('No personal exercises match these filters.')).toBeVisible();
+  await page.getByRole('searchbox', { name: 'Search Exercise' }).fill('pec');
+  await card.getByRole('button', { name: /Review a video/ }).click();
+  await expect(page.getByRole('heading', { name: 'Review a video' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Enable camera' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Back to AI Coach' }).click();
+  await expect(page.getByRole('heading', { name: 'My exercises' })).toBeVisible();
+  await card.getByRole('button', { name: /Log .* manually/ }).click();
+  await expect.poll(() => started?.exerciseIds).toEqual([item._id]);
+  await expect(page).toHaveURL(/\/coach\/session$/);
+});
+
 test('a restored session opens Home instead of account setup', async ({ page }) => {
   await page.route('**/api/**', async route => {
     const path = new URL(route.request().url()).pathname;
