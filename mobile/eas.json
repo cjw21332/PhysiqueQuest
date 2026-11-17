@@ -5,7 +5,11 @@
   "build": {
     "preview": {
       "distribution": "internal",
-      "env": { "EXPO_PUBLIC_PQ_LOCAL_DEV": "0" },
+      "env": {
+        "EXPO_PUBLIC_PQ_LOCAL_DEV": "0",
+        "EXPO_PUBLIC_WEB_APP_URL": "https://physiquequest-web.onrender.com",
+        "EXPO_PUBLIC_API_URL": "https://physiquequest-web.onrender.com/api"
+      },
       "android": { "buildType": "apk" }
     },
     "development": {
