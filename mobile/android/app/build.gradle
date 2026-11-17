@@ -161,7 +161,7 @@ android {
 }
 
 gradle.taskGraph.whenReady { graph ->
-    if (graph.allTasks.any { it.name.matches('(?i)(assemble|bundle|package|sign).*release.*') } && !releaseSigningReady) {
+    if (graph.allTasks.any { it.name.matches('(?i)(assemble|bundle|package|sign).*release.*') } && !releaseSigningReady && System.getenv('EAS_BUILD') != 'true') {
         throw new GradleException('Release signing requires PQ_ANDROID_KEYSTORE_PATH, PQ_ANDROID_KEYSTORE_PASSWORD, PQ_ANDROID_KEY_ALIAS and PQ_ANDROID_KEY_PASSWORD.')
     }
 }
