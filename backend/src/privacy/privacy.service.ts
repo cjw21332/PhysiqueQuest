@@ -40,7 +40,8 @@ export class PrivacyService implements OnModuleInit, OnModuleDestroy {
     const now = new Date();
     const pseudonym = (value: string) => createHmac('sha256', process.env.JWT_SECRET!).update(value).digest('hex');
     await this.db.collection('audit_logs').insertOne({
-      actorId: event.actorId, action: event.action.slice(0, 160), requestId: event.requestId,
+      // Operational security audit is never a late user-owned record.
+      actorId: event.actorId ? `actor:${pseudonym(event.actorId)}` : undefined, action: event.action.slice(0, 160), requestId: event.requestId,
       status: event.status, ipHash: event.ip ? pseudonym(event.ip) : undefined, counts: event.counts,
       occurredAt: now, hotUntil: afterDays(now, retention('AUDIT_LOG_HOT_DAYS')), cold: false, purgeAt: auditExpiry(now),
     });
@@ -55,15 +56,28 @@ export class PrivacyService implements OnModuleInit, OnModuleDestroy {
 
   async requestDeletion(userId: string, password: string) {
     const id = new Types.ObjectId(userId);
-    const user = await this.db.collection('users').findOne({ _id: id, isActive: true, deletedAt: null });
+    const user = await this.db.collection('users').findOne({ _id: id });
     if (!user || !await bcrypt.compare(password, user.passwordHash)) throw new UnauthorizedException('Invalid password');
+    if (user.deletedAt && !user.isActive) {
+      const lifecycle = await this.db.collection('account_lifecycle').findOne({ _id: id, status: 'deleting' });
+      if (!lifecycle) throw new UnauthorizedException('Account data is unavailable');
+      return { deleted: true, purgeAfter: user.purgeAfter };
+    }
     const now = new Date(), purgeAfter = afterDays(now, retention('ACCOUNT_DELETION_GRACE_DAYS'));
-    const result = await this.db.collection('users').updateOne({ _id: id, isActive: true, deletedAt: null }, {
-      $set: { deletedAt: now, purgeAfter, purgingAt: null, isActive: false, updatedAt: now }, $inc: { sessionVersion: 1 },
-    });
-    if (result.modifiedCount) {
-      await this.db.collection('auth_sessions').updateMany({ userId: id }, { $set: { revokedAt: now } });
-      await this.db.collection('password_recovery_tokens').deleteMany({ userId: id });
+    const session = await this.connection.startSession();
+    let modified = false;
+    try { await session.withTransaction(async () => {
+      const lifecycle = await this.db.collection('account_lifecycle').updateOne({ _id: id, status: 'active' }, { $set: { status: 'deleting', deletionRequestedAt: now }, $inc: { writeVersion: 1, generation: 1 } }, { session });
+      if (!lifecycle.matchedCount) throw new UnauthorizedException('Account data is unavailable');
+      const result = await this.db.collection('users').updateOne({ _id: id, isActive: true, deletedAt: null }, {
+        $set: { deletedAt: now, purgeAfter, purgingAt: null, isActive: false, updatedAt: now }, $inc: { sessionVersion: 1 },
+      }, { session });
+      if (!result.modifiedCount) throw new UnauthorizedException('Account data is unavailable');
+      await this.db.collection('auth_sessions').updateMany({ userId: id }, { $set: { revokedAt: now } }, { session });
+      await this.db.collection('password_recovery_tokens').deleteMany({ userId: id }, { session });
+      modified = true;
+    }, { writeConcern: { w: 'majority' } }); } finally { await session.endSession(); }
+    if (modified) {
       await this.audit({ actorId: userId, action: 'account_deletion_requested' });
     }
     // The worker discovers deleted users, including after a crash in this request.
@@ -73,10 +87,15 @@ export class PrivacyService implements OnModuleInit, OnModuleDestroy {
   async recover(email: string, password: string) {
     const user = await this.db.collection('users').findOne({ email: email.trim().toLowerCase(), deletedAt: { $type: 'date' }, purgeAfter: { $gt: new Date() }, purgingAt: null });
     if (!user || !await bcrypt.compare(password, user.passwordHash)) throw generic();
-    const result = await this.db.collection('users').updateOne({ _id: user._id, deletedAt: user.deletedAt, purgeAfter: { $gt: new Date() }, purgingAt: null }, {
-      $set: { isActive: true, deletedAt: null, purgeAfter: null, failedLoginAttempts: 0, lockoutUntil: null, updatedAt: new Date() }, $inc: { sessionVersion: 1 },
-    });
-    if (!result.modifiedCount) throw generic();
+    const session = await this.connection.startSession();
+    try { await session.withTransaction(async () => {
+      const lifecycle = await this.db.collection('account_lifecycle').updateOne({ _id: user._id, status: 'deleting' }, { $set: { status: 'active' }, $unset: { deletionRequestedAt: '' }, $inc: { writeVersion: 1, generation: 1 } }, { session });
+      if (!lifecycle.modifiedCount) throw generic();
+      const result = await this.db.collection('users').updateOne({ _id: user._id, deletedAt: user.deletedAt, purgeAfter: { $gt: new Date() }, purgingAt: null }, {
+        $set: { isActive: true, deletedAt: null, purgeAfter: null, failedLoginAttempts: 0, lockoutUntil: null, updatedAt: new Date() }, $inc: { sessionVersion: 1 },
+      }, { session });
+      if (!result.modifiedCount) throw generic();
+    }, { writeConcern: { w: 'majority' } }); } finally { await session.endSession(); }
     await this.audit({ actorId: String(user._id), action: 'account_recovered' });
     return { recovered: true };
   }
@@ -99,21 +118,37 @@ export class PrivacyService implements OnModuleInit, OnModuleDestroy {
   async purgeUser(userId: string, now = new Date()) {
     const id = new Types.ObjectId(userId);
     // This claim blocks recovery before any collection is touched; retries may reclaim it.
-    const user = await this.db.collection('users').findOneAndUpdate({ _id: id, deletedAt: { $type: 'date' }, purgeAfter: { $lte: now }, isActive: false }, { $set: { purgingAt: now } }, { returnDocument: 'after' });
+    const claim = await this.connection.startSession();
+    let user;
+    try { await claim.withTransaction(async () => {
+      const lifecycle = await this.db.collection('account_lifecycle').updateOne({ _id: id, status: 'deleting' }, { $inc: { writeVersion: 1 } }, { session: claim });
+      if (!lifecycle.matchedCount) return;
+      user = await this.db.collection('users').findOneAndUpdate({ _id: id, deletedAt: { $type: 'date' }, purgeAfter: { $lte: now }, isActive: false }, { $set: { purgingAt: now } }, { returnDocument: 'after', session: claim });
+    }, { writeConcern: { w: 'majority' } }); } finally { await claim.endSession(); }
     if (!user) return {};
     await this.storage.deleteUserObjects(userId);
     const counts: Record<string, number> = {};
     for (const { name } of await this.db.listCollections({}, { nameOnly: true }).toArray()) {
-      if (['users', 'audit_logs', 'background_jobs'].includes(name) || name.startsWith('system.')) continue;
+      if (['users', 'account_lifecycle', 'audit_logs', 'background_jobs'].includes(name) || name.startsWith('system.')) continue;
       const result = await this.db.collection(name).deleteMany({ $or: [{ userId: id }, { subjectId: id }, { userId }, { subjectId: userId }] });
       if (result.deletedCount) counts[name] = result.deletedCount;
+    }
+    for (const { name } of await this.db.listCollections({}, { nameOnly: true }).toArray()) {
+      if (['users', 'account_lifecycle', 'audit_logs', 'background_jobs'].includes(name) || name.startsWith('system.')) continue;
+      if (await this.db.collection(name).findOne({ $or: [{ userId: id }, { subjectId: id }, { userId }, { subjectId: userId }] }, { projection: { _id: 1 } })) throw new Error('Account purge verification failed');
     }
     const pseudonym = `deleted:${createHmac('sha256', process.env.JWT_SECRET!).update(userId).digest('hex')}`;
     await this.db.collection('audit_logs').updateMany({ actorId: userId }, { $set: { actorId: pseudonym }, $unset: { ipHash: '' } });
     // Upsert keeps the deletion event idempotent after a crash before the user delete.
     const expiry = auditExpiry(now);
     await this.db.collection('audit_logs').updateOne({ action: 'account_purged', actorId: pseudonym }, { $setOnInsert: { action: 'account_purged', actorId: pseudonym, counts, occurredAt: now, hotUntil: afterDays(now, retention('AUDIT_LOG_HOT_DAYS')), cold: false, purgeAt: expiry } }, { upsert: true });
-    await this.db.collection('users').deleteOne({ _id: id, purgingAt: { $ne: null }, isActive: false });
+    const session = await this.connection.startSession();
+    try { await session.withTransaction(async () => {
+      const lifecycle = await this.db.collection('account_lifecycle').updateOne({ _id: id, status: 'deleting' }, { $set: { status: 'deleted', deletionCompletedAt: new Date() }, $inc: { writeVersion: 1 } }, { session });
+      if (!lifecycle.modifiedCount) throw new Error('Account lifecycle is unavailable');
+      const deleted = await this.db.collection('users').deleteOne({ _id: id, purgingAt: { $ne: null }, isActive: false }, { session });
+      if (!deleted.deletedCount) throw new Error('Account purge could not be finalized');
+    }, { writeConcern: { w: 'majority' } }); } finally { await session.endSession(); }
     await this.db.collection('background_jobs').updateMany({ 'payload.userId': userId }, { $set: { payload: {} } });
     this.logger.log({ event: 'account_purged', counts });
     return counts;

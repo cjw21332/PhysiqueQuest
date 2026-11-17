@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import { describe, expect, it, vi } from 'vitest';
 import { Types, type Model } from 'mongoose';
 import { WorkoutsService } from '../src/workouts/workouts.service.js';
@@ -7,7 +8,7 @@ const owner = '507f1f77bcf86cd799439011';
 function fixture(latest: Record<string, unknown> | null) {
   const sort = vi.fn().mockReturnValue({ exec: async () => latest });
   const findOne = vi.fn().mockReturnValue({ sort });
-  return { service: new WorkoutsService({ findOne } as unknown as Model<WorkoutSession>), findOne, sort };
+  return { service: new WorkoutsService(lifecycleModel({ findOne } as unknown as Model<WorkoutSession>)), findOne, sort };
 }
 describe('current workout recovery', () => {
   it('does not resurrect older abandoned workouts after the latest session ends', async () => {

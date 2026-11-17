@@ -5,6 +5,18 @@ import { UsdaService } from './usda.service.js';
 describe('USDA search request construction', () => {
   afterEach(() => vi.restoreAllMocks());
 
+  it('does not automatically match unspecified chicken to raw chicken', async () => {
+    const raw = { fdcId: 990091, description: 'Chicken breast, raw', dataType: 'Foundation', foodNutrients: [] };
+    const fetchJson = vi.fn().mockResolvedValue({ foods: [raw] });
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson } as never);
+    await expect(service.lookupFood('chicken breast')).resolves.toBeUndefined();
+  });
+  it('does not automatically match generic white rice to glutinous rice', async () => {
+    const rice = { fdcId: 990092, description: 'Rice, white, glutinous, cooked', dataType: 'Foundation', foodNutrients: [] };
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue({ foods: [rice] }) } as never);
+    await expect(service.lookupFood('white rice cooked')).resolves.toBeUndefined();
+  });
+
   it('sends food search terms and USDA data types as a JSON POST body', async () => {
     const fetchJson = vi.fn().mockResolvedValue({ foods: [] });
     const service = new UsdaService(

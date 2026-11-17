@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
 import { WorkoutsService } from '../src/workouts/workouts.service.js';
@@ -9,7 +10,7 @@ const user = '507f1f77bcf86cd799439011', id = '507f1f77bcf86cd799439012';
 function setup() {
   const workout = { _id: id, status: 'active', revision: 2, exercises: [{ exerciseId: 'a', name: 'Squat', sets: 2 }, { exerciseId: 'b', name: 'Row', sets: 2 }], sets: [{ setId: 'a:0', exerciseId: 'a', setIndex: 0, status: 'completed' }] };
   const deleteOne = vi.fn().mockResolvedValue({ deletedCount: 1 });
-  const service = new WorkoutsService({ deleteOne } as never, {} as never);
+  const service = new WorkoutsService(lifecycleModel({ deleteOne } as never), {} as never);
   vi.spyOn(service as any, 'owned').mockResolvedValue(workout);
   const change = vi.spyOn(service as any, 'change').mockImplementation(async (_user, _id, _revision, patch) => ({ ...workout, ...patch }));
   return { service, change, deleteOne };

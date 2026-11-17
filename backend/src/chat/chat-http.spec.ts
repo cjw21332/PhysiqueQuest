@@ -1,3 +1,6 @@
+import { quotaModel } from '../../test/lifecycle-quota.fixture.js';
+import { getModelToken } from '@nestjs/mongoose';
+import { AuthRateLimit } from '../auth/auth-rate-limit.schema.js';
 import 'reflect-metadata';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { Test } from '@nestjs/testing';
@@ -7,18 +10,19 @@ import { ChatController } from './chat.controller.js';
 import { ChatService } from './chat.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ChatRateLimitGuard } from './chat-rate-limit.guard.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 describe('chat HTTP authentication and input contract', () => {
   let app: INestApplication;
   const reply = vi.fn(async () => ({ reply: 'Home guide', sources: [], privacy: { personalDataIncluded: false, historyStored: false, provider: 'self-hosted' } }));
   beforeAll(async () => {
-    const module = await Test.createTestingModule({ controllers: [ChatController], providers: [
+    const module = await Test.createTestingModule({ controllers: [ChatController], providers: [{ provide: getModelToken(AuthRateLimit.name), useValue: quotaModel() },
       { provide: ChatService, useValue: { reply, status: async () => ({ ready: true }) } }, ChatRateLimitGuard,
     ] }).overrideGuard(JwtAuthGuard).useValue({ canActivate(context: any) {
       const req = context.switchToHttp().getRequest();
       if (req.headers.authorization !== 'Bearer synthetic-session') throw new UnauthorizedException();
-      req.user = { userId: 'aaaaaaaaaaaaaaaaaaaaaaaa' }; return true;
-    } }).compile();
+      req.user = { userId: 'aaaaaaaaaaaaaaaaaaaaaaaa', lifecycleGeneration: 0 }; return true;
+    } }).overrideGuard(AiRateLimitGuard).useValue({ canActivate: () => true }).compile();
     app = module.createNestApplication(); app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
     await app.init();
   });

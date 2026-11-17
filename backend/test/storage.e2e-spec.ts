@@ -20,6 +20,7 @@ describe.skipIf(process.env.PQ_SECURITY_DB_TEST !== '1' || !process.env.MONGODB_
     directory = await mkdtemp(join(tmpdir(), 'pq-storage-test-'));
     process.env.STORAGE_DRIVER = 'local'; process.env.STORAGE_LOCAL_DIR = directory; process.env.JWT_SECRET = randomBytes(32).toString('hex');
     connection = await createConnection(process.env.MONGODB_URI!, { dbName: database, serverSelectionTimeoutMS: 10_000 }).asPromise();
+    await connection.collection('account_lifecycle').insertOne({ _id: new Types.ObjectId(owner), status: 'active', generation: 0, writeVersion: 0 });
     storage = new StorageService(connection);
     const module = await Test.createTestingModule({ controllers: [StorageController], providers: [{ provide: StorageService, useValue: storage }] })
       .overrideGuard(JwtAuthGuard).useValue({ canActivate(context: ExecutionContext) { context.switchToHttp().getRequest().user = { userId: owner }; return true; } }).compile();

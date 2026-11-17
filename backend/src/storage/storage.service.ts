@@ -1,7 +1,8 @@
 import { Injectable, Logger, NotFoundException, BadRequestException, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import type { Connection } from 'mongoose';
+import type { Connection, ClientSession } from 'mongoose';
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { randomBytes } from 'node:crypto';
 import { cdnDownloadUrl } from './cdn.js';
 import { sniffImageMime } from '../foodscan/foodscan.schemas.js';
@@ -27,7 +28,12 @@ export class StorageService implements OnModuleInit, OnModuleDestroy {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(contentType) || !Number.isInteger(size) || size < 8 || size > MAX_UPLOAD_BYTES) throw new BadRequestException('Upload must be a JPEG, PNG or WebP image of at most 5 MB');
     const key = randomBytes(32).toString('hex'), _id = new Types.ObjectId();
     const expiresAt = new Date(Date.now() + Number(process.env.ORPHAN_UPLOAD_TTL_HOURS || 24) * 3600_000);
-    await this.records.insertOne({ _id, userId: new Types.ObjectId(userId), key, contentType, size, status: 'pending', createdAt: new Date(), expiresAt });
+    const fence = new AccountLifecycleFence(this.connection), generation = await fence.generation(userId);
+    await fence.withActiveWrite(userId, async session => {
+      await this.records.insertOne({ _id, userId: new Types.ObjectId(userId), generation, key, contentType, size, status: 'pending', createdAt: new Date(), expiresAt }, { session });
+      // An owner-free cleanup receipt survives metadata purge and delayed PUTs.
+      await this.connection.collection('storage_cleanup').insertOne({ _id, key, runAt: expiresAt, createdAt: new Date() }, { session });
+    }, generation);
     return { id: String(_id), uploadUrl: await this.provider.uploadUrl(key, contentType, size), expiresIn: 900, contentType, headers: { 'Content-Type': contentType, ...(this.provider instanceof S3StorageProvider ? { 'If-None-Match': '*' } : {}) }, maxBytes: MAX_UPLOAD_BYTES };
   }
   private async owned(id: string, userId: string) {
@@ -41,7 +47,8 @@ export class StorageService implements OnModuleInit, OnModuleDestroy {
     if (bytes.length !== record.size || sniffImageMime(bytes) !== record.contentType) {
       await this.provider.delete(record.key); throw new BadRequestException('Upload content does not match its declared image type and size');
     }
-    const changed = await this.records.updateOne({ _id: record._id, userId: record.userId, status: { $ne: 'deleting' }, expiresAt: { $gt: new Date() } }, { $set: { status: record.status === 'analyzed' ? 'analyzed' : 'ready', verifiedAt: new Date() } });
+    if (!Number.isSafeInteger(record.generation)) throw new NotFoundException();
+    const changed = await new AccountLifecycleFence(this.connection).withActiveWrite(userId, async session => this.records.updateOne({ _id: record._id, userId: record.userId, status: { $ne: 'deleting' }, expiresAt: { $gt: new Date() } }, { $set: { status: record.status === 'analyzed' ? 'analyzed' : 'ready', verifiedAt: new Date() } }, { session }), record.generation);
     if (!changed.matchedCount) throw new NotFoundException();
     return { id, verified: true };
   }
@@ -53,30 +60,61 @@ export class StorageService implements OnModuleInit, OnModuleDestroy {
     if (bytes.length !== record.size || sniffImageMime(bytes) !== record.contentType) throw new BadRequestException('Invalid upload content');
     return { image: bytes.toString('base64'), mimeType: record.contentType };
   }
-  async markAnalyzed(id: string, userId: string) {
+  async markAnalyzed(id: string, userId: string, expectedGeneration?: number, session?: ClientSession) {
     const record = await this.owned(id, userId); if (!['ready', 'analyzed'].includes(record.status)) throw new BadRequestException('Upload is not verified');
     // Repeated completion notifications must not extend original retention.
-    await this.records.updateOne({ _id: record._id, status: 'ready' }, { $set: { status: 'analyzed', analyzedAt: new Date(), expiresAt: new Date(Date.now() + Number(process.env.MEDIA_ORIGINAL_TTL_HOURS || 24) * 3600_000) } });
+    if (!Number.isSafeInteger(record.generation) || (expectedGeneration !== undefined && record.generation !== expectedGeneration)) throw new NotFoundException();
+    const write = async (session: ClientSession) => {
+      await this.records.updateOne({ _id: record._id, status: 'ready' }, { $set: { status: 'analyzed', analyzedAt: new Date(), expiresAt: new Date(Date.now() + Number(process.env.MEDIA_ORIGINAL_TTL_HOURS || 24) * 3600_000) } }, { session });
+    };
+    if (session) {
+      await new AccountLifecycleFence(this.connection).participate(userId, session, record.generation);
+      await write(session);
+    }
+    else await new AccountLifecycleFence(this.connection).withActiveWrite(userId, write, record.generation);
   }
   async readLocal(key: string) { const record = await this.records.findOne({ key, status: { $in: ['ready', 'analyzed'] }, expiresAt: { $gt: new Date() } }); if (!record) throw new NotFoundException(); return { bytes: await this.provider.read(key), contentType: record.contentType }; }
   async writeLocal(key: string, bytes: Buffer) {
     if (!(this.provider instanceof LocalStorageProvider)) throw new NotFoundException();
     const record = await this.records.findOne({ key, status: 'pending', expiresAt: { $gt: new Date() } });
     if (!record || bytes.length !== record.size || sniffImageMime(bytes) !== record.contentType) throw new BadRequestException('Invalid upload content');
+    const fence = new AccountLifecycleFence(this.connection);
+    if (!Number.isSafeInteger(record.generation) || await fence.generation(String(record.userId)) !== record.generation) throw new NotFoundException();
     await this.provider.write(key, bytes);
+    try { await fence.withActiveWrite(String(record.userId), async () => undefined, record.generation); }
+    catch (error) { await this.provider.delete(key); throw error; }
   }
   async deleteUserObjects(userId: string) {
     let deleted = 0;
-    for await (const record of this.records.find({ userId: new Types.ObjectId(userId) })) { await this.provider.delete(record.key); await this.records.deleteOne({ _id: record._id }); deleted++; }
+    for await (const record of this.records.find({ userId: new Types.ObjectId(userId) })) {
+      // Also backfill an owner-free cleanup receipt for pre-migration objects.
+      await this.connection.collection('storage_cleanup').updateOne({ _id: record._id }, { $setOnInsert: { key: record.key, runAt: new Date(), createdAt: new Date() } }, { upsert: true });
+      await this.provider.delete(record.key); await this.records.deleteOne({ _id: record._id }); deleted++;
+    }
     return deleted;
   }
   async cleanup(now = new Date()) {
     if (this.running) return; this.running = true; let deleted = 0;
     try {
+      // Receipts deliberately remain after successful deletion: a previously
+      // signed upload can arrive late. Repeated object deletion is idempotent.
+      for await (const receipt of this.connection.collection('storage_cleanup').find({ runAt: { $lte: now } }).limit(100)) {
+        const metadata = await this.records.findOne({ _id: receipt._id });
+        if (!metadata || metadata.expiresAt <= now) await this.provider.delete(receipt.key);
+        await this.connection.collection('storage_cleanup').updateOne({ _id: receipt._id }, { $set: { runAt: new Date(now.getTime() + 3600_000), checkedAt: now } });
+      }
       for (let i = 0; i < 100; i++) {
-        const record = await this.records.findOneAndUpdate({ expiresAt: { $lte: now }, $or: [{ status: { $ne: 'deleting' } }, { lockedUntil: { $lte: now } }] }, { $set: { status: 'deleting', lockedUntil: new Date(now.getTime() + 300_000) } }, { returnDocument: 'after' });
+        const [candidate] = await this.records.aggregate([
+          { $match: { generation: { $gte: 0 }, expiresAt: { $lte: now }, $or: [{ status: { $ne: 'deleting' } }, { lockedUntil: { $lte: now } }] } },
+          { $lookup: { from: 'account_lifecycle', localField: 'userId', foreignField: '_id', as: 'lifecycle' } },
+          { $unwind: '$lifecycle' }, { $match: { 'lifecycle.status': 'active', $expr: { $eq: ['$generation', { $ifNull: ['$lifecycle.generation', 0] }] } } }, { $limit: 1 },
+        ]).toArray();
+        if (!candidate) break;
+        const fence = new AccountLifecycleFence(this.connection);
+        const record = await fence.withActiveWrite(String(candidate.userId), async session => this.records.findOneAndUpdate({ _id: candidate._id, expiresAt: { $lte: now }, $or: [{ status: { $ne: 'deleting' } }, { lockedUntil: { $lte: now } }] }, { $set: { status: 'deleting', lockedUntil: new Date(now.getTime() + 300_000) } }, { returnDocument: 'after', session }), candidate.generation);
         if (!record) break;
-        await this.provider.delete(record.key); await this.records.deleteOne({ _id: record._id, status: 'deleting' }); deleted++;
+        await this.provider.delete(record.key);
+        await fence.withActiveWrite(String(record.userId), async session => this.records.deleteOne({ _id: record._id, status: 'deleting' }, { session }), record.generation); deleted++;
       }
       this.logger.log({ event: 'storage_cleanup', deleted }); return { deleted };
     } finally { this.running = false; }

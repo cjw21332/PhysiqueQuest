@@ -17,6 +17,7 @@ import { WorkoutsService } from '../src/workouts/workouts.service.js';
 import { Notifications, NotificationsSchema } from '../src/notifications/schemas/notification.schema.js';
 import { AlertEvent, AlertEventSchema } from '../src/safety/schemas/alert-event.schema.js';
 import { activityDate } from '../src/workouts/workout-contract.js';
+import { User, UserSchema } from '../src/auth/schemas/user.schema.js';
 
 try { loadEnvFile('.env'); } catch { /* CI may supply configuration. */ }
 const enabled = process.env.PQ_SECURITY_DB_TEST === '1' && Boolean(process.env.MONGODB_URI);
@@ -34,7 +35,7 @@ describe.skipIf(!enabled)('Phiq isolation on an isolated MongoDB database', () =
       connection.model(Settings.name, SettingsSchema)];
     const quests = new ActivityService(models[3] as never, new NutritionService(models[1] as never), new WorkoutsService(models[2] as never), {
       get: () => { throw new Error('Assistant must never read shared leaderboards'); },
-    } as never);
+    } as never, connection.model(User.name, UserSchema));
     const notices = connection.model(Notifications.name, NotificationsSchema), safety = connection.model(AlertEvent.name, AlertEventSchema);
     context = new ChatContextService(...models as [never, never, never, never, never, never, never], quests, notices, safety);
     for (const [index, userId] of [owner, other].entries()) {
@@ -71,11 +72,11 @@ describe.skipIf(!enabled)('Phiq isolation on an isolated MongoDB database', () =
     expect(serialized).not.toContain('PRIVATE-EMAIL-SENTINEL');
     expect(serialized).not.toContain('9999');
     expect(serialized).not.toContain('987');
-    const ownerQuest = data.sources.find(source => source.id === 'user-activity')!.data as { state: { totalExperience: number } };
-    expect(ownerQuest.state.totalExperience).toBe(100);
+    const ownerQuest = data.sources.find(source => source.id === 'user-activity')!.data as { state: { level: number; currentExp: number } };
+    expect(ownerQuest.state).toMatchObject({ level: 2, currentExp: 0 });
     const otherData = await context.build(String(other), 'Give my home overview', true);
-    const otherQuest = otherData.sources.find(source => source.id === 'user-activity')!.data as { state: { totalExperience: number } };
-    expect(otherQuest.state.totalExperience).toBe(140);
+    const otherQuest = otherData.sources.find(source => source.id === 'user-activity')!.data as { state: { level: number; currentExp: number } };
+    expect(otherQuest.state).toMatchObject({ level: 2, currentExp: 40 });
     const foreign = JSON.stringify(otherData);
     expect(foreign).toContain('FOREIGN-ONLY-SENTINEL');
     expect(foreign).not.toContain('OWNER-ONLY-SENTINEL');

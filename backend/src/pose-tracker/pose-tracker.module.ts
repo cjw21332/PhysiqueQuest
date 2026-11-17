@@ -83,8 +83,8 @@ export class PoseTrackerService {
     const testable = adminTest && config.validationStatus !== 'disabled' && config.trackingMode !== 'unavailable';
     if (!canTrack(config) && !testable) throw new BadRequestException('This exercise needs a verified tracking configuration. Manual workout logging remains available.');
 
-    // Generated-angle mode runs locally, no provider token needed
-    if (config.trackingMode === 'generated-angle') {
+    // Generated-angle and native-pattern modes run on the device, no provider token needed
+    if (config.trackingMode === 'generated-angle' || config.nativePattern) {
       return { config, token: null, developerOutputs: false };
     }
 

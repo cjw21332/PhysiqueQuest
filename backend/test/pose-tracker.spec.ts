@@ -86,6 +86,27 @@ describe('PoseTracker API configuration',()=>{
     const betaIds = Object.entries(catalogTiersMap).filter(([k, v]) => v.tier === 'auto_count_beta').map(([k]) => k).sort();
     expect(betaIds).toEqual(['1g5bPpA', '3eGE2JC', '6YUfHPL', 'I4hDWkc', 'lBDjFxJ'].sort());
   });
-
-
+  it('maps catalog exercises to native patterns without claiming full support', () => {
+    const partial = resolveTrackingConfig({ exerciseId: '03lzqwk', name: 'cable crunch' });
+    expect(partial.nativePattern).toBe('core_flexion');
+    expect(partial.nativeSupport).toBe('PARTIALLY_SUPPORTED');
+    expect(partial.capabilities).toContain('on-device');
+    expect(partial.validationStatus).not.toBe('verified');
+    expect(canTrack(partial)).toBe(true);
+    const unsupported = resolveTrackingConfig({ exerciseId: '01qpYSe', name: 'upward facing dog stretch' });
+    expect(unsupported.nativePattern ?? null).toBeNull();
+    expect(canTrack(unsupported)).toBe(false);
+  });
+  it('never labels an exercise fully supported and serves native launches without a provider token', async () => {
+    vi.stubEnv('POSETRACKER_ENABLED', 'false');
+    vi.stubEnv('POSETRACKER_API_TOKEN', '');
+    const nativeRow = { exerciseId: '03lzqwk', name: 'cable crunch', equipments: ['cable'], targetMuscles: ['abdominals'], instructions: ['curl'] };
+    const model = { findOne: vi.fn(() => ({ lean: async () => null })), find: vi.fn(() => ({ lean: async () => [] })), updateOne: vi.fn(async () => {}) };
+    const catalog = { trackingCatalog: async () => [nativeRow], trackingRecord: async (id: string) => id === nativeRow.exerciseId ? nativeRow : null };
+    const service = new PoseTrackerService(model as any, catalog as any);
+    const launched = await service.launch('03lzqwk');
+    expect(launched.token).toBeNull();
+    expect(launched.config.nativePattern).toBe('core_flexion');
+    expect(launched.config.nativeSupport).not.toBe('FULLY_SUPPORTED');
+  });
 });

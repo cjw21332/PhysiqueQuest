@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import { BadRequestException } from '@nestjs/common';
 import { Types, type Model } from 'mongoose';
 import { describe, expect, it, vi } from 'vitest';
@@ -43,7 +44,7 @@ describe('workout calendar isolation and remaining sets', () => {
     const rows = Array.from({ length: 25 }, (_, index) => ({ ...planned, _id: String(index), startedAt: new Date(planned.startedAt) }));
     rows.push({ ...rows[0], dayIndex: 2 }, { ...rows[0], startedAt: new Date('2026-10-05T03:00:00Z') });
     const find = vi.fn((_filter: any) => ({ sort: () => ({ lean: () => ({ exec: async () => rows }) }) }));
-    const service = new WorkoutsService({ find } as unknown as Model<WorkoutSession>);
+    const service = new WorkoutsService(lifecycleModel({ find } as unknown as Model<WorkoutSession>));
     expect(await service.forDay(owner, '2026-10-12', 'Asia/Taipei')).toHaveLength(25);
     expect(find.mock.calls[0][0].userId).toEqual(new Types.ObjectId(owner));
     expect(find.mock.calls[0][0].$or[1].startedAt.$gte).toBeInstanceOf(Date);
@@ -52,14 +53,14 @@ describe('workout calendar isolation and remaining sets', () => {
   });
   it('rejects invalid dates and timezones before accessing the database', async () => {
     const find = vi.fn();
-    const service = new WorkoutsService({ find } as unknown as Model<WorkoutSession>);
+    const service = new WorkoutsService(lifecycleModel({ find } as unknown as Model<WorkoutSession>));
     await expect(service.forDay(owner, '2026-02-30')).rejects.toBeInstanceOf(BadRequestException);
     await expect(service.forDay(owner, '2026-10-12', 'Invalid/Zone')).rejects.toBeInstanceOf(BadRequestException);
     expect(find).not.toHaveBeenCalled();
   });
   it('rejects mismatched, impossible or standalone scheduled dates before writing', async () => {
     const create = vi.fn();
-    const service = new WorkoutsService({ create } as unknown as Model<WorkoutSession>);
+    const service = new WorkoutsService(lifecycleModel({ create } as unknown as Model<WorkoutSession>));
     const input = { origin: 'planned' as const, exerciseIds: ['curl'], exercises: [{ exerciseId: 'curl', name: 'Curl', equipment: '', sets: 3 }], startedAt: planned.startedAt, dayIndex: 0 };
     await expect(service.create(owner, { ...input, scheduledDate: '2026-10-14' })).rejects.toBeInstanceOf(BadRequestException);
     await expect(service.create(owner, { ...input, scheduledDate: '2026-02-30' })).rejects.toBeInstanceOf(BadRequestException);
@@ -70,7 +71,7 @@ describe('workout calendar isolation and remaining sets', () => {
     const now = vi.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-10-19T04:00:00Z'));
     try {
     const create = vi.fn(async (value: any) => value);
-    const service = new WorkoutsService({ create } as unknown as Model<WorkoutSession>);
+    const service = new WorkoutsService(lifecycleModel({ create } as unknown as Model<WorkoutSession>));
     const saved = await service.create(owner, { origin: 'planned', exerciseIds: ['curl'], exercises: [{ exerciseId: 'curl', name: 'Curl', equipment: '', sets: 3 }], startedAt: '2026-10-19T03:00:00Z', dayIndex: 0, scheduledDate: '2026-10-12', timezone: 'Asia/Taipei' });
     expect(saved.scheduledDate).toBe('2026-10-12');
     expect(saved.startedAt).toEqual(new Date('2026-10-19T03:00:00Z'));

@@ -76,6 +76,33 @@ describe('GeminiService.detectFoods', () => {
     ]);
   });
 
+  it('reports available token counts before rejecting malformed structured output', async () => {
+    generateContent.mockResolvedValue({ text: 'invalid', usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 4, totalTokenCount: 19 } });
+    const report = vi.fn();
+    await expect(service().detectFoods(PNG, 'image/png', report)).rejects.toMatchObject({ code: ErrorCode.UPSTREAM_UNAVAILABLE });
+    expect(report).toHaveBeenCalledWith({ input: 10, output: 4, total: 19 });
+  });
+
+  it('marks failed attempts as unknown usage before a successful retry', async () => {
+    generateContent.mockRejectedValueOnce(busy()).mockResolvedValue({ text: OK_TEXT, usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 4, totalTokenCount: 14 } });
+    const report = vi.fn();
+    const pending = service().detectFoods(PNG, 'image/png', report);
+    await vi.advanceTimersByTimeAsync(1000);
+    await pending;
+    expect(report).toHaveBeenNthCalledWith(1, null);
+    expect(report).toHaveBeenNthCalledWith(2, { input: 10, output: 4, total: 14 });
+  });
+
+  it.each([
+    'not json',
+    '{"items":[{"food_name":"rice","est_weight_g":-5,"confidence":0.8}]}',
+    '{"items":[{"food_name":"rice","est_weight_g":null,"confidence":0.8}]}',
+    '{"items":[{"food_name":"rice","est_weight_g":100,"confidence":2}]}',
+  ])('rejects malformed model output instead of inventing a result', async (text) => {
+    generateContent.mockResolvedValue({ text });
+    await expect(service().detectFoods(PNG, 'image/png')).rejects.toMatchObject({ code: ErrorCode.UPSTREAM_UNAVAILABLE });
+  });
+
   it('retries a busy provider and returns the eventual answer', async () => {
     generateContent.mockRejectedValueOnce(busy()).mockResolvedValue({ text: OK_TEXT });
     const pending = service().detectFoods(PNG, 'image/png');

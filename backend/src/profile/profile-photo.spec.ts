@@ -1,10 +1,11 @@
+import { lifecycleModel } from '../../test/lifecycle-model.fixture.js';
 import { describe, expect, it, vi } from 'vitest';
 import { ProfileService } from './profile.service.js';
 
 describe('profile photo', () => {
   it('saves and removes only the owner’s photo and rejects invalid bytes', async () => {
     const update = vi.fn().mockResolvedValue({ photo: '' });
-    const service = new ProfileService({ findOneAndUpdate: update } as never);
+    const service = new ProfileService(lifecycleModel({ findOneAndUpdate: update } as never, true));
     const owner = 'aaaaaaaaaaaaaaaaaaaaaaaa';
     const image = 'data:image/jpeg;base64,/9j/4AAQ';
     await service.updatePhoto(owner, image);

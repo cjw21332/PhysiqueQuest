@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
 import { LeaderboardService } from '../src/leaderboard/leaderboard.service.js';
@@ -27,7 +28,7 @@ const build = (overrides: {
   previous?: unknown[];
 } = {}) =>
   new LeaderboardService(
-    snapshots(overrides.previous ?? []),
+    lifecycleModel(snapshots(overrides.previous ?? [])),
     findModel(overrides.users ?? []),
     findModel(overrides.settings ?? []),
     findModel(overrides.nutrition ?? []),
@@ -114,7 +115,7 @@ describe('leaderboard read efficiency', () => {
       return { lean: () => ({ exec: async () => [{ userId: B, values: { showLeaderboard: false } }] }) };
     } })) };
     const users = findModel([{ _id: A, name: 'Ana' }, { _id: B, name: 'Ben' }]);
-    const service = new LeaderboardService(snapshots(), users, settings as any, nutrition as any, { find: () => chain([]), aggregate: vi.fn(async () => [{ userId: A, day: '2099-01-01' }, { userId: B, day: '2099-01-01' }]) } as any);
+    const service = new LeaderboardService(lifecycleModel(snapshots()), users, settings as any, nutrition as any, { find: () => chain([]), aggregate: vi.fn(async () => [{ userId: A, day: '2099-01-01' }, { userId: B, day: '2099-01-01' }]) } as any);
     const result = await service.get(A, 'all');
     expect(result.self).toMatchObject({ userId: A, rank: 1, points: 200 });
     expect(result.entries.map(entry => entry.userId)).toEqual([A]);
@@ -132,7 +133,9 @@ describe('leaderboard read efficiency', () => {
     const hidden = vi.spyOn(service as any, 'hiddenUsers').mockResolvedValue(new Set());
     const previous = vi.spyOn(service as any, 'previousRanks').mockResolvedValue(new Map());
     const request = service.get(A, 'all');
-    expect(hidden).toHaveBeenCalledOnce();
+    // Lifecycle generations are captured before scoring; these independent reads
+    // must still start without waiting for the pending scoring result.
+    await vi.waitFor(() => expect(hidden).toHaveBeenCalledOnce());
     expect(previous).toHaveBeenCalledOnce();
     finish(new Map());
     expect((await request).self).toMatchObject({ userId: A, points: 0, rank: 1 });

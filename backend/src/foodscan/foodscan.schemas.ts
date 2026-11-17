@@ -118,23 +118,28 @@ export type AnalyzeRequest = z.infer<typeof analyzeRequestSchema>;
 // --------------------------------------------------------------------------
 
 export const macrosSchema = z.object({
-  kcal: z.number().nullable(),
-  protein_g: z.number().nullable(),
-  carbs_g: z.number().nullable(),
-  fat_g: z.number().nullable(),
+  kcal: z.number().finite().nonnegative().nullable(),
+  protein_g: z.number().finite().nonnegative().nullable(),
+  carbs_g: z.number().finite().nonnegative().nullable(),
+  fat_g: z.number().finite().nonnegative().nullable(),
 });
 
 export const analyzedItemSchema = z.object({
-  food_name: z.string(),
-  est_weight_g: z.number(),
-  confidence: z.number(),
+  food_name: z.string().trim().min(1).max(120),
+  est_weight_g: z.number().finite().positive().max(5000),
+  confidence: z.number().finite().min(0).max(1),
+  portion_method: z.literal('visual_estimate').optional(),
+  portion_confidence: z.null().optional(),
+  region_confidence: z.null().optional(),
+  weight_min_g: z.null().optional(),
+  weight_max_g: z.null().optional(),
   found: z.boolean(),
-  fdc_id: z.number().optional(),
+  fdc_id: z.number().int().positive().optional(),
   description: z.string().optional(),
-  kcal: z.number().nullable(),
-  protein_g: z.number().nullable(),
-  carbs_g: z.number().nullable(),
-  fat_g: z.number().nullable(),
+  kcal: z.number().finite().nonnegative().nullable(),
+  protein_g: z.number().finite().nonnegative().nullable(),
+  carbs_g: z.number().finite().nonnegative().nullable(),
+  fat_g: z.number().finite().nonnegative().nullable(),
   per_100g: macrosSchema.optional(),
 });
 
@@ -143,8 +148,14 @@ export const analyzeResponseSchema = z.object({
   model: z.string(),
   items: z.array(analyzedItemSchema),
   unmatched: z.array(z.string()),
-  totals: z.object({ kcal: z.number().nullable(), protein_g: z.number().nullable(), carbs_g: z.number().nullable(), fat_g: z.number().nullable() }),
+  totals: macrosSchema,
   degraded: z.boolean(),
+}).superRefine((response, ctx) => {
+  for (const key of ['kcal', 'protein_g', 'carbs_g', 'fat_g'] as const) {
+    const incomplete = response.items.some(item => item[key] === null);
+    const expected = incomplete ? null : Math.round(response.items.reduce((sum, item) => sum + item[key]!, 0) * 10) / 10;
+    if (response.totals[key] !== expected) ctx.addIssue({ code: 'custom', path: ['totals', key], message: 'Total does not match item values' });
+  }
 });
 
 export const foodCandidateSchema = z.object({

@@ -5,6 +5,7 @@ import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ChatRateLimitGuard } from './chat-rate-limit.guard.js';
 import { ChatService } from './chat.service.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 class ChatMessage {
   @IsIn(['user', 'assistant']) role: 'user' | 'assistant';
@@ -20,5 +21,5 @@ export class ChatRequest {
 export class ChatController {
   constructor(private readonly chat: ChatService) {}
   @Get('status') status() { return this.chat.status(); }
-  @Post() send(@Req() req: Request & { user: { userId: string } }, @Body() body: ChatRequest) { return this.chat.reply(req.user.userId, body.messages, body.includePersonalData ?? false, body.page); }
+  @Post() @UseGuards(AiRateLimitGuard) send(@Req() req: Request & { user: { userId: string } }, @Body() body: ChatRequest) { return this.chat.reply(req.user.userId, body.messages, body.includePersonalData ?? false, body.page); }
 }

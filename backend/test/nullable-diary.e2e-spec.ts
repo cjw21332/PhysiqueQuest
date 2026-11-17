@@ -9,12 +9,13 @@ it.skipIf(!process.env.PQ_TEST_MONGO_URI)('migrates legacy meals and round trips
   try {
     const db = connection.db!;
     const owner = new Types.ObjectId();
+    await connection.collection('account_lifecycle').insertMany([owner].map(id => ({ _id: new Types.ObjectId(String(id)), status: 'active', generation: 0, writeVersion: 0 })));
     const model = connection.model('Nutrition', NutritionSchema);
     await db.collection('nutrition').insertOne({ userId: owner, meals: [{ id: 'older', calories: 0 }] });
     expect((await up(db)).modifiedCount).toBe(1);
     expect((await up(db)).modifiedCount).toBe(0);
-    const service = new NutritionService(model);
-    await service.addMealsFromScan(owner.toString(), { meal: 'Dinner', items: [{ food_name: 'rice', found: true, kcal: 150, protein_g: 0, carbs_g: null, fat_g: null, est_weight_g: 100 }] });
+    const service = new NutritionService(model, { getNutrients: async () => ({ fdcId: 123, description: 'rice', dataType: 'test', kcal_per_100g: 150, protein_g_per_100g: 0, carbs_g_per_100g: null, fat_g_per_100g: null }) } as never);
+    await service.addMealsFromScan(owner.toString(), { meal: 'Dinner', items: [{ food_name: 'rice', found: true, fdc_id: 123, kcal: 150, protein_g: 0, carbs_g: null, fat_g: null, est_weight_g: 100 }] });
     await service.addMeal(owner.toString(), { name:'Label product', meal:'Lunch', source:'Barcode', brand:'Label brand', barcode:'4006381333931', servingQuantity:150, servingUnit:'g', calories:225, fiber:3, sodium:0, addedSugar:null, protein:0 });
     await service.addMeal(owner.toString(), {name:'Manual label',meal:'Lunch',source:'Manual',servingQuantity:150,servingUnit:'ml',calories:375,protein:0,fiber:6,sodium:null});
     const { meals } = await service.read(owner.toString());

@@ -14,6 +14,7 @@ PushDeviceSchema.index({ token: 1 }, { unique: true });
 
 @Schema({ timestamps: true, collection: 'push_deliveries' })
 export class PushDelivery {
+  @Prop() generation?: number;
   @Prop({ type: MongoSchema.Types.ObjectId, required: true }) userId: Types.ObjectId;
   @Prop({ type: MongoSchema.Types.ObjectId, required: true }) deviceId: Types.ObjectId;
   @Prop({ type: MongoSchema.Types.ObjectId, required: true }) deviceVersion: Types.ObjectId;

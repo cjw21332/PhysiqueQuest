@@ -225,7 +225,7 @@ describe('POST /nutrition/scan', () => {
     const res = await post({ image: TINY_PNG_BASE64, mimeType: 'image/jpeg' });
 
     expect(res.status).toBe(200);
-    expect(detectFoods).toHaveBeenCalledWith(expect.any(String), 'image/png');
+    expect(detectFoods).toHaveBeenCalledWith(expect.any(String), 'image/png', expect.any(Function));
   });
 
   it('accepts a data: URL prefix and normalises it', async () => {
@@ -233,7 +233,7 @@ describe('POST /nutrition/scan', () => {
     const res = await post({ image: `data:image/png;base64,${TINY_PNG_BASE64}` });
 
     expect(res.status).toBe(200);
-    expect(detectFoods).toHaveBeenCalledWith(TINY_PNG_BASE64, 'image/png');
+    expect(detectFoods).toHaveBeenCalledWith(TINY_PNG_BASE64, 'image/png', expect.any(Function));
   });
 
   it('validates the body before spending a provider call', async () => {

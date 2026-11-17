@@ -134,7 +134,7 @@ export class UsdaService {
     // crowd the generic matches out of the provider's first page.
     const data = await this.search(query, 25, ['Foundation', 'SR Legacy', 'Survey (FNDDS)']);
     const eligible = (foods: UsdaFood[]) => foods.filter(food => food.fdcId && food.description &&
-      tokens.every(token => foodSearchTokens(food.description).includes(token)));
+      tokens.every(token => foodSearchTokens(food.description).includes(token)) && compatiblePreparation(tokens, foodSearchTokens(food.description)));
     let foods = eligible(data.foods || []);
     if (!foods.some(food => nutrientCount(food) === 4)) {
       const products = await this.search(query, 25, ['Branded']);
@@ -159,7 +159,7 @@ export class UsdaService {
       retryServerErrors: true,
     });
 
-    if (!data?.fdcId) throw notFound('No food record exists for that identifier');
+    if (!data?.fdcId || data.fdcId !== fdcId || typeof data.description !== 'string' || !data.description.trim()) throw notFound('No food record exists for that identifier');
 
     const { kcal, protein, carbs, fat } = parseNutrients(data);
     const result: NutrientResult = {
@@ -240,6 +240,12 @@ export class UsdaService {
 }
 
 const FOOD_SEARCH_STOP_WORDS = new Set(['and', 'or', 'with', 'of', 'the', 'fresh', 'food', 'foods']);
+
+/** A raw or processed record is unsafe to select automatically for an unspecified meal. */
+function compatiblePreparation(query: string[], description: string[]): boolean {
+  const excludedUnlessRequested = ['raw', 'uncooked', 'sausage', 'bacon', 'ham', 'processed', 'glutinous', 'sticky'];
+  return !excludedUnlessRequested.some(term => { const token = foodSearchTokens(term)[0]; return description.includes(token) && !query.includes(token); });
+}
 
 function foodSearchTokens(value: string): string[] {
   return normalizeFoodDescription(value)

@@ -12,7 +12,7 @@ const enabled = process.env.PQ_SECURITY_DB_TEST === '1' && Boolean(process.env.M
 describe.skipIf(!enabled)('privacy retention on isolated MongoDB', () => {
   const database = `pq_security_test_${randomBytes(8).toString('hex')}`;
   let connection: Connection, service: PrivacyService;
-  const collections = ['profiles', 'nutrition', 'workout_sessions', 'progress_entries', 'settings', 'activity', 'notifications', 'safety_alert_events', 'password_recovery_tokens', 'sign_in_events', 'coach_programs', 'auth_sessions', 'future_user_data', 'email_verifications', 'push_devices', 'push_deliveries', 'analysis_jobs', 'analysis_results', 'storage_uploads'];
+  const collections = ['profiles', 'nutrition', 'food_scan_usage', 'workout_sessions', 'progress_entries', 'settings', 'activity', 'notifications', 'safety_alert_events', 'password_recovery_tokens', 'sign_in_events', 'coach_programs', 'auth_sessions', 'future_user_data', 'email_verifications', 'push_devices', 'push_deliveries', 'analysis_jobs', 'analysis_results', 'storage_uploads'];
   beforeAll(async () => {
     vi.stubEnv('HEALTH_DATA_ENCRYPTION_KEY', randomBytes(32).toString('base64'));
     connection = await createConnection(process.env.MONGODB_URI!, { dbName: database, serverSelectionTimeoutMS: 10_000 }).asPromise();
@@ -30,6 +30,7 @@ describe.skipIf(!enabled)('privacy retention on isolated MongoDB', () => {
   it('revokes immediately, recovers only during grace, exports health and purges every owned collection without touching another user', async () => {
     const db = connection.db!, id = new Types.ObjectId(), other = new Types.ObjectId();
     await db.collection('users').insertMany([{ _id: id, email: 'synthetic@example.invalid', passwordHash: await bcrypt.hash('synthetic-password', 4), isActive: true, sessionVersion: 0 }, { _id: other, isActive: true }]);
+    await db.collection('account_lifecycle').insertMany([id, other].map(_id => ({ _id, status: 'active', generation: 0, writeVersion: 0 })));
     for (const name of collections) {
       const record = { userId: id, healthNotes: 'synthetic health', contactPhone: 'synthetic contact', ...(name === 'push_devices' ? { token: 'synthetic-private-push-token' } : {}) };
       await db.collection(name).insertMany([name === 'profiles' ? transformProfile(record, true) : record, { userId: other }]);

@@ -7,7 +7,7 @@ export function validateEnvironment(env: Record<string, unknown>) {
   const fail = (name: string): never => { throw new Error(`Invalid or missing ${name}`); };
   for (const name of Object.keys(retentionDefaults) as Array<keyof typeof retentionDefaults>) retention(name, env as NodeJS.ProcessEnv);
   if (read('SWAGGER_ENABLED') && !['true', 'false'].includes(read('SWAGGER_ENABLED'))) fail('SWAGGER_ENABLED');
-  for (const name of ['EMAIL_VERIFICATION_ENFORCED', 'S3_FORCE_PATH_STYLE']) if (read(name) && !['true', 'false'].includes(read(name))) fail(name);
+  for (const name of ['EMAIL_VERIFICATION_ENFORCED', 'S3_FORCE_PATH_STYLE', 'POSE_ANALYSIS_PRIVATE_DOCKER']) if (read(name) && !['true', 'false'].includes(read(name))) fail(name);
   if (read('PUSH_PROVIDER') && !['dry-run', 'expo'].includes(read('PUSH_PROVIDER'))) fail('PUSH_PROVIDER');
   if (read('STORAGE_DRIVER') && !['local', 's3'].includes(read('STORAGE_DRIVER'))) fail('STORAGE_DRIVER');
   if (read('MAIL_PROVIDER') && !['console', 'mailpit', 'resend', 'brevo'].includes(read('MAIL_PROVIDER'))) fail('MAIL_PROVIDER');
@@ -67,7 +67,11 @@ export function validateEnvironment(env: Record<string, unknown>) {
     for (const prefix of ['ALERT_DELIVERY', 'POSE_ANALYSIS', 'EMAIL_DELIVERY']) {
       if (Boolean(read(`${prefix}_URL`)) !== Boolean(read(`${prefix}_API_KEY`))) fail(prefix);
       if (read(`${prefix}_URL`)) {
-        try { if (new URL(read(`${prefix}_URL`)).protocol !== 'https:') fail(`${prefix}_URL`); } catch { fail(`${prefix}_URL`); }
+        try {
+          const endpoint = new URL(read(`${prefix}_URL`));
+          const privateDockerPose = prefix === 'POSE_ANALYSIS' && read('POSE_ANALYSIS_PRIVATE_DOCKER') === 'true' && endpoint.href === 'http://pose:8000/analyze';
+          if (endpoint.protocol !== 'https:' && !privateDockerPose) fail(`${prefix}_URL`);
+        } catch { fail(`${prefix}_URL`); }
       }
     }
   }

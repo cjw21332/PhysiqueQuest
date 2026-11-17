@@ -25,6 +25,7 @@ describe.skipIf(!enabled)('real MongoDB refresh rotation', () => {
     await Promise.all([sessions.init(), users.init()]);
     const user = await users.create({ name: 'Synthetic session', email: 'session@example.invalid', passwordHash: 'not-a-real-password' });
     const service = new SessionService(sessions, users, new JwtService({ secret: randomBytes(32).toString('hex') }));
+    await connection.collection('account_lifecycle').insertOne({ _id: user._id, status: 'active', generation: 0, writeVersion: 0 });
     const first = await service.issue(user);
     const results = await Promise.allSettled([service.refresh(first.refresh_token), service.refresh(first.refresh_token)]);
     expect(results.filter(result => result.status === 'fulfilled')).toHaveLength(1);

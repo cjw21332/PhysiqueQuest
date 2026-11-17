@@ -1,3 +1,4 @@
+import { lifecycleModel } from '../../test/lifecycle-model.fixture.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ActivityService } from './activity.service.js';
 
@@ -17,7 +18,7 @@ function fixture() {
   };
   const leaderboard = { get: vi.fn().mockResolvedValue({ self: { rank: 1, points: 500 } }) };
   const users = { findById: vi.fn().mockReturnValue({ select: () => ({ lean: () => ({ exec: async () => ({ createdAt: new Date('2026-10-01T00:00:00Z') }) }) }) }) };
-  const service = new ActivityService({ findOne, findOneAndUpdate } as never, nutrition as never, workouts as never, leaderboard as never, users as never);
+  const service = new ActivityService(lifecycleModel({ findOne, findOneAndUpdate } as never), nutrition as never, workouts as never, leaderboard as never, users as never);
   return { service, findOne, findOneAndUpdate, nutrition, workouts, leaderboard };
 }
 

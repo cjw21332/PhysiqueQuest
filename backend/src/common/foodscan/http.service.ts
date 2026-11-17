@@ -41,8 +41,7 @@ export class HttpService {
       // The cause can embed the request URL, which for USDA contains the API key.
       throw upstreamUnavailable(
         opts.upstream,
-        `${opts.upstream} request to ${target} failed: ${describe(cause)}`,
-        cause
+        `${opts.upstream} request to ${target} failed: ${describe(cause)}`
       );
     }
 

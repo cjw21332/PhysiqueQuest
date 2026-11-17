@@ -17,6 +17,7 @@ import { LocalChatProvider } from './local-chat.provider.js';
 import { Notifications, NotificationsSchema } from '../notifications/schemas/notification.schema.js';
 import { AlertEvent, AlertEventSchema } from '../safety/schemas/alert-event.schema.js';
 import { AuthRateLimit, AuthRateLimitSchema } from '../auth/auth-rate-limit.schema.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 @Module({ imports: [MongooseModule.forFeature([
   { name: Profile.name, schema: ProfileSchema }, { name: Nutrition.name, schema: NutritionSchema },
@@ -25,5 +26,5 @@ import { AuthRateLimit, AuthRateLimitSchema } from '../auth/auth-rate-limit.sche
   { name: Settings.name, schema: SettingsSchema },
   { name: Notifications.name, schema: NotificationsSchema }, { name: AlertEvent.name, schema: AlertEventSchema },
   { name: AuthRateLimit.name, schema: AuthRateLimitSchema },
-]), ActivityModule, WorkoutsModule], controllers: [ChatController], providers: [ChatService, ChatContextService, LocalChatProvider, ChatRateLimitGuard] })
+]), ActivityModule, WorkoutsModule], controllers: [ChatController], providers: [ChatService, ChatContextService, LocalChatProvider, ChatRateLimitGuard, AiRateLimitGuard] })
 export class ChatModule {}

@@ -8,6 +8,7 @@ import { Activity } from './schemas/activity.schema.js';
 import { activityDate, earnsWorkoutCredit } from '../workouts/workout-contract.js';
 import { LeaderboardService } from '../leaderboard/leaderboard.service.js';
 import { User } from '../auth/schemas/user.schema.js';
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 
 const missionRules = [
   { key: 'workout', title: 'Complete one workout', target: 1, points: 100 },
@@ -38,11 +39,11 @@ export class ActivityService {
   ) {}
 
   private async userState(userId: string) {
-    return this.model.findOneAndUpdate(
+    return new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       { $setOnInsert: { userId: new Types.ObjectId(userId), state: { timezone: 'UTC' } } },
-      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
-    );
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true, session },
+    ));
   }
 
   async get(userId: string, requestedTimezone?: string) {
@@ -106,7 +107,7 @@ export class ActivityService {
     }
     const current = await this.userState(userId);
     current.state = { timezone: timezone ?? current.state.timezone ?? 'UTC' };
-    await current.save();
+    await new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => current.save({ session }));
     return this.get(userId);
   }
 }

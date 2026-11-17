@@ -27,13 +27,13 @@
 
 The main API runs on port 4000 for accounts, workouts, and saved Coach plans. The current frontend uses the independent Coach service on port 4050 for public ExerciseDB library requests and stateless plan previews. Start both with `npm run start:dev` and `npm run start:coach:dev` from `backend/` (or build, then use `npm run start:coach` for the Coach service). Both processes use shared backend source modules; only the main API connects to MongoDB.
 
-## Private Phiq assistant
+## Phiq assistant
 
 `POST /api/chat` (also `/api/v1/chat`) requires JWT/session authentication. Body: `{ "messages": [{ "role": "user", "text": "What can I do here?" }], "includePersonalData": false, "page": "/scan/plan" }`. The optional page must be a known application path, never an external URL. Personal context defaults off. Identity comes only from the verified session. Limits:12 messages,2000 characters/message,10 requests/account/minute,30 requests/IP/minute, one active request/account and configurable model concurrency. Account/IP quotas use atomic shared MongoDB counters and fail closed on store failure. Add edge/runtime capacity limits appropriate to the deployment.
 
-The response contains plain-text `reply`, internal evidence `sources` and `privacy` (`personalDataIncluded`, `historyStored:false`, `provider:"self-hosted"`). The UI does not retain/render source metadata, and model source footers are removed. Reviewed help covers35 pages and can answer directly; exact supported metrics also avoid inference. Other requests use compact relevant context. Expanded owner-only summaries include active workouts, notification metadata, selected preferences and safety event status. Explicitly requested health-profile and emergency-contact fields require consent, are projected field-by-field from the authenticated user's profile, and are answered deterministically without entering model prompts. Locations, media, credentials and other users remain excluded. Quest metrics reuse the app rules without leaderboard reads. No history is saved; client assistant messages are ignored and no model tools or mutation capabilities exist. Device drafts and complete raw history are unavailable. Model failures return503, quota failures429. Authenticated `GET /api/chat/status` returns only `{ready:boolean}`.
+The response contains plain-text `reply`, internal evidence `sources` and `privacy` (`personalDataIncluded`, `historyStored:false`, `provider:"openai"`). Reviewed help and exact supported metrics can answer directly; other requests send relevant context to OpenAI. Personal context requires the user's opt-in. Explicitly requested health-profile and emergency-contact fields are answered deterministically without entering model prompts. Locations, media, credentials and other users remain excluded. PhysiqueQuest does not save chat history. Model failures return 503, quota failures 429. Authenticated `GET /api/chat/status` returns only `{ready:boolean}`.
 
-Run `npm run ai:setup` and `npm run ai:warmup` from the root after installing Ollama. Configure `CHAT_OLLAMA_URL`, `CHAT_OLLAMA_MODEL` and `CHAT_TIMEOUT_MS` as needed; only approved local/private origins and local completion models are accepted. No Gemini or other AI API key is used for chat. Read [runtime setup](../ai/README.md) and [the data/security contract](../ai/AI-SPEC.md) before deployment. To rerun real local-model checks after building: `rtk proxy node scripts/evaluate-chat.mjs` from `backend/`; this uses synthetic data and writes `ai/evaluation-latest.json`.
+Set `OPENAI_API_KEY` on the backend. The selected model is `gpt-6-luna`; the key must not be sent to the frontend or mobile app. Requests use `store: false`, which does not change the OpenAI project's data-sharing settings. The application does not start or depend on Ollama for chat.
 
 ## Food scanning
 
@@ -76,24 +76,11 @@ Codes: `INVALID_REQUEST` (400), `UNAUTHENTICATED` (401), `NOT_FOUND` (404),
 `UPSTREAM_TIMEOUT` (504). Every response echoes an `x-request-id` header; send
 your own to correlate the call with these logs.
 
-The Gemini and USDA keys are both optional. Without them the process still
-boots and every other route keeps working; the scanner answers 503. See
-`.env.example` for the full list of variables.
+The OpenAI and USDA keys are optional at startup. Food recognition requires OpenAI; nutrition lookup requires USDA. See `.env.example` for the full list of variables.
 
 USDA requests are retried once after transient 500, 502, 503, or 504 responses.
 Food search loads nutrition details only after a result is selected, to avoid
 unnecessary provider requests while the user is typing.
-
-Two of those variables are worth knowing about when a scan is slow or fails:
-
-- `GEMINI_THINKING_LEVEL` (default `LOW`) caps how much the model deliberates.
-  Under a structured-output schema the unset level took about 9s per scan and
-  overran `FOODSCAN_UPSTREAM_TIMEOUT_MS`, which surfaced as a 504 on a request
-  that would otherwise have succeeded. `LOW` answers in roughly 4s.
-- `GEMINI_ATTEMPTS` (default `3`) bounds retries. The provider intermittently
-  answers 503 while a model is under load, and only that case is retried; an
-  exhausted quota or a timeout is reported immediately rather than spending more
-  of the caller's budget.
 
 `FOODSCAN_REQUEST_TIMEOUT_MS` (default 25s) bounds a whole scan and is
 deliberately far below the 60s the mobile client waits before offering a retry.

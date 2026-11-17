@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { createHash } from 'node:crypto';
 import { Model } from 'mongoose';
 import { AuthRateLimit } from '../auth/auth-rate-limit.schema.js';
+import { consumeQuota } from '../privacy/lifecycle-quota.js';
 
 // Shared database buckets cover both ordinary and administrator launches across replicas.
 @Injectable()
@@ -14,17 +15,16 @@ export class PoseTrackerRateLimitGuard implements CanActivate {
       throw new ServiceUnavailableException('PoseTracker launch is temporarily unavailable.');
     }
     const now = Date.now(), window = Math.floor(now / 60_000);
-    for (const [identity, maximum] of [[`user:${req.user.userId}`, 10], [`ip:${req.ip}`, 30]] as const) {
-      const filter = { _id: createHash('sha256').update(`pose-tracker:${identity}:${window}`).digest('hex') };
-      const update = { $inc: { hits: 1 }, $setOnInsert: { expiresAt: new Date((window + 2) * 60_000) } };
-      let result: AuthRateLimit | null;
-      try {
-        result = await this.limits.findOneAndUpdate(filter, update, { upsert:true, returnDocument:'after', maxTimeMS:2000 }).catch(async (error: {code?:number}) => {
-          if (error.code !== 11000) throw error;
-          return this.limits.findOneAndUpdate(filter, update, { returnDocument:'after', maxTimeMS:2000 });
-        });
-      } catch { throw new ServiceUnavailableException('PoseTracker launch is temporarily unavailable.'); }
-      if (!result || result.hits > maximum) {
+    const identities = [[`user:${req.user.userId}`, 10], [`ip:${req.ip}`, 30]] as const;
+    let counts: number[];
+    try {
+      counts = await consumeQuota(this.limits.db, req.user.userId, identities.map(([identity]) => ({
+        id: createHash('sha256').update(`pose-tracker:${identity}:${window}`).digest('hex'), owned: identity.startsWith('user:'), expiresAt: new Date((window + 2) * 60000),
+      })), req.user.lifecycleGeneration);
+    } catch { throw new ServiceUnavailableException('PoseTracker launch is temporarily unavailable.'); }
+    for (const [index, [, maximum]] of identities.entries()) {
+      const hits = counts[index];
+      if (hits > maximum) {
         http.getResponse().setHeader('Retry-After', String(60 - Math.floor(now / 1000) % 60));
         throw new HttpException('Too many PoseTracker launch requests. Try again later.', 429);
       }

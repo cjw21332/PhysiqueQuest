@@ -10,6 +10,7 @@ import { AuthRateLimit } from './auth-rate-limit.schema.js';
 import { EmailDeliveryProvider } from '../providers/email-delivery.provider.js';
 import { RECOVERY_CODE_VALIDITY_MINUTES } from '../common/recovery-policy.js';
 import { PrivacyService } from '../privacy/privacy.service.js';
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 const invalid = () => new BadRequestException('Recovery request is invalid or expired. Request a new code.');
@@ -86,15 +87,18 @@ export class PasswordRecoveryService {
     if (!available && (process.env.NODE_ENV !== 'development' || account)) return response;
     const user = await this.users.findOne({ email, isActive: true, ...(account ? { _id: account.userId, sessionVersion: this.versionFilter(account) } : {}) });
     if (!user) return response;
+    const fence = new AccountLifecycleFence(this.users.db), generation = await fence.generation(String(user._id));
     const code = String(randomInt(100000, 1_000_000));
     // Each request has an independent digest, so equal six-digit codes never collide.
-    await this.tokens.updateMany({ userId: user._id, usedAt: null }, { $set: { usedAt: new Date() } });
-    await this.tokens.create({ userId: user._id, purpose: account ? 'password-change' : 'password-reset', ...account, requestId, tokenHash: this.codeHash(requestId, code), attempts: 0,
-      verifiedAt: null, expiresAt: new Date(Date.now() + RECOVERY_CODE_VALIDITY_MINUTES * 60_000), usedAt: null });
+    await fence.withActiveWrite(String(user._id), async session => {
+      await this.tokens.updateMany({ userId: user._id, usedAt: null }, { $set: { usedAt: new Date() } }, { session });
+      await this.tokens.create([{ userId: user._id, generation, purpose: account ? 'password-change' : 'password-reset', ...account, requestId, tokenHash: this.codeHash(requestId, code), attempts: 0,
+        verifiedAt: null, expiresAt: new Date(Date.now() + RECOVERY_CODE_VALIDITY_MINUTES * 60_000), usedAt: null }], { session });
+    }, generation);
     if (!available) return { ...response, code };
     const sent = await this.email.sendPasswordReset(user.email, code, user.name);
     if (!sent.ok) {
-      await this.tokens.updateMany({ requestId }, { $set: { usedAt: new Date() } });
+      await fence.withActiveWrite(String(user._id), async session => this.tokens.updateMany({ requestId }, { $set: { usedAt: new Date() } }, { session }), generation);
       this.logger.warn(`Recovery email was not delivered (${sent.code}).`);
       // Keep the production response account-neutral, including delivery failures.
       if (process.env.NODE_ENV === 'development') return { ...response, delivery: 'unavailable' as const, reason: 'Email delivery failed. Check the backend provider configuration.' };
@@ -105,18 +109,21 @@ export class PasswordRecoveryService {
 
   async verify(requestId: string, code: string, ip = 'unknown', account?: ChangeAccount) {
     await this.limit(`verify:ip:${ip}`, 60, 900);
+    const original = await this.tokens.findOne({ ...this.scope(account), requestId }).lean();
+    if (!original || !Number.isSafeInteger(original.generation)) throw invalid();
+    const fence = new AccountLifecycleFence(this.tokens.db);
     // Count every attempt before checking the digest, atomically across instances.
-    const attempted = await this.tokens.findOneAndUpdate(
+    const attempted = await fence.withActiveWrite(String(original.userId), async session => this.tokens.findOneAndUpdate(
       { ...this.scope(account), requestId, usedAt: null, verifiedAt: null, attempts: { $lt: 5 }, expiresAt: { $gt: new Date() } },
-      { $inc: { attempts: 1 } }, { returnDocument: 'after' },
-    );
+      { $inc: { attempts: 1 } }, { returnDocument: 'after', session },
+    ), original.generation);
     if (!attempted) throw invalid();
     const resetToken = randomBytes(32).toString('hex');
-    const verified = await this.tokens.findOneAndUpdate(
+    const verified = await fence.withActiveWrite(String(original.userId), async session => this.tokens.findOneAndUpdate(
       { ...this.scope(account), _id: attempted._id, requestId, tokenHash: this.codeHash(requestId, code), usedAt: null, verifiedAt: null, expiresAt: { $gt: new Date() } },
       { $set: { verifiedAt: new Date(), grantHash: digest(resetToken), grantExpiresAt: new Date(Date.now() + 5 * 60_000) } },
-      { returnDocument: 'after' },
-    );
+      { returnDocument: 'after', session },
+    ), original.generation);
     if (!verified) throw invalid();
     return { verified: true, resetToken };
   }
@@ -133,6 +140,8 @@ export class PasswordRecoveryService {
           { $set: { usedAt: new Date() } }, { returnDocument: 'after', session },
         );
         if (!recovery) throw invalid();
+        if (!Number.isSafeInteger(recovery.generation)) throw invalid();
+        await new AccountLifecycleFence(this.users.db).participate(String(recovery.userId), session, recovery.generation);
         const result = await this.users.updateOne({ _id: recovery.userId, isActive: true,
           ...(account ? { email: account.accountEmail, sessionVersion: this.versionFilter(account) } : {}) },
           { $set: { passwordHash, failedLoginAttempts: 0, lockoutUntil: null, emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false }, $inc: { sessionVersion: 1 } }, { session });

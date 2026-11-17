@@ -13,6 +13,9 @@ import { scannerBodyErrorHandler } from '../src/common/foodscan/app-exception.fi
 import { FoodScanConfigService } from '../src/common/foodscan/foodscan-config.js';
 import { PinoLogger } from '../src/common/foodscan/pino-logger.js';
 import { FoodScanModule, SCANNER_ROUTE_PATHS } from '../src/foodscan/foodscan.module.js';
+import { ScanRateLimitGuard } from '../src/common/foodscan/scan-rate-limit.guard.js';
+import { AiRateLimitGuard } from '../src/common/ai-rate-limit.guard.js';
+import { FoodScanUsageService } from '../src/foodscan/foodscan-usage.service.js';
 import { server } from './foodscan.harness.js';
 import { JSON_HEADERS, TINY_PNG_BASE64 } from './foodscan.fixtures.js';
 
@@ -64,7 +67,9 @@ describe('JWT authentication', () => {
         JwtStrategy,
         { provide: SessionService, useValue: {} },
       ],
-    }).compile();
+    }).overrideGuard(ScanRateLimitGuard).useValue({ canActivate: () => true })
+      .overrideGuard(AiRateLimitGuard).useValue({ canActivate: () => true })
+      .overrideProvider(FoodScanUsageService).useValue({ begin: async () => 'test', finish: async () => {}, summary: async () => ({}) }).compile();
 
     app = moduleRef.createNestApplication<NestExpressApplication>({ bodyParser: false });
     const config = app.get(FoodScanConfigService);
@@ -84,6 +89,7 @@ describe('JWT authentication', () => {
     ['post', '/nutrition/scan'],
     ['get', '/nutrition/foods/search?q=apple'],
     ['get', '/nutrition/foods/171477'],
+    ['get', '/nutrition/scan-usage'],
   ];
 
   describe('rejects unauthenticated requests', () => {

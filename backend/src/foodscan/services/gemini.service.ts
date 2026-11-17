@@ -15,6 +15,8 @@ import {
   type Deadline,
 } from '../../common/foodscan/deadline-context.js';
 import type { ImageMimeType } from '../foodscan.schemas.js';
+import { z } from 'zod';
+import type { TokenUsage } from '../foodscan-usage.service.js';
 
 const responseSchema = {
   type: 'OBJECT',
@@ -52,9 +54,23 @@ For each item:
 - est_weight_g: estimate the edible weight of this one item in grams based on the plate, utensils, and portion sizes visible. Be realistic and conservative.
 - confidence: your confidence in the identification, 0 to 1.
 
-Treat each visually separate food as its own item — do not merge a mixed plate into a single entry. Identify only foods, not drinks, unless a drink is clearly the main item. If the image contains no clear food, return an empty items array.`;
+List distinct foods on a plate separately. Treat a recognisable mixed dish as one dish when its ingredients cannot be separated visually; never list that dish and its same ingredients twice. Group multiple pieces of the same food into one entry. Include visible sauces or toppings only when distinguishable. Do not invent obscured foods. Include preparation in the name only when visible. Weight is uncertain: use visible portion and reference objects, never imply a measurement. Identify only foods, not drinks, unless a drink is clearly the main item. If the image contains no clear food, return an empty items array.`;
+
+const detectionSchema = z.object({ items: z.array(z.object({
+  food_name: z.string().trim().min(1).max(120),
+  est_weight_g: z.number().finite().min(1).max(5000),
+  confidence: z.number().finite().min(0).max(1),
+})) });
 
 const MODEL_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9.]+)*$/;
+
+function readUsage(metadata: unknown): TokenUsage | null {
+  if (!metadata || typeof metadata !== 'object') return null;
+  const record = metadata as Record<string, unknown>;
+  const valid = (value: unknown) => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : null;
+  const counts = { input: valid(record.promptTokenCount), output: valid(record.candidatesTokenCount), total: valid(record.totalTokenCount) };
+  return Object.values(counts).some(value => value !== null) ? counts : null;
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -129,7 +145,7 @@ export class GeminiService {
     return this.client;
   }
 
-  async detectFoods(base64: string, mimeType: ImageMimeType): Promise<DetectedItem[]> {
+  async detectFoods(base64: string, mimeType: ImageMimeType, onUsage?: (usage: TokenUsage | null) => void): Promise<DetectedItem[]> {
     const cfg = this.config.value;
 
     if (!cfg.gemini.configured) {
@@ -185,6 +201,9 @@ export class GeminiService {
         }));
         break;
       } catch (cause) {
+        // Failed attempts may be billable even when their usage is unavailable.
+        const metadata = cause && typeof cause === 'object' ? (cause as { usageMetadata?: unknown }).usageMetadata : undefined;
+        onUsage?.(readUsage(metadata));
         // The deadline already produced the client's response. Reporting a
         // second failure for a call we deliberately cancelled would log a
         // timeout after the request was answered, which reads as a new fault.
@@ -220,25 +239,22 @@ export class GeminiService {
       }
     }
 
-    const parsed = extractJson(result.text ?? '');
-    const raw: unknown[] = Array.isArray(parsed?.items) ? parsed.items : [];
-
-    const items = raw
-      .slice(0, cfg.maxDetectedItems)
-      .map((entry) => {
-        const i = (entry ?? {}) as Record<string, unknown>;
-        return {
-          food_name: String(i.food_name ?? '').trim(),
-          est_weight_g: Math.round(clamp(Number(i.est_weight_g), 1, 5000)),
-          confidence: clamp(Number(i.confidence), 0, 1),
-        };
-      })
-      .filter((i) => i.food_name.length > 0);
+    const usage = result.usageMetadata;
+    if (usage) {
+      const counts = readUsage(usage);
+      onUsage?.(counts);
+      this.logger.log(`gemini_usage model=${cfg.gemini.model} input_tokens=${counts?.input ?? 'unknown'} output_tokens=${counts?.output ?? 'unknown'} total_tokens=${counts?.total ?? 'unknown'}`);
+    } else onUsage?.(null);
+    const parsed = detectionSchema.safeParse(extractJson(result.text ?? ''));
+    if (!parsed.success) throw upstreamUnavailable('vision model', 'gemini returned invalid structured output');
+    const raw = parsed.data.items;
+    const items = raw.slice(0, cfg.maxDetectedItems);
 
     if (raw.length > cfg.maxDetectedItems) {
       this.logger.warn(
-        `detected_items_truncated detected=${raw.length} kept=${items.length} - vision model returned more items than the per-request cap`
+        `detected_items_over_limit detected=${raw.length} limit=${cfg.maxDetectedItems} - rejecting incomplete scan`
       );
+      throw upstreamUnavailable('vision model', 'gemini returned too many food items');
     }
 
     return items;
@@ -267,15 +283,9 @@ export class GeminiService {
       });
     }
 
-    // The provider message can embed the request URL and account details, so it
-    // is logged but not returned.
-    return upstreamUnavailable('vision model', `gemini call failed (model=${model}): ${message}`, cause);
+    // Provider messages may contain credentials or request data. Never log them.
+    return upstreamUnavailable('vision model', `gemini call failed model=${model} category=upstream_unavailable`);
   }
-}
-
-function clamp(v: number, lo: number, hi: number): number {
-  if (!Number.isFinite(v)) return lo;
-  return Math.max(lo, Math.min(hi, v));
 }
 
 function extractJson(text: string): Record<string, unknown> | null {

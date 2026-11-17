@@ -40,7 +40,7 @@ describe('Phiq private assistant', () => {
     const { service, context, model } = fixture();
     const result = await service.reply(OWNER, [{ role: 'user', text: 'What is on Home?' }]);
     expect(context.build).not.toHaveBeenCalled();
-    expect(result.privacy).toEqual({ personalDataIncluded: false, historyStored: false, provider: 'self-hosted' });
+    expect(result.privacy).toEqual({ personalDataIncluded: false, historyStored: false, provider: 'openai' });
     expect(result.sources).toEqual([{ id: 'page-home', label: 'Reviewed page guide' }]);
     expect(model.generate).not.toHaveBeenCalled();
   });

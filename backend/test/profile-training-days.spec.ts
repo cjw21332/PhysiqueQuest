@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
 import type { Model } from 'mongoose';
@@ -27,10 +28,10 @@ describe('profile training-day persistence', () => {
     const updatedProfile = { ...storedProfile, days: ['Tuesday', 'Thursday'] };
     const findOne = vi.fn().mockResolvedValue(storedProfile);
     const findOneAndUpdate = vi.fn().mockResolvedValue(updatedProfile);
-    const service = new ProfileService({
+    const service = new ProfileService(lifecycleModel({
       findOne,
       findOneAndUpdate,
-    } as unknown as Model<Profile>);
+    } as unknown as Model<Profile>));
     const patch = Object.assign(new UpdateProfileDto(), { days: ['Tuesday', 'Thursday'] });
 
     await service.update(USER, patch);

@@ -7,7 +7,7 @@ describe('health/readiness', () => {
   it('requires a connected, responding database for readiness', async () => {
     await expect(new HealthController({ readyState: 0 } as any).ready()).rejects.toThrow('Not ready');
     const command = vi.fn(async () => ({ ok: 1 }));
-    await expect(new HealthController({ readyState: 1, db: { command } } as any).ready()).resolves.toEqual({ status: 'ready' });
+    await expect(new HealthController({ readyState: 1, db: { command } } as any).ready()).resolves.toEqual({ status: 'ready', lifecycleRejections: 0 });
     command.mockRejectedValue(new Error('private host'));
     await expect(new HealthController({ readyState: 1, db: { command } } as any).ready()).rejects.toThrow('Not ready');
   });

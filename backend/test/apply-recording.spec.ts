@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { describe, expect, it, vi } from 'vitest';
@@ -41,7 +42,7 @@ function fixture(reps = 4) {
       return copy(doc);
     }),
   };
-  return { service: new WorkoutsService(model), docs, model, failNext: (value: typeof failNext) => { failNext = value; } };
+  return { service: new WorkoutsService(lifecycleModel(model)), docs, model, failNext: (value: typeof failNext) => { failNext = value; } };
 }
 
 describe('applying reviewed recordings to a planned set', () => {

@@ -7,6 +7,7 @@ import {
   analyzeRequestSchema,
   buildFoodSearchQuerySchema,
   fdcIdParamSchema,
+  analyzeResponseSchema,
 } from './foodscan.schemas.js';
 import { MALFORMED_BASE64, NOT_AN_IMAGE_BASE64, TINY_JPEG_BASE64, TINY_PNG_BASE64 } from '../../test/foodscan.fixtures.js';
 
@@ -138,4 +139,11 @@ describe('request validation', () => {
       expect(fdcIdParamSchema.safeParse({ fdcId: '171477' }).success).toBe(true);
     });
   });
+});
+
+it('rejects totals that disagree with the individual foods', () => {
+  const result = { request_id: 'test', model: 'test', unmatched: [], degraded: false,
+    items: [{ food_name: 'rice', est_weight_g: 100, confidence: 0.8, found: true, kcal: 130, protein_g: 2, carbs_g: 28, fat_g: 0 }],
+    totals: { kcal: 999, protein_g: 2, carbs_g: 28, fat_g: 0 } };
+  expect(analyzeResponseSchema.safeParse(result).success).toBe(false);
 });

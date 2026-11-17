@@ -16,7 +16,11 @@ describe('NutritionService.addMealsFromScan', () => {
 
   beforeEach(() => {
     findOneAndUpdate = vi.fn(async () => ({ meals: [] }));
-    service = new NutritionService({ findOneAndUpdate } as never);
+    const session = { inTransaction: () => true, withTransaction: async (callback: () => Promise<void>) => callback(), endSession: async () => {} };
+    const db = { startSession: async () => session, collection: () => ({ updateOne: async () => ({ matchedCount: 1 }), findOne: async () => ({ generation: 0 }) }) };
+    service = new NutritionService({ findOneAndUpdate, db } as never, { getNutrients: vi.fn(async (id: number) => id === 171477 ? {
+      fdcId: id, description: 'Chicken breast, raw', kcal_per_100g: 120, protein_g_per_100g: 22.5, carbs_g_per_100g: 0, fat_g_per_100g: 2.6,
+    } : { fdcId: id, description: 'cooked chicken', kcal_per_100g: 165, protein_g_per_100g: 31, carbs_g_per_100g: 0, fat_g_per_100g: 3.6 }) } as never);
   });
 
   /** The meal objects that were pushed, in order. */
@@ -47,7 +51,7 @@ describe('NutritionService.addMealsFromScan', () => {
     await service.addMealsFromScan(USER_ID, payload({
       items: [
         ...payload().items,
-        { food_name: 'white rice', found: true, fdc_id: 168878, kcal: 260, protein_g: 4.8, carbs_g: 56.4, fat_g: 0.6 },
+        { food_name: 'white rice', found: true, fdc_id: 168878, est_weight_g: 100, kcal: 260, protein_g: 4.8, carbs_g: 56.4, fat_g: 0.6 },
       ],
     }));
 
@@ -70,6 +74,26 @@ describe('NutritionService.addMealsFromScan', () => {
     });
   });
 
+  it('recalculates corrected weights from per-100g values on save', async () => {
+    await service.addMealsFromScan(USER_ID, payload({ items: [{
+      food_name: 'cooked chicken', found: true, fdc_id: 99, est_weight_g: 120,
+      kcal: 999, protein_g: 999, carbs_g: 999, fat_g: 999,
+      per_100g: { kcal: 165, protein_g: 31, carbs_g: 0, fat_g: 3.6 },
+    }] }));
+    expect(pushedMeals()[0]).toMatchObject({ calories: 198, protein: 37.2, carbs: 0, fat: 4.3 });
+  });
+
+  it('fails closed if a matched item lacks a verifiable record or weight', async () => {
+    await expect(service.addMealsFromScan(USER_ID, payload({ items: [{ food_name: 'rice', found: true, est_weight_g: 100, kcal: 1, protein_g: 1, carbs_g: 1, fat_g: 1 }] }))).rejects.toThrow(BadRequestException);
+    expect(findOneAndUpdate).not.toHaveBeenCalled();
+  });
+
+  it('does not save any items if USDA verification fails', async () => {
+    const failing = new NutritionService({ findOneAndUpdate } as never, { getNutrients: vi.fn().mockRejectedValue(new Error('unavailable')) } as never);
+    await expect(failing.addMealsFromScan(USER_ID, payload())).rejects.toThrow();
+    expect(findOneAndUpdate).not.toHaveBeenCalled();
+  });
+
   it('keeps the scan provenance so an entry can be traced back', async () => {
     await service.addMealsFromScan(USER_ID, payload());
 
@@ -84,20 +108,20 @@ describe('NutritionService.addMealsFromScan', () => {
     // Storing an explicit null would make "unknown" indistinguishable from a
     // measured zero in the saved document.
     await service.addMealsFromScan(USER_ID, payload({
-      items: [{ food_name: 'mystery paste', found: true, kcal: 10, protein_g: 1, carbs_g: 1, fat_g: 0 }],
+      items: [{ food_name: 'mystery paste', found: false, est_weight_g: 50, kcal: 10, protein_g: 1, carbs_g: 1, fat_g: 0 }],
     }));
 
     const meal = pushedMeals()[0];
     expect(meal).not.toHaveProperty('fdcId');
     expect(meal).not.toHaveProperty('confidence');
-    expect(meal).not.toHaveProperty('estWeightG');
+    expect(meal.estWeightG).toBe(50);
   });
 
   it('gives every row a distinct id', async () => {
     await service.addMealsFromScan(USER_ID, payload({
       items: [
-        { food_name: 'chicken breast', found: true, kcal: 180, protein_g: 33, carbs_g: 0, fat_g: 4 },
-        { food_name: 'white rice', found: true, kcal: 260, protein_g: 5, carbs_g: 56, fat_g: 1 },
+        { food_name: 'chicken breast', found: true, fdc_id: 171477, est_weight_g: 150, kcal: 180, protein_g: 33, carbs_g: 0, fat_g: 4 },
+        { food_name: 'white rice', found: true, fdc_id: 99, est_weight_g: 100, kcal: 260, protein_g: 5, carbs_g: 56, fat_g: 1 },
       ],
     }));
 
@@ -110,7 +134,7 @@ describe('NutritionService.addMealsFromScan', () => {
     await service.addMealsFromScan(USER_ID, payload({
       items: [
         ...payload().items,
-        { food_name: 'mystery paste', found: false, kcal: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
+        { food_name: 'mystery paste', found: false, est_weight_g: 50, kcal: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
       ],
     }));
 

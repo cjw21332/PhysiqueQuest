@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { OPENAI_MODEL } from '../common/openai.js';
 import { FoodScanConfigService } from '../common/foodscan/foodscan-config.js';
 import { AppError, ErrorCode } from '../common/foodscan/errors.js';
 import { mapConcurrent } from '../common/foodscan/http.service.js';
 import { GeminiService, type DetectedItem } from './services/gemini.service.js';
 import { UsdaService, type NutrientResult } from './services/usda.service.js';
+import type { TokenUsage } from './foodscan-usage.service.js';
 import {
   analyzeRequestSchema,
   analyzeResponseSchema,
@@ -73,7 +75,7 @@ export class FoodScanService {
    * a DTO so Zod stays the single authority for the contract; the body is typed
    * `unknown` at the controller so the global ValidationPipe skips it.
    */
-  async analyze(rawBody: unknown, requestId: string): Promise<AnalyzeResponse> {
+  async analyze(rawBody: unknown, requestId: string, onUsage?: (usage: TokenUsage | null) => void): Promise<AnalyzeResponse> {
     const cfg = this.config.value;
 
     // Validation runs before any credential or provider is touched, so a
@@ -88,13 +90,21 @@ export class FoodScanService {
       throw err;
     }
 
-    const detected = await this.gemini.detectFoods(image.base64, image.mimeType);
+    const visionStarted = Date.now();
+    let detected: DetectedItem[];
+    try {
+      detected = await this.gemini.detectFoods(image.base64, image.mimeType, onUsage);
+      this.logger.log(`vision_completed request_id=${requestId} model=${OPENAI_MODEL} duration_ms=${Date.now() - visionStarted} image_bytes=${image.bytes} image_mime=${image.mimeType}`);
+    } catch (error) {
+      this.logger.warn(`vision_failed request_id=${requestId} model=${OPENAI_MODEL} duration_ms=${Date.now() - visionStarted} image_bytes=${image.bytes} image_mime=${image.mimeType} category=${error instanceof AppError ? error.code : 'unknown'}`);
+      throw error;
+    }
 
     if (detected.length === 0) {
       // A valid image with no recognisable food is a successful outcome.
       const empty: AnalyzeResponse = {
         request_id: requestId,
-        model: cfg.gemini.model,
+        model: OPENAI_MODEL,
         items: [],
         unmatched: [],
         totals: zeroMacros(),
@@ -129,6 +139,7 @@ export class FoodScanService {
           food_name: d.food_name,
           est_weight_g: d.est_weight_g,
           confidence: d.confidence,
+          portion_method: 'visual_estimate', portion_confidence: null, region_confidence: null, weight_min_g: null, weight_max_g: null,
           found: false,
           kcal: null, protein_g: null, carbs_g: null, fat_g: null,
         });
@@ -149,15 +160,16 @@ export class FoodScanService {
         food_name: d.food_name,
         est_weight_g: d.est_weight_g,
         confidence: d.confidence,
+        portion_method: 'visual_estimate', portion_confidence: null, region_confidence: null, weight_min_g: null, weight_max_g: null,
         found: true,
         fdc_id: nut.fdcId,
         description: titleCase(nut.description),
         ...macros,
         per_100g: {
-          kcal: scale(nut.kcal_per_100g, 1),
-          protein_g: scale(nut.protein_g_per_100g, 1),
-          carbs_g: scale(nut.carbs_g_per_100g, 1),
-          fat_g: scale(nut.fat_g_per_100g, 1),
+          kcal: nut.kcal_per_100g,
+          protein_g: nut.protein_g_per_100g,
+          carbs_g: nut.carbs_g_per_100g,
+          fat_g: nut.fat_g_per_100g,
         },
       });
     });
@@ -166,7 +178,7 @@ export class FoodScanService {
       items.some(item => item[key] === null) ? null : round(items.reduce((sum, item) => sum + item[key]!, 0));
     const response: AnalyzeResponse = {
       request_id: requestId,
-      model: cfg.gemini.model,
+      model: OPENAI_MODEL,
       items,
       unmatched,
       totals: {
@@ -179,7 +191,7 @@ export class FoodScanService {
     };
 
     this.logger.log(
-      `analysis_completed request_id=${requestId} model=${cfg.gemini.model} ` +
+      `analysis_completed request_id=${requestId} model=${OPENAI_MODEL} ` +
         `image_bytes=${image.bytes} image_mime=${image.mimeType} detected_items=${detected.length} ` +
         `matched_items=${items.length - unmatched.length} unmatched_items=${unmatched.length} degraded=${degraded}`
     );

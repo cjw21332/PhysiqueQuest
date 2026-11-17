@@ -1,80 +1,46 @@
-import { Injectable, type CanActivate, type ExecutionContext } from '@nestjs/common';
+import { Injectable, Optional, type CanActivate, type ExecutionContext } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/mongoose';
+import { createHash } from 'node:crypto';
+import type { Connection } from 'mongoose';
 import { FoodScanConfigService } from './foodscan-config.js';
-import { rateLimited } from './errors.js';
+import { rateLimited, serviceUnavailable } from './errors.js';
 import { PinoLogger } from './pino-logger.js';
 import type { ScanRequest } from './scan-request.js';
+import { consumeQuota } from '../../privacy/lifecycle-quota.js';
 
-interface Bucket {
-  count: number;
-  resetAt: number;
-}
-
-/** Bound memory so unkeyed growth is impossible. */
-const MAX_BUCKETS = 10_000;
-
-/**
- * Fixed-window limiter keyed by the authenticated user.
- *
- * This is not a defence against an internet-scale flood. It exists so that one
- * misbehaving client, or one stuck in a retry loop, cannot drain the Gemini and
- * USDA quota that everyone else shares.
- *
- * State is per-process and in-memory. That is adequate for a single instance; a
- * multi-replica deployment would need a shared store.
- */
+/** MongoDB atomic fixed-window buckets shared by all backend instances. */
 @Injectable()
 export class ScanRateLimitGuard implements CanActivate {
-  private readonly buckets = new Map<string, Bucket>();
+  private indexReady?: Promise<unknown>;
+  constructor(private readonly config: FoodScanConfigService, private readonly logger: PinoLogger,
+    @Optional() @InjectConnection() private readonly connection?: Connection) {}
 
-  constructor(
-    private readonly config: FoodScanConfigService,
-    private readonly logger: PinoLogger,
-  ) {}
-
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const { rateLimit } = this.config.value;
     if (!rateLimit.enabled) return true;
-
-    const http = context.switchToHttp();
-    const req = http.getRequest<ScanRequest>();
+    const http = context.switchToHttp(), req = http.getRequest<ScanRequest>();
     const res = http.getResponse<{ setHeader(name: string, value: string): void }>();
-
-    const now = Date.now();
-    const key = req.user?.userId ?? `ip:${req.ip ?? 'unknown'}`;
-    let bucket = this.buckets.get(key);
-
-    if (!bucket || bucket.resetAt <= now) {
-      if (!bucket && this.buckets.size >= MAX_BUCKETS) {
-        for (const [k, v] of this.buckets) {
-          if (v.resetAt <= now) this.buckets.delete(k);
-          if (this.buckets.size < MAX_BUCKETS) break;
-        }
-        if (this.buckets.size >= MAX_BUCKETS) throw rateLimited('Request capacity exceeded', 60);
-      }
-      bucket = { count: 0, resetAt: now + rateLimit.windowMs };
-      this.buckets.set(key, bucket);
+    if (!req.user?.userId || !this.connection?.db) throw serviceUnavailable('Food scanner limits are temporarily unavailable');
+    const now = Date.now(), window = Math.floor(now / rateLimit.windowMs), resetAt = (window + 1) * rateLimit.windowMs;
+    const id = createHash('sha256').update(`foodscan:${req.user.userId}:${rateLimit.windowMs}:${window}`).digest('hex');
+    const collection = this.connection.db.collection<{ _id: string; hits: number; expiresAt: Date }>('auth_rate_limits');
+    let count: number;
+    try {
+      this.indexReady ??= collection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0, maxTimeMS: 2000 });
+      await this.indexReady;
+      [count] = await consumeQuota(this.connection, req.user.userId, [{ id, owned: true, expiresAt: new Date(resetAt + rateLimit.windowMs) }], req.user.lifecycleGeneration);
+    } catch {
+      this.indexReady = undefined;
+      throw serviceUnavailable('Food scanner limits are temporarily unavailable');
     }
-
-    bucket.count += 1;
-
-    const remaining = Math.max(0, rateLimit.max - bucket.count);
+    const retry = Math.max(1, Math.ceil((resetAt - now) / 1000));
     res.setHeader('X-RateLimit-Limit', String(rateLimit.max));
-    res.setHeader('X-RateLimit-Remaining', String(remaining));
-    res.setHeader('X-RateLimit-Reset', String(Math.ceil((bucket.resetAt - now) / 1000)));
-
-    if (bucket.count > rateLimit.max) {
-      const retryAfter = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
-      this.logger.event('warn', {
-        event: 'rate_limited',
-        request_id: req.requestId,
-        path: req.path,
-        retry_after_s: retryAfter,
-      }, 'caller exceeded rate limit');
-      // Thrown rather than returned false: a bare false would produce Nest's
-      // default 403 body instead of the documented RATE_LIMITED envelope.
-      throw rateLimited('Caller exceeded the request rate limit', retryAfter);
+    res.setHeader('X-RateLimit-Remaining', String(Math.max(0, rateLimit.max - count)));
+    res.setHeader('X-RateLimit-Reset', String(retry));
+    if (count > rateLimit.max) {
+      this.logger.event('warn', { event: 'rate_limited', request_id: req.requestId, path: req.path, retry_after_s: retry }, 'caller exceeded rate limit');
+      throw rateLimited('Caller exceeded the request rate limit', retry);
     }
-
     return true;
   }
 }

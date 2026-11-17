@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
 import bcrypt from 'bcryptjs';
@@ -23,12 +24,12 @@ describe('sign-in event collection', () => {
     };
     const signInEvents = { create: vi.fn(async () => ({})) };
     const jwt = { sign: vi.fn(() => 'jwt-token') };
-    const service = new AuthService(userModel as any, signInEvents as any, jwt as any);
+    const service = new AuthService(lifecycleModel(userModel as any), lifecycleModel(signInEvents as any), jwt as any);
 
     await service.login({ email: user.email, password: 'correct horse' });
 
     expect(signInEvents.create).toHaveBeenCalledTimes(1);
-    expect(signInEvents.create).toHaveBeenCalledWith(expect.objectContaining({ source: 'login' }));
+    expect(signInEvents.create).toHaveBeenCalledWith([expect.objectContaining({ source: 'login' })], { session: expect.anything() });
   });
 
   it('does not record an event when the password is wrong', async () => {
@@ -40,7 +41,7 @@ describe('sign-in event collection', () => {
     };
     const signInEvents = { create: vi.fn(async () => ({})) };
     const jwt = { sign: vi.fn(() => 'jwt-token') };
-    const service = new AuthService(userModel as any, signInEvents as any, jwt as any);
+    const service = new AuthService(lifecycleModel(userModel as any), lifecycleModel(signInEvents as any), jwt as any);
 
     await expect(service.login({ email: user.email, password: 'wrong' })).rejects.toThrow();
     expect(signInEvents.create).not.toHaveBeenCalled();

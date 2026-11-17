@@ -23,7 +23,8 @@ describe.skipIf(process.env.PQ_SECURITY_DB_TEST !== '1' || !process.env.MONGODB_
   });
   it('is neutral to unknown addresses, throttles resends, and consumes a link once', async () => {
     const db = connection.db!;
-    await db.collection('users').insertOne({ email: 'synthetic@example.invalid', isActive: true, emailVerified: false });
+    const first = await db.collection('users').insertOne({ email: 'synthetic@example.invalid', isActive: true, emailVerified: false });
+    await db.collection('account_lifecycle').insertOne({ _id: first.insertedId, status: 'active', generation: 0, writeVersion: 0 });
     expect(await service.request('unknown@example.invalid')).toMatchObject({ accepted: true });
     expect(await service.request('synthetic@example.invalid')).toMatchObject({ accepted: true });
     await expect(service.request('synthetic@example.invalid')).rejects.toThrow('Wait 60');
@@ -32,7 +33,8 @@ describe.skipIf(process.env.PQ_SECURITY_DB_TEST !== '1' || !process.env.MONGODB_
     expect(await service.confirm(token)).toEqual({ verified: true });
     await expect(service.confirm(token)).rejects.toThrow('invalid or expired');
     expect((await db.collection('users').findOne({ email: 'synthetic@example.invalid' }))?.emailVerified).toBe(true);
-    await db.collection('users').insertOne({ email: 'expired@example.invalid', isActive: true });
+    const expiredUser = await db.collection('users').insertOne({ email: 'expired@example.invalid', isActive: true });
+    await db.collection('account_lifecycle').insertOne({ _id: expiredUser.insertedId, status: 'active', generation: 0, writeVersion: 0 });
     await service.request('expired@example.invalid');
     const expired = consoleMailbox.messages.at(-1)!.token;
     await db.collection('email_verifications').updateMany({ usedAt: null }, { $set: { expiresAt: new Date(0) } });
@@ -59,6 +61,7 @@ describe.skipIf(process.env.PQ_SECURITY_DB_TEST !== '1' || !process.env.MONGODB_
   it('verifies only the signed-in account matching the code email', async () => {
     const email = 'account-verification@example.invalid';
     const user = await connection.db!.collection('users').insertOne({ email, isActive: true, emailVerified: false });
+    await connection.collection('account_lifecycle').insertOne({ _id: user.insertedId, status: 'active', generation: 0, writeVersion: 0 });
     const { requestId } = await service.requestRegistration(email);
     const code = consoleMailbox.messages.at(-1)!.token;
     await expect(service.confirmAccount(String(user.insertedId), 'other@example.invalid', requestId, code)).rejects.toThrow('invalid or expired');

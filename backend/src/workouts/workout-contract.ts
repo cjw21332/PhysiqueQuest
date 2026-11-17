@@ -17,6 +17,7 @@ export type SetResult = {
   loadKg?: number;
   loadValue?: number;
   loadUnit?: 'kg' | 'lbs';
+  barWeightKg?: number;
   status: 'completed' | 'skipped';
   source: 'manual' | 'local-video';
   setType?: 'normal' | 'warmup' | 'drop' | 'failure';

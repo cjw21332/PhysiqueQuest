@@ -1,3 +1,4 @@
+import { lifecycleModel } from '../../test/lifecycle-model.fixture.js';
 import { describe, expect, it, vi } from 'vitest';
 import { Types } from 'mongoose';
 import { DryRunPushProvider, ExpoPushProvider } from './push.provider.js';
@@ -25,13 +26,14 @@ describe('push provider', () => {
 });
 
 function fixture(job?: Record<string, unknown>) {
+  if (job) job.generation = 0;
   const devices = { findOne: vi.fn().mockReturnValue({ select: vi.fn().mockResolvedValue(null) }),
     findOneAndUpdate: vi.fn().mockResolvedValue({}), deleteOne: vi.fn().mockResolvedValue({}),
     find: vi.fn().mockReturnValue({ select: () => ({ lean: async () => [{ _id: new Types.ObjectId() }] }) }) };
-  const deliveries = { findOneAndUpdate: vi.fn().mockReturnValueOnce({ lean: async () => job }).mockReturnValue({ lean: async () => null }),
+  const deliveries = { find: () => ({ limit: () => ({ lean: async () => [] }) }), aggregate: vi.fn().mockResolvedValueOnce(job ? [job] : []).mockResolvedValue([]), findById: () => ({ lean: async () => job }), findOneAndUpdate: vi.fn().mockReturnValueOnce({ lean: async () => job }).mockReturnValue({ lean: async () => null }),
     updateOne: vi.fn().mockResolvedValue({}) };
   const notifications = { exists: vi.fn().mockResolvedValue(true) };
-  const service = new PushService(devices as any, deliveries as any, notifications as any);
+  const service = new PushService(lifecycleModel(devices as any), lifecycleModel(deliveries as any), notifications as any);
   return { service, devices, deliveries, notifications };
 }
 
@@ -47,7 +49,7 @@ describe('push queue ownership and retention', () => {
     const userId = new Types.ObjectId().toHexString();
     await f.service.enqueue(userId, 'notification-uuid');
     const payload = f.deliveries.updateOne.mock.calls[0][1].$setOnInsert;
-    expect(Object.keys(payload).sort()).toEqual(['attempts', 'deviceId', 'deviceVersion', 'notificationId', 'runAt', 'status', 'userId']);
+    expect(Object.keys(payload).sort()).toEqual(['attempts', 'deviceId', 'deviceVersion', 'generation', 'notificationId', 'runAt', 'status', 'userId']);
     expect(f.notifications.exists).toHaveBeenCalledWith({ userId: new Types.ObjectId(userId), 'items.id': 'notification-uuid' });
   });
   it('does not queue a notification owned by another account', async () => {
@@ -61,7 +63,7 @@ describe('push queue ownership and retention', () => {
     f.devices.findOne.mockReturnValue({ select: () => ({ lean: async () => ({ _id: job.deviceId, token: 'ExpoPushToken[abcdefghijklmnop]' }) }) } as any);
     (f.service as any).provider = { receipt: async () => ({ error: 'DeviceNotRegistered' }) };
     await f.service.tick();
-    expect(f.devices.deleteOne).toHaveBeenCalledWith({ _id: job.deviceId, token: 'ExpoPushToken[abcdefghijklmnop]' });
+    expect(f.devices.deleteOne).toHaveBeenCalledWith({ _id: job.deviceId, token: 'ExpoPushToken[abcdefghijklmnop]' }, { session: expect.anything() });
     const completion = f.deliveries.updateOne.mock.calls[0][1].$set;
     expect(completion.status).toBe('failed');
     expect(completion.expiresAt.getTime() - Date.now()).toBeGreaterThan(6.9 * 86400000);

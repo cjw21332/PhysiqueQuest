@@ -87,6 +87,13 @@ export class ScannedMealItemDto {
   @IsOptional() @IsNumber() @Min(0) fat_g: number | null;
   @IsOptional() @IsNumber() @Min(0) @Max(5000) est_weight_g?: number;
   @IsOptional() @IsNumber() @Min(0) @Max(1) confidence?: number;
+  @IsOptional() @IsIn(['ai', 'manual', 'corrected']) identification_method?: 'ai' | 'manual' | 'corrected';
+  @IsOptional() @IsBoolean() weight_corrected?: boolean;
+  @IsOptional() @IsIn(['visual_estimate']) portion_method?: 'visual_estimate';
+  @IsOptional() @IsIn([null]) portion_confidence?: null;
+  @IsOptional() @IsIn([null]) region_confidence?: null;
+  @IsOptional() @IsIn([null]) weight_min_g?: null;
+  @IsOptional() @IsIn([null]) weight_max_g?: null;
   /**
    * Present on matched items. Accepted so the array round-trips unchanged, but
    * not persisted: the saved macros are already scaled to the estimated weight.
@@ -98,6 +105,7 @@ export class ScannedMealItemDto {
 }
 
 export class MealFromScanDto {
+  @IsOptional() @IsString() @Matches(/^[A-Za-z0-9_-]{16,80}$/) idempotency_key?: string;
   /** One meal row is written per selected item. */
   @IsArray()
   @ArrayMaxSize(50)

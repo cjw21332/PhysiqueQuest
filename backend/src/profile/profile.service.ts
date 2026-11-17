@@ -1,3 +1,4 @@
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, type HydratedDocument } from 'mongoose';
@@ -21,10 +22,10 @@ export class ProfileService {
     }
 
     // Create profile
-    const profile = await this.profileModel.create({
+    const profile = await new AccountLifecycleFence(this.profileModel.db).withActiveWrite(userId, async session => (await this.profileModel.create([{
       ...createProfileDto,
       userId: ownerId,
-    }).catch((error: unknown) => {
+    }], { session }))[0]).catch((error: unknown) => {
       if (isDuplicateKeyError(error)) throw new ConflictException('Profile already exists for this user');
       throw error;
     });
@@ -51,11 +52,11 @@ export class ProfileService {
       if (value !== undefined) patch[key] = value;
     }
     validateProfileMeasurements({ ...current.toObject(), ...patch });
-    const profile = await this.profileModel.findOneAndUpdate(
+    const profile = await new AccountLifecycleFence(this.profileModel.db).withActiveWrite(userId, async session => this.profileModel.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       { $set: patch },
       { returnDocument: 'after', runValidators: true },
-    );
+    ).session(session));
 
     if (!profile) {
       throw new NotFoundException('Profile not found');
@@ -66,13 +67,13 @@ export class ProfileService {
 
   async updatePhoto(userId: string, photo: string): Promise<HydratedDocument<Profile>> {
     if (photo && sniffImageMime(Buffer.from(photo.slice('data:image/jpeg;base64,'.length), 'base64')) !== 'image/jpeg') throw new BadRequestException('Please choose a valid image.');
-    const profile = await this.profileModel.findOneAndUpdate({ userId: new Types.ObjectId(userId) }, { $set: { photo } }, { returnDocument: 'after' });
+    const profile = await new AccountLifecycleFence(this.profileModel.db).withActiveWrite(userId, async session => this.profileModel.findOneAndUpdate({ userId: new Types.ObjectId(userId) }, { $set: { photo } }, { returnDocument: 'after' }).session(session));
     if (!profile) throw new NotFoundException('Profile not found');
     return profile;
   }
 
   async delete(userId: string): Promise<void> {
-    const result = await this.profileModel.deleteOne({ userId: new Types.ObjectId(userId) });
+    const result = await new AccountLifecycleFence(this.profileModel.db).withActiveWrite(userId, async session => this.profileModel.deleteOne({ userId: new Types.ObjectId(userId) }).session(session));
     if (result.deletedCount === 0) {
       throw new NotFoundException('Profile not found');
     }

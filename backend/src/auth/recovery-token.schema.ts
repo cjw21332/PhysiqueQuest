@@ -3,6 +3,7 @@ import { Schema as MongooseSchema, Types } from 'mongoose';
 
 @Schema({ timestamps: true, collection: 'password_recovery_tokens' })
 export class RecoveryToken {
+  @Prop() generation?: number;
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true, index: true }) userId: Types.ObjectId;
   @Prop({ required: true, unique: true, select: false }) tokenHash: string;
   @Prop() requestId?: string;

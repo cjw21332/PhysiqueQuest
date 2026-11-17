@@ -72,6 +72,7 @@ export class SetResultDto {
   @IsOptional() @IsNumber() @Min(0) @Max(1000) loadKg?: number;
   @IsOptional() @IsNumber() @Min(0) @Max(2204.63) loadValue?: number;
   @IsOptional() @IsIn(['kg', 'lbs']) loadUnit?: 'kg' | 'lbs';
+  @IsOptional() @IsNumber() @Min(0) @Max(100) barWeightKg?: number;
   @IsIn(['completed', 'skipped']) status: 'completed' | 'skipped';
   @IsIn(['manual', 'local-video']) source: 'manual' | 'local-video';
   @IsOptional() @IsInt() @Min(0) @Max(1000) detectedReps?: number;
