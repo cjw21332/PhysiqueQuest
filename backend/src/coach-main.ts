@@ -15,6 +15,9 @@ app.use(compressionMiddleware);
 app.use(queryValidationMiddleware);
 app.useBodyParser('json', { limit: '32kb' });
 const origins = (process.env.COACH_FRONTEND_URL || process.env.CORS_ALLOWED_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:3000').split(',').map(value => value.trim());
+// The bundled Android frontend uses the WebViewAssetLoader reserved origin.
+// Append it without replacing the deployment's existing allowlist.
+origins.push('https://appassets.androidplatform.net');
 app.enableCors({ origin: (origin, callback) => callback(isAllowedFrontendOrigin(origin, origins, process.env.NODE_ENV) ? null : new Error('Origin is not allowed by CORS'), true), methods: ['GET', 'POST', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'] });
 app.enableShutdownHooks();
 await app.listen(Number(process.env.COACH_PORT || 4050), '0.0.0.0');
