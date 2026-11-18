@@ -14,7 +14,7 @@ export class PoseAnalysisProvider {
       health.pathname = health.pathname.replace(/\/analyze\/?$/, '/health');
       if (health.pathname === new URL(endpoint).pathname) return false;
       health.search = ''; health.hash = '';
-      const response = await fetch(health, { signal: AbortSignal.timeout(30000), redirect: 'error' });
+      const response = await fetch(health, { signal: AbortSignal.timeout(75000), redirect: 'error' });
       const result = await response.json() as { available?: unknown };
       return response.ok && result.available === true;
     } catch { return false; }
@@ -30,7 +30,7 @@ export class PoseAnalysisProvider {
     const endpoint = this.config.get<string>('POSE_ANALYSIS_URL');
     const apiKey = this.config.get<string>('POSE_ANALYSIS_API_KEY');
     if (!endpoint || !apiKey) throw new Error('Pose provider is not configured');
-    const response = await outboundFetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }, body: JSON.stringify(payload), signal: AbortSignal.timeout(60_000) });
+    const response = await outboundFetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }, body: JSON.stringify(payload), signal: AbortSignal.timeout(90_000) });
     if (!response.ok) throw new Error(`Pose provider returned ${response.status}`);
     const result = await response.json() as { analysis?: unknown };
     if (!result.analysis || typeof result.analysis !== 'object' || Array.isArray(result.analysis) || JSON.stringify(result.analysis).length > 2_000_000) throw new Error('Pose provider returned an invalid analysis');
