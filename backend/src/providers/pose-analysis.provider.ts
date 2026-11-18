@@ -6,6 +6,19 @@ import { ConfigService } from '@nestjs/config';
 export class PoseAnalysisProvider {
   constructor(private readonly config: ConfigService) {}
   isAvailable() { return Boolean(this.config.get<string>('POSE_ANALYSIS_URL') && this.config.get<string>('POSE_ANALYSIS_API_KEY')); }
+  async isHealthy() {
+    const endpoint = this.config.get<string>('POSE_ANALYSIS_URL');
+    if (!this.isAvailable() || !endpoint) return false;
+    try {
+      const health = new URL(endpoint);
+      health.pathname = health.pathname.replace(/\/analyze\/?$/, '/health');
+      if (health.pathname === new URL(endpoint).pathname) return false;
+      health.search = ''; health.hash = '';
+      const response = await fetch(health, { signal: AbortSignal.timeout(3000), redirect: 'error' });
+      const result = await response.json() as { available?: unknown };
+      return response.ok && result.available === true;
+    } catch { return false; }
+  }
   async analyze(payload: {
     mediaBase64: string;
     mimeType: string;

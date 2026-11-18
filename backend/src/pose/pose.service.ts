@@ -8,8 +8,10 @@ import { VideoReviewService } from './video-review.service.js';
 @Injectable()
 export class PoseService {
   constructor(private readonly provider: PoseAnalysisProvider, @Optional() private readonly review?: VideoReviewService) {}
-  // Configuration is checked here; a provider outage is reported when analysis is requested.
-  status() { return this.provider.isAvailable() ? { available: true as const } : { available: false as const, reason: 'provider_not_configured' as const }; }
+  async status() {
+    if (!this.provider.isAvailable()) return { available: false as const, reason: 'provider_not_configured' as const };
+    return await this.provider.isHealthy() ? { available: true as const } : { available: false as const, reason: 'provider_unavailable' as const };
+  }
   async analyze(dto: PoseAnalysisDto) {
     if (!this.provider.isAvailable()) throw new ServiceUnavailableException({ code: 'PROVIDER_NOT_CONFIGURED', message: 'Pose analysis is not configured on the backend.' });
     const bytes = Buffer.from(dto.mediaBase64, 'base64');
@@ -29,7 +31,8 @@ export class PoseService {
       const analysis = await this.provider.analyze(dto) as Record<string, unknown>;
       const { _reviewFrames, _timeline, ...publicAnalysis } = analysis;
       if (!dto.mimeType.startsWith('video/') || !_reviewFrames) return publicAnalysis;
-      const exerciseReview = await this.review?.review(_reviewFrames, _timeline);
+      let exerciseReview: Record<string, unknown> | null | undefined;
+      try { exerciseReview = await this.review?.review(_reviewFrames, _timeline); } catch { exerciseReview = null; }
       return { ...publicAnalysis, exerciseReview: exerciseReview ?? null };
     }
     catch { throw new BadGatewayException({ code: 'POSE_PROVIDER_FAILED', message: 'Pose analysis did not return a usable result. Please retry later.' }); }
