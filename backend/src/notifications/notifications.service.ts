@@ -24,6 +24,11 @@ export class NotificationsService implements OnModuleInit, OnModuleDestroy {
     await this.get(userId);
     return new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.findOneAndUpdate({ userId: new Types.ObjectId(userId) }, { $set: { 'items.$[].unread': false } }, { returnDocument: 'after' }).session(session));
   }
+  async clear(userId: string, ids: string[]) {
+    return new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.findOneAndUpdate(
+      { userId: new Types.ObjectId(userId) }, { $pull: { items: { id: { $in: ids } } } }, { returnDocument: 'after' },
+    ).session(session));
+  }
   async setReminder(userId: string, reminder: { enabled: boolean; hour: number; minute: number; timezone: string }) {
     const generation = await new AccountLifecycleFence(this.model.db).generation(userId);
     try { new Intl.DateTimeFormat('en', { timeZone: reminder.timezone }); } catch { throw new BadRequestException('Choose a valid timezone'); }
