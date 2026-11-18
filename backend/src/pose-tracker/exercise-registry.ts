@@ -113,7 +113,7 @@ export function resolveTrackingConfig(row: CatalogExercise, override?: ConfigOve
     limitations: rule ? ['Provider identifier and catalog metadata matched; real-person accuracy and account access are not validated.', 'Camera cannot assess pain, injury risk or equipment load.'] : [category === 'machine-occlusion' ? 'Equipment can obscure joints; camera feasibility and a specific reference require verification.' : category === 'isometric' || category === 'mobility' ? 'Duration alone does not verify the held position or stretching technique; provider configuration requires review.' : 'No verified built-in mapping. An exercise-specific reference and camera validation are required.'], configurationVersion,
   };
   const tracked = catalogTrackingMap[exId];
-  if (!rule && tracked?.pattern && nativePatterns.has(tracked.pattern)) {
+  if (tracked?.pattern && nativePatterns.has(tracked.pattern)) {
     config.nativePattern = tracked.pattern;
     config.nativeSupport = tracked.support;
     config.nativeOverride = sanitizeNativeOverride(tracked.override);
