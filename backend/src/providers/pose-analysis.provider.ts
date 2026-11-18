@@ -14,7 +14,7 @@ export class PoseAnalysisProvider {
       health.pathname = health.pathname.replace(/\/analyze\/?$/, '/health');
       if (health.pathname === new URL(endpoint).pathname) return false;
       health.search = ''; health.hash = '';
-      const response = await fetch(health, { signal: AbortSignal.timeout(3000), redirect: 'error' });
+      const response = await fetch(health, { signal: AbortSignal.timeout(30000), redirect: 'error' });
       const result = await response.json() as { available?: unknown };
       return response.ok && result.available === true;
     } catch { return false; }
