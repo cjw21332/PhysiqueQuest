@@ -10,6 +10,7 @@ describe('OpenAI video review', () => {
     const result = await new VideoReviewService(config as never).review([{ jpeg: 'YWJj', timeSeconds: 0 }, { jpeg: 'YWJj', timeSeconds: 1 }], []);
     expect(result).toMatchObject({ exercise: 'Squat', equipment: 'Bodyweight', estimatedReps: null });
     expect(JSON.stringify(vi.mocked(openAIResponse).mock.calls[0])).toContain('data:image/jpeg;base64,YWJj');
+    expect(vi.mocked(openAIResponse).mock.calls[0][3]).toBe('gpt-6-luna');
   });
   it('does not submit insufficient frames', async () => {
     vi.mocked(openAIResponse).mockClear();
