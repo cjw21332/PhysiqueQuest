@@ -1,1 +1,4 @@
 output/PhysiqueQuest-Android-universal.apk filter=lfs diff=lfs merge=lfs -text
+artifacts/android/PhysiqueQuest-preview.apk filter=lfs diff=lfs merge=lfs -text
+artifacts/android/share/PhysiqueQuest-installed.apk filter=lfs diff=lfs merge=lfs -text
+artifacts/android/share/PhysiqueQuest.apk filter=lfs diff=lfs merge=lfs -text
