@@ -37,6 +37,7 @@ export class WorkoutSession {
     'planned' | 'standalone' | 'recorded-set';
   @Prop() requestKey?: string;
   @Prop() requestHash?: string;
+  @Prop() lastRoutineHash?: string;
   @Prop() completionHash?: string;
   @Prop() programVersion?: string;
   @Prop() dayIndex?: number;

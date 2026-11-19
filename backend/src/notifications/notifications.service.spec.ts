@@ -3,6 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { NotificationsService } from './notifications.service.js';
 
 describe('notifications', () => {
+  it('clears only selected notifications for the signed-in account', async () => {
+    const findOneAndUpdate = vi.fn().mockResolvedValue({ items: [] });
+    const service = new NotificationsService(lifecycleModel({ findOneAndUpdate } as never));
+    await service.clear('507f1f77bcf86cd799439011', ['old-1', 'old-2']);
+    expect(findOneAndUpdate).toHaveBeenCalledWith(expect.objectContaining({ userId: expect.anything() }), { $pull: { items: { id: { $in: ['old-1', 'old-2'] } } } }, expect.anything());
+  });
   it('marks a notification without replacing concurrently added items', async () => {
     const findOneAndUpdate = vi.fn().mockResolvedValue({ items: [] });
     const service = new NotificationsService(lifecycleModel({ findOneAndUpdate } as never));

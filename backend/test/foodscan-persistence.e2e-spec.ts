@@ -23,8 +23,45 @@ import { AuthService } from '../src/auth/auth.service.js';
 import { SessionService } from '../src/auth/session.service.js';
 import { FoodScanModule } from '../src/foodscan/foodscan.module.js';
 import { NutritionModule } from '../src/nutrition/nutrition.module.js';
-import { GeminiService } from '../src/foodscan/services/gemini.service.js';
+import { AI_VISION_PROVIDER } from '../src/foodscan/services/vision-provider.js';
+import type { VisionProvider } from '../src/foodscan/services/vision-provider.js';
 import { UsdaService } from '../src/foodscan/services/usda.service.js';
+import { issueEvidenceProof } from '../src/foodscan/services/evidence-proof.js';
+
+it.skipIf(!process.env.PQ_TEST_MONGO_URI)('atomically consumes scan evidence while permitting the identical save retry', async () => {
+  const dbName = `pq_foodscan_test_${randomUUID().replaceAll('-', '')}`;
+  const connection = await createConnection(process.env.PQ_TEST_MONGO_URI!, { dbName, serverSelectionTimeoutMS: 3000 }).asPromise();
+  vi.stubEnv('JWT_SECRET', 'isolated-replay-test-secret');
+  try {
+    const owner = new Types.ObjectId().toString();
+    await connection.collection('account_lifecycle').insertOne({ _id: new Types.ObjectId(owner), status: 'active', generation: 0, writeVersion: 0 });
+    await connection.collection('nutrition').createIndex({ userId: 1 }, { unique: true });
+    const evidence = { name: 'visually_identified', quantity: 'estimated', preparation: 'unknown', added_oil: 'unknown' } as const;
+    const scan = { id: randomUUID(), image: 'a'.repeat(64), analysis: 'b'.repeat(64) };
+    const proof = issueEvidenceProof(owner, 'rice', 100, evidence, scan)!;
+    const item = { food_name: 'rice', found: false, est_weight_g: 100, kcal: null, protein_g: null, carbs_g: null, fat_g: null, evidence, evidence_ref: proof };
+    const service = new NutritionService(connection.model('Nutrition', NutritionSchema));
+    const body = { meal: 'Lunch', items: [item], idempotency_key: 'scan_save_key_0001' };
+    const saved = await service.addMealsFromScan(owner, body);
+    expect(await service.addMealsFromScan(owner, body)).toEqual(saved);
+    await expect(service.addMealsFromScan(owner, { ...body, idempotency_key: 'scan_save_key_0002' })).rejects.toThrow('already been saved');
+    await expect(service.addMealsFromScan(owner, { ...body, idempotency_key: undefined })).rejects.toThrow('already been saved');
+    const record = await service.read(owner);
+    expect(record.meals).toHaveLength(1);
+    expect(record.consumedScanEvidence).toHaveLength(1);
+    const otherScan = { ...scan, id: randomUUID() };
+    const otherProof = issueEvidenceProof(owner, 'rice', 100, evidence, otherScan)!;
+    const competing = await Promise.allSettled(['scan_save_key_0003', 'scan_save_key_0004'].map(idempotency_key =>
+      service.addMealsFromScan(owner, { ...body, idempotency_key, items: [{ ...item, evidence_ref: otherProof }] })));
+    expect(competing.filter(result => result.status === 'fulfilled')).toHaveLength(1);
+    expect(competing.filter(result => result.status === 'rejected')).toHaveLength(1);
+    expect((await service.read(owner)).meals).toHaveLength(2);
+  } finally {
+    vi.unstubAllEnvs();
+    if (/^pq_foodscan_test_[a-f0-9]{32}$/.test(connection.name)) await connection.dropDatabase();
+    await connection.close();
+  }
+});
 
 // Real isolated MongoDB; provider data is synthetic, and no browser/JWT is used.
 it.skipIf(!process.env.PQ_TEST_MONGO_URI)('persists corrected scan selections with server-priced nutrition and user isolation', async () => {
@@ -69,7 +106,7 @@ it.skipIf(!process.env.PQ_TEST_MONGO_URI)('runs authenticated scanner and meal H
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
   const connection = app.get(getConnectionToken());
   const record = (id: number) => ({ fdcId: id, description: id === 101 ? 'Roasted chicken' : 'Fried egg', dataType: 'test', kcal_per_100g: id === 101 ? 165 : 200, protein_g_per_100g: 31, carbs_g_per_100g: 0, fat_g_per_100g: 3.6 });
-  vi.spyOn(app.get(GeminiService), 'detectFoods').mockImplementation(async (_image, _mime, usage) => { usage?.({ input: 10, output: 2, total: 12 }); return [{ food_name: 'chicken', est_weight_g: 100, confidence: 0.8 }, { food_name: 'extra', est_weight_g: 20, confidence: 0.2 }]; });
+  vi.spyOn(app.get<VisionProvider>(AI_VISION_PROVIDER), 'detectFoods').mockImplementation(async (_image, _mime, usage) => { usage?.({ input: 10, output: 2, total: 12 }); return [{ food_name: 'chicken', est_weight_g: 100, confidence: 0.8 }, { food_name: 'extra', est_weight_g: 20, confidence: 0.2 }]; });
   vi.spyOn(app.get(UsdaService), 'lookupFood').mockResolvedValue(record(101));
   vi.spyOn(app.get(UsdaService), 'getNutrients').mockImplementation(async id => record(id));
   vi.spyOn(app.get(UsdaService), 'searchCandidates').mockResolvedValue([{ fdc_id: 101, description: 'Roasted chicken', data_type: 'test' }]);
@@ -83,7 +120,7 @@ it.skipIf(!process.env.PQ_TEST_MONGO_URI)('runs authenticated scanner and meal H
     expect(scan.status).toBe(200);
     const duplicate = await api.post('/nutrition/scan').set('Authorization', token(owner)).set('X-Request-ID', 'idempotent-scan-1').send({ image: TINY_PNG_BASE64 });
     expect(duplicate.status).toBe(400);
-    expect(app.get(GeminiService).detectFoods).toHaveBeenCalledTimes(1);
+    expect(app.get<VisionProvider>(AI_VISION_PROVIDER).detectFoods).toHaveBeenCalledTimes(1);
     const search = await api.get('/nutrition/foods/search?q=roasted').set('Authorization', token(owner));
     expect(search.status).toBe(200);
     const detail = await api.get('/nutrition/foods/101').set('Authorization', token(owner));

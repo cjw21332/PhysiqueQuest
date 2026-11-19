@@ -1,3 +1,4 @@
+import { savedScanMealDates } from '../nutrition/saved-scan-meals.js';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -103,7 +104,7 @@ export class LeaderboardService {
         ...(start ? [{ $match: { firstAt: { $gte: start } } }] : []),
         { $project: { _id: 0, userId: '$_id.userId', day: '$_id.day' } },
       ]),
-      this.nutrition.find({}).select('userId meals.date water.date water.glasses').lean().exec(),
+      this.nutrition.find({}).select('userId meals.id meals.date meals.scanSavedAt meals.scanGroupId scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses').lean().exec(),
       this.workouts.find({ status: 'completed', 'sets.status': 'completed' }).select('userId endedAt timezone status sets').lean().exec(),
     ]);
 
@@ -116,11 +117,11 @@ export class LeaderboardService {
 
     const startDate = start ? start.toISOString().slice(0, 10) : '0000-00-00';
     for (const [id, days] of personalRecordDays(recordSessions)) for (const day of days) if (day >= startDate) add(id, 150);
-    for (const record of nutrition as { userId: unknown; meals?: { date: string }[]; water?: { date: string; glasses: number }[] }[]) {
+    for (const record of nutrition as { userId: unknown; meals?: { id?: string; date: string; scanSavedAt?: Date | string; scanGroupId?: string }[]; scanSaveReceipts?: { key: string; mealIds: string[] }[]; water?: { date: string; glasses: number }[] }[]) {
       const id = String(record.userId);
       const mealDays = new Map<string, number>();
-      for (const meal of record.meals ?? []) {
-        if (meal.date && meal.date >= startDate) mealDays.set(meal.date, (mealDays.get(meal.date) ?? 0) + 1);
+      for (const date of savedScanMealDates(record.meals ?? [], record.scanSaveReceipts)) {
+        if (date >= startDate) mealDays.set(date, (mealDays.get(date) ?? 0) + 1);
       }
       for (const count of mealDays.values()) if (count >= 3) add(id, MEAL_DAY_POINTS);
       for (const entry of record.water ?? []) if (entry.date && entry.date >= startDate && entry.glasses >= 8) add(id, WATER_DAY_POINTS);

@@ -1,10 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { OPENAI_MODEL } from '../common/openai.js';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { createHash, randomUUID } from 'node:crypto';
 import { FoodScanConfigService } from '../common/foodscan/foodscan-config.js';
 import { AppError, ErrorCode } from '../common/foodscan/errors.js';
+import { currentDeadline, remainingMs, runWithDeadline } from '../common/foodscan/deadline-context.js';
 import { mapConcurrent } from '../common/foodscan/http.service.js';
-import { GeminiService, type DetectedItem } from './services/gemini.service.js';
-import { UsdaService, type NutrientResult } from './services/usda.service.js';
+import { AI_VISION_PROVIDER, type VisionProvider, type DetectedItem } from './services/vision-provider.js';
+import { UsdaService } from './services/usda.service.js';
+import { foodSearchTerms } from './services/food-synonyms.js';
+import { researchedRecipeByName } from './services/researched-recipes.js';
+import { researchNutrition } from './services/web-nutrition.js';
+import { issueEvidenceProof } from './services/evidence-proof.js';
+import { attributeEvidence } from './services/evidence-attribution.js';
 import type { TokenUsage } from './foodscan-usage.service.js';
 import {
   analyzeRequestSchema,
@@ -64,7 +70,7 @@ export class FoodScanService {
   constructor(
     private readonly config: FoodScanConfigService,
     private readonly schemas: FoodScanSchemasService,
-    private readonly gemini: GeminiService,
+    @Inject(AI_VISION_PROVIDER) private readonly vision: VisionProvider,
     private readonly usda: UsdaService,
   ) {}
 
@@ -75,7 +81,7 @@ export class FoodScanService {
    * a DTO so Zod stays the single authority for the contract; the body is typed
    * `unknown` at the controller so the global ValidationPipe skips it.
    */
-  async analyze(rawBody: unknown, requestId: string, onUsage?: (usage: TokenUsage | null) => void): Promise<AnalyzeResponse> {
+  async analyze(rawBody: unknown, requestId: string, onUsage?: (usage: TokenUsage | null) => void, userId?: string): Promise<AnalyzeResponse> {
     const cfg = this.config.value;
 
     // Validation runs before any credential or provider is touched, so a
@@ -93,10 +99,10 @@ export class FoodScanService {
     const visionStarted = Date.now();
     let detected: DetectedItem[];
     try {
-      detected = await this.gemini.detectFoods(image.base64, image.mimeType, onUsage);
-      this.logger.log(`vision_completed request_id=${requestId} model=${OPENAI_MODEL} duration_ms=${Date.now() - visionStarted} image_bytes=${image.bytes} image_mime=${image.mimeType}`);
+      detected = body.description?.trim() ? await this.vision.detectFoods(image.base64, image.mimeType, onUsage, body.description.trim()) : await this.vision.detectFoods(image.base64, image.mimeType, onUsage);
+      this.logger.log(`vision_completed request_id=${requestId} duration_ms=${Date.now() - visionStarted}`);
     } catch (error) {
-      this.logger.warn(`vision_failed request_id=${requestId} model=${OPENAI_MODEL} duration_ms=${Date.now() - visionStarted} image_bytes=${image.bytes} image_mime=${image.mimeType} category=${error instanceof AppError ? error.code : 'unknown'}`);
+      this.logger.warn(`vision_failed request_id=${requestId} duration_ms=${Date.now() - visionStarted} category=${error instanceof AppError ? error.code : 'unknown'}`);
       throw error;
     }
 
@@ -104,7 +110,6 @@ export class FoodScanService {
       // A valid image with no recognisable food is a successful outcome.
       const empty: AnalyzeResponse = {
         request_id: requestId,
-        model: OPENAI_MODEL,
         items: [],
         unmatched: [],
         totals: zeroMacros(),
@@ -116,9 +121,43 @@ export class FoodScanService {
     // Bounded concurrency instead of a serial await loop, which made an
     // eight-item photo cost sixteen sequential round trips.
     let degraded = false;
-    const results = await mapConcurrent(detected, USDA_CONCURRENCY, async (d) => {
+    const deadline = currentDeadline();
+    // Return recognized foods promptly even if a nutrition provider is slow.
+    const nutritionBudget = Math.max(0, Math.min(10_000, remainingMs(deadline) - 1500));
+    const nutritionAbort = new AbortController();
+    let nutritionTimer: ReturnType<typeof setTimeout> | undefined;
+    const results: Array<Awaited<ReturnType<UsdaService['lookupFood']>> | Awaited<ReturnType<typeof researchNutrition>> | ReturnType<typeof researchedRecipeByName>> = new Array(detected.length);
+    const lookup = runWithDeadline({ signal: nutritionAbort.signal, deadlineAt: Date.now() + nutritionBudget }, () => mapConcurrent(detected.map((food, index) => ({ food, index })), USDA_CONCURRENCY, async ({ food: d, index }) => {
+      const result = await (async () => {
+      if (nutritionAbort.signal.aborted) return undefined;
       try {
-        return await this.usda.lookupFood(d.food_name);
+        const reviewed = researchedRecipeByName(d.food_name, [...(d.searchTerms ?? []), ...(d.localName ? [d.localName] : [])]);
+        if (reviewed) return reviewed;
+        const genericTokens = new Set(['chicken', 'turkey', 'shrimp', 'prawns', 'seafood', 'vegetable', 'vegetables', 'cooked', 'fried', 'grilled', 'stewed', 'soup', 'with']);
+        const nameTokens = foodSearchTerms(d.food_name)[0].split(' ').filter(token => token.length >= 5 && !genericTokens.has(token));
+        // A generic ingredient alias for a mixed dish is not a reliable match
+        // for the complete dish. Preserve uncertainty instead of substituting it.
+        const aliases = [...(d.searchTerms ?? []), ...(d.localName ? [d.localName] : [])].filter(term => !d.isComposite || nameTokens.some(token => foodSearchTerms(term).some(alias => alias.split(' ').includes(token))));
+        let webLookup: ReturnType<typeof researchNutrition> | undefined;
+        for (const term of [...new Set([d.food_name, ...aliases].flatMap(foodSearchTerms))]) {
+          if (nutritionAbort.signal.aborted) return undefined;
+          try {
+            const result = await this.usda.lookupFood(term, false);
+            if (result) {
+              const incomplete = [result.kcal_per_100g, result.protein_g_per_100g, result.carbs_g_per_100g, result.fat_g_per_100g].some(value => value === null);
+              if (incomplete && userId && !nutritionAbort.signal.aborted) {
+                return await (webLookup ?? researchNutrition(d.food_name, userId, onUsage)) ?? result;
+              }
+              return result;
+            }
+          } catch {
+            // A failed search term should not prevent another name for the same food from matching.
+            degraded = true;
+            this.logger.warn({ event: 'nutrition_lookup_failed', request_id: requestId });
+          }
+          if (!webLookup && userId && !nutritionAbort.signal.aborted) webLookup = researchNutrition(d.food_name, userId, onUsage);
+        }
+        return webLookup ? await webLookup : undefined;
       } catch {
         // A single failed nutrition lookup must not fail the whole analysis:
         // the caller can still show the detected items.
@@ -126,21 +165,40 @@ export class FoodScanService {
         this.logger.warn({ event: 'nutrition_lookup_failed', request_id: requestId });
         return undefined;
       }
-    });
+      })();
+      if (!nutritionAbort.signal.aborted) results[index] = result;
+      return result;
+    }));
+    if (Number.isFinite(nutritionBudget)) {
+      const completed = await Promise.race([
+        lookup.then(() => true),
+        new Promise<false>(resolve => { nutritionTimer = setTimeout(() => { nutritionAbort.abort(); resolve(false); }, nutritionBudget); }),
+      ]);
+      if (!completed) degraded = true;
+    } else {
+      (await lookup).forEach((value, index) => { results[index] = value; });
+    }
+    if (nutritionTimer) clearTimeout(nutritionTimer);
 
     const items: AnalyzedItem[] = [];
     const unmatched: string[] = [];
 
+    const scan = { id: randomUUID(), image: createHash('sha256').update(image.base64).digest('hex'), analysis: createHash('sha256').update(JSON.stringify(detected)).digest('hex') };
     detected.forEach((d, i) => {
-      const nut: NutrientResult | undefined = results[i];
+      const nut = results[i];
+      const evidence = attributeEvidence(d, body.description);
+      const evidence_ref = userId ? issueEvidenceProof(userId, d.food_name, d.est_weight_g, evidence, scan) : undefined;
       if (!nut) {
         unmatched.push(d.food_name);
         items.push({
           food_name: d.food_name,
           est_weight_g: d.est_weight_g,
           confidence: d.confidence,
+          localName: d.localName, searchTerms: d.searchTerms, isComposite: d.isComposite, portionDescription: d.portionDescription,
           portion_method: 'visual_estimate', portion_confidence: null, region_confidence: null, weight_min_g: null, weight_max_g: null,
           found: false,
+          evidence,
+          ...(evidence_ref ? { evidence_ref } : {}),
           kcal: null, protein_g: null, carbs_g: null, fat_g: null,
         });
         return;
@@ -160,9 +218,12 @@ export class FoodScanService {
         food_name: d.food_name,
         est_weight_g: d.est_weight_g,
         confidence: d.confidence,
+        localName: d.localName, searchTerms: d.searchTerms, isComposite: d.isComposite, portionDescription: d.portionDescription,
         portion_method: 'visual_estimate', portion_confidence: null, region_confidence: null, weight_min_g: null, weight_max_g: null,
         found: true,
-        fdc_id: nut.fdcId,
+        evidence,
+        ...(evidence_ref ? { evidence_ref } : {}),
+        ...('fdcId' in nut ? { fdc_id: nut.fdcId } : { nutrition_ref: nut.nutrition_ref, nutrition_source: nut.source, ...('reference_ingredients' in nut && Array.isArray(nut.reference_ingredients) ? { reference_ingredients: nut.reference_ingredients as string[] } : {}) }),
         description: titleCase(nut.description),
         ...macros,
         per_100g: {
@@ -178,7 +239,6 @@ export class FoodScanService {
       items.some(item => item[key] === null) ? null : round(items.reduce((sum, item) => sum + item[key]!, 0));
     const response: AnalyzeResponse = {
       request_id: requestId,
-      model: OPENAI_MODEL,
       items,
       unmatched,
       totals: {
@@ -191,16 +251,14 @@ export class FoodScanService {
     };
 
     this.logger.log(
-      `analysis_completed request_id=${requestId} model=${OPENAI_MODEL} ` +
-        `image_bytes=${image.bytes} image_mime=${image.mimeType} detected_items=${detected.length} ` +
-        `matched_items=${items.length - unmatched.length} unmatched_items=${unmatched.length} degraded=${degraded}`
+      `analysis_completed request_id=${requestId} duration_ms=${Date.now() - visionStarted}`
     );
 
     return analyzeResponseSchema.parse(response);
   }
 
   async searchFoods(q: string, requestId: string): Promise<{ request_id: string; candidates: FoodCandidate[] }> {
-    const candidates = await this.usda.searchCandidates(q, 8);
+    const candidates = await this.usda.searchCandidates(foodSearchTerms(q)[0], 8);
 
     this.logger.log(`food_search request_id=${requestId} result_count=${candidates.length}`);
 
@@ -213,6 +271,8 @@ export class FoodScanService {
     return {
       request_id: requestId,
       fdc_id: nut.fdcId,
+      id: `usda:${nut.fdcId}`,
+      source: 'USDA',
       description: nut.description,
       data_type: nut.dataType,
       ...(nut.servingSizeG ? { serving_size_g: nut.servingSizeG } : {}),

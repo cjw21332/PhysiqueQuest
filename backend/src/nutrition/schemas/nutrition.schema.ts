@@ -14,6 +14,7 @@ export class MealEntry {
 @Prop({type:Number, min:0}) cholesterol?: number | null;
   @Prop({ type: String }) brand?: string;
   @Prop({ type: Number, min: 0 }) servingQuantity?: number;
+  @Prop({ type: Number, min: 0 }) servingSizeG?: number;
   @Prop({ type: String }) servingUnit?: string;
   @Prop({ type: String }) barcode?: string;
   @Prop({ required: true }) id: string;
@@ -43,7 +44,11 @@ export class MealEntry {
   @Prop({ type: Object }) nutritionPer100g?: { kcal: number | null; protein_g: number | null; carbs_g: number | null; fat_g: number | null };
   @Prop({ enum: ['ai', 'manual', 'corrected'] }) identificationMethod?: string;
   @Prop({ type: Boolean }) weightCorrected?: boolean;
+  @Prop({ type: Object }) foodEvidence?: { name: string; quantity: string; preparation: string; added_oil: string };
+  @Prop({ type: String, maxlength: 120 }) preparation?: string;
+  @Prop({ type: String, maxlength: 200 }) addedOil?: string;
   @Prop({ type: Date }) scanSavedAt?: Date;
+  @Prop({ type: String }) scanGroupId?: string;
 }
 
 @Schema({ _id: false })
@@ -63,8 +68,15 @@ export class Nutrition {
   @Prop({ type: [{ _id: false, key: { type: String, required: true }, hash: { type: String, required: true }, mealIds: { type: [String], required: true } }], default: [] })
   scanSaveReceipts?: { key: string; hash: string; mealIds: string[] }[];
 
+  /** Digests of consumed scan identifiers; stored with the meal transaction. */
+  @Prop({ type: [String], default: [] })
+  consumedScanEvidence?: string[];
+
   @Prop({ type: Object, default: null })
   dietaryPlan?: { goal: string; calories: number; protein: number; carbs: number; fat: number; activity?: string; startedAt?: string };
+
+  @Prop({ type: Number, default: null, min: 0 })
+  previousCalorieTarget?: number | null;
 
   @Prop({ type: [WaterEntry], default: [] })
   water: WaterEntry[];

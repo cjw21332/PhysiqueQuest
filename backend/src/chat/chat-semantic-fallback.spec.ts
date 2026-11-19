@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+﻿import { describe, expect, it, vi } from 'vitest';
 import { createChatFixture, CHAT_FIXTURE_OWNER } from './testing/chat-fixture.js';
 import { CHAT_SEMANTIC_ROUTES, completeSemanticPlan, needsSemanticRouting, semanticCandidates, semanticHints, semanticQuestion, semanticSourceIds, type SemanticPlan } from './chat-semantic-router.js';
 import { fastEducationAnswer, fastPageAnswer, fastRecordAnswer } from './chat-fast-answers.js';

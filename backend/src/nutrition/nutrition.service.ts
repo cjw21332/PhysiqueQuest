@@ -8,6 +8,9 @@ import { UsdaService } from '../foodscan/services/usda.service.js';
 import { mapConcurrent } from '../common/foodscan/http.service.js';
 import { AppError, ErrorCode } from '../common/foodscan/errors.js';
 import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
+import { researchedRecipeById } from '../foodscan/services/researched-recipes.js';
+import { verifiedWebNutrition } from '../foodscan/services/web-nutrition.js';
+import { readEvidenceProof } from '../foodscan/services/evidence-proof.js';
 
 @Injectable()
 export class NutritionService implements OnModuleInit {
@@ -54,7 +57,7 @@ export class NutritionService implements OnModuleInit {
 
   async updateMeal(userId: string, id: string, dto: MealDto): Promise<NutritionDocument> {
     const patch: Record<string, unknown> = { 'meals.$.edited': true };
-    for (const key of ['name', 'meal', 'calories', 'detail', 'protein', 'carbs', 'fat', 'saturatedFat', 'transFat', 'fiber', 'sugars', 'addedSugar', 'sodium', 'cholesterol', 'fdcId'] as const) {
+    for (const key of ['name', 'meal', 'calories', 'detail', 'protein', 'carbs', 'fat', 'saturatedFat', 'transFat', 'fiber', 'sugars', 'addedSugar', 'sodium', 'cholesterol', 'fdcId', 'estWeightG', 'servingQuantity', 'servingUnit', 'servingSizeG'] as const) {
       if (dto[key] !== undefined) patch[`meals.$.${key}`] = dto[key];
     }
     return this.withActiveWrite(userId, async session => {
@@ -82,8 +85,15 @@ export class NutritionService implements OnModuleInit {
     if (dto.protein + dto.carbs + dto.fat !== 100) throw new BadRequestException('Macro percentages must add up to 100');
     return this.withActiveWrite(userId, async session => this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
-      { $set: { dietaryPlan: { ...dto, startedAt: dto.startedAt ?? new Date().toISOString() } } },
-      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true, runValidators: true, session },
+      [{ $set: {
+        previousCalorieTarget: { $cond: [
+          { $and: [{ $isNumber: '$dietaryPlan.calories' }, { $ne: ['$dietaryPlan.calories', dto.calories] }] },
+          '$dietaryPlan.calories', { $ifNull: ['$previousCalorieTarget', null] },
+        ] },
+        dietaryPlan: { $literal: { ...dto, startedAt: dto.startedAt ?? new Date().toISOString() } },
+        meals: { $ifNull: ['$meals', []] }, water: { $ifNull: ['$water', []] },
+      } }],
+      { upsert: true, returnDocument: 'after', updatePipeline: true, session },
     ));
   }
 
@@ -120,12 +130,38 @@ export class NutritionService implements OnModuleInit {
     if (key) { const existing = await this.withActiveWrite(userId, replay, generation); if (existing) return existing; }
 
     const date = dto.date || new Date().toISOString().slice(0, 10);
+    // All server-signed observations in one meal must originate from the same
+    // analysis. Manual entries have no proof and may be added during review.
+    const proofs = dto.items.flatMap(item => item.evidence_ref ? [item.evidence_ref] : []);
+    if (new Set(proofs).size !== proofs.length) throw new BadRequestException('A food evidence reference was used more than once.');
+    const verifiedProofs = proofs.map(proof => {
+      const payload = readEvidenceProof(proof, userId);
+      if (!payload) throw new BadRequestException('The food evidence has expired or is invalid. Scan the meal again.');
+      return { proof, payload };
+    });
+    const contexts = verifiedProofs.map(({ payload }) => payload.scan ? JSON.stringify(payload.scan) : 'legacy');
+    if (new Set(contexts).size > 1) throw new BadRequestException('Food evidence from different scans cannot be combined.');
+    // A whole new-format scan can be saved once, even if only a subset of its
+    // items was selected. Legacy references are consumed individually.
+    const consumptionIds = [...new Set(verifiedProofs.map(({ proof, payload }) => createHash('sha256').update(payload.scan ? `scan:${payload.scan.id}` : `legacy:${proof}`).digest('hex')))];
+    const scanGroupId = key || randomUUID();
+    const savedAt = new Date();
     const meals = await mapConcurrent(dto.items, 4, async (item) => {
       if (!Number.isFinite(item.est_weight_g) || !item.est_weight_g || item.est_weight_g <= 0 || item.est_weight_g > 5000) throw new BadRequestException('Each food needs a weight between 0 and 5000 g');
-      if (item.found && !item.fdc_id) throw new BadRequestException('Select a nutrition record for each matched food');
-      if (item.found && !this.usda) throw new BadRequestException('Nutrition verification is unavailable');
+      if ((item.entered_quantity === undefined) !== (item.entered_unit === undefined)) throw new BadRequestException('Quantity and unit must be provided together');
+      if (item.entered_quantity !== undefined && item.entered_unit !== undefined) {
+        const factors = { g: 1, kg: 1000, oz: 28.349523125, lb: 453.59237 };
+        const grams = item.entered_quantity * factors[item.entered_unit];
+        if (!Number.isFinite(grams) || grams <= 0 || Math.abs(grams - item.est_weight_g) > 0.11) throw new BadRequestException('The quantity does not match the food weight');
+      }
+      const trustedEvidence = item.evidence_ref ? readEvidenceProof(item.evidence_ref, userId) : undefined;
+      if (item.evidence_ref && !trustedEvidence) throw new BadRequestException('The food evidence has expired or is invalid. Scan the meal again.');
+      if (item.found && Boolean(item.fdc_id) === Boolean(item.nutrition_ref)) throw new BadRequestException('Select one nutrition record for each matched food');
+      const recipe = item.nutrition_ref ? researchedRecipeById(item.nutrition_ref) ?? verifiedWebNutrition(item.nutrition_ref, userId) : undefined;
+      if (item.nutrition_ref && !recipe) throw new BadRequestException('The selected nutrition record is unavailable. Choose another food.');
+      if (item.found && item.fdc_id && !this.usda) throw new BadRequestException('Nutrition verification is unavailable');
       let record;
-      try { record = item.found ? await this.usda!.getNutrients(item.fdc_id!) : undefined; }
+      try { record = item.found ? recipe ?? await this.usda!.getNutrients(item.fdc_id!) : undefined; }
       catch (error) {
         if (error instanceof AppError && error.code === ErrorCode.NOT_FOUND) throw new BadRequestException('The selected nutrition record is unavailable. Choose another food.');
         throw new ServiceUnavailableException('Nutrition verification is temporarily unavailable. Try saving again.');
@@ -152,10 +188,28 @@ export class NutritionService implements OnModuleInit {
       ...(!item.found || item.fdc_id === undefined ? {} : { fdcId: item.fdc_id }),
       ...(item.confidence === undefined || (item.identification_method && item.identification_method !== 'ai') ? {} : { confidence: item.confidence }),
       ...(item.est_weight_g === undefined ? {} : { estWeightG: item.est_weight_g }),
-      ...(record ? { nutritionProvider: 'USDA FoodData Central', nutritionDescription: record.description, nutritionPer100g: per100 } : {}),
+      ...(item.entered_quantity === undefined ? {} : { servingQuantity: item.entered_quantity, servingUnit: item.entered_unit }),
+      ...(record ? { nutritionProvider: recipe ? recipe.source : 'USDA FoodData Central', nutritionDescription: record.description, nutritionPer100g: per100 } : {}),
       identificationMethod: item.identification_method ?? 'ai',
       ...(item.weight_corrected === undefined ? {} : { weightCorrected: item.weight_corrected }),
-      scanSavedAt: new Date(),
+      ...(item.preparation_correction?.trim() ? { preparation: item.preparation_correction.trim() } : {}),
+      ...(item.added_oil_correction?.trim() ? { addedOil: item.added_oil_correction.trim() } : {}),
+      ...(item.evidence ? { foodEvidence: (() => {
+        const trusted = trustedEvidence;
+        if (!trusted) return {
+          name: item.identification_method === 'manual' ? 'user_confirmed' : 'unknown',
+          quantity: item.identification_method === 'manual' ? 'user_confirmed' : 'unknown',
+          preparation: item.preparation_correction?.trim() ? 'user_confirmed' : 'unknown', added_oil: item.added_oil_correction?.trim() ? 'user_confirmed' : 'unknown',
+        };
+        return { ...trusted.evidence,
+          name: item.food_name !== trusted.name ? 'user_confirmed' : trusted.evidence.name,
+          quantity: item.est_weight_g !== trusted.grams ? 'user_confirmed' : trusted.evidence.quantity,
+          preparation: item.preparation_correction?.trim() ? 'user_confirmed' : trusted.evidence.preparation,
+          added_oil: item.added_oil_correction?.trim() ? 'user_confirmed' : trusted.evidence.added_oil,
+        };
+      })() } : {}),
+      scanSavedAt: savedAt,
+      scanGroupId,
     }); });
 
     return this.withActiveWrite(userId, async session => {
@@ -164,7 +218,20 @@ export class NutritionService implements OnModuleInit {
       // Concurrent first saves may race on the existing unique userId index.
       const prior = await replay(session);
       if (prior) return prior;
+    }
+    if (consumptionIds.length) {
+      // The same transaction commits consumption and meal rows. A rollback
+      // leaves the evidence usable; concurrent writers cannot both consume it.
       await this.model.findOneAndUpdate({ userId: owner }, { $setOnInsert: { userId: owner, meals: [], water: [] } }, { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true, session });
+      const consumed = await this.model.updateOne(
+        { userId: owner, consumedScanEvidence: { $nin: consumptionIds } },
+        { $addToSet: { consumedScanEvidence: { $each: consumptionIds } } },
+        { session },
+      );
+      if (consumed.matchedCount !== 1) throw new ConflictException('This scan has already been saved.');
+    }
+    if (key) {
+      if (!consumptionIds.length) await this.model.findOneAndUpdate({ userId: owner }, { $setOnInsert: { userId: owner, meals: [], water: [] } }, { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true, session });
       const receipt = { key, hash, mealIds: meals.map(meal => meal.id) };
       const written = await this.model.findOneAndUpdate(
         { userId: owner, 'scanSaveReceipts.key': { $ne: key } },

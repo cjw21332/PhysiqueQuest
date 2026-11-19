@@ -7,7 +7,7 @@ import { isIP } from 'node:net';
 import { Readable } from 'node:stream';
 import { CHAT_CONFIG_KEYS, chatConfig, isPrivateChatAddress } from './chat-config.js';
 import { SEMANTIC_ROUTING_INSTRUCTIONS, SEMANTIC_ROUTING_PRECISION, SEMANTIC_SCHEMA, completeSemanticPlan, parseSemanticPlan, semanticCandidates, semanticHints, type SemanticPlan } from './chat-semantic-router.js';
-import { openAIResponse } from '../common/openai.js';
+import { openAIResponse, OPENAI_MODEL } from '../common/openai.js';
 
 export type LocalChatMessage = { role: 'system' | 'user'; content: string };
 export type GroundedReply = { inScope: boolean; answer: string; sourceIds: string[] };
@@ -78,7 +78,7 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
   constructor(private readonly config: ConfigService) {}
 
   private settings() { return chatConfig(Object.fromEntries(CHAT_CONFIG_KEYS.map(key => [key, this.config.get(key)]))); }
-  private signal(timeoutMs: number) { return AbortSignal.any([AbortSignal.timeout(timeoutMs), this.shutdown.signal]); }
+  private signal(timeoutMs: number, requestSignal?: AbortSignal) { return AbortSignal.any([AbortSignal.timeout(timeoutMs), this.shutdown.signal, ...(requestSignal ? [requestSignal] : [])]); }
   private async checkModel(settings: ChatSettings, signal: AbortSignal) {
     if (!process.env.OPENAI_API_KEY?.trim()) throw new Error('OpenAI is not configured');
     return;
@@ -101,7 +101,7 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
   private async cloudChat(body: { messages: Array<{ role: string; content: string }>; format: unknown; options: { num_predict: number; [key: string]: unknown }; [key: string]: unknown }, signal: AbortSignal) {
     const input = body.messages.map(message => ({ role: message.role, content: message.content }));
     input.unshift({ role: 'system', content: 'Return only valid JSON matching this schema: ' + JSON.stringify(body.format) });
-    const result = await openAIResponse(input, Math.max(512, body.options.num_predict), signal);
+    const result = await openAIResponse(input, Math.max(512, body.options.num_predict), signal, process.env.OPENAI_MODEL?.trim() || OPENAI_MODEL);
     return { done: true, done_reason: 'stop', message: { content: result.content } };
   }
 
@@ -110,7 +110,8 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
     const key = process.env.OPENAI_API_KEY?.trim();
     if (!key) return { ready: false };
     try {
-      const response = await fetch('https://api.openai.com/v1/models/gpt-6-luna', { headers: { Authorization: `Bearer ${key}` }, signal: this.signal(5000), redirect: 'error' });
+      const model = process.env.OPENAI_MODEL?.trim() || OPENAI_MODEL;
+      const response = await fetch(`https://api.openai.com/v1/models/${encodeURIComponent(model)}`, { headers: { Authorization: `Bearer ${key}` }, signal: this.signal(5000), redirect: 'error' });
       await response.body?.cancel();
       return { ready: response.ok };
     } catch { return { ready: false }; }
@@ -169,12 +170,13 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
   }
 
   /** Meaning-only planning: no account records, IDs, database tools or free-form queries. */
-  async routeQuestion(question: string, previousUserQuestions: readonly string[] = [], page?: string): Promise<SemanticPlan> {
+  async routeQuestion(question: string, previousUserQuestions: readonly string[] = [], page?: string, requestSignal?: AbortSignal): Promise<SemanticPlan> {
     const settings = this.settings();
     if (this.active >= settings.maxConcurrency) throw new ServiceUnavailableException('Phiq is busy. Please try again shortly.');
     this.active++;
     try {
-      const signal = this.signal(Math.min(settings.timeoutMs, 20000));
+      const signal = this.signal(Math.min(settings.timeoutMs, 20000), requestSignal);
+      signal.throwIfAborted();
       await this.checkModel(settings, signal);
       const candidates = semanticCandidates(question, previousUserQuestions, page);
       const evidence = semanticHints(question, previousUserQuestions, page);
@@ -200,12 +202,13 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
     } finally { this.active--; }
   }
 
-  async generate(messages: LocalChatMessage[], sourceIds: string[]): Promise<GroundedReply> {
+  async generate(messages: LocalChatMessage[], sourceIds: string[], requestSignal?: AbortSignal): Promise<GroundedReply> {
     const settings = this.settings();
     if (this.active >= settings.maxConcurrency) throw new ServiceUnavailableException('Phiq is busy. Please try again shortly.');
     this.active++;
     try {
-      const signal = this.signal(settings.timeoutMs);
+      const signal = this.signal(settings.timeoutMs, requestSignal);
+      signal.throwIfAborted();
       await this.checkModel(settings, signal);
       const schema = {
         type: 'object', additionalProperties: false, required: ['inScope', 'answer', 'sourceIds'],

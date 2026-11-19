@@ -2,6 +2,8 @@ import { describe,it,expect,vi,afterEach } from 'vitest';
 import { PoseTrackerService } from '../src/pose-tracker/pose-tracker.module.js';
 import { validateOverride, resolveTrackingConfig, canTrack } from '../src/pose-tracker/exercise-registry.js';
 import { catalogTiersMap } from '../src/pose-tracker/catalog-tiers.js';
+import { catalogTrackingMap } from '../src/pose-tracker/catalog-tracking.generated.js';
+import { nativePatterns } from '../src/pose-tracker/exercise-registry.js';
 const row={exerciseId:'squat',name:'bodyweight squat',equipments:['bodyweight'],targetMuscles:['quadriceps'],instructions:['Bend knees and hips']};
 function setup(config?:any){const model={findOne:vi.fn(()=>({lean:async()=>config?{config}:null})),find:vi.fn(()=>({lean:async()=>[]})),updateOne:vi.fn(async()=>{})};const catalog={trackingCatalog:async()=>[row],trackingRecord:async(id:string)=>id===row.exerciseId?row:null};return {service:new PoseTrackerService(model as any,catalog as any),model};}
 describe('PoseTracker API configuration',()=>{
@@ -96,6 +98,24 @@ describe('PoseTracker API configuration',()=>{
     const unsupported = resolveTrackingConfig({ exerciseId: '01qpYSe', name: 'upward facing dog stretch' });
     expect(unsupported.nativePattern ?? null).toBeNull();
     expect(canTrack(unsupported)).toBe(false);
+  });
+  it('uses the native pattern for a documented provider exercise only when requested by the app', async () => {
+    vi.stubEnv('POSETRACKER_ENABLED', 'false');
+    const squatRow = { ...row, exerciseId: '6YUfHPL', name: 'quads bodyweight squat' };
+    const model = { findOne: vi.fn(() => ({ lean: async () => null })) };
+    const catalog = { trackingRecord: async () => squatRow };
+    const service = new PoseTrackerService(model as any, catalog as any);
+    expect((await service.launch(squatRow.exerciseId, false, true)).config.nativePattern).toBe('squat');
+    await expect(service.launch(squatRow.exerciseId)).rejects.toThrow('disabled');
+  });
+  it('only advertises implemented native patterns for every mapped catalog exercise', () => {
+    for (const [id, entry] of Object.entries(catalogTrackingMap)) {
+      const config = resolveTrackingConfig({ exerciseId: id, name: 'catalog exercise' });
+      if (entry.pattern && nativePatterns.has(entry.pattern)) {
+        expect(config.nativePattern, id).toBe(entry.pattern);
+        expect(config.nativeSupport, id).not.toBe('FULLY_SUPPORTED');
+      } else expect(config.nativePattern, id).toBeFalsy();
+    }
   });
   it('never labels an exercise fully supported and serves native launches without a provider token', async () => {
     vi.stubEnv('POSETRACKER_ENABLED', 'false');

@@ -5,16 +5,81 @@ import { UsdaService } from './usda.service.js';
 describe('USDA search request construction', () => {
   afterEach(() => vi.restoreAllMocks());
 
+  it('does not present an arbitrary food portion as a standard serving', async () => {
+    const food = { fdcId: 990100, description: 'Test food', dataType: 'Foundation', foodPortions: [{ amount: 2, modifier: 'slices', gramWeight: 80 }] };
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue(food) } as never);
+    expect((await service.getNutrients(food.fdcId)).servingSizeG).toBeUndefined();
+  });
+
+  it('returns a serving weight when the food record states one in grams', async () => {
+    const food = { fdcId: 990101, description: 'Test labelled food', dataType: 'Branded', servingSize: 35, servingSizeUnit: 'g' };
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue(food) } as never);
+    expect((await service.getNutrients(food.fdcId)).servingSizeG).toBe(35);
+  });
+
+  it('caches confirmed empty searches but retries failures', async () => {
+    const fetchJson = vi.fn().mockResolvedValue({ foods: [] });
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson } as never);
+    await service.lookupFood('unique cached absent dish');
+    await service.lookupFood('unique cached absent dish');
+    expect(fetchJson).toHaveBeenCalledTimes(2);
+    fetchJson.mockRejectedValueOnce(new Error('temporary')).mockResolvedValue({ foods: [] });
+    await expect(service.lookupFood('unique transient absent dish')).rejects.toThrow();
+    await service.lookupFood('unique transient absent dish');
+    expect(fetchJson).toHaveBeenCalledTimes(5);
+  });
+
   it('does not automatically match unspecified chicken to raw chicken', async () => {
     const raw = { fdcId: 990091, description: 'Chicken breast, raw', dataType: 'Foundation', foodNutrients: [] };
     const fetchJson = vi.fn().mockResolvedValue({ foods: [raw] });
     const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson } as never);
     await expect(service.lookupFood('chicken breast')).resolves.toBeUndefined();
   });
+  it('does not substitute mature yardlong bean seeds for the cooked pods', async () => {
+    const food = { fdcId: 990090, description: 'Yardlong beans, mature seeds, cooked', dataType: 'SR Legacy', foodNutrients: [{ nutrientId: 1008, unitName: 'KCAL', value: 118 }] };
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue({ foods: [food] }) } as never);
+    await expect(service.lookupFood('yardlong bean cooked', false)).resolves.toBeUndefined();
+  });
+  it('does not substitute breaded fried fast-food chicken for unspecified chicken pieces', async () => {
+    const food = { fdcId: 990099, description: 'Fast foods, chicken, breaded and fried, boneless pieces, plain', dataType: 'Survey (FNDDS)', foodNutrients: [{ nutrientId: 1008, unitName: 'KCAL', value: 300 }] };
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue({ foods: [food] }) } as never);
+    await expect(service.lookupFood('chicken pieces', false)).resolves.toBeUndefined();
+  });
+  it('does not substitute pickled meat or unprepared vegetables for visible cooked ingredients', async () => {
+    const foods = [
+      { fdcId: 990097, description: 'Pork, pickled pork hocks', dataType: 'Survey (FNDDS)', foodNutrients: [{ nutrientId: 1008, unitName: 'KCAL', value: 171 }] },
+      { fdcId: 990098, description: 'Okra, frozen, unprepared', dataType: 'Foundation', foodNutrients: [{ nutrientId: 1008, unitName: 'KCAL', value: 30 }] },
+    ];
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue({ foods }) } as never);
+    await expect(service.lookupFood('pork', false)).resolves.toBeUndefined();
+    await expect(service.lookupFood('okra', false)).resolves.toBeUndefined();
+  });
   it('does not automatically match generic white rice to glutinous rice', async () => {
     const rice = { fdcId: 990092, description: 'Rice, white, glutinous, cooked', dataType: 'Foundation', foodNutrients: [] };
     const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue({ foods: [rice] }) } as never);
     await expect(service.lookupFood('white rice cooked')).resolves.toBeUndefined();
+  });
+  it('does not match a dish to a rice bowl when rice was not requested', async () => {
+    const bowl = { fdcId: 990093, description: 'Adobo chicken with rice bowl', dataType: 'Branded', foodNutrients: [] };
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue({ foods: [bowl] }) } as never);
+    await expect(service.lookupFood('chicken adobo')).resolves.toBeUndefined();
+  });
+  it('does not auto-select branded entries when matching visible ingredients', async () => {
+    const fetchJson = vi.fn().mockResolvedValue({ foods: [] });
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson } as never);
+    await expect(service.lookupFood('unique pictured pork pieces', false)).resolves.toBeUndefined();
+    expect(fetchJson).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(fetchJson.mock.calls[0][1].body).dataType).not.toContain('Branded');
+  });
+  it('does not match an ingredient to a dish that excludes it or contains another protein', async () => {
+    const food = { fdcId: 990095, description: 'Beef and vegetables excluding dark-green leafy greens', dataType: 'Survey (FNDDS)', foodNutrients: [] };
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue({ foods: [food] }) } as never);
+    await expect(service.lookupFood('leafy greens', false)).resolves.toBeUndefined();
+  });
+  it('marks physically impossible converted nutrient values unavailable', async () => {
+    const food = { fdcId: 990096, description: 'Pork', dataType: 'Branded', servingSize: 4, servingSizeUnit: 'G', labelNutrients: { calories: { value: 120 }, protein: { value: 23 }, fat: { value: 2.5 }, carbohydrates: { value: 0 } } };
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson: vi.fn().mockResolvedValue(food) } as never);
+    expect(await service.getNutrients(990096)).toMatchObject({ kcal_per_100g: null, protein_g_per_100g: null, carbs_g_per_100g: null, fat_g_per_100g: null });
   });
 
   it('sends food search terms and USDA data types as a JSON POST body', async () => {
@@ -94,4 +159,11 @@ describe('USDA search request construction', () => {
       kcal_per_100g: 480, protein_g_per_100g: 8, carbs_g_per_100g: 65, fat_g_per_100g: 20,
     });
   });
+  it('does not match cooked rice to a rice-noodle product', async () => {
+    const food = { fdcId: 990101, description: 'Rice noodles, cooked', dataType: 'Survey (FNDDS)', foodNutrients: [] };
+    const fetchJson = vi.fn().mockResolvedValue({ foods: [food] });
+    const service = new UsdaService({ value: { usda: { apiKey: 'test', base: 'https://example.test', configured: true } } } as FoodScanConfigService, { fetchJson } as never);
+    await expect(service.lookupFood('cooked rice', false)).resolves.toBeUndefined();
+  });
+
 });

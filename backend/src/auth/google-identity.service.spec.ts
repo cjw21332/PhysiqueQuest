@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LoginTicket } from 'google-auth-library';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 const { verifyIdToken } = vi.hoisted(() => ({ verifyIdToken: vi.fn() }));
 vi.mock('google-auth-library', () => ({
   OAuth2Client: class {
@@ -26,14 +26,11 @@ describe('Google identity verification', () => {
   });
   it('uses the Firebase Web OAuth client by default and matches the mobile build', async () => {
     vi.stubEnv('GOOGLE_WEB_CLIENT_ID', '');
+    const firebase = JSON.parse(readFileSync(new URL('../../../mobile/google-services.json', import.meta.url), 'utf8'));
     const app = JSON.parse(readFileSync(new URL('../../../mobile/app.json', import.meta.url), 'utf8'));
-    const web = app.expo.extra.googleWebClientId;
-    const firebasePath = new URL('../../../mobile/google-services.json', import.meta.url);
-    if (existsSync(firebasePath)) {
-      const firebase = JSON.parse(readFileSync(firebasePath, 'utf8'));
-      const android = firebase.client.find((client: any) => client.client_info.android_client_info.package_name === app.expo.android.package);
-      expect(android.oauth_client.find((client: any) => client.client_type === 3).client_id).toBe(web);
-    }
+    const android = firebase.client.find((client: any) => client.client_info.android_client_info.package_name === app.expo.android.package);
+    const web = android.oauth_client.find((client: any) => client.client_type === 3).client_id;
+    expect(app.expo.extra.googleWebClientId).toBe(web);
     verifyIdToken.mockResolvedValue(ticket(identityClaims()));
     await new GoogleIdentityService().verify('token');
     expect(verifyIdToken).toHaveBeenCalledWith({ idToken: 'token', audience: web });

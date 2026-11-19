@@ -12,7 +12,7 @@ import { FoodScanController } from './foodscan.controller.js';
 import { FoodScanSchemasService } from './foodscan.schemas.js';
 import { FoodScanService } from './foodscan.service.js';
 import { FoodSearchController } from './foodsearch.controller.js';
-import { GeminiService } from './services/gemini.service.js';
+import { AI_VISION_PROVIDER } from './services/vision-provider.js';
 import { OpenAIVisionService } from './services/openai-vision.service.js';
 import { UsdaService } from './services/usda.service.js';
 import { FoodScanUsageService } from './foodscan-usage.service.js';
@@ -52,7 +52,7 @@ export const SCANNER_ROUTE_PATHS = [
     PinoLogger,
     HttpService,
     FoodScanSchemasService,
-    { provide: GeminiService, useClass: OpenAIVisionService },
+    { provide: AI_VISION_PROVIDER, useClass: OpenAIVisionService },
     UsdaService,
     FoodScanService,
     FoodScanUsageService,

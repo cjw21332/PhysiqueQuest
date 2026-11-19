@@ -46,4 +46,10 @@ describe('httpOnly session cookie boundary', () => {
     expect(sessionCookieOptions({ NODE_ENV: 'production' })).toMatchObject({ httpOnly: true, secure: true, sameSite: 'lax' });
     expect(sessionCookieOptions({ NODE_ENV: 'production' }).domain).toBeUndefined();
   });
+  it('can issue secure host-only cross-site cookies when explicitly configured', () => {
+    expect(sessionCookieOptions({ NODE_ENV: 'production', COOKIE_SECURE: 'true', COOKIE_SAMESITE: 'none' })).toMatchObject({
+      httpOnly: true, secure: true, sameSite: 'none', path: '/api',
+    });
+    expect(sessionCookieOptions({ NODE_ENV: 'production', COOKIE_SECURE: 'true', COOKIE_SAMESITE: 'none' }).domain).toBeUndefined();
+  });
 });

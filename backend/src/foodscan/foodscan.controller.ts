@@ -54,7 +54,7 @@ export class FoodScanController {
   @HttpCode(HttpStatus.OK)
   async analyze(@Req() req: ScanRequest, @Body() body: unknown): Promise<AnalyzeResponse> {
     const requestId = req.requestId ?? 'unknown';
-    const id = await this.usage.begin(req.user!.userId, requestId, OPENAI_MODEL);
+    const id = await this.usage.begin(req.user!.userId, requestId, process.env.OPENAI_MODEL?.trim() || OPENAI_MODEL);
     let observed: TokenUsage | null = null;
     let incompleteUsage = false;
     try {
@@ -65,7 +65,7 @@ export class FoodScanController {
           const add = (a: number | null, b: number | null) => a === null || b === null ? null : a + b;
           observed = { input: add(observed.input, usage.input), output: add(observed.output, usage.output), total: add(observed.total, usage.total) };
         }
-      });
+      }, req.user!.userId);
       await this.usage.finish(id, 'success', observed, undefined, !incompleteUsage);
       return result;
     } catch (error) {

@@ -104,7 +104,22 @@ export function fastRecordAnswer(question: string, sources: Source[], page?: str
   const personalRecords = data('user-records');
   if (personalRecords && /\b(?:my|mine|i)\b.{0,50}\b(?:personal records?|personal bests?|best lifts?)\b/.test(q)) {
     const records = rows(personalRecords.records);
-    return { reply: records.length ? 'Your saved personal records: ' + records.map(record => display(record.name) + ': ' + (numeric(record.loadValue) && record.loadUnit ? quantity(record.loadValue, record.loadUnit) : quantity(record.loadKg, 'kg')) + (record.date ? ' on ' + display(record.date) : '')).join('; ') + (personalRecords.truncated ? '. Showing at most 30 exercises.' : '.') : 'No weighted personal records are saved yet.', sourceIds: ['user-records'] };
+    const formatRecord = (record: Row) => display(record.name) + ': ' + (numeric(record.loadValue) && record.loadUnit ? quantity(record.loadValue, record.loadUnit) : quantity(record.loadKg, 'kg')) + (record.date ? ' on ' + display(record.date) : '');
+    const subject = /\b(?:personal records?|personal bests?|best lifts?)\b\s*(?:\/\s*(?:best|personal best))?\s+(?:for|on|in|of)\s+(?:the\s+)?(.+?)[?!.]*$/.exec(q)?.[1]?.trim();
+    if (subject) {
+      const words = subject.normalize('NFKD').replace(/\p{M}/gu, '').match(/[\p{L}\p{N}]+/gu) ?? [];
+      const matches = words.length ? records.filter(record => {
+        const nameWords = new Set((typeof record.name === 'string' ? record.name : '').normalize('NFKD').toLowerCase().replace(/\p{M}/gu, '').match(/[\p{L}\p{N}]+/gu) ?? []);
+        return words.every(word => nameWords.has(word));
+      }) : [];
+      const exact = matches.filter(record => typeof record.name === 'string' && record.name.toLowerCase() === subject);
+      const selected = exact.length === 1 ? exact : matches;
+      const reply = selected.length === 1 ? 'Your saved best for ' + formatRecord(selected[0]) + '.'
+        : selected.length > 1 ? 'I found multiple matching exercises. Which one did you mean?\n' + selected.map(record => '• ' + formatRecord(record)).join('\n')
+          : 'I couldn’t find a matching saved personal record for ' + subject + (personalRecords.truncated ? ' in the records I checked. Some records were not included.' : '.');
+      return { reply: reply + (personalRecords.truncated && selected.length ? '\nI checked up to 30 saved exercises; other matches may not be included.' : ''), sourceIds: ['user-records'] };
+    }
+    return { reply: records.length ? 'Your saved personal records:\n' + records.map(record => '• ' + formatRecord(record)).join('\n') + (personalRecords.truncated ? '\nShowing at most 30 exercises.' : '') : 'No weighted personal records are saved yet.', sourceIds: ['user-records'] };
   }
   const notifications = data('user-notifications'), safety = data('user-safety'), progress = data('user-progress');
   const privateProfile = data('user-private-profile');
@@ -116,7 +131,7 @@ export function fastRecordAnswer(question: string, sources: Source[], page?: str
       const healthConditions = /\b(?:conditions?|injur(?:y|ies))\b/.test(q);
       const healthNotes = /\bhealth notes?\b/.test(q);
       const contact = /\b(?:emergency contact|safety contact|contact (?:name|phone|number|relationship))\b/.test(q);
-      if (privateProfile.name !== undefined && /\b(?:my name|name did i save|name in my profile|who am i)\b/.test(q)) add('user-private-profile', 'Your saved name is ' + display(privateProfile.name) + '.');
+      if (privateProfile.name !== undefined && /\b(?:my name|name did i save|name in my profile|who am i)\b/.test(q)) add('user-private-profile', present(privateProfile.name) ? "You're " + display(privateProfile.name) + ', according to your profile.' : "I couldn't find a name in your profile.");
       if (privateProfile.age !== undefined && /\b(?:my age|age did i save|how old am i)\b/.test(q)) add('user-private-profile', 'Your saved age is ' + display(privateProfile.age) + '.');
       if (privateProfile.gender !== undefined && /\b(?:my gender|gender did i save|my sex|sex did i save)\b/.test(q)) add('user-private-profile', 'Your saved gender is ' + display(privateProfile.gender) + '.');
       if (healthConditions || healthNotes) {

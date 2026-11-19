@@ -1405,19 +1405,19 @@ export const CHAT_QUESTION_CASES: readonly ChatQuestionCase[] = [
     "expectedTopic": "page-guide"
   },
   {
-    "id": "guide-admin-exercises",
-    "question": "Why can I not open the administrator exercise catalogue?",
+    "id": "guide-personal-exercises",
+    "question": "How do I use my personal exercises?",
     "personal": false,
     "outcome": "guide",
-    "page": "/me/exercises",
+    "page": "/me/personal-exercises",
     "expectedTopic": "page-guide"
   },
   {
-    "id": "guide-engagement",
-    "question": "Are the engagement analytics live account data?",
+    "id": "guide-personal-exercises-create",
+    "question": "How do I add my own exercise?",
     "personal": false,
     "outcome": "guide",
-    "page": "/me/engagement",
+    "page": "/me/personal-exercises",
     "expectedTopic": "page-guide"
   },
   {

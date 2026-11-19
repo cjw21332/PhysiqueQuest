@@ -44,7 +44,7 @@ describe('independent factual answer checks', () => {
   });
   it('answers own identity, health-profile and emergency-contact questions from consented fields', async () => {
     const { ask, generate } = setup();
-    expect(await ask('What is my name?')).toBe('Your saved name is Synthetic User.');
+    expect(await ask('What is my name?')).toBe("You're Synthetic User, according to your profile.");
     expect(await ask('How old am I?')).toBe('Your saved age is 28.');
     expect(await ask('Which gender did I save?')).toBe('Your saved gender is Female.');
     expect(await ask('What conditions are saved in my health profile?')).toContain('Asthma');

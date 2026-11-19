@@ -5,6 +5,7 @@ import { GoogleAuthService } from '../src/auth/google-auth.service.js';
 import { UserSchema } from '../src/auth/schemas/user.schema.js';
 import { NutritionService } from '../src/nutrition/nutrition.service.js';
 import { NutritionSchema } from '../src/nutrition/schemas/nutrition.schema.js';
+import { ProfileSchema } from '../src/profile/schemas/profile.schema.js';
 
 it.skipIf(!process.env.PQ_TEST_REPLICA_URI)('registers both account types and fences real nutrition writes and receipts', async () => {
   const name = `pq_slice_${randomBytes(12).toString('hex')}`;
@@ -12,11 +13,18 @@ it.skipIf(!process.env.PQ_TEST_REPLICA_URI)('registers both account types and fe
   try {
     const users = connection.model('User', UserSchema);
     const events = { create: async () => ({}) };
-    const auth = new AuthService(users, events as never, { sign: () => 'token' } as never);
-    const registered = await auth.register({ email: 'local@example.test', name: 'Local', password: 'Example-Password1', requestId: 'x', code: '123456' });
+    const profiles = connection.model('Profile', ProfileSchema);
+    const profile = { name: 'Local', age: '25', height: '170', heightUnit: 'cm', weight: '70', weightUnit: 'kg', gender: 'Other', activity: 'Moderate', goal: 'Strength', seriousness: 'Consistent', equipment: ['Dumbbells'], days: ['Monday'], duration: '30 min', conditions: [], contactName: 'Friend', contactPhone: '09123456789' };
+    const auth = new AuthService(users, events as never, { sign: () => 'token' } as never, profiles);
+    const failedSave = vi.spyOn(profiles, 'create').mockRejectedValueOnce(new Error('profile write failed') as never);
+    await expect(auth.register({ email: 'failure@example.test', name: 'Local', password: 'Example-Password1', requestId: 'x', code: '123456', profile })).rejects.toThrow('profile write failed');
+    failedSave.mockRestore();
+    expect(await users.findOne({ email: 'failure@example.test' })).toBeNull();
+    const registered = await auth.register({ email: 'local@example.test', name: 'Local', password: 'Example-Password1', requestId: 'x', code: '123456', profile });
     const identity = { verify: async () => ({ email: 'google@example.test', name: 'Google', uid: 'google-synthetic' }) };
-    const google = new GoogleAuthService(users, events as never, identity as never, { consumeRegistration: async () => {} } as never);
-    const googleUser = await google.register({ idToken: 'synthetic', password: 'Example-Password1', requestId: 'x', code: '123456' });
+    const google = new GoogleAuthService(users, events as never, identity as never, { consumeRegistration: async () => {} } as never, profiles);
+    const googleUser = await google.register({ idToken: 'synthetic', password: 'Example-Password1', requestId: 'x', code: '123456', profile });
+    expect(await profiles.countDocuments()).toBe(2);
     for (const id of [registered.user.id, String(googleUser._id)]) expect(await connection.collection('account_lifecycle').findOne({ _id: new Types.ObjectId(id) })).toMatchObject({ status: 'active' });
     const service = new NutritionService(connection.model('Nutrition', NutritionSchema));
     await service.onModuleInit();

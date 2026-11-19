@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NutritionService } from '../src/nutrition/nutrition.service.js';
 import type { MealFromScanDto } from '../src/nutrition/dto/nutrition.dto.js';
+import { issueEvidenceProof } from '../src/foodscan/services/evidence-proof.js';
 
 /**
  * The scan-to-meal helper turns a scan response into nutrition rows.
@@ -18,13 +19,13 @@ describe('NutritionService.addMealsFromScan', () => {
     findOneAndUpdate = vi.fn(async () => ({ meals: [] }));
     const session = { inTransaction: () => true, withTransaction: async (callback: () => Promise<void>) => callback(), endSession: async () => {} };
     const db = { startSession: async () => session, collection: () => ({ updateOne: async () => ({ matchedCount: 1 }), findOne: async () => ({ generation: 0 }) }) };
-    service = new NutritionService({ findOneAndUpdate, db } as never, { getNutrients: vi.fn(async (id: number) => id === 171477 ? {
+    service = new NutritionService({ findOneAndUpdate, updateOne: vi.fn(async () => ({ matchedCount: 1 })), db } as never, { getNutrients: vi.fn(async (id: number) => id === 171477 ? {
       fdcId: id, description: 'Chicken breast, raw', kcal_per_100g: 120, protein_g_per_100g: 22.5, carbs_g_per_100g: 0, fat_g_per_100g: 2.6,
     } : { fdcId: id, description: 'cooked chicken', kcal_per_100g: 165, protein_g_per_100g: 31, carbs_g_per_100g: 0, fat_g_per_100g: 3.6 }) } as never);
   });
 
   /** The meal objects that were pushed, in order. */
-  const pushedMeals = () => findOneAndUpdate.mock.calls[0][1].$push.meals.$each as Record<string, unknown>[];
+  const pushedMeals = () => findOneAndUpdate.mock.calls.find(call => call[1].$push?.meals)?.[1].$push.meals.$each as Record<string, unknown>[];
 
   const payload = (overrides: Partial<MealFromScanDto> = {}): MealFromScanDto =>
     ({
@@ -82,6 +83,21 @@ describe('NutritionService.addMealsFromScan', () => {
     }] }));
     expect(pushedMeals()[0]).toMatchObject({ calories: 198, protein: 37.2, carbs: 0, fat: 4.3 });
   });
+  it('validates and preserves an explicitly entered mass unit', async () => {
+    await service.addMealsFromScan(USER_ID, payload({ items: [{ ...payload().items[0], est_weight_g: 453.59237, entered_quantity: 1, entered_unit: 'lb' }] }));
+    expect(pushedMeals()[0]).toMatchObject({ estWeightG: 453.59237, servingQuantity: 1, servingUnit: 'lb' });
+  });
+  it('rejects a mismatched entered quantity and normalized weight', async () => {
+    await expect(service.addMealsFromScan(USER_ID, payload({ items: [{ ...payload().items[0], est_weight_g: 150, entered_quantity: 1, entered_unit: 'kg' }] }))).rejects.toThrow('quantity');
+    expect(findOneAndUpdate).not.toHaveBeenCalled();
+  });
+  it('recalculates a reviewed recipe from its server-owned reference and rejects forged values', async () => {
+    await service.addMealsFromScan(USER_ID, payload({ items: [{ food_name: 'pork sinigang', found: true, nutrition_ref: 'recipe:bjmp-pork-sinigang', est_weight_g: 272.72, kcal: 1, protein_g: 1, carbs_g: 1, fat_g: 1 }] }));
+    expect(pushedMeals()[0]).toMatchObject({ calories: 226.4, protein: 10.1, carbs: 4.6, fat: 18.6, nutritionProvider: 'Philippine food-service recipe estimate' });
+  });
+  it('rejects an unknown recipe reference', async () => {
+    await expect(service.addMealsFromScan(USER_ID, payload({ items: [{ food_name: 'pork sinigang', found: true, nutrition_ref: 'recipe:unknown', est_weight_g: 100, kcal: 1, protein_g: 1, carbs_g: 1, fat_g: 1 }] }))).rejects.toThrow(BadRequestException);
+  });
 
   it('fails closed if a matched item lacks a verifiable record or weight', async () => {
     await expect(service.addMealsFromScan(USER_ID, payload({ items: [{ food_name: 'rice', found: true, est_weight_g: 100, kcal: 1, protein_g: 1, carbs_g: 1, fat_g: 1 }] }))).rejects.toThrow(BadRequestException);
@@ -102,6 +118,64 @@ describe('NutritionService.addMealsFromScan', () => {
       confidence: 0.92,
       estWeightG: 150,
     });
+  });
+
+  it('persists conservative property evidence and records explicit weight corrections', async () => {
+    await service.addMealsFromScan(USER_ID, payload({ items: [{ food_name: 'chicken breast', found: true, fdc_id: 171477, est_weight_g: 150, kcal: 180, protein_g: 33, carbs_g: 0, fat_g: 4, identification_method: 'ai', weight_corrected: true, evidence: { name: 'user_confirmed', quantity: 'user_confirmed', preparation: 'user_confirmed', added_oil: 'user_confirmed' } }] }));
+    expect(pushedMeals()[0].foodEvidence).toEqual({ name: 'unknown', quantity: 'unknown', preparation: 'unknown', added_oil: 'unknown' });
+  });
+
+  it('preserves signed property evidence and marks only an edited quantity confirmed', async () => {
+    vi.stubEnv('JWT_SECRET', 'test-evidence-secret');
+    try {
+      const evidence = { name: 'visually_identified', quantity: 'estimated', preparation: 'user_confirmed', added_oil: 'unknown' } as const;
+      const proof = issueEvidenceProof(USER_ID, 'chicken breast', 120, evidence)!;
+      await service.addMealsFromScan(USER_ID, payload({ items: [{ ...payload().items[0], est_weight_g: 150, evidence, evidence_ref: proof }] }));
+      expect(pushedMeals()[0].foodEvidence).toEqual({ ...evidence, quantity: 'user_confirmed' });
+    } finally { vi.unstubAllEnvs(); }
+  });
+
+  it('stores preparation and cooking fat corrections without changing other signed evidence', async () => {
+    vi.stubEnv('JWT_SECRET', 'test-evidence-secret');
+    try {
+      const evidence = { name: 'visually_identified', quantity: 'estimated', preparation: 'unknown', added_oil: 'unknown' } as const;
+      const evidence_ref = issueEvidenceProof(USER_ID, 'chicken breast', 150, evidence)!;
+      await service.addMealsFromScan(USER_ID, payload({ items: [{ ...payload().items[0], evidence, evidence_ref, preparation_correction: 'grilled', added_oil_correction: '1 tsp olive oil' }] }));
+      expect(pushedMeals()[0]).toMatchObject({ preparation: 'grilled', addedOil: '1 tsp olive oil', foodEvidence: { ...evidence, preparation: 'user_confirmed', added_oil: 'user_confirmed' } });
+    } finally { vi.unstubAllEnvs(); }
+  });
+
+  it('rejects a tampered evidence reference before saving', async () => {
+    vi.stubEnv('JWT_SECRET', 'test-evidence-secret');
+    try {
+      const evidence = { name: 'visually_identified', quantity: 'estimated', preparation: 'unknown', added_oil: 'unknown' } as const;
+      const evidence_ref = issueEvidenceProof(USER_ID, 'chicken breast', 150, evidence)! + 'x';
+      await expect(service.addMealsFromScan(USER_ID, payload({ items: [{ ...payload().items[0], evidence, evidence_ref }] }))).rejects.toThrow('evidence');
+      expect(findOneAndUpdate).not.toHaveBeenCalled();
+    } finally { vi.unstubAllEnvs(); }
+  });
+
+  it('accepts distinct signed items from the same scan and rejects mixed or duplicated evidence', async () => {
+    vi.stubEnv('JWT_SECRET', 'test-evidence-secret');
+    try {
+      const evidence = { name: 'visually_identified', quantity: 'estimated', preparation: 'unknown', added_oil: 'unknown' } as const;
+      const scan = { id: 'b253bb02-2123-4b17-bdf4-640fa8012355', image: 'a'.repeat(64), analysis: 'b'.repeat(64) };
+      const other = { ...scan, id: 'bc101ca9-acb4-4bb3-a73b-a74235f58f73' };
+      const first = issueEvidenceProof(USER_ID, 'chicken breast', 150, evidence, scan)!;
+      const second = issueEvidenceProof(USER_ID, 'chicken breast', 150, evidence, scan)!;
+      const different = issueEvidenceProof(USER_ID, 'chicken breast', 150, evidence, other)!;
+      const item = payload().items[0];
+      await service.addMealsFromScan(USER_ID, payload({ items: [{ ...item, evidence, evidence_ref: first }, { ...item, evidence, evidence_ref: second }] }));
+      expect(pushedMeals()).toHaveLength(2);
+      findOneAndUpdate.mockClear();
+      await expect(service.addMealsFromScan(USER_ID, payload({ items: [{ ...item, evidence_ref: first }, { ...item, evidence_ref: different }] }))).rejects.toThrow('different scans');
+      for (const changed of [{ ...scan, image: 'c'.repeat(64) }, { ...scan, analysis: 'd'.repeat(64) }]) {
+        const changedProof = issueEvidenceProof(USER_ID, 'chicken breast', 150, evidence, changed)!;
+        await expect(service.addMealsFromScan(USER_ID, payload({ items: [{ ...item, evidence_ref: first }, { ...item, evidence_ref: changedProof }] }))).rejects.toThrow('different scans');
+      }
+      await expect(service.addMealsFromScan(USER_ID, payload({ items: [{ ...item, evidence_ref: first }, { ...item, evidence_ref: first }] }))).rejects.toThrow('more than once');
+      expect(findOneAndUpdate).not.toHaveBeenCalled();
+    } finally { vi.unstubAllEnvs(); }
   });
 
   it('omits provenance fields the scan did not provide', async () => {

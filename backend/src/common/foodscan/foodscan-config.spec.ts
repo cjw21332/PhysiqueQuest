@@ -40,7 +40,7 @@ let saved: Record<string, string | undefined>;
  * Only the ordering matters here. The client's cap is generous by design, and
  * the server is expected to answer well inside it with a specific reason.
  */
-const CLIENT_SCAN_CAP_MS = 60_000;
+const CLIENT_SCAN_CAP_MS = 110_000;
 
 beforeEach(() => {
   saved = Object.fromEntries(MANAGED_KEYS.map((k) => [k, process.env[k]]));

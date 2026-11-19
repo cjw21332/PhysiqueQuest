@@ -88,6 +88,9 @@ class BoundedCache<T> {
 // cache useful without pushing a steady caller over that ceiling.
 const detailCache = new BoundedCache<NutrientResult>(2000, 60 * 60 * 1000);
 const searchCache = new BoundedCache<UsdaFood>(1000, 60 * 60 * 1000);
+// Cache only successful empty searches, never errors, to avoid repeating
+// identical requests for foods absent from the database.
+const missingSearchCache = new BoundedCache<boolean>(1000, 10 * 60 * 1000);
 
 @Injectable()
 export class UsdaService {
@@ -122,11 +125,12 @@ export class UsdaService {
     });
   }
 
-  private async searchFood(query: string): Promise<UsdaFood | undefined> {
+  private async searchFood(query: string, allowBranded: boolean): Promise<UsdaFood | undefined> {
     this.requireConfigured();
-    const key = normalizeFoodDescription(query);
+    const key = `${allowBranded ? 'all' : 'generic'}:${normalizeFoodDescription(query)}`;
     const cached = searchCache.get(key);
     if (cached) return cached;
+    if (missingSearchCache.get(key)) return undefined;
 
     const tokens = foodSearchTokens(query);
     if (!tokens.length) return undefined;
@@ -136,7 +140,7 @@ export class UsdaService {
     const eligible = (foods: UsdaFood[]) => foods.filter(food => food.fdcId && food.description &&
       tokens.every(token => foodSearchTokens(food.description).includes(token)) && compatiblePreparation(tokens, foodSearchTokens(food.description)));
     let foods = eligible(data.foods || []);
-    if (!foods.some(food => nutrientCount(food) === 4)) {
+    if (allowBranded && !foods.some(food => nutrientCount(food) === 4)) {
       const products = await this.search(query, 25, ['Branded']);
       foods = [...foods, ...eligible(products.foods || [])];
     }
@@ -144,6 +148,7 @@ export class UsdaService {
       foodSearchScore(b, tokens) - foodSearchScore(a, tokens));
     const best = foods[0];
     if (best) searchCache.set(key, best);
+    else missingSearchCache.set(key, true);
     return best;
   }
 
@@ -172,14 +177,14 @@ export class UsdaService {
       fat_g_per_100g: fat,
       servingSizeG: data.servingSizeUnit?.toLowerCase() === 'g' && data.servingSize && data.servingSize > 0
         ? data.servingSize
-        : data.foodPortions?.find((portion) => typeof portion.gramWeight === 'number' && portion.gramWeight > 0)?.gramWeight,
+        : undefined,
     };
     detailCache.set(String(fdcId), result);
     return result;
   }
 
-  async lookupFood(foodName: string): Promise<NutrientResult | undefined> {
-    const food = await this.searchFood(foodName);
+  async lookupFood(foodName: string, allowBranded = true): Promise<NutrientResult | undefined> {
+    const food = await this.searchFood(foodName, allowBranded);
     if (!food) return undefined;
 
     // Search values and detail values belong to the same FDC record. Never
@@ -192,12 +197,13 @@ export class UsdaService {
     };
     try {
       const detail = await this.getNutrients(food.fdcId);
-      return { ...detail,
+      const result = { ...detail,
         kcal_per_100g: detail.kcal_per_100g ?? kcal,
         protein_g_per_100g: detail.protein_g_per_100g ?? protein,
         carbs_g_per_100g: detail.carbs_g_per_100g ?? carbs,
         fat_g_per_100g: detail.fat_g_per_100g ?? fat,
       };
+      return [result.kcal_per_100g, result.protein_g_per_100g, result.carbs_g_per_100g, result.fat_g_per_100g].every(value => value === null) ? undefined : result;
     } catch (error) {
       if (nutrientCount(food) === 0) throw error;
       return summary;
@@ -232,7 +238,7 @@ export class UsdaService {
       const redundant = candidates.some((candidate) => tokenSimilarity(tokens, foodSearchTokens(candidate.description)) >= 0.82);
       if (redundant) continue;
       seenNames.add(normalized);
-      candidates.push({ fdc_id: food.fdcId, description: food.description, data_type: food.dataType });
+      candidates.push({ fdc_id: food.fdcId, id: `usda:${food.fdcId}`, source: 'USDA', description: food.description, data_type: food.dataType });
       if (candidates.length >= pageSize) break;
     }
     return candidates;
@@ -243,8 +249,8 @@ const FOOD_SEARCH_STOP_WORDS = new Set(['and', 'or', 'with', 'of', 'the', 'fresh
 
 /** A raw or processed record is unsafe to select automatically for an unspecified meal. */
 function compatiblePreparation(query: string[], description: string[]): boolean {
-  const excludedUnlessRequested = ['raw', 'uncooked', 'sausage', 'bacon', 'ham', 'processed', 'glutinous', 'sticky'];
-  return !excludedUnlessRequested.some(term => { const token = foodSearchTokens(term)[0]; return description.includes(token) && !query.includes(token); });
+  const excludedUnlessRequested = ['raw', 'uncooked', 'unprepared', 'frozen', 'canned', 'pickled', 'cured', 'smoked', 'dried', 'dehydrated', 'fried', 'breaded', 'battered', 'mature', 'sausage', 'bacon', 'ham', 'processed', 'glutinous', 'sticky', 'noodle', 'pasta', 'flour', 'rice', 'beef', 'pork', 'chicken', 'turkey', 'lamb', 'shrimp', 'fish', 'tuna'];
+  return !description.some(token => ['excluding', 'except', 'without'].includes(token)) && !excludedUnlessRequested.some(term => { const token = foodSearchTokens(term)[0]; return description.includes(token) && !query.includes(token); });
 }
 
 function foodSearchTokens(value: string): string[] {
@@ -321,6 +327,11 @@ function parseNutrients(data: UsdaFood): {
     protein ??= label('protein');
     carbs ??= label('carbohydrates');
     fat ??= label('fat');
+  }
+  // Malformed serving conversions can imply more than 100 g of a nutrient in
+  // 100 g of food (or thousands of kcal). Do not present such records as food.
+  if ((kcal !== undefined && kcal > 950) || [protein, carbs, fat].some(value => value !== undefined && value > 100.5) || (protein ?? 0) + (carbs ?? 0) + (fat ?? 0) > 105) {
+    return { kcal: null, protein: null, carbs: null, fat: null };
   }
   return { kcal: kcal ?? null, protein: protein ?? null, carbs: carbs ?? null, fat: fat ?? null };
 }

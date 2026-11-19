@@ -254,6 +254,8 @@ export class WorkoutsService implements OnModuleInit {
   async updateRoutine(userId: string, id: string, dto: UpdateRoutineDto) {
     const workout = await this.owned(userId, id);
     if (workout.status !== 'active') throw new BadRequestException('This workout is already completed.');
+    const lastRoutineHash = hash(dto);
+    if (workout.revision === dto.expectedRevision + 1 && workout.lastRoutineHash === lastRoutineHash) return workout;
     if ((workout.revision ?? 0) !== dto.expectedRevision) throw new ConflictException('Reload this workout before retrying.');
     const original = workout.exercises ?? [];
     const ids = dto.exercises.map(item => item.exerciseId);
@@ -267,7 +269,7 @@ export class WorkoutsService implements OnModuleInit {
       if ((workout.sets ?? []).some(set => set.exerciseId === item.exerciseId && set.setIndex >= next.sets)) throw new BadRequestException('Cannot remove saved sets.');
       return next;
     });
-    return this.change(userId, id, dto.expectedRevision, { exercises, exerciseIds: ids, ...(dto.routineName !== undefined ? { routineName: dto.routineName.trim() } : {}) });
+    return this.change(userId, id, dto.expectedRevision, { lastRoutineHash, exercises, exerciseIds: ids, ...(dto.routineName !== undefined ? { routineName: dto.routineName.trim() } : {}) });
   }
   async cancel(userId: string, id: string, expectedRevision: number) {
     const workout = await this.owned(userId, id);

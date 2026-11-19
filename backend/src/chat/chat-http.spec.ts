@@ -42,11 +42,17 @@ describe('chat HTTP authentication and input contract', () => {
   });
   it('passes only guard identity and explicit consent to service', async () => {
     await request(app.getHttpServer()).post('/chat').auth('synthetic-session', { type: 'bearer' }).send({ messages: [{ role: 'user', text: 'Home' }], includePersonalData: true }).expect(201);
-    expect(reply).toHaveBeenLastCalledWith('aaaaaaaaaaaaaaaaaaaaaaaa', [{ role: 'user', text: 'Home' }], true, undefined);
+    expect(reply).toHaveBeenLastCalledWith('aaaaaaaaaaaaaaaaaaaaaaaa', [{ role: 'user', text: 'Home' }], true, undefined, expect.any(AbortSignal));
+  });
+  it('allows more than the former per-minute chat quota while still requiring authentication', async () => {
+    for (let index = 0; index < 12; index++) {
+      await request(app.getHttpServer()).post('/chat').auth('synthetic-session', { type: 'bearer' }).send({ messages: [{ role: 'user', text: 'Home' }] }).expect(201);
+    }
+    await request(app.getHttpServer()).post('/chat').send({ messages: [{ role: 'user', text: 'Home' }] }).expect(401);
   });
   it('accepts an application-page hint and keeps model readiness authenticated', async () => {
     await request(app.getHttpServer()).post('/chat').auth('synthetic-session', { type: 'bearer' }).send({ messages: [{ role: 'user', text: 'What can I do here?' }], page: '/scan/plan' }).expect(201);
-    expect(reply).toHaveBeenLastCalledWith('aaaaaaaaaaaaaaaaaaaaaaaa', [{ role: 'user', text: 'What can I do here?' }], false, '/scan/plan');
+    expect(reply).toHaveBeenLastCalledWith('aaaaaaaaaaaaaaaaaaaaaaaa', [{ role: 'user', text: 'What can I do here?' }], false, '/scan/plan', expect.any(AbortSignal));
     const response = await request(app.getHttpServer()).get('/chat/status').auth('synthetic-session', { type: 'bearer' }).expect(200);
     expect(response.body).toEqual({ ready: true });
   });

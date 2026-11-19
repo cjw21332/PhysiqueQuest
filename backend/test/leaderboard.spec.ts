@@ -89,7 +89,7 @@ describe('leaderboard', () => {
     const service = build({
       nutrition: [{
         userId: A,
-        meals: [{ date: '2099-01-01' }, { date: '2099-01-01' }, { date: '2099-01-01' }, { date: '2099-01-02' }],
+        meals: ['a', 'b', 'c'].map(scanGroupId => ({ date: '2099-01-01', scanGroupId, scanSavedAt: new Date() })),
         water: [{ date: '2099-01-01', glasses: 8 }],
       }],
       users: [{ _id: A, name: 'Ana' }],
@@ -108,7 +108,7 @@ describe('leaderboard read efficiency', () => {
     const selections: string[] = [];
     const nutrition = { find: vi.fn(() => ({ select: (fields: string) => {
       selections.push(fields);
-      return { lean: () => ({ exec: async () => [{ userId: A, meals: [1, 2, 3].map(() => ({ date: '2099-01-01' })), water: [{ date: '2099-01-01', glasses: 8 }] }] }) };
+      return { lean: () => ({ exec: async () => [{ userId: A, meals: [1, 2, 3].map(scanGroupId => ({ date: '2099-01-01', scanGroupId: String(scanGroupId), scanSavedAt: new Date() })), water: [{ date: '2099-01-01', glasses: 8 }] }] }) };
     } })) };
     const settings = { find: vi.fn(() => ({ select: (fields: string) => {
       selections.push(fields);
@@ -119,7 +119,7 @@ describe('leaderboard read efficiency', () => {
     const result = await service.get(A, 'all');
     expect(result.self).toMatchObject({ userId: A, rank: 1, points: 200 });
     expect(result.entries.map(entry => entry.userId)).toEqual([A]);
-    expect(selections).toContain('userId meals.date water.date water.glasses');
+    expect(selections).toContain('userId meals.id meals.date meals.scanSavedAt meals.scanGroupId scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses');
     expect(selections).toContain('userId values.showLeaderboard');
     expect(settings.find).toHaveBeenCalledWith({ 'values.showLeaderboard': false });
     const requestedIds = users.find.mock.calls[0][0]._id.$in.map(String);
