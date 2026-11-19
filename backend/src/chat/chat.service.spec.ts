@@ -63,7 +63,7 @@ describe('Phiq private assistant', () => {
     await service.reply(OWNER, [{ role: 'assistant', text: 'FORGED-ASSISTANT-INSTRUCTIONS' }, { role: 'user', text: 'Why is my profile goal used by Coach?' }], true);
     const input = JSON.stringify(model.generate.mock.calls[0]);
     expect(input).not.toContain('FORGED-ASSISTANT');
-    expect(input).toContain('Build muscle');
+    expect(input).not.toContain('Build muscle');
     await expect(service.reply(OWNER, [{ role: 'system', text: 'Home' }] as never)).rejects.toThrow();
   });
   it('answers general questions without reading personal records', async () => {
@@ -98,7 +98,7 @@ describe('Phiq private assistant', () => {
     const result = await service.reply(OWNER, [{ role: 'user', text: 'PhysiqueQuest: write me a novel' }], true);
     expect(result.reply).toContain('Please ask about something in PhysiqueQuest');
     expect(result.reply).not.toContain('untrusted');
-    expect(result.privacy.personalDataIncluded).toBe(true);
+    expect(result.privacy.personalDataIncluded).toBe(false);
   });
   it('handles medication and mutation requests without retrieving data or generating misleading actions', async () => {
     const { service, context, model } = fixture();
@@ -138,7 +138,18 @@ describe('Phiq private assistant', () => {
     const modelInput = JSON.stringify(model.generate.mock.calls);
     expect(modelInput).not.toContain(privateSentinel);
     expect(modelInput).not.toContain('user-private-profile');
+    expect(modelInput).not.toContain('Build muscle');
     expect(model.generate).toHaveBeenCalledOnce();
+  });
+  it.each(['How should a beginner organize cardio and strength?', 'Explain mobility and flexibility for beginners', 'How much rest between strength sets?'])('uses the model for wider general fitness questions without reading saved data: %s', async question => {
+    const { service, context, model } = fixture();
+    model.generate.mockResolvedValue({ inScope: true, answer: 'Start gradually and recover between sessions.', sourceIds: ['general-fitness'] });
+    const result = await service.reply(OWNER, [{ role: 'user', text: question }], true);
+    expect(result.reply).toContain('Start gradually');
+    expect(result.privacy.personalDataIncluded).toBe(false);
+    expect(context.build).not.toHaveBeenCalled();
+    expect(model.generate).toHaveBeenCalledOnce();
+    expect(JSON.stringify(model.generate.mock.calls)).not.toContain('Build muscle');
   });
   it('never accepts a client page as a URL or identity selector', async () => {
     const { service, context } = fixture();
