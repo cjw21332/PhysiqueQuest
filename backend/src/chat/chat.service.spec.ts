@@ -141,7 +141,7 @@ describe('Phiq private assistant', () => {
     expect(modelInput).not.toContain('Build muscle');
     expect(model.generate).toHaveBeenCalledOnce();
   });
-  it.each(['How should a beginner organize cardio and strength?', 'Explain mobility and flexibility for beginners', 'How much rest between strength sets?'])('uses the model for wider general fitness questions without reading saved data: %s', async question => {
+  it.each(['How should a beginner organize cardio and strength?', 'Explain mobility and flexibility for beginners', 'How much rest between strength sets?', 'How can I improve my squat form?'])('uses the model for wider general fitness questions without reading saved data: %s', async question => {
     const { service, context, model } = fixture();
     model.generate.mockResolvedValue({ inScope: true, answer: 'Start gradually and recover between sessions.', sourceIds: ['general-fitness'] });
     const result = await service.reply(OWNER, [{ role: 'user', text: question }], true);
