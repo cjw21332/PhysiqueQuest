@@ -1,0 +1,166 @@
+/* Shared interaction and spacing rules for the nutrition experience. */
+.scan-reference { --scan-radius: 16px; }
+.scan-reference :is(button, input, select, a):focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.scan-reference button { cursor: pointer; }
+.scan-reference button:disabled { cursor: not-allowed; }
+.scan-reference :is(.scan-dashboard, .diet-plan, .add-food-screen, .food-history-screen, .review-estimate-screen, .meal-edit) { min-width: 0; }
+.scan-reference :is(h1, h2, h3, p, small, strong, b) { overflow-wrap: anywhere; }
+.scan-reference :is(.scan-header, .diet-header) { min-height: 56px; }
+.scan-reference :is(.coach-back, .diet-header button) { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; border-radius: 12px; }
+.scan-reference :is(.scan-chips, .history-tabs) { gap: 8px; }
+.scan-reference :is(.scan-chips, .history-tabs) button { min-height: 44px; padding-inline: 14px; }
+.scan-reference :is(.food-search input, .meal-edit input, .meal-edit select, .diet-plan input, .diet-plan select) { font-size: 16px; }
+
+/* Dashboard and hydration */
+.scan-reference .scan-dashboard-meals { margin-block: 22px; }
+.scan-reference .meal-diary-list { display: grid; gap: 10px; }
+.scan-reference .meal-diary-card { overflow: hidden; border: 1px solid var(--line); border-radius: var(--scan-radius); }
+.scan-reference .meal-diary-toggle { min-height: 72px; }
+.scan-reference .meal-diary-add { min-height: 44px; min-width: 64px; }
+.scan-reference .meal-diary-food { min-height: 56px; }
+.scan-reference .water-tracker { margin-block: 20px; }
+.scan-reference .water-tracker-actions button { min-height: 44px; }
+.scan-reference .scan-dashboard-link { min-height: 68px; }
+
+/* Search, portions, and editing */
+.scan-reference .food-search { min-height: 52px; border: 1px solid var(--line); }
+.scan-reference .food-search button { min-width: 44px; min-height: 44px; }
+.scan-reference .recent-foods > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.scan-reference .recent-foods button { min-height: 40px; padding-inline: 12px; }
+.scan-reference .food-result-list { border: 1px solid var(--line); border-radius: 14px; }
+.scan-reference .food-result-list > button { min-height: 64px; gap: 10px; padding: 12px; }
+.scan-reference .food-result-list > button > span { min-width: 0; }
+.scan-reference .food-result-list > button strong { white-space: normal; text-align: right; }
+.scan-reference .food-results-status, .scan-reference .empty-food-results { margin: 0; padding: 16px; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+.scan-reference .quantity-row { align-items: end; flex-wrap: wrap; gap: 12px; }
+.scan-reference .quantity-row input { min-height: 48px; }
+.scan-reference .food-value { min-height: 48px; gap: 12px; }
+.scan-reference .scan-save-hint { margin: 0 0 8px; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.scan-reference .meal-edit { min-width: 0; }
+.scan-reference .meal-edit-field { min-width: 0; }
+.scan-reference .meal-edit-field :is(input, select) { min-height: 48px; max-width: 100%; }
+.scan-reference .meal-edit-grid { gap: 12px; }
+.scan-reference .meal-delete-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--red-line); border-radius: 10px; background: transparent; color: var(--red-dark); }
+.scan-reference .meal-editor { gap: 16px; padding-bottom: 24px; }
+.scan-reference .meal-editor .scan-header { margin-bottom: 0; }
+.scan-reference .meal-editor-intro { padding: 8px 2px 4px; }
+.scan-reference .meal-editor-intro > span, .scan-reference .meal-editor-heading > div > span { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+.scan-reference .meal-editor-intro h1 { margin: 8px 0 4px; color: var(--ink); font-size: 28px; line-height: 1.15; letter-spacing: -.03em; }
+.scan-reference .meal-editor-intro p, .scan-reference .meal-editor-hint { margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+.scan-reference .meal-editor-card { padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--soft); }
+.scan-reference .meal-editor-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+.scan-reference .meal-editor-heading h3 { margin: 5px 0 0; color: var(--ink); font-size: 17px; }
+.scan-reference .meal-editor-source { padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--text-secondary); font-size: 12px; }
+.scan-reference .meal-editor-card .meal-edit-field { margin-bottom: 14px; }
+.scan-reference .meal-editor-card .meal-edit-field :is(input, select) { background: var(--bg-tertiary, var(--soft)); }
+.scan-reference .meal-editor-card .meal-edit-category { margin: 20px 0; }
+.scan-reference .meal-editor-quantity { margin-bottom: 7px !important; }
+.scan-reference .meal-unit-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; color: var(--text-secondary); font-size: 14px; }
+.scan-reference .meal-unit-switch { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg-tertiary, var(--soft)); }
+.scan-reference .meal-unit-switch button { min-height: 38px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--text-secondary); font-size: 12px; font-weight: 600; }
+.scan-reference .meal-unit-switch button[aria-pressed="true"] { background: var(--green); color: var(--night, #0b0f15); }
+.scan-reference .meal-serving-size { margin-top: 14px; }
+.scan-reference .serving-weight-field { display: grid; gap: 8px; margin-top: 14px; color: var(--text-secondary); font-size: 13px; }
+.scan-reference .serving-weight-field input { box-sizing: border-box; min-height: 48px; width: 100%; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); color: var(--ink); font: inherit; font-size: 16px; }
+.scan-reference .meal-editor-input { display: flex; align-items: center; position: relative; }
+.scan-reference .meal-editor-input input { padding-right: 50px !important; }
+.scan-reference .meal-editor-input > span { position: absolute; right: 15px; color: var(--text-secondary); font-weight: 700; }
+.scan-reference .meal-editor-card > .meal-editor-hint + .meal-edit-grid { margin-top: 16px; }
+.scan-reference .meal-editor .meal-delete-button { align-self: center; }
+.scan-reference .meal-editor .scan-footer { margin-top: 0; }
+
+/* Dietary plan */
+.scan-reference .diet-header { justify-content: flex-start; padding-left: 52px; }
+.scan-reference .diet-header h1 { margin: 0; font-size: 20px; }
+.scan-reference .diet-tabs { gap: 3px; border: 1px solid var(--line); }
+.scan-reference .diet-tabs button { min-width: 0; padding: 6px; line-height: 1.25; }
+.scan-reference .diet-card { padding: 18px; border-radius: 18px; }
+.scan-reference .diet-card h2 { font-size: 17px; line-height: 1.3; }
+.scan-reference .diet-card p, .scan-reference .diet-card small { line-height: 1.5; }
+.scan-reference .diet-title-row { min-width: 0; align-items: center; }
+.scan-reference .diet-title-row > :first-child { min-width: 0; }
+.scan-reference .diet-summary-row > span { flex: 1; min-width: 0; }
+.scan-reference .diet-macro-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.scan-reference .diet-macro-grid > div { min-width: 0; padding: 10px; }
+.scan-reference .diet-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.scan-reference .diet-actions button, .scan-reference .diet-plan > .diet-primary, .scan-reference .diet-reset { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; padding: 10px 12px; line-height: 1.3; text-align: center; }
+.scan-reference .diet-actions svg, .scan-reference .diet-reset svg { flex: none; }
+.scan-reference .diet-goals button { min-height: 68px; gap: 8px; }
+.scan-reference .diet-presets button { min-height: 44px; }
+.scan-reference .diet-macro-row input { box-sizing: border-box; min-height: 44px; text-align: center; }
+.scan-reference .diet-meal > div { min-width: 0; }
+.scan-reference .diet-ai-disclosure { line-height: 1.5; }
+
+/* History and consistent empty/error states */
+.scan-reference .history-entry { min-height: 60px; height: auto; gap: 10px; }
+.scan-reference .history-entry > span { min-width: 0; }
+.scan-reference .history-record-details li { gap: 10px; }
+.scan-reference .history-records > p { padding: 16px; border: 1px solid var(--line); border-radius: 14px; color: var(--text-secondary); line-height: 1.5; }
+.scan-reference .food-history-screen { padding-bottom: 24px; }
+.scan-reference .history-summary { margin: 18px 0; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--soft); }
+.scan-reference .history-summary-head { display: flex; align-items: center; gap: 10px; }
+.scan-reference .history-summary-icon { display: grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--green-light); color: var(--green); }
+.scan-reference .history-summary-head h3 { margin: 0; font-size: 14px; line-height: 1.3; }
+.scan-reference .history-summary-head p { margin: 3px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.scan-reference .history-summary .history-total { margin: 15px 0 2px; }
+.scan-reference .history-summary .history-total b { color: var(--ink); font-size: 32px; }
+.scan-reference .history-comparison { margin: 4px 0 0; color: var(--ink); font-size: 13px; line-height: 1.45; }
+.scan-reference .history-summary-note, .scan-reference .history-chart-note { margin: 8px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.scan-reference .history-chart-section, .scan-reference .history-macros, .scan-reference .history-records { margin: 20px 0; }
+.scan-reference .history-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.scan-reference .history-section-heading h3 { margin: 0; color: var(--ink); font-size: 15px; }
+.scan-reference .history-section-heading > span { color: var(--text-secondary); font-size: 12px; text-align: right; }
+.scan-reference .history-chart-scroll { overflow-x: auto; overflow-y: hidden; padding: 4px 2px 12px; scrollbar-width: thin; overscroll-behavior-inline: contain; }
+.scan-reference .history-chart-key { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 12px; color: var(--text-secondary); font-size: 11px; line-height: 1.4; }
+.scan-reference .history-chart-key span { display: inline-flex; align-items: center; gap: 5px; }
+.scan-reference .history-chart-key i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; background: var(--gray-mid); }
+.scan-reference .history-chart-key .history-key-logged { height: 9px; background: var(--green); }
+.scan-reference .history-chart-key .history-key-previous { height: 0; border-top: 1px dashed var(--text-secondary); background: transparent; }
+.scan-reference .history-chart-layout { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+.scan-reference .history-y-axis { box-sizing: border-box; flex: none; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; height: 150px; margin-top: 24px; color: var(--text-secondary); font-size: 10px; line-height: 1; font-variant-numeric: tabular-nums; }
+.scan-reference .history-chart-layout .history-chart-scroll { flex: 1; min-width: 0; }
+.scan-reference .history-previous-target-line { position: absolute; left: 0; right: 0; height: 0; border-top: 1px dashed var(--text-secondary); z-index: 1; pointer-events: none; }
+.scan-reference .history-chart-scroll:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 8px; }
+.scan-reference .history-chart-scroll .history-chart { width: 100%; height: 150px; margin: 20px 0 26px; gap: 4px; }
+.scan-reference .history-chart-scroll .history-chart-column { min-width: 6px; }
+.scan-reference .history-chart-scroll .history-chart-column i { min-width: 4px; }
+.scan-reference .history-chart-scroll .history-chart-column:nth-child(2) small { left: 0; transform: none; }
+.scan-reference .history-chart-scroll .history-chart-column:last-child small { left: auto; right: 0; transform: none; }
+.scan-reference .history-record-group { margin-top: 8px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--soft); }
+.scan-reference .history-record-group .history-entry { width: 100%; padding: 12px 14px; border: 0; background: transparent; text-align: left; }
+.scan-reference .history-record-group .history-record-details { padding: 0 14px 8px; background: transparent; }
+.scan-reference .history-record-details li { padding: 12px 0; border-top: 1px solid var(--line); }
+.scan-reference .history-record-details li > span { min-width: 0; color: var(--ink); font-size: 13px; }
+.scan-reference .history-record-details li > span small { line-height: 1.55; }
+.scan-reference .history-record-details li > b { flex: none; white-space: nowrap; }
+.scan-reference .diet-card p, .scan-reference .diet-card small { font-size: 13px; }
+.scan-reference .diet-goals button { font-size: 13px; }
+.scan-reference .diet-meal-note { line-height: 1.5; }
+.scan-reference :is(.error, .diet-message, .water-tracker-error) { overflow-wrap: anywhere; line-height: 1.5; }
+@media (max-width: 360px) {
+  .scan-reference .diet-card { padding: 14px; }
+  .scan-reference .diet-actions { grid-template-columns: 1fr; }
+  .scan-reference .diet-macro-grid > div { padding: 8px; }
+  .scan-reference .diet-macro-grid strong { font-size: 16px; }
+  .scan-reference .diet-meal { flex-wrap: wrap; }
+  .scan-reference .history-entry strong { white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-reference .scan-spinner { animation-duration: 2s; }
+}
+.scan-description-dialog { position: fixed; inset: 0; margin: auto; width: min(400px, calc(100% - 32px)); max-width: calc(100% - 32px); max-height: min(680px, calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))); overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; padding: 24px; border: 1px solid var(--line); border-radius: 20px; color: var(--ink); background: var(--soft); box-shadow: 0 24px 70px rgb(0 0 0 / 35%); }
+.scan-description-dialog::backdrop { background: rgb(0 0 0 / 70%); }
+.scan-description-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.scan-description-heading h2 { margin: 0; font-size: 20px; }
+.scan-description-heading button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--bg-tertiary); font-size: 24px; }
+.scan-description-dialog p { color: var(--muted); line-height: 1.5; font-size: 14px; }
+.scan-description-heading + p { margin-top: 8px; }
+.scan-description-dialog label { display: block; margin: 20px 0 8px; font-weight: 600; }
+.scan-description-dialog textarea { box-sizing: border-box; width: 100%; min-height: 130px; padding: 12px; resize: vertical; color: var(--ink); background: var(--bg-tertiary); border: 1px solid var(--line); border-radius: 12px; font: inherit; }
+.scan-description-dialog textarea + p { margin-top: 8px; }
+.scan-description-actions { display: grid; gap: 8px; margin-top: 18px; }
+.scan-description-actions button { min-height: 48px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--bg-tertiary); font-weight: 600; }
+.scan-description-actions .primary { color: var(--night, #0b0f15); background: var(--green); border-color: var(--green); }
+.scan-description-dialog button { cursor: pointer; }
+.scan-description-dialog :is(button, textarea):focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+@media (max-height: 560px) { .scan-description-dialog { padding: 16px; } .scan-description-dialog label { margin-top: 12px; } .scan-description-dialog textarea { min-height: 84px; } .scan-description-actions { margin-top: 12px; } }

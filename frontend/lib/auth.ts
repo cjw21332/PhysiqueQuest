@@ -13,9 +13,9 @@ export interface User {
 
 export { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './session';
 
-export async function register(name: string, email: string, password: string, requestId: string, code: string): Promise<User> {
+export async function register(name: string, email: string, password: string, requestId: string, code: string, profile: unknown): Promise<User> {
   try {
-    const response = await api.register({ name, email, password, requestId, code });
+    const response = await api.register({ name, email, password, requestId, code, profile });
 
     const user: User = {
       id: response.user.id,
@@ -74,6 +74,7 @@ export async function registerWithGoogle(data: {
   requestId: string;
   code: string;
   name: string;
+  profile: unknown;
 }): Promise<User> {
   const response = await api.googleRegister(data);
   session.set(response, getApiBaseUrl());
@@ -87,10 +88,17 @@ export async function registerWithGoogle(data: {
 
 export async function logout() {
   const deviceId = typeof window === 'undefined' ? null : localStorage.getItem('physiquequest-push-device');
-  if (deviceId) { await api.revokePushDevice(deviceId); localStorage.removeItem('physiquequest-push-device'); }
-  await api.logout();
-  clearAuthSession();
-  // The bounded device snapshot is restored only for the same authenticated account.
+  try {
+    if (deviceId) {
+      await api.revokePushDevice(deviceId);
+      localStorage.removeItem('physiquequest-push-device');
+    }
+    await api.logout();
+  } catch {
+    // The local session must still end when the server cannot be reached.
+  } finally {
+    clearAuthSession();
+  }
 }
 
 export function getCurrentUser(): User | null {
@@ -100,5 +108,6 @@ export function getCurrentUser(): User | null {
 }
 
 export function isAuthenticated(): boolean {
-  return Boolean(getCurrentUser()?.token);
+  const user = session.current(getApiBaseUrl());
+  return Boolean(user?.token || user?.offlineOnly);
 }

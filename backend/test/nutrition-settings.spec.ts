@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import { describe, expect, it } from 'vitest';
 import { NutritionService } from '../src/nutrition/nutrition.service.js';
 import { SettingsService } from '../src/settings/settings.service.js';
@@ -6,6 +7,7 @@ describe('user-owned persistence services', () => {
   it('creates an empty nutrition state instead of seeding sample meals', async () => {
     const state = { meals: [], water: [] };
     const model = {
+      db: { startSession: async () => ({ inTransaction: () => true, withTransaction: async (fn: () => Promise<void>) => fn(), endSession: async () => {} }), collection: () => ({ updateOne: async () => ({ matchedCount: 1 }) }) },
       findOneAndUpdate: async () => state,
     } as any;
     const result = await new NutritionService(model).get('507f1f77bcf86cd799439011');
@@ -18,7 +20,7 @@ describe('user-owned persistence services', () => {
     const model = {
       findOneAndUpdate: async (_filter: unknown, update: { $set: Record<string, unknown> }) => { for (const [key, value] of Object.entries(update.$set)) state.values[key.replace('values.', '')] = value; return state; },
     } as any;
-    const result = await new SettingsService(model).update('507f1f77bcf86cd799439011', {
+    const result = await new SettingsService(lifecycleModel(model)).update('507f1f77bcf86cd799439011', {
       values: { threshold: 45, notifications: true },
     });
     expect(result.values).toEqual({ threshold: 45, notifications: true });

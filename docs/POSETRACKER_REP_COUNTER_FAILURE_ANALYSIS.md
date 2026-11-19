@@ -1,0 +1,42 @@
+# Rep-counter failure investigation (updated; calibration investigation incomplete)
+
+The targeted run on 2026-11-17 reproduced eight failures. This is a software-test investigation, not evidence of camera accuracy. No production code, thresholds, checkpoints, or data were changed. Further investigation and regression tests are required before a repair can be justified.
+
+Command from the repository root: `node_modules\.bin\vitest.cmd run shared/__tests__/genericRepCounter.spec.ts shared/__tests__/exerciseEngine.spec.ts shared/__tests__/videoAnalysisPipeline.spec.ts`. Result: 3 files, 2 passed and 1 failed; 45 tests, 37 passed, 8 failed, 0 skipped.
+
+All eight cases use the bilateral `SQUAT_CONFIG` and construct coincident landmark coordinates. Their mocks override `computeJointAngle`, but bilateral tracking instead calls `computeJointAngleWithVisibility` through `computeBilateralAngle`. The bilateral calculation therefore rejects the degenerate geometry as missing, so these tests do not exercise the intended mocked movement. Replace the mocks with explicit nondegenerate synthetic bilateral landmark sequences, then reassess each assertion; do not change visibility thresholds to accommodate the fixture.
+
+| Test (all in `shared/__tests__/genericRepCounter.spec.ts`) | Expected | Observed first failure | Investigation / proposed next step |
+| --- | --- | --- | --- |
+| counts a full rep for squat | One counted rep | Zero | Bilateral fixture produces no valid primary angle; rebuild fixture and evaluate state transitions. |
+| detects partial rep when not reaching full threshold | One partial | Zero | Same invalid bilateral fixture; retest partial path. |
+| rejects rep when stability constraint violated | At least one rejection | Zero | Invalid primary angle prevents stability processing; retest with valid geometry and sustained fault. |
+| declares visibility lost when frames stall and restores without counting interrupted motion | No loss at 500 ms; loss at 501 ms; recover without count | Already lost at 500 ms | Initial frames are already treated as missing, so the loss timer predates the intended last valid frame; retest with valid geometry. |
+| discards an interrupted rep and emits loss and restoration exactly once | Recover to start, no count, one event each | Remains lost | Mocked recovery is bypassed for bilateral angles; retest valid recovery. |
+| preserves completed totals across a long timestamp gap and clears them only on session reset | One count retained, then reset to zero | Zero before gap | Invalid bilateral fixture prevents first count; retest the gap and reset after a real counted sequence. |
+| continues an in-progress rep after a brief visibility dip | One rep without loss/restoration events | Zero | Both movement and recovery mocks are bypassed; retest with a valid short interruption. |
+| restores counting when visibility returns | Restoration event and start state | No restoration event | Recovery landmarks are still geometrically degenerate; retest with valid geometry. |
+
+This common fixture defect explains why these tests currently do not verify their stated scenarios; it does not establish that the actual counter is correct. In particular, the first transition from `AT_START` to `MOVING` does not also evaluate the peak threshold on the same frame, so sparse or fast motions need independent tests. Fault timing, long-gap behavior, loss recovery, and the exact intended safety policy remain to be checked after fixing the fixture.
+
+## Corrected fixtures and observations
+
+The eight named tests now use real bilateral angle calculation, not an angle mock. For each side the knee is at (0.38 or 0.62, 0.55), the hip is 0.16 above it, and the ankle is placed 0.16 away at an angle from the upward ray. The shoulder is positioned to produce a 140-degree hip angle. Coordinates are normalized image coordinates, x right, y down, aspect 1; z is zero. The relevant indices are hips 23/24, knees 25/26, ankles 27/28 and shoulders 11/12. With visibility 1, the test checks the actual weighted bilateral result against each requested angle to five decimal places before every update; visibility 0 yields null. This is constructed geometry, not measured human motion. `computePrimaryAngle` calls `computeBilateralAngle`, which calls `computeJointAngleWithVisibility` on both sides; it checks visibility on all three points, rejects zero-length rays, aspect-scales x, and takes a visibility-weighted average of available sides. These tests do not exercise asymmetry.
+
+Representative 150, 130, 110, and 90 degree frames calculate to those respective angles. With smoothing disabled in these tests, the normal trace at timestamps 0/100/200/300/500 ms and angles 150/130/90/120/150 is `AT_START → MOVING → AT_PEAK → AT_PEAK → AT_START`, with one `rep_counted` event and total one. The partial sequence 150/130/110/130/150 at 100 ms intervals emits one partial and zero full reps. The fault sequence 150/130/100/90/100/130/150 at 100–700 ms emits a rejection for the 140-degree hip and zero full reps.
+
+The original eight now pass: (1) full rep: one; (2) partial: one partial, zero full; (3) sustained hip fault: rejection, zero full; (4) at the exact 500 ms stalled boundary no loss, at 501 ms loss, then one restoration and zero reps; (5) frames 1/101/201 valid, 301/802/900 hidden, 1000/1100 visible: one loss, one restoration, zero reps; (6) frames 1/101/201/401 produce one rep, a gap to 2000 preserves it, session reset clears it; (7) brief missing frame at 301 followed by return at 501 continues the rep, with no visibility events; (8) initially missing frames at 0/501 followed by valid 600 emit restoration and return to start. In each case the bypassed bilateral mock and coincident coordinates caused the original first assertion failure; the corrected tests demonstrate the corresponding behavior only for these sequences.
+
+For frame stalls `tick` starts its timer at the last frame timestamp. For explicitly missing frames `handleVisibilityLost` starts its timer at the first missing frame; both use strictly greater than 500 ms. Thus these are different boundaries. Further testing is required to determine whether the difference is the intended safety policy when frame cadence is low.
+
+## Sparse motion and outstanding failures
+
+At timestamps 0/200/500 and angles 150/90/150, the state trace is `AT_START → MOVING → AT_START` with zero full reps: the first peak frame only enters `MOVING` and the return is treated as partial. A 150/90/90/150 sequence at 0/100/150/250 counts one when configured with a 100 ms minimum. This demonstrates a missed single-sample peak, but whether accepting a lone peak is safe against transient landmark noise is not yet established; no production transition was changed. It must not be described as a repaired production defect.
+
+The expanded targeted command passes 51 tests, 0 failed, 0 skipped in 3 files. The complete shared suite `node_modules\\.bin\\vitest.cmd run shared/__tests__` completed with 76 passed, 5 failed, 0 skipped in 5 files (4 files passed, 1 failed). All five are in `genericRepCounter.cases.spec.ts`: five reps after rest (4 vs 5), 140-degree rest (0 vs 3), shallow calibrated reps (0 vs 3), mixed full/shallow reps (3 vs 4), and brief shift calibration (`159.99999999999997` vs null). They are not fixed or fully diagnosed. The implementation uses a 3000 ms calibration warmup, then collects at least five samples, and calculates rolling extrema; several failing expectations may depend on that policy or on calibration assumptions. Do not infer a fix until these tests and intended calibration requirements are reconciled.
+
+No production files were modified. Fixture changes and six additional timing/state software tests are in `shared/__tests__/genericRepCounter.spec.ts`. The complete-suite failures, policy for isolated peak samples and loss timing, device behavior and real-world accuracy remain unresolved.
+
+## Phase 2B update
+
+The preceding paragraph records the earlier phase only. A later diagnostic found endpoint clamping could expand an observed 20-degree span to 35 degrees and accept it as calibration. A regression reproduced this and `shared/genericRepCounter.ts` now requires the observed span to meet the existing minimum before clamping. The original brief-shift case passes; the other four original calibration cases remain failing. See `POSETRACKER_CALIBRATION_RELIABILITY.md` for traces and exact results.

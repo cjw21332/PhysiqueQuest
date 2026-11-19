@@ -1,0 +1,1853 @@
+{
+  "files": {
+    "01e83deb_0015_c-curl twist_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\01e83deb_0015_c-curl twist_[13].mp4",
+      "size_bytes": 4725504,
+      "sha256": "5e352dc6fb8d697e100312ada061a9897ecad881246e469a2b883d270320984b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "01e83deb_0055_knee to chest_[17].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\01e83deb_0055_knee to chest_[17].mp4",
+      "size_bytes": 4681801,
+      "sha256": "291de9f3e76ed398b1e5347ca6a0bcfba4f8c4180f7de016da8488a4e41e78cb",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "01e83deb_0136_bent scissor_[36].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\01e83deb_0136_bent scissor_[36].mp4",
+      "size_bytes": 6026028,
+      "sha256": "c18074bda1b2dbf9b2f8e533a2b07b7bd2754211bd6a7cca392d36491be88eee",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "01e83deb_0216_toe taps_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\01e83deb_0216_toe taps_[16].mp4",
+      "size_bytes": 4717964,
+      "sha256": "c464a68a9ed762f913a4b340cea4b29ff97167a752c890a8b67b38d8c1e7e9e7",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "01e83deb_0258_leg extension + crunch [l]_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\01e83deb_0258_leg extension + crunch [l]_[11].mp4",
+      "size_bytes": 5865557,
+      "sha256": "5f6df2e3639ee5f8607a518bae60643444d1d7f525a63a657835295fa35fa1da",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "01e83deb_0339_side crunch + leg stretch [l]_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\01e83deb_0339_side crunch + leg stretch [l]_[12].mp4",
+      "size_bytes": 5156196,
+      "sha256": "75705d7fc7ef3ec5971438c6e0552e055982f1dc334ca0074bd1bd165bce3016",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "01e83deb_0419_leg extension + crunch [r]_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\01e83deb_0419_leg extension + crunch [r]_[11].mp4",
+      "size_bytes": 6258132,
+      "sha256": "b86bbc5cf36b5a01f8b71b99a0c7e0c31a67c4ce52c0862c5a1952af1ea2e137",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "01e83deb_0459_side crunch + leg stretch [r]_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\01e83deb_0459_side crunch + leg stretch [r]_[12].mp4",
+      "size_bytes": 5920218,
+      "sha256": "74c67458d4fb096c6439d4f1175afb10b1848510a1eb2bc4ca7fb333e8c00db8",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "04996ace_0016_reverse lunges challenge_[50].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\04996ace_0016_reverse lunges challenge_[50].mp4",
+      "size_bytes": 14698574,
+      "sha256": "abd3932ae444b12a0786a0ceda801341c8d6564deecd00d51a655d324da1e8c1",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0009_leg lift_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0009_leg lift_[14].mp4",
+      "size_bytes": 5123323,
+      "sha256": "d2d2881453f3d629150ad64b3be6d206a5d64d71f9b3f9952bf91e32929335f4",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0039_donkey kick + cross_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0039_donkey kick + cross_[16].mp4",
+      "size_bytes": 4877262,
+      "sha256": "1f11cadce3c6a4c172c244d25b2071f948bec436d99a7504900a8a6dd3f27026",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0109_donkey twist_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0109_donkey twist_[8].mp4",
+      "size_bytes": 4683710,
+      "sha256": "47877e7a7595c85e3d9dbba5452ee01b9ad1e30089c0678626727e406a4f57fe",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0139_rainbow_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0139_rainbow_[8].mp4",
+      "size_bytes": 4546352,
+      "sha256": "7e438c77da307dba980d085b339aa905a5203cc59f8d4b7264a861c2d18bd057",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0209_crossed side kick_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0209_crossed side kick_[9].mp4",
+      "size_bytes": 4665424,
+      "sha256": "0f8c3ce1847bac74dca5c2dc48a16ca7f0cbd32b3f9100bcd18e078c3508e35e",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0239_hamstring curl_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0239_hamstring curl_[10].mp4",
+      "size_bytes": 3596919,
+      "sha256": "b35dc838b17feee38bd156940e97904b409dab7cacc45fc8f75be875b25bc80e",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0339_side leg lift_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0339_side leg lift_[10].mp4",
+      "size_bytes": 5111828,
+      "sha256": "3a03f9f78eba40ff4de3f150e43ce988500c2ed1048a824b0a6ace6c39055395",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0409_leg swipe_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0409_leg swipe_[11].mp4",
+      "size_bytes": 4143674,
+      "sha256": "e985a71d79fcdfd2474af048d802b6c440d92280ba27e9c6f3059a844ee9f793",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0439_leg extension_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0439_leg extension_[11].mp4",
+      "size_bytes": 3846999,
+      "sha256": "4746e020c4f13c0fb0bfd8036035de3cdac20d411ac74a1ae4a36a6eb2b6a2fc",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0509_leg circle_[22].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0509_leg circle_[22].mp4",
+      "size_bytes": 4358305,
+      "sha256": "e303563591d22de3e9b32ba24070abfc9dfe086e18b260ca52bb892cf032c404",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0609_leg lift_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0609_leg lift_[14].mp4",
+      "size_bytes": 4757929,
+      "sha256": "37cd1321d3e35e0340b61fc02d744152e64ce250c45a1f4c3b9345e3266ca851",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0639_donkey kick + cross_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0639_donkey kick + cross_[8].mp4",
+      "size_bytes": 4635404,
+      "sha256": "cda8b23bc7da4855e144603255aae8af6c1da863a0f3b47d3826037f701837e5",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0709_donkey twist_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0709_donkey twist_[8].mp4",
+      "size_bytes": 4582948,
+      "sha256": "9cccb4a5ad4a197bc38b2947b47709ea5c2a3b4a9a9078a2cc244267162df42d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0739_rainbow_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0739_rainbow_[8].mp4",
+      "size_bytes": 4663551,
+      "sha256": "551d62021a6af5f7cf4f69cc3e150e9d295d58c9e1b6ee96e9b59336e06ce382",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0809_crossed side kick_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0809_crossed side kick_[9].mp4",
+      "size_bytes": 4785894,
+      "sha256": "fb9afdba5375e97cc34f43235e9486fc1ded4f297fd8e280798afb79bf3cc95d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0839_hamstring curl_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0839_hamstring curl_[11].mp4",
+      "size_bytes": 3801731,
+      "sha256": "8e63c1f07f3d959bf59c382dfbf03b2a777e39bf8eca7cae2b0164e047def8c1",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_0943_side leg lift_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_0943_side leg lift_[10].mp4",
+      "size_bytes": 4071894,
+      "sha256": "7a28882a9588a157d0818a2cfa0ba7ddc3f19efbe52be69c559310e9386f4368",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_1009_leg swipe_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_1009_leg swipe_[11].mp4",
+      "size_bytes": 4223104,
+      "sha256": "2a41ca0984c766ec4ccc5f0ce0ec64d3991166c52a8c94aab6e12bef60e4aff4",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_1039_leg extension_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_1039_leg extension_[12].mp4",
+      "size_bytes": 3369391,
+      "sha256": "76949756ba61a2fdcad6ea27f07d993830aef9dd232aef6c01355369de730161",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_1109_leg circle_[19].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_1109_leg circle_[19].mp4",
+      "size_bytes": 4264022,
+      "sha256": "f805752693acb6a8ba4c9da464c6cf278d38736d4e7289d6fb6985a577377744",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_1209_pointe to heel bridge_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_1209_pointe to heel bridge_[8].mp4",
+      "size_bytes": 3932219,
+      "sha256": "e250d081a3526166495b922b2ff97f194408a00e8e1ec25120c7bb9bc8efd3db",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_1239_pointed glute bridge_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_1239_pointed glute bridge_[11].mp4",
+      "size_bytes": 3520960,
+      "sha256": "d2ae2dbd43292bb3c14c8bcdee213c106b22a9632887b0605e74be8e8e5d094b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_1339_1-leg glute bridge_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_1339_1-leg glute bridge_[10].mp4",
+      "size_bytes": 4051541,
+      "sha256": "deeddc1e064f88454c6313dd91cc3b9647f3ddfeb9123b8371929036632400bc",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0a9a588e_1409_1-leg glute bridge_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0a9a588e_1409_1-leg glute bridge_[10].mp4",
+      "size_bytes": 3640881,
+      "sha256": "bae4825e789f95a140fbd1f5d55df0a909a06e0a995815024d6e1a3fab9cdb63",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0017_straight leg lift [r]_[13-12-14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0017_straight leg lift [r]_[13-12-14].mp4",
+      "size_bytes": 5544618,
+      "sha256": "2a4a3d081ea139e053122bb8d063bad0a13bcfef92caf0fd94e373739c467770",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0139_straight leg circle [r]_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0139_straight leg circle [r]_[11].mp4",
+      "size_bytes": 5370850,
+      "sha256": "bc46d20a18d0122f04eaf9488878f306854f0af97314ed0ebda511ab476fc447",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0229_lower leg lift (L)_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0229_lower leg lift (L)_[12].mp4",
+      "size_bytes": 5972165,
+      "sha256": "762ff96f690e37ecf03a8b938491518b45b22b064703bbcf372886cb1ceb2c29",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0359_straight leg lift (L)_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0359_straight leg lift (L)_[10].mp4",
+      "size_bytes": 5567357,
+      "sha256": "628688cb26a19a0727b829593515eae20b213efc986713ece76d00af304ab789",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0519_straight leg circle(L)_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0519_straight leg circle(L)_[9].mp4",
+      "size_bytes": 5091261,
+      "sha256": "a8cd0d688b0846a8c0b96d5c372e79cd757f6676523a92b945e3215492d08143",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0559_lower leg lift (R)_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0559_lower leg lift (R)_[13].mp4",
+      "size_bytes": 6006816,
+      "sha256": "f390383db80f19cb2d271455591787bfb7aebbbf46e1a59024259bd4ad86bf0e",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0739_V bridge lift (feet connected)_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0739_V bridge lift (feet connected)_[8].mp4",
+      "size_bytes": 4688632,
+      "sha256": "60c3271d882a43b4b9e5ee74b2e94a901a3e4c5ecee204be86be128c5f446ead",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0819_V bridge lift + butterfly_[7].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0819_V bridge lift + butterfly_[7].mp4",
+      "size_bytes": 4746290,
+      "sha256": "453801ac8948cbb7e0fd17b2ec9bf800fbe6b3d5d9dc629462b6fb1094864a95",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "0e88251c_0859_V bridge hold + butterfly_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\0e88251c_0859_V bridge hold + butterfly_[14].mp4",
+      "size_bytes": 4807695,
+      "sha256": "ee7bfcf733c6e63f275120986414c54942210f8943cca9d6df967cd5404ef2a9",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "14c2c3f4_0045_drop squats_[40].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\14c2c3f4_0045_drop squats_[40].mp4",
+      "size_bytes": 9273417,
+      "sha256": "d244ebdcb1309cc1fbd65d78081a4a2719f4dc643282220a87e68214ec21a4c5",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "14c2c3f4_0146_half burpees_[17].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\14c2c3f4_0146_half burpees_[17].mp4",
+      "size_bytes": 8600531,
+      "sha256": "dfc4245b227452fe85a6189352ed95916e2108c5933e4768b4f249db29fd0f0a",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "14c2c3f4_0248_high knees_[146-145-147].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\14c2c3f4_0248_high knees_[146-145-147].mp4",
+      "size_bytes": 8848999,
+      "sha256": "1ce88350b25bb39172a5d2bc4da1e768e51a26da6935decc05a60cd8cab94b5e",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "14c2c3f4_0346_butt kick squat jumps_[23].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\14c2c3f4_0346_butt kick squat jumps_[23].mp4",
+      "size_bytes": 8214160,
+      "sha256": "5f3acfa66952a28f033e7b85b0a1e6a2c1cadeefb9b930501695f084e2464f57",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "14c2c3f4_0447_push up toe tap_[14-13-15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\14c2c3f4_0447_push up toe tap_[14-13-15].mp4",
+      "size_bytes": 7303842,
+      "sha256": "af86cee009f58b5ac39fb3fc53cb0c2e0a368555c3fff24ee697ad3b3afa270b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "14c2c3f4_0549_bicycle crunches_[114-113-115].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\14c2c3f4_0549_bicycle crunches_[114-113-115].mp4",
+      "size_bytes": 7151507,
+      "sha256": "384ab2ef9dcb784e82efbb9393c802d4c8d85e7bf30c5317afa652195c247fc1",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "14c2c3f4_0751_side plank raises(right side)_[51].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\14c2c3f4_0751_side plank raises(right side)_[51].mp4",
+      "size_bytes": 5596727,
+      "sha256": "5b4c27aed625010a7e273a4abbd65c420399708d61a8ea9dcf715ddde37c159b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "14c2c3f4_0847_full burpees_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\14c2c3f4_0847_full burpees_[16].mp4",
+      "size_bytes": 9474582,
+      "sha256": "ccfb77f065c45e05efc78b3bc742e5d8241f09ab9e881408445a429f97ee8a32",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "17e2d98f_0041_high knees_[17].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\17e2d98f_0041_high knees_[17].mp4",
+      "size_bytes": 4142278,
+      "sha256": "4db7735bb0ed461a629b50cb559915443d068334ac2ee37e7991d157569283b2",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "17e2d98f_0111_sun rises_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\17e2d98f_0111_sun rises_[11].mp4",
+      "size_bytes": 4710084,
+      "sha256": "21cf21fe05c9a55c90b336f7c48a7f241e4a2d0d5c18567b442d6d080706caa6",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "17e2d98f_0141_hip circles_[7].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\17e2d98f_0141_hip circles_[7].mp4",
+      "size_bytes": 3661782,
+      "sha256": "b32ec1e2152f7eecc78b7ea563b178c91c4328278bd2bc2cd580dfe8d643f960",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "17e2d98f_0211_high knee & cross punches_[21].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\17e2d98f_0211_high knee & cross punches_[21].mp4",
+      "size_bytes": 4120660,
+      "sha256": "69b4e4e191543ec350b056ae0d4a59044a9375f6fe1be0ec125dafe822280630",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "17e2d98f_0241_slow sq_[6].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\17e2d98f_0241_slow sq_[6].mp4",
+      "size_bytes": 3586140,
+      "sha256": "682a808935ec64fdc4ec906b63558da925e4f74e33b20e2a7fab43e22136a66c",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "17e2d98f_0311_cross toe touches_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\17e2d98f_0311_cross toe touches_[10].mp4",
+      "size_bytes": 4839379,
+      "sha256": "0b27bb42d647096527992ecbbb9f670622058fe3a7a7f1a266ba63468238da48",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "17e2d98f_0341_step jacks_[30].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\17e2d98f_0341_step jacks_[30].mp4",
+      "size_bytes": 4993918,
+      "sha256": "0c52a4442a7c6e5f057dd8afffdbd04fca48d7283948d9d26046fa52af0332dd",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "17e2d98f_0411_standing donkey kicks_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\17e2d98f_0411_standing donkey kicks_[10].mp4",
+      "size_bytes": 4204953,
+      "sha256": "b03cae1c0c73f17e9c16add2ccac61ea76ae119b006a8c6e017b4f3972e422d2",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58_0053_leg raise clap_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58_0053_leg raise clap_[8].mp4",
+      "size_bytes": 1568806,
+      "sha256": "168ef0d64bd146a12bb3e2cd495cfd2c5f3cf8cfbe913cf6f7c7085f6e9b1431",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58_0231_crossbody mountain climber_[52-51-53].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58_0231_crossbody mountain climber_[52-51-53].mp4",
+      "size_bytes": 2307431,
+      "sha256": "14505cdd50b976944983d72257ce4dc43b251ef859f41827e693bc0ce02ef42b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58_0533_100_[70].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58_0533_100_[70].mp4",
+      "size_bytes": 1468664,
+      "sha256": "272152e3c6985089cf641e3492164c4db4bbb4a6aa701c44319b4702ed707596",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58_0603_crunch_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58_0603_crunch_[12].mp4",
+      "size_bytes": 1941737,
+      "sha256": "d36685ae177183650c4c2a79550f4003a28de5ddd21dd839ae458e79c93430f0",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58_0643_up&down plank_[11-10-12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58_0643_up&down plank_[11-10-12].mp4",
+      "size_bytes": 2134439,
+      "sha256": "a3917b18dbb01a870758a3c59275c8f54bb9b358931a8576e62813723ff2c7ff",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58_0753_heel tap_[28].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58_0753_heel tap_[28].mp4",
+      "size_bytes": 1489252,
+      "sha256": "9555a85a209b92ba9e75bf720065a2a891a8237ef64a98df4d9fab5006cb438a",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58_0903_reverse crunch leg extension_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58_0903_reverse crunch leg extension_[12].mp4",
+      "size_bytes": 1712466,
+      "sha256": "4fffda015b19a903f05bb4cf722e7df5a52b9af70eb14935303e6bf69dbb9e73",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58_0933_straight leg crunch_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58_0933_straight leg crunch_[8].mp4",
+      "size_bytes": 1737286,
+      "sha256": "af8dfa5ec03ffc2bfc132aa935d6a9dc646e295b566f555946329b8459684829",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "199aec58ef058b0a17cd460ca5f138c9_1013_up&down plank_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\199aec58ef058b0a17cd460ca5f138c9_1013_up&down plank_[10].mp4",
+      "size_bytes": 1782764,
+      "sha256": "82b2dd957501adee67254c865492255dfdd19473b4a70298399d132d74c73e6c",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0014_wall bicycle_[15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0014_wall bicycle_[15].mp4",
+      "size_bytes": 4846471,
+      "sha256": "795df605e11bea2bbfd37804d7dc734124bce376b6df831681ebcd8a0b054dfb",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0044_wall bridge_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0044_wall bridge_[10].mp4",
+      "size_bytes": 3693512,
+      "sha256": "fdf4a0bd5a350f39dfffa135c80fafbc29a791eb62dae9a429d4dc56d32aa49b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0114_1 leg bridge(R)_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0114_1 leg bridge(R)_[14].mp4",
+      "size_bytes": 3722620,
+      "sha256": "305ee786db62c8afc5fa3344bb6d8ce3dc0709da4f44df7248ce9189ecfa09a8",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0144_1 leg bridge(L)_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0144_1 leg bridge(L)_[14].mp4",
+      "size_bytes": 3637785,
+      "sha256": "435243a33b93a79f215c66c950e7fba3cb583cf3c32437a1584bf597aacbc572",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0215_wall marching_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0215_wall marching_[12].mp4",
+      "size_bytes": 4556606,
+      "sha256": "95a343d804bbbfcfe8b623a7485182b98604dc354f0264acd5419b1e8b2b9865",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0244_cross crunch(R)_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0244_cross crunch(R)_[16].mp4",
+      "size_bytes": 4587736,
+      "sha256": "1070f57afd4a84e7bf693f224c7c4b6148ee1e7226dd195000dc23b887c9e2f1",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0314_cross crunch(L)_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0314_cross crunch(L)_[16].mp4",
+      "size_bytes": 4448530,
+      "sha256": "79ed3b56e94e8c5447621e82c77c80fa7503c9523b25912ebe17e0ae6499f173",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0344_wall walk_[7].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0344_wall walk_[7].mp4",
+      "size_bytes": 3920337,
+      "sha256": "0d54fc13a29da16569c0d5a117fed64f7ddce6cf948d70963625e0099e9ac63c",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0416_leg slides_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0416_leg slides_[12].mp4",
+      "size_bytes": 3629482,
+      "sha256": "ec4f58fe3b1e912df91be0c307706865ff007570abef1917b750fafe65abb0ec",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0444_hip slides_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0444_hip slides_[10].mp4",
+      "size_bytes": 3824648,
+      "sha256": "49fab624eceb80a99e6b1877012a802dc934f1f4ed8360feef95a0e7bba4c709",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0517_wall twist_[33].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0517_wall twist_[33].mp4",
+      "size_bytes": 5131188,
+      "sha256": "deac1b59f3a6e1636e9fffff8b7f9c42dd417106529a22d788e8049833181e64",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0545_crunch_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0545_crunch_[16].mp4",
+      "size_bytes": 3854553,
+      "sha256": "19d0dcc1933daaa1a177767f3fdfc1138b5456896de37141ac2867fd38f1a26a",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0650_baby cobra_[5].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0650_baby cobra_[5].mp4",
+      "size_bytes": 3156336,
+      "sha256": "378d59b580cd2406a475f340f0046736a07a4bd7f7cf413f38706fa30ba720b6",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0720_booty slide_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0720_booty slide_[10].mp4",
+      "size_bytes": 3741029,
+      "sha256": "907047831fdd5af98968d18de7a704364c94e467c46022024412894c219545ca",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0814_wall push_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0814_wall push_[10].mp4",
+      "size_bytes": 4322896,
+      "sha256": "f20d8ed8bfc7e1245d8446328e74cc434f54c9c4a340dae65a47e9ca1b3b7573",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0844_kickback(R)_[17].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0844_kickback(R)_[17].mp4",
+      "size_bytes": 4472156,
+      "sha256": "37a223ae48ab0c9a269e7c22223219265e89526ff65fa9594e1bbc645da21486",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "1e6a72cd_0914_kickback(L)_[17].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\1e6a72cd_0914_kickback(L)_[17].mp4",
+      "size_bytes": 4181935,
+      "sha256": "c3a633a4ebb2c7481bedea5dc8794308b23928af4e6d876e6f4c49d4b215dfb0",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "36f0d07e_0140_open chest & press_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\36f0d07e_0140_open chest & press_[13].mp4",
+      "size_bytes": 5195737,
+      "sha256": "499e0b2652e262c362d12ee185162fd193e37b63fd2eaf493036a500884da74b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "36f0d07e_0220_prayer pulses_[26].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\36f0d07e_0220_prayer pulses_[26].mp4",
+      "size_bytes": 4914928,
+      "sha256": "c97000dd9bb1c84df7f406e79e70406576e30316a4d8a6a5115bbff70ff22f90",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "36f0d07e_0300_bicep curls_[24].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\36f0d07e_0300_bicep curls_[24].mp4",
+      "size_bytes": 5446094,
+      "sha256": "30099d705f329071efeadc0fd289bcb79426fbac4ccc3deab2b412e61cd3cda4",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "36f0d07e_0506_straight arm lift_[24].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\36f0d07e_0506_straight arm lift_[24].mp4",
+      "size_bytes": 5516861,
+      "sha256": "090716f28a709719dd794ba711561075f6be4eb28ef9b265b26b971e8d0be395",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "36f0d07e_0638_stting tricep push_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\36f0d07e_0638_stting tricep push_[13].mp4",
+      "size_bytes": 5327104,
+      "sha256": "73f0cb06694cabcf72ca318ecfde26b1622099906c27ab6d6f5883f66d38a9ab",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "36f0d07e_0716_box push-ups_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\36f0d07e_0716_box push-ups_[11].mp4",
+      "size_bytes": 5101469,
+      "sha256": "b90cd5f4a3d06e677ab339712faf26a9dc82cc38fcda6351f9b0d08d48005d73",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "3977a2e05bacbfc8e3be9a48162bc169_1012_alternating side crunch_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\3977a2e05bacbfc8e3be9a48162bc169_1012_alternating side crunch_[14].mp4",
+      "size_bytes": 5379401,
+      "sha256": "4d2d87a520fa8c53c33f88a642e4f3e8f9564fbda76d7a5c1c474f51b4267dbd",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "4555d6aead3c90604b2c19ee3f1dc820_0614_good morning + twist_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\4555d6aead3c90604b2c19ee3f1dc820_0614_good morning + twist_[10].mp4",
+      "size_bytes": 4705831,
+      "sha256": "8d326b304c49be7f047514cfde778fafd27c2cdaf6620e1d32e3762b1c59b945",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0014_jumping jack_[35].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0014_jumping jack_[35].mp4",
+      "size_bytes": 4743350,
+      "sha256": "9a79f511c151a5a853d15e20c172fbf6766a40b562e1efd1f1db0906e5c78ee2",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0044_high knees_[80-79-81].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0044_high knees_[80-79-81].mp4",
+      "size_bytes": 4867095,
+      "sha256": "5ef1d763eddd32f18a57f33ebbd44ab5660e56f4364301050c6d1a543e6e5311",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0114_squat + side jumpy_[21].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0114_squat + side jumpy_[21].mp4",
+      "size_bytes": 4465788,
+      "sha256": "315359721c3893fcc34fe5aff9965fdea886f61726f125e2ceb779bee36039fa",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0144_mountain climber_[69-68-70].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0144_mountain climber_[69-68-70].mp4",
+      "size_bytes": 4460602,
+      "sha256": "09978bf758e2dc1664ad5333873ff5314abbda6f4e20b9f7604ca1aa2752508b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0244_plank + jumping jack_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0244_plank + jumping jack_[10].mp4",
+      "size_bytes": 4498953,
+      "sha256": "0cdc1bd6aa1d70ff28685953606d3290184a67feef99fccf49050a4e2059b27f",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0314_jump + punches_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0314_jump + punches_[16].mp4",
+      "size_bytes": 4423815,
+      "sha256": "ec5d06c1a681c1181b63de0b1ee7adbd1d6f8a937f48169781260fd45df95149",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0344_high knees_[82].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0344_high knees_[82].mp4",
+      "size_bytes": 4620864,
+      "sha256": "7e9266437de46446f93aba07e8d50b85299f633f23b40c0763e9d99847521d1a",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0414_squat jump + 3s hold_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0414_squat jump + 3s hold_[10].mp4",
+      "size_bytes": 3688014,
+      "sha256": "7fe1b287c340860b8e748273563111a1848513a254043b04922e560bb0fb9033",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0444_twisting mountain climber_[59-58-60].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0444_twisting mountain climber_[59-58-60].mp4",
+      "size_bytes": 4465263,
+      "sha256": "c313f39dc9cbdca4ef5f63cb6814323a6a3b6fcfe16437148b2f03ed8013faf2",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0514_push up (on knees)_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0514_push up (on knees)_[12].mp4",
+      "size_bytes": 3713099,
+      "sha256": "a06c7b0f9703f5d1617a2271d30a0ee5f29ff87190190a299a4b0ca6ff0c3338",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0614_plank jump + 3 punches_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0614_plank jump + 3 punches_[9].mp4",
+      "size_bytes": 4229719,
+      "sha256": "b2b11456233462c7e769c4dbd504e3146c0885b376ecdb2989cdaf9fec63b074",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0644_HIGH KNEES_[79-78-80].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0644_HIGH KNEES_[79-78-80].mp4",
+      "size_bytes": 4610651,
+      "sha256": "ce7cfa2aa7d9a079071a85001c0689c124030c72bbe2e55a7363aa51b4da896f",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0713_SQUAT + SIDE JUMPY_[21].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0713_SQUAT + SIDE JUMPY_[21].mp4",
+      "size_bytes": 4648986,
+      "sha256": "9ba2e47fb175b5069521f87ebac2ebdba7df861f10d2d9900b48ee235e2f9dc8",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0744_JUMPING JACK_[35].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0744_JUMPING JACK_[35].mp4",
+      "size_bytes": 4775877,
+      "sha256": "a328f02f6c62e01c29f3ec23b7819e0f94096d0342565b5581db084fbb66afb5",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0815_PLANK + JUMPING JACK_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0815_PLANK + JUMPING JACK_[11].mp4",
+      "size_bytes": 4644738,
+      "sha256": "66606179edadaf39fc75b96029f8c16945cd6a8dc6806a9f768f609bb20f97e3",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0845_MOUNTAIN CLIMBER_[62].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0845_MOUNTAIN CLIMBER_[62].mp4",
+      "size_bytes": 4402611,
+      "sha256": "08896fb2fa87582593d350e1e974bae8a17bf32b6f9dc4eb7188531423bde080",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0915_HIGH PLANK_[1].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0915_HIGH PLANK_[1].mp4",
+      "size_bytes": 2938662,
+      "sha256": "3ad71f7ff418b8f7211db06953b0e68a302657c714f345c89b6a0e2bb4ee5e12",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "5e3a8d78_0944_ELBOW PLANK_[1].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\5e3a8d78_0944_ELBOW PLANK_[1].mp4",
+      "size_bytes": 3072903,
+      "sha256": "1f712a3b7ccf6179c3f3b0ad1dc5c79d0faaac64e463b308f8dcd923f862cbd7",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "60093019_0019_donkey kicks_[50].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\60093019_0019_donkey kicks_[50].mp4",
+      "size_bytes": 14965799,
+      "sha256": "81a32e5ab021b729e57a66db89db128b4c77fb756a27f7bff740feee9311c882",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "64f0a0d9_0017_plank jacks challenge_[100].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\64f0a0d9_0017_plank jacks challenge_[100].mp4",
+      "size_bytes": 15409966,
+      "sha256": "a20db8aad4059cdcf9368d29052c12325e5622dfc3a7521c41583d6067393ae3",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0013_leg lift circles_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0013_leg lift circles_[12].mp4",
+      "size_bytes": 4017192,
+      "sha256": "c8d3279387e58ddd90cb4b65512be61fa8c5d72c45822ffa64229703f4ac53a4",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0043_reverse crunch variation_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0043_reverse crunch variation_[12].mp4",
+      "size_bytes": 4005910,
+      "sha256": "4f0b0fcdc9023c4d0b57e87896d33cb39248a652513c3d213bad50c9f543dfa4",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0113_leg lift_[67].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0113_leg lift_[67].mp4",
+      "size_bytes": 4575762,
+      "sha256": "5e93d075a45afd7c416d6fee5a029a1812db5eb52735b25910bde7eef6e256e3",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0143_cross crunch_[17].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0143_cross crunch_[17].mp4",
+      "size_bytes": 4565870,
+      "sha256": "857e998c71db0d8b51243bd66b78ec9bd1a8fb6322ca32fffc35ade1f90c7872",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0213_russian twist_[35].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0213_russian twist_[35].mp4",
+      "size_bytes": 4696518,
+      "sha256": "4c408b807bc0cc41c528083a43d179b038fc4509aba8b1fee4ee77981abe02cf",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0243_leg lift_[15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0243_leg lift_[15].mp4",
+      "size_bytes": 3930345,
+      "sha256": "2314951a31bda25082c22f061906e3d21330fff4edd1fb63bab377188f9d68d0",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0313_flutter kicks_[90].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0313_flutter kicks_[90].mp4",
+      "size_bytes": 4428769,
+      "sha256": "380e87874263d9a3144c7246bfe67fbec6ba88ff5c56aa7b64c9833ffde7fb56",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0343_toe taps_[56].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0343_toe taps_[56].mp4",
+      "size_bytes": 3300530,
+      "sha256": "f66e400638bc5c04de6bb4d2c331c9acf8f1430f2876c904a3449a646acc9f6c",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0413_reverse crunch variantion_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0413_reverse crunch variantion_[13].mp4",
+      "size_bytes": 4119564,
+      "sha256": "457edc71ad5aa792617e62ef717a37325020a91a84a3fd43b048a8e28d155b54",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0513_bicycle crunch_[40].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0513_bicycle crunch_[40].mp4",
+      "size_bytes": 5272004,
+      "sha256": "bf62fcd5711c208f79043a2572fe8c6af843638cfae474f290a59ee488c4a5cb",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0543_side plank pull left_[21].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0543_side plank pull left_[21].mp4",
+      "size_bytes": 4826953,
+      "sha256": "5d754adb3bed0c68f53caacf9acaadfcd90ae1bb53ab22cca97fd9bbfa0e17fc",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0613_side plank reach through left_[11-10-12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0613_side plank reach through left_[11-10-12].mp4",
+      "size_bytes": 4441075,
+      "sha256": "e2cc013a5f868adb236b5d6784d3a2945a3288ee4425ad2beb25c862aa2f2420",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0713_side plank pull right_[19-18-20].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0713_side plank pull right_[19-18-20].mp4",
+      "size_bytes": 4453800,
+      "sha256": "b47f99d5b6eff3df0d0ef2c83b301e741a39bebdc12285df336fcd5decda5004",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0743_side plank reach through right_[12-11-13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0743_side plank reach through right_[12-11-13].mp4",
+      "size_bytes": 4872624,
+      "sha256": "58381da6ea6cc55b75fc3de1902e6a23e71a1e5d2fb6e63eaadeff313656ece9",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0913_plank back & forth_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0913_plank back & forth_[13].mp4",
+      "size_bytes": 3280183,
+      "sha256": "a7d239169f0793e631d16ffffc77e406027ae83add448457bb077f1bd6eda1c1",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "6770817f_0943_cross-spider plank_[22].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\6770817f_0943_cross-spider plank_[22].mp4",
+      "size_bytes": 4718100,
+      "sha256": "6f857cb85f24662bb261881b861bd54ddde539479fe8df01dae7b75704cb5078",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "68ac8406_0024_star jumps challenge_[50].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\68ac8406_0024_star jumps challenge_[50].mp4",
+      "size_bytes": 10409312,
+      "sha256": "bf8915900f7278c707d359eebfc4956b796592bb2c61f035c45e9353e10b1b08",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "764ecccd_0714_lower leg slide_[15-14-16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\764ecccd_0714_lower leg slide_[15-14-16].mp4",
+      "size_bytes": 3992141,
+      "sha256": "e36a90d1da42c1dda7756ef099f2309c3ef23193ca4b15ec114b43dbe18edd8d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "764ecccd_0744_halfmoon_[23-22-24].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\764ecccd_0744_halfmoon_[23-22-24].mp4",
+      "size_bytes": 4088864,
+      "sha256": "93b0267d31dcb7ae1965b92c1044bb562cc4df48871b907f5f849f3025523e1d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "764ecccd_0814_5 pulses, 3 long_[4].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\764ecccd_0814_5 pulses, 3 long_[4].mp4",
+      "size_bytes": 4220342,
+      "sha256": "39ec47c30908cf2d8db66a0ffb3c2071bcf5a1f271ca211009405b754103bba7",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "87fe2aa4_0026_squat_[15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\87fe2aa4_0026_squat_[15].mp4",
+      "size_bytes": 5399762,
+      "sha256": "b279c155559df88afd6e74f34eecfdb4f98ac4450813361c4b99e7d785bd4d9a",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "87fe2aa4_0114_squat_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\87fe2aa4_0114_squat_[12].mp4",
+      "size_bytes": 4573816,
+      "sha256": "47afb039cce820413d69c7a53cb88013225bfe1e8f5649607dd060acbb9af4af",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "87fe2aa4_0159_donkey kick_[20].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\87fe2aa4_0159_donkey kick_[20].mp4",
+      "size_bytes": 3920422,
+      "sha256": "beba2388cebe9a773a662c5d427ce3d9ff06073115d753ae7b9a0f0a5a5098b1",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "87fe2aa4_0224_donkey kick_[20].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\87fe2aa4_0224_donkey kick_[20].mp4",
+      "size_bytes": 4283908,
+      "sha256": "1511f84f0084a8f93604b9f7fc68e13062940fd50e2d31f9d3f9c7c1a5d62103",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "87fe2aa4_0304_side leg raise_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\87fe2aa4_0304_side leg raise_[16].mp4",
+      "size_bytes": 6359441,
+      "sha256": "07f894004fa5d1d170892ecf185238ebe39f040b5d2017fad5cd4d8fcfd97cb1",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "87fe2aa4_0403_reverse lunges_[20].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\87fe2aa4_0403_reverse lunges_[20].mp4",
+      "size_bytes": 7291755,
+      "sha256": "887f345798aeda51db8d5ac4a8350d1ca50b178d0ca4dcd250f8fcf4d9028616",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "87fe2aa4_0514_squat_[15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\87fe2aa4_0514_squat_[15].mp4",
+      "size_bytes": 4839981,
+      "sha256": "8c02541cd2740e4a3ee814d22c8fb0ae04f97a707af679559c7cad1e7bfa34b8",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_0011_cat cow_[7].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_0011_cat cow_[7].mp4",
+      "size_bytes": 1689007,
+      "sha256": "b680ef1162eb8930490ea677c3374d04bfa2c8d15405109a026c2a486a55a6bc",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_0611_roll up_[4].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_0611_roll up_[4].mp4",
+      "size_bytes": 2156241,
+      "sha256": "e5c9e72df7c92e9d1dfe7a75344f22e6ad5caa8a0f2dbe439ba5bfdfc14d27eb",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_0711_floor taps + extend_[7].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_0711_floor taps + extend_[7].mp4",
+      "size_bytes": 1836677,
+      "sha256": "3cf635bd741d48bafbd295edabf89e0c52ac6e8f98d0d0dc3c3f0b7c71924b01",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_0811_lifted crunch_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_0811_lifted crunch_[12].mp4",
+      "size_bytes": 1702751,
+      "sha256": "560d48c92c23529597591fee2c96e1468a8881a8c954818e05023f11be96ab75",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_0841_bow crunch(R)_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_0841_bow crunch(R)_[13].mp4",
+      "size_bytes": 1762979,
+      "sha256": "deb15d972e6c4a62843228be39046cdd25318a00b8cdabb951c8722ac2b80ea7",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_0911_bridge +floor taps(R)_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_0911_bridge +floor taps(R)_[10].mp4",
+      "size_bytes": 1625776,
+      "sha256": "dd85a055bcea605ff799a4ea87904daa9a08162c932853f3c72bd6ed947abace",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_0941_bow crunch(L)_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_0941_bow crunch(L)_[11].mp4",
+      "size_bytes": 1704319,
+      "sha256": "fee1e133108f7fcfac66603e86f75d10f95ef4ff701676e8409d59e540575cc4",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_1114_half plank crunch(R)_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_1114_half plank crunch(R)_[10].mp4",
+      "size_bytes": 2349213,
+      "sha256": "87e4492b66139d2c14296a0119a4a836ff75845a6164a5193f8c1e50a35f4895",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_1141_half plank opener(R)_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_1141_half plank opener(R)_[9].mp4",
+      "size_bytes": 2416680,
+      "sha256": "a0392e97a4e3755f8b6fff1e540508fa4b20a4c183c21d25aa0290035d6bc494",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_1241_half plank crunch(L)_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_1241_half plank crunch(L)_[10].mp4",
+      "size_bytes": 2506416,
+      "sha256": "857bb15dba077454259be5a8fc45a0c6fc18b7268a8afb2ac4ce2b46f36b9460",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_1311_half plank opener(L)_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_1311_half plank opener(L)_[8].mp4",
+      "size_bytes": 2517056,
+      "sha256": "d9bc34cf4d529261a6d3494d2c452d8447cb6f26f893b6542d168cc514f3ddda",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "89e84598_1419_reverse plank lift_[6].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\89e84598_1419_reverse plank lift_[6].mp4",
+      "size_bytes": 1729900,
+      "sha256": "dcb3999f2de37821e6b2c0965cff7dec5c36159aa61320a54252ed16e671316d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "9d5ebd38_0016_bridge_[50].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\9d5ebd38_0016_bridge_[50].mp4",
+      "size_bytes": 13737933,
+      "sha256": "c93aed6db7ce1a819b1d5dc149961f998ff9f434be83d4b5760e66b16eac360f",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0020_crunch +weight_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0020_crunch +weight_[12].mp4",
+      "size_bytes": 3395016,
+      "sha256": "47229fee63d1e6649cf51ec109efa6f32f0e2a1b832974a9aca854df46101203",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0050_sit up + weight_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0050_sit up + weight_[8].mp4",
+      "size_bytes": 4529799,
+      "sha256": "8e6808dbdd6a92881e09375c0a25ce891a40618a5a4a6b2f40866fd8ff294e6f",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0150_sitting leg lift_[15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0150_sitting leg lift_[15].mp4",
+      "size_bytes": 4213407,
+      "sha256": "cf5bef823c23cd46f2cd5813b4a72542678d1a1be395501eb5eadc858175a788",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0220_crunch + knee_leg lift_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0220_crunch + knee_leg lift_[12].mp4",
+      "size_bytes": 4099530,
+      "sha256": "2a08e902acab6ea2a4b9c1350b69cb87761555bc8a1ede1d3e39b31ed5d41eab",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0250_jack knife_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0250_jack knife_[10].mp4",
+      "size_bytes": 4473493,
+      "sha256": "7d82019fafc71f273eb47af5f8b0cc3689a12686dad0333cda66a47bb4b9547b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0320_leg lift + roll in_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0320_leg lift + roll in_[8].mp4",
+      "size_bytes": 3649009,
+      "sha256": "c72379c4adca962e4b43c88418691870622be6643d0b873ca307ec461be7b5e1",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0350_AB hold + knee touches_[19].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0350_AB hold + knee touches_[19].mp4",
+      "size_bytes": 3700628,
+      "sha256": "4e1c065e935d5d0d375b5d71119fddb30303ce0b8a8ff6d6fa0dd6a7210d4b87",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0420_russian twist + weight_[21].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0420_russian twist + weight_[21].mp4",
+      "size_bytes": 5024871,
+      "sha256": "fae1a4d0f048ea161e7dd628ec7bf03887a421f576fc942474230935f42a056b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0450_russian twist + pulses_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0450_russian twist + pulses_[16].mp4",
+      "size_bytes": 4711259,
+      "sha256": "a101574e14a165d17a294541037160c5cd7cf4becff158f8e18a32942d5b0938",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0520_straight leg bicycle_[21].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0520_straight leg bicycle_[21].mp4",
+      "size_bytes": 5255683,
+      "sha256": "936e66729832873e36dcd0466d06540aef39a989622ff8705de39025a1d8283b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0620_stretch out +knee touches_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0620_stretch out +knee touches_[10].mp4",
+      "size_bytes": 4039597,
+      "sha256": "364fa51e2deebd2eac40d32720f1cb200466bf4c209b9c30471800266cd57193",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0650_side plank lift_[13-12-14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0650_side plank lift_[13-12-14].mp4",
+      "size_bytes": 4659204,
+      "sha256": "251c1207871413cec8b43da8c7d855af672f88777c42328efc5d67d64f682418",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0850_crawl, right_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0850_crawl, right_[8].mp4",
+      "size_bytes": 5731394,
+      "sha256": "3ee1664c82481283a9472dfa3866ab90ae3b98786118aadb79eab8fb1e375ca3",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "acc1df64_0920_crawl, left_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\acc1df64_0920_crawl, left_[9].mp4",
+      "size_bytes": 6300848,
+      "sha256": "c64417422ce7f4918fa7ffcac43f7a5d3969a49d584b8f428629b8b34c0772b9",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0057_knee in & out_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0057_knee in & out_[12].mp4",
+      "size_bytes": 4046743,
+      "sha256": "7d9e7490eaf4241f3c14966800260ac75d4b9e9cf331d90c7e05557eab0bcfca",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0137_climbers_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0137_climbers_[14].mp4",
+      "size_bytes": 4778424,
+      "sha256": "928ab01928a991af85ce96237ca03905d72ebcf23e933ec9ac8be136834d0d79",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0217_commando_[6].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0217_commando_[6].mp4",
+      "size_bytes": 3828275,
+      "sha256": "6e655232367d57fd24fafa0f30f3c52972fd5a2bc279d740d52cb0eec1de539e",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0257_leg raises_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0257_leg raises_[10].mp4",
+      "size_bytes": 4191614,
+      "sha256": "973a2c620dc8a2efa695ace1e28bc2a4bb07ed2baf60636f57b71fccafc64c78",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0337_straight leg sit ups_[6].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0337_straight leg sit ups_[6].mp4",
+      "size_bytes": 3764566,
+      "sha256": "1c974cb0cc999260e54e4c91f7c27eef165a19e05416b4535f037b329e4d9638",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0417_deadbugs_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0417_deadbugs_[11].mp4",
+      "size_bytes": 4038247,
+      "sha256": "6e41d1a8613d0ef15100f84c2bf2f738a3019d3060ca54de137a00be8b161014",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0457_half jacks_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0457_half jacks_[14].mp4",
+      "size_bytes": 4628072,
+      "sha256": "0f5a596055009b9a07170ea808695c36e6b9117eba969e8758b698cceb4b4372",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0617_reverse crunches_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0617_reverse crunches_[9].mp4",
+      "size_bytes": 3912435,
+      "sha256": "ccc58978c209f19c190a6e9f1dceeb79026659787908c1c2a059b24d8ebab86d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0657_leg extensions_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0657_leg extensions_[9].mp4",
+      "size_bytes": 3542396,
+      "sha256": "8154e15b6f3518384ee40d4e31f95ade073d2610999d3f1bd7e102232ac9673a",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0737_cocoons_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0737_cocoons_[9].mp4",
+      "size_bytes": 4153995,
+      "sha256": "905bbb52340d6d41e88a6e79eea668aac54de8596c3af55cc3df2a6f0a4e1e32",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0858_heel taps_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0858_heel taps_[14].mp4",
+      "size_bytes": 3410073,
+      "sha256": "957f2f315bc4374c84c713aed226b3c58a6c76ede420da2424d1353e3736b23b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "bdfe7f1d_0938_simple bicycle_[22].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\bdfe7f1d_0938_simple bicycle_[22].mp4",
+      "size_bytes": 4338491,
+      "sha256": "0cbde449ffc801a0cdcc2db9d4eb6f6bb395536a2c20f9d3ca678214543a5182",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "c36fbdd3_0019_side leg raises_[20].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\c36fbdd3_0019_side leg raises_[20].mp4",
+      "size_bytes": 9311420,
+      "sha256": "94f2a583c71e1bbeea8ccefa244f943534b9f735d3f8f1c5e1501184d3787bb0",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "cbc15c42_0043_tiny steps_[19].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\cbc15c42_0043_tiny steps_[19].mp4",
+      "size_bytes": 4340441,
+      "sha256": "3cd10fdc9150287a0570cb1a5f605728eadf3bee37f64ae2482df8f5a0821b54",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "cbc15c42_0113_warrior 2 + up_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\cbc15c42_0113_warrior 2 + up_[8].mp4",
+      "size_bytes": 4522340,
+      "sha256": "82f083052f8c3668968632f32ededa8071a6a1a786538921a5abd4a95cc686fb",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "cbc15c42_0213_warrior 2 + up_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\cbc15c42_0213_warrior 2 + up_[9].mp4",
+      "size_bytes": 4617627,
+      "sha256": "73b85aa570b474df0cefa14de8d55f53ca6a65e55ef7f5f352a4506c523eca9c",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "cbc15c42_0313_yoga squat circle_[6].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\cbc15c42_0313_yoga squat circle_[6].mp4",
+      "size_bytes": 4557381,
+      "sha256": "734f4c4177ceb435fc5b88008acbfdf69830e068f608d382c4ec4fe1bc66d2a8",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "cbc15c42_0444_3 point knee tap (R)_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\cbc15c42_0444_3 point knee tap (R)_[8].mp4",
+      "size_bytes": 4085767,
+      "sha256": "0e806b6a28834a4411607391c0aac97c0614e32b8141a3802d39df3d442911ea",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "cbc15c42_0616_3 point knee tap (L)_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\cbc15c42_0616_3 point knee tap (L)_[9].mp4",
+      "size_bytes": 3932814,
+      "sha256": "d7e05a234dd5d66aa9f26a91dea5cfeecd34f6af881073e86d99cc324c2a9adf",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "cbc15c42_0746_shoulder in & out_[7].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\cbc15c42_0746_shoulder in & out_[7].mp4",
+      "size_bytes": 3903002,
+      "sha256": "c0f2f0b8d8b40e8181f7feaf628b15a891d4f7f999c214656ef435dd1ab5f60d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "cbc15c42a1594949711ac9a7c8c465e1_0616_3 point knee tap (L)_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\cbc15c42a1594949711ac9a7c8c465e1_0616_3 point knee tap (L)_[9].mp4",
+      "size_bytes": 3932814,
+      "sha256": "d7e05a234dd5d66aa9f26a91dea5cfeecd34f6af881073e86d99cc324c2a9adf",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "ce0fbe3f_0020_simple crunch_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\ce0fbe3f_0020_simple crunch_[12].mp4",
+      "size_bytes": 3074206,
+      "sha256": "fc5441f0840c3677644e084566e18e26517a86c8c0717d96ccd3b478904c1dbf",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "d1075a73_0014_alternating knee crunch_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\d1075a73_0014_alternating knee crunch_[10].mp4",
+      "size_bytes": 6996930,
+      "sha256": "61b89b57b62724d113016270bfd435fb28397edc30515ca81e59d7a6b5cd92ea",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "d1075a73_0056_knee to chest_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\d1075a73_0056_knee to chest_[16].mp4",
+      "size_bytes": 5711069,
+      "sha256": "39f5103e3d877a25f1f21dfa5f19e959f520f105febc42e25340261d34682265",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "d1075a73_0146_double leg stretch + open_[8].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\d1075a73_0146_double leg stretch + open_[8].mp4",
+      "size_bytes": 5041328,
+      "sha256": "332793c63adfda0758dc08c81b2a1b7c224f5f6020cab50070418ad240140a51",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "d1075a73_0226_straight leg lower_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\d1075a73_0226_straight leg lower_[14].mp4",
+      "size_bytes": 5486885,
+      "sha256": "463cf3b4b5af57622583a342cb3b205ebcb580b2c59cea2764d28c400fbc414f",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "d1075a73_0306_frog extension_[9].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\d1075a73_0306_frog extension_[9].mp4",
+      "size_bytes": 4303712,
+      "sha256": "38c29103872717bcfe0b4b9f55f1e89c7fe4f1d199c98ae03e90d040a552ca4f",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "d1075a73_0357_hip lift_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\d1075a73_0357_hip lift_[14].mp4",
+      "size_bytes": 5021187,
+      "sha256": "078852b63df22a18cd9fd7db13ce8dbdbea1a3d6e8c62ebd013c967e7c4d0318",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "d1075a73_0445_cross + leg stretch [l]_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\d1075a73_0445_cross + leg stretch [l]_[12].mp4",
+      "size_bytes": 5203007,
+      "sha256": "0783bb6128f8e2695a09c76828f2fd1d49d5f3a8624561e71afbce3d85376f3e",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "d1075a73_0525_cross + leg stretch [l]_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\d1075a73_0525_cross + leg stretch [l]_[12].mp4",
+      "size_bytes": 5708582,
+      "sha256": "1ca631c4ac2789a2ece04ca97388b1b87921eb0c0a130e265894f31d6d372188",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0013_bridge circle_[15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0013_bridge circle_[15].mp4",
+      "size_bytes": 3711495,
+      "sha256": "61618c8bba1151883fa728dc0769035a24a515bce75fc114d4395d64e202b837",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0043_1 leg through(R)_[12].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0043_1 leg through(R)_[12].mp4",
+      "size_bytes": 3395773,
+      "sha256": "fb18c50db1f978caa4581b460a376487e76b6f505fe7595d899e002875d3dbab",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0113_bridge + cross crunch_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0113_bridge + cross crunch_[14].mp4",
+      "size_bytes": 4474189,
+      "sha256": "64251ca6e05127628352b92d9b8026d5c551b6c0d15695ed19a83b1271d972ed",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0143_1 leg through(L)_[10].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0143_1 leg through(L)_[10].mp4",
+      "size_bytes": 3384926,
+      "sha256": "f7baa78398d1dbcbbc1784b00d6e283d56b5cf9d0b611081c080ac9aaedc3c7d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0213_bridge + cross crunch_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0213_bridge + cross crunch_[14].mp4",
+      "size_bytes": 4315884,
+      "sha256": "b72c720414b2ca8cc91c646ac42e7397d7216b26f82f6d4869e5c158a80214a3",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0245_bridge +crunch_[7].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0245_bridge +crunch_[7].mp4",
+      "size_bytes": 3605046,
+      "sha256": "8364899054b259cd46e549095ce54a6db4b81cbd3b1c8a39e8d537b7c553767c",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0313_cross crunch_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0313_cross crunch_[14].mp4",
+      "size_bytes": 4555374,
+      "sha256": "be291cd90ca5b018331759662f0ff4a4a7bff6971bc8258a6a4123d523c5a981",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0344_ALT.leg lifts_[17].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0344_ALT.leg lifts_[17].mp4",
+      "size_bytes": 4218420,
+      "sha256": "1f5149338e80da91c909b9035419ae0c96f29c7f7c81322ca27e1ebb886d58e7",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0414_bicycle crunch_[31].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0414_bicycle crunch_[31].mp4",
+      "size_bytes": 5205405,
+      "sha256": "7cc36879f06751e1a7388a1827978779825e012cb49ac8e51e78b973f67f6ce0",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0519_leg lift variantion_[6].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0519_leg lift variantion_[6].mp4",
+      "size_bytes": 3879849,
+      "sha256": "be1314937678f0ef6d64816b50a70ab110ba16a063c0f6b5ede53fc4227f4d62",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0544_knee to elbow_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0544_knee to elbow_[11].mp4",
+      "size_bytes": 4825095,
+      "sha256": "a5669f087503c7313dbe1bd242c4f4314a0eec54ae4384430430938bcbe81f5b",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0614_half plank crunch_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0614_half plank crunch_[11].mp4",
+      "size_bytes": 5187920,
+      "sha256": "91245012491290fd23098e5caffec461ba8cf3a7784ee97b1301a6d1fd6fccc2",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0644_clamshell + hip lift_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0644_clamshell + hip lift_[11].mp4",
+      "size_bytes": 4431708,
+      "sha256": "bc0c8a735ba548d9eb4590c19cedaef59d5d1aa976534beb15b0064341ec2a04",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0714_clamshell twist_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0714_clamshell twist_[13].mp4",
+      "size_bytes": 4169081,
+      "sha256": "a9dd889a2b1f4b801b0ad104c27e080ca298909fb0cf83345526918c860668bc",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0744_kickback_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0744_kickback_[14].mp4",
+      "size_bytes": 4009352,
+      "sha256": "62065c1cc4e9d07c8b4302a9ba3397412b786d4abcecc3b9505a2ffe5e507ade",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0844_leg lift variantion_[6].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0844_leg lift variantion_[6].mp4",
+      "size_bytes": 4586595,
+      "sha256": "b26b15130447529232aeeda916a8efc4a5db99cbe4fecb88f593f2230037195c",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0914_knee to elbow_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0914_knee to elbow_[13].mp4",
+      "size_bytes": 4862209,
+      "sha256": "6b5cce312bbd4b6cf161afbb6f7adac8908e30fea2bc66598f4b43cc09e5e4c8",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_0944_half plank crunch_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_0944_half plank crunch_[11].mp4",
+      "size_bytes": 5240052,
+      "sha256": "d5659d178d491c02f604152a94a254b97ec055df798ca6e7aaa37868a748b874",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_1014_clamshell +hip lift_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_1014_clamshell +hip lift_[13].mp4",
+      "size_bytes": 4399221,
+      "sha256": "4b2cfc71ef5a0211398348444680779a6e9f368bff5317431e7bcd25e339386c",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_1044_clamshell twist_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_1044_clamshell twist_[14].mp4",
+      "size_bytes": 4022032,
+      "sha256": "d0c8d1138af04cd9e501188f0bd7d3b7b777141610cee2df9ade91ee07747571",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fc3d98d5_1114_kickback_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fc3d98d5_1114_kickback_[13].mp4",
+      "size_bytes": 4072967,
+      "sha256": "4afa0209c38e47db0ab7e8b9be334c9e1e3edeeaf49f129827fff0fafaf7580d",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0015_bridge lift_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0015_bridge lift_[11].mp4",
+      "size_bytes": 6651134,
+      "sha256": "7c1cc27ffaf8cfa78a019b1f09a83dbce12510ffc1061e30225c38dcecb68b8f",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0055_bridge + leg extend[r]_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0055_bridge + leg extend[r]_[11].mp4",
+      "size_bytes": 5940484,
+      "sha256": "cbebf6ef06bfa263e262b4847151d536f63b9b61569372c9d6153c4a5a1215d2",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0135_bridge + leg extend[l]_[11].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0135_bridge + leg extend[l]_[11].mp4",
+      "size_bytes": 5637510,
+      "sha256": "59184032541a15c36ae7cff3c27d39f25ed791bc0dd2aae36ab4346a711c185e",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0215_toe taps_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0215_toe taps_[16].mp4",
+      "size_bytes": 5887164,
+      "sha256": "55f9a48ae660d37b8810e908355a2829bda74e3dc1564e925666f026b215b972",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0258_singel leg reach_[16].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0258_singel leg reach_[16].mp4",
+      "size_bytes": 4596793,
+      "sha256": "59d7447ad3622e7a9413968bdb364a6077e39c654aacfa1493688aae113d6aed",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0338_criss cross_[15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0338_criss cross_[15].mp4",
+      "size_bytes": 5513669,
+      "sha256": "ffe637f2ecc06bd31762cf588545af8cf46f7c4f5b224f8935435d6f2b75a2ac",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0429_back kick extend[r]_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0429_back kick extend[r]_[14].mp4",
+      "size_bytes": 5004146,
+      "sha256": "2fa21914d21cca89288ef37fb4bb04c9bf16e14692c7d343e619fd6ae1c7545e",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0509_side kick extend[r]_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0509_side kick extend[r]_[13].mp4",
+      "size_bytes": 5816538,
+      "sha256": "c79663f8c3716eff568ca68018413dacab1928874f6843e6bad614b2b4cf7339",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0549_back kick extend[l]_[15].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0549_back kick extend[l]_[15].mp4",
+      "size_bytes": 5821763,
+      "sha256": "80a8a4618ef763d2aa7c0aebe7d7cdaa51cde61385ce5fa8406c18c24beaeb09",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0629_side kick extend[r]_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0629_side kick extend[r]_[13].mp4",
+      "size_bytes": 4916005,
+      "sha256": "1f2d3ce6ac769b2487ce41b3f04d122d6d1faf7e88b22c5aad3cdfdf057427bb",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0721_table top reach[r]_[13].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0721_table top reach[r]_[13].mp4",
+      "size_bytes": 5425606,
+      "sha256": "1a8552adba8550e29867621fa97d0600c34b9bdeb8be696363b9a65eee477b61",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0801_side kick extend[r]_[17].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0801_side kick extend[r]_[17].mp4",
+      "size_bytes": 5195457,
+      "sha256": "e0691c48bd6f7f35bee3a24c3f7b80e138e6e93d97f314b46c67c7fa253014be",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0841_table top reach[l]_[14].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0841_table top reach[l]_[14].mp4",
+      "size_bytes": 4836552,
+      "sha256": "d015d09bea852582b0c8acdfbe4907719399ec9755ff5ee076975e29838489f7",
+      "attempts": 1,
+      "last_error": ""
+    },
+    "fcd2886c_0923_table top reach pulse[l]_[19].mp4": {
+      "status": "complete",
+      "local_path": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\ml\\ml\\data\\raw\\real_video\\pushupbench\\fcd2886c_0923_table top reach pulse[l]_[19].mp4",
+      "size_bytes": 4646853,
+      "sha256": "c33190994ec7e171ba9331fcac482458c42b03fb101e77a2749c4ea7f2c582ac",
+      "attempts": 1,
+      "last_error": ""
+    }
+  },
+  "last_updated": 1794244290.0175154
+}

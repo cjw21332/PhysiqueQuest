@@ -54,11 +54,12 @@ const equipmentOptions = ['Bodyweight only', 'Dumbbells', 'Resistance bands', 'F
 const activityOptions = ['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete'];
 const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'None of these'];
 
-export default function CalibrationFlow({ name, email, onComplete, submitError = '' }: {
+export default function CalibrationFlow({ name, email, onComplete, submitError = '', pendingDraftKey }: {
   name: string;
   email: string;
   onComplete: (profile: Profile) => void | Promise<void>;
   submitError?: string;
+  pendingDraftKey?: string;
 }) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<CalibrationData>(initialData);
@@ -72,8 +73,8 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
   const scrollRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    draftKey.current = calibrationDraftKey();
-    const draft = readCalibrationDraft(initialData);
+    draftKey.current = pendingDraftKey || calibrationDraftKey();
+    const draft = readCalibrationDraft(initialData, draftKey.current);
     if (draft) { setData(draft.data); setStep(draft.step); setSkipped(draft.skipped); }
     setReady(true);
   }, []);
@@ -81,7 +82,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
     if (!ready) return;
     try {
       const key = draftKey.current;
-      if (!key || key !== calibrationDraftKey()) throw new Error('Account changed');
+      if (!key || key !== (pendingDraftKey || calibrationDraftKey())) throw new Error('Account changed');
       localStorage.setItem(key, JSON.stringify({ version: 1, data, step, skipped }));
       setDraftError(false);
     } catch { setDraftError(true); }
@@ -127,7 +128,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
   async function submitStep(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!ready || submitting.current) return;
-    if (!draftKey.current || draftKey.current !== calibrationDraftKey()) { setError('Your account or connection changed. Reopen registration to continue with the correct account.'); return; }
+    if (!draftKey.current || draftKey.current !== (pendingDraftKey || calibrationDraftKey())) { setError('Your account or connection changed. Reopen registration to continue with the correct account.'); return; }
     setError('');
     if (step === 1) {
       const age = Number(data.age);
@@ -216,7 +217,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
         <div className="calibration-scroll" ref={scrollRef}>
       <div className="wizard-heading">
         <div className="step-header">
-          <small>Step {step} of 4 · Calibration</small>
+          <small>YOUR PROFILE · STEP {step} OF 4</small>
           {step > 1 && (
             <button type="button" className="ghost back-link" onClick={() => { setError(''); setStep(step - 1); }}>
               <span className="back-link-icon"><Icon name="arrow" size={14} /></span>
@@ -225,8 +226,8 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
           )}
         </div>
         <h2 ref={headingRef} tabIndex={-1}>{stepTitles[step - 1]}</h2>
-        <p className="calibration-draft-status" role="status">{!ready ? 'Loading your progress…' : draftError ? 'Device storage is unavailable. Keep this page open to avoid losing progress.' : 'Progress saved on this device for your account. Reopen registration to continue. Your profile is sent when you finish.'}</p>
-        <p>{step === 1 ? 'Save your starting measurements. Nutrition targets currently use shared defaults.' : step === 2 ? 'Choose a goal to track. You can update it later.' : step === 3 ? 'Choose equipment, training days and session length for your plan.' : 'Add health notes and an emergency contact to your profile.'}</p>
+        <p>{step === 1 ? 'Tell us a little about yourself to get started.' : step === 2 ? 'Choose what you want to work toward. You can change it later.' : step === 3 ? 'Build a routine that fits your schedule and equipment.' : 'Share anything helpful and add an emergency contact.'}</p>
+        <p className={`calibration-draft-status ${draftError ? 'has-error' : ''}`} role="status"><Icon name={draftError ? 'warning' : 'check'} size={14}/><span>{!ready ? 'Loading your progress…' : draftError ? 'Progress could not be saved on this device. Keep this page open.' : 'Your progress is saved on this device.'}</span></p>
       </div>
 
         <div className="step-content">
@@ -333,7 +334,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
             <button type="button" className="ghost calibration-skip" onClick={()=>skipped.includes('camera') ? restore('camera') : skip('camera', { placementConfirmed: false })}>{skipped.includes('camera') ? 'Show camera guidance' : 'Skip camera guidance'}</button>
             {!skipped.includes('camera') && <div className="placement-card">
               <span className="phone-icon"><Icon name="smartphone" size={18} /></span>
-              <div><b>Camera preview setup</b><p>For a full-body preview, prop your phone at waist height, 2.5–3.0 m away. Live form analysis is unavailable.</p></div>
+              <div><b>Camera preview setup</b><p>For a full-body preview, prop your phone at waist height, around 2.5–3.0 m away. Tracking availability varies by exercise.</p></div>
               <label className="placement-check"><input type="checkbox" checked={data.placementConfirmed} onChange={(event) => setField('placementConfirmed', event.target.checked)} />I understand this camera setup guidance</label>
             </div>}
           </>}

@@ -5,6 +5,7 @@ import { DietaryPlanDto, MealDto, MealFromScanDto, WaterDto } from './dto/nutrit
 import { NutritionService } from './nutrition.service.js';
 import { DietaryRecommendationService } from './dietary-recommendation.service.js';
 import { CoachRateLimitGuard } from '../coach/coach-rate-limit.guard.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 type AuthenticatedRequest = Request & { user: { userId: string } };
 
@@ -15,10 +16,11 @@ export class NutritionController {
 
   @Get() get(@Req() req: AuthenticatedRequest) { return this.service.read(req.user.userId); }
   @Put('plan') setPlan(@Req() req: AuthenticatedRequest, @Body() dto: DietaryPlanDto) { return this.service.setPlan(req.user.userId, dto); }
-  @Post('plan/recommend') @UseGuards(CoachRateLimitGuard) recommend(@Req() req: AuthenticatedRequest) { return this.recommendations.recommend(req.user.userId); }
+  @Post('plan/recommend') @UseGuards(CoachRateLimitGuard, AiRateLimitGuard) recommend(@Req() req: AuthenticatedRequest) { return this.recommendations.recommend(req.user.userId); }
   @Post('meals') addMeal(@Req() req: AuthenticatedRequest, @Body() dto: MealDto) { return this.service.addMeal(req.user.userId, dto); }
   /** Turns a POST /api/nutrition/scan result into one meal row per priced item. */
   @Post('meals/from-scan') addMealsFromScan(@Req() req: AuthenticatedRequest, @Body() dto: MealFromScanDto) { return this.service.addMealsFromScan(req.user.userId, dto); }
+  @Get('meals/from-scan/receipts/:key') scanSaveReceipt(@Req() req: AuthenticatedRequest, @Param('key') key: string) { return this.service.scanSaveReceipt(req.user.userId, key); }
   @Put('meals/:id') updateMeal(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: MealDto) { return this.service.updateMeal(req.user.userId, id, dto); }
   @Delete('meals/:id') deleteMeal(@Req() req: AuthenticatedRequest, @Param('id') id: string) { return this.service.deleteMeal(req.user.userId, id); }
   @Get('water') getWater(@Req() req: AuthenticatedRequest) { return this.service.read(req.user.userId).then(state => state.water); }

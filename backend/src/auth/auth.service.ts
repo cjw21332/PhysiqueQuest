@@ -1,3 +1,4 @@
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { Injectable, Logger, UnauthorizedException, ConflictException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, type HydratedDocument } from 'mongoose';
@@ -7,6 +8,8 @@ import { User } from './schemas/user.schema.js';
 import { SignInEvent } from './schemas/sign-in-event.schema.js';
 import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto.js';
 import { emailStatus } from './email-verification.js';
+import { Profile } from '../profile/schemas/profile.schema.js';
+import { validateProfileMeasurements } from '../profile/profile.service.js';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +19,7 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(SignInEvent.name) private signInEvents: Model<SignInEvent>,
     private jwtService: JwtService,
+    @InjectModel(Profile.name) private profiles: Model<Profile>,
   ) {}
 
   /**
@@ -23,12 +27,13 @@ export class AuthService {
    * (activeUsers, weeklyRetention). Best-effort: a logging failure must never
    * block an otherwise successful sign-in.
    */
-  private recordSignIn(userId: string, source: 'login' | 'register'): void {
-    void this.signInEvents.create({ userId: new Types.ObjectId(userId), occurredAt: new Date(), source })
+  private async recordSignIn(userId: string, source: 'login' | 'register', generation?: number): Promise<void> {
+    await new AccountLifecycleFence(this.signInEvents.db).withActiveWrite(userId, async lifecycleSession => (await this.signInEvents.create([{ userId: new Types.ObjectId(userId), occurredAt: new Date(), source }], { session: lifecycleSession }))[0], generation)
       .catch(() => this.logger.warn('Failed to record sign-in event for admin analytics'));
   }
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
+    validateProfileMeasurements(registerDto.profile);
     const { email, name, password } = registerDto;
     // Ensure the unique email index exists before accepting any registration.
     await this.userModel.init();
@@ -45,15 +50,21 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // The unique email index is the final guard against concurrent duplicate registrations.
-    const user = await this.userModel.create({ email: normalizedEmail, name: name.trim(), passwordHash, emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false, authPolicyVersion: 2 }).catch((error: unknown) => {
+    const session = await this.userModel.db.startSession();
+    let user!: HydratedDocument<User>;
+    try { await session.withTransaction(async () => {
+      [user] = await this.userModel.create([{ email: normalizedEmail, name: name.trim(), passwordHash, emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false, authPolicyVersion: 2 }], { session });
+      await this.profiles.create([{ ...registerDto.profile, userId: user._id }], { session });
+      await this.userModel.db.collection('account_lifecycle').insertOne({ _id: user._id, status: 'active', writeVersion: 0 }, { session });
+    }, { writeConcern: { w: 'majority' } }); } catch (error: unknown) {
       if (isDuplicateKeyError(error)) throw new ConflictException('Email already registered');
       throw error;
-    });
+    } finally { await session.endSession(); }
 
     // Generate JWT token
     const payload = { sub: user._id.toString(), email: user.email, sessionVersion: user.sessionVersion ?? 0 };
     const access_token = this.jwtService.sign(payload);
-    this.recordSignIn(user._id.toString(), 'register');
+    await this.recordSignIn(user._id.toString(), 'register');
 
     return {
       access_token,
@@ -80,12 +91,13 @@ export class AuthService {
       throw new UnauthorizedException('Account is disabled');
     }
 
+    const generation = await new AccountLifecycleFence(this.userModel.db).generation(String(user._id));
     const now = new Date();
     if (user.lockoutUntil && user.lockoutUntil > now) {
       throw new HttpException('Sign-in is paused for 15 minutes after too many failed attempts.', HttpStatus.TOO_MANY_REQUESTS);
     }
     if (user.lockoutUntil && user.lockoutUntil <= now) {
-      await this.userModel.updateOne({ _id: user._id }, { $set: { failedLoginAttempts: 0, lockoutUntil: null } });
+      await new AccountLifecycleFence(this.userModel.db).withActiveWrite(String(user._id), async lifecycleSession => this.userModel.updateOne({ _id: user._id }, { $set: { failedLoginAttempts: 0, lockoutUntil: null } }).session(lifecycleSession), generation);
       user.failedLoginAttempts = 0;
       user.lockoutUntil = null;
     }
@@ -93,25 +105,25 @@ export class AuthService {
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
-      const failedUser = await this.userModel.findByIdAndUpdate(
+      const failedUser = await new AccountLifecycleFence(this.userModel.db).withActiveWrite(String(user._id), async lifecycleSession => this.userModel.findByIdAndUpdate(
         user._id,
         { $inc: { failedLoginAttempts: 1 } },
         { returnDocument: 'after' },
-      );
+      ).session(lifecycleSession), generation);
       if (failedUser && failedUser.failedLoginAttempts >= 5) {
         const lockoutUntil = new Date(Date.now() + 15 * 60_000);
-        await this.userModel.updateOne({ _id: user._id }, { $set: { lockoutUntil } });
+        await new AccountLifecycleFence(this.userModel.db).withActiveWrite(String(user._id), async lifecycleSession => this.userModel.updateOne({ _id: user._id }, { $set: { lockoutUntil } }).session(lifecycleSession), generation);
         throw new HttpException('Sign-in is paused for 15 minutes after too many failed attempts.', HttpStatus.TOO_MANY_REQUESTS);
       }
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    await this.userModel.updateOne({ _id: user._id }, { $set: { failedLoginAttempts: 0, lockoutUntil: null } });
+    await new AccountLifecycleFence(this.userModel.db).withActiveWrite(String(user._id), async lifecycleSession => this.userModel.updateOne({ _id: user._id }, { $set: { failedLoginAttempts: 0, lockoutUntil: null } }).session(lifecycleSession), generation);
 
     // Generate JWT token
     const payload = { sub: user._id.toString(), email: user.email, sessionVersion: user.sessionVersion ?? 0 };
     const access_token = this.jwtService.sign(payload);
-    this.recordSignIn(user._id.toString(), 'login');
+    await this.recordSignIn(user._id.toString(), 'login', generation);
 
     return {
       access_token,
@@ -125,15 +137,17 @@ export class AuthService {
   }
 
   async validateUser(userId: string): Promise<HydratedDocument<User>> {
+    const generation = await new AccountLifecycleFence(this.userModel.db).generation(userId);
     const user = await this.userModel.findById(userId);
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid user');
     }
+    user.$locals.lifecycleGeneration = generation;
     return user;
   }
 
   async revokeAll(userId: string): Promise<void> {
-    await this.userModel.updateOne({ _id: new Types.ObjectId(userId) }, { $inc: { sessionVersion: 1 } });
+    await new AccountLifecycleFence(this.userModel.db).withActiveWrite(userId, async lifecycleSession => this.userModel.updateOne({ _id: new Types.ObjectId(userId) }, { $inc: { sessionVersion: 1 } }).session(lifecycleSession));
   }
 }
 

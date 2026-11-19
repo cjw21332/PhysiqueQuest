@@ -1,110 +1,78 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Profile } from './types';
 import { Icon } from './icons';
 import { useProgress } from '../../hooks/useProgress';
-import { normalizeTrainingDays } from '../../lib/trainingDays';
-import { useRouter } from 'next/navigation';
 import { useWorkoutSummary } from '../../hooks/useWorkoutSummary';
+import { normalizeTrainingDays, TRAINING_DAYS } from '../../lib/trainingDays';
 import { formatLocalDate } from '../../lib/localDate.mjs';
-import { useState } from 'react';
 import WeightModal from '../../components/WeightModal';
+import './goals.css';
 
 function shortDate(value?: string) {
   if (!value) return 'Date unavailable';
   const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? 'Date unavailable'
-    : date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+  return Number.isNaN(date.getTime()) ? 'Date unavailable' : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export default function GoalsMilestones({ profile }: { profile: Profile }) {
-  const { push: navigate } = useRouter();
+export default function GoalsMilestones({ profile, refreshProfile }: { profile: Profile; refreshProfile: () => Promise<unknown> }) {
+  const { push } = useRouter();
   const [weightOpen, setWeightOpen] = useState(false);
   const [weightNotice, setWeightNotice] = useState('');
   const { entries, loading, error, refresh } = useProgress('weight');
-  const { summary, loading: workoutLoading, error: workoutError } = useWorkoutSummary();
-  const orderedEntries = [...entries].sort((a, b) =>
-    new Date(b.measuredAt ?? b.date ?? 0).getTime() - new Date(a.measuredAt ?? a.date ?? 0).getTime(),
-  );
-  const latest = orderedEntries[0];
-  const target = Number(profile.targetWeight);
+  const { summary, loading: workoutLoading, error: workoutError, refresh: refreshWorkouts } = useWorkoutSummary();
+  const ordered = [...entries].sort((a, b) => new Date(b.measuredAt ?? b.date ?? 0).getTime() - new Date(a.measuredAt ?? a.date ?? 0).getTime());
   const unit = profile.weightUnit === 'lbs' || profile.weightUnit === 'lb' ? 'lb' : 'kg';
-  const inUnit = (value: number, source: string) => source === unit ? value : unit === 'kg' ? value * 0.45359237 : value / 0.45359237;
-  const firstEntry = orderedEntries.at(-1);
-  const start = firstEntry ? inUnit(firstEntry.value, firstEntry.unit) : null;
-  const current = Number(profile.weight) > 0 ? Number(profile.weight) : latest ? inUnit(latest.value, latest.unit) : null;
+  const target = Number(profile.targetWeight);
+  const current = Number(profile.weight);
+  const hasCurrent = Number.isFinite(current) && current > 0;
   const hasTarget = Number.isFinite(target) && target > 0;
-  const canMeasureGoalProgress = current !== null && hasTarget && start !== null && start > 0 && target !== start;
-  const progress = canMeasureGoalProgress
-    ? Math.min(100, Math.max(0, Math.round((current - start) / (target - start) * 100)))
-    : null;
-  const goalReached = current !== null && hasTarget && Math.abs(current - target) < 0.05;
+  const difference = hasCurrent && hasTarget ? Math.abs(target - current) : null;
+  const reached = difference !== null && difference < 0.05;
   const days = normalizeTrainingDays(profile.days || []);
-  const amountToTarget = current !== null && hasTarget ? Math.abs(target - current) : null;
-  const targetDate = profile.targetDate
-    ? new Date(`${profile.targetDate}T12:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-    : null;
-  const weeksLeft = profile.targetDate
-    ? Math.max(0, Math.ceil((new Date(`${profile.targetDate}T12:00:00`).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000)))
-    : null;
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
   weekStart.setHours(0, 0, 0, 0);
-  const workoutsThisWeek = summary?.trainingDates.filter(date => date >= formatLocalDate(weekStart) && date <= formatLocalDate()).length ?? 0;
-  const trainingProgress = days.length
-    ? Math.min(100, Math.round(workoutsThisWeek / days.length * 100))
-    : 0;
+  const workouts = summary?.trainingDates.filter(date => date >= formatLocalDate(weekStart) && date <= formatLocalDate()).length ?? 0;
+  const percent = days.length ? Math.min(100, Math.round(workouts / days.length * 100)) : 0;
+  const targetDate = profile.targetDate ? new Date(`${profile.targetDate}T12:00:00`) : null;
+  const validDate = targetDate && !Number.isNaN(targetDate.getTime()) ? targetDate : null;
+  const pastTarget = !!validDate && profile.targetDate! < formatLocalDate();
 
-  return <div className="home-ref-subview home-ref-goals-page">
-    <header className="section-page-head home-ref-page-head">
-      <div className="section-back-title">
-        <button type="button" className="coach-back" onClick={() => navigate('/home')} aria-label="Back to Home"><Icon name="arrow" size={20}/></button>
-        <h2>Goals</h2>
-      </div>
-      <button type="button" className="home-ref-edit" aria-label="Edit your goals in account settings" onClick={() => navigate('/me')}><Icon name="edit" size={13}/>Edit</button>
+  return <div className="home-ref-subview pq-goals">
+    <header className="section-page-head pq-goals-header pq-page-heading">
+      <button type="button" className="coach-back" onClick={() => push('/home')} aria-label="Back to Home"><Icon name="arrow" size={20}/></button>
+      <h1>Goals</h1>
+      <button type="button" className="pq-goals-edit" onClick={() => push('/me/goals?from=goals')}><Icon name="edit" size={15}/> Edit</button>
     </header>
 
-    <section className="goal-hero home-ref-goal" aria-labelledby="primary-goal-heading">
-      <div className="home-ref-goal-top"><small>Primary goal</small>{progress !== null && <b aria-label={`${progress}% of your weight goal`}>{progress}%</b>}</div>
-      <div className="goal-hero-title"><h2 id="primary-goal-heading">{profile.goal || 'No goal set'}</h2></div>
-      {progress !== null && <div className="goal-progress" role="progressbar" aria-label="Progress toward target weight" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><i style={{ width: `${progress}%` }}/></div>}
-      <div className="goal-weights"><b>{current !== null ? `${Number(current.toFixed(1))} ${unit} now` : 'Log a weight to track progress'}</b><span>{hasTarget ? `${target} ${profile.weightUnit || unit} target` : 'Add a target weight in Me'}</span></div>
-      <button type="button" className="weight-update-button" onClick={() => setWeightOpen(true)}>Update weight</button>
-      {weightNotice && <p role="status">{weightNotice}</p>}
-      <div className="home-ref-goal-foot">
-        <span>{targetDate ? `Target date · ${targetDate}` : 'No target date set'}</span>
-        {weeksLeft !== null && <span>{weeksLeft} {weeksLeft === 1 ? 'week' : 'weeks'} left</span>}
+    <div className="pq-goals-intro"><div><span className="pq-goals-eyebrow">YOUR JOURNEY</span><h2>Progress, on your terms.</h2><p>A clearer picture of where you’re headed.</p></div><span className="pq-goals-intro-mark"><Icon name="target" size={27}/></span></div>
+
+    <section className="pq-goals-hero" aria-labelledby="goal-primary">
+      <div className="pq-goals-hero-top"><span className="pq-goals-goal-label"><Icon name="target" size={16}/> PRIMARY GOAL</span><span className="pq-goals-goal-status">YOUR FOCUS</span></div>
+      <h2 id="goal-primary">{profile.goal || 'Choose your goal'}</h2>
+      <p>{profile.goal ? 'A little progress adds up. Keep showing up for yourself.' : 'Set a goal to give your training a direction.'}</p>
+      <div className="pq-goals-metrics"><div><small><Icon name="scale" size={15}/> CURRENT</small><strong>{hasCurrent ? <>{current.toLocaleString()} <span>{unit}</span></> : 'Not set'}</strong><em>Profile weight</em></div><div><small><Icon name="target" size={15}/> TARGET</small><strong>{hasTarget ? <>{target.toLocaleString()} <span>{unit}</span></> : 'Not set'}</strong><em>Your goal</em></div></div>
+      <div className="pq-goals-target"><Icon name={reached ? 'check-circle' : 'target'} size={17}/><span>{difference === null ? 'Add a current and target weight to compare.' : reached ? 'You’re at your target weight.' : `${Number(difference.toFixed(1))} ${unit} ${current < target ? 'below' : 'above'} your target`}</span></div>
+      <div className="pq-goals-hero-actions"><button type="button" className="pq-goals-primary" onClick={() => setWeightOpen(true)}><Icon name="scale" size={17}/> Update weight</button><button type="button" className="pq-goals-text-button" onClick={() => push('/me/goals?from=goals')}>{profile.goal ? 'Edit goal' : 'Set a goal'} <Icon name="chevron-right" size={15}/></button></div>
+      {weightNotice && <p className="pq-goals-notice" role="status">{weightNotice}</p>}
+    </section>
+
+    <section className="pq-goals-date" aria-label="Target date"><span className="pq-goals-icon"><Icon name="calendar" size={19}/></span><div><small>TARGET DATE</small><strong>{validDate ? shortDate(validDate.toISOString()) : 'No date set'}</strong><p>{pastTarget ? 'This date has passed. Review it whenever you’re ready.' : validDate ? 'Your personal target, not a deadline.' : 'A date is optional. Set one in your goal settings.'}</p></div><button type="button" onClick={() => push('/me/goals?from=goals')} aria-label="Edit target date"><Icon name="chevron-right" size={18}/></button></section>
+
+    <section className="pq-goals-section" aria-labelledby="training-heading"><div className="pq-goals-section-head"><div><span className="pq-goals-eyebrow">BUILD CONSISTENCY</span><h2 id="training-heading">This week’s training</h2></div><button type="button" onClick={() => push('/me/training?from=goals')}>Schedule <span aria-hidden="true">→</span></button></div>
+      <div className="pq-goals-card pq-goals-training"><div className="pq-goals-training-top"><span className="pq-goals-icon"><Icon name="dumbbell" size={20}/></span><div><strong>{days.length ? `${days.length} ${days.length === 1 ? 'day' : 'days'} planned` : 'Set your training days'}</strong><p>{days.length ? days.map(day => day.slice(0, 3)).join(' · ') : 'Choose a weekly schedule that works for you.'}</p></div><span className="pq-goals-training-count">{workoutLoading ? '…' : workoutError ? '—' : workouts}<small>{days.length ? ` / ${days.length}` : ''}</small></span></div>
+        {!workoutLoading && !workoutError && days.length > 0 && <><div className="pq-goals-track" role="progressbar" aria-label="Weekly training days completed" aria-valuemin={0} aria-valuemax={days.length} aria-valuenow={Math.min(workouts, days.length)}><span style={{ width: `${percent}%` }}/></div><p className="pq-goals-caption">{workouts} {workouts === 1 ? 'day' : 'days'} with a completed workout this week</p><div className="pq-goals-week" aria-label="This week’s planned and completed training days">{TRAINING_DAYS.map((day, index) => { const date = new Date(weekStart); date.setDate(date.getDate() + index); const completed = !!summary?.trainingDates.includes(formatLocalDate(date)); const planned = days.includes(day.value); return <div key={day.value} className={`pq-goals-week-day${completed ? ' is-complete' : planned ? ' is-planned' : ''}`} aria-label={`${day.value}: ${completed ? 'workout completed' : planned ? 'planned' : 'not planned'}`}><span>{day.label.slice(0, 1)}</span><i>{completed ? <Icon name="check" size={13}/> : planned ? <span/> : '—'}</i></div>; })}</div><div className="pq-goals-week-legend"><span><i className="is-complete"/> Completed</span><span><i className="is-planned"/> Planned</span></div></>}
+        {workoutLoading && <p role="status">Loading training activity…</p>}{workoutError && <p role="alert">Training activity couldn’t be loaded. <button type="button" onClick={() => void refreshWorkouts()}>Retry</button></p>}
       </div>
     </section>
 
-    <section className="subsection home-ref-milestones" aria-labelledby="milestone-heading">
-      <div className="section-head"><h3 id="milestone-heading">Milestones</h3><span>{loading ? 'Loading' : error ? 'Unavailable' : `${orderedEntries.length} saved`}</span></div>
-      {error && <div role="alert" className="scan-warning">{error}<button type="button" onClick={() => void refresh()}>Retry</button></div>}
-      {loading ? <p role="status">Loading saved measurements…</p> : error ? null : orderedEntries.length > 0
-        ? <div className="milestone-list home-ref-milestone-list">
-          {orderedEntries.slice(0, 3).map((entry, index) => <div className={`milestone ${index === 0 ? 'current' : 'done'}`} key={entry._id}>
-            <span className="milestone-dot">{index === 0 ? <span aria-hidden="true">•</span> : <Icon name="check" size={12}/>}</span>
-            <div><b>{index === 0 ? 'Current weight' : 'Weight check-in'} · {entry.value} {entry.unit}</b><small>{index === 0 && amountToTarget !== null && !goalReached ? `${amountToTarget.toFixed(1)} ${profile.weightUnit || unit} to target` : `Saved ${shortDate(entry.measuredAt ?? entry.date)}`}</small></div>
-          </div>)}
-          {hasTarget && <div className={`milestone ${goalReached ? 'done' : ''}`}>
-            <span className="milestone-dot">{goalReached ? <Icon name="check" size={12}/> : null}</span>
-            <div><b>Target · {target} {profile.weightUnit || unit}</b><small>{goalReached ? 'Goal reached' : 'Upcoming'}</small></div>
-          </div>}
-        </div>
-        : <p>Log your first weight to start tracking milestones.</p>}
+    <section className="pq-goals-section" aria-labelledby="checkins-heading"><div className="pq-goals-section-head"><div><span className="pq-goals-eyebrow">YOUR PROGRESS</span><h2 id="checkins-heading">Recent check-ins</h2></div><button type="button" onClick={() => push('/progress?from=goals')}>View all <span aria-hidden="true">→</span></button></div>
+      <div className="pq-goals-card pq-goals-checkins" aria-busy={loading}>{loading ? <p role="status">Loading your check-ins…</p> : error ? <p role="alert">Your check-ins couldn’t be loaded. <button type="button" onClick={() => void refresh()}>Retry</button></p> : ordered.length ? <ul>{ordered.slice(0, 3).map((entry, index) => <li key={entry._id}><span className="pq-goals-check-icon"><Icon name="scale" size={16}/></span><div><strong>{index === 0 ? 'Latest check-in' : 'Weight check-in'}</strong><small>{shortDate(entry.measuredAt ?? entry.date)}</small></div><b>{entry.value} <small>{entry.unit}</small></b></li>)}</ul> : <div className="pq-goals-empty"><strong>Your first check-in starts here</strong><p>Log your weight to see your history over time.</p><button type="button" onClick={() => setWeightOpen(true)}>Log weight <Icon name="chevron-right" size={15}/></button></div>}</div>
     </section>
-
-    <section className="subsection secondary-goals home-ref-secondary" aria-labelledby="secondary-goals-heading">
-      <h3 id="secondary-goals-heading">Secondary goals</h3>
-      <article className="secondary-goal home-ref-training-goal">
-        <span className="mini-progress" role="img" style={{ background: `conic-gradient(var(--green) ${trainingProgress}%, var(--line) 0)` }} aria-label={`${trainingProgress}% of this week's ${days.length} planned training days completed`}>
-          <span>{workoutLoading ? '…' : workoutError ? '—' : `${trainingProgress}%`}</span>
-        </span>
-        <div><b>{days.length ? `Train ${days.length}× per week` : 'Set your training days'}</b><small>{days.length ? days.map(day => day.slice(0, 3)).join(' · ') : 'Choose your schedule in Me'}</small></div>
-      </article>
-      {workoutError && <p className="error" role="alert">{workoutError}</p>}
-    </section>
-    {weightOpen && <WeightModal profile={profile} onClose={() => setWeightOpen(false)} onSaved={message => { setWeightOpen(false); setWeightNotice(message); void refresh(); }}/>}
+    <div className="pq-goals-footnote"><Icon name="lightbulb" size={17}/><p>Progress isn’t always linear. Your saved check-ins are here to help you see the bigger picture.</p></div>
+    {weightOpen && <WeightModal profile={profile} onClose={() => setWeightOpen(false)} onSaved={message => { setWeightOpen(false); setWeightNotice(message); void refresh(); void refreshProfile(); }}/>}
   </div>;
 }

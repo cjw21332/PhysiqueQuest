@@ -1,3 +1,6 @@
+import { quotaModel } from '../../test/lifecycle-quota.fixture.js';
+import { getModelToken } from '@nestjs/mongoose';
+import { AuthRateLimit } from '../auth/auth-rate-limit.schema.js';
 import 'reflect-metadata';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { Test } from '@nestjs/testing';
@@ -7,18 +10,19 @@ import { ChatController } from './chat.controller.js';
 import { ChatService } from './chat.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ChatRateLimitGuard } from './chat-rate-limit.guard.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 describe('chat HTTP authentication and input contract', () => {
   let app: INestApplication;
   const reply = vi.fn(async () => ({ reply: 'Home guide', sources: [], privacy: { personalDataIncluded: false, historyStored: false, provider: 'self-hosted' } }));
   beforeAll(async () => {
-    const module = await Test.createTestingModule({ controllers: [ChatController], providers: [
+    const module = await Test.createTestingModule({ controllers: [ChatController], providers: [{ provide: getModelToken(AuthRateLimit.name), useValue: quotaModel() },
       { provide: ChatService, useValue: { reply, status: async () => ({ ready: true }) } }, ChatRateLimitGuard,
     ] }).overrideGuard(JwtAuthGuard).useValue({ canActivate(context: any) {
       const req = context.switchToHttp().getRequest();
       if (req.headers.authorization !== 'Bearer synthetic-session') throw new UnauthorizedException();
-      req.user = { userId: 'aaaaaaaaaaaaaaaaaaaaaaaa' }; return true;
-    } }).compile();
+      req.user = { userId: 'aaaaaaaaaaaaaaaaaaaaaaaa', lifecycleGeneration: 0 }; return true;
+    } }).overrideGuard(AiRateLimitGuard).useValue({ canActivate: () => true }).compile();
     app = module.createNestApplication(); app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
     await app.init();
   });
@@ -38,11 +42,17 @@ describe('chat HTTP authentication and input contract', () => {
   });
   it('passes only guard identity and explicit consent to service', async () => {
     await request(app.getHttpServer()).post('/chat').auth('synthetic-session', { type: 'bearer' }).send({ messages: [{ role: 'user', text: 'Home' }], includePersonalData: true }).expect(201);
-    expect(reply).toHaveBeenLastCalledWith('aaaaaaaaaaaaaaaaaaaaaaaa', [{ role: 'user', text: 'Home' }], true, undefined);
+    expect(reply).toHaveBeenLastCalledWith('aaaaaaaaaaaaaaaaaaaaaaaa', [{ role: 'user', text: 'Home' }], true, undefined, expect.any(AbortSignal));
+  });
+  it('allows more than the former per-minute chat quota while still requiring authentication', async () => {
+    for (let index = 0; index < 12; index++) {
+      await request(app.getHttpServer()).post('/chat').auth('synthetic-session', { type: 'bearer' }).send({ messages: [{ role: 'user', text: 'Home' }] }).expect(201);
+    }
+    await request(app.getHttpServer()).post('/chat').send({ messages: [{ role: 'user', text: 'Home' }] }).expect(401);
   });
   it('accepts an application-page hint and keeps model readiness authenticated', async () => {
     await request(app.getHttpServer()).post('/chat').auth('synthetic-session', { type: 'bearer' }).send({ messages: [{ role: 'user', text: 'What can I do here?' }], page: '/scan/plan' }).expect(201);
-    expect(reply).toHaveBeenLastCalledWith('aaaaaaaaaaaaaaaaaaaaaaaa', [{ role: 'user', text: 'What can I do here?' }], false, '/scan/plan');
+    expect(reply).toHaveBeenLastCalledWith('aaaaaaaaaaaaaaaaaaaaaaaa', [{ role: 'user', text: 'What can I do here?' }], false, '/scan/plan', expect.any(AbortSignal));
     const response = await request(app.getHttpServer()).get('/chat/status').auth('synthetic-session', { type: 'bearer' }).expect(200);
     expect(response.body).toEqual({ ready: true });
   });

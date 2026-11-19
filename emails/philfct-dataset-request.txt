@@ -1,0 +1,12 @@
+To: philfct@fnri.dost.gov.ph
+Subject: Request to use Philippine Food Composition Table data in a student capstone
+
+Dear DOST-FNRI team,
+
+We are developing PhysiqueQuest, a student capstone application that helps users record meals and review estimated nutrition. May we request a machine-readable copy of the Philippine Food Composition Table, or written permission to include selected records in the app?
+
+Please let us know the permitted uses, required attribution, any licensing conditions, and the appropriate process for obtaining the dataset. We would also appreciate guidance on citation and updates.
+
+Thank you for your time.
+
+PhysiqueQuest student team

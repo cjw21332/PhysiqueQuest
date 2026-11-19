@@ -1,0 +1,62 @@
+Last 30 Days Skill (Agents)
+
+<skill_content>
+# Skill: last30days
+
+## Overview
+
+This skill provides recent community and social trend research over the last 30 days. It helps users understand current discussions, sentiment, and trends across social platforms and communities.
+
+## Capabilities
+
+- **Community Sentiment**: Monitor community sentiment and discussions
+- **Social Trends**: Identify trending topics and themes
+- **Trend Analysis**: Analyze patterns in discussions
+- **Topic Research**: Research specific trending topics
+- **Sentiment Tracking**: Track sentiment over time
+- **Content Discovery**: Discover relevant content and discussions
+
+## Use Cases
+
+### Market Research
+- Track community interest in products
+- Monitor brand sentiment
+- Identify emerging trends
+
+### Content Strategy
+- Research trending topics
+- Plan content around trends
+- Understand audience interests
+
+### Business Intelligence
+- Monitor competitor discussions
+- Track market trends
+- Gather consumer insights
+
+## Example Usage
+
+```
+opencode run "Use last30days to research trending AI topics in tech"
+
+opencode run "Use last30days to check community sentiment around a product"
+
+opencode run "Use last30days to find trending topics in the design space"
+```
+
+## Technical Details
+
+This skill uses web search and browsing capabilities to gather recent information and research current trends.
+
+## Output
+
+The skill provides:
+- Trending topics and discussions
+- Sentiment analysis
+- Trend reports
+- Relevant content and sources
+
+---
+
+Base directory: .opencode/skills/last30days
+This skill is part of the Agents ecosystem for trend research and analysis.
+</skill_content>

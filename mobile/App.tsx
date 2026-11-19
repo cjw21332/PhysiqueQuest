@@ -1,3 +1,4 @@
+import { handleOfflineAccount } from './offlineAccount';
 import Constants from 'expo-constants';
 import { googleSignInError } from './googleSignInError';
 import FoodScannerCamera, { type FoodCameraRequest } from './FoodScannerCamera';
@@ -7,7 +8,7 @@ import * as Device from 'expo-device';
 import * as Network from 'expo-network';
 import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, Platform, TurboModuleRegistry } from 'react-native';
+import { AppState, NativeModules, Platform, TurboModuleRegistry } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
@@ -23,12 +24,14 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { isTrustedWebViewUrl, isTrustedWebViewNavigation, normalizeFrontendUrl, resolveApiUrl, resolveFrontendUrl, selectConfiguredUrl } from './connection.mjs';
+import { backendIsReady, isTrustedWebViewUrl, isTrustedWebViewNavigation, normalizeFrontendUrl, resolveApiUrl, resolveFrontendUrl, selectConfiguredUrl } from './connection.mjs';
 import { performanceGuardScript } from './performance-guard.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
 import NativeTrackingCamera, { nativePoseAvailable, poseScript, type NativeTrackingOptions } from './NativeTrackingCamera';
 import PoseTrackerNative from './PoseTrackerNative';
+import type { NativePoseSummary } from '../shared/poseSessionSummary';
 import { readinessMessageLimit, readinessScript, validateNativeReadinessContext, validateReadinessCheck, type NativeReadinessContext, type ReadinessCheck } from '../shared/cameraReadiness';
+import type { ExerciseConfigOverride } from '../shared/exerciseEngine';
 
 Notifications.setNotificationHandler({ handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }) });
 
@@ -81,6 +84,7 @@ export function nativeFramingText(check:ReadinessCheck) {
 }
 
 function getInitialAddress() {
+  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net';
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_WEB_APP_URL?: string } | undefined;
   return resolveFrontendUrl(selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_WEB_APP_URL, extra?.EXPO_PUBLIC_WEB_APP_URL), Constants.expoConfig?.hostUri);
 }
@@ -109,11 +113,6 @@ function buildInsetsScript(insets: { top: number; bottom: number; left: number; 
     localStorage.setItem('physiquequest-runtime-api-url',${encodedApiUrl});
     localStorage.setItem('physiquequest-app-version',${JSON.stringify(Constants.expoConfig?.version ?? '')});
   }catch(e){}})();true;`;
-}
-
-function buildBackendCheckScript(apiUrl: string) {
-  const readinessUrl = apiUrl.replace(/\/api\/?$/i, '/ready');
-  return `(function(){fetch(${JSON.stringify(readinessUrl)},{credentials:'include'}).then(function(r){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:r.ok,status:r.status}));}).catch(function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:'backend-status',ok:false}));});})();true;`;
 }
 
 /** Delivers a host event to the WebView as the `physiquequest-inactivity` CustomEvent. */
@@ -192,16 +191,36 @@ function AppContent() {
   const [address, setAddress] = useState(inferredAddress ?? '');
   const [loadedAddress, setLoadedAddress] = useState(inferredAddress);
   const [manualApiUrl, setManualApiUrl] = useState<string | null>(null);
-  const apiUrl = useMemo(() => loadedAddress ? resolveApiUrl(manualApiUrl ?? selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_API_URL, extra?.EXPO_PUBLIC_API_URL), loadedAddress) : null, [extra?.EXPO_PUBLIC_API_URL, loadedAddress, manualApiUrl]);
+  const apiUrl = useMemo(() => {
+    if (!loadedAddress) return null;
+    let configured = manualApiUrl ?? selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_API_URL, extra?.EXPO_PUBLIC_API_URL);
+    if (NativeModules.PQShell?.standalone === true) {
+      configured = extra?.EXPO_PUBLIC_API_URL;
+      try {
+        const url = new URL(configured ?? '');
+        if (url.protocol !== 'https:' || url.hostname.endsWith('.trycloudflare.com') || url.hostname === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(url.hostname)) return null;
+      } catch { return null; }
+    }
+    return resolveApiUrl(configured, loadedAddress);
+  }, [extra?.EXPO_PUBLIC_API_URL, loadedAddress, manualApiUrl]);
   const [error, setError] = useState(!inferredAddress);
   const [key, setKey] = useState(0);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
   const [cameraPreview, setCameraPreview] = useState<NativeCameraPreview | null>(null);
-  const [providerSession, setProviderSession] = useState<{token:string;exercise:string;name:string}|null>(null);
-  const closeProviderSession = useCallback(() => {
+  const [providerSession, setProviderSession] = useState<{token?:string;exercise:string;name:string;pattern:string;support:string;contactName?:string;override?:ExerciseConfigOverride}|null>(null);
+  const [poseDeliveryStatus, setPoseDeliveryStatus] = useState<'idle' | 'pending' | 'delivered' | 'failed'>('idle');
+  const poseSafetyAlarm = useCallback(() => {
+    setPoseDeliveryStatus('pending');
+    webRef.current?.injectJavaScript("window.dispatchEvent(new CustomEvent('physiquequest-pose-safety',{detail:{type:'alarm'}}));true;");
+  }, []);
+  const poseSafetyStop = useCallback(() => {
+    webRef.current?.injectJavaScript("window.dispatchEvent(new CustomEvent('physiquequest-pose-safety',{detail:{type:'stop'}}));true;");
+  }, []);
+  const closeProviderSession = useCallback((summary?: NativePoseSummary) => {
     setProviderSession(null);
-    webRef.current?.injectJavaScript("window.dispatchEvent(new CustomEvent('physiquequest-posetracker-closed'));true;");
+    const detail = JSON.stringify(summary ?? null).replace(/</g, '\\u003c');
+    webRef.current?.injectJavaScript(`window.dispatchEvent(new CustomEvent('physiquequest-posetracker-closed',{detail:${detail}}));true;`);
   }, []);
   const [foodCamera, setFoodCamera] = useState<FoodCameraRequest | null>(null);
   const [framing,setFraming]=useState<ReadinessCheck>({status:'unknown',reason:'pending'});
@@ -231,11 +250,57 @@ function AppContent() {
   }, [insetScript]);
   useEffect(() => { pushInsets(); }, [pushInsets]);
 
-  const checkBackend = useCallback(() => {
-    setBackendStatus('checking');
-    if (apiUrl) webRef.current?.injectJavaScript(buildBackendCheckScript(apiUrl));
-    else setBackendStatus('offline');
+  const probe = useRef<AbortController | null>(null);
+  const networkAvailable = useRef<boolean | null>(null);
+  const backendStatusRef = useRef(backendStatus);
+  backendStatusRef.current = backendStatus;
+  const checkBackend = useCallback(async () => {
+    if (networkAvailable.current === false || probe.current) return;
+    const controller = new AbortController();
+    probe.current = controller;
+    // A free server can take nearly a minute to wake. Keep a single startup
+    // request alive instead of repeatedly aborting it and reporting offline.
+    const timeout = setTimeout(() => controller.abort(), backendStatusRef.current === 'checking' ? 65000 : 7000);
+    try {
+      const ready = apiUrl && await backendIsReady(apiUrl, controller.signal);
+      if (probe.current === controller) setBackendStatus(ready ? 'online' : 'offline');
+    } finally { clearTimeout(timeout); if (probe.current === controller) probe.current = null; }
   }, [apiUrl]);
+
+  useEffect(() => {
+    const checkIfActive = () => { if (AppState.currentState === 'active') void checkBackend(); };
+    const unsubscribe = NetInfo.addEventListener(state => {
+      const available = state.isConnected !== false;
+      networkAvailable.current = available;
+      if (!available) {
+        probe.current?.abort();
+        probe.current = null;
+        setBackendStatus('offline');
+      } else checkIfActive();
+    });
+    const subscription = AppState.addEventListener('change', state => { if (state === 'active') void checkBackend(); });
+    let lastPeriodic = Date.now();
+    const interval = setInterval(() => {
+      const now = Date.now();
+      if (now - lastPeriodic >= (backendStatusRef.current === 'online' ? 30000 : 5000)) {
+        lastPeriodic = now;
+        checkIfActive();
+      }
+    }, 5000);
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+      subscription.remove();
+      probe.current?.abort();
+      probe.current = null;
+    };
+  }, [checkBackend]);
+
+  useEffect(() => {
+    if (backendStatus !== 'checking') webRef.current?.injectJavaScript(
+      `window.dispatchEvent(new CustomEvent('physiquequest:backend-status',{detail:${JSON.stringify(backendStatus)}}));true;`
+    );
+  },[backendStatus]);
 
   const collectReadiness = useCallback(async () => {
     const network = await Network.getNetworkStateAsync();
@@ -393,7 +458,7 @@ function AppContent() {
         javaScriptEnabled
         domStorageEnabled
         sharedCookiesEnabled
-        thirdPartyCookiesEnabled={false}
+        thirdPartyCookiesEnabled={Platform.OS === 'android' && NativeModules.PQShell?.standalone === true}
         allowsBackForwardNavigationGestures
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction={false}
@@ -446,7 +511,21 @@ function AppContent() {
               intent?: string;
               exercise?: string;
               name?: string;
+              pattern?: string;
+              support?: string;
+              contactName?: string;
+              override?: unknown;
+              status?: string;
             };
+            if (apiUrl && ['remember-offline-account','forget-offline-account','restore-offline-account'].includes(message.type ?? '') &&
+                typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,120}$/.test(message.requestId)) {
+              const origin = new URL(loadedAddress).origin;
+              void handleOfflineAccount(message.type!,origin,apiUrl,message.token).catch(()=>null).then(grant => {
+                const detail = JSON.stringify({requestId:message.requestId,account:grant ? {id:grant.id,expiresAt:grant.expiresAt} : null});
+                webRef.current?.injectJavaScript(`if(location.origin===${JSON.stringify(origin)})window.dispatchEvent(new CustomEvent('physiquequest:offline-account',{detail:${detail}}));true;`);
+              });
+              return;
+            }
             if (message.type === 'google-sign-in' && typeof message.requestId === 'string' &&
               /^[a-zA-Z0-9-]{8,100}$/.test(message.requestId) && ['login', 'register'].includes(message.intent ?? '')) {
               const requestId = message.requestId;
@@ -459,6 +538,8 @@ function AppContent() {
                   const GoogleSignin = googleSignin.current!;
                   if (!googleConfigured.current) throw new Error('Google sign-in is not configured in this build.');
                   if (Platform.OS === 'android') await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+                  // A cancelled registration must allow the account chooser to appear again.
+                  if (message.intent === 'register') await GoogleSignin.signOut().catch(() => undefined);
                   const result = await GoogleSignin.signIn();
                   if (result.type === 'cancelled') {
                     webRef.current?.injectJavaScript(buildGoogleAuthScript({ requestId, cancelled: true }));
@@ -472,15 +553,16 @@ function AppContent() {
                 }
               })();
             }
-            if (message.type === 'posetracker-native-start' && typeof message.token === 'string' && message.token.length <= 200 && typeof message.exercise === 'string' && /^[a-z_]{1,60}$/.test(message.exercise) && typeof message.name === 'string' && message.name.length <= 160) {
+            if (message.type === 'posetracker-native-start' && typeof message.exercise === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(message.exercise) && typeof message.name === 'string' && message.name.length <= 160 && typeof message.pattern === 'string' && /^[a-z_]{1,40}$/.test(message.pattern) && ['FULLY_SUPPORTED','PARTIALLY_SUPPORTED','NOT_YET_VALIDATED'].includes(message.support ?? '')) {
               stopNativeCamera();
-              setProviderSession({token:message.token,exercise:message.exercise,name:message.name});
+              setPoseDeliveryStatus('idle');
+              setProviderSession({token:typeof message.token === 'string' && message.token.length <= 200 ? message.token : undefined,exercise:message.exercise,name:message.name,pattern:message.pattern,support:message.support!,contactName:typeof message.contactName === 'string' && message.contactName.length <= 100 ? message.contactName : undefined,override:message.override&&typeof message.override==='object'&&!Array.isArray(message.override)?message.override as ExerciseConfigOverride:undefined});
             }
-            if (message.type === 'posetracker-native-stop') closeProviderSession();
-            if (message.type === 'backend-status') setBackendStatus(message.ok ? 'online' : 'offline');
-            if (message.type === 'food-camera-start' && typeof message.requestId === 'string' && message.requestId.length <= 100 && ['photo', 'barcode'].includes(message.mode ?? '') && isCameraFrame(message.frame)) {
+            if (message.type === 'posetracker-native-stop') setProviderSession(null);
+            if (message.type === 'pose-safety-status' && providerSession && ['pending', 'delivered', 'failed'].includes(message.status ?? '')) setPoseDeliveryStatus(message.status as 'pending' | 'delivered' | 'failed');
+            if (message.type === 'food-camera-start' && typeof message.requestId === 'string' && message.requestId.length <= 100 && message.mode === 'photo' && isCameraFrame(message.frame)) {
               stopNativeCamera();
-              setFoodCamera({ requestId: message.requestId, mode: message.mode as 'photo' | 'barcode', frame: message.frame!, facing: message.facing === 'front' ? 'front' : 'back', capture: 0 });
+              setFoodCamera({ requestId: message.requestId, mode: 'photo', frame: message.frame!, facing: message.facing === 'front' ? 'front' : 'back', capture: 0 });
             }
             if (message.type === 'food-camera-frame' && isCameraFrame(message.frame)) setFoodCamera(current => current && current.requestId === message.requestId ? { ...current, frame: message.frame! } : current);
             if (message.type === 'food-camera-capture') setFoodCamera(current => current && current.requestId === message.requestId && current.mode === 'photo' ? { ...current, capture: current.capture + 1 } : current);
@@ -554,7 +636,7 @@ function AppContent() {
           setError(true);
         }}
       /> : null}
-      {providerSession && <PoseTrackerNative key={`${providerSession.exercise}:${providerSession.token}`} {...providerSession} close={closeProviderSession}/>}
+      {providerSession && <PoseTrackerNative key={`${providerSession.exercise}:${providerSession.pattern}`} {...providerSession} close={closeProviderSession} onSafetyAlarm={poseSafetyAlarm} onSafetyStop={poseSafetyStop} deliveryStatus={poseDeliveryStatus}/>}
       {foodCamera && <FoodScannerCamera key={foodCamera.requestId} request={foodCamera} finish={result => {
         const detail = JSON.stringify({ ...result, requestId: foodCamera.requestId }).replace(/</g, '\\u003c');
         if (result.type !== 'ready') setFoodCamera(null);
@@ -666,12 +748,6 @@ function AppContent() {
               </View>
             </>
           )}
-        </View>
-      )}
-      {loadedAddress && !error && backendStatus === 'offline' && (
-        <View style={[styles.backendBanner, { top: insets.top + 8, left: insets.left + 12, right: insets.right + 12 }]}>
-          <Text style={styles.backendBannerText}>Backend unavailable · server-backed features cannot sync</Text>
-          <Pressable accessibilityRole="button" accessibilityLabel="Change server address" style={styles.retryButton} onPress={() => { setAddress(loadedAddress); setError(true); }}><Text style={styles.retryText}>Change server</Text></Pressable>
         </View>
       )}
       {loadedAddress && !error && readiness?.cameraPermission === 'denied' && (
@@ -879,23 +955,6 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: '#0b0f15', fontWeight: '700' },
   hint: { marginTop: 12, color: '#94a3b8' },
-  backendBanner: {
-    position: 'absolute',
-    minHeight: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 12,
-    backgroundColor: '#480909',
-    borderWidth: 1,
-    borderColor: '#f87171',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  backendBannerText: { flex: 1, color: '#f87171', fontSize: 12, fontWeight: '600' },
-  retryText: { color: '#22c55e', fontSize: 12, fontWeight: '700' },
-  retryButton: { minWidth: 48, minHeight: 48, justifyContent: 'center', paddingHorizontal: 8 },
   permissionBanner: {
     position: 'absolute',
     minHeight: 40,

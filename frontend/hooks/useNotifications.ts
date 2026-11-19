@@ -16,5 +16,6 @@ export function useNotifications() {
   }, [refresh]);
   const markRead = useCallback(async (id: string) => { setActionError(''); try { await api.markNotification(id, false); } catch (err) { setActionError(err instanceof Error ? err.message : 'Could not update notification.'); } }, []);
   const markAllRead = useCallback(async () => { setActionError(''); try { await api.markAllNotifications(); } catch (err) { setActionError(err instanceof Error ? err.message : 'Could not update notifications.'); } }, []);
-  return { items: data?.items ?? [], reminder: data?.reminder, loading, error: actionError || error, refresh, markRead, markAllRead };
+  const clearNotifications = useCallback(async (ids: string[]) => { setActionError(''); try { await api.clearNotifications(ids); return true; } catch (err) { setActionError(err instanceof Error ? err.message : 'Could not clear notifications.'); return false; } }, []);
+  return { items: data?.items ?? [], reminder: data?.reminder, loading, error: actionError || error, refresh, markRead, markAllRead, clearNotifications };
 }

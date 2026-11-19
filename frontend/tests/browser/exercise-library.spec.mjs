@@ -20,6 +20,37 @@ async function setup(page, catalog, detailHandler) {
   await page.getByRole('button', { name: /Exercise library/ }).click();
 }
 
+test('library highlights available camera options and keeps filters usable on mobile', async ({ page }, info) => {
+  const manual = { ...exercise, _id: '01qpYSe', name: 'Manual example', gifUrl: '' };
+  const camera = { ...exercise, _id: '0lQnxMZ', name: 'Camera example', gifUrl: '' };
+  await page.setViewportSize({ width: 360, height: 800 });
+  await setup(page, (route, url, headers) => route.fulfill({ json: { items: [manual, camera], total: 2, page: 1, limit: 12, pages: 1 }, headers }));
+  const items = page.locator('.library-item');
+  await expect(items).toHaveCount(2);
+  await expect(items.first()).toContainText('Camera Example');
+  await expect(items.first()).toContainText('Camera tracking · needs review');
+  await expect(items.last()).toContainText('Manual tracking');
+  const toggle = page.getByRole('button', { name: 'Filters & sorting' });
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await page.getByRole('button', { name: /Equipment type:/ }).click();
+  const picker = page.getByRole('dialog', { name: 'Equipment type' });
+  await expect(picker).toBeVisible();
+  await picker.getByRole('button', { name: 'Dumbbells' }).click();
+  await expect(page.getByRole('button', { name: /Equipment type: Dumbbells/ })).toBeVisible();
+  const clear = page.getByRole('button', { name: 'Clear filters' });
+  await expect(page.locator('#library-filter-controls').getByRole('button', { name: 'Clear filters' })).toBeVisible();
+  for (const width of [320, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.screenshot({ path: info.outputPath('library-redesign.png') });
+  await clear.click();
+  await expect(page.getByRole('button', { name: /Equipment type: Any Equipment/i })).toBeVisible();
+});
+
 test('saved exercises survive reload and remain searchable when catalog requests fail', async ({ page }) => {
   let offline = false;
   await setup(page, (route, url, headers) => offline

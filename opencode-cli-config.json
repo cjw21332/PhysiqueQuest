@@ -1,0 +1,19 @@
+# OpenCode CLI Configuration - VS Code Integration
+# This file controls OpenCode CLI behavior in VS Code terminal
+
+{
+  "keybinds": {
+    "paste-image": "ctrl+shift+v",
+    "paste-text": "ctrl+v"
+  },
+  "settings": {
+    "terminal": {
+      "image-paste": true,
+      "image-attachment": true
+    },
+    "mcp": {
+      "default-search-provider": "exa",
+      "exa-mcp-url": "https://mcp.exa.ai/mcp"
+    }
+  }
+}

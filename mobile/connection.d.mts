@@ -4,3 +4,4 @@ export function resolveFrontendUrl(configuredUrl: string | undefined, hostUri: s
 export function resolveApiUrl(configuredApiUrl: string | undefined, frontendUrl: string): string | null;
 export function isTrustedWebViewUrl(value: string, frontendUrl: string): boolean;
 export function isTrustedWebViewNavigation(value: string, frontendUrl: string, isTopFrame?: boolean): boolean;
+export function backendIsReady(apiUrl: string, signal: AbortSignal): Promise<boolean>;

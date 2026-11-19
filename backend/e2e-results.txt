@@ -1,0 +1,157 @@
+
+> backend@0.0.1 test:e2e
+> vitest run --config ./vitest.config.e2e.ts
+
+[33mThe plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the [1mresolve.tsconfigPaths[22m option. You can remove the plugin and set [1mresolve.tsconfigPaths: true[22m in your Vite config instead.[39m
+
+ RUN  v4.1.11 C:/Users/MY PC/Desktop/Projects/PhysiqueQuest/backend
+
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:24 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    settings: [33m1[39m
+  }
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:25 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    notifications: [33m1[39m
+  }
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:26 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    notifications: [33m1[39m
+  }
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:27 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    progress_entries: [33m1[39m
+  }
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:28 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    workout_sessions: [33m1[39m
+  }
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:28 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    food_scan_usage: [33m1[39m
+  }
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:29 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    auth_rate_limits: [33m1[39m
+  }
+}
+[33m[Nest] 6844  - [39m11/15/2026, 8:18:30 PM [33m   WARN[39m [38;5;3m[SessionService] [39mObject(1) {
+  event: [32m'refresh_token_reuse'[39m
+}
+[33m[Nest] 19488  - [39m11/15/2026, 8:18:30 PM [33m   WARN[39m [38;5;3m[FoodScanUsageService] [39m[33mscan_usage_reconciliation_deferred[39m
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:30 PM [32m    LOG[39m [38;5;3m[FoodScanUsageService] [39m[32mscan_usage_maintenance reconciled=0 removed=0 pending=1 incomplete=0 oldest_unresolved_ms=1794745110531 failed_completion_writes_process=0[39m
+[33m[Nest] 19488  - [39m11/15/2026, 8:18:30 PM [33m   WARN[39m [38;5;3m[FoodScanUsageService] [39m[33mscan_usage_reconciliation_deferred[39m
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:30 PM [32m    LOG[39m [38;5;3m[FoodScanUsageService] [39m[32mscan_usage_maintenance reconciled=0 removed=0 pending=1 incomplete=0 oldest_unresolved_ms=1794745110546 failed_completion_writes_process=0[39m
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:31 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    food_scan_usage: [33m1[39m,
+    analysis_jobs: [33m1[39m
+  }
+}
+[31m[Nest] 19488  - [39m11/15/2026, 8:18:31 PM [31m  ERROR[39m [38;5;3m[FoodScanUsageService] [39m[31mscan_usage_update_failed[39m
+[31m[Nest] 19488  - [39m11/15/2026, 8:18:31 PM [31m  ERROR[39m [38;5;3m[FoodScanUsageService] [39m[31mscan_usage_update_failed[39m
+[33m[Nest] 19488  - [39m11/15/2026, 8:18:31 PM [33m   WARN[39m [38;5;3m[AnalysisJobsService] [39mObject(1) {
+  event: [32m'analysis_failure_invalidated'[39m
+}
+[33m[Nest] 19488  - [39m11/15/2026, 8:18:33 PM [33m   WARN[39m [38;5;3m[AnalysisJobsService] [39mObject(1) {
+  event: [32m'analysis_failure_invalidated'[39m
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:34 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    storage_uploads: [33m1[39m
+  }
+}
+[33m[Nest] 30360  - [39m11/15/2026, 8:18:36 PM [33m   WARN[39m [38;5;3m[AuthService] [39m[33mFailed to record sign-in event for admin analytics[39m
+[32m[Nest] 6528  - [39m11/15/2026, 8:18:36 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {}
+}
+[32m[Nest] 27624  - [39m11/15/2026, 8:18:36 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    food_scan_usage: [33m1[39m
+  }
+}
+[31m[Nest] 27624  - [39m11/15/2026, 8:18:37 PM [31m  ERROR[39m [38;5;3m[FoodScanUsageService] [39m[31mscan_usage_update_failed[39m
+[33m[Nest] 19488  - [39m11/15/2026, 8:18:37 PM [33m   WARN[39m [38;5;3m[NotificationsService] [39m[33mCould not create a daily reminder[39m
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:37 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    storage_uploads: [33m1[39m
+  }
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:37 PM [32m    LOG[39m [38;5;3m[StorageService] [39mObject(2) {
+  event: [32m'storage_cleanup'[39m,
+  deleted: [33m0[39m
+}
+[32m[Nest] 19488  - [39m11/15/2026, 8:18:37 PM [32m    LOG[39m [38;5;3m[StorageService] [39mObject(2) {
+  event: [32m'storage_cleanup'[39m,
+  deleted: [33m0[39m
+}
+[32m[Nest] 24064  - [39m11/15/2026, 8:18:40 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(2) {
+  event: [32m'account_purged'[39m,
+  counts: {
+    profiles: [33m1[39m,
+    push_deliveries: [33m1[39m,
+    email_verifications: [33m1[39m,
+    notifications: [33m1[39m,
+    analysis_jobs: [33m1[39m,
+    auth_sessions: [33m1[39m,
+    leaderboard_snapshots: [33m1[39m,
+    storage_uploads: [33m1[39m,
+    coach_programs: [33m1[39m,
+    settings: [33m1[39m,
+    push_devices: [33m1[39m,
+    workout_sessions: [33m1[39m,
+    nutrition: [33m1[39m,
+    progress_entries: [33m1[39m,
+    food_scan_usage: [33m1[39m,
+    future_user_data: [33m1[39m,
+    safety_alert_events: [33m1[39m,
+    activity: [33m1[39m,
+    analysis_results: [33m1[39m,
+    sign_in_events: [33m1[39m
+  }
+}
+[32m[Nest] 24064  - [39m11/15/2026, 8:18:41 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(5) {
+  event: [32m'retention_cleanup'[39m,
+  auditCold: [33m0[39m,
+  auditPurged: [33m0[39m,
+  jobsPurged: [33m0[39m,
+  sessionsPurged: [33m0[39m
+}
+[32m[Nest] 24064  - [39m11/15/2026, 8:18:43 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(5) {
+  event: [32m'retention_cleanup'[39m,
+  auditCold: [33m0[39m,
+  auditPurged: [33m0[39m,
+  jobsPurged: [33m0[39m,
+  sessionsPurged: [33m0[39m
+}
+[32m[Nest] 24064  - [39m11/15/2026, 8:18:44 PM [32m    LOG[39m [38;5;3m[PrivacyService] [39mObject(5) {
+  event: [32m'retention_cleanup'[39m,
+  auditCold: [33m1[39m,
+  auditPurged: [33m1[39m,
+  jobsPurged: [33m1[39m,
+  sessionsPurged: [33m1[39m
+}
+
+ Test Files  19 passed | 4 skipped (23)
+      Tests  80 passed | 9 skipped (89)
+   Start at  20:18:22
+   Duration  186.70s (transform 2.22s, setup 0ms, import 37.98s, tests 318.66s, environment 3ms)
+

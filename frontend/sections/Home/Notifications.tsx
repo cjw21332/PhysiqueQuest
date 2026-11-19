@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '../../lib/api';
 import { useNotifications } from '../../hooks/useNotifications';
 import { Icon } from './icons';
+import DeleteConfirmation from '../../components/DeleteConfirmation';
 
 export default function Notifications({ onBack }: { onBack: () => void }) {
-  const { items, reminder, loading, error, refresh, markRead, markAllRead } = useNotifications();
+  const { items, reminder, loading, error, refresh, markRead, markAllRead, clearNotifications } = useNotifications();
   const [pushMessage, setPushMessage] = useState('');
   const [reminderMessage, setReminderMessage] = useState('');
   const [native, setNative] = useState(false);
@@ -14,6 +15,10 @@ export default function Notifications({ onBack }: { onBack: () => void }) {
   const pushTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [reminderTime, setReminderTime] = useState('20:00');
   const [reminderBusy, setReminderBusy] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [clearMessage, setClearMessage] = useState('');
+  const [clearSelection, setClearSelection] = useState<{ ids: string[]; hasMore: boolean; pinned: boolean } | null>(null);
+  const [clearFailed, setClearFailed] = useState(false);
   useEffect(() => { if (reminder) setReminderTime(`${String(reminder.hour).padStart(2, '0')}:${String(reminder.minute).padStart(2, '0')}`); }, [reminder?.hour, reminder?.minute]);
   useEffect(() => {
     setNative(!!(window as unknown as { ReactNativeWebView?: unknown }).ReactNativeWebView);
@@ -60,13 +65,30 @@ export default function Notifications({ onBack }: { onBack: () => void }) {
   const sorted = [...items].reverse();
   const safety = sorted.find(item => item.icon === 'shield' || /(safety|emergency alert)/i.test(item.title));
   const remaining = sorted.filter(item => item.id !== safety?.id);
+  const clearRecent = async () => {
+    if (!clearSelection || clearing) return;
+    setClearing(true); setClearMessage(''); setClearFailed(false);
+    try {
+      if (await clearNotifications(clearSelection.ids)) {
+        setClearMessage(clearSelection.hasMore ? 'Notifications cleared. More notifications are available to clear.' : 'Notifications cleared.');
+        setClearSelection(null);
+      } else setClearFailed(true);
+    }
+    finally { setClearing(false); }
+  };
   return <div className="home-notifications">
     <header className="section-page-head home-notifications-head">
-      <div className="section-back-title"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="chevron-left" size={24}/></button><h2>Notifications</h2></div>
-      {unread > 0 && <button type="button" className="mark-all-btn" onClick={() => void markAllRead()}>Mark all read</button>}
+      <div className="section-back-title pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="arrow" size={20}/></button><h2>Notifications</h2></div>
     </header>
     <div className="notification-intro"><div><h3>Your updates</h3><p>Keep track of your activity and safety notices.</p></div><span className="notification-count">{unread ? `${unread} unread` : 'All caught up'}</span></div>
-    {error && <div role="alert" className="scan-warning notification-error"><p>{error}</p><button type="button" onClick={() => void refresh()}>Try again</button></div>}
+    {(unread > 0 || remaining.length > 0) && <div className="notification-actions" aria-label="Notification actions">
+      {unread > 0 && <button type="button" className="mark-all-btn" disabled={clearing} onClick={() => void markAllRead()}><Icon name="check-circle" size={16}/> Mark all read</button>}
+      {remaining.length > 0 && <button type="button" className="notification-clear" disabled={clearing} onClick={() => { setClearFailed(false); setClearSelection({ ids: remaining.slice(0, 1000).map(item => item.id), hasMore: remaining.length > 1000, pinned: Boolean(safety) }); }}><Icon name="trash" size={16}/>Clear notifications</button>}
+    </div>}
+    {clearMessage && <p role="status" className="notification-clear-feedback">{clearMessage}</p>}
+    {clearSelection && <DeleteConfirmation title="Clear notifications?" description={`Remove ${clearSelection.ids.length} notification${clearSelection.ids.length === 1 ? '' : 's'}?${clearSelection.pinned ? ' Your pinned safety notice will stay.' : ''}`} confirmLabel="Clear notifications" busyLabel="Clearing…" busy={clearing} error={clearFailed ? 'Could not clear notifications. Please try again.' : undefined} onCancel={() => setClearSelection(null)} onConfirm={() => void clearRecent()}/>}
+    {error && !clearFailed && <div role="alert" className="scan-warning notification-error"><p>{error}</p><button type="button" onClick={() => void refresh()}>Try again</button></div>}
+    {clearFailed && !clearSelection && <p role="alert" className="notification-clear-feedback">Could not clear notifications. Please try again.</p>}
     {loading && !items.length ? <p role="status" className="notifications-state">Loading notifications…</p> : !items.length && !error ? <div className="notification-empty"><span className="notification-empty-icon"><Icon name="bell" size={24}/></span><strong>You’re all caught up</strong><p>New notifications will appear here.</p></div> : <>
       {safety && <section className="safety-alert notification-safety-card" aria-label="Pinned safety notice">
         <span className="alert-icon"><Icon name="shield" size={18}/></span>

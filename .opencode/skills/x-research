@@ -1,0 +1,63 @@
+X/Twitter Research Skill (Agents)
+
+<skill_content>
+# Skill: x-research
+
+## Overview
+
+This skill provides X/Twitter public sentiment research for recent market, company, product, or community discourse. It helps users understand what people are saying on X/Twitter across various topics.
+
+## Capabilities
+
+- **Public Sentiment**: Monitor public sentiment and discussions on X/Twitter
+- **Trend Analysis**: Identify trending topics and conversations
+- **Community Discourse**: Research community discussions and conversations
+- **Sentiment Tracking**: Track sentiment and opinions over time
+- **Topic Analysis**: Analyze specific topics and discussions
+- **Content Discovery**: Discover relevant posts and discussions
+
+## Use Cases
+
+### Market Analysis
+- Track X/Twitter sentiment around products
+- Monitor brand mentions on X
+- Research competitor discussions
+
+### Product Research
+- Gather user feedback on products
+- Research user experiences
+- Track product discussions
+
+### Community Research
+- Monitor community conversations
+- Track industry trends
+- Understand community sentiment
+
+## Example Usage
+
+```
+opencode run "Use x-research to get sentiment around the latest product launch"
+
+opencode run "Use x-research to track conversations about market trends"
+
+opencode run "Use x-research to analyze community feedback on a new feature"
+```
+
+## Important Notes
+
+**Rate Limiting**: X/Twitter may enforce rate limits. Use responsibly and consider caching strategies.
+
+## Output
+
+The skill provides:
+- X/Twitter public sentiment analysis
+- Trend reports and insights
+- Community discourse analysis
+- Relevant conversations and topics
+- Sentiment analysis results
+
+---
+
+Base directory: .opencode/skills/x-research
+This skill is part of the Agents ecosystem for X/Twitter research and analysis.
+</skill_content>

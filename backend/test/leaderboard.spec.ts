@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
 import { LeaderboardService } from '../src/leaderboard/leaderboard.service.js';
@@ -27,7 +28,7 @@ const build = (overrides: {
   previous?: unknown[];
 } = {}) =>
   new LeaderboardService(
-    snapshots(overrides.previous ?? []),
+    lifecycleModel(snapshots(overrides.previous ?? [])),
     findModel(overrides.users ?? []),
     findModel(overrides.settings ?? []),
     findModel(overrides.nutrition ?? []),
@@ -88,7 +89,7 @@ describe('leaderboard', () => {
     const service = build({
       nutrition: [{
         userId: A,
-        meals: [{ date: '2099-01-01' }, { date: '2099-01-01' }, { date: '2099-01-01' }, { date: '2099-01-02' }],
+        meals: ['a', 'b', 'c'].map(scanGroupId => ({ date: '2099-01-01', scanGroupId, scanSavedAt: new Date() })),
         water: [{ date: '2099-01-01', glasses: 8 }],
       }],
       users: [{ _id: A, name: 'Ana' }],
@@ -107,18 +108,18 @@ describe('leaderboard read efficiency', () => {
     const selections: string[] = [];
     const nutrition = { find: vi.fn(() => ({ select: (fields: string) => {
       selections.push(fields);
-      return { lean: () => ({ exec: async () => [{ userId: A, meals: [1, 2, 3].map(() => ({ date: '2099-01-01' })), water: [{ date: '2099-01-01', glasses: 8 }] }] }) };
+      return { lean: () => ({ exec: async () => [{ userId: A, meals: [1, 2, 3].map(scanGroupId => ({ date: '2099-01-01', scanGroupId: String(scanGroupId), scanSavedAt: new Date() })), water: [{ date: '2099-01-01', glasses: 8 }] }] }) };
     } })) };
     const settings = { find: vi.fn(() => ({ select: (fields: string) => {
       selections.push(fields);
       return { lean: () => ({ exec: async () => [{ userId: B, values: { showLeaderboard: false } }] }) };
     } })) };
     const users = findModel([{ _id: A, name: 'Ana' }, { _id: B, name: 'Ben' }]);
-    const service = new LeaderboardService(snapshots(), users, settings as any, nutrition as any, { find: () => chain([]), aggregate: vi.fn(async () => [{ userId: A, day: '2099-01-01' }, { userId: B, day: '2099-01-01' }]) } as any);
+    const service = new LeaderboardService(lifecycleModel(snapshots()), users, settings as any, nutrition as any, { find: () => chain([]), aggregate: vi.fn(async () => [{ userId: A, day: '2099-01-01' }, { userId: B, day: '2099-01-01' }]) } as any);
     const result = await service.get(A, 'all');
     expect(result.self).toMatchObject({ userId: A, rank: 1, points: 200 });
     expect(result.entries.map(entry => entry.userId)).toEqual([A]);
-    expect(selections).toContain('userId meals.date water.date water.glasses');
+    expect(selections).toContain('userId meals.id meals.date meals.scanSavedAt meals.scanGroupId scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses');
     expect(selections).toContain('userId values.showLeaderboard');
     expect(settings.find).toHaveBeenCalledWith({ 'values.showLeaderboard': false });
     const requestedIds = users.find.mock.calls[0][0]._id.$in.map(String);
@@ -132,7 +133,9 @@ describe('leaderboard read efficiency', () => {
     const hidden = vi.spyOn(service as any, 'hiddenUsers').mockResolvedValue(new Set());
     const previous = vi.spyOn(service as any, 'previousRanks').mockResolvedValue(new Map());
     const request = service.get(A, 'all');
-    expect(hidden).toHaveBeenCalledOnce();
+    // Lifecycle generations are captured before scoring; these independent reads
+    // must still start without waiting for the pending scoring result.
+    await vi.waitFor(() => expect(hidden).toHaveBeenCalledOnce());
     expect(previous).toHaveBeenCalledOnce();
     finish(new Map());
     expect((await request).self).toMatchObject({ userId: A, points: 0, rank: 1 });

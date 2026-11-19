@@ -43,6 +43,7 @@ export default function AddFood({
   const [recent, setRecent] = useState<string[]>(SUGGESTIONS);
   const [amount, setAmount] = useState('150');
   const [unit, setUnit] = useState<'grams' | 'servings'>('grams');
+  const [customServing, setCustomServing] = useState('');
   const [loading, setLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState('');
@@ -98,6 +99,8 @@ export default function AddFood({
   }, [query, fetchResults, preview]);
 
   const selectFood = async (food: FoodCandidate) => {
+    setUnit('grams');
+    setCustomServing('');
     const requestId = ++detailRequestRef.current;
     const item: FoodSelection = results.find(result => result.fdc_id === food.fdc_id) ?? { ...food };
     setSelected(item);
@@ -114,8 +117,8 @@ export default function AddFood({
     }
   };
 
-  const servingSizeG = selected?.detail?.serving_size_g ?? 100;
-  const grams = unit === 'grams' ? Number(amount) : Number(amount) * servingSizeG;
+  const servingSizeG = selected?.detail?.serving_size_g || (Number(customServing) > 0 && Number(customServing) <= 100000 ? Number(customServing) : undefined);
+  const grams = unit === 'grams' ? Number(amount) : servingSizeG ? Number(amount) * servingSizeG : NaN;
   const scale = grams / 100;
   const macros = selected?.detail?.per_100g;
   const calculated = useMemo(() => macros && Number.isFinite(scale) ? {
@@ -144,7 +147,7 @@ export default function AddFood({
       group: selected.data_type,
       fdcId: selected.fdc_id,
       description: selected.description,
-      servingSizeG,
+      servingSizeG: servingSizeG ?? 0,
     }, meal, Number(amount), unit);
       if (!preview) {
         setRecent(nextRecent);
@@ -154,10 +157,10 @@ export default function AddFood({
     finally { setSaving(false); }
   };
 
-  const validAmount = Number.isFinite(Number(amount)) && Number(amount) > 0;
+  const validAmount = Number.isFinite(Number(amount)) && Number(amount) > 0 && Number.isFinite(grams) && grams <= 100000;
   return (
     <div className="add-food-screen">
-      <header className="scan-header add-food-header">
+      <header className="scan-header add-food-header pq-page-heading">
         <button className="coach-back" onClick={onBack} aria-label="Back"><Icon name="arrow" size={20} /></button>
         <h2>Add food</h2>
       </header>
@@ -181,12 +184,13 @@ export default function AddFood({
         <section className="food-results" aria-label="Search results">
           <div className="section-head"><h3>Results</h3><small>{loading ? 'Searching…' : `${results.length} found`}</small></div>
           <div className="food-result-list">
+            {loading && <p className="food-results-status" role="status">Searching foods…</p>}
             {results.map(food => {
               const isSelected = selected?.fdc_id === food.fdc_id;
               const detail = isSelected ? selected?.detail : food.detail;
               return <button type="button" key={food.fdc_id} className={isSelected ? 'selected' : ''} aria-pressed={isSelected} onClick={() => void selectFood(food)}>
                 <i className={isSelected ? 'checked' : ''} aria-hidden="true" />
-                <span><b>{titleCase(food.description)}</b><small>{food.data_type} · per 100 g</small></span>
+                <span><b>{titleCase(food.description)}</b><small>{food.source || 'USDA'} · {food.data_type} · per 100 g</small></span>
                 <strong>{detail ? detail.per_100g.kcal === null ? 'Calories unavailable' : `${Math.round(detail.per_100g.kcal)} kcal` : 'Select to load'}</strong>
               </button>;
             })}
@@ -202,9 +206,10 @@ export default function AddFood({
           <div className="quantity-row">
             <label><small>Quantity</small><input type="number" min="0.1" step="any" inputMode="decimal" value={amount} onChange={event => setAmount(event.target.value)} aria-label="Quantity" /></label>
             <div className="scan-chips" aria-label="Portion unit">
-              {(['grams', 'servings'] as const).map(value => <button type="button" key={value} className={unit === value ? 'active' : ''} aria-pressed={unit === value} onClick={() => { if (value !== unit) setAmount(String(round(value === 'grams' ? grams : grams / servingSizeG))); setUnit(value); }}>{value}</button>)}
+              {(['grams', 'servings'] as const).map(value => <button type="button" key={value} className={unit === value ? 'active' : ''} aria-pressed={unit === value} onClick={() => { if (value === unit) return; if (Number.isFinite(grams) && servingSizeG) setAmount(String(Number((value === 'grams' ? grams : grams / servingSizeG).toFixed(6)))); else if (value === 'servings') setAmount('1'); else setAmount(''); setUnit(value); }}>{value}</button>)}
             </div>
           </div>
+          {unit === 'servings' && !selected?.detail?.serving_size_g && <label className="serving-weight-field">Grams per serving<input type="number" min="0.000001" max="100000" step="any" inputMode="decimal" value={customServing} onChange={event => setCustomServing(event.target.value)} placeholder="Enter serving weight" /></label>}
           <div className="calculated-head"><h3>Calculated nutrition</h3><small>{unit === 'grams' ? `${Number(amount) || 0} g` : `${round(grams) || 0} g`}</small></div>
           {detailLoading && <p className="food-detail-loading" role="status">Loading nutrition…</p>}
           {!detailLoading && selected && !selected.detail && error && <p className="food-detail-loading" role="alert">{error}</p>}
@@ -214,11 +219,14 @@ export default function AddFood({
             ['Carbohydrates', calculated?.carbs != null ? `${calculated.carbs.toFixed(1)} g` : 'Unavailable'],
             ['Fat', calculated?.fat != null ? `${calculated.fat.toFixed(1)} g` : 'Unavailable'],
           ].map(([label, value]) => <div className="food-value" key={label}><span>{label}</span><b>{value}</b></div>)}
-          {unit === 'servings' && <small className="serving-basis">One serving = {round(servingSizeG)} g{selected?.detail?.serving_size_g ? '' : ' (USDA serving size unavailable)'}</small>}
+          {unit === 'servings' && servingSizeG && <small className="serving-basis">One serving = {round(servingSizeG)} g</small>}
+          {unit === 'servings' && !servingSizeG && <small className="serving-basis">Enter the weight of one serving to calculate nutrition.</small>}
         </section>
       </div>
 
       <footer className="scan-footer add-food-footer">
+        {!selected && !loading && <p className="scan-save-hint">Select a food to continue.</p>}
+        {selected && !validAmount && <p className="scan-save-hint" role="alert">Enter a valid quantity and serving weight (up to 100,000 g).</p>}
         {error && selected?.detail && <p className="error" role="alert">{error}</p>}
         {calculated && Object.values(calculated).some(value => value === null) && <p>Nutrition information is missing. Known values will be saved.</p>}
         <button className="primary" disabled={saving || !selected?.detail || detailLoading || !calculated || !validAmount} onClick={()=>void handleSave()}>{saving ? 'Saving…' : `Save to ${meal}`}</button>

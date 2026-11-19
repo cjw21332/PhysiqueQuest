@@ -1,0 +1,20 @@
+# OpenCode CLI Configuration
+# This is the configuration file that controls how the CLI behaves
+
+{
+  "keybinds": {
+    "paste-image": "ctrl+shift+v",  // Standard clipboard paste shortcut for images in VS Code
+    "paste-text": "ctrl+v",          // Standard text paste
+    "paste-clipboard-image": "ctrl+shift+c"  // Alternative clipboard paste
+  },
+  "settings": {
+    "terminal": {
+      "image-paste": true,
+      "image-attachment": true
+    },
+    "mcp": {
+      "default-search-provider": "exa",
+      "exa-mcp-url": "https://mcp.exa.ai/mcp"
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useRef, useState, type Ref, type FormEvent } from 'react';
 import PasswordStrengthChecker, { validatePassword } from '../../components/PasswordStrengthChecker';
+import PolicyConsent from './PolicyConsent';
 
 type Props = {
   mode: 'register' | 'login';
@@ -110,11 +111,12 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
   };
 
   return (
-    <form className="auth-screen screen-enter" onSubmit={event => void handleContinue(event)} aria-busy={working}>
+    <form className={`auth-screen screen-enter ${register ? 'registration-screen' : ''}`} onSubmit={event => void handleContinue(event)} aria-busy={working}>
       <div className="auth-body">
         <div className="auth-heading">
+          {register && <span className="registration-eyebrow">YOUR JOURNEY STARTS HERE</span>}
           <h2>{register ? 'Create your account' : 'Welcome back'}</h2>
-          <p>{register ? 'It takes about two minutes to set up your plan.' : 'Log in to continue your fitness journey.'}</p>
+          <p>{register ? 'A few details now. A plan built around you next.' : 'Log in to continue your fitness journey.'}</p>
         </div>
         <div className="segmented">
           <button type="button" disabled={working} aria-pressed={register} className={register ? 'selected' : ''} onClick={() => { onModeChange('register'); onErrorChange(''); }}>
@@ -143,10 +145,7 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
         {register && (
           <>
             {passwordField('Confirm password', confirmPassword, setConfirmPassword, showConfirmPassword, () => setShowConfirmPassword(v => !v), true)}
-            <label className="consent">
-              <input type="checkbox" required disabled={working} checked={consent} onChange={e => onConsentChange(e.target.checked)}/>
-              <span>I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" aria-label="Terms (opens in a new tab)">terms</a>, <a href="/privacy" target="_blank" rel="noopener noreferrer" aria-label="Privacy policy (opens in a new tab)">privacy policy</a>, and <a href="/camera-consent" target="_blank" rel="noopener noreferrer" aria-label="Camera-based health data processing (opens in a new tab)">camera-based health data processing</a>. These documents are drafts pending team review.</span>
-            </label>
+            <PolicyConsent checked={consent} onChange={onConsentChange} disabled={working}/>
           </>
         )}
         {onGoogleAuth && (

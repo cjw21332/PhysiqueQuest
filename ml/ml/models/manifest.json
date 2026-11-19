@@ -1,0 +1,128 @@
+{
+  "version": "1.0.0",
+  "date": "2026-11-09",
+  "git_hash": "unknown",
+  "pose_model": {
+    "file": "pose_landmarker_lite.task",
+    "sha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a"
+  },
+  "data_inventory_hash": "bfc1ba6305f4d33c1920260cd85470d569a56c2786ab4064f19234adac81c2f5",
+  "feature_spec_ref": "docs/FEATURE_SPEC.md",
+  "labels": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "curl",
+    "hinge",
+    "horizontal_pull",
+    "horizontal_push",
+    "lateral_raise",
+    "squat",
+    "triceps_extension"
+  ],
+  "class_to_idx": {
+    "cardio_dynamic": 0,
+    "core_flexion": 1,
+    "core_isometric": 2,
+    "curl": 3,
+    "hinge": 4,
+    "horizontal_pull": 5,
+    "horizontal_push": 6,
+    "lateral_raise": 7,
+    "squat": 8,
+    "triceps_extension": 9
+  },
+  "models": {
+    "cnn1d.onnx": {
+      "status": "EXPERIMENTAL: trained on real GIF windows, corrected normalization, 3 seeds",
+      "val_macro_f1_mean": 0.5226,
+      "val_macro_f1_std": 0.0305,
+      "test_macro_f1_mean": 0.3865,
+      "test_macro_f1_std": 0.0162,
+      "seeds": [
+        0.5154,
+        0.5631,
+        0.4894
+      ],
+      "best_seed": 123,
+      "note": "Beats cosine-kNN baseline (0.4420) on validation",
+      "quantized": {
+        "file": "cnn1d_int8_quantized.onnx",
+        "sha256": "e130d20f75dd80380167b60026e254c9888d296df177470fd8551a1fbd326741",
+        "size_bytes": 173865,
+        "note": "Dynamic int8 quantization, 100% top-1 parity with PyTorch, max logit diff 0.18"
+      },
+      "float32": {
+        "file": "cnn1d_int8.onnx",
+        "sha256": "e6c9c30f81b22c21b017c324e900c0c5071aa902f65d4a8b2edc7efefaf0988d",
+        "size_bytes": 673130
+      }
+    },
+    "gru.onnx": {
+      "status": "EXPERIMENTAL: trained on real GIF windows, corrected normalization, 3 seeds",
+      "val_macro_f1_mean": 0.4453,
+      "val_macro_f1_std": 0.0225,
+      "test_macro_f1_mean": 0.3237,
+      "test_macro_f1_std": 0.052,
+      "seeds": [
+        0.4422,
+        0.4742,
+        0.4194
+      ],
+      "best_seed": 123,
+      "note": "Below CNN1D performance",
+      "quantized": {
+        "file": "gru_int8_quantized.onnx",
+        "sha256": "b53afcf7db0c3ecd671d386d7085f6b0701c78df74dd40f616ef5ca09b783cab",
+        "size_bytes": 805306,
+        "note": "Dynamic int8 quantization limited (GRU ops not quantized), 100% top-1 parity, max logit diff 0.03"
+      },
+      "float32": {
+        "file": "gru_int8.onnx",
+        "sha256": "5c9b19edcfdcd6c877b650b32eaca1f148bafcc7b98c7d60ff41e3d031159954",
+        "size_bytes": 806942
+      }
+    }
+  },
+  "thresholds": {
+    "classification_confidence": 0.5,
+    "open_set_rejection": 0.3
+  },
+  "mapping_version": "taxonomy_v1",
+  "input_spec": {
+    "window_size": 48,
+    "features_per_frame": 132,
+    "fps": 15,
+    "normalization": "mid_hip_center_torso_length"
+  },
+  "status": "EXPERIMENTAL: trained on real GIF windows (corrected normalization)",
+  "training": {
+    "data": "real GIF windows (1324 exercises, corrected xyz normalization)",
+    "train_windows": 1043,
+    "val_windows": 129,
+    "test_windows": 131,
+    "cnn1d_val_macro_f1": 0.5376,
+    "cnn1d_test_macro_f1": 0.4344,
+    "gru_val_macro_f1": 0.47,
+    "gru_test_macro_f1": 0.336,
+    "dtw_baseline_val_macro_f1": 0.442,
+    "cnn1d_beats_dtw_on_val": true
+  },
+  "notes": [
+    "Models trained on real GIF windows with corrected xyz-only normalization (visibility preserved)",
+    "CNN1D beats DTW baseline on validation (0.5376 > 0.4420)",
+    "Still below production target (0.85); real video training needed",
+    "Task 12 mobile integration BLOCKED pending real-video retraining and validation"
+  ],
+  "baselines": {
+    "cosine_knn": {
+      "val_macro_f1": 0.442,
+      "test_macro_f1": 0.3942
+    },
+    "dtw_angle": {
+      "val_macro_f1": 0.1702,
+      "test_macro_f1": 0.1237,
+      "note": "Genuine DTW on 8 joint angles, 200 train samples"
+    }
+  }
+}

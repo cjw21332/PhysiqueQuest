@@ -4,6 +4,13 @@ import { isAllowedFrontendOrigin } from '../src/common/cors-policy.js';
 describe('Expo Go frontend CORS policy', () => {
   const configured = ['https://app.physiquequest.example/'];
 
+  it('allows the packaged Android origin only when explicitly configured', () => {
+    const android = 'https://appassets.androidplatform.net';
+    expect(isAllowedFrontendOrigin(android, configured, 'production')).toBe(false);
+    expect(isAllowedFrontendOrigin(android, [...configured, android], 'production')).toBe(true);
+    expect(isAllowedFrontendOrigin('https://appassets.androidplatform.net.attacker.invalid', [...configured, android], 'production')).toBe(false);
+  });
+
   it('accepts requests without an Origin header and explicit configured origins', () => {
     expect(isAllowedFrontendOrigin(undefined, configured, 'production')).toBe(true);
     expect(isAllowedFrontendOrigin('https://app.physiquequest.example', configured, 'production')).toBe(true);

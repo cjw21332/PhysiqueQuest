@@ -12,6 +12,19 @@ function setup(routeIds: string[], decision = 'answer', timeframe = 'unspecified
 }
 
 describe('semantic fallback for unfamiliar wording', () => {
+  it('interprets indirect wording before deciding whether it is in scope', async () => {
+    const { ask, routeQuestion } = setup(['nutrition.calorie-target']);
+    const answer = await ask('Remind me of the daily fuel allowance I picked.');
+    expect(routeQuestion).toHaveBeenCalledOnce();
+    expect(answer.reply).toContain('2000 kcal');
+  });
+  it('redirects clearly unrelated questions without reading personal records', async () => {
+    const { ask, calls, generate } = setup([], 'out_of_scope');
+    const answer = await ask('What is the capital of France?');
+    expect(answer.reply).toContain('Please ask about something in PhysiqueQuest');
+    expect(calls).toHaveLength(0);
+    expect(generate).not.toHaveBeenCalled();
+  });
   it('does not mistake known vocabulary for a reviewed complete question', () => {
     expect(needsSemanticRouting('What do I have to eat?')).toBe(true);
     expect(needsSemanticRouting('How many calories are in my target rather than what I logged?')).toBe(true);
@@ -83,6 +96,24 @@ describe('semantic fallback for unfamiliar wording', () => {
   it('combines independently selected domains', async () => {
     const { ask } = setup(['nutrition.calorie-target', 'profile.weight']);
     const answer = await ask('Give me my energy allowance alongside my body mass.');
+    expect(answer.reply).toContain('2000 kcal');
+    expect(answer.reply).toContain('72 kg');
+  });
+  it('starts independent personal route reads together and preserves both answers', async () => {
+    const { service, context } = setup(['nutrition.calorie-target', 'profile.weight']);
+    const original = context.build.bind(context);
+    let release!: () => void;
+    const gate = new Promise<void>(resolve => { release = resolve; });
+    const started: string[] = [];
+    vi.spyOn(context, 'build').mockImplementation(async (userId, question, personal, page) => {
+      started.push(question);
+      await gate;
+      return original(userId, question, personal, page);
+    });
+    const pending = service.reply(CHAT_FIXTURE_OWNER, [{ role: 'user', text: 'Give me my energy allowance alongside my body mass.' }], true);
+    await vi.waitFor(() => expect(started).toHaveLength(2));
+    release();
+    const answer = await pending;
     expect(answer.reply).toContain('2000 kcal');
     expect(answer.reply).toContain('72 kg');
   });

@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'physiquequest-device-cache-v1';
-const RESOURCES = ['profile', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:chest', 'progress:waist', 'progress:arms', 'progress:benchPress', 'workouts', 'workout-summary', 'exercise-library'];
+const RESOURCES = ['profile', 'settings', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:chest', 'progress:waist', 'progress:arms', 'progress:benchPress', 'workouts', 'workout-summary', 'exercise-library'];
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const MAX_BYTES = 512_000;
 const day = time => new Date(time).toLocaleDateString('en-CA');
@@ -92,7 +92,7 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
     if (!force && usable(key, entry) && entry.confirmedAt && now() - entry.confirmedAt < 60_000) return Promise.resolve(entry.data);
     const revision = entry.revision;
     const request = Promise.resolve().then(load).then(data => {
-      if (!validate(key, data)) throw new Error('The server returned incomplete data. Try refreshing.');
+      if (!validate(key, data)) throw new Error('Some information could not be loaded. Please try again.');
       if (same(owner) && entries[key]?.revision === revision) {
         publish(key, data);
         entries[key].confirmedAt = now();

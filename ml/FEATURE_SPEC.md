@@ -265,3 +265,25 @@ assertEqual(tsFrames.repCount, pythonRepCount);
 ---
 
 *Generated: 2026-11-09. This spec is the single source of truth for mobile implementation.*
+
+---
+
+## Known defect in v1.0 (documented 2026-11-16)
+
+Step 3 normalises **all four** columns, including `visibility`:
+
+```
+kps_centered = kps - mid_hip          # visibility included
+kps_normalized = kps_centered / torso # visibility included
+```
+
+`visibility` is a 0–1 confidence, so this turns it into an unbounded,
+sign-flipped value (measured range −2.61 to −0.07 in the extracted dataset). The
+column therefore carries almost no confidence information, and the model cannot
+down-weight occluded joints.
+
+Any future model (v2) must be trained on a versioned **v1.1** of this spec that
+keeps `visibility` raw while normalising only x, y and z. That change must be
+made in Python and in the mobile extractor together, with the parity test in §10
+extended to cover it. v1 models in `ml/models/pattern_v1/` were trained with the
+v1.0 behaviour and must stay documented as such.

@@ -1,3 +1,4 @@
+import { lifecycleModel } from '../../test/lifecycle-model.fixture.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ActivityService } from './activity.service.js';
 
@@ -8,7 +9,7 @@ function fixture() {
   const findOne = vi.fn().mockReturnValue({ exec: vi.fn().mockResolvedValue({ state: { timezone: 'Asia/Singapore', level: 999999, dayStreak: 999999 } }) });
   const findOneAndUpdate = vi.fn();
   const nutrition = { read: vi.fn().mockResolvedValue({ meals: [
-    ...Array.from({ length: 3 }, () => ({ date: '2026-10-29', protein: 50, carbs: 80, fat: 25 })),
+    ...Array.from({ length: 3 }, (_, index) => ({ date: '2026-10-29', scanGroupId: String(index), scanSavedAt: new Date('2026-10-29T01:00:00Z'), protein: 50, carbs: 80, fat: 25 })),
     { date: '2026-10-28', protein: 0, carbs: 0, fat: 0 },
   ], water: [{ date: '2026-10-29', glasses: 8 }] }) };
   const workouts = {
@@ -17,7 +18,7 @@ function fixture() {
   };
   const leaderboard = { get: vi.fn().mockResolvedValue({ self: { rank: 1, points: 500 } }) };
   const users = { findById: vi.fn().mockReturnValue({ select: () => ({ lean: () => ({ exec: async () => ({ createdAt: new Date('2026-10-01T00:00:00Z') }) }) }) }) };
-  const service = new ActivityService({ findOne, findOneAndUpdate } as never, nutrition as never, workouts as never, leaderboard as never, users as never);
+  const service = new ActivityService(lifecycleModel({ findOne, findOneAndUpdate } as never), nutrition as never, workouts as never, leaderboard as never, users as never);
   return { service, findOne, findOneAndUpdate, nutrition, workouts, leaderboard };
 }
 
@@ -27,7 +28,7 @@ describe('private assistant quest computation', () => {
     const { service, findOne, findOneAndUpdate, nutrition, workouts, leaderboard } = fixture();
     const summary = await service.getForAssistant(OWNER);
     expect(String(findOne.mock.calls[0][0].userId)).toBe(OWNER);
-    expect(nutrition.read).toHaveBeenCalledExactlyOnceWith(OWNER, 'userId meals.date meals.protein meals.carbs meals.fat water.date water.glasses');
+    expect(nutrition.read).toHaveBeenCalledExactlyOnceWith(OWNER, 'userId meals.id meals.date meals.scanSavedAt meals.scanGroupId meals.protein meals.carbs meals.fat scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses');
     expect(workouts.creditHistory).toHaveBeenCalledExactlyOnceWith(OWNER, 'Asia/Singapore');
     expect(workouts.personalRecordDays).toHaveBeenCalledExactlyOnceWith(OWNER, 'Asia/Singapore');
     expect(leaderboard.get).not.toHaveBeenCalled();

@@ -1,0 +1,1281 @@
+{
+  "model": "models\\pattern_v1\\cnn1d.onnx",
+  "seed": 7,
+  "classes": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "hinge",
+    "horizontal_push",
+    "lateral_raise",
+    "squat"
+  ],
+  "splits": {
+    "train": {
+      "windows": 3291,
+      "subjects": [
+        "01e83deb",
+        "0a9a588e",
+        "0e88251c",
+        "14c2c3f4",
+        "199aec58",
+        "199aec58ef058b0a17cd460ca5f138c9",
+        "36f0d07e",
+        "4555d6aead3c90604b2c19ee3f1dc820",
+        "60093019",
+        "64f0a0d9",
+        "6770817f",
+        "68ac8406",
+        "764ecccd",
+        "87fe2aa4",
+        "9d5ebd38",
+        "acc1df64",
+        "bdfe7f1d",
+        "c36fbdd3",
+        "cbc15c42a1594949711ac9a7c8c465e1",
+        "d1075a73",
+        "fc3d98d5"
+      ],
+      "videos": 148,
+      "per_class_windows": {
+        "cardio_dynamic": 357,
+        "core_flexion": 1295,
+        "core_isometric": 163,
+        "hinge": 1213,
+        "horizontal_push": 81,
+        "lateral_raise": 25,
+        "squat": 157
+      },
+      "per_class_subjects": {
+        "cardio_dynamic": [
+          "14c2c3f4",
+          "199aec58",
+          "64f0a0d9",
+          "68ac8406",
+          "acc1df64",
+          "bdfe7f1d"
+        ],
+        "core_flexion": [
+          "01e83deb",
+          "0a9a588e",
+          "0e88251c",
+          "14c2c3f4",
+          "199aec58",
+          "6770817f",
+          "764ecccd",
+          "acc1df64",
+          "bdfe7f1d",
+          "cbc15c42a1594949711ac9a7c8c465e1",
+          "d1075a73",
+          "fc3d98d5"
+        ],
+        "core_isometric": [
+          "0e88251c",
+          "199aec58",
+          "199aec58ef058b0a17cd460ca5f138c9",
+          "6770817f",
+          "9d5ebd38"
+        ],
+        "hinge": [
+          "0a9a588e",
+          "0e88251c",
+          "14c2c3f4",
+          "4555d6aead3c90604b2c19ee3f1dc820",
+          "60093019",
+          "6770817f",
+          "764ecccd",
+          "87fe2aa4",
+          "acc1df64",
+          "bdfe7f1d",
+          "c36fbdd3",
+          "d1075a73",
+          "fc3d98d5"
+        ],
+        "horizontal_push": [
+          "14c2c3f4",
+          "36f0d07e",
+          "bdfe7f1d"
+        ],
+        "lateral_raise": [
+          "36f0d07e"
+        ],
+        "squat": [
+          "14c2c3f4",
+          "87fe2aa4"
+        ]
+      }
+    },
+    "val": {
+      "windows": 687,
+      "subjects": [
+        "1e6a72cd",
+        "3977a2e05bacbfc8e3be9a48162bc169",
+        "89e84598",
+        "cbc15c42"
+      ],
+      "videos": 37,
+      "per_class_windows": {
+        "cardio_dynamic": 56,
+        "core_flexion": 303,
+        "core_isometric": 15,
+        "hinge": 203,
+        "horizontal_push": 19,
+        "lateral_raise": 72,
+        "squat": 19
+      },
+      "per_class_subjects": {
+        "cardio_dynamic": [
+          "1e6a72cd",
+          "cbc15c42"
+        ],
+        "core_flexion": [
+          "1e6a72cd",
+          "3977a2e05bacbfc8e3be9a48162bc169",
+          "89e84598",
+          "cbc15c42"
+        ],
+        "core_isometric": [
+          "89e84598"
+        ],
+        "hinge": [
+          "1e6a72cd",
+          "89e84598"
+        ],
+        "horizontal_push": [
+          "1e6a72cd"
+        ],
+        "lateral_raise": [
+          "1e6a72cd",
+          "cbc15c42"
+        ],
+        "squat": [
+          "cbc15c42"
+        ]
+      }
+    },
+    "test": {
+      "windows": 928,
+      "subjects": [
+        "04996ace",
+        "17e2d98f",
+        "5e3a8d78",
+        "ce0fbe3f",
+        "fcd2886c"
+      ],
+      "videos": 42,
+      "per_class_windows": {
+        "cardio_dynamic": 208,
+        "core_flexion": 88,
+        "core_isometric": 95,
+        "hinge": 338,
+        "horizontal_push": 19,
+        "lateral_raise": 19,
+        "squat": 161
+      },
+      "per_class_subjects": {
+        "cardio_dynamic": [
+          "17e2d98f",
+          "5e3a8d78"
+        ],
+        "core_flexion": [
+          "17e2d98f",
+          "ce0fbe3f",
+          "fcd2886c"
+        ],
+        "core_isometric": [
+          "5e3a8d78"
+        ],
+        "hinge": [
+          "17e2d98f",
+          "fcd2886c"
+        ],
+        "horizontal_push": [
+          "5e3a8d78"
+        ],
+        "lateral_raise": [
+          "17e2d98f"
+        ],
+        "squat": [
+          "04996ace",
+          "17e2d98f",
+          "5e3a8d78"
+        ]
+      }
+    },
+    "imbalance": {
+      "train_windows_min": 25,
+      "train_windows_max": 1295,
+      "ratio_max_over_min": 51.8,
+      "class_weights_applied": [
+        1.317,
+        0.363,
+        2.884,
+        0.388,
+        5.804,
+        18.806,
+        2.995
+      ]
+    }
+  },
+  "model_metrics": {
+    "train": {
+      "accuracy": 0.9474,
+      "macro_f1": 0.883,
+      "per_class": {
+        "0": {
+          "precision": 0.9807,
+          "recall": 0.9944,
+          "f1": 0.9875,
+          "support": 357
+        },
+        "1": {
+          "precision": 0.9889,
+          "recall": 0.8934,
+          "f1": 0.9387,
+          "support": 1295
+        },
+        "2": {
+          "precision": 0.895,
+          "recall": 0.9939,
+          "f1": 0.9419,
+          "support": 163
+        },
+        "3": {
+          "precision": 0.9594,
+          "recall": 0.9744,
+          "f1": 0.9669,
+          "support": 1213
+        },
+        "4": {
+          "precision": 0.9195,
+          "recall": 0.9877,
+          "f1": 0.9524,
+          "support": 81
+        },
+        "5": {
+          "precision": 0.2451,
+          "recall": 1.0,
+          "f1": 0.3937,
+          "support": 25
+        },
+        "6": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 157
+        }
+      }
+    },
+    "val": {
+      "accuracy": 0.4571,
+      "macro_f1": 0.3023,
+      "per_class": {
+        "0": {
+          "precision": 0.0952,
+          "recall": 0.0714,
+          "f1": 0.0816,
+          "support": 56
+        },
+        "1": {
+          "precision": 0.7622,
+          "recall": 0.4653,
+          "f1": 0.5779,
+          "support": 303
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 15
+        },
+        "3": {
+          "precision": 0.599,
+          "recall": 0.5961,
+          "f1": 0.5975,
+          "support": 203
+        },
+        "4": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 19
+        },
+        "5": {
+          "precision": 0.25,
+          "recall": 0.4583,
+          "f1": 0.3235,
+          "support": 72
+        },
+        "6": {
+          "precision": 0.4054,
+          "recall": 0.7895,
+          "f1": 0.5357,
+          "support": 19
+        }
+      }
+    },
+    "test": {
+      "accuracy": 0.4688,
+      "macro_f1": 0.3589,
+      "per_class": {
+        "0": {
+          "precision": 0.4067,
+          "recall": 0.2933,
+          "f1": 0.3408,
+          "support": 208
+        },
+        "1": {
+          "precision": 0.561,
+          "recall": 0.5227,
+          "f1": 0.5412,
+          "support": 88
+        },
+        "2": {
+          "precision": 0.0857,
+          "recall": 0.0316,
+          "f1": 0.0462,
+          "support": 95
+        },
+        "3": {
+          "precision": 0.719,
+          "recall": 0.5148,
+          "f1": 0.6,
+          "support": 338
+        },
+        "4": {
+          "precision": 0.2143,
+          "recall": 0.9474,
+          "f1": 0.3495,
+          "support": 19
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 19
+        },
+        "6": {
+          "precision": 0.5155,
+          "recall": 0.8261,
+          "f1": 0.6348,
+          "support": 161
+        }
+      }
+    }
+  },
+  "test_subjects": {
+    "04996ace": {
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "per_class": {
+        "0": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "3": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "4": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "6": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 66
+        }
+      },
+      "classes_present": [
+        "squat"
+      ],
+      "windows": 66,
+      "videos": 1
+    },
+    "17e2d98f": {
+      "accuracy": 0.0724,
+      "macro_f1": 0.0346,
+      "per_class": {
+        "0": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 38
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 19
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "3": {
+          "precision": 0.0588,
+          "recall": 0.0263,
+          "f1": 0.0364,
+          "support": 38
+        },
+        "4": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 19
+        },
+        "6": {
+          "precision": 0.1266,
+          "recall": 0.2632,
+          "f1": 0.1709,
+          "support": 38
+        }
+      },
+      "classes_present": [
+        "cardio_dynamic",
+        "core_flexion",
+        "hinge",
+        "lateral_raise",
+        "squat"
+      ],
+      "windows": 152,
+      "videos": 8
+    },
+    "5e3a8d78": {
+      "accuracy": 0.4076,
+      "macro_f1": 0.3009,
+      "per_class": {
+        "0": {
+          "precision": 0.4692,
+          "recall": 0.3588,
+          "f1": 0.4067,
+          "support": 170
+        },
+        "1": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "2": {
+          "precision": 1.0,
+          "recall": 0.0316,
+          "f1": 0.0612,
+          "support": 95
+        },
+        "3": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "4": {
+          "precision": 0.5143,
+          "recall": 0.9474,
+          "f1": 0.6667,
+          "support": 19
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "6": {
+          "precision": 0.5044,
+          "recall": 1.0,
+          "f1": 0.6706,
+          "support": 57
+        }
+      },
+      "classes_present": [
+        "cardio_dynamic",
+        "core_isometric",
+        "horizontal_push",
+        "squat"
+      ],
+      "windows": 341,
+      "videos": 18
+    },
+    "ce0fbe3f": {
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "per_class": {
+        "0": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "1": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 19
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "3": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "4": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "6": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      },
+      "classes_present": [
+        "core_flexion"
+      ],
+      "windows": 19,
+      "videos": 1
+    },
+    "fcd2886c": {
+      "accuracy": 0.5714,
+      "macro_f1": 0.2377,
+      "per_class": {
+        "0": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "1": {
+          "precision": 0.45,
+          "recall": 0.54,
+          "f1": 0.4909,
+          "support": 50
+        },
+        "2": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "3": {
+          "precision": 0.8827,
+          "recall": 0.5767,
+          "f1": 0.6976,
+          "support": 300
+        },
+        "4": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "5": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "6": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      },
+      "classes_present": [
+        "core_flexion",
+        "hinge"
+      ],
+      "windows": 350,
+      "videos": 14
+    }
+  },
+  "test_videos": {
+    "04996ace_0016_reverse lunges challenge_[50]": {
+      "pattern": "squat",
+      "accuracy": 1.0,
+      "windows": 66
+    },
+    "17e2d98f_0041_high knees_[17]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "17e2d98f_0111_sun rises_[11]": {
+      "pattern": "lateral_raise",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "17e2d98f_0141_hip circles_[7]": {
+      "pattern": "hinge",
+      "accuracy": 0.0526,
+      "windows": 19
+    },
+    "17e2d98f_0211_high knee & cross punches_[21]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "17e2d98f_0241_slow sq_[6]": {
+      "pattern": "squat",
+      "accuracy": 0.5263,
+      "windows": 19
+    },
+    "17e2d98f_0311_cross toe touches_[10]": {
+      "pattern": "core_flexion",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "17e2d98f_0341_step jacks_[30]": {
+      "pattern": "squat",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "17e2d98f_0411_standing donkey kicks_[10]": {
+      "pattern": "hinge",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "5e3a8d78_0014_jumping jack_[35]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.1579,
+      "windows": 19
+    },
+    "5e3a8d78_0044_high knees_[80-79-81]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "5e3a8d78_0114_squat + side jumpy_[21]": {
+      "pattern": "squat",
+      "accuracy": 1.0,
+      "windows": 19
+    },
+    "5e3a8d78_0144_mountain climber_[69-68-70]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.9474,
+      "windows": 19
+    },
+    "5e3a8d78_0244_plank + jumping jack_[10]": {
+      "pattern": "core_isometric",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "5e3a8d78_0314_jump + punches_[16]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.1053,
+      "windows": 19
+    },
+    "5e3a8d78_0344_high knees_[82]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "5e3a8d78_0414_squat jump + 3s hold_[10]": {
+      "pattern": "squat",
+      "accuracy": 1.0,
+      "windows": 19
+    },
+    "5e3a8d78_0444_twisting mountain climber_[59-58-60]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.8947,
+      "windows": 19
+    },
+    "5e3a8d78_0514_push up (on knees)_[12]": {
+      "pattern": "horizontal_push",
+      "accuracy": 0.9474,
+      "windows": 19
+    },
+    "5e3a8d78_0614_plank jump + 3 punches_[9]": {
+      "pattern": "core_isometric",
+      "accuracy": 0.0526,
+      "windows": 19
+    },
+    "5e3a8d78_0644_HIGH KNEES_[79-78-80]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.0556,
+      "windows": 18
+    },
+    "5e3a8d78_0713_SQUAT + SIDE JUMPY_[21]": {
+      "pattern": "squat",
+      "accuracy": 1.0,
+      "windows": 19
+    },
+    "5e3a8d78_0744_JUMPING JACK_[35]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.1053,
+      "windows": 19
+    },
+    "5e3a8d78_0815_PLANK + JUMPING JACK_[11]": {
+      "pattern": "core_isometric",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "5e3a8d78_0845_MOUNTAIN CLIMBER_[62]": {
+      "pattern": "cardio_dynamic",
+      "accuracy": 0.9474,
+      "windows": 19
+    },
+    "5e3a8d78_0915_HIGH PLANK_[1]": {
+      "pattern": "core_isometric",
+      "accuracy": 0.0,
+      "windows": 19
+    },
+    "5e3a8d78_0944_ELBOW PLANK_[1]": {
+      "pattern": "core_isometric",
+      "accuracy": 0.1053,
+      "windows": 19
+    },
+    "ce0fbe3f_0020_simple crunch_[12]": {
+      "pattern": "core_flexion",
+      "accuracy": 1.0,
+      "windows": 19
+    },
+    "fcd2886c_0015_bridge lift_[11]": {
+      "pattern": "hinge",
+      "accuracy": 0.16,
+      "windows": 25
+    },
+    "fcd2886c_0055_bridge + leg extend[r]_[11]": {
+      "pattern": "hinge",
+      "accuracy": 1.0,
+      "windows": 25
+    },
+    "fcd2886c_0135_bridge + leg extend[l]_[11]": {
+      "pattern": "hinge",
+      "accuracy": 1.0,
+      "windows": 25
+    },
+    "fcd2886c_0215_toe taps_[16]": {
+      "pattern": "core_flexion",
+      "accuracy": 0.08,
+      "windows": 25
+    },
+    "fcd2886c_0258_singel leg reach_[16]": {
+      "pattern": "hinge",
+      "accuracy": 0.0,
+      "windows": 25
+    },
+    "fcd2886c_0338_criss cross_[15]": {
+      "pattern": "core_flexion",
+      "accuracy": 1.0,
+      "windows": 25
+    },
+    "fcd2886c_0429_back kick extend[r]_[14]": {
+      "pattern": "hinge",
+      "accuracy": 0.0,
+      "windows": 25
+    },
+    "fcd2886c_0509_side kick extend[r]_[13]": {
+      "pattern": "hinge",
+      "accuracy": 0.0,
+      "windows": 25
+    },
+    "fcd2886c_0549_back kick extend[l]_[15]": {
+      "pattern": "hinge",
+      "accuracy": 0.72,
+      "windows": 25
+    },
+    "fcd2886c_0629_side kick extend[r]_[13]": {
+      "pattern": "hinge",
+      "accuracy": 1.0,
+      "windows": 25
+    },
+    "fcd2886c_0721_table top reach[r]_[13]": {
+      "pattern": "hinge",
+      "accuracy": 0.84,
+      "windows": 25
+    },
+    "fcd2886c_0801_side kick extend[r]_[17]": {
+      "pattern": "hinge",
+      "accuracy": 0.4,
+      "windows": 25
+    },
+    "fcd2886c_0841_table top reach[l]_[14]": {
+      "pattern": "hinge",
+      "accuracy": 0.84,
+      "windows": 25
+    },
+    "fcd2886c_0923_table top reach pulse[l]_[19]": {
+      "pattern": "hinge",
+      "accuracy": 0.96,
+      "windows": 25
+    }
+  },
+  "confusion": {
+    "labels": [
+      "cardio_dynamic",
+      "core_flexion",
+      "core_isometric",
+      "hinge",
+      "horizontal_push",
+      "lateral_raise",
+      "squat"
+    ],
+    "raw": [
+      [
+        61,
+        3,
+        0,
+        44,
+        20,
+        24,
+        56
+      ],
+      [
+        0,
+        46,
+        0,
+        23,
+        0,
+        0,
+        19
+      ],
+      [
+        68,
+        0,
+        3,
+        0,
+        16,
+        8,
+        0
+      ],
+      [
+        4,
+        33,
+        32,
+        174,
+        24,
+        39,
+        32
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        18,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        18
+      ],
+      [
+        15,
+        0,
+        0,
+        1,
+        6,
+        6,
+        133
+      ]
+    ],
+    "row_normalised": [
+      [
+        0.293,
+        0.014,
+        0.0,
+        0.212,
+        0.096,
+        0.115,
+        0.269
+      ],
+      [
+        0.0,
+        0.523,
+        0.0,
+        0.261,
+        0.0,
+        0.0,
+        0.216
+      ],
+      [
+        0.716,
+        0.0,
+        0.032,
+        0.0,
+        0.168,
+        0.084,
+        0.0
+      ],
+      [
+        0.012,
+        0.098,
+        0.095,
+        0.515,
+        0.071,
+        0.115,
+        0.095
+      ],
+      [
+        0.053,
+        0.0,
+        0.0,
+        0.0,
+        0.947,
+        0.0,
+        0.0
+      ],
+      [
+        0.053,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.947
+      ],
+      [
+        0.093,
+        0.0,
+        0.0,
+        0.006,
+        0.037,
+        0.037,
+        0.826
+      ]
+    ],
+    "top_confusions": [
+      {
+        "true": "core_isometric",
+        "pred": "cardio_dynamic",
+        "count": 68,
+        "share_of_true": 0.716
+      },
+      {
+        "true": "cardio_dynamic",
+        "pred": "squat",
+        "count": 56,
+        "share_of_true": 0.269
+      },
+      {
+        "true": "cardio_dynamic",
+        "pred": "hinge",
+        "count": 44,
+        "share_of_true": 0.212
+      },
+      {
+        "true": "hinge",
+        "pred": "lateral_raise",
+        "count": 39,
+        "share_of_true": 0.115
+      },
+      {
+        "true": "hinge",
+        "pred": "core_flexion",
+        "count": 33,
+        "share_of_true": 0.098
+      },
+      {
+        "true": "hinge",
+        "pred": "core_isometric",
+        "count": 32,
+        "share_of_true": 0.095
+      },
+      {
+        "true": "hinge",
+        "pred": "squat",
+        "count": 32,
+        "share_of_true": 0.095
+      },
+      {
+        "true": "cardio_dynamic",
+        "pred": "lateral_raise",
+        "count": 24,
+        "share_of_true": 0.115
+      },
+      {
+        "true": "hinge",
+        "pred": "horizontal_push",
+        "count": 24,
+        "share_of_true": 0.071
+      },
+      {
+        "true": "core_flexion",
+        "pred": "hinge",
+        "count": 23,
+        "share_of_true": 0.261
+      }
+    ]
+  },
+  "windows": {
+    "summary": {
+      "motion": {
+        "p10": 0.0124,
+        "p25": 0.0184,
+        "p50": 0.0268,
+        "p75": 0.0387,
+        "p90": 0.0575,
+        "mean": 0.0377
+      },
+      "rom": {
+        "p10": 0.175,
+        "p25": 0.2613,
+        "p50": 0.3459,
+        "p75": 0.5238,
+        "p90": 0.7593,
+        "mean": 0.4419
+      },
+      "zero_frac": {
+        "p10": 0.0,
+        "p25": 0.0,
+        "p50": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "mean": 0.0007
+      }
+    },
+    "test_accuracy_by_motion_quartile": {
+      "q1_lowest": {
+        "windows": 228,
+        "accuracy": 0.4167,
+        "motion_mean": 0.0119
+      },
+      "q2": {
+        "windows": 215,
+        "accuracy": 0.7256,
+        "motion_mean": 0.0226
+      },
+      "q3": {
+        "windows": 199,
+        "accuracy": 0.5578,
+        "motion_mean": 0.0309
+      },
+      "q4_highest": {
+        "windows": 286,
+        "accuracy": 0.2552,
+        "motion_mean": 0.1386
+      }
+    },
+    "test_accuracy_by_zero_frac": {
+      "clean": {
+        "windows": 923,
+        "accuracy": 0.4713,
+        "motion_mean": 0.0571
+      },
+      "some_zero": {
+        "windows": 5,
+        "accuracy": 0.0,
+        "motion_mean": 0.1218
+      },
+      "gt_10pct_zero": {
+        "windows": 0,
+        "accuracy": null,
+        "motion_mean": null
+      }
+    },
+    "test_accuracy_by_rom": {
+      "low": {
+        "windows": 542,
+        "accuracy": 0.5443,
+        "motion_mean": 0.0269
+      },
+      "high": {
+        "windows": 386,
+        "accuracy": 0.3627,
+        "motion_mean": 0.1005
+      }
+    }
+  },
+  "baselines": {
+    "majority_class": "core_flexion",
+    "majority_test_accuracy": 0.0948,
+    "train_centroid_nn_test_accuracy": 0.2888,
+    "train_centroid_nn_test_macro_f1": 0.21,
+    "model_test_accuracy": 0.4688,
+    "model_test_macro_f1": 0.3589
+  },
+  "provenance": {
+    "videos_total": 231,
+    "videos_multi_set": 16,
+    "multi_set_examples": [
+      "0e88251c_0017_straight leg lift [r]_[13-12-14]",
+      "14c2c3f4_0248_high knees_[146-145-147]",
+      "14c2c3f4_0447_push up toe tap_[14-13-15]",
+      "14c2c3f4_0549_bicycle crunches_[114-113-115]",
+      "199aec58_0231_crossbody mountain climber_[52-51-53]"
+    ],
+    "subjects_total": 30,
+    "classes_per_subject": {
+      "01e83deb": 1,
+      "04996ace": 1,
+      "0a9a588e": 2,
+      "0e88251c": 3,
+      "14c2c3f4": 5,
+      "17e2d98f": 5,
+      "199aec58": 3,
+      "199aec58ef058b0a17cd460ca5f138c9": 1,
+      "1e6a72cd": 5,
+      "36f0d07e": 2,
+      "3977a2e05bacbfc8e3be9a48162bc169": 1,
+      "4555d6aead3c90604b2c19ee3f1dc820": 1,
+      "5e3a8d78": 4,
+      "60093019": 1,
+      "64f0a0d9": 1,
+      "6770817f": 3,
+      "68ac8406": 1,
+      "764ecccd": 2,
+      "87fe2aa4": 2,
+      "89e84598": 3,
+      "9d5ebd38": 1,
+      "acc1df64": 3,
+      "bdfe7f1d": 4,
+      "c36fbdd3": 1,
+      "cbc15c42": 4,
+      "cbc15c42a1594949711ac9a7c8c465e1": 1,
+      "ce0fbe3f": 1,
+      "d1075a73": 2,
+      "fc3d98d5": 2,
+      "fcd2886c": 2
+    },
+    "subjects_with_multiple_classes": 18,
+    "duplicate_exercise_names": {
+      "knee to chest": 2,
+      "toe taps": 3,
+      "leg lift": 4,
+      "donkey kick + cross": 2,
+      "donkey twist": 2,
+      "rainbow": 2,
+      "crossed side kick": 2,
+      "hamstring curl": 2,
+      "side leg lift": 2,
+      "leg swipe": 2,
+      "leg extension": 2,
+      "leg circle": 2,
+      "1-leg glute bridge": 2,
+      "high knees": 5,
+      "crunch": 2,
+      "up&down plank": 2,
+      "jumping jack": 2,
+      "squat + side jumpy": 2,
+      "mountain climber": 2,
+      "plank + jumping jack": 2,
+      "cross crunch": 2,
+      "bicycle crunch": 2,
+      "squat": 3,
+      "donkey kick": 2,
+      "warrior 2 + up": 2,
+      "3 point knee tap (l)": 2,
+      "cross + leg stretch [l]": 2,
+      "bridge + cross crunch": 2,
+      "leg lift variantion": 2,
+      "knee to elbow": 2,
+      "half plank crunch": 2,
+      "clamshell twist": 2,
+      "kickback": 2,
+      "side kick extend[r]": 3
+    },
+    "excluded_classes": [
+      "curl",
+      "triceps_extension"
+    ],
+    "class_video_counts": {
+      "core_flexion": 83,
+      "squat": 13,
+      "hinge": 82,
+      "core_isometric": 12,
+      "cardio_dynamic": 26,
+      "horizontal_push": 5,
+      "lateral_raise": 6,
+      "curl": 3,
+      "triceps_extension": 1
+    },
+    "class_subject_counts": {
+      "cardio_dynamic": 10,
+      "core_flexion": 19,
+      "core_isometric": 7,
+      "curl": 1,
+      "hinge": 17,
+      "horizontal_push": 5,
+      "lateral_raise": 4,
+      "squat": 6,
+      "triceps_extension": 1
+    }
+  },
+  "perturbation_robustness": {
+    "identity": 0.4688,
+    "mirrored": 0.3265,
+    "rotate_+10deg": 0.4256,
+    "rotate_+20deg": 0.389,
+    "rotate_-20deg": 0.3728,
+    "scale_x_1.15": 0.4601,
+    "scale_y_0.85": 0.472,
+    "time_reversed": 0.4677,
+    "single_frame_repeated": 0.4375
+  },
+  "variance_decomposition": {
+    "by_class": {
+      "groups": 7,
+      "between_var_per_dim": 111.491122,
+      "within_var_per_dim": 0.991467,
+      "fisher_ratio": 112.451
+    },
+    "by_subject": {
+      "groups": 30,
+      "between_var_per_dim": 83.256506,
+      "within_var_per_dim": 0.638168,
+      "fisher_ratio": 130.462
+    },
+    "by_subject_within_class_residual": {
+      "groups": 30,
+      "between_var_per_dim": 63.983111,
+      "within_var_per_dim": 0.615605,
+      "fisher_ratio": 103.935
+    }
+  }
+}

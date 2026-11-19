@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import 'reflect-metadata';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SessionService } from '../src/auth/session.service.js';
@@ -16,9 +17,9 @@ function harness() {
     updateOne: vi.fn(async (_filter: any, update: any) => { Object.assign(row, update.$set); return { modifiedCount: 1 }; }),
   };
   const user = { _id: '507f1f77bcf86cd799439011', email: 'a@example.com', name: 'A', sessionVersion: 0, isActive: true };
-  const users = { findById: vi.fn(async () => user) };
+  const users = lifecycleModel({ findById: vi.fn(async () => user) } as any);
   const jwt = { sign: vi.fn((payload: any, options: any) => JSON.stringify({ ...payload, expiresIn: options.expiresIn })) };
-  return { service: new SessionService(model as any, users as any, jwt as any), model, users, user, get row() { return row; } };
+  return { service: new SessionService(lifecycleModel(model as any, true), users as any, jwt as any), model, users, user, get row() { return row; } };
 }
 
 describe('rotating sessions', () => {

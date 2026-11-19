@@ -444,6 +444,9 @@ export class GenericRepCounter {
     const values = this.calibrationSamples.map(sample => sample.angle).sort((a, b) => a - b);
     const low = values[Math.floor((values.length - 1) * 0.05)];
     const high = values[Math.ceil((values.length - 1) * 0.95)];
+    // Endpoint clamps can push endpoints apart. Require the observed span itself
+    // to meet the same minimum before a clamped calibration can be accepted.
+    if (high - low < Math.max(this.config.minCalibratedRom, priorRom * 0.4)) return;
     const decreasing = priorPeak < priorRest;
     const clamp = (value: number, prior: number) => Math.max(0, Math.min(180, Math.max(prior - 45, Math.min(prior + 45, value))));
     const rest = clamp(decreasing ? high : low, priorRest);

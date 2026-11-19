@@ -1,8 +1,10 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
 import { CoachService as SavedCoachService } from '../src/coach/coach.service.js';
+vi.mock('../src/coach/openai-plan.js', () => ({ orderPlanWithOpenAI: async (plan: unknown) => plan }));
 
-class CoachService extends SavedCoachService { constructor(profiles: any, settings: any, exercises: any) { super(profiles, settings, exercises, { findOne: () => ({ lean: () => ({ exec: async () => null }) }), findOneAndUpdate: (_filter: any, update: any) => ({ lean: () => ({ exec: async () => update.$setOnInsert }) }) } as any); } }
+class CoachService extends SavedCoachService { constructor(profiles: any, settings: any, exercises: any) { super(profiles, settings, exercises, lifecycleModel({ findOne: () => ({ lean: () => ({ exec: async () => null }) }), findOneAndUpdate: (_filter: any, update: any) => ({ lean: () => ({ exec: async () => update.$setOnInsert }) }) } as any)); } }
 
 const USER = '507f1f77bcf86cd799439011';
 

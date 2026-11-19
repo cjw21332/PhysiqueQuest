@@ -1,0 +1,461 @@
+{
+  "health": {
+    "videos": 231,
+    "detected_pct": {
+      "min": 82.22,
+      "p10": 100.0,
+      "median": 100.0,
+      "p90": 100.0,
+      "max": 100.0,
+      "mean": 99.84
+    },
+    "key_visibility": {
+      "min": -2.613,
+      "p10": -1.756,
+      "median": -1.06,
+      "p90": -0.256,
+      "max": -0.07,
+      "mean": -1.036
+    },
+    "zero_joint_frac": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 0.0,
+      "p90": 0.0,
+      "max": 0.11111,
+      "mean": 0.00112
+    },
+    "duration_s": {
+      "min": 22.0,
+      "p10": 32.0,
+      "median": 32.0,
+      "p90": 42.0,
+      "max": 117.0,
+      "mean": 36.54
+    },
+    "fps": {
+      "30.0": 231
+    },
+    "orientation": {
+      "landscape": 231
+    },
+    "resolution": {
+      "1920x1080": 231
+    },
+    "videos_below_90pct_detection": 1,
+    "videos_below_0.6_key_visibility": 231,
+    "videos_static_motion": 1,
+    "videos_shorter_than_window": 0,
+    "static_examples": [
+      "0e88251c_0859_V bridge hold + butterfly_[14]"
+    ],
+    "low_detection_examples": [
+      [
+        "cbc15c42_0746_shoulder in & out_[7]",
+        82.22
+      ]
+    ]
+  },
+  "reps": {
+    "single_set_videos": 215,
+    "multi_set_videos": 16,
+    "median_abs_error_peaks_vs_gt": 4.0,
+    "within_1_share": 0.4,
+    "pearson_r": 0.233,
+    "per_class": {
+      "cardio_dynamic": {
+        "videos": 20,
+        "median_abs_error": 7.0,
+        "within_1_share": 0.3,
+        "median_gt_reps": 17.0,
+        "median_detected_peaks": 8.5
+      },
+      "core_flexion": {
+        "videos": 81,
+        "median_abs_error": 4.0,
+        "within_1_share": 0.432,
+        "median_gt_reps": 12.0,
+        "median_detected_peaks": 8.0
+      },
+      "core_isometric": {
+        "videos": 11,
+        "median_abs_error": 6.0,
+        "within_1_share": 0.091,
+        "median_gt_reps": 10.0,
+        "median_detected_peaks": 3.0
+      },
+      "curl": {
+        "videos": 3,
+        "median_abs_error": 6.0,
+        "within_1_share": 0.333,
+        "median_gt_reps": 24.0,
+        "median_detected_peaks": 13.0
+      },
+      "hinge": {
+        "videos": 76,
+        "median_abs_error": 4.0,
+        "within_1_share": 0.421,
+        "median_gt_reps": 12.0,
+        "median_detected_peaks": 11.0
+      },
+      "horizontal_push": {
+        "videos": 4,
+        "median_abs_error": 7.0,
+        "within_1_share": 0.25,
+        "median_gt_reps": 10.5,
+        "median_detected_peaks": 1.5
+      },
+      "lateral_raise": {
+        "videos": 6,
+        "median_abs_error": 1.5,
+        "within_1_share": 0.5,
+        "median_gt_reps": 10.0,
+        "median_detected_peaks": 10.5
+      },
+      "squat": {
+        "videos": 13,
+        "median_abs_error": 1.0,
+        "within_1_share": 0.538,
+        "median_gt_reps": 20.0,
+        "median_detected_peaks": 14.0
+      },
+      "triceps_extension": {
+        "videos": 1,
+        "median_abs_error": 12.0,
+        "within_1_share": 0.0,
+        "median_gt_reps": 13.0,
+        "median_detected_peaks": 1.0
+      }
+    },
+    "note": "Peaks in the highest-range joint axis are a crude proxy; disagreement is a flag for review, not proof of a wrong label."
+  },
+  "coverage": {
+    "videos": 231,
+    "subjects": 30,
+    "subject_prefixes_8": 28,
+    "alias_collisions": [
+      "199aec58->199aec58",
+      "cbc15c42->cbc15c42"
+    ],
+    "per_pattern": {
+      "cardio_dynamic": {
+        "videos": 26,
+        "subjects": 10,
+        "median_duration_s": 32.0,
+        "median_gt_reps": 28.0,
+        "portrait": 0,
+        "landscape": 26
+      },
+      "core_flexion": {
+        "videos": 83,
+        "subjects": 18,
+        "median_duration_s": 32.0,
+        "median_gt_reps": 12.0,
+        "portrait": 0,
+        "landscape": 83
+      },
+      "core_isometric": {
+        "videos": 12,
+        "subjects": 6,
+        "median_duration_s": 32.0,
+        "median_gt_reps": 10.5,
+        "portrait": 0,
+        "landscape": 12
+      },
+      "curl": {
+        "videos": 3,
+        "subjects": 1,
+        "median_duration_s": 42.0,
+        "median_gt_reps": 24.0,
+        "portrait": 0,
+        "landscape": 3
+      },
+      "hinge": {
+        "videos": 82,
+        "subjects": 17,
+        "median_duration_s": 32.0,
+        "median_gt_reps": 13.0,
+        "portrait": 0,
+        "landscape": 82
+      },
+      "horizontal_push": {
+        "videos": 5,
+        "subjects": 5,
+        "median_duration_s": 32.0,
+        "median_gt_reps": 11.0,
+        "portrait": 0,
+        "landscape": 5
+      },
+      "lateral_raise": {
+        "videos": 6,
+        "subjects": 4,
+        "median_duration_s": 32.0,
+        "median_gt_reps": 10.0,
+        "portrait": 0,
+        "landscape": 6
+      },
+      "squat": {
+        "videos": 13,
+        "subjects": 6,
+        "median_duration_s": 32.0,
+        "median_gt_reps": 20.0,
+        "portrait": 0,
+        "landscape": 13
+      },
+      "triceps_extension": {
+        "videos": 1,
+        "subjects": 1,
+        "median_duration_s": 42.0,
+        "median_gt_reps": 13.0,
+        "portrait": 0,
+        "landscape": 1
+      }
+    },
+    "duplicate_sequence_hashes": 1,
+    "same_subject_same_exercise_repeats": {
+      "0a9a588e|leg lift": 2,
+      "0a9a588e|donkey kick + cross": 2,
+      "0a9a588e|donkey twist": 2,
+      "0a9a588e|rainbow": 2,
+      "0a9a588e|crossed side kick": 2,
+      "0a9a588e|hamstring curl": 2,
+      "0a9a588e|side leg lift": 2,
+      "0a9a588e|leg swipe": 2,
+      "0a9a588e|leg extension": 2,
+      "0a9a588e|leg circle": 2,
+      "0a9a588e|1-leg glute bridge": 2,
+      "5e3a8d78|jumping jack": 2,
+      "5e3a8d78|high knees": 3,
+      "5e3a8d78|squat + side jumpy": 2,
+      "5e3a8d78|mountain climber": 2,
+      "5e3a8d78|plank + jumping jack": 2,
+      "6770817f|leg lift": 2,
+      "87fe2aa4|squat": 3,
+      "87fe2aa4|donkey kick": 2,
+      "cbc15c42|warrior 2 + up": 2,
+      "d1075a73|cross + leg stretch [l]": 2,
+      "fc3d98d5|bridge + cross crunch": 2,
+      "fc3d98d5|leg lift variantion": 2,
+      "fc3d98d5|knee to elbow": 2,
+      "fc3d98d5|half plank crunch": 2,
+      "fc3d98d5|clamshell twist": 2,
+      "fc3d98d5|kickback": 2,
+      "fcd2886c|side kick extend[r]": 3
+    },
+    "subjects_with_multiple_patterns": 18,
+    "exercises_per_pattern": {
+      "cardio_dynamic": [
+        "100",
+        "HIGH KNEES",
+        "JUMPING JACK",
+        "MOUNTAIN CLIMBER",
+        "climbers",
+        "crawl, left",
+        "crawl, right",
+        "crossbody mountain climber",
+        "full burpees",
+        "half burpees",
+        "half jacks",
+        "high knee & cross punches",
+        "high knees",
+        "jack knife",
+        "jump + punches",
+        "jumping jack",
+        "mountain climber",
+        "plank jacks challenge",
+        "star jumps challenge",
+        "tiny steps",
+        "twisting mountain climber",
+        "wall marching",
+        "wall walk"
+      ],
+      "core_flexion": [
+        "3 point knee tap (L)",
+        "3 point knee tap (R)",
+        "5 pulses, 3 long",
+        "AB hold + knee touches",
+        "ALT.leg lifts",
+        "V bridge lift (feet connected)",
+        "V bridge lift + butterfly",
+        "alternating knee crunch",
+        "alternating side crunch",
+        "baby cobra",
+        "bent scissor",
+        "bicycle crunch",
+        "bicycle crunches",
+        "bow crunch(L)",
+        "bow crunch(R)",
+        "bridge +crunch",
+        "c-curl twist",
+        "cat cow",
+        "cocoons",
+        "criss cross",
+        "cross + leg stretch [l]",
+        "cross crunch",
+        "cross crunch(L)",
+        "cross crunch(R)",
+        "cross toe touches",
+        "crunch",
+        "crunch + knee_leg lift",
+        "crunch +weight",
+        "deadbugs",
+        "double leg stretch + open",
+        "flutter kicks",
+        "half plank crunch",
+        "half plank crunch(L)",
+        "half plank crunch(R)",
+        "half plank opener(L)",
+        "half plank opener(R)",
+        "halfmoon",
+        "heel tap",
+        "heel taps",
+        "knee in & out",
+        "knee to chest",
+        "knee to elbow",
+        "leg extension + crunch [l]",
+        "leg extension + crunch [r]",
+        "leg lift",
+        "leg lift + roll in",
+        "leg lift circles",
+        "leg lift variantion",
+        "leg raise clap",
+        "leg raises",
+        "lifted crunch",
+        "reverse crunch leg extension",
+        "reverse crunch variantion",
+        "reverse crunch variation",
+        "reverse crunches",
+        "roll up",
+        "russian twist",
+        "russian twist + pulses",
+        "russian twist + weight",
+        "side crunch + leg stretch [l]",
+        "side crunch + leg stretch [r]",
+        "simple bicycle",
+        "simple crunch",
+        "sit up + weight",
+        "straight leg bicycle",
+        "straight leg crunch",
+        "straight leg sit ups",
+        "stretch out +knee touches",
+        "toe taps"
+      ],
+      "core_isometric": [
+        "ELBOW PLANK",
+        "HIGH PLANK",
+        "PLANK + JUMPING JACK",
+        "V bridge hold + butterfly",
+        "bridge",
+        "cross-spider plank",
+        "plank + jumping jack",
+        "plank back & forth",
+        "plank jump + 3 punches",
+        "reverse plank lift",
+        "up&down plank"
+      ],
+      "curl": [
+        "bicep curls",
+        "open chest & press",
+        "prayer pulses"
+      ],
+      "hinge": [
+        "1 leg bridge(L)",
+        "1 leg bridge(R)",
+        "1 leg through(L)",
+        "1 leg through(R)",
+        "1-leg glute bridge",
+        "back kick extend[l]",
+        "back kick extend[r]",
+        "booty slide",
+        "bridge + cross crunch",
+        "bridge + leg extend[l]",
+        "bridge + leg extend[r]",
+        "bridge +floor taps(R)",
+        "bridge circle",
+        "bridge lift",
+        "clamshell + hip lift",
+        "clamshell +hip lift",
+        "clamshell twist",
+        "crossed side kick",
+        "donkey kick",
+        "donkey kick + cross",
+        "donkey kicks",
+        "donkey twist",
+        "floor taps + extend",
+        "frog extension",
+        "good morning + twist",
+        "hamstring curl",
+        "hip circles",
+        "hip lift",
+        "hip slides",
+        "kickback",
+        "kickback(L)",
+        "kickback(R)",
+        "leg circle",
+        "leg extension",
+        "leg extensions",
+        "leg slides",
+        "leg swipe",
+        "lower leg lift (L)",
+        "lower leg lift (R)",
+        "lower leg slide",
+        "pointe to heel bridge",
+        "pointed glute bridge",
+        "rainbow",
+        "side kick extend[r]",
+        "side leg lift",
+        "side leg raise",
+        "side leg raises",
+        "side plank lift",
+        "side plank pull left",
+        "side plank pull right",
+        "side plank raises(right side)",
+        "side plank reach through left",
+        "side plank reach through right",
+        "singel leg reach",
+        "sitting leg lift",
+        "standing donkey kicks",
+        "straight leg circle [r]",
+        "straight leg circle(L)",
+        "straight leg lift (L)",
+        "straight leg lift [r]",
+        "straight leg lower",
+        "table top reach pulse[l]",
+        "table top reach[l]",
+        "table top reach[r]",
+        "wall bicycle",
+        "wall bridge"
+      ],
+      "horizontal_push": [
+        "box push-ups",
+        "commando",
+        "push up (on knees)",
+        "push up toe tap",
+        "wall push"
+      ],
+      "lateral_raise": [
+        "shoulder in & out",
+        "straight arm lift",
+        "sun rises",
+        "wall twist",
+        "warrior 2 + up"
+      ],
+      "squat": [
+        "SQUAT + SIDE JUMPY",
+        "butt kick squat jumps",
+        "drop squats",
+        "reverse lunges",
+        "reverse lunges challenge",
+        "slow sq",
+        "squat",
+        "squat + side jumpy",
+        "squat jump + 3s hold",
+        "step jacks",
+        "yoga squat circle"
+      ],
+      "triceps_extension": [
+        "stting tricep push"
+      ]
+    }
+  }
+}

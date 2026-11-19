@@ -1,0 +1,50 @@
+{
+  "total_test_videos_matched": 136,
+  "overall_mae": 10.080882352941176,
+  "overall_exact_pct": 17.647058823529413,
+  "overall_within1_pct": 34.55882352941176,
+  "per_class": {
+    "bench_press": {
+      "n": 19,
+      "mae": 8.157894736842104,
+      "exact_pct": 15.789473684210526,
+      "within1_pct": 15.789473684210526
+    },
+    "front_raise": {
+      "n": 18,
+      "mae": 4.055555555555555,
+      "exact_pct": 22.22222222222222,
+      "within1_pct": 44.44444444444444
+    },
+    "jumping_jack": {
+      "n": 26,
+      "mae": 27.03846153846154,
+      "exact_pct": 3.8461538461538463,
+      "within1_pct": 3.8461538461538463
+    },
+    "pull_up": {
+      "n": 19,
+      "mae": 1.631578947368421,
+      "exact_pct": 42.10526315789473,
+      "within1_pct": 78.94736842105263
+    },
+    "push_up": {
+      "n": 16,
+      "mae": 10.4375,
+      "exact_pct": 6.25,
+      "within1_pct": 37.5
+    },
+    "situp": {
+      "n": 20,
+      "mae": 8.85,
+      "exact_pct": 10.0,
+      "within1_pct": 30.0
+    },
+    "squat": {
+      "n": 18,
+      "mae": 3.611111111111111,
+      "exact_pct": 27.77777777777778,
+      "within1_pct": 44.44444444444444
+    }
+  }
+}

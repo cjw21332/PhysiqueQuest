@@ -1,0 +1,31 @@
+# PoseTracker model inventory
+
+Audit date: 2026-11-17. Source: live repository inspection and the recursive SHA-256 inventory in [`audit_snapshot.json`](../ml/reports/experiments/pose_audit_20261117/audit_snapshot.json). The snapshot records 53 project-owned model/checkpoint files across `ml/`, Android assets, and web assets, excluding bundled framework test fixtures inside the isolated Python environment. Generated quantization variants and historical checkpoints are included; this is not a count of deployable models.
+
+| Component | Current implementation | Model/checkpoint | Training source | Runtime location | Current status |
+|---|---|---|---|---|---|
+| Pose landmarks (Android live camera) | MediaPipe Tasks Vision native wrapper (`expo-mediapipe-pose` 0.3.0; Tasks Vision 0.10.29); Lite task, one pose, segmentation off | `pose_landmarker_lite.task`, SHA-256 `59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a` | Google pretrained MediaPipe asset; not PhysiqueQuest-trained | On device through `mobile/NativeTrackingCamera.tsx` and native `PoseCameraView` | Current live camera landmark model |
+| Pose landmarks (web live camera) | MediaPipe Tasks Vision JS 0.10.32, `PoseLandmarker`, VIDEO mode, CPU delegate | Same Lite task asset | Google pretrained | Browser worker `frontend/workers/pose.worker.ts` | Web path; separate from the native Android module |
+| Exercise name/pattern selection | User-selected exercise resolves through registry/configuration | No learned classifier in the live session path | Hand-authored catalog/config | `mobile/PoseTrackerNative.tsx`, `shared/exerciseEngine.ts` | Deterministic mapping; not automatic ML recognition |
+| Repetition and phase tracking | Joint-angle state machine, smoothing, range/tempo/visibility checks | No learned checkpoint | Hand-authored deterministic rules | `shared/genericRepCounter.ts`, `shared/exerciseEngine.ts`; video path also uses `shared/videoAnalysisPipeline.ts` | Production behavior; validation is incomplete and current counter tests have failures (see audit) |
+| Form cues | Exercise-specific rule/config checks over 2D landmarks and angles | No learned checkpoint | Hand-authored heuristics | Shared exercise engine and client presentation | Not a validated biomechanical or medical assessment |
+| Uploaded-video PoseTracker analysis (mobile local path) | Samples local video frames and feeds pose landmarks to the same deterministic engine | MediaPipe Lite pose model plus rule engine | Same pretrained model/config | `mobile/PoseTrackerNative.tsx`, `shared/videoAnalysisPipeline.ts` | Local on-device analysis; not a separate trained classifier |
+| CameraCheck video review | Separate backend `PoseAnalysisProvider`, optional review service | Configured external endpoint / optional Gemini integration | External provider; not a PoseTracker model artifact | Backend service path | Do not conflate with the local PoseTracker upload-video workflow |
+| Pattern v1 CNN | 1D CNN, 168,071 parameters, 48×132 input, 7 output classes | `ml/models/pattern_v1/cnn1d.onnx`; dynamic and static quantized variants | PushUpBench-derived keypoints; CC-BY-4.0 according to `ml/DATA_LICENSES.md` | No Android/browser import found | Experimental; held-out test macro-F1 0.3589; not production |
+| Pattern v1 GRU/CNN and 10-class ONNX files | Legacy CNN/GRU artifact families | `ml/models/*.onnx` and nested manifests | Some are synthetic sine-wave data; manifests mark invalid | No app import found | Invalid for shipping; preserve as historical artifacts |
+| Nested real-GIF CNN/GRU | 10-class CNN/GRU experiments | `ml/ml/models/` and `ml/ml/reports/train/` checkpoints | ExerciseDB GIF windows; license status unresolved/TBD | No app import found | Experimental/historical; low test results and licensing blocker |
+| Attention w48 | Temporal CNN with attention pooling, 168,200 parameters, 48×132 input | `ml/models/experimental/attention_w48/` and quantized variants | PushUpBench-derived keypoints | No app import found | Experimental; previous five-person held-out report is insufficient for promotion |
+| Static exercise coverage configurations | Generated mapping/config values for catalog exercises | No learned weights | Catalog plus rule/config mapping | `backend/src/pose-tracker/catalog-tracking.generated.ts`, shared generated maps | Coverage metadata does not constitute validated support |
+
+## Runtime flow
+
+Android camera frames enter the native MediaPipe wrapper, which produces landmarks. The user-selected exercise is mapped to an existing pattern/configuration. Landmark coordinates and confidence are passed to the deterministic shared engine, which updates movement phase, counts reps, and emits cues. The local uploaded-video route samples frames and uses the same analysis pipeline. No PhysiqueQuest classifier checkpoint was found in the application imports. Browser tracking uses its worker for landmarks; an additional browser-only embedded third-party flow exists for unsupported catalog entries and is not the Android local model path.
+
+The identical Lite task file is present under `mobile/assets`, `frontend/public/pose`, and `ml/models`; the snapshot hashes confirm the copies. Full and Heavy MediaPipe task assets are present as alternatives, but source inspection found the Lite asset loaded by the app. Full recursive file hashes are recorded in the snapshot rather than duplicating a potentially very large generated list here.
+
+## Discrepancies
+
+- Earlier documentation described PhysiqueQuest exercise models as part of the production tracker. The Android client path uses MediaPipe for landmarks and deterministic code for the exercise logic; the trained CNN/GRU/attention models are not imported.
+- `ml/FEATURE_SPEC.md` names `shared/pose-features.ts` as the parity target, but that file is absent. Current deterministic counter logic uses raw landmarks rather than the 132-feature tensor used by the experimental classifier.
+- The training extractor still normalizes visibility with coordinate values (documented in the data audit); the mobile contribution writer has a v1.1 distinction. Those are not interchangeable model inputs.
+- The inventory count includes many nested quantized artifacts and checkpoint files, not 1,858 distinct architectures.

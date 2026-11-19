@@ -29,7 +29,7 @@ export default function EngagementAnalytics({ onBack, preview = false }: { onBac
     const link = document.createElement('a'); link.href = url; link.download = `physiquequest-${preview ? 'sample-' : ''}emergency-events-${range}-days.csv`; link.click(); URL.revokeObjectURL(url);
   };
   return <section className="me-section admin-tools-screen admin-reference" aria-label="Admin engagement analytics">
-    <header className="admin-tools-header"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to account settings"><Icon name="arrow" size={20}/></button><h2>Admin · Engagement</h2></header>
+    <header className="admin-tools-header pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to account settings"><Icon name="arrow" size={20}/></button><h2>Admin · Engagement</h2></header>
     <div className="admin-tools-scroll engagement-scroll">
       <div className="engagement-ranges" role="group" aria-label="Analytics date range">{([7, 30, 90] as Range[]).map(days => <button type="button" key={days} className={range === days ? 'active' : ''} aria-pressed={range === days} onClick={() => setRange(days)}>{days} days</button>)}</div>
       {error && <div role="alert" className="error">{error}<button type="button" className="scan-retry" onClick={() => void refresh()}>Try again</button></div>}

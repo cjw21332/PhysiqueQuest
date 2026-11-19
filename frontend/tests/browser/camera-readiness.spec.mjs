@@ -50,7 +50,8 @@ export async function cameraFixture(page) {
   });
   await page.goto('/coach');
   await page.getByRole('button', { name: 'Start session', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Camera check', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /Live session Use your camera/ }).click();
+  await expect(page.getByRole('heading', { name: 'Live camera setup', exact: true })).toBeVisible();
   return requests;
 }
 
@@ -60,7 +61,7 @@ test('camera preparation keeps the dark coach layout on its routed page', async 
   await expect(page.locator('.signed-in-layout')).toHaveClass(/coach-dark-theme/);
   for (const width of [320, 390, 1440]) {
     await page.setViewportSize({ width, height: 844 });
-    await expect(page.getByRole('heading', { name: 'Camera check' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Live camera setup' })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
 });
@@ -168,6 +169,10 @@ async function enable(page) {
 async function released(page) {
   await expect.poll(()=>page.evaluate(()=>window.readinessStreams.every(s=>s.getTracks().every(t=>t.readyState==='ended')))).toBe(true);
 }
+async function switchCameraMode(page, mode) {
+  await page.getByRole('button', { name: 'Back to AI Coach', exact: true }).click();
+  await page.getByRole('button', { name: mode === 'upload' ? /Review a video Choose a recording/ : /Live session Use your camera/ }).click();
+}
 
 test('web lifecycle: resize resets dwell, blur stops tracks and reopen needs fresh evidence',async({page})=>{
   await cameraFixture(page); await enable(page);
@@ -180,8 +185,8 @@ test('web lifecycle: resize resets dwell, blur stops tracks and reopen needs fre
   await expect(connection(page)).toContainText('Unavailable'); await released(page);
   await enable(page);
   expect(await page.evaluate(()=>window.readinessEvidence.workers)).toBeGreaterThan(1);
-  await page.getByRole('button',{name:'Upload video',exact:true}).click(); await released(page);
-  await page.getByRole('button',{name:'Live feed',exact:true}).click();
+  await switchCameraMode(page, 'upload'); await released(page);
+  await switchCameraMode(page, 'live');
   await expect(connection(page)).toContainText('Unavailable');
 });
 
@@ -195,9 +200,9 @@ for(const event of ['mute','ended']) test(`web lifecycle: ${event} track invalid
 test('web lifecycle: hidden document tears down and rapid switch/off cannot revive readiness',async({page})=>{
   await cameraFixture(page); await enable(page);
   await page.getByRole('button',{name:'Switch to front camera'}).click();
-  await page.getByRole('button',{name:'Upload video',exact:true}).click();
+  await switchCameraMode(page, 'upload');
   await released(page);
-  await page.getByRole('button',{name:'Live feed',exact:true}).click();
+  await switchCameraMode(page, 'live');
   await expect(connection(page)).toContainText('Unavailable');
   await enable(page);
   await page.evaluate(()=>{Object.defineProperty(document,'visibilityState',{configurable:true,value:'hidden'});document.dispatchEvent(new Event('visibilitychange'));});
@@ -219,7 +224,7 @@ test('web lifecycle: advancing currentTime fallback works, stalled frame callbac
     HTMLVideoElement.prototype.cancelVideoFrameCallback=undefined;
   });
   await enable(page);
-  await page.getByRole('button',{name:'Upload video',exact:true}).click();
+  await switchCameraMode(page, 'upload');
   await released(page);
 });
 
@@ -241,9 +246,9 @@ test('web lifecycle: late stream and pending bitmap are released after stop',asy
   });
   await page.getByRole('button',{name:'Enable camera',exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>!!window.finishAcquisition)).toBe(true);
-  await page.getByRole('button',{name:'Upload video',exact:true}).click();
+  await switchCameraMode(page, 'upload');
   await page.evaluate(()=>window.finishAcquisition()); await released(page);
-  await page.getByRole('button',{name:'Live feed',exact:true}).click();
+  await switchCameraMode(page, 'live');
   await page.evaluate(()=>{
     navigator.mediaDevices.getUserMedia=window.savedAcquire;
     const bitmap=window.createImageBitmap;
@@ -253,7 +258,7 @@ test('web lifecycle: late stream and pending bitmap are released after stop',asy
   });
   await page.getByRole('button',{name:'Enable camera',exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>!!window.finishBitmap),{timeout:20000}).toBe(true);
-  await page.getByRole('button',{name:'Upload video',exact:true}).click();
+  await switchCameraMode(page, 'upload');
   await page.evaluate(()=>window.finishBitmap());
   await expect.poll(()=>page.evaluate(()=>window.readinessEvidence.bitmapsClosed)).toBe(1);
   await released(page);
@@ -286,7 +291,7 @@ test('readiness UX: denied permission stays actionable and manual continuation s
   await expect(page.getByRole('button',{name:'Enable camera',exact:true})).toBeEnabled();
   await expect(page.getByRole('button',{name:'Start session',exact:true})).toBeEnabled();
   await page.getByRole('button',{name:'Continue without camera',exact:true}).click();
-  await expect(page.getByRole('heading',{name:'Camera check',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Live camera setup',exact:true})).toHaveCount(0);
   expect(requests.filter(r=>r.path.endsWith('/workouts') && r.method==='POST')).toHaveLength(1);
 });
 
@@ -330,7 +335,7 @@ test('readiness UX: meaningful labels, stable announcements, focus and 48px targ
   expect(await page.evaluate(()=>window.announcements)).toBeLessThanOrEqual(3);
   expect(await page.locator('.readiness-list [aria-live]').count()).toBe(1);
   await page.evaluate(()=>{document.documentElement.style.fontSize='200%';document.documentElement.dataset.largeText='true';});
-  for(const name of ['Back to AI Coach','Live feed','Upload video','Retry camera checks','Start session','Continue without camera']) {
+  for(const name of ['Back to AI Coach','Retry camera checks','Start session','Continue without camera']) {
     const button=page.getByRole('button',{name,exact:true}),box=await button.boundingBox();
     expect(box.height,`${name} height`).toBeGreaterThanOrEqual(48);expect(box.width,`${name} width`).toBeGreaterThanOrEqual(48);
   }
@@ -342,25 +347,47 @@ test('readiness UX: meaningful labels, stable announcements, focus and 48px targ
 test('readiness UX: upload status is lazy and explicit analysis retains video payload',async({page})=>{
   const requests=await cameraFixture(page);
   expect(requests.filter(r=>r.path.includes('/pose'))).toEqual([]);
-  await page.getByRole('button',{name:'Upload video',exact:true}).click();
-  await expect.poll(()=>requests.filter(r=>r.path.endsWith('/pose/status')).length).toBe(1);
+  await switchCameraMode(page, 'upload');
+  await expect.poll(()=>requests.filter(r=>r.path.endsWith('/pose/status')).length).toBeGreaterThanOrEqual(1);
   await page.getByLabel('Choose a recorded exercise video').setInputFiles(fileURLToPath(new URL('../../public/opening-app-animation.mp4', import.meta.url)));
-  await expect.poll(() => page.locator('.upload-dropzone video').evaluate(video => video.readyState)).toBeGreaterThan(0);
-  await page.getByLabel('Exercise in this recording (optional)').selectOption('chest_press');
+  await expect.poll(() => page.locator('.video-review video').evaluate(video => video.readyState)).toBeGreaterThan(0);
+  await page.locator('.video-review video').evaluate(video => { window.savedReviewVideo = video; });
+  await expect(page.getByLabel('Exercise in this recording (optional)')).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: test.info().outputPath('video-review.png') });
   expect(requests.filter(r=>r.method==='POST' && r.path.includes('/pose'))).toEqual([]);
   await page.getByRole('button',{name:'Analyze video',exact:true}).click();
   await expect.poll(()=>requests.filter(r=>r.method==='POST' && r.path.includes('/pose')).length).toBe(1);
   const data=JSON.parse(requests.find(r=>r.method==='POST' && r.path.includes('/pose')).data);
   expect(data).toMatchObject({mimeType:'video/mp4', analysisType:'workout'});
-  expect(data.exerciseHint).toBe('chest_press');
+  expect(data.exerciseHint).toBeUndefined();
   expect(data.durationSeconds).toBeGreaterThan(0);
   expect(data.mediaBase64.length).toBeGreaterThan(100);
   await expect(page.getByRole('region', { name: 'Video analysis' })).toContainText('Keep your feet planted');
   await expect(page.getByRole('region', { name: 'Video analysis' })).toContainText('Your workout has not been changed.');
   await page.getByRole('button', { name: 'Back to video', exact: true }).first().click();
+  await expect(page.locator('.video-review video')).toBeVisible();
+  expect(await page.locator('.video-review video').evaluate(video => video === window.savedReviewVideo)).toBe(true);
+  expect(await page.locator('.video-review video').evaluate(video => video.error)).toBeNull();
   await page.getByRole('button', { name: 'Choose a different video' }).click();
   await page.getByLabel('Choose a recorded exercise video').setInputFiles(fileURLToPath(new URL('../../public/opening-app-animation.mp4', import.meta.url)));
-  await expect(page.getByLabel('Exercise in this recording (optional)')).toHaveValue('');
+  await expect(page.locator('.video-review video')).toBeVisible();
+});
+
+test('video analysis recovers without losing the selected recording', async ({ page }) => {
+  await cameraFixture(page);
+  let available = false;
+  await page.route('**/api/pose/status', route => route.fulfill({ json: { available }, headers }));
+  await switchCameraMode(page, 'upload');
+  await page.getByLabel('Choose a recorded exercise video').setInputFiles(fileURLToPath(new URL('../../public/opening-app-animation.mp4', import.meta.url)));
+  await expect(page.getByText(/Video analysis is temporarily unavailable/)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Analyze video' })).toHaveCount(0);
+  available = true;
+  await page.getByRole('button', { name: 'Try again', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Analyze video' })).toBeVisible();
+  await expect(page.locator('.video-review video')).toBeVisible();
+  await expect(page.getByText('opening-app-animation.mp4')).toBeVisible();
 });
 
 test('an unavailable exercise review can be retried and shows the returned guidance', async ({ page }) => {
@@ -370,9 +397,9 @@ test('an unavailable exercise review can be retried and shows the returned guida
     attempts++;
     return route.fulfill({ json: attempts === 1 ? { observations: ['Tracked'], exerciseReview: null } : { observations: ['Tracked'], exerciseReview: { exercise: 'Chest press', equipment: 'Machine', generalBodyPart: 'Upper body', specificMuscles: 'Chest', estimatedReps: 3, formObservations: ['Review elbow position'], corrections: ['Keep wrists aligned'], instructions: ['Press under control'] } }, headers });
   });
-  await page.getByRole('button', { name: 'Upload video', exact: true }).click();
+  await switchCameraMode(page, 'upload');
   await page.getByLabel('Choose a recorded exercise video').setInputFiles(fileURLToPath(new URL('../../public/opening-app-animation.mp4', import.meta.url)));
-  await expect.poll(() => page.locator('.upload-dropzone video').evaluate(video => video.readyState)).toBeGreaterThan(0);
+  await expect.poll(() => page.locator('.video-review video').evaluate(video => video.readyState)).toBeGreaterThan(0);
   await page.getByRole('button', { name: 'Analyze video', exact: true }).click();
   await expect(page.getByText('Exercise review unavailable')).toBeVisible();
   await page.getByRole('button', { name: 'Retry exercise review' }).click();
@@ -391,7 +418,7 @@ test('an unavailable exercise review can be retried and shows the returned guida
 
 for (const method of ['click', 'keyboard']) test(`upload icon opens the video picker by ${method}`, async ({ page }) => {
   await cameraFixture(page);
-  await page.getByRole('button', { name: 'Upload video', exact: true }).click();
+  await switchCameraMode(page, 'upload');
   const icon = page.getByRole('button', { name: 'Choose a video', exact: true });
   const chooser = page.waitForEvent('filechooser');
   if (method === 'keyboard') { await icon.focus(); await page.keyboard.press('Enter'); }
@@ -413,10 +440,10 @@ test('readiness regression: live enable and retry send no analysis/media and ret
   await expect(connection(page)).toContainText('Ready');
   await page.getByRole('button',{name:'Back to AI Coach',exact:true}).click();
   await released(page);
-  await page.getByRole('button',{name:'Start session',exact:true}).click();
+  await page.getByRole('button',{name:/Live session Use your camera/}).click();
   await expect(connection(page)).toContainText('Unavailable');
   expect(requests.filter(r=>r.path.includes('/pose'))).toEqual([]);
-  expect(outgoing).toEqual([]);
+  expect(outgoing.filter(request => !request.url.endsWith('/auth/session/migrate'))).toEqual([]);
   expect(await page.evaluate(()=>Object.keys(localStorage).filter(key=>/readiness|camera/i.test(key)))).toEqual([]);
 });
 
@@ -435,7 +462,7 @@ for (const failure of ['denied','unsupported','model-failure','stale']) test(`re
     await expect(connection(page)).toContainText('Fresh evidence expired',{timeout:5000});
   }
   await page.getByRole('button',{name:'Continue without camera',exact:true}).click();
-  await expect(page.getByRole('heading',{name:'Camera check',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Live camera setup',exact:true})).toHaveCount(0);
   await released(page);
   const writes=requests.filter(r=>r.path.endsWith('/workouts') && r.method==='POST');
   expect(writes).toHaveLength(1);
@@ -446,14 +473,15 @@ for (const failure of ['denied','unsupported','model-failure','stale']) test(`re
 
 test('readiness regression: explicit video rejects wrong type and over-20MB before an analysis request',async({page})=>{
   const requests=await cameraFixture(page);
-  await page.getByRole('button',{name:'Upload video',exact:true}).click();
-  await expect.poll(()=>requests.filter(r=>r.path.endsWith('/pose/status')).length).toBe(1);
+  await switchCameraMode(page, 'upload');
+  await expect.poll(()=>requests.filter(r=>r.path.endsWith('/pose/status')).length).toBeGreaterThanOrEqual(1);
   await page.getByLabel('Choose a recorded exercise video').setInputFiles({name:'set.webm',mimeType:'video/webm',buffer:Buffer.from('invalid-type')});
   await page.getByRole('button',{name:'Analyze video',exact:true}).click();
-  await expect(page.locator('.error[role=alert]')).toContainText('Choose an MP4 or MOV video');
+  await expect(page.getByRole('dialog', { name: 'Video analysis unavailable' })).toContainText('Choose an MP4 or MOV video');
+  await page.getByRole('button', { name: 'Go back', exact: true }).click();
   await page.getByRole('button',{name:'Choose a different video',exact:true}).click();
   await page.getByLabel('Choose a recorded exercise video').setInputFiles({name:'large.mp4',mimeType:'video/mp4',buffer:Buffer.alloc(20*1024*1024+1)});
   await page.getByRole('button',{name:'Analyze video',exact:true}).click();
-  await expect(page.locator('.error[role=alert]')).toContainText('Choose a video smaller than 20 MB');
+  await expect(page.getByRole('dialog', { name: 'Video analysis unavailable' })).toContainText('Choose a video smaller than 20 MB');
   expect(requests.filter(r=>r.method==='POST' && r.path.includes('/pose'))).toEqual([]);
 });

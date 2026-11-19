@@ -116,7 +116,7 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       setStatus('unavailable');
       cameraWasEnabled = false;
       setMessage(typeof window !== 'undefined' && window.isSecureContext === false
-        ? 'Camera access in a browser requires HTTPS or localhost. Use a secure browser address or open the native app.'
+        ? 'Camera access isn’t available on this page. Open the app or use a secure connection and try again.'
         : 'This browser cannot open the camera.');
       return;
     }

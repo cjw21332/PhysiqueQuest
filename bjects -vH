@@ -1,0 +1,26 @@
+  PhysiqueQuest-v1.0.0                            [m 8e3f7de [[34morigin/PhysiqueQuest-v1.0.0[m] Add safe area insets to prevent system UI overlap
+  PhysiqueQuest-v1.1.0                            [m 3f7f0ae [[34morigin/PhysiqueQuest-v1.1.0[m] fix: polish calibration actions and hydration
+  PhysiqueQuest-v2.1.0                            [m f3b3294 [[34morigin/PhysiqueQuest-v2.1.0[m: ahead 3] feat: commit v2.1.0 mobile dashboard redesign + guard + Me v2.1.0
+  PhysiqueQuest-v2.1.1                            [m 4a4bd45 [[34morigin/PhysiqueQuest-v2.1.1[m: ahead 13] chore: update backend build metadata
+  PhysiqueQuest-v2.2.1                            [m a274532 [[34morigin/PhysiqueQuest-v2.2.1[m: ahead 1] docs: design Expo Go end-to-end reliability
++ [36mPhysiqueQuest-v2.3.0                            [m de9a8b5 ([36mC:/Users/MY PC/Desktop/Projects/PhysiqueQuest-v2.3.0-scan[m) [[34morigin/PhysiqueQuest-v2.3.0[m] feat: update ship-code skill to push HEAD to main
+  PhysiqueQuest-v2.4.0                            [m a723af4 [[34morigin/PhysiqueQuest-v2.4.0[m] Organize progress reports
+  PhysiqueQuest-v2.4.1                            [m 607dfc7 [[34morigin/PhysiqueQuest-v2.4.1[m] Release PhysiqueQuest v2.4.1
+  PhysiqueQuest-v2.5.0                            [m ad3e15b [[34morigin/PhysiqueQuest-v2.5.0[m] feat: complete camera readiness and safety flows
+  PhysiqueQuest-v2.5.2                            [m 37c4309 [[34morigin/PhysiqueQuest-v2.5.2[m] feat: add coach plans, leaderboard, and sign-in analytics
+  PhysiqueQuest-v2.6.0                            [m 1cfcb9b [[34morigin/PhysiqueQuest-v2.6.0[m] fix: remove duplicate sign-in event index
+  PhysiqueQuest-v2.7.0                            [m cca3054 [[34morigin/PhysiqueQuest-v2.7.0[m] feat: prepare PhysiqueQuest v2.7.0
+  PhysiqueQuest-v2.7.2                            [m 574f4f9 [[34morigin/PhysiqueQuest-v2.7.2[m] feat: add camera rep counting and restore Expo Go launch
+  PhysiqueQuest-v2.7.3                            [m 955605c [[34morigin/PhysiqueQuest-v2.7.3[m] feat: release PhysiqueQuest v2.7.3 with ExerciseDB Coach and saved programs
+  PhysiqueQuest-v3.1.0                            [m e4a54d0 [[34morigin/PhysiqueQuest-v3.1.0[m] Keep the launch page fixed within the viewport
+  PhysiqueQuest-v3.1.1                            [m e1d0946 [[34morigin/PhysiqueQuest-v3.1.1[m: ahead 1] docs: record backend hardening discovery and migration decisions
+  PhysiqueQuest-v3.1.2                            [m 31563dc [[34morigin/PhysiqueQuest-v3.1.2[m] release: PhysiqueQuest v3.1.2
+  PhysiqueQuest-v4.0.0                            [m 8fbad23 [[34morigin/PhysiqueQuest-v4.0.0[m] release: PhysiqueQuest v4.0.0
+  PhysiqueQuest-v4.1.0                            [m ffc83ce [[34morigin/PhysiqueQuest-v4.1.0[m] fix: reset video selection and refresh system tests
+  PhysiqueQuest-v4.2.0                            [m 4268bf7 [[34morigin/PhysiqueQuest-v4.2.0[m: ahead 1] chore: update dependencies and files
+  PhysiqueQuest-v5.0.0                            [m 4268bf7 chore: update dependencies and files
+  backup/PhysiqueQuest-v2.2.1-before-email-rewrite[m 4a4bd45 chore: update backend build metadata
+  codex/backend-hardening                         [m 5c90c1b docs: record hardening evidence and deployment requirements
+* [32mfeat/on-device-pose-ml                          [m 3afdcab feat: H1 coverage report, H2 tracking tiers, H3 recording checklist
+  main                                            [m 4268bf7 [[34morigin/main[m] chore: update dependencies and files
+  v1.0.0                                          [m 8e3f7de [[34morigin/v1.0.0[m: gone] Add safe area insets to prevent system UI overlap

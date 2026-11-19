@@ -6,6 +6,7 @@ import HomeDashboard from './HomeDashboard';
 import Notifications from './Notifications';
 import type { Profile } from './types';
 import { useScreenRoute } from '../../hooks/useScreenRoute';
+import './homeExperience.css';
 
 type View = 'dashboard' | 'notifications';
 

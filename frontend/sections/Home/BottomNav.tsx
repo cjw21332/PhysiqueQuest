@@ -21,7 +21,8 @@ export default function BottomNav({ coachIcon = 'coach' }: { coachIcon?: string 
   useEffect(() => { tabs.forEach(tab => router.prefetch(tab.path)); }, [router]);
 
   const handleNavigation = (path: string) => {
-    if (path !== pathname) router.push(path);
+    if (path === pathname) return;
+    router.push(path);
   };
 
   return (

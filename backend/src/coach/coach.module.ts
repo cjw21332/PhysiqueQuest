@@ -6,6 +6,7 @@ import { ExerciseDbModule } from '../exercises/exercisedb.module.js';
 import { CoachController } from './coach.controller.js';
 import { CoachService } from './coach.service.js';
 import { CoachProgram, CoachProgramSchema } from './coach-program.schema.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { CoachProgram, CoachProgramSchema } from './coach-program.schema.js';
     ]),
   ],
   controllers: [CoachController],
-  providers: [CoachService],
+  providers: [CoachService, AiRateLimitGuard],
   exports: [CoachService],
 })
 export class CoachModule {}

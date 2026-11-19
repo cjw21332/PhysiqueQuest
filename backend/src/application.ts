@@ -17,12 +17,16 @@ import { json } from 'express';
 import { queryValidationMiddleware } from './common/query-validation.middleware.js';
 import { setupOpenApi } from './openapi.js';
 import { PrivacyService } from './privacy/privacy.service.js';
+import { getConnectionToken } from '@nestjs/mongoose';
+import { assertLifecycleReadiness } from './privacy/lifecycle-readiness.js';
 
 export async function createApplication() {
   initializeSentry();
   // bufferLogs holds Nest's bootstrap output until the pino logger is installed,
   // so the first lines of the process are structured JSON like everything else.
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true, bodyParser: false });
+  try { await assertLifecycleReadiness(app.get(getConnectionToken())); }
+  catch (error) { await app.close(); throw error; }
   const logger = app.get(PinoLogger);
   app.useLogger(logger);
   app.enableShutdownHooks();

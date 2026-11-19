@@ -1,0 +1,62 @@
+Scrape Skill (gstack)
+
+<skill_content>
+# Skill: scrape
+
+## Overview
+
+This skill pulls data from web pages through the Aside browser - using your real, already signed-in sessions. It's designed for data extraction from web pages with authenticated sessions.
+
+## Capabilities
+
+- **Data Extraction**: Extract data from web pages
+- **Authenticated Sessions**: Use existing browser sessions and cookies
+- **Page Scraping**: Scrape structured data from web pages
+- **Session Management**: Manage browser sessions for data extraction
+- **Content Parsing**: Parse and extract relevant content
+- **Session Persistence**: Maintain session state across multiple pages
+
+## Use Cases
+
+### Data Collection
+- Extract data from authenticated web pages
+- Scrape API documentation
+- Collect data from web portals
+
+### Research
+- Scrape research papers and articles
+- Collect web-based data for analysis
+- Extract structured data from web pages
+
+### Automation
+- Automate data collection tasks
+- Extract data from multiple pages
+- Build data pipelines
+
+## Example Usage
+
+```
+opencode run "Use scrape to get the latest posts from twitter.com/username"
+
+opencode run "Use scrape to extract product data from the e-commerce site"
+
+opencode run "Use scrape to collect article data from news website"
+```
+
+## Technical Details
+
+This skill uses the Aside browser framework with authenticated sessions. It leverages existing browser sessions and cookies for data extraction tasks.
+
+## Output
+
+The skill provides:
+- Extracted data from web pages
+- Session information
+- Page metadata
+- Structured data output
+
+---
+
+Base directory: .opencode/skills/scrape
+This skill is part of the gstack ecosystem for web data extraction.
+</skill_content>

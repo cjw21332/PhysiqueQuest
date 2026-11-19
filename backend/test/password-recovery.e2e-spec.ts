@@ -1,7 +1,7 @@
 import { loadEnvFile } from 'node:process';
 import { randomBytes } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
-import { createConnection, type Connection } from 'mongoose';
+import { createConnection, Types, type Connection } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { PasswordRecoveryService } from '../src/auth/password-recovery.service.js';
 import { User, UserSchema } from '../src/auth/schemas/user.schema.js';
@@ -36,6 +36,7 @@ describe.skipIf(!enabled)('Recovery transactions on an isolated MongoDB database
     const service = new PasswordRecoveryService(users, tokens, email as unknown as EmailDeliveryProvider, limits, new ConfigService({ JWT_SECRET: randomBytes(32).toString('hex') }));
     const first = await users.create({ name: 'Synthetic test', email: 'recovery-one@example.invalid', passwordHash: 'original' });
     const second = await users.create({ name: 'Synthetic test', email: 'recovery-two@example.invalid', passwordHash: 'original' });
+    await connection.collection('account_lifecycle').insertMany([first._id, second._id].map(id => ({ _id: new Types.ObjectId(String(id)), status: 'active', generation: 0, writeVersion: 0 })));
     const a = await service.request(first.email, 'synthetic-ip-1');
     const b = await service.request(second.email, 'synthetic-ip-2');
     await expect(service.verify('0'.repeat(64), sent.get(first.email)!, 'synthetic-ip-1')).rejects.toThrow();
@@ -64,6 +65,7 @@ describe.skipIf(!enabled)('Recovery transactions on an isolated MongoDB database
     const service = new PasswordRecoveryService(users, tokens, email as unknown as EmailDeliveryProvider, limits, new ConfigService({ JWT_SECRET: randomBytes(32).toString('hex') }));
     const owner = await users.create({ name: 'Synthetic owner', email: 'change-owner@example.invalid', passwordHash: 'original' });
     const other = await users.create({ name: 'Synthetic other', email: 'change-other@example.invalid', passwordHash: 'original' });
+    await connection.collection('account_lifecycle').insertMany([owner._id, other._id].map(id => ({ _id: new Types.ObjectId(String(id)), status: 'active', generation: 0, writeVersion: 0 })));
     await users.collection.updateOne({ _id: owner._id }, { $unset: { sessionVersion: '' } });
     const change = await service.requestChange(String(owner._id), 'synthetic-change-ip');
     expect([...sent.keys()]).toEqual([owner.email]);

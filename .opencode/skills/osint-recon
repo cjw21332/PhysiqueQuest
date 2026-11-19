@@ -1,0 +1,65 @@
+OSINT Recon Skill
+
+<skill_content>
+# Skill: osint-recon
+
+## Overview
+
+This skill gathers and correlates open source intelligence from public sources for authorized investigations, threat intelligence, and attack surface assessment.
+
+## Capabilities
+
+- **Domain Investigation**: Research domains and subdomains
+- **Public Records**: Access and analyze public records
+- **Social Media Intelligence**: Gather intelligence from social media
+- **Infrastructure Mapping**: Map internet infrastructure
+- **Threat Intelligence**: Collect threat intelligence data
+- **Attack Surface Assessment**: Assess attack surfaces from public data
+- **Correlation**: Correlate intelligence from multiple sources
+- **Report Generation**: Generate intelligence reports
+
+## Use Cases
+
+### Investigation
+- Investigate domains and organizations
+- Research public figures and entities
+- Gather intelligence for authorized investigations
+
+### Security
+- Threat intelligence collection
+- Attack surface mapping
+- Security reconnaissance
+
+### Research
+- Academic research on public data
+- Journalistic investigation
+- Corporate due diligence
+
+## Example Usage
+
+```
+opencode run "Use osint-recon to research example.com domain infrastructure"
+
+opencode run "Use osint-recon to gather threat intelligence on known attackers"
+
+opencode run "Use osint-recon to assess public attack surface of organization"
+```
+
+## Important Notes
+
+**Authorization Required**: This skill should only be used for authorized investigations with proper legal authority. Unauthorized reconnaissance may violate laws and ethical guidelines.
+
+## Output
+
+The skill provides:
+- Intelligence findings and correlations
+- Attack surface assessment
+- Threat intelligence reports
+- Evidence and source documentation
+- Analysis and recommendations
+
+---
+
+Base directory: .opencode/skills/osint-recon
+This skill is part of the Cybersecurity ecosystem for authorized OSINT investigations.
+</skill_content>

@@ -2,7 +2,7 @@ export function createSession({ fetcher = (...args) => fetch(...args), storage =
   let user = null, base = null, generation = 0, pending = null, restoring = null, legacyToken = null, legacyBase = null;
   const listeners = new Set();
   const notify = () => { for (const listener of listeners) listener(); };
-  const current = (url) => !url || url === base ? user : null;
+  const current = (url) => (!url || url === base) && (!user?.offlineOnly || user.expiresAt > Date.now()) ? user : null;
   const clear = () => { user = null; base = null; legacyToken = null; legacyBase = null; generation++; notify(); };
   const accept = (body, url) => {
     if (body.refresh_token || typeof body.access_token !== 'string' || !body.user?.id || typeof body.expires_in !== 'number') throw Error('Invalid session response');
@@ -51,5 +51,12 @@ export function createSession({ fetcher = (...args) => fetch(...args), storage =
     restoring = restoreOnce(url).finally(() => { restoring = null; });
     return restoring;
   };
-  return { current, clear, refresh, restore, subscribe: listener => { listeners.add(listener); return () => { listeners.delete(listener); }; }, set: (body, url) => { generation++; legacyToken = null; legacyBase = null; return accept(body, url); } };
+  const restoreOffline = (account,url) => {
+    if (current(url) || !account?.id || !Number.isFinite(account.expiresAt) || account.expiresAt <= Date.now()) return current(url);
+    base = url;
+    user = {id:account.id,name:'',email:'',token:'',offlineOnly:true,emailVerified:true,sessionKey:++generation,expiresAt:account.expiresAt};
+    notify();
+    return user;
+  };
+  return { current, clear, refresh, restore, restoreOffline, subscribe: listener => { listeners.add(listener); return () => { listeners.delete(listener); }; }, set: (body, url) => { generation++; legacyToken = null; legacyBase = null; return accept(body, url); } };
 }

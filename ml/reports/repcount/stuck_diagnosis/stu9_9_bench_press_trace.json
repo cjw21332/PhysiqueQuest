@@ -1,0 +1,1516 @@
+{
+  "count": 21,
+  "partialCount": 3,
+  "holdDurationMs": 0,
+  "reps": [
+    {
+      "type": "rep_counted",
+      "count": 1,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 666.6666666666667,
+      "romFraction": 0.497112867676325,
+      "romVsReference": 0.26720764456398965,
+      "quality": "partial",
+      "tempoSec": 0.6666666666666667
+    },
+    {
+      "type": "rep_counted",
+      "count": 2,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 866.6666666666665,
+      "romFraction": 0.864022852331507,
+      "romVsReference": 0.4831786807533437,
+      "quality": "partial",
+      "tempoSec": 0.8666666666666665
+    },
+    {
+      "type": "rep_counted",
+      "count": 3,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 3466.666666666667,
+      "romFraction": 0.6500648193282369,
+      "romVsReference": 0.9624903404076147,
+      "quality": "full",
+      "tempoSec": 3.466666666666667
+    },
+    {
+      "type": "rep_counted",
+      "count": 4,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1533.333333333333,
+      "romFraction": 0.5401184469058313,
+      "romVsReference": 0.6444277041189099,
+      "quality": "partial",
+      "tempoSec": 1.533333333333333
+    },
+    {
+      "type": "rep_counted",
+      "count": 5,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1066.6666666666679,
+      "romFraction": 0.46136737416043144,
+      "romVsReference": 0.552998282986843,
+      "quality": "partial",
+      "tempoSec": 1.066666666666668
+    },
+    {
+      "type": "rep_counted",
+      "count": 6,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1133.333333333334,
+      "romFraction": 0.48801402278058814,
+      "romVsReference": 0.5425895927059748,
+      "quality": "partial",
+      "tempoSec": 1.133333333333334
+    },
+    {
+      "type": "rep_counted",
+      "count": 7,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 666.6666666666679,
+      "romFraction": 0.6328721943699436,
+      "romVsReference": 0.8769200697797014,
+      "quality": "full",
+      "tempoSec": 0.6666666666666679
+    },
+    {
+      "type": "rep_counted",
+      "count": 8,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 666.6666666666661,
+      "romFraction": 0.4374257137793547,
+      "romVsReference": 0.2615569560280487,
+      "quality": "partial",
+      "tempoSec": 0.6666666666666661
+    },
+    {
+      "type": "rep_counted",
+      "count": 9,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 400,
+      "romFraction": 0.7490758185636105,
+      "romVsReference": 0.635378965270493,
+      "quality": "partial",
+      "tempoSec": 0.4
+    },
+    {
+      "type": "rep_counted",
+      "count": 10,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1733.333333333334,
+      "romFraction": 0.4850191027698158,
+      "romVsReference": 0.5343177411492831,
+      "quality": "partial",
+      "tempoSec": 1.7333333333333338
+    },
+    {
+      "type": "rep_counted",
+      "count": 11,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 600,
+      "romFraction": 0.41596346901660963,
+      "romVsReference": 0.19619842364721204,
+      "quality": "partial",
+      "tempoSec": 0.6
+    },
+    {
+      "type": "rep_counted",
+      "count": 12,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 466.6666666666679,
+      "romFraction": 0.6297589771485967,
+      "romVsReference": 0.4308071489010918,
+      "quality": "partial",
+      "tempoSec": 0.4666666666666679
+    },
+    {
+      "type": "rep_counted",
+      "count": 13,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 933.3333333333321,
+      "romFraction": 0.48083374156886505,
+      "romVsReference": 0.43890783256516347,
+      "quality": "partial",
+      "tempoSec": 0.9333333333333321
+    },
+    {
+      "type": "rep_counted",
+      "count": 14,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 3266.666666666668,
+      "romFraction": 0.43321807323591804,
+      "romVsReference": 0.7971659629187463,
+      "quality": "partial",
+      "tempoSec": 3.266666666666668
+    },
+    {
+      "type": "rep_counted",
+      "count": 15,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 466.66666666666424,
+      "romFraction": 0.4089221505294209,
+      "romVsReference": 0.5791007599367599,
+      "quality": "partial",
+      "tempoSec": 0.46666666666666423
+    },
+    {
+      "type": "rep_counted",
+      "count": 16,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1533.3333333333358,
+      "romFraction": 0.4342352404672532,
+      "romVsReference": 0.4752836305976895,
+      "quality": "partial",
+      "tempoSec": 1.5333333333333357
+    },
+    {
+      "type": "rep_counted",
+      "count": 17,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 400,
+      "romFraction": 0.7133637134192511,
+      "romVsReference": 0.6550193668240288,
+      "quality": "partial",
+      "tempoSec": 0.4
+    },
+    {
+      "type": "rep_counted",
+      "count": 18,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1200,
+      "romFraction": 0.5748563192343614,
+      "romVsReference": 0.8411835591343624,
+      "quality": "partial",
+      "tempoSec": 1.2
+    },
+    {
+      "type": "rep_counted",
+      "count": 19,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 466.6666666666679,
+      "romFraction": 0.5225678765305416,
+      "romVsReference": 0.5202752410725653,
+      "quality": "partial",
+      "tempoSec": 0.4666666666666679
+    },
+    {
+      "type": "rep_counted",
+      "count": 20,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 2133.3333333333358,
+      "romFraction": 0.5773963537922201,
+      "romVsReference": 0.8943401093991658,
+      "quality": "full",
+      "tempoSec": 2.133333333333336
+    },
+    {
+      "type": "rep_counted",
+      "count": 21,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 600,
+      "romFraction": 0.6558464059841329,
+      "romVsReference": 0.6414137356152644,
+      "quality": "partial",
+      "tempoSec": 0.6
+    }
+  ],
+  "events": [
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 1,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 666.6666666666667,
+      "romFraction": 0.497112867676325,
+      "romVsReference": 0.26720764456398965,
+      "quality": "partial",
+      "tempoSec": 0.6666666666666667
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "visibility_lost",
+      "joint": "__BILATERAL_AVG__"
+    },
+    {
+      "type": "visibility_restored",
+      "joint": "__BILATERAL_AVG__"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 2,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 866.6666666666665,
+      "romFraction": 0.864022852331507,
+      "romVsReference": 0.4831786807533437,
+      "quality": "partial",
+      "tempoSec": 0.8666666666666665
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 3,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 3466.666666666667,
+      "romFraction": 0.6500648193282369,
+      "romVsReference": 0.9624903404076147,
+      "quality": "full",
+      "tempoSec": 3.466666666666667
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 4,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1533.333333333333,
+      "romFraction": 0.5401184469058313,
+      "romVsReference": 0.6444277041189099,
+      "quality": "partial",
+      "tempoSec": 1.533333333333333
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_partial",
+      "progress": 0.6544729396420902,
+      "joint": "__BILATERAL_AVG__",
+      "cue": "Go deeper - bend more"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 5,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1066.6666666666679,
+      "romFraction": 0.46136737416043144,
+      "romVsReference": 0.552998282986843,
+      "quality": "partial",
+      "tempoSec": 1.066666666666668
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 6,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1133.333333333334,
+      "romFraction": 0.48801402278058814,
+      "romVsReference": 0.5425895927059748,
+      "quality": "partial",
+      "tempoSec": 1.133333333333334
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 7,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 666.6666666666679,
+      "romFraction": 0.6328721943699436,
+      "romVsReference": 0.8769200697797014,
+      "quality": "full",
+      "tempoSec": 0.6666666666666679
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 8,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 666.6666666666661,
+      "romFraction": 0.4374257137793547,
+      "romVsReference": 0.2615569560280487,
+      "quality": "partial",
+      "tempoSec": 0.6666666666666661
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 9,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 400,
+      "romFraction": 0.7490758185636105,
+      "romVsReference": 0.635378965270493,
+      "quality": "partial",
+      "tempoSec": 0.4
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 10,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1733.333333333334,
+      "romFraction": 0.4850191027698158,
+      "romVsReference": 0.5343177411492831,
+      "quality": "partial",
+      "tempoSec": 1.7333333333333338
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 11,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 600,
+      "romFraction": 0.41596346901660963,
+      "romVsReference": 0.19619842364721204,
+      "quality": "partial",
+      "tempoSec": 0.6
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 12,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 466.6666666666679,
+      "romFraction": 0.6297589771485967,
+      "romVsReference": 0.4308071489010918,
+      "quality": "partial",
+      "tempoSec": 0.4666666666666679
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 13,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 933.3333333333321,
+      "romFraction": 0.48083374156886505,
+      "romVsReference": 0.43890783256516347,
+      "quality": "partial",
+      "tempoSec": 0.9333333333333321
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 14,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 3266.666666666668,
+      "romFraction": 0.43321807323591804,
+      "romVsReference": 0.7971659629187463,
+      "quality": "partial",
+      "tempoSec": 3.266666666666668
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 15,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 466.66666666666424,
+      "romFraction": 0.4089221505294209,
+      "romVsReference": 0.5791007599367599,
+      "quality": "partial",
+      "tempoSec": 0.46666666666666423
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 16,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1533.3333333333358,
+      "romFraction": 0.4342352404672532,
+      "romVsReference": 0.4752836305976895,
+      "quality": "partial",
+      "tempoSec": 1.5333333333333357
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 17,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 400,
+      "romFraction": 0.7133637134192511,
+      "romVsReference": 0.6550193668240288,
+      "quality": "partial",
+      "tempoSec": 0.4
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_partial",
+      "progress": 0.46095708031651633,
+      "joint": "__BILATERAL_AVG__",
+      "cue": "Go deeper - bend more"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 18,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 1200,
+      "romFraction": 0.5748563192343614,
+      "romVsReference": 0.8411835591343624,
+      "quality": "partial",
+      "tempoSec": 1.2
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 19,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 466.6666666666679,
+      "romFraction": 0.5225678765305416,
+      "romVsReference": 0.5202752410725653,
+      "quality": "partial",
+      "tempoSec": 0.4666666666666679
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 20,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 2133.3333333333358,
+      "romFraction": 0.5773963537922201,
+      "romVsReference": 0.8943401093991658,
+      "quality": "full",
+      "tempoSec": 2.133333333333336
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_partial",
+      "progress": 0.7182612288835541,
+      "joint": "__BILATERAL_AVG__",
+      "cue": "Go deeper - bend more"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 21,
+      "joint": "__BILATERAL_AVG__",
+      "durationMs": 600,
+      "romFraction": 0.6558464059841329,
+      "romVsReference": 0.6414137356152644,
+      "quality": "partial",
+      "tempoSec": 0.6
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "visibility_lost",
+      "joint": "__BILATERAL_AVG__"
+    }
+  ],
+  "smoothedAngles": [
+    52.98630320141674,
+    52.03034338194837,
+    54.45964391355552,
+    58.81447763828494,
+    65.39907452275003,
+    70.80981182129145,
+    82.73612530411428,
+    90.67446964268373,
+    104.06150681953903,
+    109.28559277188415,
+    104.33189907183099,
+    91.19429034188464,
+    79.85378648891962,
+    85.37118456841043,
+    81.97816560799775,
+    65.93774863527486,
+    70.15644114326702,
+    73.50855676230843,
+    75.95152381598612,
+    84.02378555612249,
+    96.84498258264716,
+    106.85293279975791,
+    112.75145104388783,
+    124.60383816553221,
+    135.52682663367636,
+    136.93534932352514,
+    137.5370517642855,
+    134.73947831327854,
+    134.73947831327854,
+    133.33084999167946,
+    117.77860372842954,
+    109.95053103796835,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    123.84613251431642,
+    145.63675965359596,
+    148.5679452001965,
+    152.7085351239963,
+    152.7085351239963,
+    152.7085351239963,
+    142.94984381638335,
+    133.3530067209741,
+    129.18051502057705,
+    129.18051502057705,
+    129.18051502057705,
+    129.18051502057705,
+    111.18282783740734,
+    111.18282783740734,
+    74.32472175067535,
+    74.32472175067535,
+    74.32472175067535,
+    91.61459893251572,
+    91.61459893251572,
+    119.40647115541282,
+    130.05565552189535,
+    130.05565552189535,
+    123.7386340828035,
+    123.7386340828035,
+    137.21983818251738,
+    145.411581965486,
+    156.73818923544775,
+    116.88799159249018,
+    116.88799159249018,
+    106.27283852207869,
+    108.49644802647907,
+    108.49644802647907,
+    108.49644802647907,
+    108.49644802647907,
+    108.49644802647907,
+    98.82272314061426,
+    98.82272314061426,
+    98.82272314061426,
+    103.92569339142744,
+    119.57026196773268,
+    121.24531294618735,
+    119.85919391291557,
+    115.1932874038844,
+    131.99524285203495,
+    142.17915127362545,
+    153.71524570007028,
+    155.99466077677147,
+    161.36242822039918,
+    162.014251337127,
+    155.73528598244854,
+    157.8580846992707,
+    161.7294800365102,
+    161.7294800365102,
+    161.7294800365102,
+    161.7294800365102,
+    161.7294800365102,
+    144.9878272064162,
+    121.2962424344733,
+    114.40471773922764,
+    117.99708432962737,
+    123.96428893691763,
+    124.57234381712536,
+    122.7374908563074,
+    122.21544761070555,
+    114.37606016191643,
+    130.6842089023964,
+    108.90222665492745,
+    94.18014296407993,
+    81.72802196889329,
+    76.62707209687912,
+    76.2919334974262,
+    81.17479014886806,
+    64.88858022916327,
+    64.87725189148753,
+    54.50044608208519,
+    49.249834188893146,
+    90.60243700020825,
+    113.61740032576373,
+    131.31362703351033,
+    126.52624031417614,
+    144.04118469355015,
+    121.88803564727651,
+    117.43691187788264,
+    87.55869638422905,
+    83.41060277656213,
+    86.8840060983746,
+    97.91981193559147,
+    115.52291122611038,
+    121.55096982966985,
+    116.18354432316417,
+    131.895763203334,
+    130.4726079893907,
+    140.29793557330018,
+    111.33238822709686,
+    97.20743778485696,
+    101.09732442100454,
+    96.79991677214261,
+    113.82954340226462,
+    103.87933819663091,
+    69.01846410413889,
+    94.33153328847102,
+    123.19621685147698,
+    128.94511146481872,
+    91.40438867400677,
+    75.98992245449635,
+    97.68422435987296,
+    93.90648764976206,
+    75.63930579662468,
+    66.72112615942746,
+    57.009376239617865,
+    54.855031699474225,
+    80.62025603794275,
+    96.32940276649013,
+    103.30796954112634,
+    91.65838379978757,
+    107.02982138872028,
+    111.49560201604609,
+    109.68665943222187,
+    117.77711170036187,
+    109.90861168282633,
+    92.77506594234171,
+    106.6554557021647,
+    126.16779765591326,
+    140.56442641849293,
+    93.13792017575156,
+    116.90196340993006,
+    96.18940452735097,
+    76.85044195388738,
+    106.82812553801932,
+    105.58835906117113,
+    125.85450575646198,
+    104.9735719532379,
+    128.95699298679278,
+    112.06267411253108,
+    86.33307525425658,
+    87.87857356128346,
+    81.24294398455133,
+    92.43235643166149,
+    99.24173378721693,
+    110.85355412295766,
+    121.22145838652514,
+    128.65903352634376,
+    117.66645083636047,
+    114.61728930447657,
+    100.49319928182058,
+    76.01297987047417,
+    86.55517222847573,
+    83.22040755771522,
+    67.14801661372786,
+    46.737028278239904,
+    88.56390016581388,
+    119.85000884845442,
+    139.7745571853629,
+    151.08954106521622,
+    110.89430081875823,
+    101.34667943928577,
+    127.94286321510504,
+    103.12411946472284,
+    90.83779811930918,
+    84.51516612807683,
+    70.79208675422639,
+    64.39897825912,
+    65.0943189990633,
+    73.7541845008101,
+    87.1614027488292,
+    100.60781334262032,
+    108.78469649082808,
+    105.10927770382892,
+    99.95853309041456,
+    87.08599116578853,
+    108.81682550009134,
+    99.93065149597702,
+    78.4872518431739,
+    70.62080930264341,
+    65.29026022440566,
+    73.0501180396349,
+    76.70832476749436,
+    58.40956805008756,
+    50.91556192838486,
+    36.263932727645056,
+    82.99768904656734,
+    79.16238289569398,
+    112.12831658554117,
+    93.09276455025903,
+    85.48582756190932,
+    76.76299103650749,
+    68.65355644850725,
+    59.91876352339516,
+    91.93891100742884,
+    87.60615538552854,
+    114.86519847449442,
+    128.04743293267603,
+    136.44911779749066,
+    138.7524630620953,
+    131.61176493998752,
+    107.75153017690192,
+    100.34591402101144,
+    80.48224020301326,
+    93.57878576401102,
+    92.0613567173627,
+    91.66382518770732,
+    85.34154591781831,
+    75.70506600490205,
+    107.98351868368668,
+    128.56281368995428,
+    108.56006885607684,
+    123.59408718101787,
+    140.2730414496456,
+    139.1539591203039,
+    136.87795208303723,
+    121.16897968463215,
+    89.79763424073234,
+    75.68936084336954,
+    68.90414054567346,
+    68.09164054668241,
+    66.53116346817397,
+    68.83655792006859,
+    81.08936474450353,
+    90.54294912955183,
+    94.1592425434965,
+    87.2958380762659,
+    79.81449061549229,
+    78.80486358370733,
+    95.46148555959229,
+    83.02220179578369,
+    72.87280603733974,
+    70.44547828614391,
+    108.4878189859102,
+    86.04460845188609,
+    110.36443124945919,
+    123.91175335573129,
+    94.82234521585781,
+    85.28255159322708,
+    65.94968873198232,
+    53.73862305283097,
+    49.36069319656015,
+    53.958140814933074,
+    56.70479137533484,
+    56.21468294002015,
+    67.12864282474715,
+    75.15301235024324,
+    94.61614582962241,
+    114.46778191798663,
+    119.68587507970474,
+    118.23715418839436,
+    126.50644266952062,
+    110.06866403635499,
+    103.27944438333576,
+    92.75472341297001,
+    79.66697498384482,
+    103.1234146376434,
+    107.79503189899854,
+    84.47679769434905,
+    70.16117780874812,
+    57.38482569825424,
+    49.815290106989366,
+    93.3591931528272,
+    89.69472292266514,
+    117.25428680244306,
+    97.09954936894087,
+    78.74840192031319,
+    70.49768274516903,
+    71.4982097771639,
+    96.48675166786893,
+    84.94439406798907,
+    86.01771253884374,
+    71.36756622895743,
+    89.7023899767751,
+    102.73991987548443,
+    84.85668013319334,
+    94.57109862525411,
+    107.27829729350097,
+    104.14077896588029,
+    111.35726435760367,
+    112.05562676262824,
+    91.72186098506725,
+    103.30415939363525,
+    95.19798936370402,
+    92.62191932849777,
+    94.73971836044865,
+    120.71964031808093,
+    108.37004293449712,
+    124.21926449994962,
+    133.46302233352085,
+    145.8001020653246,
+    156.3034809368079,
+    154.313998468088,
+    148.40223032290191,
+    151.9439969074608,
+    154.2834853061907,
+    145.79492321803667,
+    157.1968649880228,
+    162.09093980908622,
+    165.07808007686805,
+    163.77866660247784,
+    129.92342841076066,
+    105.5091238032845,
+    99.44218818089388,
+    127.0096559113716,
+    139.84230423398373,
+    150.19187138163517,
+    148.90855606886424,
+    132.54078397029608,
+    110.79551875683396,
+    91.50226330644175,
+    61.359266186047265,
+    99.32421721316214,
+    88.63241742092737,
+    84.40285695847771,
+    85.36303699589911,
+    86.83251486888018,
+    84.77374283021342,
+    72.61292240189078,
+    69.80824331248817,
+    66.86011898977695,
+    66.07493104936907,
+    100.48786138472231,
+    89.96484500043753,
+    117.2131791043569,
+    131.8135301417355,
+    141.71976125432226,
+    102.55911410023414,
+    106.53441015512996,
+    73.0525951048627,
+    91.25480284588613,
+    87.49588067062278,
+    97.14623484508897,
+    117.21142450409101,
+    95.94273870985148,
+    85.69496625119851,
+    79.6182430892078,
+    107.79458611930778,
+    125.91111347246377,
+    104.86466457570586,
+    107.24749988809714,
+    113.23739260936432,
+    104.7659000648496,
+    98.15944332467592,
+    89.12382565386322,
+    66.076535323829,
+    86.10194296684392,
+    108.68457271256773,
+    124.8008810316474,
+    129.53514740048288,
+    121.24532174474487,
+    86.37602238314886,
+    66.21351054492625,
+    71.45548308119805,
+    86.1972150766655,
+    90.11936121157726,
+    90.21259930183606,
+    63.22727834491196,
+    67.13511301933329,
+    98.49696775193695,
+    119.55338058489093,
+    136.10467242517433,
+    136.75229414548664,
+    138.37373035852087,
+    149.57294959022866,
+    105.51984048438723,
+    115.91893610006153,
+    137.3299902098246,
+    110.77855580966211,
+    82.35661160117857,
+    97.56338440551653,
+    82.6357990242834,
+    88.56071790690862,
+    86.58583945332103,
+    94.09716468389547,
+    98.76943363211922,
+    66.12320962614845,
+    64.21886171740452,
+    65.04791863760676,
+    71.1390541948359,
+    59.595917525316324,
+    67.96718434268436,
+    52.301890992363745,
+    74.29530259383748,
+    99.23671523795852,
+    90.68915843568708,
+    100.15775235600628,
+    80.50770890076029,
+    107.61101787424718,
+    85.05947537259561,
+    60.35675779247852,
+    96.16611919215717,
+    103.61136067538777,
+    112.42614745206006,
+    130.54445870399098,
+    130.1295190192298,
+    130.75381531907033,
+    123.37159372264296,
+    120.39327665908141,
+    79.42211602858504,
+    113.59064245309676,
+    134.84461595606513,
+    141.89380371870715,
+    112.98747468773458,
+    131.65759106883246,
+    145.18086520796538,
+    127.13600923245153,
+    142.18600360208492,
+    143.48696981397381,
+    149.83063074766378,
+    159.5648876712899,
+    129.98740190922936,
+    110.40748666041893,
+    95.06040424063217,
+    83.47922280721914,
+    86.91620998449703,
+    116.75698696912099,
+    129.3727729198111,
+    98.67130843997123,
+    123.09715637667941,
+    102.86032162031748,
+    126.16737254541886,
+    84.62603405926023,
+    55.166647500016076,
+    93.43302971005168,
+    118.33855007987795,
+    89.07818363457396,
+    70.65351104124211,
+    52.14589521075121,
+    49.38294405950939,
+    57.16317288710227,
+    55.16941640498606,
+    46.47873450652151,
+    50.00355246719026,
+    53.79665744361188,
+    65.49280547168979,
+    53.79260131383822,
+    53.706193781994045,
+    45.46930133377048,
+    76.86583520929477,
+    83.28774673626121,
+    71.12541847917689,
+    54.349565180575944,
+    88.4584091894917,
+    82.95443092722275,
+    80.59159515480947,
+    53.42901984462387,
+    45.448085476305025,
+    38.2304207574805,
+    86.25111656131554,
+    110.46108173881888,
+    128.87973116944104,
+    118.83398343772339,
+    120.27972514574634,
+    114.51079369486223,
+    96.7465083658993,
+    87.54713764669599,
+    78.46135533322618,
+    68.38039852724783,
+    63.90518283988118,
+    71.96112509792948,
+    58.26418669447986,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565,
+    62.33989202785565
+  ]
+}

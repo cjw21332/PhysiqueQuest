@@ -1,0 +1,3384 @@
+[
+  {
+    "video": "01e83deb_0015_c-curl twist_[13].mp4",
+    "exercise": "c-curl twist",
+    "expected_pattern": "core_flexion",
+    "predicted_pattern": "horizontal_pull",
+    "confidence": 0.3821713626384735,
+    "pattern_match": false,
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "pred_reps": 22,
+    "rep_error": 9,
+    "frames_with_pose": 631,
+    "video_duration_sec": 42.06666666666667
+  },
+  {
+    "video": "01e83deb_0055_knee to chest_[17].mp4",
+    "exercise": "knee to chest",
+    "expected": "core_flexion",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0136_bent scissor_[36].mp4",
+    "exercise": "bent scissor",
+    "expected": "core_flexion",
+    "gt_reps": 36,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0216_toe taps_[16].mp4",
+    "exercise": "toe taps",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0258_leg extension + crunch [l]_[11].mp4",
+    "exercise": "leg extension + crunch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0339_side crunch + leg stretch [l]_[12].mp4",
+    "exercise": "side crunch + leg stretch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0419_leg extension + crunch [r]_[11].mp4",
+    "exercise": "leg extension + crunch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0459_side crunch + leg stretch [r]_[12].mp4",
+    "exercise": "side crunch + leg stretch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "04996ace_0016_reverse lunges challenge_[50].mp4",
+    "exercise": "reverse lunges challenge",
+    "expected_pattern": "squat",
+    "predicted_pattern": "squat",
+    "confidence": 0.8506162166595459,
+    "pattern_match": true,
+    "gt_reps": 50,
+    "gt_rep_type": "single",
+    "pred_reps": 33,
+    "rep_error": 17,
+    "frames_with_pose": 990,
+    "video_duration_sec": 66.0
+  },
+  {
+    "video": "0a9a588e_0009_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0039_donkey kick + cross_[16].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0109_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0139_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0209_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0239_hamstring curl_[10].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0339_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0409_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0439_leg extension_[11].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0509_leg circle_[22].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 22,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0609_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0639_donkey kick + cross_[8].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0709_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0739_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0809_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0839_hamstring curl_[11].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0943_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1009_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1039_leg extension_[12].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1109_leg circle_[19].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 19,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1209_pointe to heel bridge_[8].mp4",
+    "exercise": "pointe to heel bridge",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1239_pointed glute bridge_[11].mp4",
+    "exercise": "pointed glute bridge",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1339_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1409_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0017_straight leg lift [r]_[13-12-14].mp4",
+    "exercise": "straight leg lift [r]",
+    "expected": "hinge",
+    "gt_reps": 13.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0055_knee to chest_[17].mp4",
+    "exercise": "knee to chest",
+    "expected_pattern": "core_flexion",
+    "predicted_pattern": "cardio_dynamic",
+    "confidence": 0.7513341307640076,
+    "pattern_match": false,
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "pred_reps": 17,
+    "rep_error": 0,
+    "frames_with_pose": 631,
+    "video_duration_sec": 42.06666666666667
+  },
+  {
+    "video": "01e83deb_0136_bent scissor_[36].mp4",
+    "exercise": "bent scissor",
+    "expected": "core_flexion",
+    "gt_reps": 36,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0216_toe taps_[16].mp4",
+    "exercise": "toe taps",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0258_leg extension + crunch [l]_[11].mp4",
+    "exercise": "leg extension + crunch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0339_side crunch + leg stretch [l]_[12].mp4",
+    "exercise": "side crunch + leg stretch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0419_leg extension + crunch [r]_[11].mp4",
+    "exercise": "leg extension + crunch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0459_side crunch + leg stretch [r]_[12].mp4",
+    "exercise": "side crunch + leg stretch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0009_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0039_donkey kick + cross_[16].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0109_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0139_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0209_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0239_hamstring curl_[10].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0339_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0409_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0439_leg extension_[11].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0509_leg circle_[22].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 22,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0609_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0639_donkey kick + cross_[8].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0709_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0739_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0809_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0839_hamstring curl_[11].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0943_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1009_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1039_leg extension_[12].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1109_leg circle_[19].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 19,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1209_pointe to heel bridge_[8].mp4",
+    "exercise": "pointe to heel bridge",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1239_pointed glute bridge_[11].mp4",
+    "exercise": "pointed glute bridge",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1339_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1409_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0017_straight leg lift [r]_[13-12-14].mp4",
+    "exercise": "straight leg lift [r]",
+    "expected": "hinge",
+    "gt_reps": 13.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0139_straight leg circle [r]_[11].mp4",
+    "exercise": "straight leg circle [r]",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0229_lower leg lift (L)_[12].mp4",
+    "exercise": "lower leg lift (l)",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0359_straight leg lift (L)_[10].mp4",
+    "exercise": "straight leg lift (l)",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0519_straight leg circle(L)_[9].mp4",
+    "exercise": "straight leg circle(l)",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0559_lower leg lift (R)_[13].mp4",
+    "exercise": "lower leg lift (r)",
+    "expected": "hinge",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0739_V bridge lift (feet connected)_[8].mp4",
+    "exercise": "v bridge lift (feet connected)",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0819_V bridge lift + butterfly_[7].mp4",
+    "exercise": "v bridge lift + butterfly",
+    "expected": "core_flexion",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0859_V bridge hold + butterfly_[14].mp4",
+    "exercise": "v bridge hold + butterfly",
+    "expected": "core_isometric",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0045_drop squats_[40].mp4",
+    "exercise": "drop squats",
+    "expected_pattern": "squat",
+    "predicted_pattern": "squat",
+    "confidence": 0.38374489545822144,
+    "pattern_match": true,
+    "gt_reps": 40,
+    "gt_rep_type": "single",
+    "pred_reps": 13,
+    "rep_error": 27,
+    "frames_with_pose": 315,
+    "video_duration_sec": 21.0
+  },
+  {
+    "video": "14c2c3f4_0146_half burpees_[17].mp4",
+    "exercise": "half burpees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0248_high knees_[146-145-147].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 146.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0346_butt kick squat jumps_[23].mp4",
+    "exercise": "butt kick squat jumps",
+    "expected": "squat",
+    "gt_reps": 23,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0447_push up toe tap_[14-13-15].mp4",
+    "exercise": "push up toe tap",
+    "expected": "horizontal_push",
+    "gt_reps": 14.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0549_bicycle crunches_[114-113-115].mp4",
+    "exercise": "bicycle crunches",
+    "expected": "core_flexion",
+    "gt_reps": 114.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0751_side plank raises(right side)_[51].mp4",
+    "exercise": "side plank raises(right side)",
+    "expected": "hinge",
+    "gt_reps": 51,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0847_full burpees_[16].mp4",
+    "exercise": "full burpees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0041_high knees_[17].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0111_sun rises_[11].mp4",
+    "exercise": "sun rises",
+    "expected": "lateral_raise",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0141_hip circles_[7].mp4",
+    "exercise": "hip circles",
+    "expected": "hinge",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0211_high knee & cross punches_[21].mp4",
+    "exercise": "high knee & cross punches",
+    "expected": "cardio_dynamic",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0241_slow sq_[6].mp4",
+    "exercise": "slow sq",
+    "expected": "squat",
+    "gt_reps": 6,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0311_cross toe touches_[10].mp4",
+    "exercise": "cross toe touches",
+    "expected": "core_flexion",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0341_step jacks_[30].mp4",
+    "exercise": "step jacks",
+    "expected": "squat",
+    "gt_reps": 30,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0411_standing donkey kicks_[10].mp4",
+    "exercise": "standing donkey kicks",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0053_leg raise clap_[8].mp4",
+    "exercise": "leg raise clap",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0231_crossbody mountain climber_[52-51-53].mp4",
+    "exercise": "crossbody mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 52.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0533_100_[70].mp4",
+    "exercise": "100",
+    "expected": "cardio_dynamic",
+    "gt_reps": 70,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0603_crunch_[12].mp4",
+    "exercise": "crunch",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0643_up&down plank_[11-10-12].mp4",
+    "exercise": "up&down plank",
+    "expected": "core_isometric",
+    "gt_reps": 11.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0753_heel tap_[28].mp4",
+    "exercise": "heel tap",
+    "expected": "core_flexion",
+    "gt_reps": 28,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0903_reverse crunch leg extension_[12].mp4",
+    "exercise": "reverse crunch leg extension",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0933_straight leg crunch_[8].mp4",
+    "exercise": "straight leg crunch",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58ef058b0a17cd460ca5f138c9_1013_up&down plank_[10].mp4",
+    "exercise": "up&down plank",
+    "expected": "core_isometric",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0014_wall bicycle_[15].mp4",
+    "exercise": "wall bicycle",
+    "expected": "hinge",
+    "gt_reps": 15,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0044_wall bridge_[10].mp4",
+    "exercise": "wall bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0114_1 leg bridge(R)_[14].mp4",
+    "exercise": "1 leg bridge(r)",
+    "expected": "hinge",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0144_1 leg bridge(L)_[14].mp4",
+    "exercise": "1 leg bridge(l)",
+    "expected": "hinge",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0215_wall marching_[12].mp4",
+    "exercise": "wall marching",
+    "expected": "cardio_dynamic",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0244_cross crunch(R)_[16].mp4",
+    "exercise": "cross crunch(r)",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0314_cross crunch(L)_[16].mp4",
+    "exercise": "cross crunch(l)",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0344_wall walk_[7].mp4",
+    "exercise": "wall walk",
+    "expected": "cardio_dynamic",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0416_leg slides_[12].mp4",
+    "exercise": "leg slides",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0444_hip slides_[10].mp4",
+    "exercise": "hip slides",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0517_wall twist_[33].mp4",
+    "exercise": "wall twist",
+    "expected": "lateral_raise",
+    "gt_reps": 33,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0545_crunch_[16].mp4",
+    "exercise": "crunch",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0650_baby cobra_[5].mp4",
+    "exercise": "baby cobra",
+    "expected": "core_flexion",
+    "gt_reps": 5,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0720_booty slide_[10].mp4",
+    "exercise": "booty slide",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0814_wall push_[10].mp4",
+    "exercise": "wall push",
+    "expected": "horizontal_push",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0844_kickback(R)_[17].mp4",
+    "exercise": "kickback(r)",
+    "expected": "hinge",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0914_kickback(L)_[17].mp4",
+    "exercise": "kickback(l)",
+    "expected": "hinge",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0140_open chest & press_[13].mp4",
+    "exercise": "open chest & press",
+    "expected": "curl",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0220_prayer pulses_[26].mp4",
+    "exercise": "prayer pulses",
+    "expected": "curl",
+    "gt_reps": 26,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0300_bicep curls_[24].mp4",
+    "exercise": "bicep curls",
+    "expected": "curl",
+    "gt_reps": 24,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0506_straight arm lift_[24].mp4",
+    "exercise": "straight arm lift",
+    "expected": "lateral_raise",
+    "gt_reps": 24,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0638_stting tricep push_[13].mp4",
+    "exercise": "stting tricep push",
+    "expected": "triceps_extension",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0716_box push-ups_[11].mp4",
+    "exercise": "box push-ups",
+    "expected": "horizontal_push",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "3977a2e05bacbfc8e3be9a48162bc169_1012_alternating side crunch_[14].mp4",
+    "exercise": "alternating side crunch",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "4555d6aead3c90604b2c19ee3f1dc820_0614_good morning + twist_[10].mp4",
+    "exercise": "good morning + twist",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0014_jumping jack_[35].mp4",
+    "exercise": "jumping jack",
+    "expected": "cardio_dynamic",
+    "gt_reps": 35,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0044_high knees_[80-79-81].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 80.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0114_squat + side jumpy_[21].mp4",
+    "exercise": "squat + side jumpy",
+    "expected": "squat",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0144_mountain climber_[69-68-70].mp4",
+    "exercise": "mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 69.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0244_plank + jumping jack_[10].mp4",
+    "exercise": "plank + jumping jack",
+    "expected": "core_isometric",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0314_jump + punches_[16].mp4",
+    "exercise": "jump + punches",
+    "expected": "cardio_dynamic",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0344_high knees_[82].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 82,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0414_squat jump + 3s hold_[10].mp4",
+    "exercise": "squat jump + 3s hold",
+    "expected": "squat",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0444_twisting mountain climber_[59-58-60].mp4",
+    "exercise": "twisting mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 59.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0514_push up (on knees)_[12].mp4",
+    "exercise": "push up (on knees)",
+    "expected": "horizontal_push",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0614_plank jump + 3 punches_[9].mp4",
+    "exercise": "plank jump + 3 punches",
+    "expected": "core_isometric",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0644_HIGH KNEES_[79-78-80].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 79.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0713_SQUAT + SIDE JUMPY_[21].mp4",
+    "exercise": "squat + side jumpy",
+    "expected": "squat",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0744_JUMPING JACK_[35].mp4",
+    "exercise": "jumping jack",
+    "expected": "cardio_dynamic",
+    "gt_reps": 35,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0815_PLANK + JUMPING JACK_[11].mp4",
+    "exercise": "plank + jumping jack",
+    "expected": "core_isometric",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0845_MOUNTAIN CLIMBER_[62].mp4",
+    "exercise": "mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 62,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0915_HIGH PLANK_[1].mp4",
+    "exercise": "high plank",
+    "expected": "core_isometric",
+    "gt_reps": 1,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0944_ELBOW PLANK_[1].mp4",
+    "exercise": "elbow plank",
+    "expected": "core_isometric",
+    "gt_reps": 1,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "60093019_0019_donkey kicks_[50].mp4",
+    "exercise": "donkey kicks",
+    "expected_pattern": "hinge",
+    "predicted_pattern": "squat",
+    "confidence": 0.9255364537239075,
+    "pattern_match": false,
+    "gt_reps": 50,
+    "gt_rep_type": "single",
+    "pred_reps": 0,
+    "rep_error": 50,
+    "frames_with_pose": 688,
+    "video_duration_sec": 45.86666666666667
+  },
+  {
+    "video": "01e83deb_0136_bent scissor_[36].mp4",
+    "exercise": "bent scissor",
+    "expected_pattern": "core_flexion",
+    "predicted_pattern": "core_flexion",
+    "confidence": 0.8952335119247437,
+    "pattern_match": true,
+    "gt_reps": 36,
+    "gt_rep_type": "single",
+    "pred_reps": 15,
+    "rep_error": 21,
+    "frames_with_pose": 631,
+    "video_duration_sec": 42.06666666666667
+  },
+  {
+    "video": "01e83deb_0216_toe taps_[16].mp4",
+    "exercise": "toe taps",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0258_leg extension + crunch [l]_[11].mp4",
+    "exercise": "leg extension + crunch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0339_side crunch + leg stretch [l]_[12].mp4",
+    "exercise": "side crunch + leg stretch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0419_leg extension + crunch [r]_[11].mp4",
+    "exercise": "leg extension + crunch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0459_side crunch + leg stretch [r]_[12].mp4",
+    "exercise": "side crunch + leg stretch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0009_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0039_donkey kick + cross_[16].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0109_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0139_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0209_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0239_hamstring curl_[10].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0339_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0409_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0439_leg extension_[11].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0509_leg circle_[22].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 22,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0609_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0639_donkey kick + cross_[8].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0709_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0739_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0809_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0839_hamstring curl_[11].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0943_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1009_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1039_leg extension_[12].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1109_leg circle_[19].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 19,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1209_pointe to heel bridge_[8].mp4",
+    "exercise": "pointe to heel bridge",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1239_pointed glute bridge_[11].mp4",
+    "exercise": "pointed glute bridge",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1339_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1409_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0017_straight leg lift [r]_[13-12-14].mp4",
+    "exercise": "straight leg lift [r]",
+    "expected": "hinge",
+    "gt_reps": 13.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0139_straight leg circle [r]_[11].mp4",
+    "exercise": "straight leg circle [r]",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0229_lower leg lift (L)_[12].mp4",
+    "exercise": "lower leg lift (l)",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0359_straight leg lift (L)_[10].mp4",
+    "exercise": "straight leg lift (l)",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0519_straight leg circle(L)_[9].mp4",
+    "exercise": "straight leg circle(l)",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0559_lower leg lift (R)_[13].mp4",
+    "exercise": "lower leg lift (r)",
+    "expected": "hinge",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0739_V bridge lift (feet connected)_[8].mp4",
+    "exercise": "v bridge lift (feet connected)",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0819_V bridge lift + butterfly_[7].mp4",
+    "exercise": "v bridge lift + butterfly",
+    "expected": "core_flexion",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0859_V bridge hold + butterfly_[14].mp4",
+    "exercise": "v bridge hold + butterfly",
+    "expected": "core_isometric",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0146_half burpees_[17].mp4",
+    "exercise": "half burpees",
+    "expected_pattern": "cardio_dynamic",
+    "predicted_pattern": "squat",
+    "confidence": 0.5122738480567932,
+    "pattern_match": false,
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "pred_reps": 0,
+    "rep_error": 17,
+    "frames_with_pose": 300,
+    "video_duration_sec": 20.0
+  },
+  {
+    "video": "14c2c3f4_0248_high knees_[146-145-147].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 146.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0346_butt kick squat jumps_[23].mp4",
+    "exercise": "butt kick squat jumps",
+    "expected": "squat",
+    "gt_reps": 23,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0447_push up toe tap_[14-13-15].mp4",
+    "exercise": "push up toe tap",
+    "expected": "horizontal_push",
+    "gt_reps": 14.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0549_bicycle crunches_[114-113-115].mp4",
+    "exercise": "bicycle crunches",
+    "expected": "core_flexion",
+    "gt_reps": 114.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0751_side plank raises(right side)_[51].mp4",
+    "exercise": "side plank raises(right side)",
+    "expected": "hinge",
+    "gt_reps": 51,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0847_full burpees_[16].mp4",
+    "exercise": "full burpees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0041_high knees_[17].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0111_sun rises_[11].mp4",
+    "exercise": "sun rises",
+    "expected": "lateral_raise",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0141_hip circles_[7].mp4",
+    "exercise": "hip circles",
+    "expected": "hinge",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0211_high knee & cross punches_[21].mp4",
+    "exercise": "high knee & cross punches",
+    "expected": "cardio_dynamic",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0241_slow sq_[6].mp4",
+    "exercise": "slow sq",
+    "expected": "squat",
+    "gt_reps": 6,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0311_cross toe touches_[10].mp4",
+    "exercise": "cross toe touches",
+    "expected": "core_flexion",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0341_step jacks_[30].mp4",
+    "exercise": "step jacks",
+    "expected": "squat",
+    "gt_reps": 30,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0411_standing donkey kicks_[10].mp4",
+    "exercise": "standing donkey kicks",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0053_leg raise clap_[8].mp4",
+    "exercise": "leg raise clap",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0231_crossbody mountain climber_[52-51-53].mp4",
+    "exercise": "crossbody mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 52.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0533_100_[70].mp4",
+    "exercise": "100",
+    "expected": "cardio_dynamic",
+    "gt_reps": 70,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0603_crunch_[12].mp4",
+    "exercise": "crunch",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0643_up&down plank_[11-10-12].mp4",
+    "exercise": "up&down plank",
+    "expected": "core_isometric",
+    "gt_reps": 11.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0753_heel tap_[28].mp4",
+    "exercise": "heel tap",
+    "expected": "core_flexion",
+    "gt_reps": 28,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0903_reverse crunch leg extension_[12].mp4",
+    "exercise": "reverse crunch leg extension",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0933_straight leg crunch_[8].mp4",
+    "exercise": "straight leg crunch",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58ef058b0a17cd460ca5f138c9_1013_up&down plank_[10].mp4",
+    "exercise": "up&down plank",
+    "expected": "core_isometric",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0014_wall bicycle_[15].mp4",
+    "exercise": "wall bicycle",
+    "expected": "hinge",
+    "gt_reps": 15,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0044_wall bridge_[10].mp4",
+    "exercise": "wall bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0114_1 leg bridge(R)_[14].mp4",
+    "exercise": "1 leg bridge(r)",
+    "expected": "hinge",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0144_1 leg bridge(L)_[14].mp4",
+    "exercise": "1 leg bridge(l)",
+    "expected": "hinge",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0215_wall marching_[12].mp4",
+    "exercise": "wall marching",
+    "expected": "cardio_dynamic",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0244_cross crunch(R)_[16].mp4",
+    "exercise": "cross crunch(r)",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0314_cross crunch(L)_[16].mp4",
+    "exercise": "cross crunch(l)",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0344_wall walk_[7].mp4",
+    "exercise": "wall walk",
+    "expected": "cardio_dynamic",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0416_leg slides_[12].mp4",
+    "exercise": "leg slides",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0444_hip slides_[10].mp4",
+    "exercise": "hip slides",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0517_wall twist_[33].mp4",
+    "exercise": "wall twist",
+    "expected": "lateral_raise",
+    "gt_reps": 33,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0545_crunch_[16].mp4",
+    "exercise": "crunch",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0650_baby cobra_[5].mp4",
+    "exercise": "baby cobra",
+    "expected": "core_flexion",
+    "gt_reps": 5,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0720_booty slide_[10].mp4",
+    "exercise": "booty slide",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0814_wall push_[10].mp4",
+    "exercise": "wall push",
+    "expected": "horizontal_push",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0844_kickback(R)_[17].mp4",
+    "exercise": "kickback(r)",
+    "expected": "hinge",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0914_kickback(L)_[17].mp4",
+    "exercise": "kickback(l)",
+    "expected": "hinge",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0140_open chest & press_[13].mp4",
+    "exercise": "open chest & press",
+    "expected": "curl",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0220_prayer pulses_[26].mp4",
+    "exercise": "prayer pulses",
+    "expected": "curl",
+    "gt_reps": 26,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0300_bicep curls_[24].mp4",
+    "exercise": "bicep curls",
+    "expected": "curl",
+    "gt_reps": 24,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0506_straight arm lift_[24].mp4",
+    "exercise": "straight arm lift",
+    "expected": "lateral_raise",
+    "gt_reps": 24,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0638_stting tricep push_[13].mp4",
+    "exercise": "stting tricep push",
+    "expected": "triceps_extension",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0716_box push-ups_[11].mp4",
+    "exercise": "box push-ups",
+    "expected": "horizontal_push",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "3977a2e05bacbfc8e3be9a48162bc169_1012_alternating side crunch_[14].mp4",
+    "exercise": "alternating side crunch",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "4555d6aead3c90604b2c19ee3f1dc820_0614_good morning + twist_[10].mp4",
+    "exercise": "good morning + twist",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0014_jumping jack_[35].mp4",
+    "exercise": "jumping jack",
+    "expected": "cardio_dynamic",
+    "gt_reps": 35,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0044_high knees_[80-79-81].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 80.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0114_squat + side jumpy_[21].mp4",
+    "exercise": "squat + side jumpy",
+    "expected": "squat",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0144_mountain climber_[69-68-70].mp4",
+    "exercise": "mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 69.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0244_plank + jumping jack_[10].mp4",
+    "exercise": "plank + jumping jack",
+    "expected": "core_isometric",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0314_jump + punches_[16].mp4",
+    "exercise": "jump + punches",
+    "expected": "cardio_dynamic",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0344_high knees_[82].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 82,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0414_squat jump + 3s hold_[10].mp4",
+    "exercise": "squat jump + 3s hold",
+    "expected": "squat",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0444_twisting mountain climber_[59-58-60].mp4",
+    "exercise": "twisting mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 59.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0514_push up (on knees)_[12].mp4",
+    "exercise": "push up (on knees)",
+    "expected": "horizontal_push",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0614_plank jump + 3 punches_[9].mp4",
+    "exercise": "plank jump + 3 punches",
+    "expected": "core_isometric",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0644_HIGH KNEES_[79-78-80].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 79.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0713_SQUAT + SIDE JUMPY_[21].mp4",
+    "exercise": "squat + side jumpy",
+    "expected": "squat",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0744_JUMPING JACK_[35].mp4",
+    "exercise": "jumping jack",
+    "expected": "cardio_dynamic",
+    "gt_reps": 35,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0815_PLANK + JUMPING JACK_[11].mp4",
+    "exercise": "plank + jumping jack",
+    "expected": "core_isometric",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0845_MOUNTAIN CLIMBER_[62].mp4",
+    "exercise": "mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 62,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0915_HIGH PLANK_[1].mp4",
+    "exercise": "high plank",
+    "expected": "core_isometric",
+    "gt_reps": 1,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "5e3a8d78_0944_ELBOW PLANK_[1].mp4",
+    "exercise": "elbow plank",
+    "expected": "core_isometric",
+    "gt_reps": 1,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "64f0a0d9_0017_plank jacks challenge_[100].mp4",
+    "exercise": "plank jacks challenge",
+    "expected_pattern": "cardio_dynamic",
+    "predicted_pattern": "squat",
+    "confidence": 0.37981536984443665,
+    "pattern_match": false,
+    "gt_reps": 100,
+    "gt_rep_type": "single",
+    "pred_reps": 0,
+    "rep_error": 100,
+    "frames_with_pose": 825,
+    "video_duration_sec": 55.0
+  },
+  {
+    "video": "6770817f_0013_leg lift circles_[12].mp4",
+    "exercise": "leg lift circles",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0043_reverse crunch variation_[12].mp4",
+    "exercise": "reverse crunch variation",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0113_leg lift_[67].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 67,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0143_cross crunch_[17].mp4",
+    "exercise": "cross crunch",
+    "expected": "core_flexion",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0213_russian twist_[35].mp4",
+    "exercise": "russian twist",
+    "expected": "core_flexion",
+    "gt_reps": 35,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0243_leg lift_[15].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 15,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0313_flutter kicks_[90].mp4",
+    "exercise": "flutter kicks",
+    "expected": "core_flexion",
+    "gt_reps": 90,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0343_toe taps_[56].mp4",
+    "exercise": "toe taps",
+    "expected": "core_flexion",
+    "gt_reps": 56,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0413_reverse crunch variantion_[13].mp4",
+    "exercise": "reverse crunch variantion",
+    "expected": "core_flexion",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0513_bicycle crunch_[40].mp4",
+    "exercise": "bicycle crunch",
+    "expected": "core_flexion",
+    "gt_reps": 40,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "6770817f_0543_side plank pull left_[21].mp4",
+    "exercise": "side plank pull left",
+    "expected": "hinge",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0216_toe taps_[16].mp4",
+    "exercise": "toe taps",
+    "expected_pattern": "core_flexion",
+    "predicted_pattern": "core_flexion",
+    "confidence": 0.9037517309188843,
+    "pattern_match": true,
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "pred_reps": 16,
+    "rep_error": 0,
+    "frames_with_pose": 631,
+    "video_duration_sec": 42.06666666666667
+  },
+  {
+    "video": "01e83deb_0258_leg extension + crunch [l]_[11].mp4",
+    "exercise": "leg extension + crunch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0339_side crunch + leg stretch [l]_[12].mp4",
+    "exercise": "side crunch + leg stretch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0419_leg extension + crunch [r]_[11].mp4",
+    "exercise": "leg extension + crunch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0459_side crunch + leg stretch [r]_[12].mp4",
+    "exercise": "side crunch + leg stretch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0009_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0039_donkey kick + cross_[16].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0109_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0139_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0209_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0239_hamstring curl_[10].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0339_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0409_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0439_leg extension_[11].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0509_leg circle_[22].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 22,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0609_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0639_donkey kick + cross_[8].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0709_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0739_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0809_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0839_hamstring curl_[11].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0943_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1009_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1039_leg extension_[12].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1109_leg circle_[19].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 19,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1209_pointe to heel bridge_[8].mp4",
+    "exercise": "pointe to heel bridge",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1239_pointed glute bridge_[11].mp4",
+    "exercise": "pointed glute bridge",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1339_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1409_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0017_straight leg lift [r]_[13-12-14].mp4",
+    "exercise": "straight leg lift [r]",
+    "expected": "hinge",
+    "gt_reps": 13.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0139_straight leg circle [r]_[11].mp4",
+    "exercise": "straight leg circle [r]",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0229_lower leg lift (L)_[12].mp4",
+    "exercise": "lower leg lift (l)",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0359_straight leg lift (L)_[10].mp4",
+    "exercise": "straight leg lift (l)",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0519_straight leg circle(L)_[9].mp4",
+    "exercise": "straight leg circle(l)",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0559_lower leg lift (R)_[13].mp4",
+    "exercise": "lower leg lift (r)",
+    "expected": "hinge",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0739_V bridge lift (feet connected)_[8].mp4",
+    "exercise": "v bridge lift (feet connected)",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0819_V bridge lift + butterfly_[7].mp4",
+    "exercise": "v bridge lift + butterfly",
+    "expected": "core_flexion",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0859_V bridge hold + butterfly_[14].mp4",
+    "exercise": "v bridge hold + butterfly",
+    "expected": "core_isometric",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0248_high knees_[146-145-147].mp4",
+    "exercise": "high knees",
+    "expected_pattern": "cardio_dynamic",
+    "predicted_pattern": "horizontal_push",
+    "confidence": 0.35996201634407043,
+    "pattern_match": false,
+    "gt_reps": 146.0,
+    "gt_rep_type": "multi",
+    "pred_reps": 0,
+    "rep_error": 146.0,
+    "frames_with_pose": 255,
+    "video_duration_sec": 17.0
+  },
+  {
+    "video": "14c2c3f4_0346_butt kick squat jumps_[23].mp4",
+    "exercise": "butt kick squat jumps",
+    "expected_pattern": "squat",
+    "predicted_pattern": "curl",
+    "confidence": 0.3413012623786926,
+    "pattern_match": false,
+    "gt_reps": 23,
+    "gt_rep_type": "single",
+    "pred_reps": 2,
+    "rep_error": 21,
+    "frames_with_pose": 45,
+    "video_duration_sec": 3.0
+  },
+  {
+    "video": "14c2c3f4_0447_push up toe tap_[14-13-15].mp4",
+    "exercise": "push up toe tap",
+    "expected": "horizontal_push",
+    "gt_reps": 14.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0549_bicycle crunches_[114-113-115].mp4",
+    "exercise": "bicycle crunches",
+    "expected": "core_flexion",
+    "gt_reps": 114.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0751_side plank raises(right side)_[51].mp4",
+    "exercise": "side plank raises(right side)",
+    "expected": "hinge",
+    "gt_reps": 51,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0847_full burpees_[16].mp4",
+    "exercise": "full burpees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0041_high knees_[17].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0111_sun rises_[11].mp4",
+    "exercise": "sun rises",
+    "expected": "lateral_raise",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0141_hip circles_[7].mp4",
+    "exercise": "hip circles",
+    "expected": "hinge",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0211_high knee & cross punches_[21].mp4",
+    "exercise": "high knee & cross punches",
+    "expected": "cardio_dynamic",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0241_slow sq_[6].mp4",
+    "exercise": "slow sq",
+    "expected": "squat",
+    "gt_reps": 6,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0311_cross toe touches_[10].mp4",
+    "exercise": "cross toe touches",
+    "expected": "core_flexion",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0341_step jacks_[30].mp4",
+    "exercise": "step jacks",
+    "expected": "squat",
+    "gt_reps": 30,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0411_standing donkey kicks_[10].mp4",
+    "exercise": "standing donkey kicks",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0053_leg raise clap_[8].mp4",
+    "exercise": "leg raise clap",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0231_crossbody mountain climber_[52-51-53].mp4",
+    "exercise": "crossbody mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 52.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0533_100_[70].mp4",
+    "exercise": "100",
+    "expected": "cardio_dynamic",
+    "gt_reps": 70,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0603_crunch_[12].mp4",
+    "exercise": "crunch",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0643_up&down plank_[11-10-12].mp4",
+    "exercise": "up&down plank",
+    "expected": "core_isometric",
+    "gt_reps": 11.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0753_heel tap_[28].mp4",
+    "exercise": "heel tap",
+    "expected": "core_flexion",
+    "gt_reps": 28,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0903_reverse crunch leg extension_[12].mp4",
+    "exercise": "reverse crunch leg extension",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0933_straight leg crunch_[8].mp4",
+    "exercise": "straight leg crunch",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58ef058b0a17cd460ca5f138c9_1013_up&down plank_[10].mp4",
+    "exercise": "up&down plank",
+    "expected": "core_isometric",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0014_wall bicycle_[15].mp4",
+    "exercise": "wall bicycle",
+    "expected": "hinge",
+    "gt_reps": 15,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0044_wall bridge_[10].mp4",
+    "exercise": "wall bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0114_1 leg bridge(R)_[14].mp4",
+    "exercise": "1 leg bridge(r)",
+    "expected": "hinge",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0144_1 leg bridge(L)_[14].mp4",
+    "exercise": "1 leg bridge(l)",
+    "expected": "hinge",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0215_wall marching_[12].mp4",
+    "exercise": "wall marching",
+    "expected": "cardio_dynamic",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0244_cross crunch(R)_[16].mp4",
+    "exercise": "cross crunch(r)",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0314_cross crunch(L)_[16].mp4",
+    "exercise": "cross crunch(l)",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0344_wall walk_[7].mp4",
+    "exercise": "wall walk",
+    "expected": "cardio_dynamic",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0416_leg slides_[12].mp4",
+    "exercise": "leg slides",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0444_hip slides_[10].mp4",
+    "exercise": "hip slides",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0517_wall twist_[33].mp4",
+    "exercise": "wall twist",
+    "expected": "lateral_raise",
+    "gt_reps": 33,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0545_crunch_[16].mp4",
+    "exercise": "crunch",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0650_baby cobra_[5].mp4",
+    "exercise": "baby cobra",
+    "expected": "core_flexion",
+    "gt_reps": 5,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0720_booty slide_[10].mp4",
+    "exercise": "booty slide",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0258_leg extension + crunch [l]_[11].mp4",
+    "exercise": "leg extension + crunch [l]",
+    "expected_pattern": "core_flexion",
+    "predicted_pattern": "core_flexion",
+    "confidence": 0.8725257515907288,
+    "pattern_match": true,
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "pred_reps": 25,
+    "rep_error": 14,
+    "frames_with_pose": 631,
+    "video_duration_sec": 42.06666666666667
+  },
+  {
+    "video": "01e83deb_0339_side crunch + leg stretch [l]_[12].mp4",
+    "exercise": "side crunch + leg stretch [l]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0419_leg extension + crunch [r]_[11].mp4",
+    "exercise": "leg extension + crunch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "01e83deb_0459_side crunch + leg stretch [r]_[12].mp4",
+    "exercise": "side crunch + leg stretch [r]",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0009_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0039_donkey kick + cross_[16].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0109_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0139_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0209_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0239_hamstring curl_[10].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0339_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0409_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0439_leg extension_[11].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0509_leg circle_[22].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 22,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0609_leg lift_[14].mp4",
+    "exercise": "leg lift",
+    "expected": "core_flexion",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0639_donkey kick + cross_[8].mp4",
+    "exercise": "donkey kick + cross",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0709_donkey twist_[8].mp4",
+    "exercise": "donkey twist",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0739_rainbow_[8].mp4",
+    "exercise": "rainbow",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0809_crossed side kick_[9].mp4",
+    "exercise": "crossed side kick",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0839_hamstring curl_[11].mp4",
+    "exercise": "hamstring curl",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_0943_side leg lift_[10].mp4",
+    "exercise": "side leg lift",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1009_leg swipe_[11].mp4",
+    "exercise": "leg swipe",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1039_leg extension_[12].mp4",
+    "exercise": "leg extension",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1109_leg circle_[19].mp4",
+    "exercise": "leg circle",
+    "expected": "hinge",
+    "gt_reps": 19,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1209_pointe to heel bridge_[8].mp4",
+    "exercise": "pointe to heel bridge",
+    "expected": "hinge",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1239_pointed glute bridge_[11].mp4",
+    "exercise": "pointed glute bridge",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1339_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0a9a588e_1409_1-leg glute bridge_[10].mp4",
+    "exercise": "1-leg glute bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0017_straight leg lift [r]_[13-12-14].mp4",
+    "exercise": "straight leg lift [r]",
+    "expected": "hinge",
+    "gt_reps": 13.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0139_straight leg circle [r]_[11].mp4",
+    "exercise": "straight leg circle [r]",
+    "expected": "hinge",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0229_lower leg lift (L)_[12].mp4",
+    "exercise": "lower leg lift (l)",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0359_straight leg lift (L)_[10].mp4",
+    "exercise": "straight leg lift (l)",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0519_straight leg circle(L)_[9].mp4",
+    "exercise": "straight leg circle(l)",
+    "expected": "hinge",
+    "gt_reps": 9,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0559_lower leg lift (R)_[13].mp4",
+    "exercise": "lower leg lift (r)",
+    "expected": "hinge",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0739_V bridge lift (feet connected)_[8].mp4",
+    "exercise": "v bridge lift (feet connected)",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0819_V bridge lift + butterfly_[7].mp4",
+    "exercise": "v bridge lift + butterfly",
+    "expected": "core_flexion",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "0e88251c_0859_V bridge hold + butterfly_[14].mp4",
+    "exercise": "v bridge hold + butterfly",
+    "expected": "core_isometric",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0447_push up toe tap_[14-13-15].mp4",
+    "exercise": "push up toe tap",
+    "expected_pattern": "horizontal_push",
+    "predicted_pattern": "curl",
+    "confidence": 0.4981188178062439,
+    "pattern_match": false,
+    "gt_reps": 14.0,
+    "gt_rep_type": "multi",
+    "pred_reps": 9,
+    "rep_error": 5.0,
+    "frames_with_pose": 300,
+    "video_duration_sec": 20.0
+  },
+  {
+    "video": "14c2c3f4_0549_bicycle crunches_[114-113-115].mp4",
+    "exercise": "bicycle crunches",
+    "expected": "core_flexion",
+    "gt_reps": 114.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0751_side plank raises(right side)_[51].mp4",
+    "exercise": "side plank raises(right side)",
+    "expected": "hinge",
+    "gt_reps": 51,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "14c2c3f4_0847_full burpees_[16].mp4",
+    "exercise": "full burpees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0041_high knees_[17].mp4",
+    "exercise": "high knees",
+    "expected": "cardio_dynamic",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0111_sun rises_[11].mp4",
+    "exercise": "sun rises",
+    "expected": "lateral_raise",
+    "gt_reps": 11,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0141_hip circles_[7].mp4",
+    "exercise": "hip circles",
+    "expected": "hinge",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0211_high knee & cross punches_[21].mp4",
+    "exercise": "high knee & cross punches",
+    "expected": "cardio_dynamic",
+    "gt_reps": 21,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0241_slow sq_[6].mp4",
+    "exercise": "slow sq",
+    "expected": "squat",
+    "gt_reps": 6,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0311_cross toe touches_[10].mp4",
+    "exercise": "cross toe touches",
+    "expected": "core_flexion",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0341_step jacks_[30].mp4",
+    "exercise": "step jacks",
+    "expected": "squat",
+    "gt_reps": 30,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "17e2d98f_0411_standing donkey kicks_[10].mp4",
+    "exercise": "standing donkey kicks",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0053_leg raise clap_[8].mp4",
+    "exercise": "leg raise clap",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0231_crossbody mountain climber_[52-51-53].mp4",
+    "exercise": "crossbody mountain climber",
+    "expected": "cardio_dynamic",
+    "gt_reps": 52.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0533_100_[70].mp4",
+    "exercise": "100",
+    "expected": "cardio_dynamic",
+    "gt_reps": 70,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0603_crunch_[12].mp4",
+    "exercise": "crunch",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0643_up&down plank_[11-10-12].mp4",
+    "exercise": "up&down plank",
+    "expected": "core_isometric",
+    "gt_reps": 11.0,
+    "gt_rep_type": "multi",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0753_heel tap_[28].mp4",
+    "exercise": "heel tap",
+    "expected": "core_flexion",
+    "gt_reps": 28,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0903_reverse crunch leg extension_[12].mp4",
+    "exercise": "reverse crunch leg extension",
+    "expected": "core_flexion",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58_0933_straight leg crunch_[8].mp4",
+    "exercise": "straight leg crunch",
+    "expected": "core_flexion",
+    "gt_reps": 8,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "199aec58ef058b0a17cd460ca5f138c9_1013_up&down plank_[10].mp4",
+    "exercise": "up&down plank",
+    "expected": "core_isometric",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0014_wall bicycle_[15].mp4",
+    "exercise": "wall bicycle",
+    "expected": "hinge",
+    "gt_reps": 15,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0044_wall bridge_[10].mp4",
+    "exercise": "wall bridge",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0114_1 leg bridge(R)_[14].mp4",
+    "exercise": "1 leg bridge(r)",
+    "expected": "hinge",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0144_1 leg bridge(L)_[14].mp4",
+    "exercise": "1 leg bridge(l)",
+    "expected": "hinge",
+    "gt_reps": 14,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0215_wall marching_[12].mp4",
+    "exercise": "wall marching",
+    "expected": "cardio_dynamic",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0244_cross crunch(R)_[16].mp4",
+    "exercise": "cross crunch(r)",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0314_cross crunch(L)_[16].mp4",
+    "exercise": "cross crunch(l)",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0344_wall walk_[7].mp4",
+    "exercise": "wall walk",
+    "expected": "cardio_dynamic",
+    "gt_reps": 7,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0416_leg slides_[12].mp4",
+    "exercise": "leg slides",
+    "expected": "hinge",
+    "gt_reps": 12,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0444_hip slides_[10].mp4",
+    "exercise": "hip slides",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0517_wall twist_[33].mp4",
+    "exercise": "wall twist",
+    "expected": "lateral_raise",
+    "gt_reps": 33,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0545_crunch_[16].mp4",
+    "exercise": "crunch",
+    "expected": "core_flexion",
+    "gt_reps": 16,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0650_baby cobra_[5].mp4",
+    "exercise": "baby cobra",
+    "expected": "core_flexion",
+    "gt_reps": 5,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0720_booty slide_[10].mp4",
+    "exercise": "booty slide",
+    "expected": "hinge",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0814_wall push_[10].mp4",
+    "exercise": "wall push",
+    "expected": "horizontal_push",
+    "gt_reps": 10,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0844_kickback(R)_[17].mp4",
+    "exercise": "kickback(r)",
+    "expected": "hinge",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "1e6a72cd_0914_kickback(L)_[17].mp4",
+    "exercise": "kickback(l)",
+    "expected": "hinge",
+    "gt_reps": 17,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0140_open chest & press_[13].mp4",
+    "exercise": "open chest & press",
+    "expected": "curl",
+    "gt_reps": 13,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  },
+  {
+    "video": "36f0d07e_0220_prayer pulses_[26].mp4",
+    "exercise": "prayer pulses",
+    "expected": "curl",
+    "gt_reps": 26,
+    "gt_rep_type": "single",
+    "error": "too few frames with pose (0)"
+  }
+]

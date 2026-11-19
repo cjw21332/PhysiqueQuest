@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Icon } from '../Home/icons';
-import { api } from '../../lib/api';
+import { api, ApiRequestError } from '../../lib/api';
 import { useCameraStream } from '../../hooks/useCameraStream';
 import { useCameraReadiness } from '../../hooks/useCameraReadiness';
 import type { ReadinessCheck } from '../../../shared/cameraReadiness';
 import OutcomeDialog from '../../components/OutcomeDialog';
+import './video-review.css';
 
 export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: { onBack: () => void; onStart: (mode: 'live' | 'manual') => void; initialMode?: 'live' | 'upload' }) {
   const [mode] = useState<'live' | 'upload'>(initialMode);
@@ -18,11 +19,13 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
   const [analysisBusy, setAnalysisBusy] = useState(false);
   const [analysisError, setAnalysisError] = useState('');
   const [duration, setDuration] = useState<number | null>(null);
-  const [exerciseHint, setExerciseHint] = useState<'' | 'chest_press' | 'squat'>('');
+  const [previewError, setPreviewError] = useState(false);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const recordingRef = useRef<HTMLVideoElement>(null);
   const analysisGeneration = useRef(0);
   const [cameraMessage, setCameraMessage] = useState('');
-  const [poseAvailable, setPoseAvailable] = useState(false);
+  const [poseAvailable, setPoseAvailable] = useState<boolean | null>(null);
+  const [statusCheck, setStatusCheck] = useState(0);
   const live = useCameraStream();
   const readiness = useCameraReadiness({ videoRef: live.videoRef, frameRef: live.frameRef,
     active: mode === 'live' && live.status === 'on', native: live.nativePreview,
@@ -33,15 +36,22 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
   useEffect(() => {
     if (mode !== 'upload') return;
     let active = true;
-    setCameraMessage('Checking recorded-video analysis availability…');
-    api.getPoseStatus().then(status => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const check = async () => {
+      setPoseAvailable(null);
+      setCameraMessage('Checking video analysis availability…');
+      let available = false;
+      try { available = (await api.getPoseStatus()).available === true; } catch { /* The next check can recover after a temporary outage. */ }
       if (!active) return;
-      setPoseAvailable(status.available);
-      setCameraMessage(status.available ? 'When you choose Analyze video, the video is sent to the configured pose provider and sampled images may be sent to Google Gemini for exercise review.' : 'Pose analysis is not configured. Use the local video as a reference for manual logging.');
-    }).catch(error => { if (active) setCameraMessage(error instanceof Error ? error.message : 'Could not check pose-analysis availability.'); });
-    return () => { active = false; };
-  }, [mode]);
-  const chooseFile = (file?: File) => { if (!file) return; analysisGeneration.current++; if (fileUrl) URL.revokeObjectURL(fileUrl); setFileUrl(URL.createObjectURL(file)); setFileName(file.name); setSelectedFile(file); setExerciseHint(''); setDuration(null); setAnalysisBusy(false); setAnalysis(null); setAnalysisError(''); };
+      setPoseAvailable(available);
+      setCameraMessage(available ? 'Your video is sent for analysis. Selected frames may also be sent to an AI service.' : 'Video analysis is temporarily unavailable. We’ll keep checking, or you can try again.');
+      if (!available) timer = setTimeout(check, 10000);
+    };
+    void check();
+    return () => { active = false; if (timer) clearTimeout(timer); };
+  }, [mode, statusCheck]);
+  const retryAvailability = useCallback(() => setStatusCheck(value => value + 1), []);
+  const chooseFile = (file?: File) => { if (!file) return; analysisGeneration.current++; setFileUrl(URL.createObjectURL(file)); setFileName(file.name); setSelectedFile(file); setDuration(null); setPreviewError(false); setAnalysisBusy(false); setAnalysis(null); setAnalysisError(''); };
   const analyzeVideo = async () => {
     if (!selectedFile) return;
     if (selectedFile.size > 20 * 1024 * 1024) { setAnalysisError('Choose a video smaller than 20 MB.'); return; }
@@ -53,19 +63,18 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
     setAnalysisBusy(true); setAnalysisError('');
     try {
       const mediaBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onerror = () => reject(new Error('Could not read selected video.')); reader.onload = () => resolve(String(reader.result).split(',')[1] ?? ''); reader.readAsDataURL(selectedFile); });
-      const result = await api.analyzePose({ mediaBase64, mimeType, analysisType: 'workout', durationSeconds: Math.ceil(duration), ...(exerciseHint ? { exerciseHint } : {}) });
-      if (analysisGeneration.current === generation) { setAnalysis(result); setReportOpen(true); }
-    } catch (error) { if (analysisGeneration.current === generation) setAnalysisError(error instanceof Error ? error.message : 'Pose analysis did not complete.'); }
+      const result = await api.analyzePose({ mediaBase64, mimeType, analysisType: 'workout', durationSeconds: Math.ceil(duration) });
+      if (analysisGeneration.current === generation) { recordingRef.current?.pause(); setAnalysis(result); setReportOpen(true); }
+    } catch (error) { if (analysisGeneration.current === generation) setAnalysisError(error instanceof ApiRequestError && error.statusCode >= 500 ? 'Video analysis is temporarily unavailable. Please try this recording again shortly.' : error instanceof Error ? error.message : 'Video analysis could not be completed. Please try again.'); }
     finally { if (analysisGeneration.current === generation) setAnalysisBusy(false); }
   };
   const startSession = () => { live.stop(); onStart('live'); };
   const continueWithoutCamera = () => { live.stop(true); onStart('manual'); };
 
-  if (reportOpen && analysis) return <AnalysisReport value={analysis} fileName={fileName} exerciseHint={exerciseHint} onBack={() => setReportOpen(false)} onStart={continueWithoutCamera} onRetry={() => void analyzeVideo()} retrying={analysisBusy} retryError={analysisError}/>;
-
   return (
     <>
-      <header className="coach-header">
+      <div className="video-review-view" hidden={reportOpen && Boolean(analysis)}>
+      <header className="coach-header pq-page-heading">
         <button className="coach-back" onClick={() => { live.stop(); onBack(); }} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
         <h2>{mode === 'live' ? 'Live camera setup' : 'Review a video'}</h2>
       </header>
@@ -121,51 +130,37 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
         </>
       ) : (
         <>
-          <div className="upload-dropzone">
+          <section className="video-review" aria-label="Review recording">
+            <input ref={videoInputRef} hidden type="file" aria-label="Choose a recorded exercise video" accept="video/mp4,video/quicktime,.mp4,.mov" onChange={e => { chooseFile(e.target.files?.[0]); e.target.value = ''; }}/>
             {fileUrl ? (
               <>
-                <video src={fileUrl} controls playsInline onLoadedMetadata={event => setDuration(event.currentTarget.videoWidth > 0 ? event.currentTarget.duration : null)} onError={() => setDuration(null)}/>
-                <b>{fileName}</b>
-            <small>{poseAvailable ? 'Video is previewed locally. Submit it to request analysis.' : 'Video is previewed locally. Pose analysis is unavailable; use it as a reference for manual logging.'}</small>
-                <label className="upload-exercise-hint">Exercise in this recording (optional)
-                  <select value={exerciseHint} disabled={analysisBusy} onChange={event => { setExerciseHint(event.target.value as '' | 'chest_press' | 'squat'); setAnalysis(null); }}><option value="">Identify automatically</option><option value="chest_press">Chest press</option><option value="squat">Squat</option></select>
-                </label>
-                {poseAvailable && <button type="button" className="secondary" disabled={analysisBusy} onClick={() => void analyzeVideo()}>{analysisBusy ? 'Analyzing…' : 'Analyze video'}</button>}
-                {analysis && <button type="button" className="quiet-link" onClick={() => setReportOpen(true)}>View recording report</button>}
-                <button className="quiet-link" onClick={() => { analysisGeneration.current++; URL.revokeObjectURL(fileUrl); setFileUrl(''); setFileName(''); setSelectedFile(null); setDuration(null); setAnalysisBusy(false); setAnalysis(null); setAnalysisError(''); }}>
-                  Choose a different video
-                </button>
+                <div className="video-review-frame"><video ref={recordingRef} src={fileUrl} controls playsInline aria-label="Selected exercise recording" onLoadedMetadata={event => { setDuration(event.currentTarget.videoWidth > 0 ? event.currentTarget.duration : null); setPreviewError(false); }} onError={() => setPreviewError(true)}/></div>
+                <div className="video-review-file"><span className="video-review-file-icon" aria-hidden="true"><Icon name="play" size={18}/></span><div><span>YOUR RECORDING</span><strong>{fileName}</strong><small>{duration && Number.isFinite(duration) ? `${Math.floor(duration / 60)}:${String(Math.floor(duration % 60)).padStart(2, '0')} · ` : ''}{previewError ? 'Preview unavailable on this device' : 'Preview ready'}</small></div></div>
+                <div className="video-review-actions">
+                  {poseAvailable === true && <button type="button" className="primary" disabled={analysisBusy} onClick={() => void analyzeVideo()}>{analysisBusy ? 'Analyzing video…' : 'Analyze video'}</button>}
+                  {Boolean(analysis) && <button type="button" className="secondary" onClick={() => { recordingRef.current?.pause(); setReportOpen(true); }}>View recording report</button>}
+                  <button type="button" className="secondary" disabled={analysisBusy} onClick={() => videoInputRef.current?.click()}>Choose a different video</button>
+                </div>
+                {analysisBusy && <p className="video-review-status" role="status">Analyzing your recording…</p>}
               </>
             ) : (
-              <>
-                <button type="button" className="upload-icon" aria-label="Choose a video" onClick={() => videoInputRef.current?.click()}>
-                  <Icon name="upload" size={24}/>
-                </button>
-                <b>Upload a recorded set</b>
-                <p>MP4 or MOV, up to 2 minutes and 20 MB. Film from the side with your full body visible.</p>
-              </>
+              <div className="video-review-empty"><span className="video-review-upload-icon" aria-hidden="true"><Icon name="upload" size={26}/></span><h3>Review your movement</h3><p>Choose a recording to preview and analyze your set.</p><button type="button" className="primary" onClick={() => videoInputRef.current?.click()}>Choose a video</button><small>MP4 or MOV · up to 2 minutes · 20 MB max</small></div>
             )}
-          </div>
-          <p className="camera-note">{cameraMessage}</p>
-
-          <footer className="coach-footer">
-            {fileUrl ? (
-              <button className="primary" onClick={continueWithoutCamera}>Start manual session</button>
-            ) : (
-              <label className="primary choose-video">
-                Choose a video
-                <input ref={videoInputRef} type="file" aria-label="Choose a recorded exercise video" accept="video/mp4,video/quicktime,video/*" onChange={e => chooseFile(e.target.files?.[0])}/>
-              </label>
-            )}
-          </footer>
+            <aside className="video-review-guidance"><span aria-hidden="true"><Icon name="camera" size={18}/></span><div><strong>For a clearer review</strong><p>Film in good light and keep the movement in frame.</p></div></aside>
+            <p className="video-review-privacy" role="status">{cameraMessage}</p>
+            {poseAvailable === false && <button type="button" className="secondary video-review-retry" onClick={retryAvailability}>Try again</button>}
+            {fileUrl && <button type="button" className="video-review-manual" disabled={analysisBusy} onClick={continueWithoutCamera}>Continue with a manual session</button>}
+          </section>
         </>
       )}
       {analysisError && !reportOpen && <OutcomeDialog kind="error" title="Video analysis unavailable" message={analysisError} actionLabel="Choose another video" onAction={() => { setAnalysisError(''); videoInputRef.current?.click(); }} secondaryLabel="Go back" onSecondary={() => setAnalysisError('')} onClose={() => setAnalysisError('')}/>}
+      </div>
+      {reportOpen && Boolean(analysis) && <AnalysisReport value={analysis} fileName={fileName} onBack={() => setReportOpen(false)} onStart={continueWithoutCamera} onRetry={() => void analyzeVideo()} retrying={analysisBusy} retryError={analysisError}/>}
     </>
   );
 }
 
-function AnalysisReport({ value, fileName, exerciseHint, onBack, onStart, onRetry, retrying, retryError }: { value: unknown; fileName: string; exerciseHint: '' | 'chest_press' | 'squat'; onBack: () => void; onStart: () => void; onRetry: () => void; retrying: boolean; retryError: string }) {
+function AnalysisReport({ value, fileName, onBack, onStart, onRetry, retrying, retryError }: { value: unknown; fileName: string; onBack: () => void; onStart: () => void; onRetry: () => void; retrying: boolean; retryError: string }) {
   const data = value && typeof value === 'object' ? value as Record<string, unknown> : {};
   const metrics = data.metrics && typeof data.metrics === 'object' ? data.metrics as Record<string, unknown> : {};
   const sampled = typeof metrics.sampledFrames === 'number' ? metrics.sampledFrames : 0;
@@ -178,25 +173,17 @@ function AnalysisReport({ value, fileName, exerciseHint, onBack, onStart, onRetr
   const items = (name: string) => Array.isArray(review?.[name]) ? (review[name] as unknown[]).filter((item): item is string => typeof item === 'string') : [];
   const seconds = typeof metrics.durationSeconds === 'number' && Number.isFinite(metrics.durationSeconds) && metrics.durationSeconds > 0 ? Math.round(metrics.durationSeconds) : null;
   const duration = seconds === null ? 'Unavailable' : `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-  return <section className="recording-report" aria-label="Video analysis">
-    <header className="coach-header"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to video"><Icon name="arrow" size={24}/></button><h2>Recording report</h2></header>
+  const reps = typeof movement?.estimatedReps === 'number' ? movement.estimatedReps : typeof review?.estimatedReps === 'number' ? review.estimatedReps : null;
+  return <section className="recording-report video-report-v2" aria-label="Video analysis">
+    <header className="coach-header pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to video"><Icon name="arrow" size={20}/></button><h2>Recording report</h2></header>
     <div className="recording-report-body">
-      <p className="report-eyebrow">Uploaded recording</p><h1>{review && field('exercise') !== 'Unknown' ? field('exercise') : 'Movement review'}</h1><p className="report-filename">{fileName}</p>
-      <div className="recording-overview">
-        <div className="report-ring report-ring-unavailable" aria-label="Form accuracy unavailable"><strong>—</strong><small>form score</small></div>
-        <dl><div><dt>Duration</dt><dd>{duration}</dd></div><div><dt>Estimated reps</dt><dd>{typeof movement?.estimatedReps === 'number' ? movement.estimatedReps : typeof review?.estimatedReps === 'number' ? review.estimatedReps : 'Unavailable'}</dd></div><div><dt>Correct-form reps</dt><dd>Not verified</dd></div></dl>
-      </div>
-      <p className="recording-note">A reliable form accuracy score and correct-form rep count are not available for this recording. {movement && 'The rep estimate uses visible joint-angle cycles and your selected exercise; check it against the video. '} {sampled > 0 ? `A pose was detected in ${detected} of ${sampled} sampled frames; this only describes visibility.` : ''} This report does not change your workout.</p>
-      <section className="recording-section"><h3>Exercise in this recording</h3>
-        {exerciseHint && <p className="report-muted">Selected exercise: {exerciseHint === 'chest_press' ? 'Chest press' : 'Squat'} (not verified)</p>}
-        {review ? <><p className="recording-subtitle">Likely exercise: {field('exercise')}</p><dl className="recording-details"><div><dt>Equipment</dt><dd>{field('equipment')}</dd></div><div><dt>Body area</dt><dd>{field('generalBodyPart')}</dd></div><div><dt>Specific muscles</dt><dd>{field('specificMuscles')}</dd></div></dl><p className="report-muted">AI identification and repetition counts are estimates and require review.</p></> : <div className="report-card"><h3>Exercise review unavailable</h3><p>The AI provider could not complete this review. Pose measurements remain available. Try again when the service is available.</p><button type="button" className="secondary" disabled={retrying} onClick={onRetry}>{retrying ? 'Retrying analysis…' : 'Retry exercise review'}</button>{retryError && <p role="alert">{retryError}</p>}</div>}
-      </section>
-      {review && [['formObservations', 'Form observations'], ['corrections', 'Possible corrections'], ['instructions', 'How to perform the movement']].map(([key, title]) => <section className="recording-section" key={key}><h3>{title}</h3>{items(key).length ? <ol className="recording-feedback">{items(key).map((item, index) => <li key={index}><span aria-hidden="true">{key === 'instructions' ? index + 1 : '•'}</span><p>{item}</p></li>)}</ol> : <p className="report-muted">Not enough evidence to provide this feedback.</p>}</section>)}
-      <h3>Estimated joint movement</h3><p className="report-muted">Angles are approximate and depend on the camera view and visible joints.</p>
-      {joints.length ? <ul className="report-joints">{joints.map(joint => <li key={joint.joint}><span><b>{joint.joint.replace(/_/g, ' ')}</b><small>Visible in {joint.visibleFrames} sampled frames</small></span><strong>{joint.minAngle}°–{joint.maxAngle}°</strong></li>)}</ul> : <p className="report-card">Not enough visible joint data to estimate movement. Try a well-lit view with the relevant joints unobstructed.</p>}
-      {observations.length > 0 && <div className="report-card"><h3>Analysis notes</h3>{observations.map((note, index) => <p key={index}>{note}</p>)}</div>}
-      <div className="report-card"><h3>Review the movement</h3><p>AI feedback is unverified and may miss important details. Review the recording with a qualified coach; the analysis cannot determine whether form is safe. Stop if you experience pain.</p></div>
-      <p className="report-muted">Your workout has not been changed.</p>
+      <div className="video-report-hero"><p className="report-eyebrow">Your movement review</p><h1>{review && field('exercise') !== 'Unknown' ? field('exercise') : 'Exercise not identified'}</h1><p className="report-filename">{fileName}</p><p className="report-muted">Exercise identification is an estimate. Check it against your video.</p></div>
+      <div className="video-report-stats"><div><span>Estimated reps</span><strong>{reps === null ? 'Not clear' : reps}</strong></div><div><span>Duration</span><strong>{duration}</strong></div></div>
+      {review && [['formObservations', 'What we noticed'], ['corrections', 'Things to consider']].map(([key, title]) => items(key).length > 0 && <section className="video-report-section" key={key}><h3>{title}</h3><ul>{items(key).map((item, index) => <li key={index}>{item}</li>)}</ul></section>)}
+      {!review && observations.length > 0 && <section className="video-report-section"><h3>Analysis notes</h3><ul>{observations.map((item, index) => <li key={index}>{item}</li>)}</ul></section>}
+      {review && <details className="video-report-details"><summary>Exercise details</summary><dl className="recording-details"><div><dt>Equipment</dt><dd>{field('equipment')}</dd></div><div><dt>Body area</dt><dd>{field('generalBodyPart')}</dd></div><div><dt>Muscles</dt><dd>{field('specificMuscles')}</dd></div></dl></details>}
+      {!review && <div className="report-card"><h3>Exercise review unavailable</h3><p>We couldn’t complete the exercise review. Please try again.</p><button type="button" className="secondary" disabled={retrying} onClick={onRetry}>{retrying ? 'Retrying analysis…' : 'Retry exercise review'}</button>{retryError && <p role="alert">{retryError}</p>}</div>}
+      <p className="video-report-disclaimer">Feedback is an estimate, not a form or safety assessment. Review your recording with a qualified coach. Your workout has not been changed.</p>
       <button type="button" className="primary report-action" onClick={onStart}>Start manual session</button><button type="button" className="quiet-link report-back" onClick={onBack}>Back to video</button>
     </div>
   </section>;

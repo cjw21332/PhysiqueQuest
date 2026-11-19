@@ -5,6 +5,7 @@ import { json } from 'express';
 import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
 import { JwtAuthGuard } from '../src/auth/jwt-auth.guard.js';
+import { AiRateLimitGuard } from '../src/common/ai-rate-limit.guard.js';
 import { PoseController } from '../src/pose/pose.controller.js';
 import { PoseService } from '../src/pose/pose.service.js';
 
@@ -13,7 +14,8 @@ describe('pose upload validation', () => {
     const service = { analyze: vi.fn(async () => ({ observations: ['ok'] })) };
     const moduleRef = await Test.createTestingModule({ controllers: [PoseController], providers: [PoseService] })
       .overrideProvider(PoseService).useValue(service)
-      .overrideGuard(JwtAuthGuard).useValue({ canActivate: () => true }).compile();
+      .overrideGuard(JwtAuthGuard).useValue({ canActivate: () => true })
+      .overrideGuard(AiRateLimitGuard).useValue({ canActivate: () => true }).compile();
     const app = moduleRef.createNestApplication({ bodyParser: false });
     app.use(json({ limit: '28mb' }));
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));

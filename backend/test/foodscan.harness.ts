@@ -8,6 +8,9 @@ import { scannerBodyErrorHandler } from '../src/common/foodscan/app-exception.fi
 import { FoodScanConfigService } from '../src/common/foodscan/foodscan-config.js';
 import { PinoLogger } from '../src/common/foodscan/pino-logger.js';
 import { FoodScanModule, SCANNER_ROUTE_PATHS } from '../src/foodscan/foodscan.module.js';
+import { ScanRateLimitGuard } from '../src/common/foodscan/scan-rate-limit.guard.js';
+import { AiRateLimitGuard } from '../src/common/ai-rate-limit.guard.js';
+import { FoodScanUsageService } from '../src/foodscan/foodscan-usage.service.js';
 
 export const TEST_USER_ID = '64b7f1c2a1b2c3d4e5f60718';
 
@@ -31,6 +34,9 @@ export async function buildScannerApp(
       FoodScanModule,
     ],
   });
+  builder.overrideGuard(ScanRateLimitGuard).useValue({ canActivate: () => true });
+  builder.overrideGuard(AiRateLimitGuard).useValue({ canActivate: () => true });
+  builder.overrideProvider(FoodScanUsageService).useValue({ begin: async () => 'test', finish: async () => {}, summary: async () => ({}) });
 
   if (opts.auth === false) {
     builder.overrideGuard(JwtAuthGuard).useValue({

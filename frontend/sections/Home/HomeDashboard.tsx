@@ -1,6 +1,7 @@
 'use client';
+import { useEffect, useState } from 'react';
 import AdditionalNutrition from '../Scan/AdditionalNutrition';
-import { nutrientTotal, nutrientLabel } from '../Scan/nutrientTotal';
+import { knownNutrientTotal, nutrientTotal } from '../Scan/nutrientTotal';
 
 import { Icon } from './icons';
 import CalorieProgress from './CalorieProgress';
@@ -20,14 +21,21 @@ export default function HomeDashboard({ profile, onNotify }: {
   onAction?: (message: string) => void;
 }) {
   const { push: navigate } = useRouter();
-  const { activity, dailyMissions, loading: activityLoading, error: activityError } = useActivity();
-  const { meals, dietaryPlan, loading: nutritionLoading, error: nutritionError } = useNutrition();
+  const { activity, dailyMissions, loading: activityLoading, error: activityError, refresh: refreshActivity } = useActivity();
+  const { meals, dietaryPlan, loading: nutritionLoading, error: nutritionError, refresh: refreshNutrition } = useNutrition();
   const targets = dietaryPlan ? planTargets(dietaryPlan) : nutritionTargets;
   const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
-  const { plan, loading: planLoading, error: planError } = useCoachPlan();
+  const { plan, loading: planLoading, error: planError, refresh: refreshPlan } = useCoachPlan();
   const { items: notifications } = useNotifications();
   const unread = notifications.filter(item => item.unread).length;
-  const now = new Date();
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const refreshDate = () => setNow(new Date());
+    const timer = window.setInterval(refreshDate, 60_000);
+    window.addEventListener('focus', refreshDate);
+    document.addEventListener('visibilitychange', refreshDate);
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', refreshDate); document.removeEventListener('visibilitychange', refreshDate); };
+  }, []);
   const today = formatLocalDate(now);
   const todayIndex = (now.getDay() + 6) % 7;
   const todayPlan = plan?.days.find(day => day.index === todayIndex);
@@ -38,23 +46,28 @@ export default function HomeDashboard({ profile, onNotify }: {
     Carbs: nutrientTotal(todayMeals, item => item.carbs),
     Fats: nutrientTotal(todayMeals, item => item.fat),
   };
+  const knownTotals = {
+    calories: knownNutrientTotal(todayMeals, item => item.calories).total,
+    Protein: knownNutrientTotal(todayMeals, item => item.protein).total,
+    Carbs: knownNutrientTotal(todayMeals, item => item.carbs).total,
+    Fats: knownNutrientTotal(todayMeals, item => item.fat).total,
+  };
+  const incompleteNutrition = Object.values(totals).some(value => value === null);
   const completed = dailyMissions.filter(mission => mission.complete).length;
   const levelPercent = activity.nextLevelExp
     ? Math.min(100, activity.currentExp / activity.nextLevelExp * 100)
     : 0;
-  const joined = new Date(profile.createdAt ?? '');
-  const trainingWeek = Number.isNaN(joined.getTime()) ? null : Math.max(1, Math.floor((now.getTime() - joined.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1);
 
   return <div className="dashboard-container home-ref-dashboard">
     <header className="dashboard-header home-ref-header">
       <div className="user-greeting">
         <div className="avatar-badge" aria-hidden="true"><img className={profile.photo ? 'user-photo' : undefined} src={profile.photo || '/logo.jpg'} alt="" /></div>
         <div className="greeting-text">
-          <small className="greeting-meta">{now.toLocaleDateString('en-US', { weekday: 'long' })}{trainingWeek !== null ? ` · Week ${trainingWeek}` : ''}</small>
+          <small className="greeting-meta" suppressHydrationWarning>{now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</small>
           <h1 className="greeting-name">Hi, {profile.name.trim().split(' ')[0] || 'there'}</h1>
         </div>
       </div>
-      <button className="notification-bell" aria-label="Notifications" onClick={onNotify}><Icon name="bell" size={20} />{unread > 0 && <span className="notification-bell-count" aria-hidden="true">{unread > 99 ? '99+' : unread}</span>}</button>
+      <button className="notification-bell" aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'} onClick={onNotify}><Icon name="bell" size={20} />{unread > 0 && <span className="notification-bell-count" aria-hidden="true">{unread > 99 ? '99+' : unread}</span>}</button>
     </header>
 
     <section className="workout-card home-ref-workout" aria-label="Today's session">
@@ -63,7 +76,7 @@ export default function HomeDashboard({ profile, onNotify }: {
         {todayPlan?.isWorkoutDay && <span className="workout-duration"><Icon name="clock" size={13} />{plan?.duration || profile.duration}</span>}
       </div>
       {planError
-        ? <p className="home-ref-inline-error" role="alert">{planError}</p>
+        ? <p className="home-ref-inline-error" role="alert">{planError} <button type="button" onClick={() => void refreshPlan()}>Try again</button></p>
         : <h2 className="workout-title">{planLoading ? 'Preparing your plan…' : todayPlan?.isWorkoutDay ? todayPlan.title : todayPlan?.title || 'Your plan is ready'}</h2>}
       <div className="home-ref-session-meta">
         <span><Icon name="dumbbell" size={13} />{planLoading ? 'Loading exercises' : planError || !todayPlan ? 'Plan unavailable' : `${todayPlan.exercises.length} exercises`}</span>
@@ -84,41 +97,42 @@ export default function HomeDashboard({ profile, onNotify }: {
 
     <section className="content-section home-ref-section">
       <div className="section-title-row"><h3 className="section-title">Daily missions · {activityLoading ? '…' : `${completed} of ${dailyMissions.length}`}</h3><button className="view-all-link" onClick={() => navigate('/quests')}>View all</button></div>
-      {activityError ? <p role="alert" className="error">{activityError}</p> : activityLoading ? <p role="status">Loading your missions…</p> : dailyMissions.length ? <div className="missions-container">{dailyMissions.map(mission => <MissionCard key={mission.key} title={mission.title} current={mission.progress} total={mission.target} />)}</div> : <p>No missions available right now.</p>}
+      {activityError ? <p role="alert" className="error">{activityError} <button type="button" onClick={() => void refreshActivity()}>Try again</button></p> : activityLoading ? <p role="status">Loading your missions…</p> : dailyMissions.length ? <div className="missions-container">{dailyMissions.map(mission => <MissionCard key={mission.key} kind={mission.key} title={mission.title} current={mission.progress} total={mission.target} />)}</div> : <p>No missions available right now.</p>}
     </section>
 
     <section className="content-section home-ref-section">
       <div className="section-title-row"><h3 className="section-title">Nutrition today</h3><button className="scan-link" onClick={() => navigate('/scan')}><Icon name="scan" size={12} />Scan meal</button></div>
-      {nutritionError ? <p role="alert" className="error">{nutritionError}</p> : nutritionLoading ? <p role="status">Loading your nutrition…</p> : <div className="nutrition-overview home-ref-nutrition">
-        <CalorieProgress calories={totals.calories} target={targets.calories}/>
-      <AdditionalNutrition entries={todayMeals}/>
+      {nutritionError ? <p role="alert" className="error">{nutritionError} <button type="button" onClick={() => void refreshNutrition()}>Try again</button></p> : nutritionLoading ? <p role="status">Loading your nutrition…</p> : <><div className="nutrition-overview home-ref-nutrition">
+        <CalorieProgress calories={totals.calories ?? knownTotals.calories} target={targets.calories} partial={totals.calories === null && knownTotals.calories !== null}/>
         <div className="macros-list">
-          {(Object.keys(macroTargets) as (keyof typeof macroTargets)[]).map(label => <MacroProgress key={label} label={label} value={totals[label]} target={macroTargets[label]} />)}
+          {(Object.keys(macroTargets) as (keyof typeof macroTargets)[]).map(label => <MacroProgress key={label} label={label} value={totals[label]} known={knownTotals[label]} target={macroTargets[label]} />)}
         </div>
-      </div>}
+      </div>{incompleteNutrition && <p className="home-target-note">Some foods are missing nutrition details. Totals show known values only. <button type="button" onClick={() => navigate('/scan')}>Review meals</button></p>}<AdditionalNutrition entries={todayMeals}/></>}
       {!nutritionLoading && !nutritionError && !dietaryPlan && <p className="home-target-note">Using default targets. <button type="button" onClick={() => navigate('/scan/plan')}>Set your dietary plan</button></p>}
     </section>
 
     <section className="content-section home-ref-section home-ref-journey">
       <h3 className="section-title">Your journey</h3>
       <div className="journey-cards">
-        <button className="journey-card" onClick={() => navigate('/goals')}><div className="journey-icon journey-icon-goals"><Icon name="target" size={18} /></div><div className="journey-info"><div className="journey-title">Goals &amp; milestones</div><div className="journey-subtitle">{profile.goal || 'Set up your goal'}{profile.targetWeight ? ` · ${profile.targetWeight} ${profile.weightUnit} target` : ''}</div></div><Icon name="arrow" size={14} /></button>
+        <button className="journey-card" onClick={() => navigate('/goals')}><div className="journey-icon journey-icon-goals"><Icon name="goal-milestones" size={20} /></div><div className="journey-info"><div className="journey-title">Goals &amp; milestones</div><div className="journey-subtitle">{profile.goal || 'Set up your goal'}{profile.targetWeight ? ` · ${profile.targetWeight} ${profile.weightUnit} target` : ''}</div></div><Icon name="arrow" size={14} /></button>
         <button className="journey-card" onClick={() => navigate('/progress')}><div className="journey-icon journey-icon-progress"><Icon name="trend" size={18} /></div><div className="journey-info"><div className="journey-title">Progress</div><div className="journey-subtitle">Review saved measurements</div></div><Icon name="arrow" size={14} /></button>
       </div>
     </section>
   </div>;
 }
 
-function MissionCard({ title, current, total }: { title: string; current: number; total: number }) {
-  const percent = total > 0 ? Math.min(100, current / total * 100) : 0;
-  return <div className="mission-card"><div className="mission-header"><span className="mission-title">{title}</span><span className="mission-count">{current} / {total}</span></div><div className="mission-bar" role="progressbar" aria-label={title} aria-valuemin={0} aria-valuemax={total} aria-valuenow={current}><div className="mission-bar-fill" style={{ width: `${percent}%` }} /></div></div>;
+function MissionCard({ kind, title, current, total }: { kind: string; title: string; current: number; total: number }) {
+  const percent = total > 0 ? Math.max(0, Math.min(100, current / total * 100)) : 0;
+  const icon = kind === 'workout' ? 'dumbbell' : kind === 'water' ? 'water' : kind === 'meals' ? 'meal' : 'trophy';
+  return <div className="mission-card"><div className="mission-header"><span className="mission-title"><Icon name={icon} size={16}/>{title}</span><span className="mission-count">{current} / {total}</span></div><div className="mission-bar" role="progressbar" aria-label={title} aria-valuemin={0} aria-valuemax={total} aria-valuenow={Math.min(total, Math.max(0, current))} aria-valuetext={`${current} of ${total}`}><div className="mission-bar-fill" style={{ width: `${percent}%` }} /></div></div>;
 }
 
-function MacroProgress({ label, value, target }: { label: string; value: number | null; target: number }) {
-  if (value === null) return <div>{label} · Incomplete</div>;
-  const percent = Math.min(100, target > 0 ? value / target * 100 : 0);
+function MacroProgress({ label, value, known, target }: { label: string; value: number | null; known: number | null; target: number }) {
+  const shown = value ?? known;
+  if (shown === null) return <div>{label} · Unavailable</div>;
+  const percent = Math.min(100, target > 0 ? shown / target * 100 : 0);
   return <div className="macro-item">
-    <div className="macro-header"><span className="macro-label">{label}</span><span className="macro-values">{Math.round(value)} / {target} g</span></div>
-    <div className="macro-bar" role="progressbar" aria-label={`${label} intake`} aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(target, Math.round(value))}><div className="macro-bar-fill" style={{ width: `${percent}%` }} /></div>
+    <div className="macro-header"><span className="macro-label">{label}</span><span className="macro-values">{value === null ? `${Math.round(shown)} g` : `${Math.round(shown)} / ${target} g`}</span></div>
+    <div className="macro-bar" role="progressbar" aria-label={`${label} intake`} aria-valuemin={0} aria-valuemax={target} {...(value === null ? { 'aria-valuetext': `${Math.round(shown)} grams known; total incomplete` } : { 'aria-valuenow': Math.min(target, Math.round(shown)) })}><div className="macro-bar-fill" style={{ width: `${percent}%` }} /></div>
   </div>;
 }

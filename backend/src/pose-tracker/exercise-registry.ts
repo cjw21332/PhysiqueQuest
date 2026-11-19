@@ -1,4 +1,5 @@
 import { catalogTiersMap } from './catalog-tiers.ts';
+import { catalogTrackingMap } from './catalog-tracking.generated.ts';
 
 // Shared pure registry: imported by the browser, API and catalog audit. No credentials or I/O.
 export const configurationVersion = 1;
@@ -33,8 +34,47 @@ export type TrackingConfig = {
   cameraOrientation: 'front' | 'side' | 'reference' | 'pending'; capabilities: string[];
   referenceStatus: 'not-required' | 'required' | 'awaiting-verification' | 'verified' | 'disabled';
   validationStatus: 'documentation-mapped' | 'pending' | 'verified' | 'disabled'; limitations: string[]; configurationVersion: number;
+  // On-device exercise pattern from the generated catalog coverage. Present for
+  // catalog exercises the shared engine can count; absence means no native path.
+  nativePattern?: string | null;
+  nativeSupport?: 'FULLY_SUPPORTED' | 'PARTIALLY_SUPPORTED' | 'NOT_YET_VALIDATED' | 'UNSUPPORTED';
+  nativeOverride?: NativeExerciseOverride;
   verificationNotes?: string; verifiedAt?: string; updatedAt?: string;
 };
+// Must match the pattern IDs implemented in shared/exerciseEngine.ts.
+export const nativePatterns = new Set(['squat','squat_hold','hinge','lunge','horizontal_push','vertical_push','horizontal_pull','vertical_pull','curl','triceps_extension','lateral_raise','front_raise','calf_raise','hip_thrust','core_flexion','core_isometric','dip','jumping_jack','high_knees','mountain_climber']);
+export type NativeExerciseOverride = {
+  mode?: 'bilateral' | 'per_side';
+  view?: 'front' | 'side';
+  visibility?: number;
+  minRom?: number;
+  minRepMs?: number;
+  maxRepMs?: number;
+  dwellMs?: number;
+  hold?: { minHoldMs?: number; maxDriftDeg?: number };
+};
+/** Drop unknown or out-of-range generated fields before they reach a device. */
+export function sanitizeNativeOverride(value: unknown): NativeExerciseOverride | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const raw = value as Record<string, unknown>;
+  const number = (input: unknown, low: number, high: number) =>
+    typeof input === 'number' && Number.isFinite(input) && input >= low && input <= high ? input : undefined;
+  const out: NativeExerciseOverride = {};
+  if (raw.mode === 'bilateral' || raw.mode === 'per_side') out.mode = raw.mode;
+  if (raw.view === 'front' || raw.view === 'side') out.view = raw.view;
+  const visibility = number(raw.visibility, 0.2, 0.9); if (visibility !== undefined) out.visibility = visibility;
+  const minRom = number(raw.minRom, 5, 120); if (minRom !== undefined) out.minRom = minRom;
+  const minRepMs = number(raw.minRepMs, 200, 10000); if (minRepMs !== undefined) out.minRepMs = minRepMs;
+  const maxRepMs = number(raw.maxRepMs, 1000, 30000); if (maxRepMs !== undefined) out.maxRepMs = maxRepMs;
+  const dwellMs = number(raw.dwellMs, 0, 500); if (dwellMs !== undefined) out.dwellMs = dwellMs;
+  if (raw.hold && typeof raw.hold === 'object' && !Array.isArray(raw.hold)) {
+    const hold = raw.hold as Record<string, unknown>;
+    const minHoldMs = number(hold.minHoldMs, 1000, 600000);
+    const maxDriftDeg = number(hold.maxDriftDeg, 2, 45);
+    if (minHoldMs !== undefined || maxDriftDeg !== undefined) out.hold = { ...(minHoldMs !== undefined ? { minHoldMs } : {}), ...(maxDriftDeg !== undefined ? { maxDriftDeg } : {}) };
+  }
+  return Object.keys(out).length ? out : undefined;
+}
 export type ConfigOverride = Pick<TrackingConfig, 'trackingMode' | 'cameraOrientation' | 'validationStatus' | 'limitations' | 'trackingTier'> & { providerExerciseId?: string; referenceUuid?: string; generatedAngleConfig?: GeneratedAngleConfig; verificationNotes?: string; verifiedAt?: string; updatedAt?: string };
 export const normalizeName = (value: string) => value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
 export const holdExercises = new Set(['plank','wall_sit','balance_leg','balance_leg_left','balance_leg_right','chair_forward_fold','chair_side_stretch','split','facial_split','pancake','closing','bridge','cobra','bow','tiger','camel','king_pigeon','foot_to_hand','i','needle']);
@@ -72,7 +112,23 @@ export function resolveTrackingConfig(row: CatalogExercise, override?: ConfigOve
     referenceStatus: rule ? 'not-required' : 'required', validationStatus: rule ? 'documentation-mapped' : 'pending',
     limitations: rule ? ['Provider identifier and catalog metadata matched; real-person accuracy and account access are not validated.', 'Camera cannot assess pain, injury risk or equipment load.'] : [category === 'machine-occlusion' ? 'Equipment can obscure joints; camera feasibility and a specific reference require verification.' : category === 'isometric' || category === 'mobility' ? 'Duration alone does not verify the held position or stretching technique; provider configuration requires review.' : 'No verified built-in mapping. An exercise-specific reference and camera validation are required.'], configurationVersion,
   };
+  const tracked = catalogTrackingMap[exId];
+  if (tracked?.pattern && nativePatterns.has(tracked.pattern)) {
+    config.nativePattern = tracked.pattern;
+    config.nativeSupport = tracked.support;
+    config.nativeOverride = sanitizeNativeOverride(tracked.override);
+    config.capabilities = tracked.pattern === 'core_isometric' ? ['session-duration','on-device'] : ['repetitions','on-device'];
+    config.limitations = [
+      'Pattern-level on-device tracking only: the joint angles, thresholds and camera angle are shared with related exercises and have not been validated on real recordings of this exercise.',
+      'The catalog mapping is heuristic. It is classified as partially supported or not yet validated, never fully supported.',
+      'Camera cannot assess pain, injury risk or equipment load.',
+    ];
+  }
   if (override) {
+    // A stored administrator configuration takes precedence over generated coverage.
+    config.nativePattern = null;
+    config.nativeSupport = undefined;
+    config.nativeOverride = undefined;
     config.providerExerciseId = undefined;
     config.referenceUuid = undefined;
     config.generatedAngleConfig = undefined;
@@ -108,7 +164,8 @@ export function validateOverride(value: ConfigOverride) {
 export const canTrack = (config: TrackingConfig) => config.validationStatus !== 'disabled' && (
   config.trackingMode === 'builtin' && ['documentation-mapped','verified'].includes(config.validationStatus) ||
   config.trackingMode === 'reference' && config.validationStatus === 'verified' ||
-  (config.trackingMode === 'generated-angle' && ['auto_count_beta', 'auto_count_verified'].includes(config.trackingTier ?? ''))
+  (config.trackingMode === 'generated-angle' && ['auto_count_beta', 'auto_count_verified'].includes(config.trackingTier ?? '')) ||
+  !!config.nativePattern
 );
 export function auditCoverage(rows: CatalogExercise[], overrides: Record<string, ConfigOverride> = {}) {
   const records = rows.map(row => resolveTrackingConfig(row, overrides[row.exerciseId ?? row._id ?? '']));

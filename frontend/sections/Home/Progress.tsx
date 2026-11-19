@@ -116,7 +116,7 @@ export default function Progress() {
     .sort((left, right) => new Date(right.startedAt).getTime() - new Date(left.startedAt).getTime());
 
   return <div className="home-ref-subview pq-progress">
-    <header className="pq-progress-header"><button type="button" className="pq-progress-back" onClick={() => navigate('/home')} aria-label="Back to Home"><Icon name="arrow" size={20}/></button><div><span className="pq-progress-eyebrow">YOUR JOURNEY</span><h1>Progress</h1></div></header>
+    <header className="section-page-head pq-progress-header pq-page-heading"><button type="button" className="coach-back" onClick={() => { if (view !== 'overview') setView('overview'); else navigate(new URLSearchParams(window.location.search).get('from') === 'goals' ? '/goals' : '/home'); }} aria-label={view !== 'overview' ? 'Back to Progress overview' : 'Back'}><Icon name="arrow" size={20}/></button><h1>Progress</h1></header>
     <nav className="pq-progress-nav" aria-label="Progress sections">{([['overview','Overview'],['exercise','Exercises'],['muscle','Muscles'],['records','Records']] as const).map(([key,label]) => <button type="button" key={key} aria-pressed={view === key} onClick={() => setView(key)}>{label}</button>)}</nav>
 
     {view === 'overview' && <div className="pq-progress-content">
@@ -142,7 +142,7 @@ export default function Progress() {
     {view === 'records' && <div className="pq-progress-content"><PersonalRecords records={summary?.personalRecords ?? []} loading={summaryLoading} error={summaryError} retry={() => void refreshSummary()}/></div>}
     {deleting && <DeleteConfirmation title="Delete this measurement?" description={`${deleting.value} ${deleting.unit} will be removed from your progress history.`} confirmLabel="Delete measurement" onCancel={() => setDeleting(null)} onConfirm={() => { void remove(deleting._id); setDeleting(null); }}/>}
     {weightOpen && profile && <WeightModal profile={profile} onClose={() => setWeightOpen(false)} onSaved={message => { setWeightOpen(false); setWeightNotice(message); void weight.refresh(); }}/>}
-    {actionError && <OutcomeDialog kind="error" title="Could not complete your request" message={actionError} onClose={() => setActionError('')} actionLabel="Try again"/>}
+    {actionError && <OutcomeDialog kind="error" title="Something went wrong" message={actionError} onClose={() => setActionError('')} actionLabel="Got it"/>}
     {weightNotice && <OutcomeDialog kind={/but|not changed|choose|review/i.test(weightNotice) ? 'info' : 'success'} title={/but|not changed|choose|review/i.test(weightNotice) ? 'Update details' : 'Measurement updated'} message={weightNotice} onClose={() => setWeightNotice('')}/>}
   </div>;
 }

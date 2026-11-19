@@ -1,3 +1,4 @@
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -30,11 +31,16 @@ export class SessionService {
   }
 
   async issue(user: User & { _id: unknown }) {
+    const fence = new AccountLifecycleFence(this.sessions.db), generation = await fence.generation(String(user._id));
     const id = randomBytes(32).toString('hex');
     const token = `${id}.${randomBytes(32).toString('hex')}`;
     const expiresAt = afterDays(new Date(), 30);
-    await this.sessions.create({ _id: id, userId: new Types.ObjectId(String(user._id)), sessionVersion: user.sessionVersion ?? 0,
-      tokenHash: hash(token), expiresAt, purgeAt: afterDays(expiresAt, retention('REFRESH_TOKEN_RECORD_BUFFER_DAYS')), lastUsedAt: new Date() });
+    await fence.withActiveWrite(String(user._id), async lifecycleSession => {
+      const current = await this.users.findById(user._id).session(lifecycleSession);
+      if (!current?.isActive || current.deletedAt || (current.sessionVersion ?? 0) !== (user.sessionVersion ?? 0)) throw invalid();
+      return (await this.sessions.create([{ _id: id, userId: new Types.ObjectId(String(user._id)), sessionVersion: user.sessionVersion ?? 0,
+        tokenHash: hash(token), expiresAt, purgeAt: afterDays(expiresAt, retention('REFRESH_TOKEN_RECORD_BUFFER_DAYS')), lastUsedAt: new Date() }], { session: lifecycleSession }))[0];
+    }, generation);
     return this.response(user, id, token);
   }
 
@@ -50,20 +56,21 @@ export class SessionService {
     const id = token.slice(0, 64);
     const session = await this.sessions.findById(id);
     if (!session || session.revokedAt || session.expiresAt <= new Date()) throw invalid();
-    if (session.usedHashes.length >= 10_000) { await this.revoke(id, String(session.userId)); throw invalid(); }
+    const generation = await new AccountLifecycleFence(this.sessions.db).generation(String(session.userId));
+    if (session.usedHashes.length >= 10_000) { await this.revoke(id, String(session.userId), generation); throw invalid(); }
     const user = await this.users.findById(session.userId);
     if (!user || !user.isActive || (user.sessionVersion ?? 0) !== session.sessionVersion) throw invalid();
     const digest = hash(token);
     const next = `${id}.${randomBytes(32).toString('hex')}`;
-    const rotated = await this.sessions.findOneAndUpdate(
+    const rotated = await new AccountLifecycleFence(this.sessions.db).withActiveWrite(String(session.userId), async lifecycleSession => this.sessions.findOneAndUpdate(
       { _id: id, tokenHash: digest, revokedAt: null, expiresAt: { $gt: new Date() } },
       { $set: { tokenHash: hash(next), lastUsedAt: new Date() }, $push: { usedHashes: digest } },
       { returnDocument: 'before' },
-    );
+    ).session(lifecycleSession), generation);
     if (!rotated) {
       const latest = await this.sessions.findById(id);
       if (latest?.usedHashes.includes(digest)) {
-        await this.revoke(id, String(session.userId));
+        await this.revoke(id, String(session.userId), generation);
         this.logger.warn({ event: 'refresh_token_reuse' });
       }
       throw invalid();
@@ -71,8 +78,8 @@ export class SessionService {
     return this.response(user, id, next);
   }
 
-  async revoke(id: string, userId: string) {
-    await this.sessions.updateOne({ _id: id, userId: new Types.ObjectId(userId) }, { $set: { revokedAt: new Date() } });
+  async revoke(id: string, userId: string, generation?: number) {
+    await new AccountLifecycleFence(this.sessions.db).withActiveWrite(userId, async lifecycleSession => this.sessions.updateOne({ _id: id, userId: new Types.ObjectId(userId) }, { $set: { revokedAt: new Date() } }).session(lifecycleSession), generation);
   }
 
   async list(userId: string, version: number) {

@@ -5,6 +5,7 @@ import request from 'supertest';
 import { JwtAuthGuard } from '../src/auth/jwt-auth.guard.js';
 import { WorkoutsController } from '../src/workouts/workouts.controller.js';
 import { WorkoutsService } from '../src/workouts/workouts.service.js';
+import { WorkoutAiService } from '../src/workouts/workout-ai.service.js';
 import { ValidationPipe } from '@nestjs/common';
 
 const USER = '507f1f77bcf86cd799439011';
@@ -13,7 +14,7 @@ describe('GET /workouts/active JSON contract', () => {
   for (const workout of [null, { _id: '507f1f77bcf86cd799439012', userId: USER, status: 'active' }]) {
     it(`returns parseable JSON for ${workout ? 'an active session' : 'no active session'}`, async () => {
       const service = { active: vi.fn(async () => workout) };
-      const moduleRef = await Test.createTestingModule({ controllers: [WorkoutsController], providers: [WorkoutsService] })
+      const moduleRef = await Test.createTestingModule({ controllers: [WorkoutsController], providers: [WorkoutsService, { provide: WorkoutAiService, useValue: {} }] })
         .overrideProvider(WorkoutsService).useValue(service)
         .overrideGuard(JwtAuthGuard).useValue({ canActivate: (context: any) => {
           context.switchToHttp().getRequest().user = { userId: USER };
@@ -40,7 +41,7 @@ describe('POST /workouts/recorded/:id/apply', () => {
   it('uses the authenticated owner and validates the submitted plan before calling the service', async () => {
     const recordingId = '507f1f77bcf86cd799439012';
     const service = { applyRecording: vi.fn(async () => ({ _id: 'planned-session', status: 'active' })) };
-    const moduleRef = await Test.createTestingModule({ controllers: [WorkoutsController], providers: [WorkoutsService] })
+    const moduleRef = await Test.createTestingModule({ controllers: [WorkoutsController], providers: [WorkoutsService, { provide: WorkoutAiService, useValue: {} }] })
       .overrideProvider(WorkoutsService).useValue(service)
       .overrideGuard(JwtAuthGuard).useValue({ canActivate: (context: any) => { context.switchToHttp().getRequest().user = { userId: USER }; return true; } })
       .compile();

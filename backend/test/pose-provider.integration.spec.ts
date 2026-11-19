@@ -6,6 +6,13 @@ import { randomBytes } from 'node:crypto';
 import { afterAll, describe, expect, it } from 'vitest';
 import { PoseAnalysisProvider } from '../src/providers/pose-analysis.provider.js';
 import { PoseService } from '../src/pose/pose.service.js';
+import { Test } from '@nestjs/testing';
+import { ValidationPipe } from '@nestjs/common';
+import { json } from 'express';
+import request from 'supertest';
+import { PoseController } from '../src/pose/pose.controller.js';
+import { JwtAuthGuard } from '../src/auth/jwt-auth.guard.js';
+import { AiRateLimitGuard } from '../src/common/ai-rate-limit.guard.js';
 
 const root = resolve(process.cwd(), '..');
 const python = resolve(root, 'pose-service', '.venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
@@ -28,8 +35,25 @@ describe.skipIf(!existsSync(python))('self-hosted pose provider', () => {
     expect(ready).toBe(true);
     const config = { get: (name: string) => name === 'POSE_ANALYSIS_URL' ? `${url}/analyze` : name === 'POSE_ANALYSIS_API_KEY' ? key : undefined };
     const service = new PoseService(new PoseAnalysisProvider(config as never));
+    expect(await service.status()).toEqual({ available: true });
     const clip = readFileSync(resolve(root, 'frontend/public/opening-app-animation.mp4'));
     const result = await service.analyze({ mediaBase64: clip.toString('base64'), mimeType: 'video/mp4', analysisType: 'workout' });
     expect(result).toMatchObject({ observations: expect.arrayContaining([expect.stringContaining('Pose landmarks were detected')]), movementEstimate: null });
+    const suppliedClip = process.env.PQ_POSE_TEST_VIDEO;
+    if (suppliedClip) {
+      const moduleRef = await Test.createTestingModule({ controllers: [PoseController], providers: [PoseService] })
+        .overrideProvider(PoseService).useValue(service)
+        .overrideGuard(JwtAuthGuard).useValue({ canActivate: () => true })
+        .overrideGuard(AiRateLimitGuard).useValue({ canActivate: () => true }).compile();
+      const app = moduleRef.createNestApplication({ bodyParser: false });
+      app.use(json({ limit: '28mb' }));
+      app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
+      await app.init();
+      try {
+        const response = await request(app.getHttpServer()).post('/pose/analyze').send({ mediaBase64: readFileSync(suppliedClip).toString('base64'), mimeType: 'video/mp4', analysisType: 'workout' });
+        expect(response.status).toBe(201);
+        expect(response.body.metrics.detectedFrames).toBeGreaterThan(0);
+      } finally { await app.close(); }
+    }
   }, 60_000);
 });

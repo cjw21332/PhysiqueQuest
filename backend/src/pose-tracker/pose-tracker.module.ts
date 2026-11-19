@@ -78,13 +78,13 @@ export class PoseTrackerService {
     await this.configs.updateOne({ exerciseId: id }, { $set: { config, updatedBy: userId } }, { upsert: true, runValidators: true });
     return this.resolve(id);
   }
-  async launch(id: string, adminTest = false) {
+  async launch(id: string, adminTest = false, native = false) {
     const config = await this.resolve(id);
     const testable = adminTest && config.validationStatus !== 'disabled' && config.trackingMode !== 'unavailable';
     if (!canTrack(config) && !testable) throw new BadRequestException('This exercise needs a verified tracking configuration. Manual workout logging remains available.');
 
-    // Generated-angle mode runs locally, no provider token needed
-    if (config.trackingMode === 'generated-angle') {
+    // Generated-angle and native-pattern modes run on the device, no provider token needed
+    if (config.trackingMode === 'generated-angle' || (config.nativePattern && (native || config.trackingMode === 'unavailable'))) {
       return { config, token: null, developerOutputs: false };
     }
 
@@ -105,7 +105,11 @@ export class PoseTrackerController {
   @Post('exercises/:id/launch')
   @UseGuards(PoseTrackerRateLimitGuard)
   @Header('Cache-Control','private, no-store')
-  launch(@Param('id') id: string) { return this.service.launch(id); }
+  launch(@Param('id') id: string, @Body() body: unknown) {
+    const parsed = z.object({ native: z.boolean().optional() }).strict().safeParse(body ?? {});
+    if (!parsed.success) throw new BadRequestException('Invalid tracking request');
+    return this.service.launch(id, false, parsed.data.native === true);
+  }
   @Post('configurations')
   @Header('Cache-Control','private, no-store')
   configurations(@Body() body: unknown) {

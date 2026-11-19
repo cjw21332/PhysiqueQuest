@@ -1,6 +1,7 @@
 import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsDateString,
   IsIn,
@@ -65,6 +66,7 @@ export class CreateProfileDto {
   activity: string;
 
   @IsString()
+  @MinLength(1)
   @MaxLength(80)
   goal: string;
 
@@ -79,20 +81,24 @@ export class CreateProfileDto {
   targetDate?: string;
 
   @IsString()
+  @MinLength(1)
   @MaxLength(40)
   seriousness: string;
 
   @IsArray()
+  @ArrayMinSize(1)
   @ArrayMaxSize(20)
   @IsString({ each: true })
   equipment: string[];
 
   @IsArray()
+  @ArrayMinSize(1)
   @ArrayMaxSize(7)
   @IsString({ each: true })
   days: string[];
 
   @IsString()
+  @MinLength(1)
   @MaxLength(30)
   duration: string;
 

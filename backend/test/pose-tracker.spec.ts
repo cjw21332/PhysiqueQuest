@@ -2,6 +2,8 @@ import { describe,it,expect,vi,afterEach } from 'vitest';
 import { PoseTrackerService } from '../src/pose-tracker/pose-tracker.module.js';
 import { validateOverride, resolveTrackingConfig, canTrack } from '../src/pose-tracker/exercise-registry.js';
 import { catalogTiersMap } from '../src/pose-tracker/catalog-tiers.js';
+import { catalogTrackingMap } from '../src/pose-tracker/catalog-tracking.generated.js';
+import { nativePatterns } from '../src/pose-tracker/exercise-registry.js';
 const row={exerciseId:'squat',name:'bodyweight squat',equipments:['bodyweight'],targetMuscles:['quadriceps'],instructions:['Bend knees and hips']};
 function setup(config?:any){const model={findOne:vi.fn(()=>({lean:async()=>config?{config}:null})),find:vi.fn(()=>({lean:async()=>[]})),updateOne:vi.fn(async()=>{})};const catalog={trackingCatalog:async()=>[row],trackingRecord:async(id:string)=>id===row.exerciseId?row:null};return {service:new PoseTrackerService(model as any,catalog as any),model};}
 describe('PoseTracker API configuration',()=>{
@@ -86,6 +88,45 @@ describe('PoseTracker API configuration',()=>{
     const betaIds = Object.entries(catalogTiersMap).filter(([k, v]) => v.tier === 'auto_count_beta').map(([k]) => k).sort();
     expect(betaIds).toEqual(['1g5bPpA', '3eGE2JC', '6YUfHPL', 'I4hDWkc', 'lBDjFxJ'].sort());
   });
-
-
+  it('maps catalog exercises to native patterns without claiming full support', () => {
+    const partial = resolveTrackingConfig({ exerciseId: '03lzqwk', name: 'cable crunch' });
+    expect(partial.nativePattern).toBe('core_flexion');
+    expect(partial.nativeSupport).toBe('PARTIALLY_SUPPORTED');
+    expect(partial.capabilities).toContain('on-device');
+    expect(partial.validationStatus).not.toBe('verified');
+    expect(canTrack(partial)).toBe(true);
+    const unsupported = resolveTrackingConfig({ exerciseId: '01qpYSe', name: 'upward facing dog stretch' });
+    expect(unsupported.nativePattern ?? null).toBeNull();
+    expect(canTrack(unsupported)).toBe(false);
+  });
+  it('uses the native pattern for a documented provider exercise only when requested by the app', async () => {
+    vi.stubEnv('POSETRACKER_ENABLED', 'false');
+    const squatRow = { ...row, exerciseId: '6YUfHPL', name: 'quads bodyweight squat' };
+    const model = { findOne: vi.fn(() => ({ lean: async () => null })) };
+    const catalog = { trackingRecord: async () => squatRow };
+    const service = new PoseTrackerService(model as any, catalog as any);
+    expect((await service.launch(squatRow.exerciseId, false, true)).config.nativePattern).toBe('squat');
+    await expect(service.launch(squatRow.exerciseId)).rejects.toThrow('disabled');
+  });
+  it('only advertises implemented native patterns for every mapped catalog exercise', () => {
+    for (const [id, entry] of Object.entries(catalogTrackingMap)) {
+      const config = resolveTrackingConfig({ exerciseId: id, name: 'catalog exercise' });
+      if (entry.pattern && nativePatterns.has(entry.pattern)) {
+        expect(config.nativePattern, id).toBe(entry.pattern);
+        expect(config.nativeSupport, id).not.toBe('FULLY_SUPPORTED');
+      } else expect(config.nativePattern, id).toBeFalsy();
+    }
+  });
+  it('never labels an exercise fully supported and serves native launches without a provider token', async () => {
+    vi.stubEnv('POSETRACKER_ENABLED', 'false');
+    vi.stubEnv('POSETRACKER_API_TOKEN', '');
+    const nativeRow = { exerciseId: '03lzqwk', name: 'cable crunch', equipments: ['cable'], targetMuscles: ['abdominals'], instructions: ['curl'] };
+    const model = { findOne: vi.fn(() => ({ lean: async () => null })), find: vi.fn(() => ({ lean: async () => [] })), updateOne: vi.fn(async () => {}) };
+    const catalog = { trackingCatalog: async () => [nativeRow], trackingRecord: async (id: string) => id === nativeRow.exerciseId ? nativeRow : null };
+    const service = new PoseTrackerService(model as any, catalog as any);
+    const launched = await service.launch('03lzqwk');
+    expect(launched.token).toBeNull();
+    expect(launched.config.nativePattern).toBe('core_flexion');
+    expect(launched.config.nativeSupport).not.toBe('FULLY_SUPPORTED');
+  });
 });

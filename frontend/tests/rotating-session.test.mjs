@@ -78,3 +78,14 @@ test('rejects refresh credentials in JSON and clears invalid sessions', async ()
   await assert.rejects(session.refresh('/api'), /session response/i);
   assert.equal(session.current(), null);
 });
+
+test('offline grant is scoped, expires, and carries no server credential', () => {
+  const session = createSession();
+  assert.equal(session.restoreOffline({id:'owner',expiresAt:Date.now()-1},'/api'),null);
+  const user = session.restoreOffline({id:'owner',expiresAt:Date.now()+60000},'/api');
+  assert.equal(user.offlineOnly,true);
+  assert.equal(user.token,'');
+  assert.equal(session.current('/other-api'),null);
+  session.clear();
+  assert.equal(session.current('/api'),null);
+});

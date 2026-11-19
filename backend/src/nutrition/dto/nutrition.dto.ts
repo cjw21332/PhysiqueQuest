@@ -28,6 +28,8 @@ export class MealDto {
   @IsOptional() @IsString() @MaxLength(120) brand?: string;
   @IsOptional() @IsNumber() @Min(0.000001) @Max(100000) servingQuantity?: number;
   @IsOptional() @IsIn(['g','ml']) servingUnit?: string;
+  @IsOptional() @IsNumber() @Min(0.000001) @Max(100000) estWeightG?: number;
+  @IsOptional() @IsNumber() @Min(0.000001) @Max(100000) servingSizeG?: number;
   @IsOptional() @IsString() @Matches(/^(?:\d{8}|\d{12,14})$/) barcode?: string;
   @IsOptional() @IsString() @MaxLength(80) id?: string;
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
@@ -67,6 +69,13 @@ export class ScannedMacrosDto {
   @IsOptional() @IsNumber() @Min(0) fat_g: number | null;
 }
 
+export class FoodEvidenceDto {
+  @IsIn(['user_confirmed', 'visually_identified', 'estimated', 'unknown']) name: string;
+  @IsIn(['user_confirmed', 'visually_identified', 'estimated', 'unknown']) quantity: string;
+  @IsIn(['user_confirmed', 'visually_identified', 'estimated', 'unknown']) preparation: string;
+  @IsIn(['user_confirmed', 'visually_identified', 'estimated', 'unknown']) added_oil: string;
+}
+
 /**
  * One detected item from a `POST /api/nutrition/scan` response.
  *
@@ -75,11 +84,20 @@ export class ScannedMacrosDto {
  * ValidationPipe runs `forbidNonWhitelisted`, so anything else is rejected.
  */
 export class ScannedMealItemDto {
+  @IsOptional() @ValidateNested() @Type(() => FoodEvidenceDto) evidence?: FoodEvidenceDto;
+  @IsOptional() @IsString() @MaxLength(2048) evidence_ref?: string;
+  @IsOptional() @IsString() @MaxLength(120) preparation_correction?: string;
+  @IsOptional() @IsString() @MaxLength(200) added_oil_correction?: string;
+  @IsOptional() @IsNumber() @Min(0.000001) @Max(5000) entered_quantity?: number;
+  @IsOptional() @IsIn(['g', 'kg', 'oz', 'lb']) entered_unit?: 'g' | 'kg' | 'oz' | 'lb';
   @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   @IsString() @MinLength(1) @MaxLength(120) food_name: string;
   /** False when no USDA record matched; nutrition remains unavailable. */
   @IsBoolean() found: boolean;
   @IsOptional() @IsInt() @Min(1) fdc_id?: number;
+  @IsOptional() @IsString() @MaxLength(2048) nutrition_ref?: string;
+  @IsOptional() @IsString() @MaxLength(800) nutrition_source?: string;
+  @IsOptional() @IsArray() @ArrayMaxSize(20) @IsString({ each: true }) @MaxLength(120, { each: true }) reference_ingredients?: string[];
   @IsOptional() @IsString() @MaxLength(240) description?: string;
   @IsOptional() @IsNumber() @Min(0) kcal: number | null;
   @IsOptional() @IsNumber() @Min(0) protein_g: number | null;
@@ -87,6 +105,17 @@ export class ScannedMealItemDto {
   @IsOptional() @IsNumber() @Min(0) fat_g: number | null;
   @IsOptional() @IsNumber() @Min(0) @Max(5000) est_weight_g?: number;
   @IsOptional() @IsNumber() @Min(0) @Max(1) confidence?: number;
+  @IsOptional() @IsString() @MaxLength(120) localName?: string;
+  @IsOptional() @IsArray() @ArrayMaxSize(8) @IsString({ each: true }) @MaxLength(120, { each: true }) searchTerms?: string[];
+  @IsOptional() @IsBoolean() isComposite?: boolean;
+  @IsOptional() @IsString() @MaxLength(120) portionDescription?: string;
+  @IsOptional() @IsIn(['ai', 'manual', 'corrected']) identification_method?: 'ai' | 'manual' | 'corrected';
+  @IsOptional() @IsBoolean() weight_corrected?: boolean;
+  @IsOptional() @IsIn(['visual_estimate']) portion_method?: 'visual_estimate';
+  @IsOptional() @IsIn([null]) portion_confidence?: null;
+  @IsOptional() @IsIn([null]) region_confidence?: null;
+  @IsOptional() @IsIn([null]) weight_min_g?: null;
+  @IsOptional() @IsIn([null]) weight_max_g?: null;
   /**
    * Present on matched items. Accepted so the array round-trips unchanged, but
    * not persisted: the saved macros are already scaled to the estimated weight.
@@ -98,6 +127,7 @@ export class ScannedMealItemDto {
 }
 
 export class MealFromScanDto {
+  @IsOptional() @IsString() @Matches(/^[A-Za-z0-9_-]{16,80}$/) idempotency_key?: string;
   /** One meal row is written per selected item. */
   @IsArray()
   @ArrayMaxSize(50)

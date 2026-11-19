@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { api } from '../lib/api';
+import { api, deviceCache } from '../lib/api';
 import { DATA_CHANGE_EVENT } from '../lib/dataChanges.mjs';
 
 export type UserSettings = { inactivity: boolean; alarmVolume: boolean; showLeaderboard: boolean; threshold: 30 | 45 | 60 };
@@ -13,8 +13,10 @@ export function useSettings() {
   const [error, setError] = useState('');
   const retry = useCallback(async () => {
     setLoading(true); setError('');
+    const saved = deviceCache.get<{ values: Partial<UserSettings> }>('settings').data;
+    if (saved) { setSettings({ ...defaults, ...saved.values }); setLoading(false); }
     try { const result = await api.getSettings(); setSettings({ ...defaults, ...(result.values ?? {}) }); }
-    catch (err) { setError(err instanceof Error ? err.message : 'Could not load settings.'); }
+    catch (err) { if (!saved) setError(err instanceof Error ? err.message : 'Could not load settings.'); }
     finally { setLoading(false); }
   }, []);
   useEffect(() => {

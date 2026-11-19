@@ -1,0 +1,36 @@
+.photo-confirmation {
+  box-sizing: border-box;
+  width: min(100%, 440px);
+  height: min(100dvh, 850px);
+  max-width: 100%;
+  max-height: 100dvh;
+  overflow-y: auto;
+  margin: auto;
+  padding: max(16px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 70px rgb(0 0 0 / 35%);
+}
+.photo-confirmation::backdrop { background: rgb(0 0 0 / 68%); }
+.photo-confirmation[open] { display: flex; flex-direction: column; }
+.photo-confirmation-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.photo-confirmation-eyebrow { color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+.photo-confirmation-close { display: grid; place-items: center; width: 44px; height: 44px; margin: -8px -8px -8px 0; border: 0; border-radius: 12px; background: transparent; color: var(--text-secondary); font-size: 27px; line-height: 1; cursor: pointer; }
+.photo-confirmation h2 { margin: 0; color: var(--ink); font-size: 24px; line-height: 1.2; letter-spacing: -.025em; }
+.photo-confirmation-intro { margin: 8px 0 18px; color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
+.photo-confirmation-preview { position: relative; flex: 1 1 200px; min-height: 160px; overflow: hidden; width: 100%; border: 1px solid var(--line); border-radius: 20px; background: var(--soft); }
+.photo-confirmation-preview img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.photo-confirmation-placeholder { display: grid; height: 100%; place-content: center; justify-items: center; gap: 8px; color: var(--text-secondary); font-size: 14px; }
+.photo-confirmation-preview-label { position: absolute; left: 12px; bottom: 12px; padding: 6px 9px; border-radius: 7px; background: rgb(0 0 0 / 72%); color: white; font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.photo-confirmation-notice { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; }
+.photo-confirmation-notice-icon { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--green-light); color: var(--green); }
+.photo-confirmation-notice p { margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+.photo-confirmation-actions { display: grid; gap: 8px; }
+.photo-confirmation-actions button { width: 100%; min-height: 48px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.photo-confirmation-primary { display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--green); background: var(--green); color: #07140c; }
+.photo-confirmation-secondary { border: 1px solid var(--line); background: transparent; color: var(--ink); }
+.photo-confirmation button:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+.photo-confirmation button:hover { filter: brightness(1.1); }
+@media (max-height: 560px) { .photo-confirmation-intro { margin-bottom: 10px; } .photo-confirmation-notice { margin: 10px 0; } }

@@ -1,0 +1,66 @@
+Web Application Testing Skill
+
+<skill_content>
+# Skill: webapp-testing
+
+## Overview
+
+This skill provides a comprehensive toolkit for interacting with and testing local web applications using Playwright. It supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.
+
+## Capabilities
+
+- **Frontend Testing**: Verify web application functionality
+- **UI Debugging**: Debug UI behavior and interactions
+- **Screenshot Capture**: Capture browser screenshots during testing
+- **Console Log Viewing**: View browser console logs and errors
+- **Network Monitoring**: Monitor network requests and responses
+- **Performance Metrics**: Capture performance data
+- **Automated Testing**: Run automated test scripts
+- **Cross-Browser Testing**: Test across different browsers
+
+## Use Cases
+
+### Development
+- Test local web applications during development
+- Debug UI issues
+- Verify feature functionality
+
+### Quality Assurance
+- Run regression tests
+- Test user flows
+- Validate UI behavior
+
+### Documentation
+- Capture test evidence
+- Document test results
+- Create test reports
+
+## Example Usage
+
+```
+opencode run "Use webapp-testing to test the login flow on localhost:3000"
+
+opencode run "Use webapp-testing to capture screenshots of all pages on the site"
+
+opencode run "Use webapp-testing to run Playwright tests for the checkout flow"
+```
+
+## Technical Details
+
+This skill uses Playwright's browser automation capabilities to interact with web applications. It provides a comprehensive testing environment with full browser control.
+
+## Output
+
+The skill provides:
+- Test results (pass/fail)
+- Screenshots at various test steps
+- Browser console logs
+- Network activity logs
+- Performance metrics
+- Test reports
+
+---
+
+Base directory: .opencode/skills/webapp-testing
+This skill is part of the Anthropic ecosystem for web application testing.
+</skill_content>

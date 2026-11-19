@@ -15,11 +15,11 @@ A responsive, mobile-first fitness application with a Next.js frontend, Expo Go 
 
 Install root dependencies with `npm install`. Start the backend from `backend/` with `npm install` and `npm run start:dev`; start the frontend with `npm run dev` from the root. Start Expo Go with `npm run expo` from a third terminal. Configure MongoDB and JWT environment variables in `backend/.env`; keep secrets out of client environment files.
 
-Phiq is the private assistant available across Home, Coach, Scan, Quests and Me. It runs a self-hosted open-weight model without an AI-provider API key. Install/start Ollama, then run `npm run ai:setup` and `npm run ai:warmup` once from the root. Personal records require explicit chat consent and remain scoped to the signed-in account. See [the assistant setup and privacy boundaries](ai/README.md). This replaces Gemini for chat; existing image/video features retain their separate provider requirements.
+Phiq is the assistant available across Home, Coach, Scan, Quests and Me. Model requests use OpenAI GPT-6 Luna through the backend. Set `OPENAI_API_KEY` in `backend/.env`; never place the key in frontend or mobile configuration. Personal records require explicit chat consent and relevant context can be sent to OpenAI. Configure the OpenAI project's data-sharing settings separately.
 
-Phiq covers all 35 reviewed routes/subpages, uses current-page context, and answers common page help/exact supported metrics directly. Source labels are hidden from replies. For a hosted installation, use [the production containers, private inference and HTTPS gateway guide](ai/deploy/README.md); [verification evidence](ai/VERIFICATION.md) distinguishes completed checks from pending host/container staging.
+Phiq covers reviewed routes and pages, uses current-page context, and answers common page help and exact supported metrics directly. For a hosted installation, see [the production container and HTTPS gateway guide](ai/deploy/README.md).
 
-Run `rtk npm run ai:evaluate:questions` to repeat the expanded synthetic chatbot question suite with the installed local model. See [the question regression matrix](ai/question-test-matrix.md) for coverage and the browser/database test commands.
+The food scanner uses OpenAI for image recognition and USDA for nutrition lookups. An AI workout insight is available on completed reports; video analysis also requires the pose service.
 
 ## Run on a phone with Expo Go
 

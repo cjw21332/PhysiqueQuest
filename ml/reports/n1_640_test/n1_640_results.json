@@ -1,0 +1,322 @@
+{
+  "01e83deb_0015_c-curl twist_[13].mp4": {
+    "native": {
+      "detection_rate": 1.0015873015873016,
+      "pose_count": 631,
+      "avg_visible": 29.795562599049127,
+      "frame_count": 1261
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    }
+  },
+  "04996ace_0016_reverse lunges challenge_[50].mp4": {
+    "native": {
+      "detection_rate": 0.6111111111111112,
+      "pose_count": 990,
+      "avg_visible": 28.007070707070707,
+      "frame_count": 3241
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 3241
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 3241
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 3241
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 3241
+    }
+  },
+  "14c2c3f4_0045_drop squats_[40].mp4": {
+    "native": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1919
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1919
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1919
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1919
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1919
+    }
+  },
+  "14c2c3f4_0447_push up toe tap_[14-13-15].mp4": {
+    "native": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1889
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1889
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1889
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1889
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1889
+    }
+  },
+  "17e2d98f_0241_slow sq_[6].mp4": {
+    "native": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 971
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 971
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 971
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 971
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 971
+    }
+  },
+  "36f0d07e_0300_bicep curls_[24].mp4": {
+    "native": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1261
+    }
+  },
+  "5e3a8d78_0514_push up (on knees)_[12].mp4": {
+    "native": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    }
+  },
+  "87fe2aa4_0514_squat_[15].mp4": {
+    "native": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 961
+    }
+  },
+  "87fe2aa4_0403_reverse lunges_[20].mp4": {
+    "native": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1321
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1321
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1321
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1321
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 1321
+    }
+  },
+  "bdfe7f1d_0657_leg extensions_[9].mp4": {
+    "native": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 981
+    },
+    "1280x720": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 981
+    },
+    "960x540": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 981
+    },
+    "640x360": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 981
+    },
+    "640x480": {
+      "detection_rate": 0.0,
+      "pose_count": 0,
+      "avg_visible": 0,
+      "frame_count": 981
+    }
+  }
+}

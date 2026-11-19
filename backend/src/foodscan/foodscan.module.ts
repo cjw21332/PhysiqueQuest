@@ -10,11 +10,14 @@ import { ScanContentTypeGuard } from '../common/foodscan/scan-content-type.guard
 import { ScanRateLimitGuard } from '../common/foodscan/scan-rate-limit.guard.js';
 import { FoodScanController } from './foodscan.controller.js';
 import { FoodScanSchemasService } from './foodscan.schemas.js';
-import { ProductService } from './services/product.service.js';
 import { FoodScanService } from './foodscan.service.js';
 import { FoodSearchController } from './foodsearch.controller.js';
-import { GeminiService } from './services/gemini.service.js';
+import { AI_VISION_PROVIDER } from './services/vision-provider.js';
+import { OpenAIVisionService } from './services/openai-vision.service.js';
 import { UsdaService } from './services/usda.service.js';
+import { FoodScanUsageService } from './foodscan-usage.service.js';
+import { FoodScanUsageController } from './foodscan-usage.controller.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 /**
  * Route paths owned by the scanner, relative to the global prefix.
@@ -43,22 +46,23 @@ export const SCANNER_ROUTE_PATHS = [
  */
 @Module({
   imports: [ConfigModule],
-  controllers: [FoodScanController, FoodSearchController],
+  controllers: [FoodScanController, FoodSearchController, FoodScanUsageController],
   providers: [
     FoodScanConfigService,
     PinoLogger,
     HttpService,
     FoodScanSchemasService,
-    GeminiService,
+    { provide: AI_VISION_PROVIDER, useClass: OpenAIVisionService },
     UsdaService,
-    ProductService,
     FoodScanService,
+    FoodScanUsageService,
     AppExceptionFilter,
     RequestContextInterceptor,
     DeadlineInterceptor,
     ScanContentTypeGuard,
     ScanRateLimitGuard,
+    AiRateLimitGuard,
   ],
-  exports: [PinoLogger, FoodScanConfigService, FoodScanService, ScanRateLimitGuard],
+  exports: [PinoLogger, FoodScanConfigService, FoodScanService, ScanRateLimitGuard, UsdaService, FoodScanUsageService, AiRateLimitGuard],
 })
 export class FoodScanModule {}

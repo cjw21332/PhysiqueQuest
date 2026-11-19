@@ -1,0 +1,7 @@
+# Progress 70 — Workout history and recommendations
+
+The November 16 Push workout was saved with seven exercises and 22 sets. The Smith working sets for November 11 and November 16 were corrected to 20 kg and 25 kg of added plates respectively; the stored totals include a separately marked 10 kg estimated bar. The November 14 Upper workout was saved with nine exercises and 28 sets and associated with the November 12 planned day. Its 1:00–2:25 PM time is approximate. No bar estimate was invented for the T-bar row, whose listed loads remain as entered.
+
+Recommendations now work from one weighted set, use the last working set for mixed loads, distinguish short and long gaps, and exclude recorded bar estimates from recommended plates. Manual Smith, EZ-bar and standard barbell entries accept added plates and store an explicitly described bar estimate, which can be changed during the workout. Equipment-specific starting resistance must be confirmed. Suggestions do not measure recovery.
+
+On the Android phone, confirmed the incline recommendation and the Smith recommendation using saved history. A temporary Smith set entered as 25 kg of plates saved as 35 kg total with a 10 kg bar estimate; the temporary workout was discarded. Frontend TypeScript, seven recommendation tests, eight workout-service tests and the backend build passed. The request to shorten text across every page remains a broader audit; only the workout guidance was shortened in this pass.

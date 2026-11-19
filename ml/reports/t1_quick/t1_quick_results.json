@@ -1,0 +1,469 @@
+{
+  "01e83deb_0015_c-curl twist_[13].mp4": {
+    "video": "01e83deb_0015_c-curl twist_[13].mp4",
+    "metadata": {
+      "frame_count": 1261,
+      "fps": 30.0,
+      "width": 1920,
+      "height": 1080
+    },
+    "expected_frames_15fps": 630,
+    "saved_frames": [
+      {
+        "frame_idx": 0,
+        "path": "reports\\t1_quick\\01e83deb_0015_c-curl twist_[13]\\01e83deb_0015_c-curl twist_[13]_frame0.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      },
+      {
+        "frame_idx": 630,
+        "path": "reports\\t1_quick\\01e83deb_0015_c-curl twist_[13]\\01e83deb_0015_c-curl twist_[13]_frame630.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      },
+      {
+        "frame_idx": 1260,
+        "path": "reports\\t1_quick\\01e83deb_0015_c-curl twist_[13]\\01e83deb_0015_c-curl twist_[13]_frame1260.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      }
+    ],
+    "video_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.09523809523809523,
+      "avg_visible": 30.316666666666666,
+      "visible_distribution": [
+        26,
+        26,
+        26,
+        26,
+        26,
+        27,
+        27,
+        27,
+        28,
+        28,
+        28,
+        31,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33
+      ]
+    },
+    "image_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.09523809523809523,
+      "avg_visible": 30.016666666666666,
+      "visible_distribution": [
+        26,
+        27,
+        27,
+        26,
+        26,
+        32,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        30,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33
+      ]
+    },
+    "confidence_05": {
+      "frames_with_pose": 60
+    },
+    "error": null
+  },
+  "04996ace_0016_reverse lunges challenge_[50].mp4": {
+    "video": "04996ace_0016_reverse lunges challenge_[50].mp4",
+    "metadata": {
+      "frame_count": 3241,
+      "fps": 30.0,
+      "width": 1920,
+      "height": 1080
+    },
+    "expected_frames_15fps": 1620,
+    "saved_frames": [
+      {
+        "frame_idx": 0,
+        "path": "reports\\t1_quick\\04996ace_0016_reverse lunges challenge_[50]\\04996ace_0016_reverse lunges challenge_[50]_frame0.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      },
+      {
+        "frame_idx": 1620,
+        "path": "reports\\t1_quick\\04996ace_0016_reverse lunges challenge_[50]\\04996ace_0016_reverse lunges challenge_[50]_frame1620.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      },
+      {
+        "frame_idx": 3240,
+        "path": "reports\\t1_quick\\04996ace_0016_reverse lunges challenge_[50]\\04996ace_0016_reverse lunges challenge_[50]_frame3240.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      }
+    ],
+    "video_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.037037037037037035,
+      "avg_visible": 27.0,
+      "visible_distribution": [
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27
+      ]
+    },
+    "image_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.037037037037037035,
+      "avg_visible": 27.0,
+      "visible_distribution": [
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27
+      ]
+    },
+    "confidence_05": {
+      "frames_with_pose": 60
+    },
+    "error": null
+  },
+  "14c2c3f4_0045_drop squats_[40].mp4": {
+    "video": "14c2c3f4_0045_drop squats_[40].mp4",
+    "metadata": {
+      "frame_count": 1919,
+      "fps": 30.0,
+      "width": 1920,
+      "height": 1080
+    },
+    "expected_frames_15fps": 959,
+    "saved_frames": [
+      {
+        "frame_idx": 0,
+        "path": "reports\\t1_quick\\14c2c3f4_0045_drop squats_[40]\\14c2c3f4_0045_drop squats_[40]_frame0.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      },
+      {
+        "frame_idx": 959,
+        "path": "reports\\t1_quick\\14c2c3f4_0045_drop squats_[40]\\14c2c3f4_0045_drop squats_[40]_frame959.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      }
+    ],
+    "video_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.06256517205422316,
+      "avg_visible": 33.0,
+      "visible_distribution": [
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33
+      ]
+    },
+    "image_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.06256517205422316,
+      "avg_visible": 32.45,
+      "visible_distribution": [
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33
+      ]
+    },
+    "confidence_05": {
+      "frames_with_pose": 60
+    },
+    "error": null
+  },
+  "14c2c3f4_0447_push up toe tap_[14-13-15].mp4": {
+    "video": "14c2c3f4_0447_push up toe tap_[14-13-15].mp4",
+    "metadata": {
+      "frame_count": 1889,
+      "fps": 30.0,
+      "width": 1920,
+      "height": 1080
+    },
+    "expected_frames_15fps": 944,
+    "saved_frames": [
+      {
+        "frame_idx": 0,
+        "path": "reports\\t1_quick\\14c2c3f4_0447_push up toe tap_[14-13-15]\\14c2c3f4_0447_push up toe tap_[14-13-15]_frame0.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      },
+      {
+        "frame_idx": 944,
+        "path": "reports\\t1_quick\\14c2c3f4_0447_push up toe tap_[14-13-15]\\14c2c3f4_0447_push up toe tap_[14-13-15]_frame944.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      }
+    ],
+    "video_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.0635593220338983,
+      "avg_visible": 30.066666666666666,
+      "visible_distribution": [
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        32,
+        32,
+        28,
+        28,
+        28,
+        28
+      ]
+    },
+    "image_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.0635593220338983,
+      "avg_visible": 29.6,
+      "visible_distribution": [
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        33,
+        32,
+        28,
+        28,
+        28,
+        28,
+        27,
+        27,
+        26,
+        26,
+        26
+      ]
+    },
+    "confidence_05": {
+      "frames_with_pose": 60
+    },
+    "error": null
+  },
+  "36f0d07e_0300_bicep curls_[24].mp4": {
+    "video": "36f0d07e_0300_bicep curls_[24].mp4",
+    "metadata": {
+      "frame_count": 1261,
+      "fps": 30.0,
+      "width": 1920,
+      "height": 1080
+    },
+    "expected_frames_15fps": 630,
+    "saved_frames": [
+      {
+        "frame_idx": 0,
+        "path": "reports\\t1_quick\\36f0d07e_0300_bicep curls_[24]\\36f0d07e_0300_bicep curls_[24]_frame0.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      },
+      {
+        "frame_idx": 630,
+        "path": "reports\\t1_quick\\36f0d07e_0300_bicep curls_[24]\\36f0d07e_0300_bicep curls_[24]_frame630.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      },
+      {
+        "frame_idx": 1260,
+        "path": "reports\\t1_quick\\36f0d07e_0300_bicep curls_[24]\\36f0d07e_0300_bicep curls_[24]_frame1260.png",
+        "shape": [
+          1080,
+          1920,
+          3
+        ]
+      }
+    ],
+    "video_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.09523809523809523,
+      "avg_visible": 27.0,
+      "visible_distribution": [
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27
+      ]
+    },
+    "image_mode": {
+      "frames_with_pose": 60,
+      "detection_rate": 0.09523809523809523,
+      "avg_visible": 27.0,
+      "visible_distribution": [
+        27,
+        28,
+        27,
+        26,
+        27,
+        27,
+        29,
+        26,
+        27,
+        27,
+        26,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27,
+        27
+      ]
+    },
+    "confidence_05": {
+      "frames_with_pose": 60
+    },
+    "error": null
+  }
+}

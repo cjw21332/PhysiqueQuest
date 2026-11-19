@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from 'react';
 import PasswordStrengthChecker, { validatePassword } from '../../components/PasswordStrengthChecker';
+import PolicyConsent from './PolicyConsent';
 
 type Props = {
   email: string;
@@ -54,7 +55,7 @@ export default function GoogleRegistrationPassword({ email, error, busy = false,
       <div className="auth-body">
         <div className="auth-heading">
           <h2>Create your account password</h2>
-          <p>Set a password for <strong>{email}</strong>. Next, verify your email with a one-time code, then finish your profile.</p>
+          <p>Set a password for <strong>{email}</strong>. Next, complete your profile, then verify your email to create your account.</p>
         </div>
         <label className="field">
           <span>Password</span>
@@ -69,14 +70,11 @@ export default function GoogleRegistrationPassword({ email, error, busy = false,
             <input type="password" autoComplete="new-password" required disabled={working} value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} />
           </div>
         </label>
-        <label className="consent">
-          <input type="checkbox" required disabled={working} checked={consent} onChange={event => setConsent(event.target.checked)} />
-          <span>I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">terms</a>, <a href="/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a>, and <a href="/camera-consent" target="_blank" rel="noopener noreferrer">camera-based health data processing</a>. These documents are drafts pending team review.</span>
-        </label>
+        <PolicyConsent checked={consent} onChange={setConsent} disabled={working} openInitially/>
         {error && <p className="error" role="alert">{error}</p>}
       </div>
       <div className="auth-footer">
-        <button type="submit" className="primary" disabled={working}>{working ? 'Sending verification code…' : 'Continue to email verification'}</button>
+        <button type="submit" className="primary" disabled={working}>{working ? 'Please wait…' : 'Continue to profile'}</button>
         <button type="button" className="secondary google-auth-cancel" disabled={working} onClick={onCancel}>Cancel Google registration</button>
       </div>
     </form>

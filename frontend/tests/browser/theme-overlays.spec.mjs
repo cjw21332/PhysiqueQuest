@@ -5,7 +5,8 @@ async function signedIn(page) {
   await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'visual', token: 'visual-test' })));
   await page.route('**/api/**', route => {
     const path = new URL(route.request().url()).pathname;
-    const json = path.endsWith('/profile') ? { name: 'Visual', email: 'visual@example.test', equipment: [], days: [] }
+    const json = path.includes('/auth/session/') ? { access_token: 'visual-test', expires_in: 3600, user: { id: 'visual', name: 'Visual', email: 'visual@example.test', emailVerified: true } }
+      : path.endsWith('/profile') ? { name: 'Visual', email: 'visual@example.test', equipment: [], days: [] }
       : path.endsWith('/nutrition') ? { meals: [], water: [] }
       : path.endsWith('/exercises') ? { items: [], total: 0, page: 1, limit: 12, pages: 0 }
       : { values: {} };
@@ -25,6 +26,9 @@ test('logout, photo chooser, public library and profile errors share the dark pa
   await page.goto('/scan');
   await page.getByRole('button', { name: /Scan your meal/ }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByRole('dialog').getByRole('button', { name: /barcode/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Take a photo/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Upload a photo/ })).toBeVisible();
   await expectDarkPalette(page);
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
   await page.goto('/exercises');

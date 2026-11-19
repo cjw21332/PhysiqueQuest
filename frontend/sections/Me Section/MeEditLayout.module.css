@@ -1,0 +1,26 @@
+.layout.layout.layout { --editor-gutter: 20px; width: 100%; max-width: 440px; min-width: 0; margin-inline: auto; }
+.layout :global(.edit-header) { padding-inline: var(--editor-gutter); }
+.layout :global(.edit-header h2) { font-size: 18px; }
+.layout :global(.edit-scroll) { padding: 24px var(--editor-gutter) 32px; overscroll-behavior: contain; }
+.layout :global(.edit-scroll > .step-content) { gap: 22px; align-content: start; }
+.layout :global(.edit-description) { color: var(--muted); line-height: 1.55; }
+.layout :global(.field > span), .layout :global(.choice-group > b), .layout :global(.group-title b) { font-size: 13px; font-weight: 600; }
+.layout :global(.input-wrap) { min-width: 0; min-height: 48px; height: auto; }
+.layout :global(.input-wrap input) { min-width: 0; font-size: 16px; }
+.layout :global(.weight-value-control) { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.layout :global(.weight-value-control > span) { min-width: 0; font-size: 15px; font-weight: 600; }
+.layout :global(.weight-value-control > span small) { position: static; margin-left: 4px; color: var(--muted); font-weight: 400; }
+.layout :global(.weight-value-control button) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none; min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--green); font-size: 13px; font-weight: 600; }
+.layout :global(.weight-guidance) { margin: -8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.layout :global(.duration-chips) { max-width: none; }
+.layout :global(.duration-chips .chip) { flex: 1 1 60px; }
+.layout :global(.goal-card), .layout :global(.equipment) { min-width: 0; }
+.layout :global(.goal-copy), .layout :global(.placement-card > div) { min-width: 0; overflow-wrap: anywhere; }
+.layout :global(.condition-checkbox) { min-height: 48px; }
+.layout :global(.edit-footer) { box-sizing: border-box; width: 100%; max-width: none; margin: 0; padding-inline: var(--editor-gutter); }
+.layout :global(:is(button, input, textarea):focus-visible) { outline: 2px solid var(--green); outline-offset: 3px; }
+@media (max-width: 350px) {
+  .layout.layout.layout { --editor-gutter: 14px; }
+  .layout :global(.weight-value-control button) { font-size: 12px; }
+  .layout :global(.measure-grid) { gap: 6px; }
+}

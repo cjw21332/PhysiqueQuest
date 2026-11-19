@@ -1,0 +1,78 @@
+Traceback (most recent call last):
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\scripts\54_train_cached_v2.py", line 380, in <module>
+    main()
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\scripts\54_train_cached_v2.py", line 363, in main
+    export_to_onnx(cnn_best, (1, 48, 132), "ml/models/cnn1d_int8.onnx")
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\src\pq_ml\models.py", line 104, in export_to_onnx
+    torch.onnx.export(
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\onnx\__init__.py", line 383, in export
+    export(
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\onnx\utils.py", line 495, in export
+    _export(
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\onnx\utils.py", line 1428, in _export
+    graph, params_dict, torch_out = _model_to_graph(
+                                    ^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\onnx\utils.py", line 1053, in _model_to_graph
+    graph, params, torch_out, module = _create_jit_graph(model, args)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\onnx\utils.py", line 937, in _create_jit_graph
+    graph, torch_out = _trace_and_get_graph_from_model(model, args)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\onnx\utils.py", line 844, in _trace_and_get_graph_from_model
+    trace_graph, torch_out, inputs_states = torch.jit._get_trace_graph(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\jit\_trace.py", line 1498, in _get_trace_graph
+    outs = ONNXTracedModule(
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\jit\_trace.py", line 138, in forward
+    graph, _out = torch._C._create_graph_by_tracing(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\jit\_trace.py", line 129, in wrapper
+    outs.append(self.inner(*trace_inputs))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1729, in _slow_forward
+    result = self.forward(*input, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\src\pq_ml\models.py", line 40, in forward
+    x = self.conv(x)
+        ^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1729, in _slow_forward
+    result = self.forward(*input, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1729, in _slow_forward
+    result = self.forward(*input, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\conv.py", line 375, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\torch\nn\modules\conv.py", line 370, in _conv_forward
+    return F.conv1d(
+           ^^^^^^^^^
+RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cpu and cuda:0! (when checking argument for argument weight in method wrapper_CUDA___slow_conv2d_forward)

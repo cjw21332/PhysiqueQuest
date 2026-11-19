@@ -1,0 +1,72 @@
+Full Page Screenshot Skill
+
+<skill_content>
+# Skill: full-page-screenshot
+
+## Overview
+
+This skill captures full-page screenshots of web pages using Chrome DevTools Protocol (CDP). It allows users to capture the entire webpage content, including parts not visible in the current viewport, which is essential for documentation, documentation, and web development purposes.
+
+## Capabilities
+
+- **Full Page Capture**: Capture the entire webpage, not just the visible portion
+- **Customizable Viewport**: Set specific viewport dimensions for focused captures
+- **Page Content**: Capture the entire DOM content, not just what's visible
+- **High-Quality Screenshots**: Generate PNG or JPEG format screenshots
+- **Page Metadata**: Include page title, URL, and other metadata
+
+## Use Cases
+
+### Documentation
+- Document web pages for reference
+- Create screenshots for documentation purposes
+
+### Development
+- Capture UI states during development
+- Document UI changes over time
+
+### Documentation
+- Document UI states for reference
+- Create screenshots for documentation purposes
+
+### Development
+- Document UI states for reference
+- Create screenshots for documentation purposes
+
+## Example Usage
+
+```
+opencode run "Use full-page-screenshot to capture https://example.com"
+
+opencode run "Use full-page-screenshot to capture https://example.com with width=1920 height=1080"
+
+opencode run "Use full-page-screenshot to capture https://example.com and save to screenshots folder"
+```
+
+## Technical Details
+
+This skill uses the Chrome DevTools Protocol to communicate with the browser and capture the full page content. It supports various formats and can handle complex page layouts.
+
+## Output
+
+The skill provides:
+- Screenshot file (PNG or JPEG)
+- Page metadata (URL, title, dimensions)
+- Optional console logs
+
+## Authentication
+
+This skill requires a running browser instance and does not require additional authentication beyond having a browser session.
+
+## Output
+
+The skill provides structured output including:
+- Screenshot file (PNG or JPEG)
+- Page metadata (URL, title, dimensions)
+- Optional console logs
+
+---
+
+Base directory: .opencode/skills/full-page-screenshot
+This skill is part of the OpenDesign ecosystem for comprehensive web capture and documentation.
+</skill_content>

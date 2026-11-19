@@ -1,9 +1,10 @@
+import { changeJournal, journals, recordAction, workoutHistorySnapshot } from './workoutJournal';
 // API client configuration
 import { appVersionHeaders, clearAuthSession, session } from './session';
 import { resolveApiBaseUrl } from './apiBaseUrl.mjs';
 import { resolveCoachBaseUrl } from './coachBaseUrl.mjs';
 import { createDeviceCache } from './deviceCache.mjs';
-import { ApiNetworkError, normalizeTransportError } from './apiErrors.mjs';
+import { ApiNetworkError, friendlyRequestMessage, normalizeTransportError } from './apiErrors.mjs';
 import { announceDataChange } from './dataChanges.mjs';
 
 export const deviceCache = createDeviceCache({
@@ -11,13 +12,14 @@ export const deviceCache = createDeviceCache({
     if (typeof window === 'undefined') return null;
     try {
       const user = session.current(getApiBaseUrl());
-      return user?.id && user?.token ? { scope: `${getApiBaseUrl()}:${user.id}`, session: String(user.sessionKey) } : null;
+      return user?.id && (user.token || user.offlineOnly) ? { scope: `${getApiBaseUrl()}:${user.id}`, session: String(user.sessionKey) } : null;
     } catch { return null; }
   },
   storage: () => typeof window === 'undefined' ? undefined : window.localStorage,
   validate: (key, data) => {
     if (!data || typeof data !== 'object') return false;
     if (key === 'profile') return typeof data.name === 'string';
+    if (key === 'settings') return !!data.values && typeof data.values === 'object' && !Array.isArray(data.values);
     if (key === 'coach') return Array.isArray(data.days) && data.days.every((day: any) => day && Array.isArray(day.exercises));
     if (key === 'nutrition') return Array.isArray(data.meals) && Array.isArray(data.water);
     if (key === 'notifications') return Array.isArray(data.items);
@@ -90,8 +92,8 @@ export type ExerciseDiscoveryQuery = { search?: string; muscle?: string; equipme
 export type ExerciseFilters = { bodyParts: string[]; equipments: string[]; targetMuscles: string[]; secondaryMuscles: string[] };
 export interface ProgressRecord { _id: string; metric: 'weight' | 'chest' | 'waist' | 'arms' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
 export interface WorkoutExerciseSnapshot { exerciseId: string; name: string; equipment: string; prescription?: string; sets: number; restBetweenSets?: number; restAfterExercise?: number; }
-export interface WorkoutSetResult { setId: string; exerciseId: string; setIndex: number; reps: number; durationSeconds?: number; loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs'; status: 'completed' | 'skipped'; source: 'manual' | 'local-video'; setType?: 'normal' | 'warmup' | 'drop' | 'failure'; }
-export interface WorkoutSessionRecord { routineName?: string; _id: string; exerciseIds: string[]; exercises?: WorkoutExerciseSnapshot[]; revision?: number; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: WorkoutSetResult[]; }
+export interface WorkoutSetResult { setId: string; exerciseId: string; setIndex: number; reps: number; durationSeconds?: number; loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs'; barWeightKg?: number; status: 'completed' | 'skipped'; source: 'manual' | 'local-video'; setType?: 'normal' | 'warmup' | 'drop' | 'failure'; }
+export interface WorkoutSessionRecord { routineName?: string; _id: string; exerciseIds: string[]; exercises?: WorkoutExerciseSnapshot[]; dayIndex?: number; scheduledDate?: string; origin?: 'planned' | 'standalone' | 'recorded-set'; revision?: number; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: WorkoutSetResult[]; }
 export type WorkoutSummary = { trainingDates: string[]; personalRecords: { exerciseId: string; name: string; loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs'; volumeKg?: number; volumeDate?: string; date: string }[] };
 export type AlertRecord = {
   _id?: string;
@@ -202,18 +204,17 @@ export interface ScannedMacros {
 
 export interface FoodCandidate {
   fdc_id: number;
+  id?: string;
+  source?: string;
   description: string;
   data_type: string;
 }
 
-export interface BarcodeProduct {
-  code:string; name:string; brand:string; image:string; quantity:string; servingLabel:string; packageAmount:number|null; basis:string; serving:number|null;
-  ingredients:string; allergens:string; categories:string; countries:string; grade:string;
-  per100:Record<'calories'|'protein'|'carbs'|'fat'|'saturatedFat'|'fiber'|'sugars'|'sodium'|'transFat'|'addedSugar'|'cholesterol',number|null>;
-}
 export interface FoodDetail {
   request_id: string;
   fdc_id: number;
+  id?: string;
+  source?: string;
   description: string;
   data_type: string;
   per_100g: ScannedMacros;
@@ -232,7 +233,17 @@ export interface ScannedItem {
   /** False when no USDA record matched. The backend skips such items on save. */
   found: boolean;
   fdc_id?: number;
+  nutrition_ref?: string;
+  nutrition_source?: string;
+  reference_ingredients?: string[];
   description?: string;
+  portionDescription?: string;
+  evidence?: { name: FoodEvidence; quantity: FoodEvidence; preparation: FoodEvidence; added_oil: FoodEvidence };
+  evidence_ref?: string;
+  preparation_correction?: string;
+  added_oil_correction?: string;
+  entered_quantity?: number;
+  entered_unit?: 'g' | 'kg' | 'oz' | 'lb';
   kcal: number | null;
   protein_g: number | null;
   carbs_g: number | null;
@@ -240,11 +251,19 @@ export interface ScannedItem {
   est_weight_g: number;
   confidence: number;
   per_100g?: ScannedMacros;
+  identification_method?: 'ai' | 'manual' | 'corrected';
+  weight_corrected?: boolean;
+  portion_method?: 'visual_estimate';
+  portion_confidence?: null;
+  region_confidence?: null;
+  weight_min_g?: null;
+  weight_max_g?: null;
 }
+
+export type FoodEvidence = 'user_confirmed' | 'visually_identified' | 'estimated' | 'unknown';
 
 export interface ScanAnalysis {
   request_id: string;
-  model: string;
   items: ScannedItem[];
   unmatched: string[];
   totals: { [K in keyof ScannedMacros]: number | null };
@@ -265,12 +284,12 @@ export class ApiRequestError extends Error {
 
 /**
  * How long the app waits for a scan result before abandoning it and offering a
- * retry. Deliberately far above the server's own deadline (25s) and above its
- * 20s cap on any single vision call: the server should always answer with a real
+ * retry. Deliberately far above the server's own deadline (90s) and above its
+ * 60s cap on any single vision call: the server should always answer with a real
  * reason first, and this exists only to stop a dropped connection from leaving
  * the screen waiting forever.
  */
-export const SCAN_TIMEOUT_MS = 60_000;
+export const SCAN_TIMEOUT_MS = 110_000;
 
 type RequestOptions = RequestInit & { timeoutMs?: number };
 
@@ -281,7 +300,7 @@ type RequestOptions = RequestInit & { timeoutMs?: number };
  */
 export class ApiTimeoutError extends Error {
   constructor(public readonly timeoutMs: number) {
-    super(`The request took longer than ${Math.round(timeoutMs / 1000)} seconds.`);
+    super('This is taking longer than expected. Please try again.');
     this.name = 'ApiTimeoutError';
   }
 }
@@ -319,6 +338,7 @@ class ApiClient {
     if (init.signal?.aborted) throw init.signal.reason ?? new Error('Request cancelled');
     const isAuth = endpoint.startsWith('/auth/session/') || endpoint.startsWith('/auth/password-reset/');
     const existing = session.current(requestBaseUrl);
+    if (existing?.offlineOnly && !isAuth) throw new ApiNetworkError();
     if (ownApi && !isAuth && existing && existing.expiresAt <= Date.now() + 30_000) {
       const refreshed = await session.refresh(requestBaseUrl);
       if (!refreshed || refreshed.id !== existing.id || refreshed.sessionKey !== existing.sessionKey || requestBaseUrl !== getApiBaseUrl()) {
@@ -379,7 +399,7 @@ class ApiClient {
         const raw = error.message;
         const message = endpoint === '/auth/registration-code/request' && response.status === 503
           ? 'We couldn’t send your verification code right now. Please try again later.'
-          : (Array.isArray(raw) ? raw.join(', ') : raw?.trim()) || `Request failed (${response.status})`;
+          : friendlyRequestMessage(response.status, raw);
         throw new ApiRequestError(message, response.status, error.code);
       }
 
@@ -426,7 +446,7 @@ class ApiClient {
       // Only report a timeout when our own timer fired; otherwise throw the real error
       if (timedOut) throw new ApiTimeoutError(cap);
       if (failure instanceof Error) throw failure;
-      throw new Error('Network error occurred');
+      throw new Error('We couldn’t connect. Check your internet connection and try again.');
     } finally {
       if (timer) clearTimeout(timer);
       externalSignal?.removeEventListener('abort', forwardAbort);
@@ -444,6 +464,7 @@ class ApiClient {
     password: string;
     requestId: string;
     code: string;
+    profile: unknown;
   }) {
     return this.request<{
       user: { id: string; name: string; email: string };
@@ -473,7 +494,7 @@ class ApiClient {
   }
 
   async checkGoogleAccount(idToken: string, intent: 'login' | 'register') {
-    return this.request<{ email: string; name: string; registered: boolean }>('/auth/google/check', {
+    return this.request<{ email: string; name: string; registered: boolean; needsProfile?: boolean }>('/auth/google/check', {
       method: 'POST',
       body: JSON.stringify({ idToken, intent }),
     });
@@ -490,7 +511,7 @@ class ApiClient {
     });
   }
 
-  async googleRegister(data: { idToken: string; password: string; requestId: string; code: string; name: string }) {
+  async googleRegister(data: { idToken: string; password: string; requestId: string; code: string; name: string; profile: unknown }) {
     return this.request<{
       user: { id: string; name: string; email: string };
       access_token: string;
@@ -532,8 +553,8 @@ class ApiClient {
   async updateMeal(id: string, data: unknown) { return this.request<any>(`/nutrition/meals/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(data) }); }
   async deleteMeal(id: string) { return this.request<any>(`/nutrition/meals/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
   async setWater(data: { date: string; glasses: number }) { return this.request<any>('/nutrition/water', { method: 'PUT', body: JSON.stringify(data) }); }
-  async getSettings() { return this.request<any>('/settings'); }
-  async updateSettings(values: Record<string, unknown>) { return this.request<any>('/settings', { method: 'PUT', body: JSON.stringify({ values }) }); }
+  async getSettings(force = false) { return deviceCache.fetch('settings', () => this.request<any>('/settings'), force); }
+  async updateSettings(values: Record<string, unknown>) { const result = await this.request<any>('/settings', { method: 'PUT', body: JSON.stringify({ values }) }); deviceCache.publish('settings', result); return result; }
   async getActivity(force = false) {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
     return deviceCache.fetch('activity', () => this.request<any>(`/activity/state?timezone=${encodeURIComponent(timezone)}`, { timeoutMs: 15_000 }), force);
@@ -543,16 +564,23 @@ class ApiClient {
   async getStrengthLeaderboard(exerciseId: string, metric: 'heaviest' | 'relative') { const params = new URLSearchParams({ metric }); if (exerciseId) params.set('exerciseId', exerciseId); return this.request<StrengthLeaderboardRecord>(`/leaderboard/strength?${params}`); }
   async saveProfilePhoto(photo: string | null) { const profile = await this.request<any>('/profile/photo', photo ? { method: 'PUT', body: JSON.stringify({ photo }) } : { method: 'DELETE' }); deviceCache.publish('profile', profile); return profile; }
   async chat(messages: { role: 'user' | 'assistant'; text: string }[], includePersonalData = false, page?: string, signal?: AbortSignal) {
-    return this.request<{ reply: string; sources?: { id: string; label: string }[]; privacy: { personalDataIncluded: boolean; historyStored: false; provider: 'self-hosted' } }>('/chat', { method: 'POST', body: JSON.stringify({ messages, includePersonalData, page }), timeoutMs: 60000, signal });
+    return this.request<{ reply: string; sources?: { id: string; label: string }[]; privacy: { personalDataIncluded: boolean; historyStored: false; provider: 'openai' } }>('/chat', { method: 'POST', body: JSON.stringify({ messages, includePersonalData, page }), timeoutMs: 60000, signal });
   }
   async getCoachPlan(force = false) { return deviceCache.fetch('coach', () => this.request<CoachPlanRecord>('/coach/plan', { timeoutMs: 30_000 }), force); }
+  async getWorkoutAiSummary(id: string) {
+    if (id.startsWith('local-')) {
+      const row = (await journals(this.workoutOwner())).find(row => row.id === id);
+      if (!row?.serverId || row.operations.length) throw new Error('Sync this workout before requesting an insight.');
+      id = row.serverId;
+    }
+    return this.request<{ summary: string; suggestion: string }>(`/workouts/${encodeURIComponent(id)}/ai-summary`, { method: 'POST', timeoutMs: 25000 }); }
   async updateCoachDay(data: { programVersion: string; dayIndex: number; title: string; exercises: CoachExercise[] }) {
     const plan = await this.request<CoachPlanRecord>('/coach/plan/day', { method: 'PUT', body: JSON.stringify(data) });
     deviceCache.publish('coach', plan);
     return plan;
   }
   async preloadAppData(force = false) {
-    return Promise.allSettled([this.getProfile(force), this.getNutrition(force), this.getActivity(force), this.getCoachPlan(force)]);
+    return Promise.allSettled([this.getProfile(force), this.getSettings(force), this.getNutrition(force), this.getActivity(force), this.getCoachPlan(force), this.getAllWorkouts(force)]);
   }
   async getNotifications(force = false) { return deviceCache.fetch('notifications', () => this.request<any>('/notifications'), force); }
   async setNotificationReminder(reminder: { enabled: boolean; hour: number; minute: number; timezone: string }) { return this.request<any>('/notifications/reminder', { method: 'PUT', body: JSON.stringify(reminder) }); }
@@ -560,6 +588,7 @@ class ApiClient {
   async revokePushDevice(deviceId: string) { return this.request('/push/devices/' + encodeURIComponent(deviceId), { method: 'DELETE' }); }
   async markNotification(id: string, unread: boolean) { return this.request<any>(`/notifications/${encodeURIComponent(id)}/read`, { method: 'PATCH', body: JSON.stringify({ unread }) }); }
   async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }
+  async clearNotifications(ids: string[]) { return this.request<any>('/notifications/clear', { method: 'POST', body: JSON.stringify({ ids }) }); }
 
   async getAuthMe() { return this.request<{ id: string; email: string; role: 'user' | 'admin' }>('/auth/me'); }
   async requestPasswordReset(email: string) {
@@ -617,28 +646,110 @@ class ApiClient {
   }
   async addProgress(data: any) { return this.request<any>('/progress', { method: 'POST', body: JSON.stringify(data) }); }
   async deleteProgress(id: string) { return this.request<any>(`/progress/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
+  private workoutOwner() {
+    const base = getApiBaseUrl();
+    const user = session.current(base);
+    if (!user?.id || (!user.token && !user.offlineOnly)) throw new Error('Sign in to open saved workouts.');
+    return JSON.stringify([base,user.id]);
+  }
+  async startManualWorkout(data: Parameters<typeof recordAction>[2] & {kind:'create'}) {
+    const owner = this.workoutOwner();
+    return recordAction(owner, 'local-' + data.data.requestKey, data);
+  }
+  async latestLocalReport() {
+    return (await journals(this.workoutOwner())).filter(row => row.workout.status === 'completed')
+      .sort((a,b) => b.workout.endedAt!.localeCompare(a.workout.endedAt!))[0]?.workout ?? null;
+  }
+  async workoutSyncStatus(id: string) {
+    const row = (await journals(this.workoutOwner())).find(row => row.id === id);
+    return row ? { pending:row.operations.length, error:row.error } : null;
+  }
+  private syncing = false;
+  async syncManualWorkouts() {
+    if (!session.current(getApiBaseUrl())?.token || this.syncing || typeof indexedDB === 'undefined' || !navigator.onLine) return;
+    this.syncing = true;
+    try {
+      const owner = this.workoutOwner();
+      for (const row of await journals(owner)) {
+        if (row.workout.status !== 'completed') continue;
+        let serverId = row.serverId;
+        for (const operation of row.operations) {
+          if (owner !== this.workoutOwner()) return;
+          try {
+            const create = operation.kind === 'create';
+            if (!create && !serverId) throw new Error('Workout creation has not been confirmed.');
+            const path = create ? '/workouts' : '/workouts/' + encodeURIComponent(serverId!) + '/' + operation.kind;
+            const method = create || operation.kind === 'complete' ? 'POST' : 'PATCH';
+            const saved = await this.request<WorkoutSessionRecord>(path,{method,body:JSON.stringify(operation.data),timeoutMs:15000});
+            if (owner !== this.workoutOwner()) return;
+            if (!saved?._id || (serverId && saved._id !== serverId) || saved.startedAt !== row.workout.startedAt ||
+                (operation.kind === 'complete' && saved.status !== 'completed')) throw new Error('Unexpected workout confirmation.');
+            if (operation.kind === 'sets' && !saved.sets?.some(set =>
+              Object.entries(operation.data.result).every(([key,value]) => set[key as keyof WorkoutSetResult] === value))) throw new Error('Server did not confirm the recorded set.');
+            if (operation.kind === 'pause' && Boolean(saved.pausedAt) !== operation.data.paused) throw new Error('Server did not confirm the pause state.');
+            if (operation.kind === 'routine' && !operation.data.exercises.every((item,index) => saved.exercises?.[index]?.exerciseId === item.exerciseId)) throw new Error('Server did not confirm the exercise order.');
+            if (operation.kind === 'complete' && (saved.endedAt !== operation.data.endedAt || saved.sets?.length !== row.workout.sets?.length)) throw new Error('Server returned a different completed workout.');
+            serverId = saved._id;
+            await changeJournal(owner,row.id,current => {
+              if (!current || current.operations[0]?.id !== operation.id) throw new Error('Workout queue changed.');
+              return {...current,serverId,operations:current.operations.slice(1),error:undefined,
+                workout:operation.kind === 'complete' ? {...saved,_id:row.id} : current.workout};
+            });
+          } catch (error) {
+            await changeJournal(owner,row.id,current => {
+              if (!current) throw error;
+              return {...current,attempts:current.attempts+1,error:error instanceof Error ? error.message : 'Synchronization failed.'};
+            });
+            break;
+          }
+        }
+      }
+    } finally { this.syncing = false; }
+  }
   async getWorkouts(limit = 20, force = false) { if (limit === 20) return (await this.getAllWorkouts(force)).slice(0, limit); return this.request<WorkoutSessionRecord[]>(`/workouts?limit=${encodeURIComponent(limit)}`); }
   async getAllWorkouts(force = false) {
+    const owner = this.workoutOwner();
     return deviceCache.fetch('workouts', async () => {
       const all: WorkoutSessionRecord[] = [];
       let before = '';
-      for (;;) {
-        const page = await this.request<WorkoutSessionRecord[]>(`/workouts?limit=100${before ? `&before=${encodeURIComponent(before)}` : ''}`);
-        all.push(...page);
-        if (page.length < 100) return all;
-        const last = page[page.length - 1];
-        const next = `${last.startedAt}|${last._id}`;
-        if (next === before) throw new Error('Could not advance workout history.');
-        before = next;
+      try {
+        for (;;) {
+          if (!navigator.onLine) throw new ApiNetworkError();
+          const page = await this.request<WorkoutSessionRecord[]>(`/workouts?limit=100${before ? `&before=${encodeURIComponent(before)}` : ''}`);
+          if (owner !== this.workoutOwner()) throw new Error('Account changed.');
+          all.push(...page);
+          if (page.length < 100) break;
+          const last = page[page.length - 1];
+          const next = `${last.startedAt}|${last._id}`;
+          if (next === before) throw new Error('Could not advance workout history.');
+          before = next;
+        }
+        if (typeof indexedDB !== 'undefined') await workoutHistorySnapshot(owner,all);
+      } catch (error) {
+        if (!(error instanceof ApiNetworkError) || typeof indexedDB === 'undefined') throw error;
+        all.splice(0,all.length,...await workoutHistorySnapshot(owner));
       }
+      const local = typeof indexedDB === 'undefined' ? [] : await journals(owner);
+      if (owner !== this.workoutOwner()) throw new Error('Account changed.');
+      return [...local.map(row => row.workout), ...all.filter(item => !local.some(row => row.serverId === item._id))]
+        .sort((a,b) => b.startedAt.localeCompare(a.startedAt));
     }, force);
   }
   async getWorkoutSummary(force = false) { const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; return deviceCache.fetch('workout-summary', () => this.request<WorkoutSummary>(`/workouts/summary?timezone=${encodeURIComponent(timezone)}`), force); }
-  async getActiveWorkout() { return this.request<WorkoutSessionRecord | null>('/workouts/active', { cache: 'no-store' }); }
-  async getWorkout(id: string) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}`, { cache: 'no-store' }); }
-  async saveWorkoutSet(id: string, expectedRevision: number, result: WorkoutSetResult) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}/sets`, { method: 'PATCH', body: JSON.stringify({ expectedRevision, result }) }); }
-  async updateWorkoutRoutine(id: string, expectedRevision: number, exercises: { exerciseId: string; restBetweenSets: number; restAfterExercise: number; name?: string; equipment?: string; prescription?: string; sets?: number }[], routineName?: string) { return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}/routine`, { method: 'PATCH', body: JSON.stringify({ expectedRevision, exercises, routineName }) }); }
-  async cancelWorkout(id: string, expectedRevision: number) { return this.request<{ cancelled: boolean }>(`/workouts/${encodeURIComponent(id)}/cancel`, { method: 'POST', body: JSON.stringify({ expectedRevision }) }); }
+  async getActiveWorkout() { const active = typeof indexedDB !== 'undefined' && (await journals(this.workoutOwner())).find(row => row.workout.status === 'active'); if (active) return active.workout; return this.request<WorkoutSessionRecord | null>('/workouts/active', { cache: 'no-store' }).catch(error => { if (error instanceof ApiNetworkError) return null; throw error; }); }
+  async getWorkout(id: string) { if (id.startsWith('local-')) {
+    const row = (await journals(this.workoutOwner())).find(row => row.id === id);
+    if (!row) throw new Error('Saved workout unavailable.');
+    return row.workout;
+  } return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}`, { cache: 'no-store' }); }
+  async saveWorkoutSet(id: string, expectedRevision: number, result: WorkoutSetResult) { if (id.startsWith('local-')) return recordAction(this.workoutOwner(),id,{kind:'sets',data:{expectedRevision,result}}); return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}/sets`, { method: 'PATCH', body: JSON.stringify({ expectedRevision, result }) }); }
+  async updateWorkoutRoutine(id: string, expectedRevision: number, exercises: { exerciseId: string; restBetweenSets: number; restAfterExercise: number; name?: string; equipment?: string; prescription?: string; sets?: number }[], routineName?: string) { if (id.startsWith('local-')) return recordAction(this.workoutOwner(),id,{kind:'routine',data:{expectedRevision,exercises:exercises as WorkoutExerciseSnapshot[],routineName}}); return this.request<WorkoutSessionRecord>(`/workouts/${encodeURIComponent(id)}/routine`, { method: 'PATCH', body: JSON.stringify({ expectedRevision, exercises, routineName }) }); }
+  async cancelWorkout(id: string, expectedRevision: number) { if (id.startsWith('local-')) {
+    await changeJournal(this.workoutOwner(),id,row => {
+      if (!row || row.workout.status !== 'active' || row.workout.revision !== expectedRevision) throw new Error('Workout changed.');
+      return null;
+    }); return {cancelled:true};
+  } return this.request<{ cancelled: boolean }>(`/workouts/${encodeURIComponent(id)}/cancel`, { method: 'POST', body: JSON.stringify({ expectedRevision }) }); }
   async createWorkout(data: any) { return this.request<any>('/workouts', { method: 'POST', body: JSON.stringify(data) }); }
   async getAdminExercises() { return this.request<any[]>('/admin/exercises'); }
   async createAdminExercise(data: any) { return this.request<any>('/admin/exercises', { method: 'POST', body: JSON.stringify(data) }); }
@@ -703,12 +814,15 @@ class ApiClient {
    */
   async analyzeImage(
     image: { base64: string; mimeType: string },
-    timeoutMs: number = SCAN_TIMEOUT_MS
+    timeoutMs: number = SCAN_TIMEOUT_MS,
+    description?: string,
+    signal?: AbortSignal
   ) {
     return this.request<ScanAnalysis>('/nutrition/scan', {
       method: 'POST',
       timeoutMs,
-      body: JSON.stringify({ image: image.base64, mimeType: image.mimeType }),
+      signal,
+      body: JSON.stringify({ image: image.base64, mimeType: image.mimeType, ...(description?.trim() ? { description: description.trim() } : {}) }),
     });
   }
 
@@ -716,28 +830,46 @@ class ApiClient {
     return this.request<{ request_id: string; candidates: FoodCandidate[] }>(`/nutrition/foods/search?q=${encodeURIComponent(query)}`);
   }
 
-  async lookupBarcode(code:string,format:string) { return this.request<BarcodeProduct>('/nutrition/foods/barcode/'+encodeURIComponent(code)+'?format='+encodeURIComponent(format)); }
 
   async getFoodDetail(fdcId: number) {
     return this.request<FoodDetail>(`/nutrition/foods/${encodeURIComponent(fdcId)}`);
   }
 
-  async getPoseStatus() { return this.request<any>('/pose/status'); }
+  async getPoseStatus() { return this.request<{ available: boolean; reason?: string }>('/pose/status', { timeoutMs: 150_000 }); }
   async getPoseTrackerConfig(id: string) { return this.request<import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig>(`/pose-tracker/exercises/${encodeURIComponent(id)}`, { timeoutMs: 15000 }); }
   async getPoseTrackerConfigs(ids: string[]) { return this.request<import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig[]>('/pose-tracker/configurations', { method: 'POST', body: JSON.stringify({ids}), timeoutMs: 15000 }); }
-  async launchPoseTracker(id: string, adminTest = false) { return this.request<{ config: import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig; token: string; developerOutputs: boolean }>(adminTest ? `/admin/pose-tracker/exercises/${encodeURIComponent(id)}/test` : `/pose-tracker/exercises/${encodeURIComponent(id)}/launch`, { method: 'POST', timeoutMs: 15000 }); }
+  async launchPoseTracker(id: string, adminTest = false, native = false) { return this.request<{ config: import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig; token: string | null; developerOutputs: boolean }>(adminTest ? `/admin/pose-tracker/exercises/${encodeURIComponent(id)}/test` : `/pose-tracker/exercises/${encodeURIComponent(id)}/launch`, { method: 'POST', ...(adminTest ? {} : { body: JSON.stringify({ native }) }), timeoutMs: 15000 }); }
   async getPoseTrackerCoverage() { return this.request<ReturnType<typeof import('../../backend/src/pose-tracker/exercise-registry').auditCoverage>>('/admin/pose-tracker/coverage'); }
   async savePoseTrackerConfig(id: string, config: import('../../backend/src/pose-tracker/exercise-registry').ConfigOverride) { return this.request<import('../../backend/src/pose-tracker/exercise-registry').TrackingConfig>(`/admin/pose-tracker/exercises/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(config) }); }
-  async analyzePose(data: PoseAnalysisInput) { return this.request<unknown>('/pose/analyze', { method: 'POST', body: JSON.stringify(data), timeoutMs: 95000 }); }
-  async pauseWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/pause`, { method: 'PATCH', body: JSON.stringify(data) }); }
-  async completeWorkout(id: string, data: any) { return this.request<any>(`/workouts/${encodeURIComponent(id)}/complete`, { method: 'POST', body: JSON.stringify(data) }); }
+  async analyzePose(data: PoseAnalysisInput) { return this.request<unknown>('/pose/analyze', { method: 'POST', body: JSON.stringify(data), timeoutMs: 180_000 }); }
+  async pauseWorkout(id: string, data: any) { if (id.startsWith('local-')) return recordAction(this.workoutOwner(),id,{kind:'pause',data:data}); return this.request<any>(`/workouts/${encodeURIComponent(id)}/pause`, { method: 'PATCH', body: JSON.stringify(data) }); }
+  async completeWorkout(id: string, data: any) { if (id.startsWith('local-')) {
+    const owner = this.workoutOwner();
+    const saved = await recordAction(owner,id,{kind:'complete',data});
+    if (owner === this.workoutOwner()) {
+      const previous = deviceCache.get<WorkoutSessionRecord[]>('workouts').data ?? await workoutHistorySnapshot(owner);
+      if (owner === this.workoutOwner()) {
+        deviceCache.publish('workouts',[saved,...previous.filter(row => row._id !== id)]);
+        const summary = deviceCache.get<WorkoutSummary>('workout-summary').data;
+        if (summary && saved.endedAt && (!saved.sets?.length || saved.sets.some(set => set.status === 'completed'))) {
+          const date = new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(saved.endedAt));
+          deviceCache.publish('workout-summary',{...summary,trainingDates:[...new Set([...summary.trainingDates,date])].sort()});
+        }
+      }
+      void this.syncManualWorkouts().catch(() => {});
+    }
+    return saved;
+  } return this.request<any>(`/workouts/${encodeURIComponent(id)}/complete`, { method: 'POST', body: JSON.stringify(data) }); }
 
   /** Writes one meal row per selected item; unmatched nutrition stays unavailable. */
-  async addMealsFromScan(data: { items: ScannedItem[]; meal: string; date?: string; time?: string }) {
+  async addMealsFromScan(data: { items: ScannedItem[]; meal: string; date?: string; time?: string; idempotency_key?: string }) {
     return this.request<any>('/nutrition/meals/from-scan', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  }
+  async getScanSaveReceipt(key: string) {
+    return this.request<{ status: 'confirmed' | 'unknown'; save_id?: string; meal_ids?: string[] }>(`/nutrition/meals/from-scan/receipts/${encodeURIComponent(key)}`);
   }
 }
 

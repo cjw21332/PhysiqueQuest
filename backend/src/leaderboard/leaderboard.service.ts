@@ -1,3 +1,4 @@
+import { savedScanMealDates } from '../nutrition/saved-scan-meals.js';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -8,6 +9,7 @@ import { WorkoutSession } from '../workouts/schemas/workout-session.schema.js';
 import { LeaderboardSnapshot } from './schemas/leaderboard-snapshot.schema.js';
 import { workoutCreditFilter, WORKOUT_CREDIT_POINTS } from '../workouts/workout-contract.js';
 import { personalRecordDays } from '../workouts/personal-records.js';
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 
 export type LeaderboardPeriod = 'week' | 'month' | 'all';
 
@@ -44,6 +46,10 @@ export class LeaderboardService {
     const now = new Date();
     const start = this.periodStart(period, now);
     const boundaryKey = this.boundaryKey(period, start);
+    const generations = new Map<string, number>();
+    for await (const row of this.snapshots.db.collection('account_lifecycle').find({ status: 'active' }, { projection: { generation: 1 } })) {
+      if (row.generation === undefined || Number.isSafeInteger(row.generation)) generations.set(String(row._id), row.generation ?? 0);
+    }
 
     const [points, hidden, previous] = await Promise.all([
       this.computePoints(start),
@@ -76,7 +82,7 @@ export class LeaderboardService {
       .filter(entry => entry.rank < self.rank)
       .sort((a, b) => b.rank - a.rank)[0];
 
-    void this.captureSnapshot(period, boundaryKey, ranked)
+    void this.captureSnapshot(period, boundaryKey, ranked, generations)
       .catch(() => this.logger.warn('Failed to capture leaderboard history snapshot'));
 
     return {
@@ -98,7 +104,7 @@ export class LeaderboardService {
         ...(start ? [{ $match: { firstAt: { $gte: start } } }] : []),
         { $project: { _id: 0, userId: '$_id.userId', day: '$_id.day' } },
       ]),
-      this.nutrition.find({}).select('userId meals.date water.date water.glasses').lean().exec(),
+      this.nutrition.find({}).select('userId meals.id meals.date meals.scanSavedAt meals.scanGroupId scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses').lean().exec(),
       this.workouts.find({ status: 'completed', 'sets.status': 'completed' }).select('userId endedAt timezone status sets').lean().exec(),
     ]);
 
@@ -111,11 +117,11 @@ export class LeaderboardService {
 
     const startDate = start ? start.toISOString().slice(0, 10) : '0000-00-00';
     for (const [id, days] of personalRecordDays(recordSessions)) for (const day of days) if (day >= startDate) add(id, 150);
-    for (const record of nutrition as { userId: unknown; meals?: { date: string }[]; water?: { date: string; glasses: number }[] }[]) {
+    for (const record of nutrition as { userId: unknown; meals?: { id?: string; date: string; scanSavedAt?: Date | string; scanGroupId?: string }[]; scanSaveReceipts?: { key: string; mealIds: string[] }[]; water?: { date: string; glasses: number }[] }[]) {
       const id = String(record.userId);
       const mealDays = new Map<string, number>();
-      for (const meal of record.meals ?? []) {
-        if (meal.date && meal.date >= startDate) mealDays.set(meal.date, (mealDays.get(meal.date) ?? 0) + 1);
+      for (const date of savedScanMealDates(record.meals ?? [], record.scanSaveReceipts)) {
+        if (date >= startDate) mealDays.set(date, (mealDays.get(date) ?? 0) + 1);
       }
       for (const count of mealDays.values()) if (count >= 3) add(id, MEAL_DAY_POINTS);
       for (const entry of record.water ?? []) if (entry.date && entry.date >= startDate && entry.glasses >= 8) add(id, WATER_DAY_POINTS);
@@ -152,19 +158,15 @@ export class LeaderboardService {
     );
   }
 
-  private async captureSnapshot(period: LeaderboardPeriod, boundaryKey: string, ranked: { userId: string; rank: number; points: number }[]) {
+  private async captureSnapshot(period: LeaderboardPeriod, boundaryKey: string, ranked: { userId: string; rank: number; points: number }[], generations: Map<string, number>) {
     if (!ranked.length) return;
-    await this.snapshots.bulkWrite(
-      ranked
-        .filter(entry => Types.ObjectId.isValid(entry.userId))
-        .map(entry => ({
-          updateOne: {
-            filter: { period, boundaryKey, subjectId: new Types.ObjectId(entry.userId) },
-            update: { $set: { rank: entry.rank, points: entry.points, creditPolicyVersion: 2 } },
-            upsert: true,
-          },
-        })),
-    );
+    for (const entry of ranked.filter(entry => Types.ObjectId.isValid(entry.userId))) {
+      if (!generations.has(entry.userId)) continue;
+      await new AccountLifecycleFence(this.snapshots.db).withActiveWrite(entry.userId, async session => this.snapshots.updateOne(
+        { period, boundaryKey, subjectId: new Types.ObjectId(entry.userId) },
+        { $set: { rank: entry.rank, points: entry.points, creditPolicyVersion: 2 } }, { upsert: true, session },
+      ), generations.get(entry.userId)).catch(() => this.logger.warn('Leaderboard snapshot invalidated or unavailable'));
+    }
   }
 
   private periodStart(period: LeaderboardPeriod, now: Date): Date | null {

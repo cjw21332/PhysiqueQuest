@@ -23,6 +23,18 @@ test('preview is allowed only for a successful, genuinely empty nutrition respon
   assert.equal(canPreviewNutrition(false, '', [{ id: 'real' }], 0), false);
   assert.equal(canPreviewNutrition(false, '', [], 2), false);
 });
+test('90-day history starts at account creation and grows until the 90-day cap', async () => {
+  const { summarizeHistory } = await load();
+  const now = new Date(2026, 10, 17, 12);
+  const created = new Date(2026, 10, 15, 12).toISOString();
+  const recent = summarizeHistory([], 90, now, created);
+  assert.deepEqual(recent.daily.map(day => day.date), ['2026-11-15', '2026-11-16', '2026-11-17']);
+  assert.equal(summarizeHistory([], 90, new Date(2026, 10, 18, 12), created).daily.length, 4);
+  assert.equal(summarizeHistory([], 90, now, new Date(2020, 0, 1, 12).toISOString()).daily.length, 90);
+  assert.equal(summarizeHistory([], 90, now, null).daily.length, 90);
+  assert.equal(summarizeHistory([], 90, now, 'invalid').daily.length, 90);
+  assert.equal(summarizeHistory([], 90, now, new Date(2027, 0, 1, 12).toISOString()).daily.length, 90);
+});
 test('reference preview agrees across dashboard, log, history, and food portions', async () => {
   const { createNutritionPreview, summarizeHistory, previewFoods } = await load();
   const today = new Date(2026, 9, 14, 12);
@@ -67,18 +79,23 @@ test('review marks unmatched food nutrition incomplete and keeps saving disabled
     if (name.endsWith('/icons')) return icons;
     if (name.endsWith('/OutcomeDialog')) return outcomeDialog;
     if (name === './types') return types;
+    if (name === './defaultMeal') return { defaultMeal: () => 'Breakfast' };
     if (name === './nutritionPresentation') return helper;
+    if (name === './FoodNameSearch') return { default: () => null };
+    if (name === './reviewEstimate.css') return {};
     if (name.endsWith('/titleCase')) return { titleCase };
     return require(name);
   });
   const props = { imageUrl: '', onBack() {}, onRetake() {}, onRetry() {}, onAddManual() {}, onSave() {} };
   const analysis = { ...helper.previewScan, items: [helper.previewScan.items[0], { ...helper.previewScan.items[1], found: false, kcal: 999 }] };
   const ready = renderToStaticMarkup(React.createElement(Review, { ...props, status: 'ready', analysis, error: '' }));
-  assert.match(ready, /Incomplete total/);
-  assert.match(ready, /Nutrition unavailable; edit it after saving/);
+  assert.match(ready, /248 kcal known/);
+  assert.match(ready, /Incomplete/);
+  assert.match(ready, /Nutrition unavailable/);
+  assert.match(ready, /Change food/);
   assert.doesNotMatch(ready, /<b>1247<\/b>/);
   const failure = renderToStaticMarkup(React.createElement(Review, { ...props, status: 'error', analysis: null, error: 'Provider unavailable' }));
   assert.match(failure, /Provider unavailable/);
-  assert.match(failure, /<button[^>]*disabled=""[^>]*>Save entry<\/button>/);
+  assert.match(failure, /<button[^>]*disabled=""[^>]*>Save meal<\/button>/);
   assert.doesNotMatch(failure, /Detected items|Estimated macros/);
 });

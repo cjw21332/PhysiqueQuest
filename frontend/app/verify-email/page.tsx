@@ -30,7 +30,7 @@ export default function VerifyEmailPage() {
         try { await session.refresh(getApiBaseUrl()); }
         catch { setMessage('Email verified. Sign in again to update your session.'); }
       } else if (['unavailable', 'console'].includes(result.developmentDelivery)) {
-        setMessage('Local email delivery is not configured for an inbox. Start Mailpit and set MAIL_PROVIDER=mailpit on the backend, then request another email.');
+        setMessage('We couldn’t send your verification email right now. Please try again later.');
       } else setMessage(result.developmentDelivery === 'mailpit'
         ? 'If this address needs verification, open the message in your local Mailpit inbox and follow its verification link.'
         : 'If this address needs verification, an email has been sent. Check your inbox and spam folder, then open the link.');

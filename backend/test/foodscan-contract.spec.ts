@@ -12,7 +12,8 @@ import {
   foodDetailResponseSchema,
   foodSearchResponseSchema,
 } from '../src/foodscan/foodscan.schemas.js';
-import { GeminiService } from '../src/foodscan/services/gemini.service.js';
+import { AI_VISION_PROVIDER } from '../src/foodscan/services/vision-provider.js';
+import type { VisionProvider } from '../src/foodscan/services/vision-provider.js';
 import { UsdaService } from '../src/foodscan/services/usda.service.js';
 import { buildScannerApp, server } from './foodscan.harness.js';
 import { JSON_HEADERS, TINY_PNG_BASE64 } from './foodscan.fixtures.js';
@@ -41,7 +42,7 @@ describe('response contract', () => {
 
   beforeEach(async () => {
     app = await buildScannerApp({ GEMINI_API_KEY: 'k', USDA_API_KEY: 'k' }, { auth: false });
-    vi.spyOn(app.get(GeminiService), 'detectFoods').mockResolvedValue([
+    vi.spyOn(app.get<VisionProvider>(AI_VISION_PROVIDER), 'detectFoods').mockResolvedValue([
       { food_name: 'chicken breast', est_weight_g: 150, confidence: 0.92 },
       { food_name: 'mystery paste', est_weight_g: 50, confidence: 0.3 },
     ]);

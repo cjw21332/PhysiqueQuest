@@ -8,9 +8,13 @@ export function calibrationDraftKey() {
   } catch { return null; }
 }
 
-export function readCalibrationDraft<T extends Record<string, string | string[] | boolean>>(initial: T): { data: T; step: number; skipped: string[] } | null {
+export function pendingCalibrationDraftKey(email: string) {
+  return `physiquequest-calibration-pending:${getApiBaseUrl()}:${encodeURIComponent(email.trim().toLowerCase())}`;
+}
+
+export function readCalibrationDraft<T extends Record<string, string | string[] | boolean>>(initial: T, draftKey = calibrationDraftKey()): { data: T; step: number; skipped: string[] } | null {
   try {
-    const key = calibrationDraftKey();
+    const key = draftKey;
     const saved = key && JSON.parse(localStorage.getItem(key) ?? 'null');
     if (!saved || saved.version !== 1 || !Number.isInteger(saved.step) || saved.step < 1 || saved.step > 4 || !saved.data) return null;
     const data = { ...initial };

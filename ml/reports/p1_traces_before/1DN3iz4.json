@@ -1,0 +1,3263 @@
+{
+  "tileDurationMs": 3000.0,
+  "countsByTile": [
+    0,
+    1,
+    1,
+    1,
+    1
+  ],
+  "lossClass": "seam; final unfinished",
+  "frames": [
+    {
+      "frame": 0,
+      "timestamp": 0,
+      "state": "MOVING",
+      "progress": 0.619540064876829,
+      "angle": 98.0459935123171,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 1
+    },
+    {
+      "frame": 1,
+      "timestamp": 66.66666666666667,
+      "state": "MOVING",
+      "progress": 0.6161152014459477,
+      "angle": 98.38847985540524,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 2,
+      "timestamp": 133.33333333333334,
+      "state": "MOVING",
+      "progress": 0.6101222921819811,
+      "angle": 98.98777078180188,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 3,
+      "timestamp": 200,
+      "state": "MOVING",
+      "progress": 0.6021012118213238,
+      "angle": 99.78987881786762,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 4,
+      "timestamp": 266.6666666666667,
+      "state": "MOVING",
+      "progress": 0.5923902220549764,
+      "angle": 100.76097779450237,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 5,
+      "timestamp": 333.33333333333337,
+      "state": "MOVING",
+      "progress": 0.5812031063223495,
+      "angle": 101.87968936776505,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 6,
+      "timestamp": 400,
+      "state": "MOVING",
+      "progress": 0.5686817692162563,
+      "angle": 103.13182307837437,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 7,
+      "timestamp": 466.6666666666667,
+      "state": "MOVING",
+      "progress": 0.5549329600304813,
+      "angle": 104.50670399695187,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 8,
+      "timestamp": 533.3333333333334,
+      "state": "MOVING",
+      "progress": 0.5400543882906303,
+      "angle": 105.99456117093696,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 9,
+      "timestamp": 600,
+      "state": "MOVING",
+      "progress": 0.5241531714899089,
+      "angle": 107.5846828510091,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 10,
+      "timestamp": 666.6666666666667,
+      "state": "MOVING",
+      "progress": 0.5073580002040847,
+      "angle": 109.26419997959152,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 11,
+      "timestamp": 733.3333333333334,
+      "state": "MOVING",
+      "progress": 0.4898255000828297,
+      "angle": 111.01744999171703,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 12,
+      "timestamp": 800,
+      "state": "MOVING",
+      "progress": 0.6747466888944529,
+      "angle": 92.52533111055472,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 13,
+      "timestamp": 866.6666666666667,
+      "state": "MOVING",
+      "progress": 0.7805267573678398,
+      "angle": 81.94732426321602,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 14,
+      "timestamp": 933.3333333333334,
+      "state": "MOVING",
+      "progress": 0.8350940437173341,
+      "angle": 76.49059562826659,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 15,
+      "timestamp": 1000.0000000000001,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 74.32333907066013,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 74.32333907066013,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 1
+    },
+    {
+      "frame": 16,
+      "timestamp": 1066.6666666666667,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 58.74613440337269,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 58.74613440337269,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 17,
+      "timestamp": 1133.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 54.34285903143574,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 54.34285903143574,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 18,
+      "timestamp": 1200,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 54.15740563338347,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 54.15740563338347,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 19,
+      "timestamp": 1266.6666666666667,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 20,
+      "timestamp": 1333.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 21,
+      "timestamp": 1400,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 22,
+      "timestamp": 1466.6666666666667,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 23,
+      "timestamp": 1533.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 24,
+      "timestamp": 1600,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 25,
+      "timestamp": 1666.6666666666667,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 26,
+      "timestamp": 1733.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 27,
+      "timestamp": 1800.0000000000002,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 52.723356887480875,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 28,
+      "timestamp": 1866.6666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_lost",
+          "joint": "__BILATERAL_AVG__"
+        }
+      ],
+      "tile": 1
+    },
+    {
+      "frame": 29,
+      "timestamp": 1933.3333333333335,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 30,
+      "timestamp": 2000.0000000000002,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 31,
+      "timestamp": 2066.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 32,
+      "timestamp": 2133.3333333333335,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 33,
+      "timestamp": 2200,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 34,
+      "timestamp": 2266.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 35,
+      "timestamp": 2333.3333333333335,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 36,
+      "timestamp": 2400,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 37,
+      "timestamp": 2466.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 38,
+      "timestamp": 2533.3333333333335,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.723356887480875,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 39,
+      "timestamp": 2600,
+      "state": "MOVING",
+      "progress": 1,
+      "angle": 45.53081952918113,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_restored",
+          "joint": "__BILATERAL_AVG__"
+        },
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 1
+    },
+    {
+      "frame": 40,
+      "timestamp": 2666.666666666667,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 46.23828445423781,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 1
+    },
+    {
+      "frame": 41,
+      "timestamp": 2733.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 49.11719815112892,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 42,
+      "timestamp": 2800,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 45.02465219430948,
+      "count": 0,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 43,
+      "timestamp": 2866.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.9972836405714925,
+      "angle": 45.21473039008456,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 44,
+      "timestamp": 2933.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 0.9976519268485774,
+      "angle": 45.18895942975348,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 1
+    },
+    {
+      "frame": 45,
+      "timestamp": 3000,
+      "state": "AT_PEAK",
+      "progress": 0.7332736492261714,
+      "angle": 63.688921358650745,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 46,
+      "timestamp": 3066.6666666666665,
+      "state": "AT_PEAK",
+      "progress": 0.556533383051094,
+      "angle": 76.05638295552211,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 47,
+      "timestamp": 3133.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 0.4362692456762545,
+      "angle": 84.47190779687784,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 48,
+      "timestamp": 3200,
+      "state": "AT_PEAK",
+      "progress": 0.35220163807930077,
+      "angle": 90.354567877667,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 49,
+      "timestamp": 3266.6666666666665,
+      "state": "AT_PEAK",
+      "progress": 0.2911307332576253,
+      "angle": 94.62802568337196,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 50,
+      "timestamp": 3333.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 0.2444679453680195,
+      "angle": 97.89327049553029,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 51,
+      "timestamp": 3400,
+      "state": "AT_PEAK",
+      "progress": 0.20663490274788418,
+      "angle": 100.54065081142177,
+      "count": 0,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 52,
+      "timestamp": 3466.6666666666665,
+      "state": "AT_START",
+      "progress": 0.1740264015604797,
+      "angle": 102.82244202343267,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "rep_counted",
+          "count": 1,
+          "joint": "__BILATERAL_AVG__",
+          "durationMs": 866.6666666666665,
+          "romFraction": 1.137617155457622,
+          "romVsReference": 0.5779778982912319,
+          "quality": "partial",
+          "tempoSec": 0.8666666666666665
+        },
+        {
+          "type": "state_change",
+          "from": "AT_PEAK",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 53,
+      "timestamp": 3533.3333333333335,
+      "state": "MOVING",
+      "progress": 0.14433953425850854,
+      "angle": 104.89979088814948,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 54,
+      "timestamp": 3600,
+      "state": "AT_START",
+      "progress": 0.11613972759906548,
+      "angle": 106.87308216719724,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 55,
+      "timestamp": 3666.666666666667,
+      "state": "MOVING",
+      "progress": 0.0885789161362643,
+      "angle": 108.80165953511381,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 56,
+      "timestamp": 3733.3333333333335,
+      "state": "AT_START",
+      "progress": 0.061210146594586595,
+      "angle": 110.7167987028065,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 57,
+      "timestamp": 3800,
+      "state": "MOVING",
+      "progress": 0.32397255516597157,
+      "angle": 92.32990777276288,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 58,
+      "timestamp": 3866.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.47416271511051267,
+      "angle": 81.82029909365133,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 59,
+      "timestamp": 3933.3333333333335,
+      "state": "AT_PEAK",
+      "progress": 0.552806123740811,
+      "angle": 76.40802926804953,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 60,
+      "timestamp": 4000,
+      "state": "AT_PEAK",
+      "progress": 0.5834367849380008,
+      "angle": 74.26967093651903,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 61,
+      "timestamp": 4066.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.8063015452001341,
+      "angle": 58.711250116180985,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 62,
+      "timestamp": 4133.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.869200849315239,
+      "angle": 54.32018424476112,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 63,
+      "timestamp": 4200,
+      "state": "AT_PEAK",
+      "progress": 0.8717436737920856,
+      "angle": 54.14266702204497,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 64,
+      "timestamp": 4266.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 65,
+      "timestamp": 4333.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 66,
+      "timestamp": 4400,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 67,
+      "timestamp": 4466.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 68,
+      "timestamp": 4533.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 69,
+      "timestamp": 4600,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 70,
+      "timestamp": 4666.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 71,
+      "timestamp": 4733.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 72,
+      "timestamp": 4800,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 73,
+      "timestamp": 4866.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_lost",
+          "joint": "__BILATERAL_AVG__"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 74,
+      "timestamp": 4933.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 75,
+      "timestamp": 5000,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 76,
+      "timestamp": 5066.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 77,
+      "timestamp": 5133.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 78,
+      "timestamp": 5200,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 79,
+      "timestamp": 5266.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 80,
+      "timestamp": 5333.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 81,
+      "timestamp": 5400,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 82,
+      "timestamp": 5466.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 83,
+      "timestamp": 5533.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 84,
+      "timestamp": 5600,
+      "state": "MOVING",
+      "progress": 1,
+      "angle": 45.53081952918113,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_restored",
+          "joint": "__BILATERAL_AVG__"
+        },
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 85,
+      "timestamp": 5666.666666666667,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 46.23828445423781,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 2
+    },
+    {
+      "frame": 86,
+      "timestamp": 5733.333333333334,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 49.11719815112892,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 87,
+      "timestamp": 5800,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 45.02465219430948,
+      "count": 1,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 88,
+      "timestamp": 5866.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.9972836405714925,
+      "angle": 45.21473039008456,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 89,
+      "timestamp": 5933.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.9976519268485774,
+      "angle": 45.18895942975348,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 2
+    },
+    {
+      "frame": 90,
+      "timestamp": 6000,
+      "state": "AT_PEAK",
+      "progress": 0.7332736492261714,
+      "angle": 63.688921358650745,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 91,
+      "timestamp": 6066.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.556533383051094,
+      "angle": 76.05638295552211,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 92,
+      "timestamp": 6133.333333333333,
+      "state": "AT_PEAK",
+      "progress": 0.4362692456762545,
+      "angle": 84.47190779687784,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 93,
+      "timestamp": 6200,
+      "state": "AT_PEAK",
+      "progress": 0.35220163807930077,
+      "angle": 90.354567877667,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 94,
+      "timestamp": 6266.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.2911307332576253,
+      "angle": 94.62802568337196,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 95,
+      "timestamp": 6333.333333333333,
+      "state": "AT_PEAK",
+      "progress": 0.2444679453680195,
+      "angle": 97.89327049553029,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 96,
+      "timestamp": 6400,
+      "state": "AT_PEAK",
+      "progress": 0.20663490274788418,
+      "angle": 100.54065081142177,
+      "count": 1,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 97,
+      "timestamp": 6466.666666666667,
+      "state": "AT_START",
+      "progress": 0.1740264015604797,
+      "angle": 102.82244202343267,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "rep_counted",
+          "count": 2,
+          "joint": "__BILATERAL_AVG__",
+          "durationMs": 866.666666666667,
+          "romFraction": 1.137617155457622,
+          "romVsReference": 0.5779778982912319,
+          "quality": "partial",
+          "tempoSec": 0.8666666666666669
+        },
+        {
+          "type": "state_change",
+          "from": "AT_PEAK",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 98,
+      "timestamp": 6533.333333333333,
+      "state": "MOVING",
+      "progress": 0.14433953425850854,
+      "angle": 104.89979088814948,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 99,
+      "timestamp": 6600,
+      "state": "AT_START",
+      "progress": 0.11613972759906548,
+      "angle": 106.87308216719724,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 100,
+      "timestamp": 6666.666666666667,
+      "state": "MOVING",
+      "progress": 0.0885789161362643,
+      "angle": 108.80165953511381,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 101,
+      "timestamp": 6733.333333333333,
+      "state": "AT_START",
+      "progress": 0.061210146594586595,
+      "angle": 110.7167987028065,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 102,
+      "timestamp": 6800,
+      "state": "MOVING",
+      "progress": 0.32397255516597157,
+      "angle": 92.32990777276288,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 103,
+      "timestamp": 6866.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.47416271511051267,
+      "angle": 81.82029909365133,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 104,
+      "timestamp": 6933.333333333333,
+      "state": "AT_PEAK",
+      "progress": 0.552806123740811,
+      "angle": 76.40802926804953,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 105,
+      "timestamp": 7000,
+      "state": "AT_PEAK",
+      "progress": 0.5834367849380008,
+      "angle": 74.26967093651903,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 106,
+      "timestamp": 7066.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.8063015452001341,
+      "angle": 58.711250116180985,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 107,
+      "timestamp": 7133.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.869200849315239,
+      "angle": 54.32018424476112,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 108,
+      "timestamp": 7200,
+      "state": "AT_PEAK",
+      "progress": 0.8717436737920856,
+      "angle": 54.14266702204497,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 109,
+      "timestamp": 7266.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 110,
+      "timestamp": 7333.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 111,
+      "timestamp": 7400,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 112,
+      "timestamp": 7466.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 113,
+      "timestamp": 7533.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 114,
+      "timestamp": 7600,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 115,
+      "timestamp": 7666.666666666667,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 116,
+      "timestamp": 7733.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 117,
+      "timestamp": 7800,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 118,
+      "timestamp": 7866.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_lost",
+          "joint": "__BILATERAL_AVG__"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 119,
+      "timestamp": 7933.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 120,
+      "timestamp": 8000,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 121,
+      "timestamp": 8066.666666666667,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 122,
+      "timestamp": 8133.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 123,
+      "timestamp": 8200,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 124,
+      "timestamp": 8266.666666666668,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 125,
+      "timestamp": 8333.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 126,
+      "timestamp": 8400,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 127,
+      "timestamp": 8466.666666666668,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 128,
+      "timestamp": 8533.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 129,
+      "timestamp": 8600,
+      "state": "MOVING",
+      "progress": 1,
+      "angle": 45.53081952918113,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_restored",
+          "joint": "__BILATERAL_AVG__"
+        },
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 130,
+      "timestamp": 8666.666666666668,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 46.23828445423781,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 3
+    },
+    {
+      "frame": 131,
+      "timestamp": 8733.333333333334,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 49.11719815112892,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 132,
+      "timestamp": 8800,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 45.02465219430948,
+      "count": 2,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 133,
+      "timestamp": 8866.666666666668,
+      "state": "AT_PEAK",
+      "progress": 0.9972836405714925,
+      "angle": 45.21473039008456,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 134,
+      "timestamp": 8933.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.9976519268485774,
+      "angle": 45.18895942975348,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 3
+    },
+    {
+      "frame": 135,
+      "timestamp": 9000,
+      "state": "AT_PEAK",
+      "progress": 0.7332736492261714,
+      "angle": 63.688921358650745,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 136,
+      "timestamp": 9066.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.556533383051094,
+      "angle": 76.05638295552211,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 137,
+      "timestamp": 9133.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.4362692456762545,
+      "angle": 84.47190779687784,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 138,
+      "timestamp": 9200,
+      "state": "AT_PEAK",
+      "progress": 0.35220163807930077,
+      "angle": 90.354567877667,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 139,
+      "timestamp": 9266.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.2911307332576253,
+      "angle": 94.62802568337196,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 140,
+      "timestamp": 9333.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.2444679453680195,
+      "angle": 97.89327049553029,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 141,
+      "timestamp": 9400,
+      "state": "AT_PEAK",
+      "progress": 0.20663490274788418,
+      "angle": 100.54065081142177,
+      "count": 2,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 142,
+      "timestamp": 9466.666666666666,
+      "state": "AT_START",
+      "progress": 0.1740264015604797,
+      "angle": 102.82244202343267,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "rep_counted",
+          "count": 3,
+          "joint": "__BILATERAL_AVG__",
+          "durationMs": 866.6666666666661,
+          "romFraction": 1.137617155457622,
+          "romVsReference": 0.5779778982912319,
+          "quality": "partial",
+          "tempoSec": 0.866666666666666
+        },
+        {
+          "type": "state_change",
+          "from": "AT_PEAK",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 143,
+      "timestamp": 9533.333333333334,
+      "state": "MOVING",
+      "progress": 0.14433953425850854,
+      "angle": 104.89979088814948,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 144,
+      "timestamp": 9600,
+      "state": "AT_START",
+      "progress": 0.11613972759906548,
+      "angle": 106.87308216719724,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 145,
+      "timestamp": 9666.666666666666,
+      "state": "MOVING",
+      "progress": 0.0885789161362643,
+      "angle": 108.80165953511381,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 146,
+      "timestamp": 9733.333333333334,
+      "state": "AT_START",
+      "progress": 0.061210146594586595,
+      "angle": 110.7167987028065,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 147,
+      "timestamp": 9800,
+      "state": "MOVING",
+      "progress": 0.32397255516597157,
+      "angle": 92.32990777276288,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 148,
+      "timestamp": 9866.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.47416271511051267,
+      "angle": 81.82029909365133,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 149,
+      "timestamp": 9933.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.552806123740811,
+      "angle": 76.40802926804953,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 150,
+      "timestamp": 10000,
+      "state": "AT_PEAK",
+      "progress": 0.5834367849380008,
+      "angle": 74.26967093651903,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 151,
+      "timestamp": 10066.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.8063015452001341,
+      "angle": 58.711250116180985,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 152,
+      "timestamp": 10133.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.869200849315239,
+      "angle": 54.32018424476112,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 153,
+      "timestamp": 10200,
+      "state": "AT_PEAK",
+      "progress": 0.8717436737920856,
+      "angle": 54.14266702204497,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 154,
+      "timestamp": 10266.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 155,
+      "timestamp": 10333.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 156,
+      "timestamp": 10400,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 157,
+      "timestamp": 10466.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 158,
+      "timestamp": 10533.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 159,
+      "timestamp": 10600,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 160,
+      "timestamp": 10666.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 161,
+      "timestamp": 10733.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 162,
+      "timestamp": 10800,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 163,
+      "timestamp": 10866.666666666666,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_lost",
+          "joint": "__BILATERAL_AVG__"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 164,
+      "timestamp": 10933.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 165,
+      "timestamp": 11000,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 166,
+      "timestamp": 11066.666666666668,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 167,
+      "timestamp": 11133.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 168,
+      "timestamp": 11200,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 169,
+      "timestamp": 11266.666666666668,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 170,
+      "timestamp": 11333.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 171,
+      "timestamp": 11400,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 172,
+      "timestamp": 11466.666666666668,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 173,
+      "timestamp": 11533.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 174,
+      "timestamp": 11600,
+      "state": "MOVING",
+      "progress": 1,
+      "angle": 45.53081952918113,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_restored",
+          "joint": "__BILATERAL_AVG__"
+        },
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 175,
+      "timestamp": 11666.666666666668,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 46.23828445423781,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 4
+    },
+    {
+      "frame": 176,
+      "timestamp": 11733.333333333334,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 49.11719815112892,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 177,
+      "timestamp": 11800,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 45.02465219430948,
+      "count": 3,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 178,
+      "timestamp": 11866.666666666668,
+      "state": "AT_PEAK",
+      "progress": 0.9972836405714925,
+      "angle": 45.21473039008456,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 179,
+      "timestamp": 11933.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.9976519268485774,
+      "angle": 45.18895942975348,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 4
+    },
+    {
+      "frame": 180,
+      "timestamp": 12000,
+      "state": "AT_PEAK",
+      "progress": 0.7332736492261714,
+      "angle": 63.688921358650745,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 181,
+      "timestamp": 12066.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.556533383051094,
+      "angle": 76.05638295552211,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 182,
+      "timestamp": 12133.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.4362692456762545,
+      "angle": 84.47190779687784,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 183,
+      "timestamp": 12200,
+      "state": "AT_PEAK",
+      "progress": 0.35220163807930077,
+      "angle": 90.354567877667,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 184,
+      "timestamp": 12266.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.2911307332576253,
+      "angle": 94.62802568337196,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 185,
+      "timestamp": 12333.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.2444679453680195,
+      "angle": 97.89327049553029,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 186,
+      "timestamp": 12400,
+      "state": "AT_PEAK",
+      "progress": 0.20663490274788418,
+      "angle": 100.54065081142177,
+      "count": 3,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 187,
+      "timestamp": 12466.666666666666,
+      "state": "AT_START",
+      "progress": 0.1740264015604797,
+      "angle": 102.82244202343267,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "rep_counted",
+          "count": 4,
+          "joint": "__BILATERAL_AVG__",
+          "durationMs": 866.6666666666661,
+          "romFraction": 1.137617155457622,
+          "romVsReference": 0.5779778982912319,
+          "quality": "partial",
+          "tempoSec": 0.866666666666666
+        },
+        {
+          "type": "state_change",
+          "from": "AT_PEAK",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 188,
+      "timestamp": 12533.333333333334,
+      "state": "MOVING",
+      "progress": 0.14433953425850854,
+      "angle": 104.89979088814948,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 189,
+      "timestamp": 12600,
+      "state": "AT_START",
+      "progress": 0.11613972759906548,
+      "angle": 106.87308216719724,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 190,
+      "timestamp": 12666.666666666666,
+      "state": "MOVING",
+      "progress": 0.0885789161362643,
+      "angle": 108.80165953511381,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 191,
+      "timestamp": 12733.333333333334,
+      "state": "AT_START",
+      "progress": 0.061210146594586595,
+      "angle": 110.7167987028065,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_START"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 192,
+      "timestamp": 12800,
+      "state": "MOVING",
+      "progress": 0.32397255516597157,
+      "angle": 92.32990777276288,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 193,
+      "timestamp": 12866.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.47416271511051267,
+      "angle": 81.82029909365133,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 1,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 194,
+      "timestamp": 12933.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.552806123740811,
+      "angle": 76.40802926804953,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 195,
+      "timestamp": 13000,
+      "state": "AT_PEAK",
+      "progress": 0.5834367849380008,
+      "angle": 74.26967093651903,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 196,
+      "timestamp": 13066.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.8063015452001341,
+      "angle": 58.711250116180985,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 197,
+      "timestamp": 13133.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.869200849315239,
+      "angle": 54.32018424476112,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 198,
+      "timestamp": 13200,
+      "state": "AT_PEAK",
+      "progress": 0.8717436737920856,
+      "angle": 54.14266702204497,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 199,
+      "timestamp": 13266.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 200,
+      "timestamp": 13333.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 201,
+      "timestamp": 13400,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 202,
+      "timestamp": 13466.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 203,
+      "timestamp": 13533.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 204,
+      "timestamp": 13600,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 205,
+      "timestamp": 13666.666666666666,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 206,
+      "timestamp": 13733.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 207,
+      "timestamp": 13800,
+      "state": "AT_PEAK",
+      "progress": 0.8922116430454061,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.18895942975348,
+      "calibrationReps": 1,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 208,
+      "timestamp": 13866.666666666666,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_lost",
+          "joint": "__BILATERAL_AVG__"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 209,
+      "timestamp": 13933.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 210,
+      "timestamp": 14000,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 211,
+      "timestamp": 14066.666666666668,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 212,
+      "timestamp": 14133.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 213,
+      "timestamp": 14200,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 214,
+      "timestamp": 14266.666666666668,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 215,
+      "timestamp": 14333.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 216,
+      "timestamp": 14400,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 217,
+      "timestamp": 14466.666666666668,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 218,
+      "timestamp": 14533.333333333334,
+      "state": "VISIBILITY_LOST",
+      "progress": 1,
+      "angle": 52.71377679011085,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 219,
+      "timestamp": 14600,
+      "state": "MOVING",
+      "progress": 1,
+      "angle": 45.53081952918113,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "visibility_restored",
+          "joint": "__BILATERAL_AVG__"
+        },
+        {
+          "type": "state_change",
+          "from": "AT_START",
+          "to": "MOVING"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 220,
+      "timestamp": 14666.666666666668,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 46.23828445423781,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [
+        {
+          "type": "state_change",
+          "from": "MOVING",
+          "to": "AT_PEAK"
+        }
+      ],
+      "tile": 5
+    },
+    {
+      "frame": 221,
+      "timestamp": 14733.333333333334,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 49.11719815112892,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 222,
+      "timestamp": 14800,
+      "state": "AT_PEAK",
+      "progress": 1,
+      "angle": 45.02465219430948,
+      "count": 4,
+      "calibratedRest": null,
+      "calibratedPeak": null,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 223,
+      "timestamp": 14866.666666666668,
+      "state": "AT_PEAK",
+      "progress": 0.9972836405714925,
+      "angle": 45.21473039008456,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    },
+    {
+      "frame": 224,
+      "timestamp": 14933.333333333334,
+      "state": "AT_PEAK",
+      "progress": 0.9976519268485774,
+      "angle": 45.18895942975348,
+      "count": 4,
+      "calibratedRest": 115,
+      "calibratedPeak": 45.02465219430948,
+      "calibrationReps": 0,
+      "events": [],
+      "tile": 5
+    }
+  ]
+}

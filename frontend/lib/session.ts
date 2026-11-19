@@ -1,8 +1,10 @@
+import { nativeOfflineAccount } from './nativeOfflineAccount';
 export const AUTH_STORAGE_KEY = 'physiquequest-auth';
 export const PROFILE_STORAGE_KEY = 'physiquequest-profile';
 
 export function clearAuthSession(broadcast = true): void {
   session.clear();
+  void nativeOfflineAccount('forget-offline-account');
   if (typeof window === 'undefined') return;
   try {
     localStorage.removeItem(AUTH_STORAGE_KEY);

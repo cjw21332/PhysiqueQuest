@@ -1,0 +1,65 @@
+Recon Skill (Cybersecurity)
+
+<skill_content>
+# Skill: recon
+
+## Overview
+
+This skill performs structured reconnaissance and attack surface enumeration for authorized penetration tests, CTF challenges, and bug bounty programs.
+
+## Capabilities
+
+- **Subdomain Enumeration**: Discover subdomains of target domains
+- **Port Scanning**: Scan ports and services on target hosts
+- **Fingerprinting**: Identify technologies and services running on targets
+- **Asset Discovery**: Discover internet-facing assets
+- **Service Enumeration**: Enumerate services and their versions
+- **Vulnerability Scanning**: Scan for known vulnerabilities
+- **Attack Surface Mapping**: Map the complete attack surface
+- **Report Generation**: Generate reconnaissance reports
+
+## Use Cases
+
+### Penetration Testing
+- Initial reconnaissance for penetration tests
+- Attack surface identification
+- Target profiling
+
+### Bug Bounty
+- Recon for bug bounty programs
+- Asset discovery for scope validation
+- Technology stack identification
+
+### Security Assessment
+- Infrastructure reconnaissance
+- Security posture assessment
+- Compliance reconnaissance
+
+## Example Usage
+
+```
+opencode run "Use recon to enumerate subdomains of example.com"
+
+opencode run "Use recon to scan open ports on target host"
+
+opencode run "Use recon to identify technologies running on web servers"
+```
+
+## Important Notes
+
+**Authorization Required**: This skill should only be used on authorized targets with explicit permission. Unauthorized reconnaissance may violate laws and ethical guidelines.
+
+## Output
+
+The skill provides:
+- Discovered assets and subdomains
+- Open ports and services
+- Technology fingerprints
+- Attack surface map
+- Reconnaissance report
+
+---
+
+Base directory: .opencode/skills/recon
+This skill is part of the Cybersecurity ecosystem for authorized security reconnaissance.
+</skill_content>

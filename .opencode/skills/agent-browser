@@ -1,0 +1,70 @@
+OpenDesign Browser Automation Skill
+
+<skill_content>
+# Skill: agent-browser
+
+## Overview
+
+OpenDesign browser automation skill that provides comprehensive web browsing capabilities including navigation, form filling, button clicking, screenshot capture, and page data extraction. This skill is designed for testing, development, and web scraping tasks.
+
+## Capabilities
+
+- **Navigation**: Open and navigate to web pages
+- **Form Interaction**: Fill out forms with data
+- **User Actions**: Click buttons, navigate links
+- **Screenshot Capture**: Take screenshots of web pages
+- **Page Data Extraction**: Extract and analyze page content
+- **Console Error Checking**: Monitor and report browser console errors
+- **OpenDesign Preview Support**: Special support for OpenDesign preview URLs
+
+## Use Cases
+
+### Basic Browsing
+- Navigate to web pages and explore content
+- Take screenshots of web interfaces
+- Extract text and data from web pages
+
+### Testing
+- Test web applications
+- Verify UI functionality
+- Capture visual evidence
+
+### Development
+- Preview changes in browser
+- Test responsive design
+- Debug web applications
+
+## Example Usage
+
+```
+opencode run "Use agent-browser to navigate to https://example.com and take a screenshot"
+
+opencode run "Use agent-browser to fill out a login form on the demo site"
+
+opencode run "Use agent-browser to extract product prices from an e-commerce page"
+```
+
+## Technical Details
+
+This skill integrates with OpenDesign's browser automation system to provide a seamless browsing experience. It supports both local and remote browsing, with built-in error handling and progress tracking.
+
+The skill uses a real browser instance (Chromium) with advanced automation capabilities, making it suitable for complex web interactions and testing scenarios.
+
+## Authentication
+
+For sites that require authentication, the skill can use existing browser sessions and cookies from previous browsing sessions.
+
+## Output
+
+The skill provides structured output including:
+- Screenshots (when requested)
+- Extracted page content
+- Console errors
+- Navigation history
+- Form interaction results
+
+---
+
+Base directory: .opencode/skills/agent-browser
+This skill is part of the OpenDesign ecosystem for comprehensive web automation and testing.
+</skill_content>

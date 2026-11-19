@@ -1,11 +1,13 @@
+import { quotaModel } from './lifecycle-quota.fixture.js';
+import { createHash } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
 import { PoseTrackerRateLimitGuard } from '../src/pose-tracker/pose-tracker-rate-limit.guard.js';
 
 function harness() {
   const buckets=new Map<string,number>();
   const model={findOneAndUpdate:vi.fn(async (filter:{_id:string})=>{const hits=(buckets.get(filter._id)??0)+1;buckets.set(filter._id,hits);return {hits};})};
-  const guard=new PoseTrackerRateLimitGuard(model as never);
-  const request=(userId:string,ip:string)=>{const response={setHeader:vi.fn()};return {response,context:{switchToHttp:()=>({getRequest:()=>({user:{userId},ip}),getResponse:()=>response})} as never};};
+  const guard=new PoseTrackerRateLimitGuard(quotaModel(model) as never);
+  const request=(userId:string,ip:string)=>{const response={setHeader:vi.fn()};return {response,context:{switchToHttp:()=>({getRequest:()=>({user:{userId: userId ? createHash('sha256').update(userId).digest('hex').slice(0,24) : '', lifecycleGeneration: 0},ip}),getResponse:()=>response})} as never};};
   return {guard,model,request};
 }
 describe('PoseTracker shared launch limits',()=>{

@@ -1,0 +1,40 @@
+{
+  "total_gifs": 1500,
+  "valid_gifs": 1324,
+  "per_frame_stats": {
+    "mean_ms": 244.76561591252764,
+    "median_ms": 100.0,
+    "std_ms": 330.92417897014315,
+    "min_ms": 100,
+    "max_ms": 5000,
+    "percentiles": {
+      "p10": 100.0,
+      "p25": 100.0,
+      "p50": 100.0,
+      "p75": 100.0,
+      "p90": 1000.0,
+      "p95": 1000.0,
+      "p99": 1000.0
+    }
+  },
+  "gif_level_stats": {
+    "mean_total_duration_sec": 3.1786253776435047,
+    "median_total_duration_sec": 3.0,
+    "min_total_duration_sec": 2.1,
+    "max_total_duration_sec": 9.5,
+    "mean_frame_count": 12.986404833836858,
+    "median_frame_count": 12.0
+  },
+  "fps_stats": {
+    "mean_fps": 4.059558664634636,
+    "median_fps": 4.0,
+    "percentiles": {
+      "p10": 4.0,
+      "p25": 4.0,
+      "p50": 4.0,
+      "p75": 4.0,
+      "p90": 4.0
+    }
+  },
+  "diff_from_08s": 1324
+}

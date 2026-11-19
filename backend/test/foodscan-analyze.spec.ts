@@ -1,7 +1,10 @@
+import { runWithDeadline } from '../src/common/foodscan/deadline-context.js';
+import { FoodScanService } from '../src/foodscan/foodscan.service.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { INestApplication } from '@nestjs/common';
 import { AppError, ErrorCode } from '../src/common/foodscan/errors.js';
-import { GeminiService } from '../src/foodscan/services/gemini.service.js';
+import { AI_VISION_PROVIDER } from '../src/foodscan/services/vision-provider.js';
+import type { VisionProvider } from '../src/foodscan/services/vision-provider.js';
 import { UsdaService } from '../src/foodscan/services/usda.service.js';
 import { buildScannerApp, server } from './foodscan.harness.js';
 import { JSON_HEADERS, TINY_PNG_BASE64 } from './foodscan.fixtures.js';
@@ -40,7 +43,7 @@ describe('POST /nutrition/scan', () => {
       { GEMINI_API_KEY: 'test-gemini', USDA_API_KEY: 'test-usda' },
       { auth: false }
     );
-    detectFoods = vi.spyOn(app.get(GeminiService), 'detectFoods');
+    detectFoods = vi.spyOn(app.get<VisionProvider>(AI_VISION_PROVIDER), 'detectFoods');
     lookupFood = vi.spyOn(app.get(UsdaService), 'lookupFood');
   });
 
@@ -51,6 +54,21 @@ describe('POST /nutrition/scan', () => {
 
   const post = (body: unknown = { image: TINY_PNG_BASE64 }) =>
     server(app).post('/nutrition/scan').set(JSON_HEADERS).send(body as object);
+
+  it('returns recognized foods when a nutrition lookup stalls near the request deadline', async () => {
+    detectFoods.mockResolvedValue([
+      { food_name: 'chicken breast', est_weight_g: 150, confidence: 0.92 },
+      { food_name: 'white rice', est_weight_g: 200, confidence: 0.85 },
+    ]);
+    lookupFood.mockImplementation(async (name: string) => name === 'chicken breast' ? CHICKEN : new Promise(() => {}));
+    const controller = new AbortController();
+    const result = await runWithDeadline({ signal: controller.signal, deadlineAt: Date.now() + 1600 },
+      () => app.get(FoodScanService).analyze({ image: TINY_PNG_BASE64 }, 'test-deadline'));
+    expect(result.degraded).toBe(true);
+    expect(result.items).toHaveLength(2);
+    expect(result.items[0]).toMatchObject({ food_name: 'chicken breast', found: true });
+    expect(result.items[1]).toMatchObject({ food_name: 'white rice', found: false, kcal: null });
+  });
 
   it('returns detected items with scaled macros and totals', async () => {
     detectFoods.mockResolvedValue([
@@ -122,6 +140,62 @@ describe('POST /nutrition/scan', () => {
     expect(res.body.items[0]).toMatchObject({ found: false, kcal: null, protein_g: null, carbs_g: null, fat_g: null });
     expect(res.body.items[0].fdc_id).toBeUndefined();
     expect(res.body.totals.kcal).toBeNull();
+  });
+
+  it('uses the reviewed pork recipe without substituting a generic ingredient', async () => {
+    detectFoods.mockResolvedValue([{ food_name: 'pork sinigang', est_weight_g: 250, confidence: 0.7, isComposite: true, searchTerms: ['pork soup', 'sinigang pork'] }]);
+    lookupFood.mockResolvedValue(undefined);
+    const res = await post();
+    expect(res.body.items[0]).toMatchObject({ found: true, nutrition_ref: 'recipe:bjmp-pork-sinigang', nutrition_source: 'Philippine food-service recipe estimate' });
+    expect(lookupFood).not.toHaveBeenCalledWith('pork soup', false);
+    expect(lookupFood).not.toHaveBeenCalled();
+  });
+  it('does not apply the pork recipe to a different sinigang', async () => {
+    detectFoods.mockResolvedValue([{ food_name: 'shrimp sinigang', est_weight_g: 250, confidence: 0.7, isComposite: true, searchTerms: ['shrimp soup'] }]);
+    lookupFood.mockResolvedValue(undefined);
+    const res = await post();
+    expect(res.body.items[0]).toMatchObject({ found: false, kcal: null });
+    expect(lookupFood).not.toHaveBeenCalledWith('shrimp soup', false);
+  });
+  it('keeps uncertain recognition wording while using the clearly labeled recipe estimate', async () => {
+    detectFoods.mockResolvedValue([{ food_name: 'Pork and vegetable soup (possibly sinigang)', est_weight_g: 272.72, confidence: 0.6, isComposite: true }]);
+    lookupFood.mockResolvedValue(undefined);
+    const res = await post();
+    expect(res.status).toBe(200);
+    expect(res.body.items[0]).toMatchObject({ food_name: 'Pork and vegetable soup (possibly sinigang)', found: true, nutrition_source: 'Philippine food-service recipe estimate', kcal: 226.4 });
+    expect(lookupFood).not.toHaveBeenCalled();
+  });
+  it('matches an equivalent model search term only when the visible dish identifies pork', async () => {
+    detectFoods.mockResolvedValue([{ food_name: 'Pork and vegetable soup', localName: 'sinigang na baboy', searchTerms: ['pork sinigang'], est_weight_g: 272.72, confidence: 0.6, isComposite: true }]);
+    lookupFood.mockResolvedValue(undefined);
+    const res = await post();
+    expect(res.body.items[0]).toMatchObject({ nutrition_ref: 'recipe:bjmp-pork-sinigang', kcal: 226.4, reference_ingredients: expect.arrayContaining(['Pork belly', 'Water spinach']) });
+    expect(lookupFood).not.toHaveBeenCalled();
+  });
+  it('does not use a pork recipe when recognition identifies another protein', async () => {
+    detectFoods.mockResolvedValue([{ food_name: 'Shrimp soup', searchTerms: ['pork sinigang'], est_weight_g: 200, confidence: 0.6, isComposite: true }]);
+    lookupFood.mockResolvedValue(undefined);
+    const res = await post();
+    expect(res.body.items[0]).toMatchObject({ found: false, kcal: null });
+    expect(res.body.items[0].reference_ingredients).toBeUndefined();
+  });
+
+  it('uses a matching Filipino name returned by recognition for a mixed dish', async () => {
+    detectFoods.mockResolvedValue([{ food_name: 'chicken adobo', localName: 'adobong manok', est_weight_g: 100, confidence: 0.8, isComposite: true, searchTerms: [] }]);
+    lookupFood.mockImplementation(async (name: string) => name === 'adobong manok' ? { ...CHICKEN, description: 'Adobong manok' } : undefined);
+    const res = await post();
+    expect(res.status).toBe(200);
+    expect(lookupFood).toHaveBeenCalledWith('adobong manok', false);
+    expect(res.body.items[0]).toMatchObject({ found: true, fdc_id: CHICKEN.fdcId, kcal: 120 });
+  });
+
+  it('continues with an equivalent recognized name after one lookup fails', async () => {
+    detectFoods.mockResolvedValue([{ food_name: 'cooked rice', est_weight_g: 100, confidence: 0.8, searchTerms: ['white rice'] }]);
+    lookupFood.mockImplementation(async (name: string) => { if (name === 'cooked rice') throw new Error('temporary failure'); return name === 'white rice' ? RICE : undefined; });
+    const res = await post();
+    expect(res.status).toBe(200);
+    expect(res.body.degraded).toBe(true);
+    expect(res.body.items[0]).toMatchObject({ found: true, fdc_id: RICE.fdcId, kcal: 130 });
   });
 
   it('degrades gracefully when one nutrition lookup fails', async () => {
@@ -225,7 +299,7 @@ describe('POST /nutrition/scan', () => {
     const res = await post({ image: TINY_PNG_BASE64, mimeType: 'image/jpeg' });
 
     expect(res.status).toBe(200);
-    expect(detectFoods).toHaveBeenCalledWith(expect.any(String), 'image/png');
+    expect(detectFoods).toHaveBeenCalledWith(expect.any(String), 'image/png', expect.any(Function));
   });
 
   it('accepts a data: URL prefix and normalises it', async () => {
@@ -233,7 +307,7 @@ describe('POST /nutrition/scan', () => {
     const res = await post({ image: `data:image/png;base64,${TINY_PNG_BASE64}` });
 
     expect(res.status).toBe(200);
-    expect(detectFoods).toHaveBeenCalledWith(TINY_PNG_BASE64, 'image/png');
+    expect(detectFoods).toHaveBeenCalledWith(TINY_PNG_BASE64, 'image/png', expect.any(Function));
   });
 
   it('validates the body before spending a provider call', async () => {

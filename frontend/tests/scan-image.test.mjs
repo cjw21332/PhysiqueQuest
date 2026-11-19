@@ -16,3 +16,20 @@ test('scan images are downscaled before upload and release their bitmap', async 
     assert.equal(canvas.width, 1280); assert.equal(canvas.height, 640); assert.equal(quality, 0.82); assert.equal(closed, true);
   } finally { for (const [key, value] of Object.entries(prior)) { if (value === undefined) delete globalThis[key]; else globalThis[key] = value; } }
 });
+
+test('oversized encoded images shrink further and non-images get a clear error', async () => {
+  const source = await readFile(new URL('../lib/scanImage.ts', import.meta.url), 'utf8');
+  const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
+  const { toScanImage } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
+  const prior = { document: globalThis.document, createImageBitmap: globalThis.createImageBitmap };
+  let calls = 0;
+  const canvas = { width: 0, height: 0, getContext: () => ({ drawImage() {} }), toDataURL: () => `data:image/jpeg;base64,${++calls === 1 ? 'A'.repeat(5600000) : 'AA=='}` };
+  globalThis.createImageBitmap = async () => ({ width: 5000, height: 4000, close() {} });
+  globalThis.document = { createElement: () => canvas };
+  try {
+    await toScanImage({ type: 'image/jpeg', name: 'large.jpg' });
+    assert.equal(calls, 2);
+    assert.equal(canvas.width, 1024);
+    await assert.rejects(toScanImage({ type: 'application/pdf', name: 'file.pdf' }), /This photo format isn't supported/);
+  } finally { for (const [key, value] of Object.entries(prior)) { if (value === undefined) delete globalThis[key]; else globalThis[key] = value; } }
+});

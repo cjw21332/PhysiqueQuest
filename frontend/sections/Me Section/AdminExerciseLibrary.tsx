@@ -62,7 +62,7 @@ export default function AdminExerciseLibrary({ onBack, preview = false }: { onBa
     finally { setBusy(false); }
   };
   return <section className="me-section admin-tools-screen admin-reference" aria-label="Admin exercise library">
-    <header className="admin-tools-header"><button type="button" className="coach-back" onClick={showForm ? closeForm : onBack} disabled={busy} aria-label={showForm ? 'Back to exercise library' : 'Back to account settings'}><Icon name="arrow" size={20}/></button><h2>Admin · Exercises</h2><button type="button" className="admin-new-button" onClick={() => { setError(''); setShowForm(true); }} disabled={busy}><span aria-hidden="true">＋</span> New</button></header>
+    <header className="admin-tools-header pq-page-heading"><button type="button" className="coach-back" onClick={showForm ? closeForm : onBack} disabled={busy} aria-label={showForm ? 'Back to exercise library' : 'Back to account settings'}><Icon name="arrow" size={20}/></button><h2>Admin · Exercises</h2><button type="button" className="admin-new-button" onClick={() => { setError(''); setShowForm(true); }} disabled={busy}><span aria-hidden="true">＋</span> New</button></header>
     <div className="admin-tools-scroll">
       {error && <div className="error" role="alert">{error}{!showForm && <button type="button" className="scan-retry" onClick={() => void refresh()}>Try again</button>}</div>}
       {showForm ? <form className="admin-reference-form" aria-labelledby="admin-new-title" onSubmit={event => void create(event)}>

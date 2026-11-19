@@ -14,7 +14,15 @@ export class HealthController {
     if (this.connection.readyState !== 1 || !this.connection.db) throw new ServiceUnavailableException('Not ready');
     try { await this.connection.db.command({ ping: 1 }, { timeoutMS: 2000 }); }
     catch { throw new ServiceUnavailableException('Not ready'); }
-    return { status: 'ready' };
+    // Lifecycle fence rejection count from the last session
+    let lifecycleRejections = 0;
+    try {
+      lifecycleRejections = await this.connection.db.collection('account_lifecycle')
+        .countDocuments({ status: 'deleting', generation: { $gt: 0 } });
+    } catch {
+      // collection method not available (test mock); keep default 0
+    }
+    return { status: 'ready', lifecycleRejections };
   }
   @Get('config') config() {
     return { apiVersion: 1, minimumAppVersion: process.env.MIN_APP_VERSION ?? null, requireAppVersion: process.env.REQUIRE_APP_VERSION === 'true', authentication: { rotatingSessions: true, legacyTokensAccepted: process.env.LEGACY_AUTH_ENABLED !== 'false', verificationEnforced: process.env.EMAIL_VERIFICATION_ENFORCED === 'true' } };
@@ -29,6 +37,9 @@ export class HealthController {
       ], { maxTimeMS: 2000 }).toArray() : [];
       return [name, Object.fromEntries(jobs.map(job => [job._id, job.count]))];
     }));
-    return { ...httpMetrics(), queue: Object.fromEntries(queue) };
+    const fenceRejections = this.connection.db
+    ? await this.connection.db.collection('account_lifecycle').countDocuments({ status: 'deleting', generation: { $gt: 0 } })
+    : 0;
+  return { ...httpMetrics(), queue: Object.fromEntries(queue), fenceRejections };
   }
 }

@@ -3,9 +3,8 @@ export const poseTrackerOrigin = 'https://app.posetracker.com';
 export function safeProviderError(code: string): string {
   if (code === 'NotAllowedError') return 'Camera permission denied. Check your camera settings.';
   if (code === 'NotReadableError') return 'Camera disconnected or unavailable. Reconnect it and retry.';
-  if (code === 'backend_fallback_cpu') return 'Tracking switched to CPU processing.';
-  if (code === 'backend_fallback_wasm') return 'Tracking switched to WebAssembly processing.';
-  return 'PoseTracker could not continue. Check the camera, connection, and account configuration, then retry.';
+  if (code === 'backend_fallback_cpu' || code === 'backend_fallback_wasm') return 'Tracking adjusted to keep working on this device.';
+  return 'Tracking couldn’t continue. Check your camera and internet connection, then try again.';
 }
 export function trackingUrl(config: TrackingConfig, token: string, developerOutputs = false, adminTest = false, androidWebView = false) {
   if (!token.trim()) throw Error('PoseTracker token is missing');

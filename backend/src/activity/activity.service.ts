@@ -1,3 +1,4 @@
+import { savedScanMealDates } from '../nutrition/saved-scan-meals.js';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -8,6 +9,7 @@ import { Activity } from './schemas/activity.schema.js';
 import { activityDate, earnsWorkoutCredit } from '../workouts/workout-contract.js';
 import { LeaderboardService } from '../leaderboard/leaderboard.service.js';
 import { User } from '../auth/schemas/user.schema.js';
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 
 const missionRules = [
   { key: 'workout', title: 'Complete one workout', target: 1, points: 100 },
@@ -38,11 +40,11 @@ export class ActivityService {
   ) {}
 
   private async userState(userId: string) {
-    return this.model.findOneAndUpdate(
+    return new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       { $setOnInsert: { userId: new Types.ObjectId(userId), state: { timezone: 'UTC' } } },
-      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
-    );
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true, session },
+    ));
   }
 
   async get(userId: string, requestedTimezone?: string) {
@@ -57,17 +59,18 @@ export class ActivityService {
   private async summary(userId: string, requestedTimezone: string | undefined, includeLeaderboard: boolean) {
     const record = await this.model.findOne({ userId: new Types.ObjectId(userId) }).exec();
     const timezone = resolveTimezone(requestedTimezone ?? record?.state?.timezone);
-    const [nutrition, workouts, records, ranking, user] = await Promise.all([this.nutrition.read(userId, 'userId meals.date meals.protein meals.carbs meals.fat water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? this.leaderboard.get(userId, 'all').catch(() => null) : Promise.resolve(null), this.users.findById(userId).select('createdAt').lean().exec()]);
+    const [nutrition, workouts, records, ranking, user] = await Promise.all([this.nutrition.read(userId, 'userId meals.id meals.date meals.scanSavedAt meals.scanGroupId meals.protein meals.carbs meals.fat scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? this.leaderboard.get(userId, 'all').catch(() => null) : Promise.resolve(null), this.users.findById(userId).select('createdAt').lean().exec()]);
     const today = zoneDate(new Date(), timezone);
 
     const mealDates = nutrition.meals.map(meal => meal.date).filter((date): date is string => typeof date === 'string');
+    const savedMealDates = savedScanMealDates(nutrition.meals, 'scanSaveReceipts' in nutrition ? nutrition.scanSaveReceipts : undefined);
     const waterByDate = new Map(nutrition.water.map(entry => [entry.date, entry.glasses]));
     const completedWorkouts = workouts.filter(workout => earnsWorkoutCredit(workout) && workout.endedAt);
 
-    const todayStats = computeTodayStats(nutrition, completedWorkouts, waterByDate, today, timezone);
+    const todayStats = computeTodayStats(savedMealDates, completedWorkouts, waterByDate, today, timezone);
     const dailyMissions = buildDailyMissions({ ...todayStats, records: Number(records.includes(today)) });
 
-    const allMeals = buildMealCountMap(mealDates);
+    const allMeals = buildMealCountMap(savedMealDates);
     const allWorkoutDates = new Set(completedWorkouts.map(workout => workout.activityDate || activityDate(workout.endedAt!, timezone)));
     const activityDates = buildActivityDates(mealDates, nutrition.water, allWorkoutDates);
 
@@ -106,7 +109,7 @@ export class ActivityService {
     }
     const current = await this.userState(userId);
     current.state = { timezone: timezone ?? current.state.timezone ?? 'UTC' };
-    await current.save();
+    await new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => current.save({ session }));
     return this.get(userId);
   }
 }
@@ -118,9 +121,9 @@ function resolveTimezone(requested?: unknown): string {
   return timezone;
 }
 
-function computeTodayStats(nutrition: any, completedWorkouts: any[], waterByDate: Map<string, number>, today: string, timezone: string) {
+function computeTodayStats(savedMealDates: string[], completedWorkouts: any[], waterByDate: Map<string, number>, today: string, timezone: string) {
   return {
-    meals: nutrition.meals.filter((m: any) => m.date === today).length,
+    meals: savedMealDates.filter(date => date === today).length,
     water: waterByDate.get(today) ?? 0,
     workouts: completedWorkouts.filter(w => (w.activityDate || activityDate(w.endedAt!, w.timezone ?? timezone)) === today).length,
   };

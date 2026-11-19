@@ -3,6 +3,7 @@ import type { Request } from 'express';
 /** Identity attached to a request once JwtAuthGuard has run. */
 export interface AuthUser {
   userId: string;
+  lifecycleGeneration?: number;
 }
 
 /**

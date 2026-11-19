@@ -1,0 +1,64 @@
+Browse Skill (gstack)
+
+<skill_content>
+# Skill: browse
+
+## Overview
+
+This skill drives a real browser through Aside to open pages, read content, click through flows, take screenshots, and check console errors. It's part of the gstack toolkit for web automation and testing.
+
+## Capabilities
+
+- **Page Navigation**: Open and navigate to web pages
+- **Content Reading**: Extract and read page content
+- **Interaction**: Click through flows and interact with page elements
+- **Screenshot Capture**: Take screenshots of pages
+- **Console Error Checking**: Monitor and report browser console errors
+- **Session Management**: Manage browser sessions
+- **Real Browser**: Uses a real browser instance (not headless)
+
+## Use Cases
+
+### Testing
+- Test web application flows
+- Verify user journeys
+- Capture visual evidence
+
+### Development
+- Debug web applications
+- Test responsive design
+- Validate UI behavior
+
+### Automation
+- Automate repetitive web tasks
+- Extract data from web pages
+- Create automated workflows
+
+## Example Usage
+
+```
+opencode run "Use browse to open https://example.com and take a screenshot"
+
+opencode run "Use browse to click through the checkout flow on the e-commerce site"
+
+opencode run "Use browse to check for console errors on the production site"
+```
+
+## Technical Details
+
+This skill uses the Aside browser automation framework to drive a real browser instance. It provides full browser control and real-time interaction capabilities.
+
+## Output
+
+The skill provides:
+- Page content
+- Screenshots
+- Console errors
+- Navigation history
+- Interaction results
+
+---
+
+Base directory: .opencode/skills/browse
+This skill is part of the gstack ecosystem for web automation and testing.
+</skill_content>

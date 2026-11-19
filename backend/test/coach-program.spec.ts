@@ -1,6 +1,8 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import 'reflect-metadata';
 import { describe, expect, it, vi } from 'vitest';
 import { CoachService } from '../src/coach/coach.service.js';
+vi.mock('../src/coach/openai-plan.js', () => ({ orderPlanWithOpenAI: async (plan: unknown) => plan }));
 
 const user = '507f1f77bcf86cd799439011';
 const otherUser = '507f1f77bcf86cd799439012';
@@ -24,7 +26,7 @@ function setup() {
   const provider = { getForPlan: vi.fn(async () => [{ _id: 'provider-bench', name: 'Dumbbell bench press', group: 'Chest', targetMuscle: 'Chest', equipment: 'Dumbbell', pose: 'missing', instructions: ['Keep wrists straight.'], gifUrl: 'https://example.com/fresh.gif' }]) };
   const profiles = { findOne: () => query(() => current) };
   const settings = { findOne: () => query(() => null) };
-  const service = () => new CoachService(profiles as any, settings as any, provider as any, programs as any);
+  const service = () => new CoachService(profiles as any, settings as any, provider as any, lifecycleModel(programs as any));
   return { service, provider, programs, records, change: (patch: any) => { current = { ...current, ...patch }; } };
 }
 

@@ -18,6 +18,11 @@ import { ScanRateLimitGuard } from '../common/foodscan/scan-rate-limit.guard.js'
 import type { ScanRequest } from '../common/foodscan/scan-request.js';
 import { FoodScanService } from './foodscan.service.js';
 import type { AnalyzeResponse } from './foodscan.schemas.js';
+import { FoodScanUsageService, type TokenUsage } from './foodscan-usage.service.js';
+import { FoodScanConfigService } from '../common/foodscan/foodscan-config.js';
+import { AppError } from '../common/foodscan/errors.js';
+import { OPENAI_MODEL } from '../common/openai.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 /**
  * Food image analysis.
@@ -31,12 +36,11 @@ import type { AnalyzeResponse } from './foodscan.schemas.js';
  * quota and a malformed request never reaches the providers.
  */
 @Controller('nutrition/scan')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, ScanContentTypeGuard, ScanRateLimitGuard, AiRateLimitGuard)
 @UseFilters(AppExceptionFilter)
 @UseInterceptors(RequestContextInterceptor, DeadlineInterceptor)
-@UseGuards(ScanContentTypeGuard, ScanRateLimitGuard)
 export class FoodScanController {
-  constructor(private readonly service: FoodScanService) {}
+  constructor(private readonly service: FoodScanService, private readonly usage: FoodScanUsageService, private readonly config: FoodScanConfigService) {}
 
   /**
    * `unknown` is deliberate: the body is a multi-megabyte base64 image, and the
@@ -48,7 +52,25 @@ export class FoodScanController {
    */
   @Post()
   @HttpCode(HttpStatus.OK)
-  analyze(@Req() req: ScanRequest, @Body() body: unknown): Promise<AnalyzeResponse> {
-    return this.service.analyze(body, req.requestId ?? 'unknown');
+  async analyze(@Req() req: ScanRequest, @Body() body: unknown): Promise<AnalyzeResponse> {
+    const requestId = req.requestId ?? 'unknown';
+    const id = await this.usage.begin(req.user!.userId, requestId, process.env.OPENAI_MODEL?.trim() || OPENAI_MODEL);
+    let observed: TokenUsage | null = null;
+    let incompleteUsage = false;
+    try {
+      const result = await this.service.analyze(body, requestId, usage => {
+        if (!usage) { incompleteUsage = true; return; }
+        if (!observed) observed = usage;
+        else {
+          const add = (a: number | null, b: number | null) => a === null || b === null ? null : a + b;
+          observed = { input: add(observed.input, usage.input), output: add(observed.output, usage.output), total: add(observed.total, usage.total) };
+        }
+      }, req.user!.userId);
+      await this.usage.finish(id, 'success', observed, undefined, !incompleteUsage);
+      return result;
+    } catch (error) {
+      await this.usage.finish(id, 'failure', observed, error instanceof AppError ? error.code : 'invalid_or_internal', !incompleteUsage);
+      throw error;
+    }
   }
 }

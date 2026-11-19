@@ -1,3 +1,4 @@
+import { currentDeadline, remainingMs } from './deadline-context.js';
 import { outboundFetch } from '../outbound.js';
 import { Injectable } from '@nestjs/common';
 import { FoodScanConfigService } from './foodscan-config.js';
@@ -23,7 +24,9 @@ export class HttpService {
    * request open with no deadline at all.
    */
   async fetchJson<T>(url: string, opts: FetchJsonOptions): Promise<T> {
-    const timeoutMs = opts.timeoutMs ?? this.config.value.upstreamTimeoutMs;
+    const deadline = currentDeadline();
+    const timeoutMs = Math.max(1, Math.min(opts.timeoutMs ?? this.config.value.upstreamTimeoutMs, remainingMs(deadline)));
+    if (deadline?.signal.aborted) throw upstreamTimeout(opts.upstream);
     const target = safeUrl(url);
 
     let res: Response;
@@ -32,7 +35,7 @@ export class HttpService {
         method: opts.method ?? 'GET',
         ...(opts.body === undefined ? {} : { body: opts.body }),
         headers: { accept: 'application/json', ...opts.headers },
-        signal: AbortSignal.timeout(timeoutMs),
+        signal: deadline ? AbortSignal.any([AbortSignal.timeout(timeoutMs), deadline.signal]) : AbortSignal.timeout(timeoutMs),
       });
     } catch (cause) {
       if (isTimeout(cause)) {
@@ -41,8 +44,7 @@ export class HttpService {
       // The cause can embed the request URL, which for USDA contains the API key.
       throw upstreamUnavailable(
         opts.upstream,
-        `${opts.upstream} request to ${target} failed: ${describe(cause)}`,
-        cause
+        `${opts.upstream} request to ${target} failed: ${describe(cause)}`
       );
     }
 

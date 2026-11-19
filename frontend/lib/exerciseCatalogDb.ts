@@ -1,4 +1,15 @@
 import type { ExerciseCatalog, ExerciseRecord, ExerciseDiscoveryQuery, ExerciseFilters } from './api';
+import { canTrack, resolveTrackingConfig } from '../../backend/src/pose-tracker/exercise-registry';
+
+const priorityCache = new WeakMap<ExerciseRecord, number>();
+export function trackingPriority(item: ExerciseRecord): number {
+  const cached = priorityCache.get(item);
+  if (cached !== undefined) return cached;
+  const config = resolveTrackingConfig(item);
+  const priority = !canTrack(config) ? 3 : config.validationStatus === 'verified' || config.nativeSupport === 'FULLY_SUPPORTED' ? 0 : config.validationStatus === 'documentation-mapped' || config.nativeSupport === 'PARTIALLY_SUPPORTED' ? 1 : 2;
+  priorityCache.set(item, priority);
+  return priority;
+}
 
 const DB_NAME = 'physiquequest-exercise-catalog';
 const DB_VERSION = 1;
@@ -71,7 +82,8 @@ export async function cachedCatalog(query: ExerciseDiscoveryQuery & { page: numb
     return (!query.muscle || row.targetMuscle === query.muscle || row.group === query.muscle) && (!query.equipment || row.equipment === query.equipment || row.equipments?.includes(query.equipment)) &&
       (!query.bodyPart || row.bodyParts?.includes(query.bodyPart)) && (!query.target || row.targetMuscles?.includes(query.target)) && (!query.secondary || row.secondaryMuscles?.includes(query.secondary));
   });
-  if (query.sort) rows.sort((a, b) => {
+  if (!query.sort) rows.sort((a, b) => trackingPriority(a) - trackingPriority(b) || a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }) || a._id.localeCompare(b._id));
+  else rows.sort((a, b) => {
     const key = (item: ExerciseRecord) => query.sort === 'body-part' ? item.bodyParts?.[0] ?? '' : query.sort === 'equipment' ? item.equipments?.[0] ?? '' : item.name;
     const order = key(a).localeCompare(key(b), undefined, { sensitivity: 'base' });
     return (query.sort === 'name-desc' ? -order : order) || a._id.localeCompare(b._id);
@@ -89,8 +101,20 @@ export async function readCatalogMetadata(): Promise<{ version: string; count: n
   try { return await new Promise((resolve, reject) => { const request = db.transaction('metadata').objectStore('metadata').get('catalog'); request.onsuccess = () => resolve(request.result ?? null); request.onerror = () => reject(request.error); }); }
   finally { db.close(); }
 }
-export async function saveCatalogMetadata(metadata: { version: string; count: number; savedAt: number; source: string }) {
+export async function replaceCatalog(items: ExerciseRecord[], metadata: { version: string; count: number; savedAt: number; source: string }) {
   const db = await openDb();
-  try { await new Promise<void>((resolve, reject) => { const tx = db.transaction('metadata', 'readwrite'); tx.objectStore('metadata').put(metadata, 'catalog'); tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error); }); }
-  finally { db.close(); }
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(['exercises', 'metadata'], 'readwrite');
+      tx.oncomplete = () => resolve();
+      tx.onabort = () => reject(tx.error ?? new Error('Catalog update interrupted.'));
+      const store = tx.objectStore('exercises');
+      store.clear();
+      for (const item of items) store.put(item);
+      tx.objectStore('metadata').put(metadata, 'catalog');
+    });
+    revision++;
+    snapshot = undefined;
+    previousSearch = undefined;
+  } finally { db.close(); }
 }

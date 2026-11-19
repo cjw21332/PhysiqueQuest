@@ -1,11 +1,11 @@
-export default function CalorieProgress({ calories, target, detailed = false }: { calories: number | null; target: number; detailed?: boolean }) {
+export default function CalorieProgress({ calories, target, detailed = false, partial = false }: { calories: number | null; target: number; detailed?: boolean; partial?: boolean }) {
   if (calories === null) return <div className="calorie-circle">Calories incomplete</div>;
   const percent = target > 0 ? Math.min(100, Math.max(0, calories / target * 100)) : 0;
-  return <div className="calorie-circle home-calorie-progress" role="img" aria-label={`${Math.round(calories)} of ${target} calories logged`}>
+  return <div className="calorie-circle home-calorie-progress" role="img" aria-label={`${Math.round(calories)} of ${target} calories logged${partial ? ', known values only' : ''}`}>
     <svg className="circle-svg" viewBox="0 0 100 100" aria-hidden="true">
       <circle cx="50" cy="50" r="45" className="circle-bg"/>
       <circle cx="50" cy="50" r="45" className="circle-progress" strokeDasharray={2 * Math.PI * 45} strokeDashoffset={2 * Math.PI * 45 * (1 - percent / 100)}/>
     </svg>
-    <div className="circle-content"><div className="calorie-amount">{detailed ? Math.round(calories).toLocaleString() : calories >= 1000 ? `${(calories / 1000).toFixed(1)}k` : Math.round(calories)}</div><div className="calorie-goal">of {target.toLocaleString()}{detailed ? ' kcal' : ''}</div></div>
+    <div className="circle-content"><div className="calorie-amount">{detailed ? Math.round(calories).toLocaleString() : calories >= 1000 ? `${(calories / 1000).toFixed(1)}k` : Math.round(calories)}</div><div className="calorie-goal">{partial ? 'known kcal' : `of ${target.toLocaleString()}${detailed ? ' kcal' : ''}`}</div></div>
   </div>;
 }

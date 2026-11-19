@@ -81,6 +81,7 @@ export const analyzeRequestSchema = z.strictObject({
   image: z.string({ error: 'image is required' }).min(1, 'image must not be empty'),
   /** Advisory. The server determines the real type from the image bytes. */
   mimeType: z.string().optional(),
+  description: z.string().max(2000).optional(),
 });
 
 /** Built per-request-budget because the search cap is configurable. */
@@ -106,8 +107,8 @@ export function buildFoodSearchQuerySchema(maxSearchQueryLength: number) {
 export const fdcIdParamSchema = z.object({
   fdcId: z
     .string({ error: 'fdcId is required' })
-    .regex(/^[1-9]\d{0,11}$/, 'fdcId must be a positive integer')
-    .transform((s) => Number.parseInt(s, 10))
+    .regex(/^(?:usda:)?[1-9]\d{0,11}$/, 'food id must identify a USDA record')
+    .transform((s) => Number.parseInt(s.replace(/^usda:/, ''), 10))
     .refine((n) => Number.isSafeInteger(n) && n > 0, 'fdcId is out of range'),
 });
 
@@ -118,37 +119,65 @@ export type AnalyzeRequest = z.infer<typeof analyzeRequestSchema>;
 // --------------------------------------------------------------------------
 
 export const macrosSchema = z.object({
-  kcal: z.number().nullable(),
-  protein_g: z.number().nullable(),
-  carbs_g: z.number().nullable(),
-  fat_g: z.number().nullable(),
+  kcal: z.number().finite().nonnegative().nullable(),
+  protein_g: z.number().finite().nonnegative().nullable(),
+  carbs_g: z.number().finite().nonnegative().nullable(),
+  fat_g: z.number().finite().nonnegative().nullable(),
 });
 
+export const foodEvidenceSchema = z.object({
+  name: z.enum(['user_confirmed', 'visually_identified', 'estimated', 'unknown']),
+  quantity: z.enum(['user_confirmed', 'visually_identified', 'estimated', 'unknown']),
+  preparation: z.enum(['user_confirmed', 'visually_identified', 'estimated', 'unknown']),
+  added_oil: z.enum(['user_confirmed', 'visually_identified', 'estimated', 'unknown']),
+}).strict();
+
 export const analyzedItemSchema = z.object({
-  food_name: z.string(),
-  est_weight_g: z.number(),
-  confidence: z.number(),
+  food_name: z.string().trim().min(1).max(120),
+  est_weight_g: z.number().finite().positive().max(5000),
+  confidence: z.number().finite().min(0).max(1),
+  localName: z.string().max(120).optional(),
+  searchTerms: z.array(z.string()).optional(),
+  isComposite: z.boolean().optional(),
+  portionDescription: z.string().max(120).optional(),
+  portion_method: z.literal('visual_estimate').optional(),
+  portion_confidence: z.null().optional(),
+  region_confidence: z.null().optional(),
+  weight_min_g: z.null().optional(),
+  weight_max_g: z.null().optional(),
   found: z.boolean(),
-  fdc_id: z.number().optional(),
+  evidence: foodEvidenceSchema.optional(),
+  evidence_ref: z.string().max(2048).optional(),
+  fdc_id: z.number().int().positive().optional(),
+  nutrition_ref: z.string().max(2048).optional(),
+  nutrition_source: z.string().max(800).optional(),
+  reference_ingredients: z.array(z.string().max(120)).max(20).optional(),
   description: z.string().optional(),
-  kcal: z.number().nullable(),
-  protein_g: z.number().nullable(),
-  carbs_g: z.number().nullable(),
-  fat_g: z.number().nullable(),
+  kcal: z.number().finite().nonnegative().nullable(),
+  protein_g: z.number().finite().nonnegative().nullable(),
+  carbs_g: z.number().finite().nonnegative().nullable(),
+  fat_g: z.number().finite().nonnegative().nullable(),
   per_100g: macrosSchema.optional(),
 });
 
 export const analyzeResponseSchema = z.object({
   request_id: z.string(),
-  model: z.string(),
   items: z.array(analyzedItemSchema),
   unmatched: z.array(z.string()),
-  totals: z.object({ kcal: z.number().nullable(), protein_g: z.number().nullable(), carbs_g: z.number().nullable(), fat_g: z.number().nullable() }),
+  totals: macrosSchema,
   degraded: z.boolean(),
+}).superRefine((response, ctx) => {
+  for (const key of ['kcal', 'protein_g', 'carbs_g', 'fat_g'] as const) {
+    const incomplete = response.items.some(item => item[key] === null);
+    const expected = incomplete ? null : Math.round(response.items.reduce((sum, item) => sum + item[key]!, 0) * 10) / 10;
+    if (response.totals[key] !== expected) ctx.addIssue({ code: 'custom', path: ['totals', key], message: 'Total does not match item values' });
+  }
 });
 
 export const foodCandidateSchema = z.object({
   fdc_id: z.number(),
+  id: z.string().optional(),
+  source: z.string().optional(),
   description: z.string(),
   data_type: z.string(),
 });
@@ -161,6 +190,8 @@ export const foodSearchResponseSchema = z.object({
 export const foodDetailResponseSchema = z.object({
   request_id: z.string(),
   fdc_id: z.number(),
+  id: z.string().optional(),
+  source: z.string().optional(),
   description: z.string(),
   data_type: z.string(),
   per_100g: macrosSchema,

@@ -1,0 +1,10 @@
+.settings :global(.me-scroll) { padding-bottom: max(28px, var(--sab)); }
+.settings :global(.me-group-title) { margin-top: 24px; margin-bottom: 8px; }
+.settings :global(.me-profile-summary) { margin-bottom: 20px; }
+.settings :global(.me-row) { min-height: 64px; }
+.settings :global(.me-row-copy) { min-width: 0; }
+.settings :global(.me-row-copy small), .settings :global(.me-setting-row small) { overflow-wrap: anywhere; line-height: 1.45; }
+.settings :global(.me-setting-row) { min-height: 64px; gap: 12px; }
+.settings :global(.me-setting-row > span) { min-width: 0; }
+.settings :global(.me-logout) { min-height: 48px; margin-top: 24px; margin-bottom: 8px; }
+.settings :global(button:focus-visible) { outline: 2px solid var(--green); outline-offset: 3px; }

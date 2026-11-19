@@ -1,3 +1,6 @@
+import { quotaModel } from '../../test/lifecycle-quota.fixture.js';
+import { getModelToken } from '@nestjs/mongoose';
+import { AuthRateLimit } from '../auth/auth-rate-limit.schema.js';
 import 'reflect-metadata';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Test } from '@nestjs/testing';
@@ -6,6 +9,7 @@ import request from 'supertest';
 import { ChatController } from './chat.controller.js';
 import { ChatService } from './chat.service.js';
 import { ChatRateLimitGuard } from './chat-rate-limit.guard.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { createChatFixture, CHAT_FIXTURE_OWNER } from './testing/chat-fixture.js';
 
@@ -14,14 +18,14 @@ describe('production controller and saved-record answers over HTTP', () => {
   let fixture: ReturnType<typeof createChatFixture>;
   beforeAll(async () => {
     fixture = createChatFixture({ generate: async () => { throw new Error('Routine records must answer without a model'); } } as never);
-    const module = await Test.createTestingModule({ controllers: [ChatController], providers: [
+    const module = await Test.createTestingModule({ controllers: [ChatController], providers: [{ provide: getModelToken(AuthRateLimit.name), useValue: quotaModel() },
       { provide: ChatService, useValue: fixture.service }, ChatRateLimitGuard,
     ] }).overrideGuard(JwtAuthGuard).useValue({ canActivate(context: any) {
       const req = context.switchToHttp().getRequest();
       if (req.headers.authorization !== 'Bearer synthetic-session') throw new UnauthorizedException();
-      req.user = { userId: CHAT_FIXTURE_OWNER };
+      req.user = { userId: CHAT_FIXTURE_OWNER, lifecycleGeneration: 0 };
       return true;
-    } }).compile();
+    } }).overrideGuard(AiRateLimitGuard).useValue({ canActivate: () => true }).compile();
     app = module.createNestApplication();
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));

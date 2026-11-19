@@ -13,8 +13,19 @@ const video = () => {
 describe('pose analysis availability', () => {
   it('reports provider setup state and returns a typed unavailable error', async () => {
     const service = new PoseService({ isAvailable: () => false, analyze: vi.fn() } as any);
-    expect(service.status()).toEqual({ available: false, reason: 'provider_not_configured' });
+    expect(await service.status()).toEqual({ available: false, reason: 'provider_not_configured' });
     await expect(service.analyze({ mediaBase64: 'AAAA', mimeType: 'video/mp4', durationSeconds: 10 })).rejects.toBeInstanceOf(ServiceUnavailableException);
+  });
+
+  it('reports an unreachable provider as unavailable', async () => {
+    const service = new PoseService({ isAvailable: () => true, isHealthy: async () => false } as any);
+    expect(await service.status()).toEqual({ available: false, reason: 'provider_unavailable' });
+  });
+
+  it('preserves pose results when exercise review unexpectedly fails', async () => {
+    const provider = { isAvailable: () => true, analyze: vi.fn(async () => ({ observations: ['tracked'], _reviewFrames: [], _timeline: [] })) };
+    const result = await new PoseService(provider as any, { review: async () => { throw new Error('review unavailable'); } } as any).analyze({ mediaBase64: video(), mimeType: 'video/mp4' });
+    expect(result).toEqual({ observations: ['tracked'], exerciseReview: null });
   });
 
   it('returns provider analysis only after confirmed upstream response', async () => {

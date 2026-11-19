@@ -1,0 +1,149 @@
+{
+  "experiment": "e2_attention",
+  "config": {
+    "model": "cnn_attention",
+    "loss": "weighted_ce",
+    "window": 48,
+    "drop_visibility": false,
+    "drop_ambiguous": false
+  },
+  "classes": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "hinge",
+    "horizontal_push",
+    "lateral_raise",
+    "squat"
+  ],
+  "train_windows": 3961,
+  "test_windows": 928,
+  "test_subjects": [
+    "04996ace",
+    "17e2d98f",
+    "5e3a8d78",
+    "ce0fbe3f",
+    "fcd2886c"
+  ],
+  "epochs": 30,
+  "final_train_loss": 0.679,
+  "test": {
+    "accuracy": 0.542,
+    "macro_f1": 0.4627,
+    "per_class": {
+      "cardio_dynamic": {
+        "precision": 0.5643,
+        "recall": 0.3798,
+        "f1": 0.454,
+        "support": 208
+      },
+      "core_flexion": {
+        "precision": 0.4583,
+        "recall": 0.5,
+        "f1": 0.4783,
+        "support": 88
+      },
+      "core_isometric": {
+        "precision": 0.325,
+        "recall": 0.2737,
+        "f1": 0.2971,
+        "support": 95
+      },
+      "hinge": {
+        "precision": 0.8858,
+        "recall": 0.574,
+        "f1": 0.6966,
+        "support": 338
+      },
+      "horizontal_push": {
+        "precision": 0.3958,
+        "recall": 1.0,
+        "f1": 0.5672,
+        "support": 19
+      },
+      "lateral_raise": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 19
+      },
+      "squat": {
+        "precision": 0.6498,
+        "recall": 0.8758,
+        "f1": 0.746,
+        "support": 161
+      }
+    },
+    "confusion_matrix": [
+      [
+        79,
+        0,
+        2,
+        0,
+        0,
+        72,
+        55
+      ],
+      [
+        17,
+        44,
+        0,
+        25,
+        0,
+        0,
+        2
+      ],
+      [
+        39,
+        0,
+        26,
+        0,
+        26,
+        4,
+        0
+      ],
+      [
+        3,
+        52,
+        52,
+        194,
+        3,
+        33,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        19,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        18
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        19,
+        141
+      ]
+    ]
+  },
+  "temporal_probe": {
+    "identity": 0.542,
+    "single_frame": 0.4601,
+    "time_reversed": 0.5582
+  },
+  "parameters": 168200
+}

@@ -49,7 +49,7 @@ export async function expectHomeBack(page) {
   await back.scrollIntoViewIfNeeded();
   await expect(back).toBeVisible();
   const button = await back.boundingBox();
-  const heading = await page.locator('.section-back-title h2').boundingBox();
+  const heading = await page.locator('.section-back-title h2, .pq-goals-header h1, .pq-progress-header h1').first().boundingBox();
   expect(button.x + button.width).toBeLessThanOrEqual(heading.x);
   expect(button.width).toBeGreaterThanOrEqual(44);
 }

@@ -1,37 +1,25 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { VideoReviewService } from '../src/pose/video-review.service.js';
+import { openAIResponse } from '../src/common/openai.js';
 
-const generateContent = vi.hoisted(() => vi.fn());
-const usedKeys = vi.hoisted(() => [] as string[]);
-vi.mock('@google/genai', () => ({ GoogleGenAI: class { models = { generateContent }; constructor(options: { apiKey: string }) { usedKeys.push(options.apiKey); } } }));
+vi.mock('../src/common/openai.js', () => ({ openAIResponse: vi.fn() }));
 const frames = [{ jpeg: 'YWJj', timeSeconds: 0 }, { jpeg: 'ZGVm', timeSeconds: 1 }];
+const service = () => new VideoReviewService({ get: () => 'configured' } as never);
 
 describe('video exercise review', () => {
-  it('bounds and validates AI output', async () => {
-    generateContent.mockResolvedValueOnce({ text: JSON.stringify({ exercise: 'Squat', equipment: 'Machine', estimatedReps: 5, formObservations: ['Review knee alignment'], instructions: ['Move under control'], corrections: [] }) });
-    const service = new VideoReviewService({ get: () => 'key' } as any);
-    expect(await service.review(frames, [])).toMatchObject({ exercise: 'Squat', equipment: 'Machine', estimatedReps: 5, formObservations: ['Review knee alignment'] });
+  beforeEach(() => vi.resetAllMocks());
+  it('validates and bounds provider output', async () => {
+    vi.mocked(openAIResponse).mockResolvedValueOnce({ content: JSON.stringify({ exercise: 'Squat', equipment: 'machine', specificMuscles: ['Chest', 'Triceps'], estimatedReps: 5, formObservations: ['Review knee alignment'] }), usage: undefined });
+    expect(await service().review(frames, [])).toMatchObject({ exercise: 'Squat', equipment: 'Machine', specificMuscles: 'Chest, Triceps', estimatedReps: 5, formObservations: ['Review knee alignment'] });
   });
-  it('returns unavailable for invalid samples or an AI failure', async () => {
-    const service = new VideoReviewService({ get: () => 'key' } as any);
-    expect(await service.review([], [])).toBeNull();
-    generateContent.mockRejectedValueOnce(new Error('unavailable'));
-    expect(await service.review(frames, [])).toBeNull();
+  it('does not submit invalid samples or use an unconfigured provider', async () => {
+    expect(await service().review([], [])).toBeNull();
+    expect(await new VideoReviewService({ get: () => undefined } as never).review(frames, [])).toBeNull();
+    expect(openAIResponse).not.toHaveBeenCalled();
   });
-  it('retries a transient provider failure before giving up', async () => {
-    generateContent.mockRejectedValueOnce({ status: 503 }).mockResolvedValueOnce({ text: JSON.stringify({ exercise: 'Chest press', equipment: 'Machine', estimatedReps: 3 }) });
-    const service = new VideoReviewService({ get: () => 'key' } as any);
-    expect(await service.review(frames, [])).toMatchObject({ exercise: 'Chest press', estimatedReps: 3 });
-  });
-  it('accepts common variations in equipment case and muscle lists', async () => {
-    generateContent.mockResolvedValueOnce({ text: JSON.stringify({ equipment: 'machine', specificMuscles: ['Chest', 'Triceps'] }) });
-    expect(await new VideoReviewService({ get: () => 'key' } as any).review(frames, [])).toMatchObject({ equipment: 'Machine', specificMuscles: 'Chest, Triceps' });
-  });
-  it('tries the secondary key after an authentication or transient provider failure', async () => {
-    usedKeys.length = 0;
-    generateContent.mockRejectedValueOnce({ status: 503 }).mockResolvedValueOnce({ text: JSON.stringify({ exercise: 'Squat' }) });
-    const service = new VideoReviewService({ get: (name: string) => name === 'GEMINI_API_KEY' ? 'primary' : name === 'GEMINI_API_KEY_SECONDARY' ? 'secondary' : undefined } as any);
-    expect(await service.review(frames, [])).toMatchObject({ exercise: 'Squat' });
-    expect(usedKeys).toEqual(['primary', 'secondary']);
+  it('returns unavailable on provider failure or malformed output', async () => {
+    vi.mocked(openAIResponse).mockRejectedValueOnce(new Error('provider error')).mockResolvedValueOnce({ content: 'not JSON', usage: undefined });
+    expect(await service().review(frames, [])).toBeNull();
+    expect(await service().review(frames, [])).toBeNull();
   });
 });

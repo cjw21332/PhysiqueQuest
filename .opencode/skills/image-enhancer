@@ -1,0 +1,65 @@
+Image Enhancer Skill
+
+<skill_content>
+# Skill: image-enhancer
+
+## Overview
+
+This skill improves image and screenshot quality by enhancing resolution, sharpness, and clarity for professional presentations and documentation. It applies advanced image enhancement techniques to make images more visually appealing and readable.
+
+## Capabilities
+
+- **Resolution Enhancement**: Increase image resolution using AI-powered upscaling
+- **Sharpness Enhancement**: Improve image clarity and sharpness
+- **Noise Reduction**: Reduce image noise and graininess
+- **Contrast Enhancement**: Boost contrast for better visibility
+- **Color Correction**: Improve color accuracy and vibrancy
+- **Format Conversion**: Convert images to various formats (PNG, JPEG, WebP)
+- **Batch Processing**: Enhance multiple images efficiently
+- **Quality Assessment**: Evaluate image quality and suggest improvements
+
+## Use Cases
+
+### Professional Presentations
+- Enhance presentation screenshots
+- Improve image quality for business presentations
+- Create professional-looking images
+
+### Documentation
+- Enhance screenshots for documentation
+- Improve technical documentation images
+- Prepare images for user guides
+
+### Web Development
+- Enhance website screenshots
+- Improve responsive design documentation
+- Create visual mockups
+
+## Example Usage
+
+```
+opencode run "Use image-enhancer to improve quality of screenshot.png"
+
+opencode run "Use image-enhancer to upscale resolution of blurry-image.jpg"
+
+opencode run "Use image-enhancer to improve product-photo.jpg for e-commerce"
+```
+
+## Authentication
+
+Requires image enhancement API access or built-in enhancement capabilities.
+
+## Output
+
+The skill provides:
+- Enhanced image files (higher resolution, better quality)
+- Sharper and clearer images
+- Reduced noise and artifacts
+- Improved color accuracy
+- Multiple format options
+
+---
+
+Base directory: .opencode/skills/image-enhancer
+This skill is part of the OpenDesign ecosystem for professional image enhancement.
+</skill_content>

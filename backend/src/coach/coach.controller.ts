@@ -2,6 +2,7 @@ import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CoachService } from './coach.service.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 type AuthenticatedRequest = Request & { user: { userId: string } };
 
@@ -14,6 +15,7 @@ export class CoachController {
   status() { return { status: 'ready', source: 'ExerciseDB V1', media: 'GIF', attribution: 'ExerciseDB by AscendAPI — https://oss.exercisedb.dev' }; }
 
   @Get('plan')
+  @UseGuards(AiRateLimitGuard)
   getPlan(@Req() req: AuthenticatedRequest) {
     return this.service.getPlan(req.user.userId);
   }

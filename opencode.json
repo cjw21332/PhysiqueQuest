@@ -1,0 +1,80 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "omniroute/opencode-auto",
+  "websearch": {
+    "provider": "exa-mcp"
+  },
+  "plugins": [
+    "omniroute-skills"
+  ],
+  "skills": [
+    "C:/Users/MY PC/.codex/skills",
+    "C:/Users/MY PC/.agents/skills",
+    "C:/Users/MY PC/.agents/skills-anthropic",
+    "C:/Users/MY PC/Desktop/Projects/PhysiqueQuest/.agents/skills",
+    "C:/Users/MY PC/.config/opencode/skills",
+    "C:/Users/MY PC/.config/opencode/skills/gsap-skills/skills",
+    "C:/Users/MY PC/.config/opencode/skills/ui-ux-pro-max-skill/.claude/skills",
+    "C:/Users/MY PC/.config/opencode/skills/open-design/skills",
+    "C:/Users/MY PC/.config/opencode/skills/emilkowalski-skills/skills",
+    "C:/Users/MY PC/.config/opencode/skills/hallmark/skills",
+    "C:/Users/MY PC/.config/opencode/skills/design-md/.agents/skills",
+    "C:/Users/MY PC/.config/opencode/skills/magicui/skills",
+    "C:/Users/MY PC/.config/opencode/skills/scroll-world/skills",
+    "C:/Users/MY PC/.config/opencode/skills/dimensional-drawing/skills",
+    "C:/Users/MY PC/Desktop/Projects/PhysiqueQuest/.agents/skills",
+    "C:/Users/MY PC/Desktop/Projects/FreeWorship (copycat)/.agents/skills",
+    "C:/Users/MY PC/Desktop/Projects/PhysiqueQuest/.opencode/skills"
+  ],
+  "permission": {
+    "skill": {
+      "*": "allow"
+    }
+  },
+  "mcp": {
+    "servers": {
+      "exa": {
+        "type": "remote",
+        "url": "https://mcp.exa.ai/mcp",
+        "enabled": true
+      }
+    }
+  },
+  "provider": {
+    "omniroute": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "OmniRoute",
+      "options": {
+        "baseURL": "http://localhost:20128/v1",
+        "apiKey": "{env:OMNIROUTE_API_KEY}"
+      },
+      "models": {
+        "opencode-auto": {
+          "name": "OmniRoute Auto Failover",
+          "attachment": true,
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        }
+      }
+    },
+    "freellmapi": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "FreeLLMAPI",
+      "options": {
+        "baseURL": "http://127.0.0.1:31415/v1",
+        "apiKey": "{env:FREELLMAPI_API_KEY}"
+      },
+      "models": {
+        "auto": {
+          "name": "Auto (router picks the best available model)",
+          "limit": {
+            "context": 1000000,
+            "output": 1000000
+          }
+        }
+      }
+    }
+  }
+}

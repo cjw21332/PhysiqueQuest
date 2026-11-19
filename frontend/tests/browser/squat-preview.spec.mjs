@@ -18,13 +18,39 @@ async function setup(page,options={}) {
   });
   await page.goto('/coach');await page.getByRole('button',{name:/Exercise library/}).click();await page.getByRole('button',{name:/quads \(bodyweight squat\)/i}).click();
   await expect(page.getByRole('button',{name:'Try squat movement preview'})).toHaveCount(0);
-  await page.getByRole('button',{name:'PoseTracker options',exact:true}).click();
+  await page.getByRole('button',{name:'View tracking options',exact:true}).click();
 }
-async function start(page){await page.getByRole('checkbox',{name:/I agree to use my camera with PoseTracker/}).check();await page.getByRole('button',{name:'Start PoseTracker',exact:true}).click();await expect(page.locator('iframe')).toBeVisible();await expect.poll(()=>page.frames().some(f=>f.url().startsWith('https://app.posetracker.com/'))).toBe(true);return page.frames().find(f=>f.url().startsWith('https://app.posetracker.com/'));}
+test('tracking setup presents readable guidance and requires consent',async({page},info)=>{
+  await page.setViewportSize({width:360,height:800});await setup(page);
+  await expect(page.getByText('Set up your camera')).toBeVisible();
+  await expect(page.getByText('Review your results')).toBeVisible();
+  await expect(page.getByRole('button',{name:'Start tracking'})).toBeDisabled();
+  await page.getByRole('checkbox',{name:/I agree to use my camera with PoseTracker/}).check();
+  await expect(page.getByRole('button',{name:'Start tracking'})).toBeEnabled();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:info.outputPath('tracking-setup.png')});
+});
+async function start(page){await page.getByRole('checkbox',{name:/I agree to use my camera with PoseTracker/}).check();await page.getByRole('button',{name:'Start tracking',exact:true}).click();await expect(page.locator('iframe')).toBeVisible();await expect.poll(()=>page.frames().some(f=>f.url().startsWith('https://app.posetracker.com/'))).toBe(true);return page.frames().find(f=>f.url().startsWith('https://app.posetracker.com/'));}
+test('native results show complete reps, partial reps and active time',async({page},info)=>{
+  await page.setViewportSize({width:360,height:800});
+  await page.addInitScript(()=>{window.ReactNativeWebView={postMessage(){}};});
+  await setup(page,{config:{nativePattern:'squat',nativeSupport:'PARTIALLY_SUPPORTED'}});
+  await page.getByRole('checkbox',{name:/I agree to camera analysis on this phone/}).check();
+  await page.getByRole('button',{name:'Start tracking',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Stop tracking'})).toBeVisible();
+  await page.evaluate(()=>window.dispatchEvent(new CustomEvent('physiquequest-posetracker-closed',{detail:{completeReps:12,partialReps:1,durationSeconds:75,holdMs:null}})));
+  const dialog=page.getByRole('dialog');
+  await expect(dialog.getByText('12',{exact:true})).toBeVisible();
+  await expect(dialog.getByText('Complete reps',{exact:true})).toBeVisible();
+  await expect(dialog.getByText('1',{exact:true})).toBeVisible();
+  await expect(dialog.getByText('Partial reps',{exact:true})).toBeVisible();
+  await expect(dialog.getByText('1:15',{exact:true})).toBeVisible();
+  await page.screenshot({path:info.outputPath('native-summary.png')});
+});
 async function emit(frame,data){await frame.evaluate(d=>parent.postMessage(JSON.stringify(d),'*'),data);}
 test('provider launch requires fresh explicit consent for each session',async({page})=>{
   await setup(page);let launches=0;page.on('request',request=>{if(new URL(request.url()).pathname.endsWith('/launch'))launches++;});
-  const button=page.getByRole('button',{name:'Start PoseTracker',exact:true});await expect(button).toBeDisabled();await expect(page.locator('iframe')).toHaveCount(0);expect(launches).toBe(0);
+  const button=page.getByRole('button',{name:'Start tracking',exact:true});await expect(button).toBeDisabled();await expect(page.locator('iframe')).toHaveCount(0);expect(launches).toBe(0);
   await start(page);expect(launches).toBe(1);await page.getByRole('button',{name:'Stop tracking'}).click();await expect(button).toBeDisabled();await expect(page.getByRole('checkbox',{name:/I agree to use my camera with PoseTracker/})).not.toBeChecked();expect(launches).toBe(1);
 });
 test('generated-angle camera session starts its worker and produces an unsaved summary',async({page})=>{
@@ -69,7 +95,7 @@ test('provider initialization, iframe camera delegation, counter and cleanup',as
   await page.getByRole('button',{name:'Back to exercise',exact:true}).click();await expect(page.locator('iframe')).toHaveCount(0);
 });
 test('missing token is explicit and never opens a fake service',async({page})=>{
-  await setup(page,{missingToken:true});await page.getByRole('checkbox',{name:/I agree to use my camera with PoseTracker/}).check();await page.getByRole('button',{name:'Start PoseTracker',exact:true}).click();await expect(page.locator('.pose-tracker-session [role=alert]')).toContainText('Could not start PoseTracker');await expect(page.locator('iframe')).toHaveCount(0);
+  await setup(page,{missingToken:true});await page.getByRole('checkbox',{name:/I agree to use my camera with PoseTracker/}).check();await page.getByRole('button',{name:'Start tracking',exact:true}).click();await expect(page.locator('.pose-tracker-session [role=alert]')).toContainText('Could not start PoseTracker');await expect(page.locator('iframe')).toHaveCount(0);
 });
 test('provider permission and disconnection errors stop the iframe',async({page})=>{
   await setup(page);let frame=await start(page);await emit(frame,{type:'error',error:'NotAllowedError',message:'Camera permission denied'});await expect(page.locator('.pose-tracker-session [role=alert]')).toContainText('Camera permission denied');await expect(page.locator('iframe')).toHaveCount(0);
@@ -85,7 +111,7 @@ test('reference mode, source validation, mobile layout and navigation cleanup',a
 });
 test('pending reference keeps normal library available',async({page})=>{
   await setup(page,{config:{trackingMode:'reference',providerExerciseId:undefined,referenceUuid:'12345678-1234-4234-8234-123456789012',validationStatus:'pending'}});
-  await expect(page.getByText(/administrator must configure/)).toBeVisible();await expect(page.getByRole('button',{name:'Start PoseTracker',exact:true})).toHaveCount(0);await page.getByRole('button',{name:'Back to exercise',exact:true}).click();await expect(page.getByRole('heading',{name:'Exercise library'})).toBeVisible();
+  await expect(page.getByText(/Camera tracking is not ready/)).toBeVisible();await expect(page.getByRole('button',{name:'Start tracking',exact:true})).toHaveCount(0);await page.getByRole('button',{name:'Back to exercise',exact:true}).click();await expect(page.getByRole('heading',{name:'Exercise library'})).toBeVisible();
 });
 test('initialization timeout and hidden-page interruption remove iframe resources',async({page})=>{
   await setup(page);await start(page);

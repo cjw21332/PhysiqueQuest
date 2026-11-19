@@ -6,6 +6,7 @@ COPY frontend/package.json ./frontend/package.json
 COPY mobile/package.json ./mobile/package.json
 RUN npm ci --workspace frontend --include-workspace-root=false --ignore-scripts
 COPY frontend ./frontend
+COPY shared ./shared
 ARG BACKEND_URL=http://backend:4000
 ARG NEXT_PUBLIC_COACH_API_URL
 ENV BACKEND_URL=$BACKEND_URL NEXT_PUBLIC_COACH_API_URL=$NEXT_PUBLIC_COACH_API_URL NEXT_TELEMETRY_DISABLED=1

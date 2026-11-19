@@ -6,8 +6,8 @@ import AuthForm from '../../../sections/Auth/AuthForm';
 import CalibrationFlow from '../../../sections/Auth/CalibrationFlow';
 import GoogleRegistrationPassword from '../../../sections/Auth/GoogleRegistrationPassword';
 import AuthOutcomeModal from '../../../sections/Auth/AuthOutcomeModal';
-import { register, registerWithGoogle, getCurrentUser } from '../../../lib/auth';
-import { calibrationDraftKey, clearCalibrationDraft } from '../../../lib/calibrationDraft';
+import { register, registerWithGoogle, loginWithGoogle, getCurrentUser } from '../../../lib/auth';
+import { calibrationDraftKey, clearCalibrationDraft, pendingCalibrationDraftKey } from '../../../lib/calibrationDraft';
 import { ApiRequestError, api } from '../../../lib/api';
 import { requestGoogleIdentity } from '../../../lib/googleAuth';
 import type { Profile } from '../../../sections/Home/types';
@@ -21,13 +21,14 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [consent, setConsent] = useState(false);
   const [calibrating, setCalibrating] = useState(false);
-  const [creatingAccount, setCreatingAccount] = useState(false);
+  const creatingAccount = false;
   const [calibrationError, setCalibrationError] = useState('');
   const [authDialog, setAuthDialog] = useState<'email-registered' | 'registration-verified' | null>(null);
   const [verification, setVerification] = useState<{ email: string; name: string; password: string; requestId: string } | null>(null);
   const [googleDraft, setGoogleDraft] = useState<{ idToken: string; email: string; password: string; requestId?: string } | null>(null);
   const [googleVerification, setGoogleVerification] = useState<{ requestId: string } | null>(null);
-  const [formVersion, setFormVersion] = useState(0);
+  const [pendingEmail, setPendingEmail] = useState<{ email: string; name: string; password: string } | null>(null);
+  const [pendingProfile, setPendingProfile] = useState<Record<string, unknown> | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const registeredAccount = useRef<{ scope: string | null; sessionKey: number | undefined } | null>(null);
   const [checkingAccount, setCheckingAccount] = useState(true);
@@ -67,20 +68,8 @@ export default function RegisterPage() {
       return;
     }
     setError('');
-    setCreatingAccount(true);
-    try {
-      const result = await api.requestRegistrationCode(normalizedEmail);
-      setVerification({ email: normalizedEmail, name: name.trim(), password: pass, requestId: result.requestId });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
-      if ((err instanceof ApiRequestError && err.statusCode === 409) || /email already registered/i.test(message)) {
-        setAuthDialog('email-registered');
-      } else {
-        setError(message);
-      }
-    } finally {
-      setCreatingAccount(false);
-    }
+    setPendingEmail({ email: normalizedEmail, name: name.trim(), password: pass });
+    setCalibrating(true);
   };
 
   const handleGoogleAuth = async () => {
@@ -88,41 +77,37 @@ export default function RegisterPage() {
     const identity = await api.checkGoogleAccount(idToken, 'register');
     setName(identity.name || identity.email.split('@')[0]);
     setEmail(identity.email);
+    if (identity.needsProfile) {
+      await loginWithGoogle(idToken);
+      setGoogleDraft(null);
+      setCalibrating(true);
+      return;
+    }
     setGoogleDraft({ idToken, email: identity.email, password: '' });
     setError('');
   };
 
   const requestGoogleVerification = async (password: string) => {
     if (!googleDraft) throw new Error('Choose your Google account again to continue.');
-    if (googleDraft.requestId) {
-      setGoogleDraft({ ...googleDraft, password });
-      setGoogleVerification({ requestId: googleDraft.requestId });
-      return;
-    }
-    setCreatingAccount(true);
-    setError('');
-    try {
-      const result = await api.requestRegistrationCode(googleDraft.email);
-      setGoogleDraft({ ...googleDraft, password, requestId: result.requestId });
-      setGoogleVerification({ requestId: result.requestId });
-    } finally {
-      setCreatingAccount(false);
-    }
+    setGoogleDraft({ ...googleDraft, password });
+    setCalibrating(true);
   };
 
   const finishGoogleRegistration = async (requestId: string, code: string) => {
     if (!googleDraft) throw new Error('Choose your Google account again to continue.');
+    if (!pendingProfile) throw new Error('Please finish your profile first.');
     await registerWithGoogle({
       idToken: googleDraft.idToken,
       password: googleDraft.password,
       requestId,
       code,
       name: name.trim(),
+      profile: pendingProfile,
     });
-    registeredAccount.current = { scope: calibrationDraftKey(), sessionKey: getCurrentUser()?.sessionKey };
+    try { localStorage.removeItem(pendingCalibrationDraftKey(googleDraft.email)); } catch { /* Account is already saved. */ }
     setGoogleVerification(null);
     setGoogleDraft(null);
-    setAuthDialog('registration-verified');
+    navigate('/home');
   };
 
   const finishCalibration = async (profile: Profile) => {
@@ -130,7 +115,6 @@ export default function RegisterPage() {
     const owner = calibrationDraftKey(), sessionKey = getCurrentUser()?.sessionKey;
     const sameAccount = () => Boolean(owner && owner === calibrationDraftKey() && sessionKey === getCurrentUser()?.sessionKey);
     try {
-      if (!sameAccount()) throw new Error('Your account or connection changed. Sign in again to continue setup.');
       // Prepare profile data for backend - remove fields that aren't in the DTO
       const profileData = {
         name: profile.name,
@@ -160,6 +144,16 @@ export default function RegisterPage() {
         contactName: profile.contactName,
         contactPhone: profile.contactPhone,
       };
+
+      if (pendingEmail || googleDraft) {
+        const address = pendingEmail?.email || googleDraft!.email;
+        const result = await api.requestRegistrationCode(address);
+        setPendingProfile(profileData);
+        if (pendingEmail) setVerification({ ...pendingEmail, requestId: result.requestId });
+        else setGoogleVerification({ requestId: result.requestId });
+        return;
+      }
+      if (!sameAccount()) throw new Error('Your account or connection changed. Sign in again to continue setup.');
 
       // Create profile in database (userId comes from JWT token in backend)
       let savedProfile;
@@ -194,8 +188,17 @@ export default function RegisterPage() {
             email={email}
             onComplete={finishCalibration}
             submitError={calibrationError}
+            pendingDraftKey={pendingEmail || googleDraft ? pendingCalibrationDraftKey(email) : undefined}
           />
         </div>
+        {verification && <ForgotPasswordFlow mode="register" accountEmail={verification.email} initialRequestId={verification.requestId} onClose={() => setVerification(null)} onSuccess={() => {}} onRegister={async (requestId, code) => {
+          if (!pendingProfile) throw new Error('Please finish your profile first.');
+          await register(verification.name, verification.email, verification.password, requestId, code, pendingProfile);
+          try { localStorage.removeItem(pendingCalibrationDraftKey(verification.email)); } catch { /* Account is already saved. */ }
+          setVerification(null);
+          navigate('/home');
+        }} />}
+        {googleVerification && googleDraft && <ForgotPasswordFlow mode="register" accountEmail={googleDraft.email} initialRequestId={googleVerification.requestId} onClose={() => setGoogleVerification(null)} onSuccess={() => {}} onRegister={finishGoogleRegistration} />}
       </main>
     );
   }
@@ -210,11 +213,10 @@ export default function RegisterPage() {
             onErrorChange={setError}
             busy={creatingAccount}
             onContinue={requestGoogleVerification}
-            onCancel={() => { setGoogleDraft(null); setGoogleVerification(null); setError(''); }}
+            onCancel={() => { setGoogleDraft(null); setGoogleVerification(null); setPendingEmail(null); setPendingProfile(null); setName(''); setEmail(''); setConsent(false); setError(''); }}
           />
         ) : (
           <AuthForm
-            key={formVersion}
             mode="register"
             onModeChange={(mode) => {
               if (mode === 'login') navigate('/login');
@@ -236,13 +238,6 @@ export default function RegisterPage() {
         )}
       </div>
     </main>
-    {verification && <ForgotPasswordFlow mode="register" accountEmail={verification.email} initialRequestId={verification.requestId} onClose={() => { setVerification(null); setName(''); setEmail(''); setConsent(false); setError(''); setFormVersion(value => value + 1); }} onSuccess={() => {}} onRegister={async (requestId, code) => {
-      await register(verification.name, verification.email, verification.password, requestId, code);
-      registeredAccount.current = { scope: calibrationDraftKey(), sessionKey: getCurrentUser()?.sessionKey };
-      setVerification(null);
-      setAuthDialog('registration-verified');
-    }} />}
-    {googleVerification && googleDraft && <ForgotPasswordFlow mode="register" accountEmail={googleDraft.email} initialRequestId={googleVerification.requestId} onClose={() => setGoogleVerification(null)} onSuccess={() => {}} onRegister={finishGoogleRegistration} />}
     {authDialog === 'email-registered' && <AuthOutcomeModal
       kind="email-registered"
       onClose={() => setAuthDialog(null)}

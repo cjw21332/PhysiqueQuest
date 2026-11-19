@@ -44,7 +44,7 @@ describe('independent factual answer checks', () => {
   });
   it('answers own identity, health-profile and emergency-contact questions from consented fields', async () => {
     const { ask, generate } = setup();
-    expect(await ask('What is my name?')).toBe('Your saved name is Synthetic User.');
+    expect(await ask('What is my name?')).toBe("You're Synthetic User, according to your profile.");
     expect(await ask('How old am I?')).toBe('Your saved age is 28.');
     expect(await ask('Which gender did I save?')).toBe('Your saved gender is Female.');
     expect(await ask('What conditions are saved in my health profile?')).toContain('Asthma');
@@ -186,7 +186,7 @@ describe('independent factual answer checks', () => {
     const { service, calls } = createChatFixture({ generate } as never);
     for (const text of ['Explain quantum physics', 'What is the capital of France?']) {
       const answer = await service.reply(CHAT_FIXTURE_OWNER, [{ role: 'user', text }], true, '/scan');
-      expect(answer.reply).toBe('A general answer.');
+      expect(answer.reply).toContain('Please ask about something in PhysiqueQuest');
       expect(answer.privacy.personalDataIncluded).toBe(false);
     }
     expect(calls).toHaveLength(0);

@@ -56,7 +56,7 @@ function isNativeBridgeAvailable() { return typeof window !== 'undefined' && Boo
 
 export default function LaunchPage() {
   const router = useRouter();
-  const returningUser = Boolean(session.current(getApiBaseUrl())?.token);
+  const returningUser = Boolean(session.current(getApiBaseUrl()));
   const [readiness, setReadiness] = useState<DeviceReadiness>(emptyReadiness);
   const [notice, setNotice] = useState('');
   const [cameraRequesting, setCameraRequesting] = useState(false);
@@ -110,7 +110,7 @@ export default function LaunchPage() {
     <main className="scene">
       <div className="app-shell">
         <section className="launch screen-enter">
-          <div className="launch-brand"><span className="launch-logo"><img src="/logo.jpg" alt="PhysiqueQuest logo" className="brand-logo" /></span><h1>PhysiqueQuest</h1><p className="subtitle">Workout plans, exercise guides, food logs and quests.</p></div>
+          <div className="launch-brand"><span className="launch-logo"><img src="/phiq-logo.png" alt="PhysiqueQuest logo" width={1280} height={1280} className="brand-logo" /></span><h1>PhysiqueQuest</h1><p className="subtitle">Workout plans, exercise guides, food logs and quests.</p></div>
           <div className="launch-spacer" />
           <div className="readiness">
             <div className="readiness-head"><b>Device checks</b><span>{readyCount} of 3 confirmed</span></div>

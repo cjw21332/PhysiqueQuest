@@ -1,0 +1,60 @@
+Marketing Screenshots Skill
+
+<skill_content>
+# Skill: screenshots-marketing
+
+## Overview
+
+This skill generates marketing screenshots using Playwright for web applications. It provides professional-quality screenshots optimized for marketing materials, documentation, and presentations.
+
+## Capabilities
+
+- **Marketing-Quality Screenshots**: Professional-grade screenshots with proper lighting and composition
+- **Playwright Integration**: Uses Playwright for reliable browser automation
+- **Responsive Capture**: Capture screenshots at various viewport sizes
+- **Batch Processing**: Generate multiple screenshots in one run
+- **Custom Styling**: Apply custom CSS/styling for marketing purposes
+- **Output Formats**: Multiple output formats (PNG, JPEG, WebP)
+
+## Use Cases
+
+### Marketing
+- Create hero images for landing pages
+- Generate product showcase screenshots
+- Create social media marketing assets
+
+### Documentation
+- Create documentation screenshots
+- Generate feature showcase images
+
+### Development
+- Capture UI states for marketing review
+- Generate consistent screenshots for A/B testing
+
+## Example Usage
+
+```
+opencode run "Use screenshots-marketing to capture https://example.com at 1920x1080"
+
+opencode run "Use screenshots-marketing to capture https://example.com at multiple breakpoints"
+
+opencode run "Use screenshots-marketing to capture https://example.com with custom styling"
+```
+
+## Technical Details
+
+This skill uses Playwright's browser automation capabilities to capture high-quality screenshots with proper rendering. It handles responsive design and can capture screenshots at various viewport sizes.
+
+## Output
+
+The skill provides:
+- Screenshot files (PNG, JPEG, WebP)
+- Multiple viewport sizes
+- Optional custom styling
+- Metadata for each capture
+
+---
+
+Base directory: .opencode/skills/screenshots-marketing
+This skill is part of the OpenDesign ecosystem for marketing and documentation.
+</skill_content>

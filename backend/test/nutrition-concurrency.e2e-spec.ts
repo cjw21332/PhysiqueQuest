@@ -16,6 +16,7 @@ describe.skipIf(process.env.PQ_SECURITY_DB_TEST !== '1' || !process.env.MONGODB_
   it('retains simultaneous water writes with one entry per day and scopes meal edits to the owner', async () => {
     const model = connection.model(Nutrition.name, NutritionSchema); await model.init();
     const service = new NutritionService(model), owner = String(new Types.ObjectId());
+    await connection.collection('account_lifecycle').insertOne({ _id: new Types.ObjectId(owner), status: 'active', generation: 0, writeVersion: 0 });
     await service.get(owner);
     await Promise.all(Array.from({ length: 10 }, (_, i) => service.setWater(owner, { date: `2026-10-${String(i + 1).padStart(2, '0')}`, glasses: i })));
     await Promise.all(Array.from({ length: 5 }, () => service.setWater(owner, { date: '2026-10-01', glasses: 2 })));

@@ -70,3 +70,17 @@ test('rejects malformed API URLs', () => {
   assert.equal(resolveApiUrl('not a url', 'http://192.168.1.42:3000'), null);
   assert.equal(resolveApiUrl(undefined, 'file:///tmp/app'), null);
 });
+
+test('readiness requires a response from a ready database-backed service', async () => {
+  const { backendIsReady } = await import('./connection.mjs');
+  const signal = new AbortController().signal;
+  const probe = response => backendIsReady('https://example.test/api', signal, async (url, options) => {
+    assert.equal(url, 'https://example.test/ready');
+    assert.equal(options.signal, signal);
+    return response;
+  });
+  assert.equal(await probe(Response.json({ status: 'ready' })), true);
+  assert.equal(await probe(Response.json({ status: 'ok' })), false);
+  assert.equal(await probe(new Response('<html>Sign in to Wi-Fi</html>')), false);
+  assert.equal(await probe(Response.json({ status: 'ready' }, { status: 503 })), false);
+});

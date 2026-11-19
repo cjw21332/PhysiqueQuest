@@ -1,0 +1,66 @@
+fal-vision Image Analysis Skill
+
+<skill_content>
+# Skill: fal-vision
+
+## Overview
+
+This skill provides advanced image analysis capabilities using fal.ai's vision models. It can analyze images for object detection, OCR, image description, visual question answering, and more.
+
+## Capabilities
+
+- **Object Detection**: Identify and locate objects in images
+- **OCR (Optical Character Recognition)**: Extract text from images
+- **Image Description**: Generate detailed descriptions of image content
+- **Visual Question Answering**: Answer questions about image content
+- **Image Segmentation**: Segment images into meaningful regions
+- **Face Detection**: Detect and analyze faces in images
+- **Scene Understanding**: Understand complex scenes and contexts
+
+## Use Cases
+
+### Analysis
+- Analyze product images for e-commerce
+- Extract text from documents/screenshot
+- Generate alt text for accessibility
+
+### Development
+- Test image processing pipelines
+- Validate image content
+- Automate image quality checks
+
+### Documentation
+- Extract data from visual documents
+- Generate descriptions for documentation
+
+## Example Usage
+
+```
+opencode run "Use fal-vision to analyze screenshot.png and describe what you see"
+
+opencode run "Use fal-vision to extract text from document.png"
+
+opencode run "Use fal-vision to detect objects in product-photo.jpg"
+```
+
+## Technical Details
+
+This skill leverages fal.ai's vision models which are state-of-the-art for image analysis tasks. It provides REST API access to various vision capabilities.
+
+## Authentication
+
+Requires fal.ai API key for accessing the vision models.
+
+## Output
+
+The skill provides structured output including:
+- Detected objects with bounding boxes
+- Extracted text with confidence scores
+- Detailed image descriptions
+- Answers to visual questions
+
+---
+
+Base directory: .opencode/skills/fal-vision
+This skill is part of the OpenDesign ecosystem for advanced image analysis.
+</skill_content>

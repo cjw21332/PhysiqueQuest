@@ -1,0 +1,63 @@
+.home-section :is(button, a, input, select, summary):focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.home-section :is(h1, h2, h3, p, small, strong, b) { overflow-wrap: anywhere; }
+.home-section button { cursor: pointer; }
+.home-section button:disabled { cursor: not-allowed; }
+.home-section :is(.dashboard-container, .home-ref-subview, .home-notifications) { min-width: 0; }
+.home-section .home-ref-header { gap: 12px; padding-block: 8px 14px; }
+.home-section .user-greeting, .home-section .greeting-text { min-width: 0; }
+.home-section .home-ref-header .notification-bell { flex: none; width: 44px; height: 44px; }
+.home-section .home-ref-workout { padding: 20px; border: 1px solid var(--line); border-radius: 20px; }
+.home-section .home-ref-workout .workout-title { margin-block: 14px 10px; font-size: 23px; line-height: 1.2; }
+.home-section .home-ref-session-meta { gap: 8px 14px; margin-bottom: 16px; }
+.home-section .home-ref-session-meta span { font-size: 12px; line-height: 1.4; }
+.home-section .home-ref-workout .start-button { min-height: 50px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.home-section .home-ref-workout .link-text { min-height: 44px; }
+.home-section .home-ref-inline-error button, .home-section .error button { min-height: 44px; padding-inline: 10px; border: 0; background: transparent; color: var(--green); font-weight: 700; }
+.home-section .home-ref-stats { padding-block: 16px; }
+.home-section .home-ref-stats .stat-box { min-width: 0; }
+.home-section .home-ref-stats .stat-number { font-size: 17px; }
+.home-section .home-ref-section { margin-top: 24px; }
+.home-section .section-title-row { gap: 10px; }
+.home-section .section-title-row h3 { min-width: 0; font-size: 16px; }
+.home-section :is(.view-all-link, .scan-link) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding-inline: 8px; white-space: nowrap; }
+.home-section .missions-container { display: flex; flex-direction: column; gap: 0; }
+.home-section .mission-card { min-width: 0; padding-block: 12px; }
+.home-section .mission-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.home-section .mission-title { display: inline-flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; line-height: 1.4; }
+.home-section .mission-title svg { flex: none; color: var(--green); }
+.home-section .mission-count { flex: none; margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.home-section .mission-bar { width: 100%; margin-top: 0; }
+.home-section .home-ref-nutrition { gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; }
+.home-section .home-ref-nutrition .macros-list { min-width: 0; flex: 1; }
+.home-section .journey-cards { display: grid; gap: 10px; }
+.home-section .journey-card { min-height: 72px; gap: 12px; }
+.home-section .journey-info { min-width: 0; }
+.home-section .journey-subtitle { white-space: normal; overflow-wrap: anywhere; line-height: 1.4; }
+.home-section .home-notifications :is(button, input) { min-height: 44px; }
+.home-section .notification-item { min-width: 0; }
+.home-section .notification-copy { min-width: 0; overflow-wrap: anywhere; }
+.home-section .notification-reminder-controls { gap: 8px; }
+.home-section :is(.pq-goals-header, .pq-progress-header) button { min-width: 44px; min-height: 44px; }
+.home-section :is(.pq-progress-nav, .pq-progress-chips, .pq-progress-periods) { gap: 8px; }
+.home-section :is(.pq-progress-nav, .pq-progress-chips, .pq-progress-periods) button { min-height: 44px; }
+.home-section :is(.progress-picker-trigger, .records-controls select, .pq-progress-form input, .pq-progress-dates input) { min-height: 48px; font-size: 16px; }
+.home-section :is(.pq-goals-card, .pq-progress-card, .records-item) { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 360px) {
+  .home-section .home-ref-workout { padding: 16px; }
+  .home-section .home-ref-session-meta { gap: 6px 10px; }
+  .home-section .home-ref-stats .stat-separator { margin-inline: 4px; }
+  .home-section .home-ref-nutrition { gap: 10px; padding: 12px; }
+  .home-section .pq-goals-hero-actions { flex-wrap: wrap; }
+  .home-section .records-controls { grid-template-columns: 1fr; }
+}
+
+.home-section .home-notifications .coach-back svg { transform: none; }
+.home-section .notification-intro { gap: 12px; }
+.home-section .notification-intro > div { min-width: 0; }
+.home-section .notification-count { flex: none; }
+.home-section .notification-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+.home-section .notification-actions :is(.mark-all-btn, .notification-clear) { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 600; }
+.home-section .notification-actions svg { flex: none; color: var(--green); }
+.home-section .notification-actions button:disabled { opacity: .6; }
+.home-section .notification-clear-feedback { margin: 0 0 14px; color: var(--muted); font-size: 12px; }
+@media (max-width: 360px) { .home-section .notification-intro { flex-wrap: wrap; } .home-section .notification-actions button { flex: 1 1 auto; } }

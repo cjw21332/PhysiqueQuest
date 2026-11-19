@@ -1,4 +1,4 @@
-export type CachedResource = 'profile' | 'nutrition' | 'activity' | 'coach' | 'notifications' | 'progress:weight' | 'progress:chest' | 'progress:waist' | 'progress:arms' | 'progress:benchPress' | 'workouts' | 'workout-summary' | 'exercise-library';
+export type CachedResource = 'profile' | 'settings' | 'nutrition' | 'activity' | 'coach' | 'notifications' | 'progress:weight' | 'progress:chest' | 'progress:waist' | 'progress:arms' | 'progress:benchPress' | 'workouts' | 'workout-summary' | 'exercise-library';
 export type CacheState<T = any> = { data: T | undefined; savedAt?: number; refreshing: boolean; error: string };
 export function createDeviceCache(options: {
   context: () => { scope: string; session: string } | null;

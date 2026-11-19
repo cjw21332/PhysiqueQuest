@@ -72,7 +72,10 @@ test('dark reference onboarding preserves registration, calibration, scrolling, 
   await page.getByLabel('Email address').fill('juan@example.test');
   await page.getByLabel('Password', { exact: true }).fill('Testing123');
   await page.getByLabel('Confirm password', { exact: true }).fill('Testing123');
-  await page.getByRole('checkbox').check();
+  await page.getByRole('checkbox', { name: /Agree to the Terms/ }).click();
+  const agreement = page.getByRole('dialog', { name: 'Review your agreement' });
+  await agreement.getByRole('region', { name: 'Terms and privacy notices' }).evaluate(el => { el.scrollTop = el.scrollHeight; el.dispatchEvent(new Event('scroll')); });
+  await agreement.getByRole('button', { name: 'Agree and continue' }).click();
   await expect(page.getByLabel('Full name')).toHaveValue('Juan Dela Cruz');
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Verification code' })).toBeVisible();

@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import {
   BadRequestException,
   ConflictException,
@@ -60,7 +61,7 @@ function fixture() {
         doc && String(filter.userId) === owner ? structuredClone(doc) : null,
     })),
   };
-  return { service: new WorkoutsService(model), model, read: () => doc };
+  return { service: new WorkoutsService(lifecycleModel(model)), model, read: () => doc };
 }
 const start = {
   requestKey: 'stable-start-0001',
@@ -93,7 +94,7 @@ describe('connected workout persistence', () => {
     const find = vi.fn((_filter: unknown) => ({
       sort: () => ({ limit: async () => [] }),
     }));
-    await new WorkoutsService({ find } as any).list(
+    await new WorkoutsService(lifecycleModel({ find } as any)).list(
       owner,
       20,
       `2026-10-01T10:00:00Z|${id}`,
@@ -229,7 +230,7 @@ describe('connected workout persistence', () => {
       _id: String(index),
     }));
     const aggregate = vi.fn(async () => [{ dates, personalRecords: [] }]);
-    const result = await new WorkoutsService({ aggregate } as any).summary(
+    const result = await new WorkoutsService(lifecycleModel({ aggregate } as any)).summary(
       owner,
       'Asia/Taipei',
     );
@@ -249,7 +250,7 @@ describe('read costs and shared credit rules', () => {
       },
     ]);
     const activity = new ActivityService(
-      { findOne, findOneAndUpdate: write } as any,
+      lifecycleModel({ findOne, findOneAndUpdate: write } as any),
       { read: async () => ({ meals: [], water: [] }) } as any,
       { creditHistory, personalRecordDays: async () => [] } as any,
       { get: async () => ({ self: { rank: 1, points: 0 } }) } as any,
@@ -269,7 +270,7 @@ describe('read costs and shared credit rules', () => {
       }),
       findOneAndUpdate: write,
     };
-    expect(await new SettingsService(model).get(owner)).toEqual({ values: {} });
+    expect(await new SettingsService(lifecycleModel(model)).get(owner)).toEqual({ values: {} });
     expect(await new NutritionService(model).read(owner)).toEqual({
       meals: [],
       water: [],

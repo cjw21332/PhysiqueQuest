@@ -1,0 +1,152 @@
+{
+  "model": "models\\experimental\\attention_w48\\cnn1d.onnx",
+  "window": 48,
+  "features": 132,
+  "classes": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "hinge",
+    "horizontal_push",
+    "lateral_raise",
+    "squat"
+  ],
+  "val_windows": 3961,
+  "test_windows": 928,
+  "gate": {
+    "max_val_macro_f1_drop": 0.015,
+    "max_size_bytes": 1000000
+  },
+  "variants": [
+    {
+      "format": "fp32",
+      "status": "ok",
+      "size_bytes": 672635,
+      "val": {
+        "accuracy": 0.9508,
+        "macro_f1": 0.94
+      },
+      "test": {
+        "accuracy": 0.542,
+        "macro_f1": 0.4627
+      },
+      "latency_ms_batch1": 0.111,
+      "val_delta_vs_fp32": 0.0
+    },
+    {
+      "format": "fp16",
+      "status": "ok",
+      "size_bytes": 338254,
+      "val": {
+        "accuracy": 0.9508,
+        "macro_f1": 0.94
+      },
+      "test": {
+        "accuracy": 0.542,
+        "macro_f1": 0.4627
+      },
+      "latency_ms_batch1": 0.148,
+      "val_delta_vs_fp32": 0.0
+    },
+    {
+      "format": "int8_dynamic",
+      "status": "ok",
+      "size_bytes": 175350,
+      "val": {
+        "accuracy": 0.6811,
+        "macro_f1": 0.6414
+      },
+      "test": {
+        "accuracy": 0.5043,
+        "macro_f1": 0.397
+      },
+      "latency_ms_batch1": 1.219,
+      "val_delta_vs_fp32": -0.2986
+    },
+    {
+      "format": "int8_dynamic_pc",
+      "status": "ok",
+      "size_bytes": 175388,
+      "val": {
+        "accuracy": 0.6822,
+        "macro_f1": 0.6434
+      },
+      "test": {
+        "accuracy": 0.5054,
+        "macro_f1": 0.3973
+      },
+      "latency_ms_batch1": 1.449,
+      "val_delta_vs_fp32": -0.2966
+    },
+    {
+      "format": "int8_dynamic_conv",
+      "status": "ok",
+      "size_bytes": 175388,
+      "val": {
+        "accuracy": 0.6822,
+        "macro_f1": 0.6434
+      },
+      "test": {
+        "accuracy": 0.5054,
+        "macro_f1": 0.3973
+      },
+      "latency_ms_batch1": 1.312,
+      "val_delta_vs_fp32": -0.2966
+    },
+    {
+      "format": "int8_static_qdq",
+      "status": "ok",
+      "size_bytes": 182202,
+      "val": {
+        "accuracy": 0.949,
+        "macro_f1": 0.9383
+      },
+      "test": {
+        "accuracy": 0.5442,
+        "macro_f1": 0.4621
+      },
+      "latency_ms_batch1": 0.08,
+      "val_delta_vs_fp32": -0.0017
+    },
+    {
+      "format": "int8_static_qdq_sym",
+      "status": "ok",
+      "size_bytes": 182252,
+      "val": {
+        "accuracy": 0.949,
+        "macro_f1": 0.9383
+      },
+      "test": {
+        "accuracy": 0.5442,
+        "macro_f1": 0.4621
+      },
+      "latency_ms_batch1": 0.153,
+      "val_delta_vs_fp32": -0.0017
+    },
+    {
+      "format": "int8_static_tensor",
+      "status": "ok",
+      "size_bytes": 178676,
+      "val": {
+        "accuracy": 0.9488,
+        "macro_f1": 0.9377
+      },
+      "test": {
+        "accuracy": 0.5496,
+        "macro_f1": 0.4655
+      },
+      "latency_ms_batch1": 0.062,
+      "val_delta_vs_fp32": -0.0023
+    }
+  ],
+  "selection": {
+    "passing_formats": [
+      "fp32",
+      "fp16",
+      "int8_static_qdq",
+      "int8_static_qdq_sym",
+      "int8_static_tensor"
+    ],
+    "best_mobile_format": "fp32"
+  }
+}

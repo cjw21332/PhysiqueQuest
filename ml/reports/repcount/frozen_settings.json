@@ -1,0 +1,6 @@
+{
+  "thresholds": "GenericRepCounter defaults, calibration=true",
+  "tuning": "none; DEV inspected without parameter changes",
+  "map_sha256": "dff909166515e4ed82f8e9b45dcaff9d4e6545415e8e135467de7b15ce5026a3",
+  "counter_sha256": "60a03f8431c0db41377d4a2de52709a473bb35a1d6375c68e491c85b326c6783"
+}

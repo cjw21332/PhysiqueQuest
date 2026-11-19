@@ -4,6 +4,7 @@ import { createHash, createHmac, randomBytes, randomInt } from 'node:crypto';
 import type { Connection } from 'mongoose';
 import { configuredMailProvider } from '../providers/mail.provider.js';
 import { EmailDeliveryProvider } from '../providers/email-delivery.provider.js';
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 
 const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 @Injectable()
@@ -50,9 +51,10 @@ export class EmailVerificationService implements OnModuleInit {
     if (!result.modifiedCount) throw new BadRequestException('Verification code is invalid or expired.');
   }
   async confirmAccount(userId: string, email: string, requestId: string, code: string) {
+    const fence = new AccountLifecycleFence(this.connection), generation = await fence.generation(userId);
     await this.consumeRegistration(email, requestId, code);
     const { ObjectId } = await import('mongodb');
-    const result = await this.db.collection('users').updateOne({ _id: new ObjectId(userId), email: email.trim().toLowerCase(), isActive: true }, { $set: { emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false, updatedAt: new Date() } });
+    const result = await fence.withActiveWrite(userId, async session => this.db.collection('users').updateOne({ _id: new ObjectId(userId), email: email.trim().toLowerCase(), isActive: true }, { $set: { emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false, updatedAt: new Date() } }, { session }), generation);
     if (!result.matchedCount) throw new BadRequestException('Could not verify this account.');
     return { verified: true };
   }
@@ -68,13 +70,14 @@ export class EmailVerificationService implements OnModuleInit {
     const user = await this.db.collection('users').findOne({ email: normalized, isActive: true });
     const provider = configuredMailProvider();
     if (user && !user.emailVerified && provider) {
+      const fence = new AccountLifecycleFence(this.connection), generation = await fence.generation(String(user._id));
       const token = randomBytes(32).toString('hex');
       const expiresAt = new Date(now.getTime() + Number(process.env.EMAIL_VERIFICATION_TTL_MINUTES || 60) * 60_000);
-      await this.db.collection('email_verifications').insertOne({ userId: user._id, email: normalized, tokenHash: hash(token), usedAt: null, createdAt: now, expiresAt });
+      await fence.withActiveWrite(String(user._id), async session => this.db.collection('email_verifications').insertOne({ userId: user._id, generation, email: normalized, tokenHash: hash(token), usedAt: null, createdAt: now, expiresAt }, { session }), generation);
       const origin = process.env.EMAIL_VERIFICATION_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
       const url = new URL('/verify-email', origin); url.hash = new URLSearchParams({ token }).toString();
       if (!await provider.send({ template: 'verification', to: normalized, name: user.name, token, verificationUrl: url.toString() })) {
-        await this.db.collection('email_verifications').deleteOne({ tokenHash: hash(token) });
+        await fence.withActiveWrite(String(user._id), async session => this.db.collection('email_verifications').deleteOne({ tokenHash: hash(token) }, { session }), generation);
         this.logger.warn({ event: 'verification_email_delivery_failed' });
       }
     }
@@ -88,6 +91,8 @@ export class EmailVerificationService implements OnModuleInit {
       await session.withTransaction(async () => {
         const verification = await this.db.collection('email_verifications').findOneAndUpdate({ tokenHash: hash(token), usedAt: null, expiresAt: { $gt: new Date() } }, { $set: { usedAt: new Date() } }, { returnDocument: 'after', session });
         if (!verification) throw new BadRequestException('Verification link is invalid or expired.');
+        if (!Number.isSafeInteger(verification.generation)) throw new BadRequestException('Request a new verification link.');
+        await new AccountLifecycleFence(this.connection).participate(String(verification.userId), session, verification.generation);
         const result = await this.db.collection('users').updateOne({ _id: verification.userId, email: verification.email, isActive: true }, { $set: { emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false, updatedAt: new Date() } }, { session });
         if (result.matchedCount !== 1) throw new BadRequestException('Verification link is invalid or expired.');
         await this.db.collection('email_verifications').updateMany({ userId: verification.userId, usedAt: null }, { $set: { usedAt: new Date() } }, { session });

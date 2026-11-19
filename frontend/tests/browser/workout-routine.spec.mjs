@@ -1,4 +1,67 @@
 import { test, expect } from '@playwright/test';
+test('Smith bar defaults to 20 kg and preserves an entered estimate', async ({ page }) => {
+  const state = await fixture(page, { smith: true });
+  await resume(page);
+  await page.getByRole('button', { name: 'View Smith Machine Bench Press' }).click();
+  await expect(page.getByLabel('Bar estimate (kg)')).toHaveValue('20');
+  await page.getByLabel('Bar estimate (kg)').fill('15');
+  await expect(page.getByLabel('Bar estimate (kg)')).toHaveValue('15');
+  await page.getByLabel('Bar estimate (kg)').fill('20');
+  await page.getByRole('button', { name: 'kg', exact: true }).click();
+  await page.getByLabel('Weight (kg), set 1').fill('25');
+  await page.getByLabel('Reps, set 1', { exact: true }).fill('8');
+  await page.getByRole('button', { name: 'Save set 1', exact: true }).click();
+  await expect.poll(() => state.workout.sets.length).toBe(1);
+  expect(state.workout.sets[0]).toMatchObject({ loadKg: 45, barWeightKg: 20 });
+});
+test('previous working set fills editable values without saving them', async ({ page }) => {
+  const state = await fixture(page);
+  const yesterday = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
+  await page.route('**/api/workouts?*', route => route.fulfill({ headers, json: [{ _id: 'previous', status: 'completed', startedAt: yesterday, endedAt: yesterday, exerciseIds: ['row'], sets: [{ setId: 'row:0', exerciseId: 'row', setIndex: 0, reps: 9, loadKg: 11.3398, loadValue: 25, loadUnit: 'lbs', status: 'completed', source: 'manual', setType: 'normal' }] }] }));
+  await resume(page);
+  await page.getByRole('button', { name: 'View Dumbbell Row' }).click();
+  await expect(page.getByLabel('Weight (lbs), set 1')).toHaveValue('25');
+  await expect(page.getByLabel('Reps, set 1', { exact: true })).toHaveValue('9');
+  expect(state.workout.sets).toHaveLength(0);
+  await page.getByLabel('Reps, set 1', { exact: true }).fill('7');
+  await page.getByRole('button', { name: 'Save set 1', exact: true }).click();
+  await expect.poll(() => state.workout.sets.length).toBe(1);
+  expect(state.workout.sets[0]).toMatchObject({ exerciseId: 'row', reps: 7, loadValue: 25, loadUnit: 'lbs' });
+});
+test('manual session keeps exercise controls usable on narrow screens', async ({ page }, info) => {
+  await fixture(page);
+  await resume(page);
+  for (const width of [320, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    const card = page.getByRole('button', { name: 'View Dumbbell Row' });
+    await card.scrollIntoViewIfNeeded();
+    const box = await card.boundingBox();
+    const reorder = await page.getByRole('button', { name: 'Reorder Dumbbell Row' }).boundingBox();
+    const options = await page.getByRole('button', { name: 'Options for Dumbbell Row' }).boundingBox();
+    expect(box.width).toBeLessThanOrEqual(width);
+    expect(reorder.width).toBeGreaterThanOrEqual(44);
+    expect(options.width).toBeGreaterThanOrEqual(44);
+    expect(reorder.x + reorder.width).toBeLessThanOrEqual(options.x + 1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: info.outputPath(`manual-layout-${width}.png`), animations: 'disabled' });
+  }
+});
+test('suggestions follow previous sets and preserve edits across reload', async ({ page }) => {
+  const state = await fixture(page);
+  const yesterday = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
+  await page.route('**/api/workouts?*', route => route.fulfill({ headers, json: [{ _id: 'previous', status: 'completed', startedAt: yesterday, endedAt: yesterday, exerciseIds: ['push'], sets: [
+    { setId: 'push:0', exerciseId: 'push', setIndex: 0, reps: 6, loadKg: 10, status: 'completed', source: 'manual', setType: 'normal' },
+    { setId: 'push:1', exerciseId: 'push', setIndex: 1, reps: 8, loadKg: 12.5, status: 'completed', source: 'manual', setType: 'normal' },
+  ] }] }));
+  await resume(page);
+  await expect(page.getByLabel('Reps, set 1', { exact: true })).toHaveValue('6');
+  await expect(page.getByLabel('Reps, set 2', { exact: true })).toHaveValue('8');
+  await page.getByLabel('Reps, set 1', { exact: true }).fill('7');
+  await page.reload();
+  await expect(page.getByLabel('Reps, set 1', { exact: true })).toHaveValue('7');
+  await expect(page.getByLabel('Reps, set 2', { exact: true })).toHaveValue('8');
+  expect(state.workout.sets).toHaveLength(0);
+});
 test('manual workout scrolls to the final exercise and back to its controls', async ({ page }) => {
   await fixture(page);
   await resume(page);
@@ -174,9 +237,10 @@ test('malformed and other-account drafts do not replace confirmed state',async({
   await expect(page.getByLabel('Reps, set 1',{exact:true})).toHaveValue('12');
 });
 const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
-async function fixture(page, { fail = false, conflict = false, failComplete = false, delaySave = 0, loseCompletionReply = false, pauseConflict = false, stale = false, staleActive = false, autoEndRest = true, transientReads = false } = {}) {
+async function fixture(page, { fail = false, conflict = false, failComplete = false, delaySave = 0, loseCompletionReply = false, pauseConflict = false, stale = false, staleActive = false, autoEndRest = true, transientReads = false, smith = false } = {}) {
   if (autoEndRest) await page.addLocatorHandler(page.getByRole('dialog', { name: 'Rest time' }), async dialog => { await dialog.getByRole('button', { name: 'End rest' }).click(); });
   const exercises = [{ exerciseId: 'push', name: 'Push-up', equipment: 'Bodyweight', prescription: '2 × 12', sets: 2 }, { exerciseId: 'row', name: 'Dumbbell row', equipment: 'Dumbbells', prescription: '1 × 10', sets: 1 }, { exerciseId: 'plank', name: 'Plank', equipment: 'Bodyweight', prescription: '1 × 45 s', sets: 1 }];
+  if (smith) exercises[1] = { exerciseId: 'row', name: 'Smith machine bench press', equipment: 'Smith machine', prescription: '1 × 10', sets: 1 };
   let workout = { _id: 'routine-1', exerciseIds: exercises.map(e => e.exerciseId), exercises, sets: [], revision: 0, startedAt: new Date(Date.now() - (stale ? 678091000 : 0)).toISOString(), status: 'active', pausedSeconds: 0 };
   let failNext = fail, conflictNext = conflict;
   const reads = { profile: 0, nutrition: 0 };
@@ -479,7 +543,7 @@ test('camera denial never blocks routine logging and controls meet phone target 
   await page.route('**/pose-tracker/exercises/push/launch',route=>route.fulfill({json:{config:{exerciseId:'push',name:'Push-up',trackingMode:'builtin',providerExerciseId:'push_up',validationStatus:'documentation-mapped',cameraOrientation:'side',targetMuscles:['pectorals'],equipment:['bodyweight'],capabilities:['repetitions'],limitations:[]},token:'mock-only',developerOutputs:false},headers}));
   await page.route('https://app.posetracker.com/pose_tracker/tracking?**',route=>route.fulfill({contentType:'text/html',body:'<script>parent.postMessage(JSON.stringify({type:"error",error:"NotAllowedError",message:"Camera permission denied"}),"*")</script>'}));
   await page.getByRole('button',{name:'PoseTracker options for Push-up'}).click();
-  await page.getByRole('button',{name:'Start PoseTracker',exact:true}).click();
+  await page.getByRole('button',{name:'Start tracking',exact:true}).click();
   await expect(page.locator('.pose-tracker-session [role=alert]')).toContainText('Camera permission denied');
   await page.getByRole('button',{name:'Back to exercise',exact:true}).click();
   for(const width of [320,390,768,1440]){
@@ -546,4 +610,51 @@ test('returning focus removes a workout completed on another screen', async ({ p
   state.workout.status = 'completed';
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect(page.getByRole('button', { name: 'Resume saved workout' })).toHaveCount(0);
+});
+
+test('saved routine can be logged manually while the WebView is offline', async ({page: desktop}) => {
+  const device = process.env.PQ_ANDROID_DEVICE;
+  let phone, adb;
+  let page = desktop;
+  const testApp = 'com.physiquequest.offlineverification';
+  if (device) {
+    const {execFileSync} = await import('node:child_process');
+    const {chromium} = await import('playwright');
+    adb = (...args) => execFileSync('adb',['-s',device,...args],{encoding:'utf8'}).trim();
+    adb('reverse','tcp:18395','tcp:'+new URL(test.info().project.use.baseURL).port);
+    adb('shell','am','start','-W','-n',testApp+'/.OfflineActivity');
+    adb('forward','tcp:18394','localabstract:webview_devtools_remote_'+adb('shell','pidof',testApp));
+    phone = await chromium.connectOverCDP('http://localhost:18394');
+    page = phone.contexts()[0].pages()[0];
+  }
+  try {
+    await fixture(page);
+    await page.context().route('**/api/workouts/active',route => route.fulfill({json:null}));
+    await page.context().route('**/api/workouts?*',route => route.fulfill({json:[]}));
+    await page.context().route('**/api/coach/plan',route => route.fulfill({json:{libraryReady:true, days:[{index:0,name:'Monday',title:'Offline press',isWorkoutDay:true,exercises:[{exerciseId:'press',name:'Press',equipment:'Dumbbells',prescription:'1 × 8',tracking:'Manual'}]}]}}));
+    await page.goto(device ? 'http://localhost:18395/coach' : '/coach');
+    await expect(page.getByRole('button',{name:'Start session'})).toBeVisible();
+    await page.context().route('**/api/**',route => route.abort('internetdisconnected'));
+    await page.context().setOffline(true);
+    await page.getByRole('button',{name:'Continue with saved content'}).click();
+    await page.getByRole('button',{name:'Start session'}).click();
+    await page.getByRole('button',{name:/Log manually/}).click();
+    await page.getByLabel('Reps, set 1',{exact:true}).fill('8');
+    await page.getByRole('button',{name:'Save set 1',exact:true}).click();
+    await page.getByRole('button',{name:'End session',exact:true}).click();
+    const confirm = page.getByRole('button',{name:'Save and end workout'});
+    const report = page.getByRole('heading',{name:'Workout report'});
+    await expect(confirm.or(report).first()).toBeVisible();
+    if (await confirm.isVisible()) await confirm.click();
+    await expect(page.getByRole('heading',{name:'Workout report'})).toBeVisible();
+    await expect(page.getByText(/Saved on this device/)).toBeVisible();
+    await expect(page.getByText(/8 reps/).first()).toBeVisible();
+  } finally {
+    if (phone) {
+      adb('shell','am','force-stop',testApp);
+      await phone.close();
+      adb('forward','--remove','tcp:18394');
+      adb('reverse','--remove','tcp:18395');
+    } else await page.context().setOffline(false);
+  }
 });

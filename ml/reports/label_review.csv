@@ -1,0 +1,232 @@
+stem,subject,exercise,pattern,gt_reps,sets,frames,duration_s,fps,width,height,source_width,source_height,orientation,detected_pct,key_visibility,zero_joint_frac,signal_peaks,signal_joint,motion
+01e83deb_0015_c-curl twist_[13],01e83deb,c-curl twist,core_flexion,13,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.8271,0.0,0,joint32y,0.01461
+01e83deb_0055_knee to chest_[17],01e83deb,knee to chest,core_flexion,17,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.4451,0.0,15,joint31y,0.01459
+01e83deb_0136_bent scissor_[36],01e83deb,bent scissor,core_flexion,36,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.7537,0.0,30,joint32y,0.04216
+01e83deb_0216_toe taps_[16],01e83deb,toe taps,core_flexion,16,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.7523,0.0,17,joint32y,0.02744
+01e83deb_0258_leg extension + crunch [l]_[11],01e83deb,leg extension + crunch [l],core_flexion,11,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.2193,0.0,17,joint31y,0.05446
+01e83deb_0339_side crunch + leg stretch [l]_[12],01e83deb,side crunch + leg stretch [l],core_flexion,12,1,630,42.0,30.0,480,270,1920,1080,landscape,99.68,-1.654,0.00159,0,joint31y,0.06572
+01e83deb_0419_leg extension + crunch [r]_[11],01e83deb,leg extension + crunch [r],core_flexion,11,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.2858,0.0,10,joint18y,0.05477
+01e83deb_0459_side crunch + leg stretch [r]_[12],01e83deb,side crunch + leg stretch [r],core_flexion,12,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.1076,0.0,20,joint32y,0.04023
+04996ace_0016_reverse lunges challenge_[50],04996ace,reverse lunges challenge,squat,50,1,1620,108.0,30.0,480,270,1920,1080,landscape,100.0,-0.9136,0.0,50,joint31x,0.02032
+0a9a588e_0009_leg lift_[14],0a9a588e,leg lift,core_flexion,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6232,0.0,13,joint31y,0.02028
+0a9a588e_0039_donkey kick + cross_[16],0a9a588e,donkey kick + cross,hinge,16,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5381,0.0,15,joint31y,0.02232
+0a9a588e_0109_donkey twist_[8],0a9a588e,donkey twist,hinge,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5459,0.0,16,joint31y,0.0232
+0a9a588e_0139_rainbow_[8],0a9a588e,rainbow,hinge,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.59,0.0,17,joint31y,0.02226
+0a9a588e_0209_crossed side kick_[9],0a9a588e,crossed side kick,hinge,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.4956,0.0,11,joint31y,0.02033
+0a9a588e_0239_hamstring curl_[10],0a9a588e,hamstring curl,hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.4811,0.0,10,joint31y,0.01192
+0a9a588e_0339_side leg lift_[10],0a9a588e,side leg lift,hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.4399,0.0,11,joint31y,0.03902
+0a9a588e_0409_leg swipe_[11],0a9a588e,leg swipe,hinge,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3458,0.0,11,joint31y,0.021
+0a9a588e_0439_leg extension_[11],0a9a588e,leg extension,hinge,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5142,0.0,12,joint31y,0.0168
+0a9a588e_0509_leg circle_[22],0a9a588e,leg circle,hinge,22,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2114,0.0,21,joint31y,0.01734
+0a9a588e_0609_leg lift_[14],0a9a588e,leg lift,core_flexion,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6405,0.0,0,joint31y,0.02495
+0a9a588e_0639_donkey kick + cross_[8],0a9a588e,donkey kick + cross,hinge,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5886,0.0,15,joint32y,0.02371
+0a9a588e_0709_donkey twist_[8],0a9a588e,donkey twist,hinge,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5788,0.0,15,joint32y,0.0269
+0a9a588e_0739_rainbow_[8],0a9a588e,rainbow,hinge,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6397,0.0,16,joint32y,0.02139
+0a9a588e_0809_crossed side kick_[9],0a9a588e,crossed side kick,hinge,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6168,0.0,20,joint32y,0.02716
+0a9a588e_0839_hamstring curl_[11],0a9a588e,hamstring curl,hinge,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5432,0.0,11,joint32y,0.01385
+0a9a588e_0943_side leg lift_[10],0a9a588e,side leg lift,hinge,10,1,420,28.0,30.0,480,270,1920,1080,landscape,100.0,-0.7322,0.0,10,joint32y,0.04835
+0a9a588e_1009_leg swipe_[11],0a9a588e,leg swipe,hinge,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5048,0.0,12,joint32y,0.02304
+0a9a588e_1039_leg extension_[12],0a9a588e,leg extension,hinge,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6758,0.0,13,joint32y,0.01763
+0a9a588e_1109_leg circle_[19],0a9a588e,leg circle,hinge,19,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6303,0.0,19,joint32y,0.03216
+0a9a588e_1209_pointe to heel bridge_[8],0a9a588e,pointe to heel bridge,hinge,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.1063,0.0,0,joint32y,0.01626
+0a9a588e_1239_pointed glute bridge_[11],0a9a588e,pointed glute bridge,hinge,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.1687,0.0,11,joint17y,0.02449
+0a9a588e_1339_1-leg glute bridge_[10],0a9a588e,1-leg glute bridge,hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.0541,0.0,9,joint32y,0.03611
+0a9a588e_1409_1-leg glute bridge_[10],0a9a588e,1-leg glute bridge,hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.9127,0.0,3,joint31y,0.02946
+0e88251c_0017_straight leg lift [r]_[13-12-14],0e88251c,straight leg lift [r],hinge,39,3,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.5886,0.0,12,joint32y,0.01464
+0e88251c_0139_straight leg circle [r]_[11],0e88251c,straight leg circle [r],hinge,11,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.4954,0.0,0,joint20y,0.00881
+0e88251c_0229_lower leg lift (L)_[12],0e88251c,lower leg lift (L),hinge,12,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.2927,0.0,11,joint31y,0.01015
+0e88251c_0359_straight leg lift (L)_[10],0e88251c,straight leg lift (L),hinge,10,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.6615,0.0,10,joint31y,0.02263
+0e88251c_0519_straight leg circle(L)_[9],0e88251c,straight leg circle(L),hinge,9,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.8168,0.0,0,joint19y,0.02694
+0e88251c_0559_lower leg lift (R)_[13],0e88251c,lower leg lift (R),hinge,13,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.3314,0.0,9,joint32y,0.01308
+0e88251c_0739_V bridge lift (feet connected)_[8],0e88251c,V bridge lift (feet connected),core_flexion,8,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.6347,0.0,8,joint6y,0.01098
+0e88251c_0819_V bridge lift + butterfly_[7],0e88251c,V bridge lift + butterfly,core_flexion,7,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.5967,0.0,8,joint18y,0.01132
+0e88251c_0859_V bridge hold + butterfly_[14],0e88251c,V bridge hold + butterfly,core_isometric,14,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.4398,0.0,4,joint18y,0.00481
+14c2c3f4_0045_drop squats_[40],14c2c3f4,drop squats,squat,40,1,945,63.0,30.0,480,270,1920,1080,landscape,100.0,-0.2952,0.0,20,joint19y,0.07516
+14c2c3f4_0146_half burpees_[17],14c2c3f4,half burpees,cardio_dynamic,17,1,930,62.0,30.0,480,270,1920,1080,landscape,100.0,-1.6112,0.0,19,joint17y,0.09452
+14c2c3f4_0248_high knees_[146-145-147],14c2c3f4,high knees,cardio_dynamic,438,3,885,59.0,30.0,480,270,1920,1080,landscape,100.0,-0.2022,0.0,73,joint19y,0.03937
+14c2c3f4_0346_butt kick squat jumps_[23],14c2c3f4,butt kick squat jumps,squat,23,1,930,62.0,30.0,480,270,1920,1080,landscape,100.0,-0.0701,0.0,24,joint19y,0.03325
+14c2c3f4_0447_push up toe tap_[14-13-15],14c2c3f4,push up toe tap,horizontal_push,42,3,930,62.0,30.0,480,270,1920,1080,landscape,100.0,-1.5844,0.0,14,joint19y,0.05067
+14c2c3f4_0549_bicycle crunches_[114-113-115],14c2c3f4,bicycle crunches,core_flexion,342,3,900,60.0,30.0,480,270,1920,1080,landscape,100.0,-2.13,0.0,1,joint19y,0.05422
+14c2c3f4_0751_side plank raises(right side)_[51],14c2c3f4,side plank raises(right side),hinge,51,1,870,58.0,30.0,480,270,1920,1080,landscape,99.77,-0.2087,0.00115,1,joint15y,0.03737
+14c2c3f4_0847_full burpees_[16],14c2c3f4,full burpees,cardio_dynamic,16,1,930,62.0,30.0,480,270,1920,1080,landscape,99.78,-1.5465,0.00108,32,joint17y,0.11544
+17e2d98f_0041_high knees_[17],17e2d98f,high knees,cardio_dynamic,17,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1368,0.0,18,joint20y,0.02684
+17e2d98f_0111_sun rises_[11],17e2d98f,sun rises,lateral_raise,11,1,480,32.0,30.0,480,270,1920,1080,landscape,99.79,-0.1327,0.00208,13,joint20y,0.05561
+17e2d98f_0141_hip circles_[7],17e2d98f,hip circles,hinge,7,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1138,0.0,1,joint20y,0.01162
+17e2d98f_0211_high knee & cross punches_[21],17e2d98f,high knee & cross punches,cardio_dynamic,21,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2356,0.0,8,joint20y,0.03176
+17e2d98f_0241_slow sq_[6],17e2d98f,slow sq,squat,6,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3659,0.0,2,joint20y,0.01216
+17e2d98f_0311_cross toe touches_[10],17e2d98f,cross toe touches,core_flexion,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2284,0.0,6,joint17y,0.04578
+17e2d98f_0341_step jacks_[30],17e2d98f,step jacks,squat,30,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1856,0.0,31,joint18y,0.05455
+17e2d98f_0411_standing donkey kicks_[10],17e2d98f,standing donkey kicks,hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6686,0.0,13,joint30y,0.02234
+199aec58_0053_leg raise clap_[8],199aec58,leg raise clap,core_flexion,8,1,465,31.0,30.0,480,270,1920,1080,landscape,100.0,-1.9451,0.0,8,joint30y,0.04695
+199aec58_0231_crossbody mountain climber_[52-51-53],199aec58,crossbody mountain climber,cardio_dynamic,156,3,495,33.0,30.0,480,270,1920,1080,landscape,100.0,-0.9195,0.0,29,joint30x,0.03845
+199aec58_0533_100_[70],199aec58,100,cardio_dynamic,70,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.0086,0.0,3,joint20y,0.01827
+199aec58_0603_crunch_[12],199aec58,crunch,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3467,0.0,13,joint20y,0.05173
+199aec58_0643_up&down plank_[11-10-12],199aec58,up&down plank,core_isometric,33,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.4705,0.0,6,joint32x,0.03672
+199aec58_0753_heel tap_[28],199aec58,heel tap,core_flexion,28,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.6396,0.0,1,joint32y,0.02037
+199aec58_0903_reverse crunch leg extension_[12],199aec58,reverse crunch leg extension,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.8346,0.0,12,joint31y,0.05394
+199aec58_0933_straight leg crunch_[8],199aec58,straight leg crunch,core_flexion,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.8191,0.0,1,joint32y,0.04551
+199aec58ef058b0a17cd460ca5f138c9_1013_up&down plank_[10],199aec58ef058b0a17cd460ca5f138c9,up&down plank,core_isometric,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.5229,0.0,4,joint30x,0.02858
+1e6a72cd_0014_wall bicycle_[15],1e6a72cd,wall bicycle,hinge,15,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.7403,0.0,8,joint31y,0.03278
+1e6a72cd_0044_wall bridge_[10],1e6a72cd,wall bridge,hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.7345,0.0,10,joint31y,0.03475
+1e6a72cd_0114_1 leg bridge(R)_[14],1e6a72cd,1 leg bridge(R),hinge,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.6234,0.0,9,joint32y,0.03785
+1e6a72cd_0144_1 leg bridge(L)_[14],1e6a72cd,1 leg bridge(L),hinge,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.7556,0.0,14,joint31y,0.0261
+1e6a72cd_0215_wall marching_[12],1e6a72cd,wall marching,cardio_dynamic,12,1,465,31.0,30.0,480,270,1920,1080,landscape,100.0,-1.4882,0.0,1,joint31y,0.0445
+1e6a72cd_0244_cross crunch(R)_[16],1e6a72cd,cross crunch(R),core_flexion,16,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.6286,0.0,15,joint31x,0.02912
+1e6a72cd_0314_cross crunch(L)_[16],1e6a72cd,cross crunch(L),core_flexion,16,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-2.4468,0.0,0,joint31y,0.0319
+1e6a72cd_0344_wall walk_[7],1e6a72cd,wall walk,cardio_dynamic,7,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.819,0.0,8,joint31y,0.02654
+1e6a72cd_0416_leg slides_[12],1e6a72cd,leg slides,hinge,12,1,450,30.0,30.0,480,270,1920,1080,landscape,100.0,-1.9541,0.0,8,joint31y,0.03912
+1e6a72cd_0444_hip slides_[10],1e6a72cd,hip slides,hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3723,0.0,6,joint31y,0.03082
+1e6a72cd_0517_wall twist_[33],1e6a72cd,wall twist,lateral_raise,33,1,435,29.0,30.0,480,270,1920,1080,landscape,100.0,-1.6952,0.0,1,joint31y,0.03374
+1e6a72cd_0545_crunch_[16],1e6a72cd,crunch,core_flexion,16,1,465,31.0,30.0,480,270,1920,1080,landscape,100.0,-2.6133,0.0,0,joint31y,0.03831
+1e6a72cd_0650_baby cobra_[5],1e6a72cd,baby cobra,core_flexion,5,1,390,26.0,30.0,480,270,1920,1080,landscape,100.0,-1.8055,0.0,4,joint32y,0.03109
+1e6a72cd_0720_booty slide_[10],1e6a72cd,booty slide,hinge,10,1,390,26.0,30.0,480,270,1920,1080,landscape,100.0,-1.184,0.0,2,joint18y,0.01483
+1e6a72cd_0814_wall push_[10],1e6a72cd,wall push,horizontal_push,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2904,0.0,2,joint20x,0.01391
+1e6a72cd_0844_kickback(R)_[17],1e6a72cd,kickback(R),hinge,17,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.0319,0.0,18,joint31y,0.01629
+1e6a72cd_0914_kickback(L)_[17],1e6a72cd,kickback(L),hinge,17,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.1893,0.0,18,joint32y,0.01914
+36f0d07e_0140_open chest & press_[13],36f0d07e,open chest & press,curl,13,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.9273,0.0,7,joint18y,0.00974
+36f0d07e_0220_prayer pulses_[26],36f0d07e,prayer pulses,curl,26,1,630,42.0,30.0,480,270,1920,1080,landscape,99.05,-1.0437,0.00794,13,joint19y,0.01244
+36f0d07e_0300_bicep curls_[24],36f0d07e,bicep curls,curl,24,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.9393,0.0,23,joint19y,0.0175
+36f0d07e_0506_straight arm lift_[24],36f0d07e,straight arm lift,lateral_raise,24,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.1187,0.0,23,joint20y,0.01524
+36f0d07e_0638_stting tricep push_[13],36f0d07e,stting tricep push,triceps_extension,13,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.116,0.0,1,joint32x,0.01116
+36f0d07e_0716_box push-ups_[11],36f0d07e,box push-ups,horizontal_push,11,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.1637,0.0,1,joint20y,0.01844
+3977a2e05bacbfc8e3be9a48162bc169_1012_alternating side crunch_[14],3977a2e05bacbfc8e3be9a48162bc169,alternating side crunch,core_flexion,14,1,690,46.0,30.0,480,270,1920,1080,landscape,99.86,-1.7487,0.00145,8,joint14y,0.01872
+4555d6aead3c90604b2c19ee3f1dc820_0614_good morning + twist_[10],4555d6aead3c90604b2c19ee3f1dc820,good morning + twist,hinge,10,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.8188,0.0,3,joint32y,0.06422
+5e3a8d78_0014_jumping jack_[35],5e3a8d78,jumping jack,cardio_dynamic,35,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2705,0.0,34,joint20y,0.06187
+5e3a8d78_0044_high knees_[80-79-81],5e3a8d78,high knees,cardio_dynamic,240,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5074,0.0,41,joint19y,0.06427
+5e3a8d78_0114_squat + side jumpy_[21],5e3a8d78,squat + side jumpy,squat,21,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.0954,0.0,3,joint19y,0.02922
+5e3a8d78_0144_mountain climber_[69-68-70],5e3a8d78,mountain climber,cardio_dynamic,207,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2562,0.0,1,joint17y,0.07289
+5e3a8d78_0244_plank + jumping jack_[10],5e3a8d78,plank + jumping jack,core_isometric,10,1,480,32.0,30.0,480,270,1920,1080,landscape,97.92,-2.1332,0.00833,3,joint31y,0.61535
+5e3a8d78_0314_jump + punches_[16],5e3a8d78,jump + punches,cardio_dynamic,16,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1801,0.0,1,joint31y,0.08998
+5e3a8d78_0344_high knees_[82],5e3a8d78,high knees,cardio_dynamic,82,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.7306,0.0,37,joint17y,0.05874
+5e3a8d78_0414_squat jump + 3s hold_[10],5e3a8d78,squat jump + 3s hold,squat,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1093,0.0,12,joint19y,0.02415
+5e3a8d78_0444_twisting mountain climber_[59-58-60],5e3a8d78,twisting mountain climber,cardio_dynamic,177,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.1411,0.0,1,joint19y,0.07296
+5e3a8d78_0514_push up (on knees)_[12],5e3a8d78,push up (on knees),horizontal_push,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.4301,0.0,12,joint29y,0.02924
+5e3a8d78_0614_plank jump + 3 punches_[9],5e3a8d78,plank jump + 3 punches,core_isometric,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3507,0.0,10,joint19y,0.08802
+5e3a8d78_0644_HIGH KNEES_[79-78-80],5e3a8d78,HIGH KNEES,cardio_dynamic,237,3,465,31.0,30.0,480,270,1920,1080,landscape,100.0,-0.7393,0.0,1,joint17y,0.06349
+5e3a8d78_0713_SQUAT + SIDE JUMPY_[21],5e3a8d78,SQUAT + SIDE JUMPY,squat,21,1,495,33.0,30.0,480,270,1920,1080,landscape,100.0,-0.1139,0.0,10,joint19y,0.03675
+5e3a8d78_0744_JUMPING JACK_[35],5e3a8d78,JUMPING JACK,cardio_dynamic,35,1,495,33.0,30.0,480,270,1920,1080,landscape,100.0,-0.302,0.0,35,joint17y,0.05983
+5e3a8d78_0815_PLANK + JUMPING JACK_[11],5e3a8d78,PLANK + JUMPING JACK,core_isometric,11,1,495,33.0,30.0,480,270,1920,1080,landscape,98.79,-1.6892,0.0,15,joint31y,0.55618
+5e3a8d78_0845_MOUNTAIN CLIMBER_[62],5e3a8d78,MOUNTAIN CLIMBER,cardio_dynamic,62,1,480,32.0,30.0,480,270,1920,1080,landscape,99.79,-1.3891,0.0,1,joint32y,0.10901
+5e3a8d78_0915_HIGH PLANK_[1],5e3a8d78,HIGH PLANK,core_isometric,1,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3831,0.0,3,joint17y,0.00996
+5e3a8d78_0944_ELBOW PLANK_[1],5e3a8d78,ELBOW PLANK,core_isometric,1,1,495,33.0,30.0,480,270,1920,1080,landscape,100.0,-1.4847,0.0,3,joint19y,0.00753
+60093019_0019_donkey kicks_[50],60093019,donkey kicks,hinge,50,1,1633,108.87,30.0,480,270,1920,1080,landscape,97.98,-0.6429,0.0196,25,joint32y,0.01889
+64f0a0d9_0017_plank jacks challenge_[100],64f0a0d9,plank jacks challenge,cardio_dynamic,100,1,1755,117.0,30.0,480,270,1920,1080,landscape,100.0,-0.7596,0.0,1,joint31y,0.03311
+6770817f_0013_leg lift circles_[12],6770817f,leg lift circles,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.587,0.0,12,joint31y,0.03126
+6770817f_0043_reverse crunch variation_[12],6770817f,reverse crunch variation,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.4529,0.0,13,joint31y,0.04572
+6770817f_0113_leg lift_[67],6770817f,leg lift,core_flexion,67,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.4353,0.0,6,joint31y,0.02591
+6770817f_0143_cross crunch_[17],6770817f,cross crunch,core_flexion,17,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.1157,0.0,9,joint31y,0.04082
+6770817f_0213_russian twist_[35],6770817f,russian twist,core_flexion,35,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.9641,0.0,2,joint32y,0.03607
+6770817f_0243_leg lift_[15],6770817f,leg lift,core_flexion,15,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.4832,0.0,14,joint31y,0.03535
+6770817f_0313_flutter kicks_[90],6770817f,flutter kicks,core_flexion,90,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2129,0.0,0,joint32y,0.03029
+6770817f_0343_toe taps_[56],6770817f,toe taps,core_flexion,56,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3799,0.0,2,joint31y,0.01109
+6770817f_0413_reverse crunch variantion_[13],6770817f,reverse crunch variantion,core_flexion,13,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.453,0.0,13,joint31y,0.04599
+6770817f_0513_bicycle crunch_[40],6770817f,bicycle crunch,core_flexion,40,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2366,0.0,19,joint13y,0.03994
+6770817f_0543_side plank pull left_[21],6770817f,side plank pull left,hinge,21,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3985,0.0,2,joint20y,0.03286
+6770817f_0613_side plank reach through left_[11-10-12],6770817f,side plank reach through left,hinge,33,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5708,0.0,11,joint18y,0.03257
+6770817f_0713_side plank pull right_[19-18-20],6770817f,side plank pull right,hinge,57,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2287,0.0,13,joint19y,0.04819
+6770817f_0743_side plank reach through right_[12-11-13],6770817f,side plank reach through right,hinge,36,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.0662,0.0,12,joint17y,0.04329
+6770817f_0913_plank back & forth_[13],6770817f,plank back & forth,core_isometric,13,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3525,0.0,0,joint30x,0.01086
+6770817f_0943_cross-spider plank_[22],6770817f,cross-spider plank,core_isometric,22,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.0779,0.0,1,joint20y,0.02633
+68ac8406_0024_star jumps challenge_[50],68ac8406,star jumps challenge,cardio_dynamic,50,1,1140,76.0,30.0,480,270,1920,1080,landscape,91.4,-0.2845,0.08509,51,joint32y,0.18373
+764ecccd_0714_lower leg slide_[15-14-16],764ecccd,lower leg slide,hinge,45,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3962,0.0,1,joint32y,0.02055
+764ecccd_0744_halfmoon_[23-22-24],764ecccd,halfmoon,core_flexion,69,3,480,32.0,30.0,480,270,1920,1080,landscape,98.54,-0.3395,0.0125,3,joint20y,0.02871
+"764ecccd_0814_5 pulses, 3 long_[4]",764ecccd,"5 pulses, 3 long",core_flexion,4,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2183,0.0,0,joint32y,0.03187
+87fe2aa4_0026_squat_[15],87fe2aa4,squat,squat,15,1,525,35.0,30.0,480,270,1920,1080,landscape,100.0,-0.1974,0.0,14,joint19y,0.02428
+87fe2aa4_0114_squat_[12],87fe2aa4,squat,squat,12,1,450,30.0,30.0,480,270,1920,1080,landscape,100.0,-0.1977,0.0,11,joint19y,0.02268
+87fe2aa4_0159_donkey kick_[20],87fe2aa4,donkey kick,hinge,20,1,360,24.0,30.0,480,270,1920,1080,landscape,100.0,-0.6646,0.0,9,joint31y,0.0208
+87fe2aa4_0224_donkey kick_[20],87fe2aa4,donkey kick,hinge,20,1,330,22.0,30.0,480,270,1920,1080,landscape,99.39,-0.728,0.0,10,joint32y,0.03069
+87fe2aa4_0304_side leg raise_[16],87fe2aa4,side leg raise,hinge,16,1,555,37.0,30.0,480,270,1920,1080,landscape,100.0,-0.4118,0.0,9,joint32y,0.0162
+87fe2aa4_0403_reverse lunges_[20],87fe2aa4,reverse lunges,squat,20,1,660,44.0,30.0,480,270,1920,1080,landscape,100.0,-0.9232,0.0,20,joint31x,0.01972
+87fe2aa4_0514_squat_[15],87fe2aa4,squat,squat,15,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1791,0.0,15,joint19y,0.0265
+89e84598_0011_cat cow_[7],89e84598,cat cow,core_flexion,7,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.8735,0.0,7,joint4y,0.00829
+89e84598_0611_roll up_[4],89e84598,roll up,core_flexion,4,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2353,0.0,4,joint17x,0.02607
+89e84598_0711_floor taps + extend_[7],89e84598,floor taps + extend,hinge,7,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.6925,0.0,7,joint31y,0.01846
+89e84598_0811_lifted crunch_[12],89e84598,lifted crunch,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.9458,0.0,1,joint32y,0.01816
+89e84598_0841_bow crunch(R)_[13],89e84598,bow crunch(R),core_flexion,13,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-2.0424,0.0,13,joint13y,0.01511
+89e84598_0911_bridge +floor taps(R)_[10],89e84598,bridge +floor taps(R),hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2974,0.0,0,joint31y,0.01673
+89e84598_0941_bow crunch(L)_[11],89e84598,bow crunch(L),core_flexion,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3284,0.0,1,joint32y,0.01609
+89e84598_1114_half plank crunch(R)_[10],89e84598,half plank crunch(R),core_flexion,10,1,435,29.0,30.0,480,270,1920,1080,landscape,100.0,-0.3403,0.0,0,joint25y,0.0229
+89e84598_1141_half plank opener(R)_[9],89e84598,half plank opener(R),core_flexion,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3397,0.0,9,joint18y,0.02237
+89e84598_1241_half plank crunch(L)_[10],89e84598,half plank crunch(L),core_flexion,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2562,0.0,1,joint31x,0.0193
+89e84598_1311_half plank opener(L)_[8],89e84598,half plank opener(L),core_flexion,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.5605,0.0,9,joint19y,0.02165
+89e84598_1419_reverse plank lift_[6],89e84598,reverse plank lift,core_isometric,6,1,405,27.0,30.0,480,270,1920,1080,landscape,100.0,-1.0415,0.0,8,joint17y,0.02055
+9d5ebd38_0016_bridge_[50],9d5ebd38,bridge,core_isometric,50,1,1530,102.0,30.0,480,270,1920,1080,landscape,100.0,-0.9903,0.0,0,joint19x,0.01894
+acc1df64_0020_crunch +weight_[12],acc1df64,crunch +weight,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.0683,0.0,12,joint20y,0.02915
+acc1df64_0050_sit up + weight_[8],acc1df64,sit up + weight,core_flexion,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.8555,0.0,16,joint20y,0.04035
+acc1df64_0150_sitting leg lift_[15],acc1df64,sitting leg lift,hinge,15,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3526,0.0,14,joint29y,0.03312
+acc1df64_0220_crunch + knee_leg lift_[12],acc1df64,crunch + knee_leg lift,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.5515,0.0,6,joint29y,0.03522
+acc1df64_0250_jack knife_[10],acc1df64,jack knife,cardio_dynamic,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2921,0.0,9,joint29y,0.04868
+acc1df64_0320_leg lift + roll in_[8],acc1df64,leg lift + roll in,core_flexion,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.6449,0.0,1,joint17y,0.03013
+acc1df64_0350_AB hold + knee touches_[19],acc1df64,AB hold + knee touches,core_flexion,19,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.4435,0.0,7,joint17y,0.01888
+acc1df64_0420_russian twist + weight_[21],acc1df64,russian twist + weight,core_flexion,21,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.9898,0.0,1,joint31y,0.03012
+acc1df64_0450_russian twist + pulses_[16],acc1df64,russian twist + pulses,core_flexion,16,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.766,0.0,16,joint18y,0.02415
+acc1df64_0520_straight leg bicycle_[21],acc1df64,straight leg bicycle,core_flexion,21,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.231,0.0,10,joint31y,0.04018
+acc1df64_0620_stretch out +knee touches_[10],acc1df64,stretch out +knee touches,core_flexion,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.4007,0.0,10,joint17x,0.03758
+acc1df64_0650_side plank lift_[13-12-14],acc1df64,side plank lift,hinge,39,3,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3002,0.0,0,joint32y,0.03256
+"acc1df64_0850_crawl, right_[8]",acc1df64,"crawl, right",cardio_dynamic,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.9509,0.0,2,joint18y,0.04513
+"acc1df64_0920_crawl, left_[9]",acc1df64,"crawl, left",cardio_dynamic,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.837,0.0,13,joint31x,0.03955
+bdfe7f1d_0057_knee in & out_[12],bdfe7f1d,knee in & out,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2155,0.0,2,joint32y,0.01659
+bdfe7f1d_0137_climbers_[14],bdfe7f1d,climbers,cardio_dynamic,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.1319,0.0,7,joint31x,0.02641
+bdfe7f1d_0217_commando_[6],bdfe7f1d,commando,horizontal_push,6,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.252,0.0,0,joint29x,0.0192
+bdfe7f1d_0257_leg raises_[10],bdfe7f1d,leg raises,core_flexion,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.8029,0.0,9,joint32y,0.02857
+bdfe7f1d_0337_straight leg sit ups_[6],bdfe7f1d,straight leg sit ups,core_flexion,6,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.0291,0.0,6,joint20x,0.02995
+bdfe7f1d_0417_deadbugs_[11],bdfe7f1d,deadbugs,core_flexion,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.9053,0.0,5,joint20y,0.02653
+bdfe7f1d_0457_half jacks_[14],bdfe7f1d,half jacks,cardio_dynamic,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.0339,0.0,7,joint18x,0.03789
+bdfe7f1d_0617_reverse crunches_[9],bdfe7f1d,reverse crunches,core_flexion,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.6624,0.0,8,joint32y,0.02829
+bdfe7f1d_0657_leg extensions_[9],bdfe7f1d,leg extensions,hinge,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.4256,0.0,1,joint18y,0.01977
+bdfe7f1d_0737_cocoons_[9],bdfe7f1d,cocoons,core_flexion,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2281,0.0,7,joint32y,0.0348
+bdfe7f1d_0858_heel taps_[14],bdfe7f1d,heel taps,core_flexion,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3213,0.0,12,joint18y,0.0273
+bdfe7f1d_0938_simple bicycle_[22],bdfe7f1d,simple bicycle,core_flexion,22,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.9745,0.0,11,joint32y,0.02869
+c36fbdd3_0019_side leg raises_[20],c36fbdd3,side leg raises,hinge,20,1,959,63.93,30.0,480,270,1920,1080,landscape,100.0,-0.3828,0.0,16,joint32y,0.01721
+cbc15c42_0043_tiny steps_[19],cbc15c42,tiny steps,cardio_dynamic,19,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.5453,0.0,11,joint32y,0.02666
+cbc15c42_0113_warrior 2 + up_[8],cbc15c42,warrior 2 + up,lateral_raise,8,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6095,0.0,9,joint20y,0.05609
+cbc15c42_0213_warrior 2 + up_[9],cbc15c42,warrior 2 + up,lateral_raise,9,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2,0.0,9,joint32x,0.05523
+cbc15c42_0313_yoga squat circle_[6],cbc15c42,yoga squat circle,squat,6,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1971,0.0,11,joint19y,0.0349
+cbc15c42_0444_3 point knee tap (R)_[8],cbc15c42,3 point knee tap (R),core_flexion,8,1,480,32.0,30.0,480,270,1920,1080,landscape,99.58,-1.8776,0.00208,1,joint32y,0.20312
+cbc15c42_0616_3 point knee tap (L)_[9],cbc15c42,3 point knee tap (L),core_flexion,9,1,450,30.0,30.0,480,270,1920,1080,landscape,100.0,-1.5431,0.0,9,joint31y,0.04663
+cbc15c42_0746_shoulder in & out_[7],cbc15c42,shoulder in & out,lateral_raise,7,1,450,30.0,30.0,480,270,1920,1080,landscape,82.22,-2.0437,0.11111,12,joint31y,0.09336
+cbc15c42a1594949711ac9a7c8c465e1_0616_3 point knee tap (L)_[9],cbc15c42a1594949711ac9a7c8c465e1,3 point knee tap (L),core_flexion,9,1,450,30.0,30.0,480,270,1920,1080,landscape,100.0,-1.5431,0.0,9,joint31y,0.04663
+ce0fbe3f_0020_simple crunch_[12],ce0fbe3f,simple crunch,core_flexion,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2646,0.0,12,joint18x,0.02726
+d1075a73_0014_alternating knee crunch_[10],d1075a73,alternating knee crunch,core_flexion,10,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.0595,0.0,6,joint32y,0.04634
+d1075a73_0056_knee to chest_[16],d1075a73,knee to chest,core_flexion,16,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.8624,0.0,0,joint32y,0.01844
+d1075a73_0146_double leg stretch + open_[8],d1075a73,double leg stretch + open,core_flexion,8,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.895,0.0,8,joint32y,0.00933
+d1075a73_0226_straight leg lower_[14],d1075a73,straight leg lower,hinge,14,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.7066,0.0,7,joint32y,0.01562
+d1075a73_0306_frog extension_[9],d1075a73,frog extension,hinge,9,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.9929,0.0,9,joint31y,0.00923
+d1075a73_0357_hip lift_[14],d1075a73,hip lift,hinge,14,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.9625,0.0,2,joint32y,0.01767
+d1075a73_0445_cross + leg stretch [l]_[12],d1075a73,cross + leg stretch [l],core_flexion,12,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.8885,0.0,11,joint14y,0.0186
+d1075a73_0525_cross + leg stretch [l]_[12],d1075a73,cross + leg stretch [l],core_flexion,12,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.4953,0.0,10,joint14y,0.01662
+fc3d98d5_0013_bridge circle_[15],fc3d98d5,bridge circle,hinge,15,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.3409,0.0,1,joint31y,0.02603
+fc3d98d5_0043_1 leg through(R)_[12],fc3d98d5,1 leg through(R),hinge,12,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.1692,0.0,12,joint31y,0.01944
+fc3d98d5_0113_bridge + cross crunch_[14],fc3d98d5,bridge + cross crunch,hinge,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.8664,0.0,13,joint31y,0.02946
+fc3d98d5_0143_1 leg through(L)_[10],fc3d98d5,1 leg through(L),hinge,10,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2184,0.0,15,joint32y,0.02513
+fc3d98d5_0213_bridge + cross crunch_[14],fc3d98d5,bridge + cross crunch,hinge,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2909,0.0,18,joint31y,0.04799
+fc3d98d5_0245_bridge +crunch_[7],fc3d98d5,bridge +crunch,core_flexion,7,1,450,30.0,30.0,480,270,1920,1080,landscape,100.0,-1.4613,0.0,1,joint31y,0.03053
+fc3d98d5_0313_cross crunch_[14],fc3d98d5,cross crunch,core_flexion,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.2511,0.0,7,joint32y,0.03149
+fc3d98d5_0344_ALT.leg lifts_[17],fc3d98d5,ALT.leg lifts,core_flexion,17,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.8003,0.0,16,joint31y,0.0446
+fc3d98d5_0414_bicycle crunch_[31],fc3d98d5,bicycle crunch,core_flexion,31,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-1.628,0.0,15,joint31y,0.04306
+fc3d98d5_0519_leg lift variantion_[6],fc3d98d5,leg lift variantion,core_flexion,6,1,405,27.0,30.0,480,270,1920,1080,landscape,100.0,-0.8079,0.0,7,joint32y,0.0309
+fc3d98d5_0544_knee to elbow_[11],fc3d98d5,knee to elbow,core_flexion,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.7223,0.0,11,joint32y,0.03103
+fc3d98d5_0614_half plank crunch_[11],fc3d98d5,half plank crunch,core_flexion,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1396,0.0,2,joint18y,0.02016
+fc3d98d5_0644_clamshell + hip lift_[11],fc3d98d5,clamshell + hip lift,hinge,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.1958,0.0,2,joint18y,0.01861
+fc3d98d5_0714_clamshell twist_[13],fc3d98d5,clamshell twist,hinge,13,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2388,0.0,18,joint32y,0.01555
+fc3d98d5_0744_kickback_[14],fc3d98d5,kickback,hinge,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3826,0.0,1,joint20y,0.01449
+fc3d98d5_0844_leg lift variantion_[6],fc3d98d5,leg lift variantion,core_flexion,6,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.78,0.0,7,joint32y,0.0293
+fc3d98d5_0914_knee to elbow_[13],fc3d98d5,knee to elbow,core_flexion,13,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.7561,0.0,13,joint31y,0.0346
+fc3d98d5_0944_half plank crunch_[11],fc3d98d5,half plank crunch,core_flexion,11,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3659,0.0,1,joint17y,0.02662
+fc3d98d5_1014_clamshell +hip lift_[13],fc3d98d5,clamshell +hip lift,hinge,13,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.6009,0.0,14,joint25y,0.01983
+fc3d98d5_1044_clamshell twist_[14],fc3d98d5,clamshell twist,hinge,14,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.3068,0.0,3,joint17y,0.01549
+fc3d98d5_1114_kickback_[13],fc3d98d5,kickback,hinge,13,1,480,32.0,30.0,480,270,1920,1080,landscape,100.0,-0.2662,0.0,2,joint17y,0.0127
+fcd2886c_0015_bridge lift_[11],fcd2886c,bridge lift,hinge,11,1,630,42.0,30.0,480,270,1920,1080,landscape,99.84,-1.6413,0.00159,0,joint32y,0.01483
+fcd2886c_0055_bridge + leg extend[r]_[11],fcd2886c,bridge + leg extend[r],hinge,11,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.1944,0.0,8,joint32y,0.01529
+fcd2886c_0135_bridge + leg extend[l]_[11],fcd2886c,bridge + leg extend[l],hinge,11,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.1539,0.0,9,joint31y,0.01458
+fcd2886c_0215_toe taps_[16],fcd2886c,toe taps,core_flexion,16,1,630,42.0,30.0,480,270,1920,1080,landscape,99.52,-1.6798,0.00317,8,joint32y,0.01836
+fcd2886c_0258_singel leg reach_[16],fcd2886c,singel leg reach,hinge,16,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-2.2632,0.0,0,joint32y,0.01453
+fcd2886c_0338_criss cross_[15],fcd2886c,criss cross,core_flexion,15,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.8059,0.0,8,joint32y,0.02755
+fcd2886c_0429_back kick extend[r]_[14],fcd2886c,back kick extend[r],hinge,14,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.7496,0.0,14,joint32y,0.02354
+fcd2886c_0509_side kick extend[r]_[13],fcd2886c,side kick extend[r],hinge,13,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.5878,0.0,13,joint32y,0.03314
+fcd2886c_0549_back kick extend[l]_[15],fcd2886c,back kick extend[l],hinge,15,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.6268,0.0,14,joint31y,0.01519
+fcd2886c_0629_side kick extend[r]_[13],fcd2886c,side kick extend[r],hinge,13,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-1.181,0.0,13,joint31y,0.01996
+fcd2886c_0721_table top reach[r]_[13],fcd2886c,table top reach[r],hinge,13,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.6434,0.0,14,joint32y,0.03365
+fcd2886c_0801_side kick extend[r]_[17],fcd2886c,side kick extend[r],hinge,17,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.706,0.0,18,joint32y,0.02825
+fcd2886c_0841_table top reach[l]_[14],fcd2886c,table top reach[l],hinge,14,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.5897,0.0,12,joint18y,0.03021
+fcd2886c_0923_table top reach pulse[l]_[19],fcd2886c,table top reach pulse[l],hinge,19,1,630,42.0,30.0,480,270,1920,1080,landscape,100.0,-0.6101,0.0,20,joint31y,0.02842

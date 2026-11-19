@@ -1,25 +1,8 @@
 name: physiquequest
 services:
-  inference:
-    build:
-      context: ../..
-      dockerfile: ai/deploy/Dockerfile
-      args:
-        OLLAMA_IMAGE: ${OLLAMA_IMAGE:-ollama/ollama:0.40.11}
-    restart: unless-stopped
-    volumes:
-      - phiq-models:/root/.ollama
-    networks:
-      inference:
-        aliases: [ollama]
-    # No published port: only the backend can reach the inference network.
-    stop_grace_period: 30s
   backend:
     build: ../../backend
     restart: unless-stopped
-    depends_on:
-      inference:
-        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: '4000'
@@ -46,15 +29,27 @@ services:
       EMAIL_VERIFICATION_ENFORCED: 'false'
       PUSH_PROVIDER: ${PUSH_PROVIDER:-dry-run}
       EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set the server-side OpenAI API key}
+      POSE_ANALYSIS_URL: http://pose:8000/analyze
+      POSE_ANALYSIS_API_KEY: ${POSE_ANALYSIS_API_KEY:?Set a private pose service key}
+      POSE_ANALYSIS_PRIVATE_DOCKER: 'true'
+      GOOGLE_WEB_CLIENT_ID: ${GOOGLE_WEB_CLIENT_ID:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       USDA_API_KEY: ${USDA_API_KEY:-}
-      CHAT_OLLAMA_URL: http://ollama:11434
-      CHAT_OLLAMA_MODEL: physiquequest-phiq
-      CHAT_KEEP_ALIVE: 30m
       CHAT_MAX_CONCURRENCY: '1'
       CHAT_MAX_OUTPUT_TOKENS: '384'
-      CHAT_WARMUP_ENABLED: 'true'
-    networks: [app, inference]
+      CHAT_WARMUP_ENABLED: 'false'
+      AI_RATE_LIMIT_PER_USER_HOUR: ${AI_RATE_LIMIT_PER_USER_HOUR:-30}
+      AI_RATE_LIMIT_GLOBAL_DAY: ${AI_RATE_LIMIT_GLOBAL_DAY:-500}
+    networks: [app, pose-private]
+  pose:
+    build:
+      context: ../..
+      dockerfile: pose-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      POSE_ANALYSIS_API_KEY: ${POSE_ANALYSIS_API_KEY:?Set a private pose service key}
+    networks: [pose-private]
   coach:
     build: ../../backend
     restart: unless-stopped
@@ -95,10 +90,8 @@ services:
     networks: [app]
 networks:
   app: {}
-  inference: {}
-    # Inference needs outbound access only for the initial public weight download.
-    # No frontend/Coach/gateway membership, no public inference port.
+  pose-private:
+    internal: true
 volumes:
-  phiq-models: {}
   tls-data: {}
   tls-config: {}

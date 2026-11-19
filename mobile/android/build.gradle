@@ -24,3 +24,37 @@ allprojects {
 
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
+
+// NDK 27.1.12297006 + CMake 3.22.1 do not seed libc++ into the link step for shared
+// libraries: CMAKE_CXX_STANDARD_LIBRARIES ends up as "-latomic -lm", so every native
+// module fails with "undefined symbol: std::__ndk1::..." (mutex, basic_string, __cxa_*, RTTI).
+// The STL selection is still c++_shared; only the C++ standard libraries are missing from
+// the link line, so seed them explicitly for every Android module's CMake build.
+def pqCxxStandardLibraries = "-DCMAKE_CXX_STANDARD_LIBRARIES=-lc++_shared -latomic -lm"
+// Windows still enforces the 260 character MAX_PATH limit for this build tree, and the
+// autolinked codegen object files exceed it. CMAKE_OBJECT_PATH_MAX makes CMake shorten
+// object paths (hashing them under an obj/ directory) instead of failing in ninja.
+// CMake rejects values below 128; 240 keeps hashing enabled below MAX_PATH.
+def pqObjectPathMax = "-DCMAKE_OBJECT_PATH_MAX=240"
+
+def seedCxxStandardLibraries = { project ->
+  def androidExt = project.extensions.findByName('android')
+  if (androidExt == null) {
+    return
+  }
+  try {
+    def cmakeArgs = androidExt.defaultConfig.externalNativeBuild.cmake.arguments
+    if (!cmakeArgs.any { it.startsWith('-DCMAKE_CXX_STANDARD_LIBRARIES=') }) {
+      cmakeArgs.add(pqCxxStandardLibraries)
+    }
+    cmakeArgs.removeAll { it.startsWith('-DCMAKE_OBJECT_PATH_MAX=') }
+    cmakeArgs.add(pqObjectPathMax)
+  } catch (Exception ignored) {
+    // Module has no CMake external native build configured.
+  }
+}
+
+subprojects { project ->
+  project.plugins.withId('com.android.library') { seedCxxStandardLibraries(project) }
+  project.plugins.withId('com.android.application') { seedCxxStandardLibraries(project) }
+}

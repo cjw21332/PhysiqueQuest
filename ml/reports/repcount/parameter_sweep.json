@@ -1,0 +1,335 @@
+{
+  "emaAlpha": {
+    "0.1": {
+      "overall_mae": 10.989247311827956,
+      "undercounts": 84,
+      "overcounts": 3,
+      "per_class_mae": {
+        "bench_press": 8.666666666666666,
+        "jumping_jack": 24.714285714285715,
+        "front_raise": 3.2666666666666666,
+        "pull_up": 6.166666666666667,
+        "squat": 9.75,
+        "push_up": 8.23076923076923,
+        "situp": 15.0
+      }
+    },
+    "0.2": {
+      "overall_mae": 7.10752688172043,
+      "undercounts": 64,
+      "overcounts": 8,
+      "per_class_mae": {
+        "bench_press": 4.583333333333333,
+        "jumping_jack": 14.214285714285714,
+        "front_raise": 1.8,
+        "pull_up": 5.166666666666667,
+        "squat": 2.8333333333333335,
+        "push_up": 5.769230769230769,
+        "situp": 13.933333333333334
+      }
+    },
+    "0.3": {
+      "overall_mae": 4.827956989247312,
+      "undercounts": 53,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4666666666666666,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.3076923076923075,
+        "situp": 13.2
+      }
+    },
+    "0.4": {
+      "overall_mae": 4.505376344086022,
+      "undercounts": 49,
+      "overcounts": 19,
+      "per_class_mae": {
+        "bench_press": 3.8333333333333335,
+        "jumping_jack": 2.142857142857143,
+        "front_raise": 1.3333333333333333,
+        "pull_up": 4.083333333333333,
+        "squat": 1.25,
+        "push_up": 5.384615384615385,
+        "situp": 12.6
+      }
+    },
+    "0.5": {
+      "overall_mae": 4.344086021505376,
+      "undercounts": 45,
+      "overcounts": 22,
+      "per_class_mae": {
+        "bench_press": 4.083333333333333,
+        "jumping_jack": 1.9285714285714286,
+        "front_raise": 1.1333333333333333,
+        "pull_up": 4.166666666666667,
+        "squat": 1.25,
+        "push_up": 5.0,
+        "situp": 12.066666666666666
+      }
+    },
+    "0.6": {
+      "overall_mae": 4.161290322580645,
+      "undercounts": 44,
+      "overcounts": 24,
+      "per_class_mae": {
+        "bench_press": 4.0,
+        "jumping_jack": 1.7857142857142858,
+        "front_raise": 1.2,
+        "pull_up": 4.166666666666667,
+        "squat": 1.0833333333333333,
+        "push_up": 4.846153846153846,
+        "situp": 11.333333333333334
+      }
+    }
+  },
+  "fullRangeThreshold": {
+    "0.6": {
+      "overall_mae": 4.774193548387097,
+      "undercounts": 48,
+      "overcounts": 16,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.2,
+        "pull_up": 4.666666666666667,
+        "squat": 1.6666666666666667,
+        "push_up": 5.384615384615385,
+        "situp": 13.0
+      }
+    },
+    "0.65": {
+      "overall_mae": 4.774193548387097,
+      "undercounts": 49,
+      "overcounts": 15,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.2666666666666666,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.384615384615385,
+        "situp": 13.0
+      }
+    },
+    "0.7": {
+      "overall_mae": 4.774193548387097,
+      "undercounts": 51,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.083333333333333,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.384615384615385,
+        "situp": 13.0
+      }
+    },
+    "0.75": {
+      "overall_mae": 4.78494623655914,
+      "undercounts": 52,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.166666666666667,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.384615384615385,
+        "situp": 13.0
+      }
+    },
+    "0.8": {
+      "overall_mae": 4.795698924731183,
+      "undercounts": 52,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.3076923076923075,
+        "situp": 13.066666666666666
+      }
+    },
+    "0.85": {
+      "overall_mae": 4.827956989247312,
+      "undercounts": 53,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4666666666666666,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.3076923076923075,
+        "situp": 13.2
+      }
+    }
+  },
+  "startTolerance": {
+    "0.15": {
+      "overall_mae": 5.139784946236559,
+      "undercounts": 62,
+      "overcounts": 10,
+      "per_class_mae": {
+        "bench_press": 4.666666666666667,
+        "jumping_jack": 3.142857142857143,
+        "front_raise": 1.8,
+        "pull_up": 4.916666666666667,
+        "squat": 1.5833333333333333,
+        "push_up": 5.3076923076923075,
+        "situp": 13.6
+      }
+    },
+    "0.2": {
+      "overall_mae": 4.827956989247312,
+      "undercounts": 53,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4666666666666666,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.3076923076923075,
+        "situp": 13.2
+      }
+    },
+    "0.25": {
+      "overall_mae": 4.78494623655914,
+      "undercounts": 51,
+      "overcounts": 17,
+      "per_class_mae": {
+        "bench_press": 4.0,
+        "jumping_jack": 2.2142857142857144,
+        "front_raise": 1.5333333333333334,
+        "pull_up": 4.5,
+        "squat": 1.9166666666666667,
+        "push_up": 5.538461538461538,
+        "situp": 12.933333333333334
+      }
+    },
+    "0.3": {
+      "overall_mae": 4.559139784946237,
+      "undercounts": 51,
+      "overcounts": 16,
+      "per_class_mae": {
+        "bench_press": 3.5833333333333335,
+        "jumping_jack": 2.142857142857143,
+        "front_raise": 1.3333333333333333,
+        "pull_up": 4.25,
+        "squat": 2.0833333333333335,
+        "push_up": 5.230769230769231,
+        "situp": 12.466666666666667
+      }
+    }
+  },
+  "minRepDurationMs": {
+    "300": {
+      "overall_mae": 4.838709677419355,
+      "undercounts": 53,
+      "overcounts": 15,
+      "per_class_mae": {
+        "bench_press": 4.416666666666667,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4666666666666666,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.3076923076923075,
+        "situp": 13.133333333333333
+      }
+    },
+    "400": {
+      "overall_mae": 4.827956989247312,
+      "undercounts": 53,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4666666666666666,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.3076923076923075,
+        "situp": 13.2
+      }
+    },
+    "500": {
+      "overall_mae": 4.838709677419355,
+      "undercounts": 55,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.0,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4666666666666666,
+        "pull_up": 4.5,
+        "squat": 1.6666666666666667,
+        "push_up": 5.538461538461538,
+        "situp": 13.333333333333334
+      }
+    },
+    "600": {
+      "overall_mae": 5.0,
+      "undercounts": 57,
+      "overcounts": 13,
+      "per_class_mae": {
+        "bench_press": 3.8333333333333335,
+        "jumping_jack": 3.4285714285714284,
+        "front_raise": 1.6,
+        "pull_up": 4.5,
+        "squat": 1.6666666666666667,
+        "push_up": 5.615384615384615,
+        "situp": 13.333333333333334
+      }
+    }
+  },
+  "maxRepDurationMs": {
+    "8000": {
+      "overall_mae": 4.838709677419355,
+      "undercounts": 53,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4666666666666666,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.384615384615385,
+        "situp": 13.2
+      }
+    },
+    "10000": {
+      "overall_mae": 4.827956989247312,
+      "undercounts": 53,
+      "overcounts": 14,
+      "per_class_mae": {
+        "bench_press": 4.25,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4666666666666666,
+        "pull_up": 4.583333333333333,
+        "squat": 1.6666666666666667,
+        "push_up": 5.3076923076923075,
+        "situp": 13.2
+      }
+    },
+    "12000": {
+      "overall_mae": 4.795698924731183,
+      "undercounts": 52,
+      "overcounts": 16,
+      "per_class_mae": {
+        "bench_press": 4.166666666666667,
+        "jumping_jack": 2.4285714285714284,
+        "front_raise": 1.4,
+        "pull_up": 4.5,
+        "squat": 1.6666666666666667,
+        "push_up": 5.230769230769231,
+        "situp": 13.266666666666667
+      }
+    }
+  },
+  "extractionFPS": {}
+}

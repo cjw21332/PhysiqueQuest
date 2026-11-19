@@ -25,7 +25,7 @@ const components = async (file, react = React) => {
   const mealDiary = await load('sections/Scan/MealDiary.tsx', name => name === '../Home/icons' ? icons : name === './types' ? types : name === './nutrientTotal' ? nutrientTotal : name.endsWith('/titleCase') ? { titleCase } : require(name));
   const waterTracker = await load('sections/Scan/WaterTracker.tsx', name => name === '../Home/icons' ? icons : require(name));
   const deleteConfirmation = await load('components/DeleteConfirmation.tsx', name => name === '../sections/Home/icons' ? icons : require(name));
-  return load(`sections/Scan/${file}.tsx`, name => name === 'react' ? react : name === '../Home/icons' ? icons : name === './types' ? types : name === '../Home/CalorieProgress' ? calorieProgress : name === './FoodNameSearch' ? foodNameSearch : name === './MealDiary' ? mealDiary : name === './WaterTracker' ? waterTracker : name === '../../components/DeleteConfirmation' ? deleteConfirmation : name === '../Scan/AdditionalNutrition' ? additionalNutrition : name === '../Scan/nutrientTotal' ? nutrientTotal : name.endsWith('/titleCase') ? { titleCase } : require(name));
+  return load(`sections/Scan/${file}.tsx`, name => name === 'react' ? react : name === '../Home/icons' ? icons : name === './types' ? types : name === '../Home/CalorieProgress' ? calorieProgress : name === './FoodNameSearch' ? foodNameSearch : name === './MealDiary' ? mealDiary : name === './WaterTracker' ? waterTracker : name === '../../components/DeleteConfirmation' ? deleteConfirmation : name === '../Scan/AdditionalNutrition' ? additionalNutrition : name === '../Scan/nutrientTotal' || name === './nutrientTotal' ? nutrientTotal : name.endsWith('/titleCase') ? { titleCase } : require(name));
 };
 
 test('shared Home calorie progress handles empty, partial, and exceeded targets', async () => {
@@ -41,7 +41,7 @@ test('shared Home calorie progress handles empty, partial, and exceeded targets'
     if (calories > 2300) assert.equal(circle.props.strokeDashoffset, 0);
     assert.match(renderToStaticMarkup(tree), /home-calorie-progress/);
   }
-  for (const file of ['sections/Home/HomeDashboard.tsx', 'sections/Scan/DailyLog.tsx']) {
+  for (const file of ['sections/Home/HomeDashboard.tsx', 'sections/Scan/NutritionDashboard.tsx']) {
     assert.match(await readFile(new URL(`../${file}`, import.meta.url), 'utf8'), /<CalorieProgress/);
   }
 });
@@ -79,8 +79,8 @@ test('typed food names use debounced backend search and ignore obsolete results'
   assert.equal(state[0], '');
   cleanup();
 });
-test('today log displays source, edited flag and original time, with an edit action and empty meal state', async () => {
-  const { default: Log } = await components('DailyLog');
+test('meal cards display source, edited flag and original time, with an edit action and empty meal state', async () => {
+  const { default: Log } = await components('MealDiary');
   const { sampleMeals } = await load('sections/Scan/types.ts');
   const html = renderToStaticMarkup(React.createElement(Log, { meals: sampleMeals.map(item => ({ ...item, edited: item.meal === 'Lunch' })), water: 5, onBack() {}, onHistory() {}, onAdd() {}, onEdit() {}, onWater() {} }));
   assert.match(html, /Scanned · 07:20/);
@@ -97,13 +97,14 @@ test('meal editor supports individual foods in a multi-item meal and retains the
   assert.match(html, /Food to edit/);
   assert.match(html, /Oats and eggs/i);
   assert.match(html, /Chicken rice bowl/i);
-  assert.match(html, /Back to Today&#x27;s Log/);
+  assert.match(html, /Back to Nutrition/);
   assert.match(html, /Save changes/);
-  assert.equal((html.match(/type="number"/g) || []).length, 4);
+  assert.equal((html.match(/type="number"/g) || []).length, 5);
+  assert.match(html, /Quantity/);
 });
 test('scan logging sends the device-local logging time rather than leaving it empty', async () => {
-  const hook = await readFile(new URL('../hooks/useNutrition.ts', import.meta.url), 'utf8');
-  assert.match(hook, /api\.addMealsFromScan\(\{[^}]*time: new Date\(\)\.toLocaleTimeString/);
+  const scan = await readFile(new URL('../sections/Scan/ScanSection.tsx', import.meta.url), 'utf8');
+  assert.match(scan, /beginPendingScanSave\(scope,meal,items,formatLocalDate\(\),new Date\(\)\.toLocaleTimeString/);
 });
 
 test('editor awaits persistence, preserves entry identity, and shows failed saves for retry', async () => {
@@ -128,4 +129,43 @@ test('editor awaits persistence, preserves entry identity, and shows failed save
   await render().props.onSubmit({ preventDefault() {} });
   assert.equal(state[2], '');
   assert.equal(state[1], false);
+});
+
+test('changing a known quantity scales nutrition, while an unknown quantity does not invent values', async () => {
+  const state = []; let cursor = 0;
+  const react = { ...React, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; } };
+  const { default: Editor } = await components('EditMeal', react);
+  const { sampleMeals } = await load('sections/Scan/types.ts');
+  const find = (node, predicate) => { if (!node || typeof node !== 'object') return; if (predicate(node)) return node; for (const child of [node.props?.children].flat(Infinity)) { const result = find(child, predicate); if (result) return result; } };
+  let saved;
+  const props = { entries: [{ ...sampleMeals[0], estWeightG: 100, calories: 200, protein: 10, fiber: 4 }], onBack() {}, async onSave(value) { saved = value; } };
+  const render = () => { cursor = 0; return Editor(props); };
+  find(render(), node => node.type === 'input' && node.props['aria-describedby'] === 'meal-quantity-hint').props.onChange({ target: { value: '250' } });
+  await render().props.onSubmit({ preventDefault() {} });
+  assert.equal(saved.estWeightG, 250); assert.equal(saved.calories, 500); assert.equal(saved.protein, 25); assert.equal(saved.fiber, 10);
+  state.length = 0;
+  props.entries = [{ ...sampleMeals[0], calories: 200 }];
+  find(render(), node => node.type === 'input' && node.props['aria-describedby'] === 'meal-quantity-hint').props.onChange({ target: { value: '250' } });
+  await render().props.onSubmit({ preventDefault() {} });
+  assert.equal(saved.estWeightG, 250); assert.equal(saved.calories, 200);
+});
+
+test('servings preserve the portion on conversion and save the serving weight', async () => {
+  const state = []; let cursor = 0;
+  const react = { ...React, useState(initial) { const index = cursor++; if (!(index in state)) state[index] = initial; return [state[index], value => { state[index] = typeof value === 'function' ? value(state[index]) : value; }]; } };
+  const { default: Editor } = await components('EditMeal', react);
+  const { sampleMeals } = await load('sections/Scan/types.ts');
+  const find = (node, predicate) => { if (!node || typeof node !== 'object') return; if (predicate(node)) return node; for (const child of [node.props?.children].flat(Infinity)) { const result = find(child, predicate); if (result) return result; } };
+  let saved;
+  const props = { entries: [{ ...sampleMeals[0], estWeightG: 160, calories: 208 }], onBack() {}, async onSave(value) { saved = value; } };
+  const render = () => { cursor = 0; return Editor(props); };
+  find(render(), node => node.type === 'button' && node.props.children === 'Servings').props.onClick();
+  find(render(), node => node.type === 'input' && node.props.placeholder === 'Enter serving weight').props.onChange({ target: { value: '8' } });
+  find(render(), node => node.type === 'input' && node.props.placeholder === 'Enter serving weight').props.onChange({ target: { value: '80' } });
+  assert.equal(find(render(), node => node.type === 'input' && node.props.id === 'meal-quantity').props.value, '2');
+  find(render(), node => node.type === 'input' && node.props.id === 'meal-quantity').props.onChange({ target: { value: '3' } });
+  await render().props.onSubmit({ preventDefault() {} });
+  assert.equal(saved.estWeightG, 240); assert.equal(saved.servingSizeG, 80); assert.equal(saved.calories, 312);
+  find(render(), node => node.type === 'button' && node.props.children === 'Grams').props.onClick();
+  assert.equal(find(render(), node => node.type === 'input' && node.props.id === 'meal-quantity').props.value, '240');
 });

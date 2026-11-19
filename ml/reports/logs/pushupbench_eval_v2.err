@@ -1,0 +1,24 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794243795.480004   27064 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794243799.065317   27064 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+WARNING: Logging before InitGoogle() is written to STDERR
+W0000 00:00:1794243802.142070   30824 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1794243802.155975   27048 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1794243802.677042   32628 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1794243802.690959   28656 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+Traceback (most recent call last):
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\scripts\56_pushupbench_eval.py", line 446, in <module>
+    main()
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\scripts\56_pushupbench_eval.py", line 319, in main
+    local_path, error = create_detector()  # This creates detector, we'll use it later
+    ^^^^^^^^^^^^^^^^^
+TypeError: cannot unpack non-iterable PoseLandmarker object
+Exception ignored in: <function PoseLandmarker.__del__ at 0x000002269F729EE0>
+Traceback (most recent call last):
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\mediapipe\tasks\python\vision\pose_landmarker.py", line 611, in __del__
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\mediapipe\tasks\python\vision\pose_landmarker.py", line 586, in close
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\mediapipe\tasks\python\core\serial_dispatcher.py", line 74, in shutdown_aware_handler
+  File "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\ml\.venv\Lib\site-packages\mediapipe\tasks\python\core\mediapipe_c_utils.py", line 126, in dispatcher_wrapper
+TypeError: 'NoneType' object is not callable

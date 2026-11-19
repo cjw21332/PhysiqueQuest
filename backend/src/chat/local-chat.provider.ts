@@ -7,6 +7,7 @@ import { isIP } from 'node:net';
 import { Readable } from 'node:stream';
 import { CHAT_CONFIG_KEYS, chatConfig, isPrivateChatAddress } from './chat-config.js';
 import { SEMANTIC_ROUTING_INSTRUCTIONS, SEMANTIC_ROUTING_PRECISION, SEMANTIC_SCHEMA, completeSemanticPlan, parseSemanticPlan, semanticCandidates, semanticHints, type SemanticPlan } from './chat-semantic-router.js';
+import { openAIResponse, OPENAI_MODEL } from '../common/openai.js';
 
 export type LocalChatMessage = { role: 'system' | 'user'; content: string };
 export type GroundedReply = { inScope: boolean; answer: string; sourceIds: string[] };
@@ -77,8 +78,11 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
   constructor(private readonly config: ConfigService) {}
 
   private settings() { return chatConfig(Object.fromEntries(CHAT_CONFIG_KEYS.map(key => [key, this.config.get(key)]))); }
-  private signal(timeoutMs: number) { return AbortSignal.any([AbortSignal.timeout(timeoutMs), this.shutdown.signal]); }
+  private signal(timeoutMs: number, requestSignal?: AbortSignal) { return AbortSignal.any([AbortSignal.timeout(timeoutMs), this.shutdown.signal, ...(requestSignal ? [requestSignal] : [])]); }
   private async checkModel(settings: ChatSettings, signal: AbortSignal) {
+    if (!process.env.OPENAI_API_KEY?.trim()) throw new Error('OpenAI is not configured');
+    return;
+    /* Legacy local model validation retained for potential future migration.
     const key = settings.url + '\n' + settings.model;
     if (this.verified?.key === key && this.verified.expiresAt > Date.now()) return;
     if (this.checking?.key === key) return this.checking.promise;
@@ -91,11 +95,27 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
       if (this.checking?.key === key) this.verified = { key, expiresAt: Date.now() + settings.modelCheckTtlMs };
     })();
     this.checking = { key, promise };
-    try { await promise; } finally { if (this.checking?.promise === promise) this.checking = undefined; }
+    try { await promise; } finally { if (this.checking?.promise === promise) this.checking = undefined; } */
+  }
+
+  private async cloudChat(body: { messages: Array<{ role: string; content: string }>; format: unknown; options: { num_predict: number; [key: string]: unknown }; [key: string]: unknown }, signal: AbortSignal) {
+    const input = body.messages.map(message => ({ role: message.role, content: message.content }));
+    input.unshift({ role: 'system', content: 'Return only valid JSON matching this schema: ' + JSON.stringify(body.format) });
+    const result = await openAIResponse(input, Math.max(512, body.options.num_predict), signal, process.env.OPENAI_MODEL?.trim() || OPENAI_MODEL);
+    return { done: true, done_reason: 'stop', message: { content: result.content } };
   }
 
   /** No host, model identifier, conversation, user data, or provider errors are exposed. */
   async status(): Promise<{ ready: boolean }> {
+    const key = process.env.OPENAI_API_KEY?.trim();
+    if (!key) return { ready: false };
+    try {
+      const model = process.env.OPENAI_MODEL?.trim() || OPENAI_MODEL;
+      const response = await fetch(`https://api.openai.com/v1/models/${encodeURIComponent(model)}`, { headers: { Authorization: `Bearer ${key}` }, signal: this.signal(5000), redirect: 'error' });
+      await response.body?.cancel();
+      return { ready: response.ok };
+    } catch { return { ready: false }; }
+    /*
     try {
       const settings = this.settings(), signal = this.signal(Math.min(settings.timeoutMs, 5000));
       await this.checkModel(settings, signal);
@@ -105,11 +125,13 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
         const entry = model as Record<string, unknown>;
         return canonical(entry.name) === canonical(settings.model) || canonical(entry.model) === canonical(settings.model);
       }) };
-    } catch { return { ready: false }; }
+    } catch { return { ready: false }; } */
   }
 
   /** Startup/prewarm only: sends an empty message list, never user or database data. */
   async warmup(): Promise<{ ready: boolean }> {
+    return this.status();
+    /*
     if (this.warming) return this.warming;
     const operation = (async () => {
       const settings = this.settings();
@@ -127,10 +149,12 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
       finally { this.active--; }
     })();
     this.warming = operation;
-    try { return await operation; } finally { if (this.warming === operation) this.warming = undefined; }
+    try { return await operation; } finally { if (this.warming === operation) this.warming = undefined; } */
   }
 
   onApplicationBootstrap() {
+    return;
+    /*
     const settings = this.settings();
     if (!settings.warmupEnabled) return;
     void this.warmup().catch(() => undefined);
@@ -138,7 +162,7 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
       const intervalMs = Math.max(1000, Math.min(15 * 60000, Math.floor(settings.keepAliveSeconds * 800)));
       this.maintenance = setInterval(() => { if (!this.active) void this.warmup().catch(() => undefined); }, intervalMs);
       this.maintenance.unref();
-    }
+    } */
   }
   onModuleDestroy() {
     if (this.maintenance) clearInterval(this.maintenance);
@@ -146,18 +170,19 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
   }
 
   /** Meaning-only planning: no account records, IDs, database tools or free-form queries. */
-  async routeQuestion(question: string, previousUserQuestions: readonly string[] = [], page?: string): Promise<SemanticPlan> {
+  async routeQuestion(question: string, previousUserQuestions: readonly string[] = [], page?: string, requestSignal?: AbortSignal): Promise<SemanticPlan> {
     const settings = this.settings();
     if (this.active >= settings.maxConcurrency) throw new ServiceUnavailableException('Phiq is busy. Please try again shortly.');
     this.active++;
     try {
-      const signal = this.signal(Math.min(settings.timeoutMs, 20000));
+      const signal = this.signal(Math.min(settings.timeoutMs, 20000), requestSignal);
+      signal.throwIfAborted();
       await this.checkModel(settings, signal);
       const candidates = semanticCandidates(question, previousUserQuestions, page);
       const evidence = semanticHints(question, previousUserQuestions, page);
       const maxRoutes = evidence.compound || evidence.topics.length > 1 || evidence.nutrients.length > 1 || evidence.measurementMetrics.length > 1 ? 3 : 1;
       const format = { ...SEMANTIC_SCHEMA, properties: { ...SEMANTIC_SCHEMA.properties, routeIds: { ...SEMANTIC_SCHEMA.properties.routeIds, maxItems: maxRoutes, items: { type: 'string', enum: [...candidates.map(route => route.id), 'clarify', 'out_of_scope', 'boundary'] } } } };
-      const result = await readJson(await privateRequest(settings, 'chat', {
+      const result = await this.cloudChat({
         model: settings.model, stream: false, think: false, truncate: false, shift: false, keep_alive: settings.keepAlive,
         messages: [
           { role: 'system', content: SEMANTIC_ROUTING_INSTRUCTIONS + '\n' + SEMANTIC_ROUTING_PRECISION + '\nSupported routes: ' + JSON.stringify(candidates.map(({ id, description }) => ({ id, description }))) },
@@ -165,7 +190,7 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
         ],
         format,
         options: { temperature: 0, num_ctx: settings.contextTokens, num_predict: Math.min(settings.maxOutputTokens, 256) },
-      }, signal), 16384);
+      }, signal);
       const message = result.message as Record<string, unknown> | undefined;
       if (result.done !== true || result.done_reason === 'length' || message?.tool_calls || typeof message?.content !== 'string') throw new Error('Invalid semantic plan');
       const plan = parseSemanticPlan(JSON.parse(message.content));
@@ -177,12 +202,13 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
     } finally { this.active--; }
   }
 
-  async generate(messages: LocalChatMessage[], sourceIds: string[]): Promise<GroundedReply> {
+  async generate(messages: LocalChatMessage[], sourceIds: string[], requestSignal?: AbortSignal): Promise<GroundedReply> {
     const settings = this.settings();
     if (this.active >= settings.maxConcurrency) throw new ServiceUnavailableException('Phiq is busy. Please try again shortly.');
     this.active++;
     try {
-      const signal = this.signal(settings.timeoutMs);
+      const signal = this.signal(settings.timeoutMs, requestSignal);
+      signal.throwIfAborted();
       await this.checkModel(settings, signal);
       const schema = {
         type: 'object', additionalProperties: false, required: ['inScope', 'answer', 'sourceIds'],
@@ -191,10 +217,10 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
           sourceIds: { type: 'array', maxItems: 8, items: { type: 'string', enum: sourceIds } },
         },
       };
-      const result = await readJson(await privateRequest(settings, 'chat', {
+      const result = await this.cloudChat({
         model: settings.model, messages, stream: false, think: false, truncate: false, shift: false, format: schema,
         keep_alive: settings.keepAlive, options: { temperature: 0.1, num_ctx: settings.contextTokens, num_predict: settings.maxOutputTokens },
-      }, signal), 32768);
+      }, signal);
       const message = result.message as Record<string, unknown> | undefined;
       if (result.done !== true || result.done_reason === 'length' || message?.tool_calls || typeof message?.content !== 'string') throw new Error('Invalid private response');
       const reply: unknown = JSON.parse(message.content);
@@ -206,7 +232,7 @@ export class LocalChatProvider implements OnApplicationBootstrap, OnModuleDestro
       return parsed;
     } catch {
       this.verified = undefined;
-      throw new ServiceUnavailableException('Phiq’s private model is unavailable right now. Please try again later.');
+      throw new ServiceUnavailableException('Phiq is unavailable right now. Please try again later.');
     } finally { this.active--; }
   }
 }

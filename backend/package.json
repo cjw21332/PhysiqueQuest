@@ -13,6 +13,7 @@
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
+    "prestart:dev": "node scripts/ensure-local-pose.mjs",
     "start:dev": "nest start --config nest-cli.dev.json --path tsconfig.dev.json --watch",
     "start:debug": "nest start --path tsconfig.dev.json --debug --watch",
     "start:prod": "node ./dist/main.js",

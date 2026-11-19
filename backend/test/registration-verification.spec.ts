@@ -15,7 +15,7 @@ describe('registration verification', () => {
     const consumeRegistration = vi.fn().mockRejectedValue(new Error('invalid code'));
     const controller = new AuthController({ register } as any, {} as any, { issue } as any, { consumeRegistration } as any);
     const req = { is: () => true, get: () => 'http://localhost:3000' } as any;
-    const dto = { email: 'test@example.invalid', name: 'Test', password: 'Password1', requestId: 'a'.repeat(64), code: '123456' };
+    const dto = { email: 'test@example.invalid', name: 'Test', password: 'Password1', requestId: 'a'.repeat(64), code: '123456', profile: { name: 'Test', age: '25', height: '170', heightUnit: 'cm', weight: '70', weightUnit: 'kg', gender: 'Other', activity: 'Moderate', goal: 'Strength', seriousness: 'Consistent', equipment: ['Dumbbells'], days: ['Monday'], duration: '30 min', conditions: [], contactName: 'Friend', contactPhone: '09123456789' } };
     await expect(controller.sessionRegister(dto, req, {} as any)).rejects.toThrow('invalid code');
     expect(register).not.toHaveBeenCalled();
     expect(issue).not.toHaveBeenCalled();

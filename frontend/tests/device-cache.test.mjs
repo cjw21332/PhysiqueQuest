@@ -113,7 +113,7 @@ test('rejects valid JSON with an invalid resource shape and does not reuse old s
   f.cache.publish('profile', { name: 'Ana' });
   const cache = createDeviceCache({ ...f.options, validate: (_key, data) => typeof data.name === 'string' });
   assert.equal(cache.get('profile').data.name, 'Ana');
-  await assert.rejects(cache.fetch('profile', async () => ({ unexpected: true }), true), /incomplete data/);
+  await assert.rejects(cache.fetch('profile', async () => ({ unexpected: true }), true), /Some information could not be loaded/);
   assert.equal(cache.get('profile').data.name, 'Ana');
   let finish;
   const pending = cache.fetch('profile', () => new Promise(resolve => { finish = resolve; }), true);

@@ -1,3 +1,4 @@
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -14,7 +15,7 @@ export class ProgressService {
     const measuredAt = new Date(dto.measuredAt);
     if (!Number.isFinite(measuredAt.getTime())) throw new BadRequestException('Measurement date is invalid');
     if (measuredAt.getTime() > Date.now() + 60_000) throw new BadRequestException('Measurement date cannot be in the future');
-    return this.model.create({ userId: new Types.ObjectId(userId), metric: dto.metric, value: dto.value, unit: dto.unit, measuredAt });
+    return new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => (await this.model.create([{ userId: new Types.ObjectId(userId), metric: dto.metric, value: dto.value, unit: dto.unit, measuredAt }], { session }))[0]);
   }
   async list(userId: string, metric: string, limit = 90, skip = 0) {
     if (typeof metric !== 'string' || (metric && !['weight', 'chest', 'waist', 'arms', 'benchPress'].includes(metric))) throw new BadRequestException('Invalid measurement metric');
@@ -25,7 +26,7 @@ export class ProgressService {
   }
   async remove(userId: string, id: string) {
     if (!Types.ObjectId.isValid(id)) throw new NotFoundException('Measurement not found');
-    const deleted = await this.model.findOneAndDelete({ _id: new Types.ObjectId(id), userId: new Types.ObjectId(userId) });
+    const deleted = await new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.findOneAndDelete({ _id: new Types.ObjectId(id), userId: new Types.ObjectId(userId) }).session(session));
     if (!deleted) throw new NotFoundException('Measurement not found');
     return deleted;
   }

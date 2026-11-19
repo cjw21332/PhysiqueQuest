@@ -1,0 +1,52 @@
+[
+  {
+    "exercise_id": "01e83deb_0015_c-curl twist_[13]",
+    "name": "c-curl twist",
+    "pattern": "core_flexion",
+    "primary_joints": [
+      11,
+      23,
+      25
+    ],
+    "start_angle": 47.4,
+    "peak_angle": 44.9,
+    "direction": "flexion",
+    "rep_period_range": [
+      0.8,
+      3.0
+    ],
+    "side_mode": "bilateral",
+    "min_rom_fraction": 0.85,
+    "min_visibility": 0.5,
+    "stability_frames": 3,
+    "validation_status": "rule",
+    "parameter_source": "rule",
+    "num_reps_detected": 1,
+    "angle_range": 2.5
+  },
+  {
+    "exercise_id": "04996ace_0016_reverse lunges challenge_[50]",
+    "name": "reverse lunges challenge",
+    "pattern": "squat",
+    "primary_joints": [
+      24,
+      26,
+      28
+    ],
+    "start_angle": 115.1,
+    "peak_angle": 170.5,
+    "direction": "extension",
+    "rep_period_range": [
+      1.31,
+      2.8
+    ],
+    "side_mode": "bilateral",
+    "min_rom_fraction": 0.85,
+    "min_visibility": 0.5,
+    "stability_frames": 3,
+    "validation_status": "gif",
+    "parameter_source": "gif",
+    "num_reps_detected": 2,
+    "angle_range": 55.5
+  }
+]

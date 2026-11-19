@@ -95,8 +95,8 @@ export default function PersonalDataEdit({ profile, onBack, onSave, error }: Pro
 
       <div className="field">
         <span>Weight</span>
-        <div className="input-wrap">
-          <span>{data.weight}</span><small>{profile.weightUnit || 'kg'}</small><button type="button" onClick={() => setWeightOpen(true)}>Update weight</button>
+        <div className="input-wrap weight-value-control">
+          <span>{data.weight || 'Not set'} <small>{data.weight ? profile.weightUnit || 'kg' : ''}</small></span><button type="button" onClick={() => setWeightOpen(true)}><Icon name="edit" size={16}/> Update weight</button>
         </div>
       </div>
       {weightNotice && <p role="status">{weightNotice}</p>}

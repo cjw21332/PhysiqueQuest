@@ -1,0 +1,76 @@
+{
+  "experiment": "e8_focal",
+  "config": {
+    "model": "cnn_attention",
+    "loss": "focal",
+    "window": 48,
+    "drop_visibility": false,
+    "drop_ambiguous": false
+  },
+  "classes": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "hinge",
+    "horizontal_push",
+    "lateral_raise",
+    "squat"
+  ],
+  "windows": 4889,
+  "cv_folds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seeds": [
+    7
+  ],
+  "folds": [
+    {
+      "seed": 7,
+      "fold": 0,
+      "val_accuracy": null,
+      "val_macro_f1": 0.273,
+      "best_epoch": 1,
+      "epochs_run": 6,
+      "parameters": 168200,
+      "seconds": 9.2
+    },
+    {
+      "seed": 7,
+      "fold": 1,
+      "val_accuracy": null,
+      "val_macro_f1": 0.5759,
+      "best_epoch": 7,
+      "epochs_run": 12,
+      "parameters": 168200,
+      "seconds": 19.0
+    },
+    {
+      "seed": 7,
+      "fold": 2,
+      "val_accuracy": null,
+      "val_macro_f1": 0.3917,
+      "best_epoch": 5,
+      "epochs_run": 10,
+      "parameters": 168200,
+      "seconds": 15.5
+    },
+    {
+      "seed": 7,
+      "fold": 3,
+      "val_accuracy": null,
+      "val_macro_f1": 0.4217,
+      "best_epoch": 6,
+      "epochs_run": 11,
+      "parameters": 168200,
+      "seconds": 17.5
+    }
+  ],
+  "mean_val_macro_f1": 0.4156,
+  "sd_val_macro_f1": 0.108,
+  "min_val_macro_f1": 0.273,
+  "max_val_macro_f1": 0.5759,
+  "median_best_epoch": 5
+}

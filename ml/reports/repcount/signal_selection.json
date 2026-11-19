@@ -1,0 +1,163 @@
+{
+  "jumping_jack": {
+    "best_joint": "shoulder",
+    "best_signal": "abduction",
+    "best_score": {
+      "mean_mae": 2.64,
+      "mean_visibility": 0.8984589324448509,
+      "n": 25,
+      "exact_pct": 20.0,
+      "within1_pct": 36.0
+    },
+    "all_candidates": {
+      "shoulder_abduction": {
+        "mean_mae": 2.64,
+        "mean_visibility": 0.8984589324448509,
+        "n": 25,
+        "exact_pct": 20.0,
+        "within1_pct": 36.0
+      }
+    }
+  },
+  "push_up": {
+    "best_joint": "elbow",
+    "best_signal": "flexion",
+    "best_score": {
+      "mean_mae": 9.923076923076923,
+      "mean_visibility": 0.9719235435873491,
+      "n": 26,
+      "exact_pct": 7.6923076923076925,
+      "within1_pct": 23.076923076923077
+    },
+    "all_candidates": {
+      "elbow_flexion": {
+        "mean_mae": 9.923076923076923,
+        "mean_visibility": 0.9719235435873491,
+        "n": 26,
+        "exact_pct": 7.6923076923076925,
+        "within1_pct": 23.076923076923077
+      },
+      "shoulder_flexion": {
+        "mean_mae": 14.11111111111111,
+        "mean_visibility": 0.8673542066529333,
+        "n": 18,
+        "exact_pct": 5.555555555555555,
+        "within1_pct": 5.555555555555555
+      }
+    }
+  },
+  "bench_press": {
+    "best_joint": "elbow",
+    "best_signal": "flexion",
+    "best_score": {
+      "mean_mae": 6.083333333333333,
+      "mean_visibility": 0.9674521243368536,
+      "n": 24,
+      "exact_pct": 8.333333333333332,
+      "within1_pct": 29.166666666666668
+    },
+    "all_candidates": {
+      "elbow_flexion": {
+        "mean_mae": 6.083333333333333,
+        "mean_visibility": 0.9674521243368536,
+        "n": 24,
+        "exact_pct": 8.333333333333332,
+        "within1_pct": 29.166666666666668
+      }
+    }
+  },
+  "situp": {
+    "best_joint": "hip",
+    "best_signal": "flexion",
+    "best_score": {
+      "mean_mae": 14.7,
+      "mean_visibility": 0.9422829629567598,
+      "n": 30,
+      "exact_pct": 10.0,
+      "within1_pct": 16.666666666666664
+    },
+    "all_candidates": {
+      "hip_flexion": {
+        "mean_mae": 14.7,
+        "mean_visibility": 0.9422829629567598,
+        "n": 30,
+        "exact_pct": 10.0,
+        "within1_pct": 16.666666666666664
+      }
+    }
+  },
+  "squat": {
+    "best_joint": "hip",
+    "best_signal": "flexion",
+    "best_score": {
+      "mean_mae": 2.7083333333333335,
+      "mean_visibility": 0.9911191494298546,
+      "n": 24,
+      "exact_pct": 33.33333333333333,
+      "within1_pct": 54.166666666666664
+    },
+    "all_candidates": {
+      "knee_flexion": {
+        "mean_mae": 3.0833333333333335,
+        "mean_visibility": 0.9885991855678009,
+        "n": 24,
+        "exact_pct": 33.33333333333333,
+        "within1_pct": 54.166666666666664
+      },
+      "hip_flexion": {
+        "mean_mae": 2.7083333333333335,
+        "mean_visibility": 0.9911191494298546,
+        "n": 24,
+        "exact_pct": 33.33333333333333,
+        "within1_pct": 54.166666666666664
+      }
+    }
+  },
+  "front_raise": {
+    "best_joint": "shoulder",
+    "best_signal": "abduction",
+    "best_score": {
+      "mean_mae": 2.0384615384615383,
+      "mean_visibility": 0.8270902027105672,
+      "n": 26,
+      "exact_pct": 11.538461538461538,
+      "within1_pct": 61.53846153846154
+    },
+    "all_candidates": {
+      "shoulder_abduction": {
+        "mean_mae": 2.0384615384615383,
+        "mean_visibility": 0.8270902027105672,
+        "n": 26,
+        "exact_pct": 11.538461538461538,
+        "within1_pct": 61.53846153846154
+      }
+    }
+  },
+  "pull_up": {
+    "best_joint": "shoulder",
+    "best_signal": "flexion",
+    "best_score": {
+      "mean_mae": 3.2857142857142856,
+      "mean_visibility": 0.8018987050223002,
+      "n": 21,
+      "exact_pct": 38.095238095238095,
+      "within1_pct": 47.61904761904761
+    },
+    "all_candidates": {
+      "elbow_flexion": {
+        "mean_mae": 5.333333333333333,
+        "mean_visibility": 0.9076113946494724,
+        "n": 24,
+        "exact_pct": 29.166666666666668,
+        "within1_pct": 41.66666666666667
+      },
+      "shoulder_flexion": {
+        "mean_mae": 3.2857142857142856,
+        "mean_visibility": 0.8018987050223002,
+        "n": 21,
+        "exact_pct": 38.095238095238095,
+        "within1_pct": 47.61904761904761
+      }
+    }
+  }
+}

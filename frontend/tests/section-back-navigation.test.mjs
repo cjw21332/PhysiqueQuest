@@ -7,10 +7,10 @@ const source = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 test('every nested section header places its back control before the page heading', async () => {
   const pages = [
     'Home/GoalsMilestones', 'Home/Progress', 'Home/Notifications',
-    'Coach/ExerciseLibrary', 'Coach/CameraCheck', 'Coach/WorkoutReport',
-    'Scan/ReviewEstimate', 'Scan/AddFood', 'Scan/DailyLog', 'Scan/FoodHistory', 'Scan/EditMeal',
+    'Coach/ExerciseLibrary', 'Coach/CameraCheck', 'Coach/WorkoutReport', 'Coach/SquatFormPreview', 'Coach/PoseTrackerSession',
+    'Scan/ReviewEstimate', 'Scan/AddFood', 'Scan/FoodHistory', 'Scan/EditMeal', 'Scan/DietaryPlan',
     'Quests Section/QuestSection', 'Me Section/MeEditLayout',
-    'Me Section/AdminExerciseLibrary', 'Me Section/EngagementAnalytics', 'Me Section/EmergencyAlertLog',
+    'Me Section/AdminExerciseLibrary', 'Me Section/EngagementAnalytics', 'Me Section/EmergencyAlertLog', 'Me Section/PersonalExercises',
   ];
   for (const page of pages) {
     const content = await source(`sections/${page}.tsx`);
@@ -35,18 +35,19 @@ test('standalone Goals and Progress pages return to the Home dashboard', async (
   const progress = await source('sections/Home/Progress.tsx');
 
   assert.match(goals, /aria-label="Back to Home"[^>]*><Icon name="arrow"/);
-  assert.match(goals, /onClick=\{\(\) => navigate\('\/home'\)\}/);
-  assert.match(progress, /aria-label="Back to Home"[^>]*><Icon name="arrow"/);
-  assert.match(progress, /onClick=\{\(\) => navigate\('\/home'\)\}/);
+  assert.match(goals, /onClick=\{\(\) => push\('\/home'\)\}/);
+  assert.match(progress, /className="coach-back"/);
+  assert.match(progress, /<Icon name="arrow" size=\{20\}\/>/);
+  assert.match(progress, /navigate\(new URLSearchParams\(window\.location\.search\)\.get\('from'\) === 'goals' \? '\/goals' : '\/home'\)/);
 });
 
-test('Scan Today log returns to Nutrition and retains its history action', async () => {
-  const dailyLog = await source('sections/Scan/DailyLog.tsx');
+test('Scan dashboard retains its history action and old route redirects', async () => {
+  const dashboard = await source('sections/Scan/NutritionDashboard.tsx');
   const scanSection = await source('sections/Scan/ScanSection.tsx');
 
-  assert.match(dailyLog, /aria-label="Back to Nutrition"[^>]*><Icon name="arrow"/);
   assert.match(scanSection, /onBack=\{\(\)\s*=>\s*setView\('nutrition'\)\}/);
-  assert.match(dailyLog, /onClick=\{onHistory\}/);
+  assert.match(dashboard, /onClick=\{onHistory\}/);
+  assert.match(await source('app/(app)/scan/[view]/page.tsx'), /view === 'today'\) redirect\('\/scan'\)/);
 });
 
 test('Me alert log and Coach workout report return to their section roots', async () => {

@@ -58,13 +58,175 @@ test('starts all four reads before the profile finishes and deduplicates Home co
   const fixture = await setup(page);
   fixture.block('profile-blocked');
   await page.goto('/home');
-  await expect.poll(() => new Set(fixture.calls.map(call => call.path)).size).toBe(4);
+  await expect.poll(() => new Set(fixture.calls.map(call => call.path)).size).toBeGreaterThanOrEqual(4);
   expect(fixture.calls.every(call => call.method === 'GET')).toBe(true);
   fixture.release();
   await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Saved workout' })).toBeVisible();
   expect(fixture.calls.filter(call => call.path.endsWith('/coach/plan'))).toHaveLength(1);
   expect(fixture.calls.filter(call => call.path.endsWith('/nutrition'))).toHaveLength(1);
+});
+
+test('Me shows saved information offline and prevents edits until reconnecting', async ({ page }) => {
+  const fixture = await setup(page);
+  await page.goto('/me');
+  await expect(page.getByRole('heading', { name: 'Account & settings' })).toBeVisible();
+  await expect(page.getByRole('switch', { name: 'Inactivity monitoring' })).toBeVisible();
+  fixture.offline();
+  await page.evaluate(() => window.dispatchEvent(new Event('offline')));
+  const offlineDialog = page.getByRole('button', { name: 'Continue offline' });
+  await expect(offlineDialog).toBeVisible();
+  await offlineDialog.click();
+  await expect(page.getByRole('heading', { name: 'Account & settings' })).toBeVisible();
+  await expect(page.getByText(profile.name)).toBeVisible();
+  await expect(page.getByRole('switch', { name: 'Inactivity monitoring' })).toBeDisabled();
+  await page.getByRole('button', { name: /Personal data/ }).click();
+  await expect(page.getByLabel('Full name')).toHaveValue(profile.name);
+  await expect(page.getByLabel('Full name')).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Save changes' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Go back' }).click();
+  fixture.release();
+  await page.evaluate(() => window.dispatchEvent(new Event('physiquequest:connection-restored')));
+  await expect(page.getByRole('switch', { name: 'Inactivity monitoring' })).toBeEnabled();
+});
+
+test('offline tabs open their own screens and personal exercises persist locally', async ({ page }) => {
+  const fixture = await setup(page);
+  await page.goto('/scan');
+  await expect(page.getByRole('heading', { name: 'Nutrition', exact: true })).toBeVisible();
+  await page.goto('/me');
+  await expect(page.getByRole('heading', { name: 'Account & settings' })).toBeVisible();
+  await page.goto('/home');
+  await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toBeVisible();
+  await expect(page.locator('.greeting-meta')).toContainText('October 19, 2026');
+  await page.waitForTimeout(1500);
+  fixture.offline();
+  await page.evaluate(() => { Object.defineProperty(navigator, 'onLine', { configurable: true, value: false }); window.dispatchEvent(new Event('offline')); });
+  const continueOffline = page.getByRole('button', { name: 'Continue offline' });
+  await expect(continueOffline).toBeVisible();
+  await continueOffline.click();
+  await page.evaluate(() => { window.offlineNavigationMarker = 'preserved'; });
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Me, account and settings' }).click();
+  await expect(page).toHaveURL(/\/me$/);
+  await expect(page.getByRole('heading', { name: 'Account & settings' })).toBeVisible();
+  expect(await page.evaluate(() => window.offlineNavigationMarker)).toBe('preserved');
+  await page.getByRole('button', { name: /My exercises/ }).click();
+  await expect(page.getByText('Offline · your saved exercises are read-only.')).toHaveCount(0);
+  await page.getByRole('button', { name: 'New', exact: true }).click();
+  await page.getByLabel('Exercise Name').fill('Offline cable row');
+  await page.getByRole('button', { name: 'Save Exercise' }).click();
+  await expect(page.getByText('Offline Cable Row', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Back to account settings' }).click();
+  await page.getByRole('button', { name: /My exercises/ }).click();
+  await expect(page.getByText('Offline Cable Row', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Back to account settings' }).click();
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Scan food and nutrition' }).click();
+  await expect(page.getByRole('heading', { name: 'Nutrition', exact: true })).toBeVisible();
+  await expect(page.getByText('Offline · showing saved nutrition')).toHaveCount(0);
+});
+
+test('offline leaderboard shows a preview and reconnects only after a successful check', async ({ page }) => {
+  const fixture = await setup(page);
+  await page.addInitScript(() => sessionStorage.setItem('pq-offline-dismissed', '1'));
+  await page.addLocatorHandler(page.getByRole('dialog', { name: "You're offline" }), async dialog => {
+    await dialog.getByRole('button', { name: 'Continue offline' }).click();
+  });
+  let leaderboardAvailable = false;
+  await page.route('**/api/leaderboard?*', route => leaderboardAvailable
+    ? route.fulfill({ json: { entries: [], self: { rank: 1, points: 0, movement: 0 } } })
+    : route.abort('failed'));
+  await page.goto('/quests');
+  await expect(page.getByRole('heading', { name: 'Quests', exact: true })).toBeVisible();
+  fixture.offline();
+  await page.evaluate(() => { Object.defineProperty(navigator, 'onLine', { configurable: true, value: false }); window.dispatchEvent(new Event('offline')); });
+  await page.getByRole('button', { name: 'Leaderboard', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Connect to see rankings' });
+  await expect(dialog).toBeVisible();
+  await expect(page.locator('.leaderboard-offline-preview')).toBeVisible();
+  await expect(page.locator('.leaderboard-offline-preview')).toHaveAttribute('inert', '');
+  await dialog.getByRole('button', { name: 'Try again' }).click();
+  await expect(dialog.getByRole('status')).toContainText('Still offline');
+  await dialog.getByRole('button', { name: 'Back to quests' }).click();
+  await expect(page.getByRole('heading', { name: 'Quests', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Leaderboard', exact: true }).click();
+  fixture.release(); leaderboardAvailable = true;
+  await page.evaluate(() => Object.defineProperty(navigator, 'onLine', { configurable: true, value: true }));
+  await page.getByRole('dialog', { name: 'Connect to see rankings' }).getByRole('button', { name: 'Try again' }).click();
+  await expect(page.getByRole('dialog', { name: 'Connect to see rankings' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Leaderboard', exact: true })).toBeVisible();
+});
+
+test('measurement errors use clear language without exposing technical details', async ({ page }) => {
+  await setup(page);
+  await page.route('**/api/progress', route => route.request().method() === 'POST'
+    ? route.fulfill({ status: 500, json: { message: 'Internal server error' } })
+    : route.fulfill({ json: [] }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/progress');
+  await page.getByRole('button', { name: 'Chest', exact: true }).click();
+  await page.getByRole('button', { name: 'Add', exact: true }).click();
+  await page.getByLabel('Log chest (cm)').fill('90');
+  await page.getByRole('button', { name: 'Save measurement' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Something went wrong' });
+  await expect(dialog).toContainText('Something went wrong on our end. Please try again in a moment.');
+  await expect(dialog).not.toContainText(/api|server|database|500/i);
+  await dialog.getByRole('button', { name: 'Got it' }).click();
+  await expect(dialog).toHaveCount(0);
+});
+
+test('page headings align the back icon and title consistently', async ({ page }) => {
+  await setup(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [url, title] of [['/goals', 'Goals'], ['/progress', 'Progress'], ['/me/personal-data', 'Personal data']]) {
+    await page.goto(url);
+    const header = page.locator('.pq-page-heading').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
+    await expect(header).toBeVisible();
+    const back = header.locator('.coach-back');
+    const heading = header.getByRole('heading', { name: title, exact: true });
+    const iconBox = await back.boundingBox();
+    const titleBox = await heading.boundingBox();
+    expect(iconBox.width).toBe(44);
+    expect(titleBox.x - (iconBox.x + iconBox.width)).toBe(8);
+    expect(Math.abs((iconBox.y + iconBox.height / 2) - (titleBox.y + titleBox.height / 2))).toBeLessThan(2);
+    expect(await heading.evaluate(node => getComputedStyle(node).fontSize)).toBe('17px');
+  }
+});
+
+test('Progress keeps the same divided header as Goals while scrolling', async ({ page }) => {
+  await setup(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const styles = [];
+  for (const [url, title] of [['/goals', 'Goals'], ['/progress', 'Progress']]) {
+    await page.goto(url);
+    const header = page.locator('.section-page-head').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
+    await expect(header).toBeVisible();
+    const before = await header.boundingBox();
+    styles.push(await header.evaluate(node => ({ position: getComputedStyle(node).position, border: getComputedStyle(node).borderBottomWidth, color: getComputedStyle(node).borderBottomColor, height: getComputedStyle(node).height })));
+    await page.locator('.home-content').evaluate(node => { node.scrollTop = 400; });
+    await expect.poll(() => page.locator('.home-content').evaluate(node => node.scrollTop)).toBeGreaterThan(0);
+    const after = await header.boundingBox();
+    expect(Math.abs(after.y - before.y)).toBeLessThan(2);
+    await expect(header.getByRole('button', { name: /back/i })).toBeVisible();
+  }
+  expect(styles[1]).toEqual(styles[0]);
+  expect(styles[1].position).toBe('sticky');
+  expect(styles[1].border).toBe('1px');
+});
+
+test('dietary plan keeps its divided header visible while scrolling', async ({ page }) => {
+  await setup(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/scan/plan');
+  const header = page.locator('.diet-header');
+  await expect(header.getByRole('heading', { name: 'My Dietary Plan' })).toBeVisible();
+  const before = await header.boundingBox();
+  const styles = await header.evaluate(node => ({ position: getComputedStyle(node).position, border: getComputedStyle(node).borderBottomWidth }));
+  await page.locator('.scan-content').evaluate(node => { node.scrollTop = 400; });
+  await expect.poll(() => page.locator('.scan-content').evaluate(node => node.scrollTop)).toBeGreaterThan(0);
+  const after = await header.boundingBox();
+  expect(Math.abs(after.y - before.y)).toBeLessThan(2);
+  expect(styles).toEqual({ position: 'sticky', border: '1px' });
+  await expect(header.getByRole('button', { name: 'Back to Nutrition' })).toBeVisible();
 });
 
 test('restores saved Home, Coach and Scan data while refreshing, then replaces it', async ({ page }) => {

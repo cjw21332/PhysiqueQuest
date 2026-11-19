@@ -1,0 +1,75 @@
+{
+  "experiment": "e9_clean_labels",
+  "config": {
+    "model": "cnn_attention",
+    "loss": "weighted_ce",
+    "window": 48,
+    "drop_visibility": false,
+    "drop_ambiguous": true
+  },
+  "classes": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "hinge",
+    "horizontal_push",
+    "squat"
+  ],
+  "windows": 4543,
+  "cv_folds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seeds": [
+    7
+  ],
+  "folds": [
+    {
+      "seed": 7,
+      "fold": 0,
+      "val_accuracy": null,
+      "val_macro_f1": 0.5876,
+      "best_epoch": 4,
+      "epochs_run": 9,
+      "parameters": 168071,
+      "seconds": 12.3
+    },
+    {
+      "seed": 7,
+      "fold": 1,
+      "val_accuracy": null,
+      "val_macro_f1": 0.3172,
+      "best_epoch": 6,
+      "epochs_run": 11,
+      "parameters": 168071,
+      "seconds": 14.1
+    },
+    {
+      "seed": 7,
+      "fold": 2,
+      "val_accuracy": null,
+      "val_macro_f1": 0.488,
+      "best_epoch": 2,
+      "epochs_run": 7,
+      "parameters": 168071,
+      "seconds": 8.9
+    },
+    {
+      "seed": 7,
+      "fold": 3,
+      "val_accuracy": null,
+      "val_macro_f1": 0.5232,
+      "best_epoch": 8,
+      "epochs_run": 13,
+      "parameters": 168071,
+      "seconds": 18.7
+    }
+  ],
+  "mean_val_macro_f1": 0.479,
+  "sd_val_macro_f1": 0.1,
+  "min_val_macro_f1": 0.3172,
+  "max_val_macro_f1": 0.5876,
+  "median_best_epoch": 5
+}

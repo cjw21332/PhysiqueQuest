@@ -4,12 +4,14 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ApplyRecordingDto, CompleteWorkoutDto, CreateWorkoutDto, PauseWorkoutDto, RecordedWorkoutDto, SaveSetDto, UpdateRoutineDto } from './dto/workout.dto.js';
 import { WorkoutsService } from './workouts.service.js';
 import { CancelWorkoutDto } from './dto/workout.dto.js';
+import { WorkoutAiService } from './workout-ai.service.js';
+import { AiRateLimitGuard } from '../common/ai-rate-limit.guard.js';
 
 type AuthenticatedRequest = Request & { user: { userId: string } };
 @Controller('workouts')
 @UseGuards(JwtAuthGuard)
 export class WorkoutsController {
-  constructor(private readonly service: WorkoutsService) {}
+  constructor(private readonly service: WorkoutsService, private readonly ai: WorkoutAiService) {}
   @Post() create(@Req() req: AuthenticatedRequest, @Body() dto: CreateWorkoutDto) { return this.service.create(req.user.userId, dto); }
   @Get() list(@Req() req: AuthenticatedRequest, @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number, @Query('before') before?: string, @Query('date') date?: string, @Query('timezone') timezone?: string) { return date !== undefined ? this.service.forDay(req.user.userId, date, timezone) : this.service.list(req.user.userId, limit, before); }
   @Get('active') async active(@Req() req: AuthenticatedRequest, @Res() response: Response) {
@@ -19,6 +21,7 @@ export class WorkoutsController {
   }
   @Get('summary') summary(@Req() req: AuthenticatedRequest, @Query('timezone') timezone?: string) { return this.service.summary(req.user.userId, timezone); }
   @Get(':id') @Header('Cache-Control', 'no-store') detail(@Req() req: AuthenticatedRequest, @Param('id') id: string) { return this.service.detail(req.user.userId, id); }
+  @Post(':id/ai-summary') @UseGuards(AiRateLimitGuard) aiSummary(@Req() req: AuthenticatedRequest, @Param('id') id: string) { return this.ai.summarize(req.user.userId, id); }
   @Post('recorded') record(@Req() req: AuthenticatedRequest, @Body() dto: RecordedWorkoutDto) { return this.service.record(req.user.userId, dto); }
   @Post('recorded/:id/apply') applyRecording(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: ApplyRecordingDto) { return this.service.applyRecording(req.user.userId, id, dto); }
   @Patch(':id/sets') saveSet(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: SaveSetDto) { return this.service.saveSet(req.user.userId, id, dto); }

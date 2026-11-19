@@ -1,0 +1,152 @@
+{
+  "model": "models\\pattern_v1\\cnn1d.onnx",
+  "window": 48,
+  "features": 132,
+  "classes": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "hinge",
+    "horizontal_push",
+    "lateral_raise",
+    "squat"
+  ],
+  "val_windows": 3961,
+  "test_windows": 928,
+  "gate": {
+    "max_val_macro_f1_drop": 0.015,
+    "max_size_bytes": 1000000
+  },
+  "variants": [
+    {
+      "format": "fp32",
+      "status": "ok",
+      "size_bytes": 671572,
+      "val": {
+        "accuracy": 0.8624,
+        "macro_f1": 0.776
+      },
+      "test": {
+        "accuracy": 0.4688,
+        "macro_f1": 0.3589
+      },
+      "latency_ms_batch1": 0.122,
+      "val_delta_vs_fp32": 0.0
+    },
+    {
+      "format": "fp16",
+      "status": "ok",
+      "size_bytes": 337124,
+      "val": {
+        "accuracy": 0.8624,
+        "macro_f1": 0.776
+      },
+      "test": {
+        "accuracy": 0.4688,
+        "macro_f1": 0.3589
+      },
+      "latency_ms_batch1": 0.13,
+      "val_delta_vs_fp32": 0.0
+    },
+    {
+      "format": "int8_dynamic",
+      "status": "ok",
+      "size_bytes": 173419,
+      "val": {
+        "accuracy": 0.5259,
+        "macro_f1": 0.497
+      },
+      "test": {
+        "accuracy": 0.3966,
+        "macro_f1": 0.25
+      },
+      "latency_ms_batch1": 1.471,
+      "val_delta_vs_fp32": -0.279
+    },
+    {
+      "format": "int8_dynamic_pc",
+      "status": "ok",
+      "size_bytes": 173453,
+      "val": {
+        "accuracy": 0.5259,
+        "macro_f1": 0.4973
+      },
+      "test": {
+        "accuracy": 0.3966,
+        "macro_f1": 0.2501
+      },
+      "latency_ms_batch1": 1.481,
+      "val_delta_vs_fp32": -0.2787
+    },
+    {
+      "format": "int8_dynamic_conv",
+      "status": "ok",
+      "size_bytes": 173453,
+      "val": {
+        "accuracy": 0.5259,
+        "macro_f1": 0.4973
+      },
+      "test": {
+        "accuracy": 0.3966,
+        "macro_f1": 0.2501
+      },
+      "latency_ms_batch1": 1.454,
+      "val_delta_vs_fp32": -0.2787
+    },
+    {
+      "format": "int8_static_qdq",
+      "status": "ok",
+      "size_bytes": 178225,
+      "val": {
+        "accuracy": 0.8617,
+        "macro_f1": 0.7771
+      },
+      "test": {
+        "accuracy": 0.4752,
+        "macro_f1": 0.3634
+      },
+      "latency_ms_batch1": 0.063,
+      "val_delta_vs_fp32": 0.0011
+    },
+    {
+      "format": "int8_static_qdq_sym",
+      "status": "ok",
+      "size_bytes": 178250,
+      "val": {
+        "accuracy": 0.8617,
+        "macro_f1": 0.7771
+      },
+      "test": {
+        "accuracy": 0.4752,
+        "macro_f1": 0.3634
+      },
+      "latency_ms_batch1": 0.055,
+      "val_delta_vs_fp32": 0.0011
+    },
+    {
+      "format": "int8_static_tensor",
+      "status": "ok",
+      "size_bytes": 174716,
+      "val": {
+        "accuracy": 0.8634,
+        "macro_f1": 0.7812
+      },
+      "test": {
+        "accuracy": 0.4752,
+        "macro_f1": 0.3612
+      },
+      "latency_ms_batch1": 0.054,
+      "val_delta_vs_fp32": 0.0052
+    }
+  ],
+  "selection": {
+    "passing_formats": [
+      "fp32",
+      "fp16",
+      "int8_static_qdq",
+      "int8_static_qdq_sym",
+      "int8_static_tensor"
+    ],
+    "best_mobile_format": "int8_static_tensor"
+  }
+}

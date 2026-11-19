@@ -1,11 +1,11 @@
 import { test,expect } from '@playwright/test';
 test('bottom navigation scales text, exposes current destination and supports touch',async({page},info)=>{
   const headers={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'*'};
-  await page.addInitScript(()=>localStorage.setItem('physiquequest-auth',JSON.stringify({id:'touch-user',name:'Student',token:'test'})));
   await page.route('**/api/**',async route=>{
     if(route.request().method()==='OPTIONS')return route.fulfill({status:204,headers});
     const path=new URL(route.request().url()).pathname;
     let json={};
+    if(path.includes('/auth/session/'))json={user:{id:'touch-user',name:'Student',email:'student@example.test'},access_token:'test-token',expires_in:3600};
     if(path.endsWith('/profile'))json={name:'Student',goal:'Strength',equipment:['Bodyweight only'],days:['Monday'],duration:'30 min'};
     if(path.endsWith('/coach/plan'))json={days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map((name,index)=>({name,index,isWorkoutDay:false,exercises:[]})),libraryReady:true};
     if(path.endsWith('/workouts/active'))json=null;

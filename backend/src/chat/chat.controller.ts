@@ -3,7 +3,6 @@ import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsIn, IsOptional, IsStr
 import { Type } from 'class-transformer';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { ChatRateLimitGuard } from './chat-rate-limit.guard.js';
 import { ChatService } from './chat.service.js';
 
 class ChatMessage {
@@ -16,9 +15,15 @@ export class ChatRequest {
   @IsOptional() @IsString() @MaxLength(160) page?: string;
 }
 @Controller('chat')
-@UseGuards(JwtAuthGuard, ChatRateLimitGuard)
+@UseGuards(JwtAuthGuard)
 export class ChatController {
   constructor(private readonly chat: ChatService) {}
   @Get('status') status() { return this.chat.status(); }
-  @Post() send(@Req() req: Request & { user: { userId: string } }, @Body() body: ChatRequest) { return this.chat.reply(req.user.userId, body.messages, body.includePersonalData ?? false, body.page); }
+  @Post() async send(@Req() req: Request & { user: { userId: string } }, @Body() body: ChatRequest) {
+    const cancellation = new AbortController();
+    const onClose = () => { if (!req.res?.writableEnded) cancellation.abort(); };
+    req.res?.once('close', onClose);
+    try { return await this.chat.reply(req.user.userId, body.messages, body.includePersonalData ?? false, body.page, cancellation.signal); }
+    finally { req.res?.off('close', onClose); }
+  }
 }

@@ -1,0 +1,450 @@
+{
+  "summary": {
+    "classes": [
+      "cardio_dynamic",
+      "core_flexion",
+      "core_isometric",
+      "hinge",
+      "horizontal_push",
+      "lateral_raise",
+      "squat"
+    ],
+    "excluded_classes": [
+      "curl",
+      "triceps_extension"
+    ],
+    "excluded_reason": "fewer than 4 distinct subjects: cannot hold out a subject without leaking identical footage between train and test",
+    "windows_total": 4906,
+    "windows_per_split": {
+      "train": 3291,
+      "val": 687,
+      "test": 928
+    },
+    "subjects_per_split": {
+      "train": 21,
+      "val": 4,
+      "test": 5
+    },
+    "videos_per_split": {
+      "train": 148,
+      "val": 37,
+      "test": 42
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.5248,
+      "val_acc": 0.3042,
+      "val_macro_f1": 0.2022
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.2427,
+      "val_acc": 0.3712,
+      "val_macro_f1": 0.2396
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.1411,
+      "val_acc": 0.3231,
+      "val_macro_f1": 0.2081
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.1208,
+      "val_acc": 0.4192,
+      "val_macro_f1": 0.2582
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.0584,
+      "val_acc": 0.4178,
+      "val_macro_f1": 0.2543
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.0302,
+      "val_acc": 0.4221,
+      "val_macro_f1": 0.26
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.0278,
+      "val_acc": 0.4338,
+      "val_macro_f1": 0.248
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.9939,
+      "val_acc": 0.3799,
+      "val_macro_f1": 0.2315
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.9807,
+      "val_acc": 0.4236,
+      "val_macro_f1": 0.2225
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.95,
+      "val_acc": 0.4279,
+      "val_macro_f1": 0.2786
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.9776,
+      "val_acc": 0.3857,
+      "val_macro_f1": 0.2315
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.9412,
+      "val_acc": 0.4061,
+      "val_macro_f1": 0.2399
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.934,
+      "val_acc": 0.4279,
+      "val_macro_f1": 0.2358
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.9298,
+      "val_acc": 0.4309,
+      "val_macro_f1": 0.2509
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.9365,
+      "val_acc": 0.4381,
+      "val_macro_f1": 0.2639
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.9157,
+      "val_acc": 0.444,
+      "val_macro_f1": 0.2758
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.9182,
+      "val_acc": 0.4367,
+      "val_macro_f1": 0.2544
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.9086,
+      "val_acc": 0.3988,
+      "val_macro_f1": 0.2256
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.9283,
+      "val_acc": 0.46,
+      "val_macro_f1": 0.2979
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.9006,
+      "val_acc": 0.4571,
+      "val_macro_f1": 0.2679
+    },
+    {
+      "epoch": 21,
+      "train_loss": 0.887,
+      "val_acc": 0.4585,
+      "val_macro_f1": 0.2795
+    },
+    {
+      "epoch": 22,
+      "train_loss": 0.9014,
+      "val_acc": 0.4745,
+      "val_macro_f1": 0.2954
+    },
+    {
+      "epoch": 23,
+      "train_loss": 0.8983,
+      "val_acc": 0.4381,
+      "val_macro_f1": 0.252
+    },
+    {
+      "epoch": 24,
+      "train_loss": 0.8941,
+      "val_acc": 0.4629,
+      "val_macro_f1": 0.2783
+    },
+    {
+      "epoch": 25,
+      "train_loss": 0.8866,
+      "val_acc": 0.4483,
+      "val_macro_f1": 0.2561
+    },
+    {
+      "epoch": 26,
+      "train_loss": 0.8765,
+      "val_acc": 0.4643,
+      "val_macro_f1": 0.2575
+    },
+    {
+      "epoch": 27,
+      "train_loss": 0.9146,
+      "val_acc": 0.3712,
+      "val_macro_f1": 0.2509
+    },
+    {
+      "epoch": 28,
+      "train_loss": 0.8794,
+      "val_acc": 0.4571,
+      "val_macro_f1": 0.3023
+    },
+    {
+      "epoch": 29,
+      "train_loss": 0.8724,
+      "val_acc": 0.441,
+      "val_macro_f1": 0.2654
+    },
+    {
+      "epoch": 30,
+      "train_loss": 0.875,
+      "val_acc": 0.492,
+      "val_macro_f1": 0.288
+    },
+    {
+      "epoch": 31,
+      "train_loss": 0.8759,
+      "val_acc": 0.4221,
+      "val_macro_f1": 0.2311
+    },
+    {
+      "epoch": 32,
+      "train_loss": 0.8794,
+      "val_acc": 0.4672,
+      "val_macro_f1": 0.2729
+    },
+    {
+      "epoch": 33,
+      "train_loss": 0.8706,
+      "val_acc": 0.4527,
+      "val_macro_f1": 0.2606
+    },
+    {
+      "epoch": 34,
+      "train_loss": 0.8523,
+      "val_acc": 0.4454,
+      "val_macro_f1": 0.2459
+    },
+    {
+      "epoch": 35,
+      "train_loss": 0.8531,
+      "val_acc": 0.4789,
+      "val_macro_f1": 0.2803
+    },
+    {
+      "epoch": 36,
+      "train_loss": 0.8698,
+      "val_acc": 0.4338,
+      "val_macro_f1": 0.2621
+    },
+    {
+      "epoch": 37,
+      "train_loss": 0.8579,
+      "val_acc": 0.4614,
+      "val_macro_f1": 0.2798
+    },
+    {
+      "epoch": 38,
+      "train_loss": 0.8649,
+      "val_acc": 0.4003,
+      "val_macro_f1": 0.2391
+    }
+  ],
+  "manifest": {
+    "model": "pattern_cnn1d",
+    "version": "1.0.0",
+    "status": "trained on real, licence-cleared recordings",
+    "dataset": "https://huggingface.co/datasets/anonymousatom/pushupbench",
+    "license": "CC-BY-4.0",
+    "attribution_required": true,
+    "feature_spec": "ml/FEATURE_SPEC.md",
+    "preprocessing": "FEATURE_SPEC pad 1.5 -> unpad -> mid-hip/torso normalise -> 15 fps",
+    "input": {
+      "shape": [
+        1,
+        48,
+        132
+      ],
+      "window_frames": 48,
+      "stride": 24
+    },
+    "classes": [
+      "cardio_dynamic",
+      "core_flexion",
+      "core_isometric",
+      "hinge",
+      "horizontal_push",
+      "lateral_raise",
+      "squat"
+    ],
+    "excluded_classes": [
+      "curl",
+      "triceps_extension"
+    ],
+    "excluded_reason": "fewer than 4 distinct subjects: cannot hold out a subject without leaking identical footage between train and test",
+    "counts": {
+      "windows_total": 4906,
+      "windows_per_split": {
+        "train": 3291,
+        "val": 687,
+        "test": 928
+      },
+      "subjects_per_split": {
+        "train": 21,
+        "val": 4,
+        "test": 5
+      }
+    },
+    "seed": 7,
+    "epochs_run": 38,
+    "best_epoch": 28,
+    "best_val_macro_f1": 0.3023,
+    "test": {
+      "accuracy": 0.4688,
+      "macro_f1": 0.3589,
+      "per_class": {
+        "cardio_dynamic": {
+          "precision": 0.4067,
+          "recall": 0.2933,
+          "f1": 0.3408,
+          "support": 208
+        },
+        "core_flexion": {
+          "precision": 0.561,
+          "recall": 0.5227,
+          "f1": 0.5412,
+          "support": 88
+        },
+        "core_isometric": {
+          "precision": 0.0857,
+          "recall": 0.0316,
+          "f1": 0.0462,
+          "support": 95
+        },
+        "hinge": {
+          "precision": 0.719,
+          "recall": 0.5148,
+          "f1": 0.6,
+          "support": 338
+        },
+        "horizontal_push": {
+          "precision": 0.2143,
+          "recall": 0.9474,
+          "f1": 0.3495,
+          "support": 19
+        },
+        "lateral_raise": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 19
+        },
+        "squat": {
+          "precision": 0.5155,
+          "recall": 0.8261,
+          "f1": 0.6348,
+          "support": 161
+        }
+      },
+      "confusion_matrix": [
+        [
+          61,
+          3,
+          0,
+          44,
+          20,
+          24,
+          56
+        ],
+        [
+          0,
+          46,
+          0,
+          23,
+          0,
+          0,
+          19
+        ],
+        [
+          68,
+          0,
+          3,
+          0,
+          16,
+          8,
+          0
+        ],
+        [
+          4,
+          33,
+          32,
+          174,
+          24,
+          39,
+          32
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          18,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          18
+        ],
+        [
+          15,
+          0,
+          0,
+          1,
+          6,
+          6,
+          133
+        ]
+      ]
+    },
+    "int8": {
+      "accuracy": 0.3966,
+      "macro_f1": 0.25,
+      "size_bytes": 173419,
+      "delta_macro_f1_vs_float": -0.1089
+    },
+    "torch_onnx_max_abs_diff": 1.9073486328125e-06,
+    "parameters": 168071,
+    "files": {
+      "cnn1d.onnx": {
+        "sha256": "2e6c07398b7b67d55021e31c6f6af58466f0640e7512b9794bf92bfe0a1bbcbe",
+        "bytes": 671572
+      },
+      "cnn1d_int8.onnx": {
+        "sha256": "7b643be58abd72c6d857c954d107a41c49ad548c4ab88377725880f0b63d2890",
+        "bytes": 173419
+      }
+    },
+    "scope_limits": [
+      "Covers only patterns present in licence-cleared recordings; horizontal_pull is absent.",
+      "Metrics are within-dataset (PushUpBench subjects), not PhysiqueQuest users.",
+      "No claim is made for rep counting; this model classifies movement pattern only."
+    ]
+  }
+}

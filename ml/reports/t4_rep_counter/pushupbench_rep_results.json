@@ -1,0 +1,52 @@
+[
+  {
+    "video": "01e83deb_0015_c-curl twist_[13]",
+    "exercise": "c-curl twist",
+    "pattern": "core_flexion",
+    "gt_reps": 13,
+    "pred_reps": 1,
+    "error": 12,
+    "rep_details": [
+      {
+        "peak_frame": 14,
+        "start_frame": 0,
+        "end_frame": 47,
+        "rom": 15.752613067626953,
+        "expected_rom": 2.4591026306152344,
+        "rom_fraction": 6.4058380126953125,
+        "duration_sec": 3.1333333333333333,
+        "type": "valley"
+      }
+    ]
+  },
+  {
+    "video": "04996ace_0016_reverse lunges challenge_[50]",
+    "exercise": "reverse lunges challenge",
+    "pattern": "squat",
+    "gt_reps": 50,
+    "pred_reps": 2,
+    "error": 48,
+    "rep_details": [
+      {
+        "peak_frame": 5,
+        "start_frame": 0,
+        "end_frame": 19,
+        "rom": 92.51371765136719,
+        "expected_rom": 55.46600341796875,
+        "rom_fraction": 1.6679354906082153,
+        "duration_sec": 1.2666666666666666,
+        "type": "peak"
+      },
+      {
+        "peak_frame": 33,
+        "start_frame": 19,
+        "end_frame": 47,
+        "rom": 57.556915283203125,
+        "expected_rom": 55.46600341796875,
+        "rom_fraction": 1.037697196006775,
+        "duration_sec": 1.8666666666666667,
+        "type": "peak"
+      }
+    ]
+  }
+]

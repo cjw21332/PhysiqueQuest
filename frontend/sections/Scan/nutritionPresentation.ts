@@ -21,8 +21,10 @@ export function createNutritionPreview(now = new Date()): { meals: FoodEntry[]; 
   return { meals, water: 5 };
 }
 
-export function summarizeHistory(meals: FoodEntry[], range: number, now = new Date()) {
-  const days = Array.from({ length: range }, (_, index) => { const day = new Date(now); day.setDate(day.getDate() - (range - index - 1)); return dateKey(day); });
+export function summarizeHistory(meals: FoodEntry[], range: number, now = new Date(), accountCreatedAt?: string | null) {
+  const created = accountCreatedAt ? new Date(accountCreatedAt) : null;
+  const startDate = created && Number.isFinite(created.getTime()) && created.getTime() <= now.getTime() ? dateKey(created) : null;
+  const days = Array.from({ length: range }, (_, index) => { const day = new Date(now); day.setDate(day.getDate() - (range - index - 1)); return dateKey(day); }).filter(day => !startDate || day >= startDate);
   const visible = meals.filter(entry => !!entry.date && days.includes(entry.date));
   const daily = days.map(date => {
     const entries = visible.filter(entry => entry.date === date);
@@ -52,7 +54,7 @@ export const previewFoods: (FoodCandidate & { detail: FoodDetail })[] = [
 }));
 
 export const previewScan: ScanAnalysis = {
-  request_id: 'local-preview', model: 'Reference preview', unmatched: [], degraded: false,
+  request_id: 'local-preview', unmatched: [], degraded: false,
   items: [
     { food_name: 'Grilled chicken breast', found: true, fdc_id: -100, est_weight_g: 150, confidence: .92, kcal: 248, protein_g: 40, carbs_g: 0, fat_g: 8 },
     { food_name: 'Steamed rice', found: true, fdc_id: -103, est_weight_g: 158, description: '1 cup', confidence: .85, kcal: 205, protein_g: 4, carbs_g: 45, fat_g: 2 },
@@ -61,5 +63,10 @@ export const previewScan: ScanAnalysis = {
 };
 export function scaleScannedItems(items: ScannedItem[], factor: number) {
   const scale = (value: number | null) => value === null ? null : value * factor;
-  return items.map(item => ({ ...item, est_weight_g: item.est_weight_g * factor, kcal: scale(item.kcal), protein_g: scale(item.protein_g), carbs_g: scale(item.carbs_g), fat_g: scale(item.fat_g) }));
+  return items.map(item => {
+    const weight = item.est_weight_g * factor;
+    const nutrient = (key: 'kcal' | 'protein_g' | 'carbs_g' | 'fat_g') => item.per_100g ? scaleByWeight(item.per_100g[key], weight) : scale(item[key]);
+    return { ...item, est_weight_g: weight, kcal: nutrient('kcal'), protein_g: nutrient('protein_g'), carbs_g: nutrient('carbs_g'), fat_g: nutrient('fat_g') };
+  });
 }
+function scaleByWeight(value: number | null, weight: number) { return value === null ? null : value * weight / 100; }

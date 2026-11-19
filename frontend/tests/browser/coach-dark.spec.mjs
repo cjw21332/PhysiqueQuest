@@ -10,9 +10,8 @@ const exercises = [
   { exerciseId: 'plank', name: 'Plank', equipment: 'Bodyweight', prescription: '3 × 45 s', tracking: 'AI tracked' },
 ];
 
-async function fixture(page) {
+async function fixture(page, equipmentLabel = 'Dumbbells') {
   await page.clock.setFixedTime(new Date('2026-10-19T08:00:00Z'));
-  await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'visual', token: 'visual-test' })));
   const profile = { name: 'Toji', equipment: ['Dumbbells'], duration: '45 min', contactName: 'Maria', contactPhone: '09123456789' };
   const catalog = exercises.map((item, i) => ({ ...item, _id: item.exerciseId, slug: item.exerciseId, targetMuscle: i === 1 ? 'Chest' : 'Shoulders', difficulty: 'Intermediate', trackingStatus: item.tracking, pose: 'ready', gifUrl: 'https://coach.test/demo.gif', recommended: '4 × 10', instructions: ['Lie flat with feet planted and a dumbbell in each hand at chest height.', 'Press both dumbbells up until your arms are straight over your shoulders.', 'Lower slowly until your elbows sit just below the bench line.', 'Pause for a beat, then press back up without bouncing.'], checks: ['Wrists stacked over elbows', 'Elbows at roughly 45° from your torso', 'Shoulder blades pinned to the bench'] }));
   await page.route('https://coach.test/demo.gif', route => route.fulfill({ contentType: 'image/gif', body: Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64') }));
@@ -24,10 +23,11 @@ async function fixture(page) {
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
     if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
     let json = {};
+    if (path.includes('/auth/session/')) json = { user: { id: 'visual', name: 'Toji', email: 'visual@example.test' }, access_token: 'visual-test', expires_in: 3600 };
     if (path.endsWith('/profile')) json = profile;
     if (path.endsWith('/settings')) json = { values: { threshold: 30 } };
     if (path.endsWith('/auth/me')) json = { id: 'visual', role: 'user' };
-    if (path.endsWith('/coach/plan')) json = { weekLabel: 'Week 3 · 4 sessions planned', duration: '45 min', libraryReady: true, days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((name, index) => ({ index, name, isWorkoutDay: [0, 2, 4, 5].includes(index), title: 'Upper Body — Push', exercises, equipmentLabel: 'Dumbbells', formTip: { exerciseName: 'Dumbbell bench press', text: 'Keep your wrists stacked over your elbows and lower until your upper arms are level with the bench.' } })) };
+    if (path.endsWith('/coach/plan')) json = { weekLabel: 'Week 3 · 4 sessions planned', duration: '45 min', libraryReady: true, days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((name, index) => ({ index, name, isWorkoutDay: [0, 2, 4, 5].includes(index), title: 'Upper Body — Push', exercises, equipmentLabel, formTip: { exerciseName: 'Dumbbell bench press', text: 'Keep your wrists stacked over your elbows and lower until your upper arms are level with the bench.' } })) };
     if (path.endsWith('/exercises')) {
       const search = (url.searchParams.get('search') || '').toLowerCase();
       const muscle = url.searchParams.get('muscle');
@@ -82,7 +82,7 @@ test('dark Coach plan, library and exercise details retain filters, playback and
   await expect(page.getByRole('heading', { name: 'Exercise library', exact: true })).toBeInViewport();
   await expectBackBeforeTitle(page);
   await capture(page, info, '03-exercise-library');
-  await page.getByRole('button', { name: /Dumbbell bench press Chest/ }).click();
+  await page.getByRole('button', { name: /Dumbbell bench press Chest/i }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCSS('background-color', 'rgb(11, 15, 21)');
   await expect(page.getByText('Manual tracking', { exact: true })).toBeVisible();
@@ -109,27 +109,30 @@ test('dark camera, upload, live session and confirmed report preserve the workou
   const state = await fixture(page);
   await page.goto('/coach');
   await page.getByRole('button', { name: 'Start session', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Camera check', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /Live session Use your camera/ }).click();
+  await expect(page.getByRole('heading', { name: 'Live camera setup', exact: true })).toBeVisible();
   await expectBackBeforeTitle(page);
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Back to AI Coach', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'AI Coach', exact: true })).toBeVisible();
+  await page.getByRole('dialog', { name: 'Choose how to train' }).getByRole('button', { name: 'Close', exact: true }).click();
   await page.getByRole('button', { name: 'Start session', exact: true }).click();
+  await page.getByRole('button', { name: /Live session Use your camera/ }).click();
   await page.getByRole('button', { name: 'Enable camera', exact: true }).click();
-  await expect(page.getByText('4 of 4 ready', { exact: true })).toBeVisible();
+  await expect(page.locator('.readiness-row').filter({ hasText: 'Camera connection' })).toContainText('Ready');
   await capture(page, info, '05-camera-check');
-  await page.getByRole('button', { name: 'Upload video', exact: true }).click();
-  await expect(page.getByRole('group', { name: 'Camera input' }).getByRole('button', { name: 'Upload video', exact: true })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('button', { name: 'Live feed', exact: true })).toHaveAttribute('aria-pressed', 'false');
+  await page.getByRole('button', { name: 'Back to AI Coach', exact: true }).click();
+  await page.getByRole('button', { name: /Review a video Choose a recording/ }).click();
   await expect(page.getByText('Upload a recorded set', { exact: true })).toBeVisible();
   await expectBackBeforeTitle(page);
-  await expectReferenceLayout(page, ['.coach-scroll', '.coach-header', '.camera-tabs', '.upload-dropzone', '.coach-footer']);
+  await expectReferenceLayout(page, ['.coach-scroll', '.coach-header', '.upload-dropzone']);
   await page.locator('.choose-video input[type="file"]').focus();
   await expect(page.locator('.choose-video input[type="file"]')).toBeFocused();
   await expect(page.locator('.choose-video')).toHaveCSS('outline-width', '2px');
   await expect(page.locator('.choose-video input[type="file"]')).toHaveAttribute('aria-label', 'Choose a recorded exercise video');
   await capture(page, info, '06-upload-video');
-  await page.getByRole('button', { name: 'Live feed', exact: true }).click();
+  await page.getByRole('button', { name: 'Back to AI Coach', exact: true }).click();
+  await page.getByRole('button', { name: /Live session Use your camera/ }).click();
   await page.getByRole('button', { name: 'Start session', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Pause workout', exact: true })).toBeVisible();
   expect(state.requestKey).toMatch(/^workout-[a-f0-9]{32}$/);
@@ -146,10 +149,9 @@ test('dark camera, upload, live session and confirmed report preserve the workou
   await expect(page.getByRole('heading', { name: 'Workout report', exact: true })).toBeVisible();
   expect(state.ended).toBe(true);
   await expect(page.getByText('42:16', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Per exercise', exact: true })).toBeVisible();
-  await expect(page.locator('.coach-footer')).toHaveCSS('background-color', 'rgb(22, 29, 39)');
-  await expectBackBeforeTitle(page);
-  await expectReferenceLayout(page, ['.coach-scroll', '.report-header', '.report-summary', '.report-section', '.coach-footer']);
+  await expect(page.getByRole('heading', { name: 'Exercise breakdown', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Back to AI Coach', exact: true })).toBeVisible();
+  await expectReferenceLayout(page, ['.coach-scroll', '.manual-report-header', '.manual-report-overview', '.manual-report-exercises']);
   await capture(page, info, '08-workout-report');
   await page.locator('.coach-scroll').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await capture(page, info, '09-workout-report-scrolled');
@@ -162,6 +164,26 @@ test('dark camera, upload, live session and confirmed report preserve the workou
   await page.locator('.coach-scroll').evaluate(el => { el.scrollTop = 0; });
   await page.getByRole('button', { name: 'Back to AI Coach', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'AI Coach', exact: true })).toBeVisible();
+});
+
+test('long equipment lists wrap inside every workout day on narrow screens', async ({ page }) => {
+  const label = 'Smith machine + dumbbells + resistance bands + cable machine + leg press machine';
+  await fixture(page, label);
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto('/coach');
+  for (const day of ['Monday', 'Wednesday', 'Friday', 'Saturday']) {
+    await page.getByRole('button', { name: `${day}, workout day` }).click();
+    const equipment = page.locator('.workout-meta .meta-item').filter({ hasText: label });
+    await expect(equipment).toBeVisible();
+    const layout = await equipment.evaluate(element => {
+      const rect = element.getBoundingClientRect(), parent = element.closest('.workout-meta').getBoundingClientRect();
+      return { left: rect.left, right: rect.right, parentLeft: parent.left, parentRight: parent.right, height: rect.height, lineHeight: parseFloat(getComputedStyle(element).lineHeight) };
+    });
+    expect(layout.left).toBeGreaterThanOrEqual(layout.parentLeft - 1);
+    expect(layout.right).toBeLessThanOrEqual(layout.parentRight + 1);
+    expect(layout.height).toBeGreaterThan(layout.lineHeight * 1.5);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
 });
 
 test('inactivity and alarm surfaces keep their dark safety colors', async ({ page }) => {

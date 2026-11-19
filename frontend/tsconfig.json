@@ -33,7 +33,17 @@
     ".next-dev/dev/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     ".next-progress-test/types/**/*.ts",
-    ".next-progress-test/dev/types/**/*.ts"
+    ".next-progress-test/dev/types/**/*.ts",
+    ".next-goals-test/types/**/*.ts",
+    ".next-goals-test/dev/types/**/*.ts",
+    ".next-phone/types/**/*.ts",
+    ".next-phone/dev/types/**/*.ts",
+    ".next-offline-workout-test/types/**/*.ts",
+    ".next-offline-workout-test/dev/types/**/*.ts",
+    ".next-proxy-verification/types/**/*.ts",
+    ".next-proxy-verification/dev/types/**/*.ts",
+    ".next-library-test/types/**/*.ts",
+    ".next-library-test/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -1,3 +1,4 @@
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import {
   Injectable,
   NotFoundException,
@@ -69,16 +70,16 @@ export class WorkoutsService implements OnModuleInit {
     payload: Record<string, unknown>,
   ) {
     const user = new Types.ObjectId(userId);
-    if (!requestKey) return this.model.create({ userId: user, ...payload });
+    if (!requestKey) return new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => (await this.model.create([{ userId: user, ...payload }], { session }))[0]);
     const requestHash = hash(payload),
       filter = { userId: user, requestKey };
     let record;
     try {
-      record = await this.model.findOneAndUpdate(
+      record = await new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.findOneAndUpdate(
         filter,
         { $setOnInsert: { ...payload, ...filter, requestHash } },
         { upsert: true, returnDocument: 'after', runValidators: true },
-      );
+      ).session(session));
     } catch (error) {
       if ((error as { code?: number }).code !== 11000) throw error;
       record = await this.model.findOne(filter).exec();
@@ -232,7 +233,7 @@ export class WorkoutsService implements OnModuleInit {
     revision: number,
     patch: Record<string, unknown>,
   ) {
-    const saved = await this.model.findOneAndUpdate(
+    const saved = await new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.findOneAndUpdate(
       {
         _id: new Types.ObjectId(id),
         userId: new Types.ObjectId(userId),
@@ -243,7 +244,7 @@ export class WorkoutsService implements OnModuleInit {
       },
       { $set: patch, $inc: { revision: 1 } },
       { returnDocument: 'after', runValidators: true },
-    );
+    ).session(session));
     if (!saved)
       throw new ConflictException(
         'This workout changed on another screen. Reload it before retrying.',
@@ -253,6 +254,8 @@ export class WorkoutsService implements OnModuleInit {
   async updateRoutine(userId: string, id: string, dto: UpdateRoutineDto) {
     const workout = await this.owned(userId, id);
     if (workout.status !== 'active') throw new BadRequestException('This workout is already completed.');
+    const lastRoutineHash = hash(dto);
+    if (workout.revision === dto.expectedRevision + 1 && workout.lastRoutineHash === lastRoutineHash) return workout;
     if ((workout.revision ?? 0) !== dto.expectedRevision) throw new ConflictException('Reload this workout before retrying.');
     const original = workout.exercises ?? [];
     const ids = dto.exercises.map(item => item.exerciseId);
@@ -266,13 +269,13 @@ export class WorkoutsService implements OnModuleInit {
       if ((workout.sets ?? []).some(set => set.exerciseId === item.exerciseId && set.setIndex >= next.sets)) throw new BadRequestException('Cannot remove saved sets.');
       return next;
     });
-    return this.change(userId, id, dto.expectedRevision, { exercises, exerciseIds: ids, ...(dto.routineName !== undefined ? { routineName: dto.routineName.trim() } : {}) });
+    return this.change(userId, id, dto.expectedRevision, { lastRoutineHash, exercises, exerciseIds: ids, ...(dto.routineName !== undefined ? { routineName: dto.routineName.trim() } : {}) });
   }
   async cancel(userId: string, id: string, expectedRevision: number) {
     const workout = await this.owned(userId, id);
     if (workout.status !== 'active') throw new BadRequestException('Only an active workout can be cancelled.');
     if ((workout.revision ?? 0) !== expectedRevision) throw new ConflictException('Reload this workout before retrying.');
-    const result = await this.model.deleteOne({ _id: workout._id, userId: new Types.ObjectId(userId), status: 'active', ...(expectedRevision === 0 ? { $or: [{ revision: 0 }, { revision: { $exists: false } }] } : { revision: expectedRevision }) });
+    const result = await new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.deleteOne({ _id: workout._id, userId: new Types.ObjectId(userId), status: 'active', ...(expectedRevision === 0 ? { $or: [{ revision: 0 }, { revision: { $exists: false } }] } : { revision: expectedRevision }) }).session(session));
     if (!result.deletedCount) throw new ConflictException('Workout changed. Reload before cancelling.');
     return { cancelled: true };
   }
@@ -285,6 +288,7 @@ export class WorkoutsService implements OnModuleInit {
         (item) => item.exerciseId === incoming.exerciseId,
       );
     this.validateLoad(incoming);
+    if (incoming.barWeightKg !== undefined && (incoming.loadKg === undefined || incoming.barWeightKg > incoming.loadKg)) throw new BadRequestException('Bar weight cannot exceed the total recorded load.');
     const existing = workout.sets?.find((item) => item.setId === incoming.setId);
     // Association is assigned only by applyRecording; ordinary edits cannot
     // detach it and make the same original recording count a second time.

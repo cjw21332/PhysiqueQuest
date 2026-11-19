@@ -26,7 +26,7 @@ export default function EmergencyAlertLog({ onBack }: { onBack: () => void }) {
 
   return (
     <section className="me-section" aria-label="Emergency alert log">
-      <header className="me-header">
+      <header className="me-header pq-page-heading">
         <button type="button" className="coach-back" onClick={onBack} aria-label="Back to account settings"><Icon name="arrow" size={20}/></button>
         <h2>Emergency alert log</h2>
         <span className="admin-view-label">Admin view</span>

@@ -81,8 +81,19 @@ def enableMinifyInReleaseBuilds = (findProperty('android.enableMinifyInReleaseBu
  * this variant is about 6MiB larger per architecture than default.
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+def releaseStore = System.getenv('PQ_ANDROID_KEYSTORE_PATH')
+def releaseStorePassword = System.getenv('PQ_ANDROID_KEYSTORE_PASSWORD')
+def releaseKeyAlias = System.getenv('PQ_ANDROID_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('PQ_ANDROID_KEY_PASSWORD')
+def releaseSigningReady = [releaseStore, releaseStorePassword, releaseKeyAlias, releaseKeyPassword].every { it }
 
 android {
+    // Allow a short native build path on Windows when the checkout path is long.
+    if (findProperty('pqCxxDir')) {
+        externalNativeBuild {
+            cmake { buildStagingDirectory file(findProperty('pqCxxDir')) }
+        }
+    }
     ndkVersion rootProject.ext.ndkVersion
 
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -95,8 +106,19 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2
         versionName "1.0.0"
+        buildConfigField "boolean", "PQ_STANDALONE", "false"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
+
+        // See ../../build.gradle. NDK 27.1 + CMake 3.22.1 drop libc++ from the link line
+        // (undefined std::__ndk1::* symbols), and the autolinked codegen object paths
+        // exceed the Windows 260 character MAX_PATH limit. The React Native plugin
+        // rewrites this module's CMake arguments, so they are set here as well.
+        externalNativeBuild {
+            cmake {
+                arguments '-DCMAKE_CXX_STANDARD_LIBRARIES=-lc++_shared -latomic -lm', '-DCMAKE_OBJECT_PATH_MAX=240'
+            }
+        }
     }
     signingConfigs {
         debug {
@@ -105,15 +127,32 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        if (releaseSigningReady) {
+            release {
+                storeFile file(releaseStore)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
-        release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
+        // A release-like, debug-signed build for testing an embedded JS bundle.
+        // It deliberately keeps the existing WebView origin until migration is ready.
+        standalone {
+            initWith release
             signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
+            debuggable false
+            minifyEnabled false
+            shrinkResources false
+            buildConfigField "boolean", "PQ_STANDALONE", "true"
+        }
+        release {
+            if (releaseSigningReady) signingConfig signingConfigs.release
             def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'
             shrinkResources enableShrinkResources.toBoolean()
             minifyEnabled enableMinifyInReleaseBuilds
@@ -130,6 +169,35 @@ android {
     }
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
+    }
+}
+
+// Include the exported site in the standalone APK. This only packages the
+// files; switching the WebView origin requires a verified storage migration.
+def mobileShellExport = file('../../../frontend/.next-mobile-export')
+def mobileShellAssets = layout.buildDirectory.dir('generated/physiquequestShellAssets')
+def verifyMobileShellExport = tasks.register('verifyMobileShellExport') {
+    doLast {
+        ['index.html', 'home.html', 'coach.html', 'scan.html', 'progress.html', 'quests.html'].each { path ->
+            if (!new File(mobileShellExport, path).isFile()) {
+                throw new GradleException("Missing mobile shell ${path}; run npm run build:mobile-shell in frontend first")
+            }
+        }
+    }
+}
+def prepareMobileShellAssets = tasks.register('prepareMobileShellAssets', Sync) {
+    dependsOn(verifyMobileShellExport)
+    from(mobileShellExport)
+    into(mobileShellAssets.map { it.dir('physiquequest-shell') })
+}
+android.sourceSets.standalone.assets.srcDir(mobileShellAssets.get().asFile)
+tasks.configureEach { task ->
+    if (task.name == 'mergeStandaloneAssets' || task.name == 'generateStandaloneLintVitalReportModel' || task.name == 'lintVitalAnalyzeStandalone') task.dependsOn(prepareMobileShellAssets)
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.project == project && it.name.matches('(?i)(assemble|bundle|package|sign).*release.*') } && !releaseSigningReady) {
+        throw new GradleException('Release signing requires PQ_ANDROID_KEYSTORE_PATH, PQ_ANDROID_KEYSTORE_PASSWORD, PQ_ANDROID_KEY_ALIAS and PQ_ANDROID_KEY_PASSWORD.')
     }
 }
 
@@ -154,6 +222,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 

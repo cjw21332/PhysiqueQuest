@@ -5,8 +5,10 @@ import { AppState, Text, View, type ViewStyle } from 'react-native';
 import type { PoseCameraViewProps, PoseFrame, PosePerformanceMetrics } from 'expo-mediapipe-pose';
 import { jointIndices, type TrackingKind, type TrackingSide } from '../shared/repCounter';
 import { readinessPolicy, validateReadinessObservation, type NativeReadinessContext, type ReadinessReason } from '../shared/cameraReadiness';
+import { TRACKING_FRAME_RATES } from '../shared/exerciseEngine';
+import { CAMERA_CONFIDENCE } from '../shared/poseConfig';
 
-export type NativeTrackingOptions = { mode?: 'tracking'; requestId: string; kind: TrackingKind; side: TrackingSide; active: boolean };
+export type NativeTrackingOptions = { mode?: 'tracking'; requestId: string; kind: TrackingKind; side: TrackingSide; active: boolean; fullLandmarks?: boolean; targetFps?: number };
 export type NativeReadinessOptions = NativeReadinessContext;
 export const nativePoseAvailable = !isRunningInExpoGo() && !!requireOptionalNativeModule('ExpoMediaPipePose');
 // Expo Go keeps the normal camera usable without loading an unavailable native view.
@@ -22,7 +24,9 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
   now:()=>number=()=>performance.now()) {
   let disposed=false, lastFrame=-1, lastAt=-Infinity, geometry='', configured=false;
   const readiness=options.mode==='readiness';
-  let interval=readiness ? readinessPolicy.samplingMs : 100;
+  const requestedFps = options.mode === 'readiness' ? TRACKING_FRAME_RATES.normal : (options.targetFps ?? TRACKING_FRAME_RATES.normal);
+  const fast = !readiness && requestedFps > TRACKING_FRAME_RATES.normal;
+  let interval=readiness ? readinessPolicy.samplingMs : 1000 / requestedFps;
   const valid=()=>!disposed && current() && options.active;
   const send=(detail:Record<string,unknown>)=>{
     if(!valid())return;
@@ -36,18 +40,21 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
   return {
     dispose(){disposed=true;}, fail,
     lifecycle(){fail('interrupted');},
-    configured(){if(!valid())return false;if(configured){fail('interrupted');return false;}configured=true;send({type:'reset',reason:'pending'});return true;},
+    configured(){if(!valid())return false;if(configured){if(readiness)fail('interrupted');return false;}configured=true;send({type:'reset',reason:'pending'});return true;},
     frame(frame:PoseFrame) {
       if(!valid())return;
       const data=frame.additionalData, at=now();
       if(data.thermalState==='critical'){fail('interrupted',true);return;}
-      if(data.thermalState==='serious' || data.inferenceDurationMs>80){interval=readiness?400:200;throttle(readiness?2.5:5);}
+      if(data.thermalState==='serious' || data.inferenceDurationMs>TRACKING_FRAME_RATES.slowInferenceMs){const fps=readiness?TRACKING_FRAME_RATES.readinessDegraded:fast?TRACKING_FRAME_RATES.fastDegraded:TRACKING_FRAME_RATES.normalDegraded;interval=1000/fps;throttle(fps);}
       if(!Number.isFinite(at) || !Number.isFinite(data.inferenceDurationMs) || data.inferenceDurationMs<0 ||
         !['front','back'].includes(data.cameraFacing) || data.cameraFacing!==facing || !['wide','ultraWide'].includes(data.cameraLens) ||
         !Number.isFinite(data.cameraZoomFactor) || data.cameraZoomFactor<1 || data.cameraZoomFactor>100 || typeof data.cameraMirrored!=='boolean' ||
         !Number.isSafeInteger(data.frameNumber) || data.frameNumber<0) {fail();return;}
       const identity=JSON.stringify([data.width,data.height,data.cameraFacing,data.cameraLens,data.cameraMirrored,data.cameraZoomFactor]);
-      if(geometry && geometry!==identity){fail('interrupted');return;}
+      if(geometry && geometry!==identity){
+        if(readiness){fail('interrupted');return;}
+        lastFrame=-1;lastAt=-Infinity;send({type:'geometry-changed'});
+      }
       geometry=identity;
       if(data.frameNumber<=lastFrame || at-lastAt<interval)return;
       if(readiness) {
@@ -60,7 +67,9 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
           !validateReadinessObservation({...observation,receivedAt:at})){fail();return;}
         send({type:'observation',observation});
       } else {
-        send({type:'frame',frame:{joints:frame.landmarks.length?jointIndices(options.kind,options.side).map(index=>frame.landmarks[index]):[],aspect:data.width/data.height,timestamp:at}});
+        // Exercise engine patterns need all 33 points; legacy preview modes keep the four joints.
+        const joints = options.fullLandmarks ? frame.landmarks : frame.landmarks.length ? jointIndices(options.kind,options.side).map(index=>frame.landmarks[index]) : [];
+        send({type:'frame',frame:{joints,aspect:data.width/data.height,width:data.width,height:data.height,timestamp:at}});
       }
       lastFrame=data.frameNumber;lastAt=at;
     },
@@ -70,7 +79,7 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
 
 export default function NativeTrackingCamera({ options, facing, style, emit, ready }: { options: NativeTrackingOptions | NativeReadinessOptions; facing: 'front' | 'back'; style: ViewStyle[]; emit: (detail: Record<string, unknown>) => void; ready: () => void }) {
   const [modelPath,setModelPath]=useState<string|null>(null), [failed,setFailed]=useState(false);
-  const [limit,setLimit]=useState(options.mode==='readiness'?5:10);
+  const [limit,setLimit]=useState(options.mode==='readiness'?TRACKING_FRAME_RATES.readiness:(options.targetFps ?? TRACKING_FRAME_RATES.normal));
   const identity=JSON.stringify([options,facing]);
   const liveIdentity=useRef(identity);liveIdentity.current=identity;
   const emitRef=useRef(emit);emitRef.current=emit;
@@ -89,7 +98,7 @@ export default function NativeTrackingCamera({ options, facing, style, emit, rea
       setModelPath(asset.localUri);
     }).catch(()=>{if(active)callbacks.fail();});
     const change=AppState.addEventListener('change',state=>{if(state!=='active')callbacks.lifecycle();});
-    const blur=AppState.addEventListener('blur',()=>callbacks.lifecycle());
+    const blur=AppState.addEventListener('blur',()=>{if(options.mode==='readiness')callbacks.lifecycle();});
     if(AppState.currentState!=='active')callbacks.lifecycle();
     return ()=>{active=false;clearTimeout(timeout);if(startupTimer.current===timeout)startupTimer.current=null;callbacks.dispose();change.remove();blur.remove();};
   },[callbacks,identity]);
@@ -97,9 +106,9 @@ export default function NativeTrackingCamera({ options, facing, style, emit, rea
   if (!PoseCamera || !modelPath || failed) return <View style={style}><Text>{failed ? 'Camera tracking unavailable. Continue manually.' : 'Loading camera tracking…'}</Text></View>;
   const props: PoseCameraViewProps = {
     cameraFacing: facing, isActive, poseModelVariant: 'lite', poseModelAssetPath: modelPath,
-    previewFps: 30, frameLimit: limit, callbackFps: limit, maxPoses: 1,
+    previewFps: TRACKING_FRAME_RATES.preview, frameLimit: limit, callbackFps: limit, maxPoses: 1,
     segmentationEnabled: false, skeleton: false,
-    minPoseDetectionConfidence: 0.6, minPosePresenceConfidence: 0.6, minTrackingConfidence: 0.6,
+    minPoseDetectionConfidence: CAMERA_CONFIDENCE, minPosePresenceConfidence: CAMERA_CONFIDENCE, minTrackingConfidence: CAMERA_CONFIDENCE,
     onLandmark:callbacks.frame, onPerformanceMetrics:callbacks.metrics,
     onCameraConfigured:()=>{if(callbacks.configured() && liveIdentity.current===identity){clearStartup();ready();}},
     onInferenceError:()=>callbacks.fail(),

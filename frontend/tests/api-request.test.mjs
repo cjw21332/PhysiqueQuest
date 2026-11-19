@@ -55,7 +55,7 @@ test('failed data refresh reports its endpoint and a successful retry clears the
   offline = true;
   const failed = await api.preloadAppData(true);
   assert.equal(failed[1].reason.name, 'ApiNetworkError');
-  assert.match(deviceCache.get('nutrition').error, /reach the PhysiqueQuest API/);
+  assert.match(deviceCache.get('nutrition').error, /Check your internet connection/);
   assert.ok(warnings.some(parts => parts.some(part => String(part).includes('/nutrition'))));
   offline = false;
   assert.ok((await api.preloadAppData(true)).every(result => result.status === 'fulfilled'));

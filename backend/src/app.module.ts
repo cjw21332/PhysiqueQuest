@@ -29,6 +29,7 @@ import { StorageModule } from './storage/storage.module.js';
 import { SyncModule } from './sync/sync.module.js';
 import { AnalysisJobsModule } from './jobs/analysis-jobs.module.js';
 import { ChatModule } from './chat/chat.module.js';
+import { DatasetModule } from './dataset/dataset.module.js';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { ChatModule } from './chat/chat.module.js';
     SyncModule,
     AnalysisJobsModule,
     ChatModule,
+    DatasetModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

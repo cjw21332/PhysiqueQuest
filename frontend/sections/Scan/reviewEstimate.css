@@ -1,0 +1,89 @@
+.scan-reference .detected-items > li { padding: 12px 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.scan-reference .review-item-actions { display: flex; gap: 12px; }
+.scan-reference .review-item-actions button, .scan-reference .detected-foods > button, .scan-reference .meal-edit > button { min-height: 40px; color: var(--green); background: transparent; border: 0; text-decoration: underline; }
+.scan-reference .detected-items .review-item-weight { align-items: center; justify-content: flex-start; min-height: 44px; }
+.scan-reference .review-item-weight input { width: 90px; max-width: 100%; padding: 8px; color: inherit; background: transparent; border: 1px solid var(--muted); border-radius: 6px; }
+.scan-reference .detected-items > li > small { display: block; line-height: 1.4; }
+.scan-reference .detected-foods .meal-edit { display: grid; gap: 8px; min-width: 0; }
+.scan-reference .detected-foods .meal-edit input { max-width: 100%; }
+.scan-reference .detected-foods { display: grid; grid-template-columns: 116px minmax(0, 1fr); align-items: start; }
+.scan-reference .detected-foods > .detected-list { min-width: 0; }
+.scan-reference .detected-foods > button, .scan-reference .detected-foods > .meal-edit { grid-column: 1 / -1; }
+
+/* Give every detected food the full mobile width for controls and details. */
+.scan-reference .review-estimate-screen .detected-foods { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 0 0 20px; }
+.scan-reference .review-estimate-screen .meal-photo { box-sizing: border-box; width: 100%; height: clamp(240px, 48dvh, 420px); border: 1px solid var(--line); border-radius: 20px; background: var(--soft); }
+.scan-reference .review-estimate-screen .meal-photo:not(.meal-photo-reference) img { width: 100%; height: 100%; object-fit: contain; }
+.scan-reference .review-estimate-screen .review-photo-label { position: absolute; z-index: 1; left: 12px; bottom: 12px; right: auto; top: auto; width: auto; height: auto; display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 9px; background: rgb(0 0 0 / 72%); color: white; font-size: 11px; font-weight: 700; }
+.scan-reference .review-estimate-screen .review-loading { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); }
+.scan-reference .review-estimate-screen .review-loading > div { position: static; display: block; flex: 1; min-width: 0; padding: 0; }
+.scan-reference .review-estimate-screen .review-status-icon { display: grid; flex: none; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--green-light); color: var(--green); }
+.scan-reference .review-estimate-screen .review-loading h3 { margin: 0 0 5px; font-size: 15px; }
+.scan-reference .review-estimate-screen .review-loading p { color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.scan-reference .review-estimate-screen .review-items-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; margin: 5px 0 12px; }
+.scan-reference .review-estimate-screen .review-items-heading h3 { margin: 0; color: var(--ink); font-size: 16px; }
+.scan-reference .review-estimate-screen .review-items-heading p { margin: 4px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.scan-reference .review-estimate-screen .review-items-heading > span { flex: none; padding: 5px 9px; border-radius: 999px; background: var(--green-light); color: var(--green); font-size: 11px; font-weight: 700; }
+.scan-reference .review-estimate-screen .detected-items { display: grid; gap: 10px; }
+.scan-reference .review-estimate-screen .detected-items > li { box-sizing: border-box; padding: 14px; border: 1px solid var(--line); border-radius: 15px; background: var(--soft); color: var(--ink); }
+.scan-reference .review-estimate-screen .detected-items > li.unmatched { border-color: var(--orange-mid); background: var(--soft); }
+.scan-reference .review-estimate-screen .detected-items > li.excluded { opacity: .65; text-decoration: none; }
+.scan-reference .review-estimate-screen .detected-items > li > label:first-child { min-height: 0; }
+.scan-reference .review-estimate-screen .detected-item-body { gap: 5px; }
+.scan-reference .review-estimate-screen .detected-item-body b { font-size: 15px; font-weight: 700; }
+.scan-reference .review-estimate-screen .detected-item-body small { color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.scan-reference .review-estimate-screen .detected-items em { background: var(--green-light); color: var(--green); }
+.scan-reference .review-estimate-screen .detected-items em.low { background: var(--orange-light); color: var(--orange-dark); }
+.scan-reference .review-estimate-screen .review-item-actions { gap: 8px; margin: 12px 0; }
+.scan-reference .review-estimate-screen .review-item-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; }
+.scan-reference .review-estimate-screen .review-item-actions button:first-child { color: var(--green); }
+.scan-reference .review-estimate-screen .detected-items .review-item-weight { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: var(--ink); font-size: 13px; font-weight: 600; }
+.scan-reference .review-estimate-screen .review-item-weight input { box-sizing: border-box; width: 96px; min-height: 42px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--ink); font-size: 16px; }
+.scan-reference .review-estimate-screen .detected-items > li > small { display: block; margin-top: 8px; color: var(--text-secondary); font-size: 12px; line-height: 1.45; }
+.scan-reference .review-estimate-screen .detected-items > li > .review-weight-note { margin-top: 2px; }
+.scan-reference .review-reference-recipe { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.scan-reference .review-reference-recipe summary { min-height: 44px; display: flex; align-items: center; color: var(--green); font-weight: 600; cursor: pointer; }
+.scan-reference .review-reference-recipe p + p { margin-top: 8px; }
+.scan-reference .review-reference-recipe summary:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.scan-reference .review-estimate-screen .review-add-food { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px; border: 1px dashed var(--line); border-radius: 12px; background: transparent; color: var(--green); font-weight: 700; text-decoration: none; cursor: pointer; }
+.scan-reference .review-estimate-screen .scan-warning { margin-bottom: 22px; background: var(--orange-light); }
+.scan-reference .review-estimate-screen .scan-warning p { margin: 0; line-height: 1.5; }
+.scan-reference .review-estimate-screen .review-portion-note { margin: -3px 0 10px; color: var(--text-secondary); font-size: 12px; }
+.scan-reference .review-estimate-screen button:focus-visible, .scan-reference .review-estimate-screen input:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+
+/* Meal review */
+.scan-reference .review-estimate-screen .review-estimate-content { padding-bottom: 26px; }
+.scan-reference .review-estimate-screen .detected-foods { gap: 18px; }
+.scan-reference .review-estimate-screen .meal-photo {
+  width: min(100%, (min(100vw, 440px) - 40px) * 0.8);
+  height: max(120px, (min(100dvh, 850px) - max(16px, env(safe-area-inset-top)) - max(20px, env(safe-area-inset-bottom)) - 144px) * 0.6);
+  justify-self: center;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.scan-reference .review-estimate-screen .meal-photo img,
+.scan-reference .review-estimate-screen .meal-photo.meal-photo-reference img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+.scan-reference .review-estimate-screen .review-items-heading { align-items: center; margin: 2px 0 12px; }
+.scan-reference .review-estimate-screen .review-items-heading h3 { font-size: 18px; }
+.scan-reference .review-estimate-screen .review-items-heading > span { color: var(--text-secondary); background: transparent; padding: 0; }
+.scan-reference .review-estimate-screen .detected-items { gap: 8px; padding: 0; list-style: none; }
+.scan-reference .review-estimate-screen .detected-items > li { padding: 16px; border-radius: 14px; }
+.scan-reference .review-estimate-screen .detected-items > li > label:first-child { display: flex; align-items: start; }
+.scan-reference .review-estimate-screen .detected-item-body b { font-size: 15px; }
+.scan-reference .review-estimate-screen .review-item-actions { margin: 12px 0 4px; }
+.scan-reference .review-estimate-screen .review-item-weight { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
+.scan-reference .review-estimate-screen .review-source { margin-top: 8px; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.scan-reference .review-estimate-screen .review-source summary { color: var(--text-secondary); cursor: pointer; min-height: 38px; display: flex; align-items: center; }
+.scan-reference .review-estimate-screen .review-source summary::after { content: '+'; margin-left: 8px; font-size: 16px; }
+.scan-reference .review-estimate-screen .review-source[open] summary::after { content: '−'; }
+.scan-reference .review-estimate-screen .review-source p { margin: 4px 0; overflow-wrap: anywhere; }
+.scan-reference .review-estimate-screen .review-estimate-note { color: var(--text-secondary); font-size: 12px; line-height: 1.5; margin: 0 0 20px; }
+.scan-reference .review-estimate-screen .scan-choice { margin-bottom: 22px; }
+.scan-reference .review-estimate-screen .review-estimate-footer { gap: 10px; }

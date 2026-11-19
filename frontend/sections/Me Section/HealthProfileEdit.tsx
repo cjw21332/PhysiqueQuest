@@ -39,7 +39,7 @@ export default function HealthProfileEdit({ profile, onBack, onSave, error }: Pr
   return (
     <MeEditLayout
       title="Health profile"
-      description="Keeps unsafe exercises out of your plan."
+      description="Helps tailor exercise guidance to the conditions you select."
       onBack={onBack}
       onDiscard={onBack}
       onSave={handleSave}
@@ -59,7 +59,7 @@ export default function HealthProfileEdit({ profile, onBack, onSave, error }: Pr
 
       <div className="safety-note">
         <span><Icon name="shield" size={16} /></span>
-        <p>Exercises that load a flagged area get a caution tag in your library and are swapped out of new plans.</p>
+        <p>Exercises involving a flagged area may receive a caution tag or be excluded from new plans. This does not guarantee an exercise is safe for you.</p>
       </div>
 
       <div className="choice-group notes-group">

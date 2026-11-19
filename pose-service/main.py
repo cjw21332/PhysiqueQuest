@@ -84,9 +84,9 @@ def analyze_video(video: bytes, exercise_hint: str | None = None) -> dict:
                     break
                 if index % frame_interval == 0 and len(review_frames) < 24:
                     h, w = frame.shape[:2]
-                    scale = min(1, 480 / max(h, w))
+                    scale = min(1, 768 / max(h, w))
                     preview = cv2.resize(frame, (max(1, round(w * scale)), max(1, round(h * scale))))
-                    encoded, jpeg = cv2.imencode('.jpg', preview, [cv2.IMWRITE_JPEG_QUALITY, 65])
+                    encoded, jpeg = cv2.imencode('.jpg', preview, [cv2.IMWRITE_JPEG_QUALITY, 75])
                     if encoded:
                         review_frames.append({'timeSeconds': round(index / fps, 2), 'jpeg': base64.b64encode(jpeg).decode('ascii')})
                 if index % step == 0:

@@ -1,3 +1,4 @@
+import { lifecycleModel } from './lifecycle-model.fixture.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import bcrypt from 'bcryptjs';
 import { Types } from 'mongoose';
@@ -24,11 +25,11 @@ function fixture() {
   const rows: any[] = [], buckets: any[] = [];
   const accounts = [{ _id: A, name: 'Account A', email: 'a@example.com', isActive: true, sessionVersion: 0 }, { _id: B, name: 'Account B', email: 'b@example.com', isActive: true, sessionVersion: 0 }];
   const users = { findOne: vi.fn(async filter => accounts.find(row => matches(row, filter))), updateOne: vi.fn(async (filter, update) => { const row = accounts.find(item => matches(item, filter)); if (!row) return { matchedCount: 0 }; apply(row, update); return { matchedCount: 1 }; }) };
-  const session = { endSession: vi.fn(), withTransaction: async (fn: () => Promise<void>) => {
+  const session = { inTransaction: () => true, endSession: vi.fn(), withTransaction: async (fn: () => Promise<void>) => {
     const backup = rows.map(row => ({ ...row })), accountBackup = accounts.map(row => ({ ...row }));
     try { await fn(); } catch (error) { rows.splice(0, rows.length, ...backup); accounts.forEach((row, i) => Object.assign(row, accountBackup[i])); throw error; }
   } };
-  const tokens = { db: { startSession: async () => session }, create: vi.fn(async row => { rows.push({ _id: new Types.ObjectId(), ...row }); }),
+  const tokens = { findOne: (filter: any) => ({ lean: async () => rows.find(row => matches(row, filter)) }), db: { collection: () => ({ findOne: async () => ({ generation: 0 }), updateOne: async () => ({ matchedCount: 1 }) }), startSession: async () => session }, create: vi.fn(async row => { rows.push({ _id: new Types.ObjectId(), ...row }); }),
     updateMany: vi.fn(async (filter, update) => { rows.filter(row => matches(row, filter)).forEach(row => apply(row, update)); }),
     findOneAndUpdate: vi.fn(async (filter, update) => { const row = rows.find(row => matches(row, filter)); if (!row) return null; apply(row, update); return { ...row }; }) };
   const limits = { findOneAndUpdate: vi.fn(async (filter, update, options) => {
@@ -41,7 +42,7 @@ function fixture() {
   }) };
   const email = { isAvailable: () => true, diagnostics: () => ({}), sendPasswordReset: vi.fn(async () => ({ ok: true })) };
   const config = { getOrThrow: () => 'test-secret-at-least-32-characters-long' };
-  const service = new PasswordRecoveryService(users as any, tokens as any, email as any, limits as any, config as any);
+  const service = new PasswordRecoveryService(lifecycleModel(users as any), lifecycleModel(tokens as any, true), email as any, limits as any, config as any);
   return { service, rows, accounts, users, tokens, email, buckets, limits, session };
 }
 beforeEach(() => { vi.stubEnv('NODE_ENV', 'production'); vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date('2026-10-18T05:00:00Z')); });
@@ -98,7 +99,7 @@ describe('request-bound recovery', () => {
     await expect(f.service.confirm(grant.resetToken, 'NewStrong1')).rejects.toThrow('database unavailable');
     expect(f.rows[0].usedAt).toBeNull();
     await f.service.confirm(grant.resetToken, 'NewStrong1');
-    expect(f.accounts[0].sessionVersion).toBe(1); expect(f.session.endSession).toHaveBeenCalledTimes(2);
+    expect(f.accounts[0].sessionVersion).toBe(1); expect(f.session.endSession).toHaveBeenCalledTimes(4);
   });
   it('uses shared IP limits, independent of a service instance', async () => {
     const f = fixture();

@@ -1,5 +1,7 @@
 # PhysiqueQuest — Frontend, Backend, and End-to-End Checklist
 
+- November 16, 2026: A partial physical-Android frontend review and its remaining verification gaps are recorded in [PROGRESS-66](../ProgressReports/PROGRESS-66.md); no exhaustive device-coverage criterion is claimed complete.
+
 ## v4.0.0 review — October 28, 2026
 
 - [x] Compare the current changes against `PhysiqueQuest-v3.1.2` and record scope in [PROGRESS-59](../ProgressReports/PROGRESS-59.md).

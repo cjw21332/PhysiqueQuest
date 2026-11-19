@@ -5,7 +5,7 @@ test('admin dark references retain local controls and responsive layout', async 
   await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'visual', token: 'visual-test' })));
   await page.route('**/api/**', route => route.fulfill({
     headers: { 'access-control-allow-origin': '*' },
-    json: route.request().url().includes('/profile') ? { name: 'Visual', email: 'visual@example.test', equipment: [], days: [] } : route.request().url().includes('/admin/exercises') ? [
+    json: route.request().url().includes('/auth/session/') ? { access_token: 'visual-test', expires_in: 3600, user: { id: 'visual', name: 'Visual', email: 'visual@example.test', role: 'admin', emailVerified: true } } : route.request().url().includes('/profile') ? { name: 'Visual', email: 'visual@example.test', equipment: [], days: [] } : route.request().url().includes('/admin/exercises') ? [
       ['Dumbbell bench press', 'Chest · Dumbbells', 'published', 'ready'],
       ['Overhead press', 'Shoulders · Dumbbells', 'published', 'ready'],
       ['Bulgarian split squat', 'Legs · Dumbbells', 'draft', 'missing'],

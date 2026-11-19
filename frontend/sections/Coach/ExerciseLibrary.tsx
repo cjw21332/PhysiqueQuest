@@ -2,8 +2,9 @@
 import { titleCase } from '../../lib/titleCase';
 
 import { useEffect, useRef, useState } from 'react';
-import { api, getCoachApiBaseUrl, type ExerciseCatalog, type ExerciseRecord, type ExerciseFilters, type ExerciseDiscoveryQuery } from '../../lib/api';
-import { cachedCatalog, cachedCount, cachedExercise, cachedFilters, readCatalogMetadata, saveCatalogMetadata, saveExercises } from '../../lib/exerciseCatalogDb';
+import { api, type ExerciseCatalog, type ExerciseRecord, type ExerciseFilters, type ExerciseDiscoveryQuery } from '../../lib/api';
+import { prepareExerciseCatalog } from '../../lib/prepareExerciseCatalog';
+import { cachedCatalog, cachedCount, cachedExercise, cachedFilters, readCatalogMetadata, saveExercises, trackingPriority } from '../../lib/exerciseCatalogDb';
 import { exerciseMediaStatus } from '../../lib/exerciseMediaCache';
 import { getCurrentUser } from '../../lib/auth';
 import { Icon } from '../Home/icons';
@@ -15,7 +16,21 @@ import { readPersonalExercises, type PersonalExercise } from '../../lib/personal
 const equipmentOptions = ['Any equipment', 'Dumbbells', 'Barbell', 'Bodyweight', 'Cable', 'Machine', 'Kettlebell', 'Resistance bands'];
 const metadata = (item: ExerciseRecord) => [item.targetMuscle || item.group, item.equipment, item.difficulty].filter(Boolean).join(' · ');
 
-export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStartPersonal }: { onBack: () => void; selectedEquipment?: string[]; onStartPersonal?: (item: PersonalExercise) => void }) {
+function FilterPicker({ label, value, options, onChange }: { label: string; value: string; options: { value: string; label: string }[]; onChange: (value: string) => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  return <div className="library-picker">
+    <span>{label}</span>
+    <button ref={button} type="button" className="library-picker-trigger" aria-label={`${label}: ${options.find(option => option.value === value)?.label || value}`} aria-haspopup="dialog" onClick={() => dialog.current?.showModal()}>{options.find(option => option.value === value)?.label || value}<span aria-hidden="true">⌄</span></button>
+    <dialog ref={dialog} className="library-picker-dialog" aria-label={label} onClose={() => button.current?.focus()} onClick={event => { if (event.target === event.currentTarget) dialog.current?.close(); }}>
+      <div className="library-picker-panel"><header><h3>{label}</h3><button type="button" aria-label={`Close ${label}`} onClick={() => dialog.current?.close()}>×</button></header>
+        <div className="library-picker-options">{options.map(option => <button key={option.value} type="button" className={value === option.value ? 'selected' : ''} aria-pressed={value === option.value} onClick={() => { onChange(option.value); dialog.current?.close(); }}>{option.label}{value === option.value && <span aria-hidden="true">✓</span>}</button>)}</div>
+      </div>
+    </dialog>
+  </div>;
+}
+
+export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStartPersonal }: { onBack: () => void; selectedEquipment?: string[]; onStartPersonal?: (item: PersonalExercise, mode: 'manual' | 'upload') => void }) {
   const [personal, setPersonal] = useState<PersonalExercise[]>([]);
   useEffect(() => { try { setPersonal(readPersonalExercises()); } catch { setPersonal([]); } }, []);
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,6 +47,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
   const [secondary, setSecondary] = useState('');
   const [sort, setSort] = useState<ExerciseDiscoveryQuery['sort']>();
   const [preferencesReady, setPreferencesReady] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<ExerciseFilters>({ bodyParts: [], equipments: [], targetMuscles: [], secondaryMuscles: [] });
   const [selected, setSelected] = useState<ExerciseRecord | null>(null);
   const [mediaError, setMediaError] = useState(false);
@@ -75,7 +91,17 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
   useEffect(() => {
     let active = true;
     void cachedFilters().then(value => { if (active) setFilters(value); }).catch(() => {});
-    void api.getExerciseFilters().then(value => { if (active && Array.isArray(value.bodyParts)) setFilters(value); }).catch(() => {});
+    void api.getExerciseFilters().then(value => {
+      if (!active) return;
+      // An unavailable catalog service returns empty arrays. Do not replace
+      // useful on-device filter choices with an empty server response.
+      setFilters(current => ({
+        bodyParts: value.bodyParts?.length ? value.bodyParts : current.bodyParts,
+        equipments: value.equipments?.length ? value.equipments : current.equipments,
+        targetMuscles: value.targetMuscles?.length ? value.targetMuscles : current.targetMuscles,
+        secondaryMuscles: value.secondaryMuscles?.length ? value.secondaryMuscles : current.secondaryMuscles,
+      }));
+    }).catch(() => {});
     return () => { active = false; };
   }, [offline]);
   useEffect(() => {
@@ -94,13 +120,14 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
     let hasLocalRecords = false;
     setLoading(true); setError('');
     const timer = window.setTimeout(async () => {
-      try { [local, hasLocalRecords] = await Promise.all([cachedCatalog(query), cachedCount().then(count => count > 0)]); if (current && hasLocalRecords) { setCatalog(local); setLoading(false); } } catch { /* Device storage is optional. */ }
+      let completeLocal = false;
+      try { const [cached, count, metadata] = await Promise.all([cachedCatalog(query), cachedCount(), readCatalogMetadata()]); local = cached; hasLocalRecords = count > 0; completeLocal = !!metadata && count === metadata.count; if (current && hasLocalRecords) { setCatalog(local); setLoading(false); } } catch { /* Device storage is optional. */ }
       try {
         const result = await api.getExercises(query);
         const active = getCurrentUser();
-        if (current && owner && active && owner.id === active.id && owner.sessionKey === active.sessionKey) { queryCache.current.set(key, { value: result, time: Date.now() }); setCatalog(result); setOffline(false); void saveExercises(result.items).then(() => { if (current && result.items.length) setStorageUnavailable(false); }).catch(() => { if (current) setStorageUnavailable(true); }); }
+        if (current && owner && active && owner.id === active.id && owner.sessionKey === active.sessionKey) { const shown = !sort && completeLocal && local && local.total === result.total ? { ...local, coverageNote: undefined } : !sort ? { ...result, items: [...result.items].sort((a, b) => trackingPriority(a) - trackingPriority(b)) } : result; queryCache.current.set(key, { value: shown, time: Date.now() }); setCatalog(shown); setOffline(false); void saveExercises(result.items).then(() => { if (current && result.items.length) setStorageUnavailable(false); }).catch(() => { if (current) setStorageUnavailable(true); }); }
       } catch (err) {
-        if (current && !hasLocalRecords) setError(err instanceof Error ? err.message : 'Could not load exercises.');
+        if (current && !hasLocalRecords) setError('Could not load exercises. Check your connection and try again.');
         else if (current) { setCatalog(local); setOffline(true); }
       } finally { if (current) setLoading(false); }
     }, 250);
@@ -109,30 +136,9 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
 
   useEffect(() => {
     let cancelled = false;
-    let busy = false;
-    const synchronize = async () => {
-      if (busy) return;
-      busy = true;
-      try {
-        const response = await fetch(`${getCoachApiBaseUrl()}/exercises/sync-status`, { cache: 'no-store', credentials: 'omit' });
-        if (!response.ok) return;
-        const status = await response.json();
-        if (cancelled) return;
-        if (status.status !== 'complete') return;
-        const metadata = await readCatalogMetadata();
-        if (metadata && metadata.source === getCoachApiBaseUrl() && metadata.version === status.lastSuccessfulSync && metadata.count === status.count && await cachedCount() >= status.count) return;
-        const seen = new Set<string>();
-        for (let page = 1; !cancelled; page++) {
-          const result = await api.getExercises({ page, limit: 100 });
-          for (const item of result.items) seen.add(item._id);
-          await saveExercises(result.items);
-          if (page >= result.pages || !result.items.length) break;
-          await new Promise(resolve => setTimeout(resolve, 300));
-        }
-        if (!cancelled && seen.size === status.count && typeof status.lastSuccessfulSync === 'string') await saveCatalogMetadata({ source: getCoachApiBaseUrl(), version: status.lastSuccessfulSync, count: seen.size, savedAt: Date.now() });
-      } catch (error) { if (!cancelled && error instanceof DOMException && ['QuotaExceededError', 'InvalidStateError', 'UnknownError'].includes(error.name)) setStorageUnavailable(true); }
-      finally { busy = false; }
-    };
+    const synchronize = () => prepareExerciseCatalog().catch(error => {
+      if (!cancelled && error instanceof DOMException && ['QuotaExceededError', 'InvalidStateError', 'UnknownError'].includes(error.name)) setStorageUnavailable(true);
+    });
     void synchronize();
     const timer = window.setInterval(() => { void synchronize(); }, 60000);
     const reconnect = () => { setRetry(value => value + 1); void synchronize(); };
@@ -178,40 +184,42 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
   };
 
   const reset = () => { setSearchTerm(''); setEquipment('Any equipment'); setBodyPart(''); setTarget(''); setSecondary(''); setSort(undefined); setPage(1); };
-  const trackingLabel = (item: ExerciseRecord) => item.pose === 'missing' ? 'Manual' : item.trackingStatus || 'Manual';
+  const trackingLabel = (item: ExerciseRecord) => { const config = trackingConfigs[item._id] ?? resolveTrackingConfig(item); return canTrack(config) ? (config.validationStatus === 'verified' || config.nativeSupport === 'FULLY_SUPPORTED' ? 'Camera tracking' : 'Camera tracking · needs review') : 'Manual tracking'; };
+  const personalMatches = personal.filter(item => item.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) && (equipment === 'Any equipment' || item.equipment.toLowerCase() === equipment.toLowerCase()) && (!target || item.targetMuscle.toLowerCase() === target.toLowerCase()) && (!bodyPart || item.targetMuscle.toLowerCase() === bodyPart.toLowerCase()) && !secondary).sort((a, b) => sort === 'name-desc' ? b.name.localeCompare(a.name) : sort === 'equipment' ? a.equipment.localeCompare(b.equipment) || a.name.localeCompare(b.name) : sort === 'body-part' ? a.targetMuscle.localeCompare(b.targetMuscle) || a.name.localeCompare(b.name) : a.name.localeCompare(b.name));
 
   if (preview) return <PoseTrackerSession key={preview._id} exercise={preview} onExit={() => setPreview(null)}/>;
 
   return <div className="coach-library" ref={libraryRef}>
-    <header className="coach-header library-header">
+    <header className="coach-header library-header pq-page-heading">
       <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button>
       <h2 ref={headingRef} tabIndex={-1}>Exercise library</h2>
     </header>
-    <p className="library-intro">Browse exercise instructions and available demonstrations.</p>
-    {catalog && <p role="status">{offline ? 'Offline: showing saved exercises.' : 'Exercise library is ready.'}</p>}
+    <div className="library-discover-intro"><span aria-hidden="true"><Icon name="library-dumbbells" size={22}/></span><div><strong>Find your next exercise</strong><p>Explore movements, watch demonstrations and choose how to track.</p></div></div>
+    {catalog && offline && <p className="library-offline-status" role="status">Offline: showing saved exercises.</p>}
     {storageUnavailable && <p role="status">Offline saving is unavailable.</p>}
     <label className="library-search">
       <Icon name="search" size={19}/>
       <input type="search" aria-label="Search Exercise" placeholder="Search Exercise" maxLength={100} value={searchTerm} onChange={event => { setSearchTerm(event.target.value); setPage(1); }}/>
       {searchTerm && <button type="button" onClick={() => { setSearchTerm(''); setPage(1); }} aria-label="Clear search"><Icon name="close" size={16}/></button>}
     </label>
-    <div className="library-filter-heading"><h3>Filters</h3>{(searchTerm || equipment !== 'Any equipment' || bodyPart || target || secondary || sort) && <button type="button" onClick={reset}>Clear filters</button>}</div>
-    <div className="library-discovery-controls">
-      <label>Body part<select value={bodyPart} onChange={event => { setBodyPart(event.target.value); setPage(1); }}><option value="">All body parts</option>{filters.bodyParts.map(value => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
-      <label>Equipment type<select value={equipment} onChange={event => { setEquipment(event.target.value); setPage(1); }}>{[...new Set([...equipmentOptions, ...filters.equipments, equipment])].map(value => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
-      <label>Target muscle<select value={target} onChange={event => { setTarget(event.target.value); setPage(1); }}><option value="">All target muscles</option>{filters.targetMuscles.map(value => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
-      <label>Secondary muscle<select value={secondary} onChange={event => { setSecondary(event.target.value); setPage(1); }}><option value="">All secondary muscles</option>{filters.secondaryMuscles.map(value => <option key={value} value={value}>{titleCase(value)}</option>)}</select></label>
-      <label>Sort by<select value={sort || ''} onChange={event => { setSort((event.target.value || undefined) as ExerciseDiscoveryQuery['sort']); setPage(1); }}><option value="">Default</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="body-part">Body part</option><option value="equipment">Equipment</option></select></label>
+    <div className="library-filter-heading"><button type="button" className="library-filter-toggle" aria-expanded={filtersOpen} aria-controls="library-filter-controls" onClick={() => setFiltersOpen(value => !value)}><Icon name="filter" size={18}/><span>Filters &amp; sorting</span><Icon name="chevron-down" size={16}/></button></div>
+    <div id="library-filter-controls" className="library-discovery-controls" hidden={!filtersOpen}>
+      <FilterPicker label="Body part" value={bodyPart} options={[{ value: '', label: 'All body parts' }, ...filters.bodyParts.map(value => ({ value, label: titleCase(value) }))]} onChange={value => { setBodyPart(value); setPage(1); }}/>
+      <FilterPicker label="Equipment type" value={equipment} options={[...new Map([...equipmentOptions, ...filters.equipments, equipment].map(value => [value.toLowerCase(), value])).values()].map(value => ({ value, label: titleCase(value) }))} onChange={value => { setEquipment(value); setPage(1); }}/>
+      <FilterPicker label="Target muscle" value={target} options={[{ value: '', label: 'All target muscles' }, ...filters.targetMuscles.map(value => ({ value, label: titleCase(value) }))]} onChange={value => { setTarget(value); setPage(1); }}/>
+      <FilterPicker label="Secondary muscle" value={secondary} options={[{ value: '', label: 'All secondary muscles' }, ...filters.secondaryMuscles.map(value => ({ value, label: titleCase(value) }))]} onChange={value => { setSecondary(value); setPage(1); }}/>
+      <FilterPicker label="Sort by" value={sort || ''} options={[{ value: '', label: 'Camera options first' }, { value: 'name-asc', label: 'Name A–Z' }, { value: 'name-desc', label: 'Name Z–A' }, { value: 'body-part', label: 'Body part' }, { value: 'equipment', label: 'Equipment' }]} onChange={value => { setSort((value || undefined) as ExerciseDiscoveryQuery['sort']); setPage(1); }}/>
+      <div className="library-filter-clear">{(searchTerm || equipment !== 'Any equipment' || bodyPart || target || secondary || sort) && <button type="button" onClick={reset}>Clear filters</button>}</div>
     </div>
-    {personal.length > 0 && <section className="personal-library"><h3>My exercises</h3><p>Saved on this device · manual tracking</p>{personal.filter(item => item.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) && (equipment === 'Any equipment' || item.equipment.toLowerCase() === equipment.toLowerCase()) && (!target || item.targetMuscle.toLowerCase() === target.toLowerCase()) && !bodyPart && !secondary).map(item => <article className="personal-exercise-row" key={item._id}><div><b>{titleCase(item.name)}</b><small>{titleCase(item.targetMuscle)} · {titleCase(item.equipment)}</small></div>{onStartPersonal && <button type="button" className="secondary" onClick={() => onStartPersonal(item)}>Start workout</button>}</article>)}</section>}
+    {personal.length > 0 && <section className="personal-library" aria-labelledby="personal-library-title"><div className="personal-library-heading"><div><h3 id="personal-library-title">My exercises</h3><p>Saved on this device · manual tracking</p></div><span>{personalMatches.length}</span></div>{personalMatches.length ? <div className="personal-library-list">{personalMatches.map(item => <article className="personal-exercise-card" key={item._id}><div className="personal-exercise-info"><span className="personal-exercise-icon" aria-hidden="true"><Icon name="library-dumbbells" size={20}/></span><div><h4>{titleCase(item.name)}</h4><p>{titleCase(item.targetMuscle)} · {titleCase(item.equipment)}</p><span className="tracking-tag manual">Manual tracking</span></div></div>{onStartPersonal && <div className="personal-exercise-actions"><button type="button" className="secondary" aria-label={`Log ${item.name} manually`} onClick={() => onStartPersonal(item, 'manual')}>Log manually</button><button type="button" className="secondary" aria-label={`Review a video for ${item.name}`} onClick={() => onStartPersonal(item, 'upload')}>Review a video</button></div>}</article>)}</div> : <p className="personal-library-empty">No personal exercises match these filters.</p>}</section>}
     {loading && <p role="status">Loading exercises…</p>}
     {error && <div className="empty-library" role="alert"><p>{error}</p><button type="button" className="secondary" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
     {!loading && catalog && <>
-      <div className="library-caption library-results-heading"><p className="result-count" role="status">{catalog.total} {catalog.total === 1 ? 'exercise' : 'exercises'}</p><span>Open a guide</span></div>
+      <div className="library-caption library-results-heading"><div><h3>Explore exercises</h3><p className="result-count" role="status">{catalog.total} {catalog.total === 1 ? 'exercise' : 'exercises'}</p></div><span>{sort ? 'Open a guide' : 'Camera options first on this page'}</span></div>
       <div className="library-list">
         {catalog.items.map(item => <button type="button" className="library-item" key={item._id} aria-haspopup="dialog" onClick={event => { openerRef.current = event.currentTarget; setMediaError(false); setSelected(item); }}>
           <span className="exercise-thumb"><Icon name="library-dumbbells" size={24}/>{item.gifUrl && <i><Icon name="play" size={8}/></i>}</span>
-          <span className="library-copy"><b>{titleCase(item.name)}</b><small>{metadata(item)}</small><span className="library-item-meta"><span className={`tracking-tag ${trackingLabel(item) === 'Caution' ? 'caution' : trackingLabel(item) === 'Manual' ? 'manual' : ''}`}>{trackingLabel(item)}</span>{item.gifUrl && <span className="library-demo-label">Demonstration</span>}<span className="library-demo-label">{canTrack(trackingConfigs[item._id] ?? resolveTrackingConfig(item)) ? "PoseTracker options available" : "PoseTracker configuration pending"}</span></span></span>
+          <span className="library-copy"><b>{titleCase(item.name)}</b><small>{metadata(item)}</small><span className="library-item-meta"><span className={`tracking-tag ${trackingLabel(item) === 'Manual tracking' ? 'manual' : ''}`}>{trackingLabel(item)}</span>{item.gifUrl && <span className="library-demo-label">Demo</span>}</span></span>
           <Icon name="arrow" size={16}/>
         </button>)}
         {!catalog.items.length && <div className="empty-library"><p>No exercises match those filters.</p><button type="button" className="secondary" onClick={reset}>Reset filters</button></div>}
@@ -235,12 +243,12 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
           </div>
           {mediaError && <button type="button" className="secondary library-media-retry" onClick={() => setDetailRetry(value => value + 1)}>Retry demonstration</button>}
           {detail.gifUrl && !mediaError && <p className="library-preview-note">{mediaCached ? 'Demonstration available offline.' : 'Demonstration requires a connection.'}</p>}
-          <div className="library-recommendation">{detail.recommended && <span>Recommended <b>{detail.recommended}</b></span>}<span className="library-manual-label">Manual tracking</span></div>
-          <div className="library-preview-note"><p>Exercise-aware movement tracking with PoseTracker.</p><button type="button" className="secondary" onClick={() => { setSelected(null); setPreview(detail); }}>PoseTracker options</button></div>
+          <div className="library-recommendation">{detail.recommended && <span>Recommended <b>{detail.recommended}</b></span>}<span className="library-manual-label">{trackingLabel(detail)}</span></div>
           {detail.description && <p className="library-description">{detail.description}</p>}
           <section className="library-instructions"><h4>How to do it</h4>{detail.instructions?.length ? <ol>{detail.instructions.map((step, index) => <li key={index}><span>{index + 1}</span><p>{step.replace(/^Step\s*\d+\s*[:.\-]?\s*/i, '')}</p></li>)}</ol> : <p>No instructions are available for this exercise.</p>}</section>
           {!!detail.checks?.length && <section className="library-form-checks"><h4>Form cues</h4><ul>{detail.checks.map((cue, index) => <li key={index}>{cue}</li>)}</ul></section>}
           <p className="library-preview-note">Exercise data by <a href="https://ascendapi.com" target="_blank" rel="noreferrer">AscendAPI</a>.</p>
+          <section className="library-tracking-cta" aria-label="Exercise tracking"><div><h4>Track your movement</h4><p>{canTrack(trackingConfigs[detail._id] ?? resolveTrackingConfig(detail)) ? 'Camera tracking is available as an estimate. Review the results after your session.' : 'Camera tracking for this movement is not ready yet. You can still log your workout manually.'}</p></div><button type="button" onClick={() => { setSelected(null); setPreview(detail); }}>View tracking options <Icon name="arrow" size={18}/></button></section>
         </>}
       </article>
     </dialog>}

@@ -46,7 +46,8 @@
 .coach-reference .workout-label { margin-bottom: 5px; color: #167336; font-size: 12px; font-weight: 500; text-transform: none; letter-spacing: 0; }
 .coach-reference .workout-title { margin: 0 0 6px; color: #111a2c; font-size: 21px; line-height: 1.25; letter-spacing: -.25px; }
 .coach-reference .workout-meta { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 5px; color: #536176; font-size: 12px; line-height: 1.45; }
-.coach-reference .workout-meta .meta-item, .coach-reference .workout-meta .meta-separator { display: inline; width: auto; flex: 0 0 auto; }
+.coach-reference .workout-meta .meta-item { display: block; width: auto; max-width: 100%; min-width: 0; flex: 0 1 auto; white-space: normal; overflow-wrap: anywhere; }
+.coach-reference .workout-meta .meta-separator { display: inline; width: auto; flex: 0 0 auto; }
 .coach-reference .meta-separator { color: #536176; }
 .coach-reference .exercise-list-card { margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
 .coach-reference .exercise-list { border: 0; }

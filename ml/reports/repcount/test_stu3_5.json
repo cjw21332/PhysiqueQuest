@@ -1,0 +1,1 @@
+{"count": 0, "partialCount": 0, "holdDurationMs": 0, "reps": [], "events": [{"type": "state_change", "from": "AT_START", "to": "MOVING"}], "smoothedAngles": [null, null, null, null, null, null, null, 114.96780930232244, 114.96780930232244]}

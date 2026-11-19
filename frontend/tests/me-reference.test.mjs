@@ -18,6 +18,7 @@ function loader(react = React, api = {}) {
     const imports = name => {
       if (name.endsWith('.css')) return {};
       if (name === 'react') return react;
+      if (name === 'next/navigation') return { useRouter: () => ({ push() {} }), usePathname: () => '/me' };
       if (name.endsWith('/api')) return { api };
       if (name.endsWith('/useSettings')) return { useSettings: () => ({ settings: { inactivity: true, alarmVolume: false, showLeaderboard: true, threshold: 45 }, loading: false, error: '', async updateSettings() {}, async retry() {} }) };
       if (name.endsWith('/BottomNav')) return { default: () => React.createElement('nav', {}, 'Home Coach Scan Quests Me'), __esModule: true };
@@ -80,11 +81,9 @@ test('account presentation remains dynamic and unit-aware rather than replacing 
   assert.match(html, /1 condition logged/);
   assert.doesNotMatch(html, /Toji Dela Cruz/);
   assert.doesNotMatch(html, /View sample profile|Test emergency alert|Emergency alert log/);
-  assert.match(html, /Admin tools/);
-  assert.match(html, /Exercise library/);
-  assert.match(html, /Engagement analytics/);
-  assert.ok(html.indexOf('Change password') < html.indexOf('Admin tools'));
-  assert.ok(html.indexOf('Admin tools') < html.indexOf('Log out'));
+  assert.doesNotMatch(html, /Admin tools|Engagement analytics|Publish exercises and pose templates/);
+  assert.match(html, /My exercises/);
+  assert.ok(html.indexOf('Change password') < html.indexOf('Log out'));
   const imperial = { ...profile, height: '5', heightInches: '10', heightUnit: 'ft & in.', weight: '163', weightUnit: 'lb' };
   const personal = renderToStaticMarkup(React.createElement(load('PersonalDataEdit').default, { profile: imperial, onBack() {}, onSave() {} }));
   assert.match(personal, /Height inches/);

@@ -36,24 +36,9 @@ function intVar(
 const DEFAULT_MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const DEFAULT_MAX_SEARCH_QUERY_LENGTH = 120;
 const DEFAULT_MAX_DETECTED_ITEMS = 12;
-/**
- * Budget for the whole scan, which is one vision call plus a bounded USDA fan-out.
- * It must stay comfortably above `DEFAULT_UPSTREAM_TIMEOUT_MS` plus one vision
- * retry, otherwise the request deadline fires while a retry is still in flight.
- *
- * It must also stay *below* the 60s the mobile client waits before abandoning a
- * scan. A deadline above that cap means the user gives up while the server is
- * still working, so the provider is still paid for a result nobody will see and
- * an immediate retry runs a second scan on top of the first.
- */
-const DEFAULT_REQUEST_TIMEOUT_MS = 25_000;
-/**
- * Per-attempt vision budget. Measured with structured output at
- * `thinkingLevel: LOW`, a healthy vision call lands around 2-4s, so 10s left no
- * room for a provider that was slow but not hung and turned healthy scans into
- * 504s.
- */
-const DEFAULT_UPSTREAM_TIMEOUT_MS = 20_000;
+// Allow vision analysis and nutrition lookup to finish within the client deadline.
+const DEFAULT_REQUEST_TIMEOUT_MS = 90_000;
+const DEFAULT_UPSTREAM_TIMEOUT_MS = 60_000;
 /**
  * Default vision model.
  *

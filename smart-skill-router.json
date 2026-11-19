@@ -1,0 +1,13 @@
+{
+  "id": "smart-skill-router",
+  "name": "smart-skill-router",
+  "description": "Route a user's task to the best currently installed skill or natural combination of skills without requiring skill names. Use for any task where an AI coding agent should inspect its available skills, select matching capabilities, respect confirmation boundaries, and fall back to general capability when no installed skill is suitable.",
+  "version": "1.0.0",
+  "type": "custom",
+  "entryPoint": "SKILL.md",
+  "metadata": {
+    "source": "local",
+    "tags": ["routing", "skill-selection", "auto-discovery"],
+    "compatibility": ["codex", "claude-code", "cursor", "opencode", "opencalw"]
+  }
+}

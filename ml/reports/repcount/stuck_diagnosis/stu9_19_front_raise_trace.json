@@ -1,0 +1,1281 @@
+{
+  "count": 1,
+  "partialCount": 0,
+  "holdDurationMs": 0,
+  "reps": [
+    {
+      "type": "rep_counted",
+      "count": 1,
+      "joint": "left_shoulder",
+      "durationMs": 1067.7333333333336,
+      "romFraction": 0.5116142512367365,
+      "romVsReference": 0.5450468896529465,
+      "quality": "partial",
+      "tempoSec": 1.0677333333333336
+    }
+  ],
+  "events": [
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_PEAK"
+    },
+    {
+      "type": "rep_counted",
+      "count": 1,
+      "joint": "left_shoulder",
+      "durationMs": 1067.7333333333336,
+      "romFraction": 0.5116142512367365,
+      "romVsReference": 0.5450468896529465,
+      "quality": "partial",
+      "tempoSec": 1.0677333333333336
+    },
+    {
+      "type": "state_change",
+      "from": "AT_PEAK",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    },
+    {
+      "type": "state_change",
+      "from": "MOVING",
+      "to": "AT_START"
+    },
+    {
+      "type": "state_change",
+      "from": "AT_START",
+      "to": "MOVING"
+    }
+  ],
+  "smoothedAngles": [
+    42.517031125396414,
+    42.517031125396414,
+    34.25911764421751,
+    23.929480868230527,
+    19.68059483748238,
+    15.358639635879033,
+    14.676423842559055,
+    14.39834583911922,
+    14.221460499928455,
+    13.38094674027139,
+    11.81891819795227,
+    10.440842616587501,
+    9.47066541285882,
+    8.749516394187825,
+    8.584092059750123,
+    8.699263203115317,
+    10.903358620396318,
+    12.470965484124257,
+    12.827312810095776,
+    13.619168625299537,
+    12.4114991434959,
+    11.17083926947074,
+    9.911905953056653,
+    7.81374499873463,
+    5.690734448735727,
+    3.989938801539722,
+    4.011414348868286,
+    6.182421211337614,
+    10.84915233013911,
+    16.906655851383057,
+    24.402898116006007,
+    33.02158441362896,
+    40.330186443126976,
+    48.62175225850202,
+    56.568150220388546,
+    64.07660862428914,
+    69.00532025428689,
+    72.0885550597124,
+    75.0396844603516,
+    75.74006973955503,
+    72.88681421951183,
+    63.04794588685269,
+    52.19442801080916,
+    42.7699051124926,
+    34.688392064700636,
+    24.141007076433418,
+    15.78491187773092,
+    12.304495160517547,
+    11.25209312162497,
+    12.079950097589773,
+    14.177286121895014,
+    16.315424742741612,
+    18.419466431973838,
+    20.59858378977171,
+    23.17715432568729,
+    24.949045383756243,
+    25.13938651374147,
+    24.88796986299944,
+    24.035694212075146,
+    23.13133367853744,
+    22.651631455862244,
+    23.157686886422752,
+    23.093532593482827,
+    22.426367802982334,
+    21.430710600911674,
+    20.190603594033057,
+    18.46073639830349,
+    17.105823632495706,
+    14.419659021917248,
+    10.169857403566946,
+    14.872970958660666,
+    18.060460183700506,
+    18.848604993578743,
+    19.966269794860317,
+    21.747508054427392,
+    22.691171622627984,
+    23.667581919832607,
+    24.44553625064816,
+    24.424616544128423,
+    25.210866643764724,
+    19.945858983434803,
+    14.321158061863798,
+    13.318138634877842,
+    13.90128915355192,
+    15.49654150096778,
+    16.813950345083274,
+    18.05506178635649,
+    19.041683256843804,
+    19.809760837994972,
+    20.21079364334875,
+    20.850873058437845,
+    21.418121922485316,
+    22.02738121320855,
+    22.579630935518495,
+    23.235386691514883,
+    23.764871120897713,
+    24.23833171996186,
+    24.32462659766981,
+    24.428535419061276,
+    24.52484249101707,
+    24.72938528802551,
+    24.67863732961369,
+    24.412644284189938,
+    23.85599159605336,
+    23.09529529723845,
+    22.511457654005557,
+    20.985281095020135,
+    18.875633662675153,
+    16.4499832847366,
+    12.097903692610613,
+    18.3405582175719,
+    22.141547208994147,
+    29.210045224737947,
+    31.75558462571862,
+    32.203177004611575,
+    29.934705918006514,
+    26.6518086715527,
+    26.693534685504055,
+    25.767457806987995,
+    25.101586552492527,
+    25.9993494523617,
+    18.840104244227742,
+    15.440192677449478,
+    15.559064786272167,
+    16.242884412153654,
+    17.55928471790106,
+    19.099822819053255,
+    20.08703659116386,
+    20.76705341538749,
+    21.864068568324175,
+    22.57185868540262,
+    23.18746461677829,
+    23.802073009478256,
+    24.382433932973598,
+    25.26369282928056,
+    25.852959397207083,
+    26.245265540626832,
+    26.402093513607987,
+    26.228530465163885,
+    25.84797766286711,
+    24.80140167415155,
+    23.78744252340505,
+    22.65559285882786,
+    22.783165509383643,
+    22.644858632211324,
+    22.34245499029982,
+    21.848138692611563,
+    21.101221842597987,
+    20.56053334067845,
+    20.492294784271106,
+    20.34202930089412,
+    17.082803825764998,
+    11.6900425485874,
+    14.847089909529027,
+    16.840308434071012,
+    23.581497382015584,
+    24.86020599347793,
+    26.129733071380947,
+    30.71816851192802,
+    32.9169251112474,
+    36.501332186134995,
+    33.259187143766,
+    29.432851931055072,
+    26.626067340619137,
+    18.65076411527094,
+    13.566376949869028,
+    13.22508045507592,
+    14.015142167784642,
+    14.778509250321179,
+    15.259816407532313,
+    15.7842119982657,
+    16.37633430265202,
+    16.99992894852418,
+    17.56897166021185,
+    18.33446826890602,
+    19.513251588210007,
+    20.7528955940277,
+    21.412939236306773,
+    21.836561974857098,
+    22.065769356320484,
+    22.360413371974786,
+    22.734209970788484,
+    22.882325111353254,
+    22.620376092575167,
+    22.614000470947676,
+    22.57654504771403,
+    22.570377397797657,
+    22.724687587099595,
+    22.358456957856248,
+    21.680892708956126,
+    19.685450000614523,
+    15.702520165257434,
+    11.45540937081845,
+    14.867991462341003,
+    19.3243137848618,
+    23.95847576922462,
+    24.52553792956667,
+    17.615018536779935,
+    11.874775543703482,
+    8.052603228179768,
+    5.4647372152677,
+    12.717449914955214,
+    17.590914011767666,
+    19.01511238132214,
+    24.252670177378718,
+    15.982909484807717,
+    15.507263637072363,
+    14.886215547537017,
+    16.146467773193436,
+    17.10252332153241,
+    17.964925849406754,
+    18.472441734313982,
+    18.780550715884807,
+    19.363329779712622,
+    20.139125712156606,
+    20.545862934600038,
+    20.962579123622348,
+    21.431533226809595,
+    21.944166149051146,
+    22.521780344809784,
+    23.2910857061813,
+    23.95606374490918,
+    24.50834877007361,
+    25.00662677668231,
+    25.327365757809225,
+    25.518433418810346,
+    25.541488164917844,
+    25.461304761602648,
+    25.210176810598497,
+    24.71361946729622,
+    23.98058125396956,
+    23.42199803735271,
+    23.27426048324174,
+    22.988529289409335,
+    22.50855791731844,
+    21.976217318388276,
+    20.731853176441682,
+    16.996674815995075,
+    17.323865243260858,
+    18.353598812301172,
+    22.289615525736334,
+    24.963781105124788,
+    27.387745900352392,
+    20.188795355151186,
+    15.856458064333905,
+    19.978610894111142,
+    25.69473300603624,
+    27.232618871513868,
+    30.08032769339026,
+    30.07139554059747,
+    28.568266268240045,
+    20.674407522568067,
+    15.03472627014182,
+    15.918501710203971,
+    17.544140136245645,
+    21.950576682869087,
+    24.297725065137456,
+    25.475858079238858,
+    26.553816053084446,
+    27.6129622403135,
+    28.516191646843684,
+    29.07100512946917,
+    29.915818802408342,
+    30.510143814646483,
+    30.982213415148827,
+    30.983457743911277,
+    31.272078651742817,
+    31.370984327372753,
+    31.15185274741426,
+    30.915065346697325,
+    30.788602569197078,
+    30.54768420010405,
+    30.259365472620992,
+    29.984039283320563,
+    29.848772608266763,
+    29.092506811087745,
+    27.469422911968405,
+    26.201519320015954,
+    25.60077089252158,
+    24.97217458323947,
+    24.535655162717372,
+    23.382086627468862,
+    21.091140279980145,
+    16.963281041326052,
+    16.272871630405916,
+    20.92462494957942,
+    23.680420289843983,
+    26.911716741350705,
+    31.6738599091475,
+    35.50246722110953,
+    34.91565013749277,
+    33.45463899796412,
+    31.280411850999027,
+    23.000545048845904,
+    16.989416944818682,
+    28.72444133517643,
+    31.49994915500352,
+    29.541025731533196,
+    26.188544958212972,
+    25.10857234322512,
+    26.291013660820184,
+    24.179174022070693,
+    20.91084112017714,
+    17.12717496406598,
+    13.075691037731469,
+    9.836483838895733,
+    10.110056842636109,
+    11.630884029869744,
+    17.656034108121418,
+    21.926144575376295,
+    22.529976910329395,
+    21.779317275660006,
+    19.194797466513833,
+    17.704168068183684,
+    22.77797949813433,
+    25.74332705958905,
+    27.877957351359463,
+    28.691002484206418,
+    29.557002151581955,
+    29.934893009389377,
+    30.108622852761336,
+    29.39048248164573,
+    28.554668081280763,
+    28.16742651911446,
+    27.966690209300957,
+    27.39077785953202,
+    26.86336646694572,
+    26.402762882621754,
+    26.11430183172932,
+    25.89706696711557,
+    26.990381208732174,
+    27.38741691714452,
+    27.82248797122307,
+    28.330210598317542,
+    27.797385563391195,
+    26.463408433004133,
+    27.409154579625806,
+    28.924680833297273,
+    30.019489573285384,
+    27.38752997509097,
+    26.549588276931228,
+    18.350225835894474,
+    18.52478147676835,
+    20.324430186707804,
+    21.388194226331898,
+    21.189720395642542,
+    18.45759236096911,
+    12.070025236748762,
+    16.204579223493585,
+    22.34842204307023,
+    27.54713264815399,
+    29.273337815734358,
+    29.39716134546316,
+    29.345534411901706,
+    30.082208493951384,
+    30.90821588158083,
+    31.418905723471596,
+    31.269477499750693,
+    30.879374612668386,
+    30.558290051513715
+  ]
+}

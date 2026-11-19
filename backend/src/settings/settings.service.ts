@@ -1,3 +1,4 @@
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -14,6 +15,6 @@ export class SettingsService {
 
   async update(userId: string, dto: UpdateSettingsDto) {
     const patch = Object.fromEntries(Object.entries(dto.values).map(([key, value]) => [`values.${key}`, value]));
-    return this.model.findOneAndUpdate({ userId: new Types.ObjectId(userId) }, { $set: patch }, { upsert: true, returnDocument: 'after', runValidators: true, setDefaultsOnInsert: true });
+    return new AccountLifecycleFence(this.model.db).withActiveWrite(userId, async session => this.model.findOneAndUpdate({ userId: new Types.ObjectId(userId) }, { $set: patch }, { upsert: true, returnDocument: 'after', runValidators: true, setDefaultsOnInsert: true }).session(session));
   }
 }

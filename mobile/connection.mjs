@@ -76,3 +76,13 @@ export function resolveApiUrl(configuredApiUrl, frontendUrl) {
   url.hash = '';
   return url.toString().replace(/\/$/, '');
 }
+
+export async function backendIsReady(apiUrl, signal, request = fetch) {
+  try {
+    const url = apiUrl.replace(/\/api\/?$/i, '/ready');
+    const response = await request(url, { signal, credentials: 'omit', headers: { 'Cache-Control': 'no-cache' } });
+    return response.ok && (await response.json())?.status === 'ready';
+  } catch {
+    return false;
+  }
+}

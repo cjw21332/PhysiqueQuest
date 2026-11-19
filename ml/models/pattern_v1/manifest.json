@@ -1,0 +1,222 @@
+{
+  "model": "pattern_cnn1d",
+  "version": "1.0.0",
+  "status": "baseline trained on real licence-cleared data; fails G4, not a deployment candidate",
+  "dataset": "https://huggingface.co/datasets/anonymousatom/pushupbench",
+  "license": "CC-BY-4.0",
+  "attribution_required": true,
+  "feature_spec": "ml/FEATURE_SPEC.md",
+  "preprocessing": "FEATURE_SPEC pad 1.5 -> unpad -> mid-hip/torso normalise -> 15 fps",
+  "input": {
+    "shape": [
+      1,
+      48,
+      132
+    ],
+    "window_frames": 48,
+    "stride": 24
+  },
+  "classes": [
+    "cardio_dynamic",
+    "core_flexion",
+    "core_isometric",
+    "hinge",
+    "horizontal_push",
+    "lateral_raise",
+    "squat"
+  ],
+  "excluded_classes": [
+    "curl",
+    "triceps_extension"
+  ],
+  "excluded_reason": "fewer than 4 distinct subjects: cannot hold out a subject without leaking identical footage between train and test",
+  "counts": {
+    "windows_total": 4906,
+    "windows_per_split": {
+      "train": 3291,
+      "val": 687,
+      "test": 928
+    },
+    "subjects_per_split": {
+      "train": 21,
+      "val": 4,
+      "test": 5
+    }
+  },
+  "seed": 7,
+  "epochs_run": 38,
+  "best_epoch": 28,
+  "best_val_macro_f1": 0.3023,
+  "test": {
+    "accuracy": 0.4688,
+    "macro_f1": 0.3589,
+    "per_class": {
+      "cardio_dynamic": {
+        "precision": 0.4067,
+        "recall": 0.2933,
+        "f1": 0.3408,
+        "support": 208
+      },
+      "core_flexion": {
+        "precision": 0.561,
+        "recall": 0.5227,
+        "f1": 0.5412,
+        "support": 88
+      },
+      "core_isometric": {
+        "precision": 0.0857,
+        "recall": 0.0316,
+        "f1": 0.0462,
+        "support": 95
+      },
+      "hinge": {
+        "precision": 0.719,
+        "recall": 0.5148,
+        "f1": 0.6,
+        "support": 338
+      },
+      "horizontal_push": {
+        "precision": 0.2143,
+        "recall": 0.9474,
+        "f1": 0.3495,
+        "support": 19
+      },
+      "lateral_raise": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 19
+      },
+      "squat": {
+        "precision": 0.5155,
+        "recall": 0.8261,
+        "f1": 0.6348,
+        "support": 161
+      }
+    },
+    "confusion_matrix": [
+      [
+        61,
+        3,
+        0,
+        44,
+        20,
+        24,
+        56
+      ],
+      [
+        0,
+        46,
+        0,
+        23,
+        0,
+        0,
+        19
+      ],
+      [
+        68,
+        0,
+        3,
+        0,
+        16,
+        8,
+        0
+      ],
+      [
+        4,
+        33,
+        32,
+        174,
+        24,
+        39,
+        32
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        18,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        18
+      ],
+      [
+        15,
+        0,
+        0,
+        1,
+        6,
+        6,
+        133
+      ]
+    ]
+  },
+  "int8": {
+    "accuracy": 0.3966,
+    "macro_f1": 0.25,
+    "size_bytes": 173419,
+    "delta_macro_f1_vs_float": -0.1089
+  },
+  "torch_onnx_max_abs_diff": 1.9073486328125e-06,
+  "parameters": 168071,
+  "files": {
+    "cnn1d.onnx": {
+      "sha256": "2e6c07398b7b67d55021e31c6f6af58466f0640e7512b9794bf92bfe0a1bbcbe",
+      "bytes": 671572
+    },
+    "cnn1d_int8.onnx": {
+      "sha256": "7b643be58abd72c6d857c954d107a41c49ad548c4ab88377725880f0b63d2890",
+      "bytes": 173419
+    }
+  },
+  "scope_limits": [
+    "Covers only patterns present in licence-cleared recordings; horizontal_pull is absent.",
+    "Metrics are within-dataset (PushUpBench subjects), not PhysiqueQuest users.",
+    "No claim is made for rep counting; this model classifies movement pattern only."
+  ],
+  "diagnosis": {
+    "report": "ml/reports/PATTERN_V1_DIAGNOSIS.md",
+    "root_causes": [
+      "order-invariant global average pooling: a single repeated frame scores 0.4375 vs 0.4688 for the real window",
+      "effective test sample is 5 subjects, not 928 windows; per-subject accuracy spans 0.072-1.000",
+      "three of seven classes have one or two test identities",
+      "representation separates subjects (Fisher 130) better than classes (112)",
+      "no facing or camera-roll canonicalisation: mirroring costs 0.142 accuracy",
+      "class weights up to 18.8x applied to a class with one training subject"
+    ],
+    "temporal_probe": {
+      "identity": 0.4688,
+      "single_frame_repeated": 0.4375,
+      "time_reversed": 0.4677
+    },
+    "mirror_probe": 0.3265,
+    "test_subjects": 5
+  },
+  "known_issues": [
+    "trained before subject-id canonicalisation; split code now uses the 8-char prefix and drops one duplicate clip",
+    "about 10 of 231 training clips have ambiguous pattern labels (see reports/PATTERN_V1_DATA_AUDIT.md)",
+    "all training footage is 1920x1080 landscape 30 fps; portrait phone input is untested",
+    "FEATURE_SPEC v1.0 normalises the visibility column, which destroys its 0-1 meaning"
+  ],
+  "quantization": {
+    "shipped_format": "onnxruntime.quantize_dynamic (cnn1d_int8.onnx)",
+    "verdict": "fails G8: val macro-F1 -0.279, test macro-F1 -0.109, and 10-20x slower than FP32",
+    "recommended_format": "static QDQ int8, per-channel, QUInt8 activations, class-balanced calibration",
+    "recommended_metrics": {
+      "val_macro_f1": 0.777,
+      "test_macro_f1": 0.363,
+      "size_bytes": 178225,
+      "latency_ms_batch1": 0.06
+    },
+    "report": "ml/reports/QUANTIZATION.md"
+  }
+}
