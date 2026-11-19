@@ -59,7 +59,7 @@ test('strength rankings can be retried after a load failure', async ({ page }) =
   });
   await page.goto('/quests/leaderboard');
   await page.getByRole('button',{name:/Strength Logged lifts/}).click();
-  await expect(page.getByRole('alert').filter({hasText:'Rankings unavailable'})).toBeVisible();
+  await expect(page.getByRole('alert').filter({hasText:'Please try again'})).toBeVisible();
   await page.getByRole('button',{name:'Try again'}).click();
   await expect(page.getByText('No ranked exercises are available yet.')).toBeVisible();
   expect(attempts).toBe(2);

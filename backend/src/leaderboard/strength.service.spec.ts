@@ -23,4 +23,12 @@ describe('strength rankings', () => {
     expect(relative.entries.map(row => row.userId)).toEqual([b, a]);
     expect(relative.entries[1].score).toBeCloseTo(120 / (200 / 2.2046226218));
   });
+  it('lists visible accounts without a qualifying set as unranked', async () => {
+    const a = 'aaaaaaaaaaaaaaaaaaaaaaaa', b = 'bbbbbbbbbbbbbbbbbbbbbbbb';
+    const query = (items: unknown[]) => ({ select: () => ({ lean: () => ({ exec: async () => items, cursor: () => ({ async *[Symbol.asyncIterator]() { yield* items; } }) }) }) });
+    const service = new StrengthService({ find: () => query([]) } as never, { collection: { find: () => ({ toArray: async () => [] }) } } as never, { find: () => query([{ _id: a, name: 'Ana' }, { _id: b, name: 'Ben' }]) } as never, { find: () => query([{ userId: b }]) } as never);
+    const result = await service.get(a);
+    expect(result.entries).toEqual([]);
+    expect(result.participants).toEqual([{ userId: a, name: 'Ana', isCurrentUser: true }]);
+  });
 });

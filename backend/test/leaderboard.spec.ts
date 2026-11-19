@@ -53,6 +53,11 @@ describe('leaderboard', () => {
     expect(result.entries.map(entry => entry.userId)).toEqual([A]);
     expect((service as any).users.find).toHaveBeenCalledWith(expect.objectContaining({ isActive: { $ne: false }, deletedAt: null }));
   });
+  it('includes visible new accounts with zero points without exposing hidden accounts', async () => {
+    const service = build({ users: [{ _id: A, name: 'Ana' }, { _id: B, name: 'Ben' }, { _id: C, name: 'Cara' }], settings: [{ userId: B, values: { showLeaderboard: false } }] });
+    const result = await service.get(A, 'week');
+    expect(result.entries.map(entry => [entry.userId, entry.points])).toEqual([[A, 0], [C, 0]]);
+  });
   it('credits a training day once and excludes standalone recordings and skipped sessions', async () => {
     const service = build({ workouts: [{ userId: A }, { userId: A }, { userId: A, origin: 'recorded-set' }, { userId: A, sets: [{ status: 'skipped' }] }], users: [{ _id: A, name: 'Ana' }] });
     expect((await service.get(A, 'all')).self.points).toBe(100);
@@ -122,8 +127,7 @@ describe('leaderboard read efficiency', () => {
     expect(selections).toContain('userId meals.id meals.date meals.scanSavedAt meals.scanGroupId scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses');
     expect(selections).toContain('userId values.showLeaderboard');
     expect(settings.find).toHaveBeenCalledWith({ 'values.showLeaderboard': false });
-    const requestedIds = users.find.mock.calls[0][0]._id.$in.map(String);
-    expect(requestedIds.sort()).toEqual([A, B]); // Caller already in points: no duplicate identifier.
+    expect(users.find).toHaveBeenCalledWith({ isActive: { $ne: false }, deletedAt: null });
   });
 
   it('starts privacy and history reads while the scoring read is pending', async () => {

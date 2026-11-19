@@ -127,7 +127,7 @@ export type AdminAlertRow = {
 
 export type LeaderboardPeriod = 'week' | 'month' | 'all';
 export type StrengthStanding = { userId: string; name: string; rank: number; score: number; maxKg: number; loadKg: number; reps: number; bodyweightKg?: number; isCurrentUser: boolean };
-export type StrengthLeaderboardRecord = { exercises: { id: string; name: string }[]; exerciseId: string | null; metric: 'heaviest' | 'relative'; entries: StrengthStanding[]; self: StrengthStanding | null; hidden: boolean };
+export type StrengthLeaderboardRecord = { exercises: { id: string; name: string }[]; exerciseId: string | null; metric: 'heaviest' | 'relative'; entries: StrengthStanding[]; participants?: { userId: string; name: string; isCurrentUser: boolean }[]; self: StrengthStanding | null; hidden: boolean };
 
 export interface LeaderboardEntryRecord {
   userId: string;
