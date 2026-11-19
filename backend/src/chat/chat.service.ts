@@ -125,7 +125,12 @@ export class ChatService {
     }
     if (/^(?:hi|hello|hey|thanks|thank you)[!.\s]*$/i.test(question)) return response('Hi, I’m Phiq. Ask me about PhysiqueQuest or enable personal data to discuss your own logged progress.');
     if (/^(?:what can you do|what (?:pages|screens|sections) can (?:you|i) (?:access|use|view)|what do you know)[?!.\s]*$/i.test(question)) return response('I can explain every PhysiqueQuest page: Home and notifications; Goals and Progress; Coach’s program, library, preparation, workout and report; Scan’s dietary plan, food entry, logs, history and review; Quests and leaderboard rules; and Me’s profile, training, health, safety and account controls. Enable saved fitness data for selected records from your own account. I cannot change records or access other users.', [{ id: 'system-privacy', label: 'Assistant capabilities' }]);
-    if (/\bwhat (?:data|information) (?:can|do) you (?:access|see|read|use)|\bcan you (?:access|read|see) (?:my|other)|\bhow (?:is|are).*(?:privacy|data protected)/i.test(question)) return response(PRIVACY_BOUNDARY, [{ id: 'system-privacy', label: 'Assistant privacy boundaries' }]);
+    if (/\bwhat (?:(?:personal|saved|fitness)\s+)?(?:data|information|records?) (?:can|do) you (?:access|see|read|use)|\bcan you (?:access|read|see) (?:my|other)|\bhow (?:is|are).*(?:privacy|data protected)/i.test(question)) {
+      const access = includePersonalData
+        ? 'Saved fitness data access is on. I can use relevant information from your signed-in account, such as saved goals, workouts, nutrition and progress, to answer your question.'
+        : 'Saved fitness data access is off. Turn on “Use my saved fitness data” if you want me to answer using relevant records from your signed-in account, such as goals, workouts, nutrition and progress.';
+      return response(`${access} I cannot access another user’s data, credentials or account secrets, and I cannot change records.`, [{ id: 'system-privacy', label: 'Assistant privacy boundaries' }]);
+    }
     const education = fastEducationAnswer(retrievalQuestion);
     if (education) return response(cleanChatReply(education.reply), education.sourceIds.map(id => ({ id, label: id === 'system-coach' ? 'Coach guide' : 'PhysiqueQuest learning guide' })));
     if (/\b(?:my|mine|i)\b.{0,50}\b(?:personal records?|personal bests?|best lifts?)\b/i.test(intent.normalized)) {

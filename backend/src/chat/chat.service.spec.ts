@@ -11,6 +11,20 @@ function fixture() {
   return { context, model, service: new ChatService(context as never, model as never) };
 }
 describe('Phiq private assistant', () => {
+  it.each(['What personal data can you read from my account?', 'What saved information can you access?', 'What fitness records can you see?'])('answers access questions directly: %s', async question => {
+    const { service, context, model } = fixture();
+    const result = await service.reply(OWNER, [{ role: 'user', text: question }], true);
+    expect(result.reply).toMatch(/access is on.*signed-in account/i);
+    expect(result.reply).not.toMatch(/clarify/i);
+    expect(context.build).not.toHaveBeenCalled();
+    expect(model.generate).not.toHaveBeenCalled();
+  });
+  it('explains how to enable saved data when access is off', async () => {
+    const { service, context } = fixture();
+    const result = await service.reply(OWNER, [{ role: 'user', text: 'What data can you access?' }], false);
+    expect(result.reply).toMatch(/access is off.*turn on.*saved fitness data/i);
+    expect(context.build).not.toHaveBeenCalled();
+  });
   it.each(['Who created you?', 'Who made you', 'Who built Phiq?', 'Who developed PhysiqueQuest?', 'Who are your creators?', 'Which team created this app?'])('answers creator questions without personal data or model access: %s', async question => {
     const { service, context, model } = fixture();
     const result = await service.reply(OWNER, [{ role: 'user', text: question }]);
