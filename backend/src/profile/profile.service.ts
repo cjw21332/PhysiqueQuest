@@ -80,7 +80,7 @@ export class ProfileService {
   }
 }
 
-function validateProfileMeasurements(profile: Partial<Profile>): void {
+export function validateProfileMeasurements(profile: Partial<Profile>): void {
   const age = Number(profile.age);
   if (!Number.isInteger(age) || age < 13 || age > 100) {
     throw new BadRequestException('Age must be between 13 and 100.');

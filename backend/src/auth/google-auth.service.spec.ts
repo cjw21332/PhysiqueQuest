@@ -5,6 +5,7 @@ import { GoogleAuthService } from './google-auth.service.js';
 import type { User } from './schemas/user.schema.js';
 
 const identity = { uid: 'google-uid', email: 'person@example.com', name: 'Google Person' };
+const profile = { name: 'Google Person', age: '25', height: '170', heightUnit: 'cm', weight: '70', weightUnit: 'kg', gender: 'Other', activity: 'Moderate', goal: 'Strength', seriousness: 'Consistent', equipment: ['Dumbbells'], days: ['Monday'], duration: '30 min', conditions: [], contactName: 'Friend', contactPhone: '09999999999' };
 
 function fixture() {
   const session = { inTransaction: () => true, withTransaction: async (fn: () => Promise<void>) => fn(), endSession: async () => {} };
@@ -18,13 +19,15 @@ function fixture() {
   const signIns = { create: vi.fn().mockResolvedValue(undefined) };
   const identities = { verify: vi.fn().mockResolvedValue(identity) };
   const verification = { consumeRegistration: vi.fn().mockResolvedValue(undefined) };
+  const profiles = { create: vi.fn().mockResolvedValue([]), exists: vi.fn().mockResolvedValue({ _id: 'profile' }) };
   const service = new GoogleAuthService(
     lifecycleModel(users as unknown as Model<User>),
     lifecycleModel(signIns as never),
     identities as never,
     verification as never,
+    profiles as never,
   );
-  return { service, users, signIns, identities, verification };
+  return { service, users, signIns, identities, verification, profiles };
 }
 
 describe('Google account lifecycle', () => {
@@ -44,6 +47,13 @@ describe('Google account lifecycle', () => {
     await expect(f.service.check('google-token', 'register')).rejects.toMatchObject({
       response: expect.objectContaining({ code: 'GOOGLE_LOGIN_REQUIRED' }),
     });
+  });
+
+  it('lets a previously created Google account resume an unfinished profile', async () => {
+    const f = fixture();
+    f.users.findOne.mockResolvedValueOnce({ _id: 'existing', isActive: true, deletedAt: null });
+    f.profiles.exists.mockResolvedValue(null);
+    await expect(f.service.check('google-token', 'register')).resolves.toMatchObject({ registered: true, needsProfile: true });
   });
 
   it('links a verified Google email to an existing account and returns it for a session', async () => {
@@ -73,6 +83,7 @@ describe('Google account lifecycle', () => {
       requestId: 'a'.repeat(64),
       code: '123456',
       name: identity.name,
+      profile,
     })).resolves.toBe(created);
 
     expect(f.verification.consumeRegistration).toHaveBeenCalledWith(identity.email, 'a'.repeat(64), '123456');
@@ -82,6 +93,7 @@ describe('Google account lifecycle', () => {
       googleUid: identity.uid,
       emailVerified: true,
     })], expect.objectContaining({ session: expect.anything() }));
+    expect(f.profiles.create).toHaveBeenCalledWith([expect.objectContaining({ userId: created._id, goal: 'Strength' })], { session: expect.anything() });
     expect(f.signIns.create).toHaveBeenCalledWith([expect.objectContaining({ source: 'register' })], { session: expect.anything() });
   });
 
@@ -93,6 +105,7 @@ describe('Google account lifecycle', () => {
       password: 'StrongPass1',
       requestId: 'a'.repeat(64),
       code: '123456',
+      profile,
     })).rejects.toMatchObject({
       response: expect.objectContaining({ code: 'GOOGLE_LOGIN_REQUIRED' }),
     });

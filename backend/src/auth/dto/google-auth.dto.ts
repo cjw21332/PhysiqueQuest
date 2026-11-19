@@ -1,4 +1,6 @@
-import { IsIn, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsDefined, IsIn, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateProfileDto } from '../../profile/dto/profile.dto.js';
 import { IsStrongPassword } from '../validators/password.validator.js';
 
 export class GoogleTokenDto {
@@ -12,6 +14,7 @@ export class GoogleLoginDto extends GoogleTokenDto {
   @IsOptional() @Matches(/^\d{6}$/) code?: string;
 }
 export class GoogleRegisterDto extends GoogleTokenDto {
+  @IsDefined() @ValidateNested() @Type(() => CreateProfileDto) profile: CreateProfileDto;
   @IsString() @IsStrongPassword() password: string;
   @Matches(/^[a-f0-9]{64}$/) requestId: string;
   @Matches(/^\d{6}$/) code: string;

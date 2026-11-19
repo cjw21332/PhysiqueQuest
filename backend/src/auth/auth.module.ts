@@ -20,10 +20,11 @@ import { AuthThrottleGuard } from './auth-throttle.guard.js';
 import { EmailVerificationService } from './email-verification.service.js';
 import { GoogleIdentityService } from './google-identity.service.js';
 import { GoogleAuthService } from './google-auth.service.js';
+import { Profile, ProfileSchema } from '../profile/schemas/profile.schema.js';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: AuthRateLimit.name, schema: AuthRateLimitSchema }, { name: RecoveryToken.name, schema: RecoveryTokenSchema }, { name: SignInEvent.name, schema: SignInEventSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: Profile.name, schema: ProfileSchema }, { name: AuthRateLimit.name, schema: AuthRateLimitSchema }, { name: RecoveryToken.name, schema: RecoveryTokenSchema }, { name: SignInEvent.name, schema: SignInEventSchema }]),
     MongooseModule.forFeature([{ name: AuthSession.name, schema: AuthSessionSchema }]),
     PassportModule,
     JwtModule.registerAsync({

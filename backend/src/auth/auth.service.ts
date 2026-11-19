@@ -8,6 +8,8 @@ import { User } from './schemas/user.schema.js';
 import { SignInEvent } from './schemas/sign-in-event.schema.js';
 import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto.js';
 import { emailStatus } from './email-verification.js';
+import { Profile } from '../profile/schemas/profile.schema.js';
+import { validateProfileMeasurements } from '../profile/profile.service.js';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +19,7 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(SignInEvent.name) private signInEvents: Model<SignInEvent>,
     private jwtService: JwtService,
+    @InjectModel(Profile.name) private profiles: Model<Profile>,
   ) {}
 
   /**
@@ -30,6 +33,7 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
+    validateProfileMeasurements(registerDto.profile);
     const { email, name, password } = registerDto;
     // Ensure the unique email index exists before accepting any registration.
     await this.userModel.init();
@@ -50,6 +54,7 @@ export class AuthService {
     let user!: HydratedDocument<User>;
     try { await session.withTransaction(async () => {
       [user] = await this.userModel.create([{ email: normalizedEmail, name: name.trim(), passwordHash, emailVerified: true, emailVerifiedAt: new Date(), legacyEmailAccess: false, authPolicyVersion: 2 }], { session });
+      await this.profiles.create([{ ...registerDto.profile, userId: user._id }], { session });
       await this.userModel.db.collection('account_lifecycle').insertOne({ _id: user._id, status: 'active', writeVersion: 0 }, { session });
     }, { writeConcern: { w: 'majority' } }); } catch (error: unknown) {
       if (isDuplicateKeyError(error)) throw new ConflictException('Email already registered');

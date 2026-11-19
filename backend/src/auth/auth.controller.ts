@@ -14,6 +14,7 @@ import { EmailVerificationService } from './email-verification.service.js';
 import { ConfirmVerificationDto, ResendVerificationDto } from './dto/email-verification.dto.js';
 import { GoogleAuthService } from './google-auth.service.js';
 import { GoogleCheckDto, GoogleLoginDto, GoogleRegisterDto } from './dto/google-auth.dto.js';
+import { validateProfileMeasurements } from '../profile/profile.service.js';
 
 @Controller('auth')
 export class AuthController {
@@ -41,6 +42,7 @@ export class AuthController {
   @ApiCreatedResponse({ type: SessionResponseDto })
   async sessionRegister(@Body() dto: RegisterDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     assertSessionRequest(req);
+    validateProfileMeasurements(dto.profile);
     await this.verification.consumeRegistration(dto.email, dto.requestId, dto.code);
     const result = await this.authService.register(dto);
     req.user = { userId: result.user.id };
@@ -145,6 +147,7 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto, @Req() req?: Request): Promise<AuthResponseDto> {
     assertLegacyAuthEnabled();
+    validateProfileMeasurements(registerDto.profile);
     await this.verification.consumeRegistration(registerDto.email, registerDto.requestId, registerDto.code);
     const result = await this.authService.register(registerDto);
     if (req) req.user = { userId: result.user.id };

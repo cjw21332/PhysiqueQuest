@@ -1,9 +1,11 @@
-import { Transform } from 'class-transformer';
-import { IsEmail, IsEmpty, IsString, MaxLength, MinLength, Matches } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsDefined, IsEmail, IsEmpty, IsString, MaxLength, MinLength, Matches, ValidateNested } from 'class-validator';
+import { CreateProfileDto } from '../../profile/dto/profile.dto.js';
 import { IsStrongPassword } from '../validators/password.validator.js';
 import { ApiHideProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
+  @IsDefined() @ValidateNested() @Type(() => CreateProfileDto) profile: CreateProfileDto;
   @Transform(({ value }) => typeof value === 'string' ? value.trim().toLowerCase() : value)
   @IsEmail()
   @MaxLength(254)
