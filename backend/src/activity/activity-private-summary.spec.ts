@@ -38,6 +38,8 @@ describe('private assistant quest computation', () => {
     expect(summary.dailyMissions.every(mission => mission.complete)).toBe(true);
     expect(summary.badges.find(badge => badge.id === 'first-pr')).toMatchObject({ earned: true });
     expect(summary.badges.find(badge => badge.id === 'macro-master')).toMatchObject({ earned: true });
+    expect(summary.badges.find(badge => badge.id === 'streak-30')).toMatchObject({ earned: false, progress: { current: 2, target: 30, unit: 'days' } });
+    expect(summary.badges.find(badge => badge.id === 'hydrated')).toMatchObject({ earned: true, progress: { current: 8, target: 8 } });
     expect(summary.badges.find(badge => badge.id === 'top-10')).toMatchObject({ available: false });
   });
 
@@ -59,6 +61,23 @@ describe('private assistant quest computation', () => {
     ], water: [] });
     const summary = await service.getForAssistant(OWNER);
     expect(summary.badges.find(badge => badge.id === 'macro-master')).toMatchObject({ earned: false });
+  });
+
+  it('derives the new badge milestones from real activity, loads, and unavailable data', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-29T06:00:00Z'));
+    const { service, nutrition, workouts, leaderboard } = fixture();
+    const dates = Array.from({ length: 20 }, (_, index) => new Date(Date.UTC(2026, 9, 29 - index)).toISOString().slice(0, 10));
+    nutrition.read.mockResolvedValue({ meals: dates.slice(0, 7).flatMap(date => [0, 1, 2].map(n => ({ date, scanGroupId: `${date}-${n}`, scanSavedAt: new Date(), protein: 50, carbs: 80, fat: 25 }))), water: dates.map(date => ({ date, glasses: 8 })) });
+    workouts.creditHistory.mockResolvedValue(dates.slice(0, 7).map(date => ({ status: 'completed', endedAt: new Date(`${date}T01:00:00Z`), activityDate: date, earlyBird: true })));
+    workouts.personalRecordDays.mockResolvedValue(dates.slice(0, 7));
+    (workouts as any).summary = vi.fn().mockResolvedValue({ personalRecords: [{ loadKg: 50 }, { loadKg: 110 }] });
+    leaderboard.get.mockResolvedValue({ self: { rank: 42, points: 500 } });
+    const result = await service.get(OWNER);
+    for (const id of ['first-workout', 'personal-record', 'goal-7', 'hydration-20', 'top-100', 'top-50', 'lift-50', 'level-beginner']) expect(result.badges.find(badge => badge.id === id)?.earned, id).toBe(true);
+    expect(result.badges.find(badge => badge.id === 'lift-150')).toMatchObject({ earned: false, progress: { current: 110, target: 150 } });
+    expect(result.badges.find(badge => badge.id === 'top-10')?.earned).toBe(false);
+    expect(result.badges.find(badge => badge.id === 'calories-100')).toMatchObject({ earned: false, available: false });
+    expect(result.badges.find(badge => badge.id === 'best-form')).toMatchObject({ earned: false, available: false });
   });
 
   it('preserves the app streak cap and propagates own-data failures', async () => {

@@ -1,0 +1,88 @@
+{
+  "browser": {
+    "route": "headless Chromium via installed Edge",
+    "executablePath": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+    "args": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--use-gl=angle",
+      "--use-angle=swiftshader",
+      "--enable-unsafe-swiftshader",
+      "--disable-dev-shm-usage"
+    ],
+    "status": "failed",
+    "error": "browserType.launch: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-setuid-sandbox --use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --disable-dev-shm-usage --user-data-dir=C:\\Users\\MY PC\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{d00f43bb-6dd9-4870-9ac1-e75bd8883585}\\Temp\\playwright_chromiumdev_profile-WFneYT --remote-debugging-pipe --no-startup-window\n<launched> pid=16800\n[pid=16800][err] [1121/201315.490:ERROR:third_party\\crashpad\\crashpad\\util\\win\\registration_protocol_win.cc:136] TransactNamedPipe: The pipe has been ended. (0x6D)\nCall log:\n\u001b[2m  - <launching> C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-setuid-sandbox --use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --disable-dev-shm-usage --user-data-dir=C:\\Users\\MY PC\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{d00f43bb-6dd9-4870-9ac1-e75bd8883585}\\Temp\\playwright_chromiumdev_profile-WFneYT --remote-debugging-pipe --no-startup-window\u001b[22m\n\u001b[2m  - <launched> pid=16800\u001b[22m\n\u001b[2m  - [pid=16800][err] [1121/201315.490:ERROR:third_party\\crashpad\\crashpad\\util\\win\\registration_protocol_win.cc:136] TransactNamedPipe: The pipe has been ended. (0x6D)\u001b[22m\n\u001b[2m  - [pid=16800] <gracefully close start>\u001b[22m\n\u001b[2m  - [pid=16800] <kill>\u001b[22m\n\u001b[2m  - [pid=16800] <will force kill>\u001b[22m\n\u001b[2m  - [pid=16800] <process did exit: exitCode=0, signal=null>\u001b[22m\n\u001b[2m  - [pid=16800] starting temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=16800] finished temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=16800] <gracefully close end>\u001b[22m\n\n    at [eval]:1:407\n    at [eval]:1:826\n    at [eval]-wrapper:6:24"
+  },
+  "python_wrapper_attempt": {
+    "status": "failed",
+    "error": "ModuleNotFoundError: No module named 'pkg_resources'",
+    "resolution": "Invoked the existing bundled ffmpeg executable directly; no install/download."
+  },
+  "python_direct_attempt": {
+    "status": "infrastructure-smoke-only",
+    "summary": {
+      "status": "infrastructure-smoke-only",
+      "processedFrames": 3,
+      "missingWorkingTripletFrames": 0,
+      "inferenceP95Ms": 84.94440000049508,
+      "fullRepsDetected": 0,
+      "partialRepsDetected": 0,
+      "fullCountError": null,
+      "partialCountError": null,
+      "falseCueRate": null,
+      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
+      "formCueEvents": 0,
+      "cameraRestarts": null,
+      "thermalState": null,
+      "memoryGrowth": null,
+      "validated": false,
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ]
+    },
+    "provenance": {
+      "status": "running",
+      "smokeOnly": true,
+      "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
+      "videoBytes": 923217,
+      "videoSha256": "dcf3765b43bcc9a84f71ba57104c3ac38048add2fd6117b6b76c213f2e0c722d",
+      "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
+      "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
+      "mediapipeVersion": "0.10.14",
+      "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "ffmpegCommand": [
+        "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
+        "-nostdin",
+        "-v",
+        "error",
+        "-i",
+        "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
+        "-vf",
+        "fps=10,scale=368:832",
+        "-frames:v",
+        "3",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "rgb24",
+        "pipe:1"
+      ],
+      "sourceFps": 30.0,
+      "counterExerciseId": "EIeI8Vf",
+      "sourceHashes": {
+        "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
+        "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
+        "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
+        "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
+        "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
+      },
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ]
+    }
+  }
+}

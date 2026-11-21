@@ -1,0 +1,68 @@
+--- a/shared/exerciseEngine.ts
++++ b/shared/exerciseEngine.ts
+@@ -163,6 +163,8 @@
+   /** True only on the update that counted a repetition/hold. */
+   counted: boolean;
+   feedback?: 'depth' | 'tempo';
++  /** A completed candidate rejected on this frame; never a counted rep. */
++  rejection?: 'timing_failed';
+ };
+ 
+ /**
+@@ -355,6 +357,7 @@
+   private lastTimestamp = -Infinity;
+   private faults: FormFault[] = [];
+   private feedback: 'depth' | 'tempo' | undefined;
++  private rejection: 'timing_failed' | undefined;
+   private faultSince = new Map<FormRuleId, number>();
+ 
+   constructor(spec: PatternSpec, options: CounterOptions = {}) {
+@@ -420,6 +423,7 @@
+ 
+   update(frame: PoseFrame): EngineSnapshot {
+     this.feedback = undefined;
++    this.rejection = undefined;
+     const ts = frame.timestamp;
+     if (!Number.isFinite(ts) || ts <= this.lastTimestamp) {
+       return this.primarySnapshot(frame);
+@@ -470,7 +474,7 @@
+     }
+     this.lastTimestamp = ts;
+     const snapshot = this.primarySnapshot(frame);
+-    return { ...snapshot, faults, counted: this.reps > countedBefore, feedback: this.feedback };
++    return { ...snapshot, faults, counted: this.reps > countedBefore, feedback: this.feedback, rejection: this.rejection };
+   }
+ 
+   private primarySnapshot(frame: PoseFrame): EngineSnapshot {
+@@ -534,8 +538,13 @@
+           if (name === 'left') this.leftReps += 1; else this.rightReps += 1;
+           state.phase = 'start';
+           state.lastRom = Math.round(rom * 10) / 10;
++        } else if (duration < this.spec.minRepMs || duration > this.spec.maxRepMs) {
++          this.feedback = 'tempo';
++          this.rejection = 'timing_failed';
++          state.phase = 'start';
+         } else if (rom >= this.spec.minRom * 0.4) {
+-          this.feedback = duration < this.spec.minRepMs || duration > this.spec.maxRepMs ? 'tempo' : 'depth';
++          // PROVISIONAL minimum: not tuned or validated on recorded partials.
++          this.feedback = 'depth';
+           this.partials += 1;
+           state.phase = 'start';
+         }
+--- a/shared/__tests__/exerciseEngine.spec.ts
++++ b/shared/__tests__/exerciseEngine.spec.ts
+@@ -151,6 +151,14 @@
+     const tempo = createExerciseCounter('squat');
+     for (const [index, angle] of [172, 150, 110, 95, 95, 140, 172].entries()) result = tempo.update(frame('squat', angle, index * 20));
+     expect(result.feedback).toBe('tempo');
++  });
++  it('rejects a peak-reaching cycle that is too fast without counting a partial', () => {
++    const counter = createExerciseCounter('squat');
++    let result = counter.snapshot();
++    for (const [index, angle] of [172, 150, 110, 95, 95, 140, 172].entries()) result = counter.update(frame('squat', angle, index * 20));
++    expect(result.rejection).toBe('timing_failed');
++    expect(result.reps).toBe(0);
++    expect(result.partials).toBe(0);
+   });
+   it.each(['squat', 'horizontal_push'] as const)('keeps %s counts stable with handheld motion', pattern => {
+     let seed = 1234567;

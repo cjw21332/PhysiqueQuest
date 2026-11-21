@@ -1,0 +1,32 @@
+[
+  {
+    "patch": "0015-camera-recovery-state.patch",
+    "node_test_summary": "\u2139 tests 19\n\u2139 suites 0\n\u2139 pass 19\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1360.6238\n",
+    "policy_tests": "7 passed"
+  },
+  {
+    "patch": "0016-browser-recovery.patch",
+    "node_test_summary": "\u2139 tests 19\n\u2139 suites 0\n\u2139 pass 19\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1347.1578\n",
+    "policy_tests": "7 passed"
+  },
+  {
+    "patch": "0017-native-recovery.patch",
+    "node_test_summary": "\u2139 tests 19\n\u2139 suites 0\n\u2139 pass 19\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1451.4417\n",
+    "policy_tests": "7 passed"
+  },
+  {
+    "patch": "0018-host-message-recovery.patch",
+    "node_test_summary": "\u2139 tests 19\n\u2139 suites 0\n\u2139 pass 19\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1319.9248\n",
+    "policy_tests": "7 passed"
+  },
+  {
+    "patch": "0019-recovery-integration-tests.patch",
+    "node_test_summary": "\u2139 tests 26\n\u2139 suites 0\n\u2139 pass 26\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1543.8759\n",
+    "policy_tests": "7 passed"
+  },
+  {
+    "patch": "0020-a3-evidence-and-apply.patch",
+    "node_test_summary": "\u2139 tests 26\n\u2139 suites 0\n\u2139 pass 26\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1386.6094\n",
+    "policy_tests": "7 passed"
+  }
+]

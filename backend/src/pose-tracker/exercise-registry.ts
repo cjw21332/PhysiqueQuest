@@ -42,7 +42,7 @@ export type TrackingConfig = {
   verificationNotes?: string; verifiedAt?: string; updatedAt?: string;
 };
 // Must match the pattern IDs implemented in shared/exerciseEngine.ts.
-export const nativePatterns = new Set(['squat','squat_hold','hinge','lunge','horizontal_push','vertical_push','horizontal_pull','vertical_pull','curl','triceps_extension','lateral_raise','front_raise','calf_raise','hip_thrust','core_flexion','core_isometric','dip','jumping_jack','high_knees','mountain_climber']);
+export const nativePatterns = new Set(['chest_fly','hip_abduction','squat','squat_hold','hinge','lunge','horizontal_push','vertical_push','horizontal_pull','vertical_pull','curl','triceps_extension','lateral_raise','front_raise','calf_raise','hip_thrust','core_flexion','core_isometric','dip','jumping_jack','high_knees','mountain_climber']);
 export type NativeExerciseOverride = {
   mode?: 'bilateral' | 'per_side';
   view?: 'front' | 'side';
@@ -167,6 +167,8 @@ export const canTrack = (config: TrackingConfig) => config.validationStatus !== 
   (config.trackingMode === 'generated-angle' && ['auto_count_beta', 'auto_count_verified'].includes(config.trackingTier ?? '')) ||
   !!config.nativePattern
 );
+/** Tracking support is independent of whether camera permission is granted. */
+export const unsupportedTrackingMessage = 'Tracking is not supported for this exercise. Manual logging is available.';
 export function auditCoverage(rows: CatalogExercise[], overrides: Record<string, ConfigOverride> = {}) {
   const records = rows.map(row => resolveTrackingConfig(row, overrides[row.exerciseId ?? row._id ?? '']));
   const ids = rows.map(r => r.exerciseId ?? r._id ?? '');

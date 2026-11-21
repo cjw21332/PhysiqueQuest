@@ -1,0 +1,124 @@
+--- a/shared/exerciseEngine.ts
++++ b/shared/exerciseEngine.ts
+@@ -139,6 +139,7 @@
+ 
+ export type FormFault = { rule: FormRuleId; message: string };
+ export type Phase = 'waiting' | 'start' | 'working' | 'peak' | 'returning' | 'lost' | 'holding';
++export type RepRejectionReason = 'implausible_geometry' | 'too_few_samples' | 'timing_failed';
+ 
+ export type EngineSnapshot = {
+   patternId: PatternId;
+@@ -163,6 +164,7 @@
+   /** True only on the update that counted a repetition/hold. */
+   counted: boolean;
+   feedback?: 'depth' | 'tempo';
++  rejected?: { reason: RepRejectionReason; side: 'left' | 'right'; timestamp: number }[];
+ };
+ 
+ /**
+@@ -207,11 +209,12 @@
+   maxAngle: number;
+   lastTimestamp: number;
+   lastVisibleAt: number | null;
++  cycleSamples: number;
+ };
+ 
+ const freshSide = (): SideState => ({
+   phase: 'waiting', smoothed: null, lastAngle: null, lastRom: 0, armed: false, repStartAt: 0, peakSince: 0,
+-  peakReached: false, minAngle: Infinity, maxAngle: -Infinity, lastTimestamp: -Infinity, lastVisibleAt: null,
++  peakReached: false, minAngle: Infinity, maxAngle: -Infinity, lastTimestamp: -Infinity, lastVisibleAt: null, cycleSamples: 0,
+ });
+ 
+ function visibilityOf(landmark: Landmark | undefined, floor: number) {
+@@ -355,6 +358,7 @@
+   private lastTimestamp = -Infinity;
+   private faults: FormFault[] = [];
+   private feedback: 'depth' | 'tempo' | undefined;
++  private rejected: NonNullable<EngineSnapshot['rejected']> = [];
+   private faultSince = new Map<FormRuleId, number>();
+ 
+   constructor(spec: PatternSpec, options: CounterOptions = {}) {
+@@ -420,6 +424,7 @@
+ 
+   update(frame: PoseFrame): EngineSnapshot {
+     this.feedback = undefined;
++    this.rejected = [];
+     const ts = frame.timestamp;
+     if (!Number.isFinite(ts) || ts <= this.lastTimestamp) {
+       return this.primarySnapshot(frame);
+@@ -470,7 +475,7 @@
+     }
+     this.lastTimestamp = ts;
+     const snapshot = this.primarySnapshot(frame);
+-    return { ...snapshot, faults, counted: this.reps > countedBefore, feedback: this.feedback };
++    return { ...snapshot, faults, counted: this.reps > countedBefore, feedback: this.feedback, rejected: this.rejected };
+   }
+ 
+   private primarySnapshot(frame: PoseFrame): EngineSnapshot {
+@@ -509,6 +514,7 @@
+     state.minAngle = Math.min(state.minAngle, angle);
+     state.maxAngle = Math.max(state.maxAngle, angle);
+     const progress = progressOf(this.spec, angle);
++    if (state.repStartAt > 0) state.cycleSamples++;
+ 
+     // A fast repetition may expose the peak for only one inference sample.
+     // Confirm it on the following return sample, with duration and ROM still
+@@ -529,18 +535,26 @@
+       if (state.peakReached && state.repStartAt > 0) {
+         const duration = ts - state.repStartAt;
+         const rom = state.maxAngle - state.minAngle;
+-        if (duration >= this.spec.minRepMs && duration <= this.spec.maxRepMs && rom >= this.spec.minRom) {
++        // A 25% margin beyond the configured span is a provisional geometric
++        // safeguard, not an anatomical guarantee or a tuned exercise threshold.
++        const implausible = rom > Math.abs(this.spec.peakAngle - this.spec.startAngle) * 1.25;
++        const reason: RepRejectionReason | null = implausible ? 'implausible_geometry' : state.cycleSamples < 3 ? 'too_few_samples' : duration < this.spec.minRepMs || duration > this.spec.maxRepMs ? 'timing_failed' : null;
++        if (reason) {
++          this.rejected.push({ reason, side: name, timestamp: ts });
++          if (reason === 'timing_failed' || reason === 'too_few_samples') this.feedback = 'tempo';
++        } else if (rom >= this.spec.minRom) {
+           this.reps += 1;
+           if (name === 'left') this.leftReps += 1; else this.rightReps += 1;
+           state.phase = 'start';
+           state.lastRom = Math.round(rom * 10) / 10;
+-        } else if (rom >= this.spec.minRom * 0.4) {
+-          this.feedback = duration < this.spec.minRepMs || duration > this.spec.maxRepMs ? 'tempo' : 'depth';
++        } else if (rom >= this.spec.minRom * 0.4) { // PROVISIONAL; not tuned to recordings.
++          this.feedback = 'depth';
+           this.partials += 1;
+           state.phase = 'start';
+         }
+         state.peakReached = false;
+         state.repStartAt = 0;
++        state.cycleSamples = 0;
+         state.minAngle = angle;
+         state.maxAngle = angle;
+         return;
+@@ -550,15 +564,18 @@
+       if (!state.peakReached && state.repStartAt > 0) {
+         const duration = ts - state.repStartAt;
+         const rom = state.maxAngle - state.minAngle;
+-        if (rom >= this.spec.minRom * 0.4) {
+-          if (duration >= this.spec.minRepMs && duration <= this.spec.maxRepMs) {
++        if (rom >= this.spec.minRom * 0.4) { // PROVISIONAL; not tuned to recordings.
++          const reason: RepRejectionReason | null = rom > Math.abs(this.spec.peakAngle - this.spec.startAngle) * 1.25 ? 'implausible_geometry' : state.cycleSamples < 3 ? 'too_few_samples' : duration < this.spec.minRepMs || duration > this.spec.maxRepMs ? 'timing_failed' : null;
++          if (!reason) {
+             this.partials += 1;
+             this.feedback = 'depth';
+           } else {
++            this.rejected.push({ reason, side: name, timestamp: ts });
+             this.feedback = 'tempo';
+           }
+         }
+         state.repStartAt = 0;
++        state.cycleSamples = 0;
+         state.peakSince = 0;
+         state.minAngle = angle;
+         state.maxAngle = angle;
+@@ -573,6 +590,7 @@
+     }
+     if (state.repStartAt === 0) {
+       state.repStartAt = ts;
++      state.cycleSamples = 1;
+     }
+     if (progress >= this.spec.peakThreshold) {
+       if (state.peakSince === 0) state.peakSince = ts;

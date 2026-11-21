@@ -1,0 +1,228 @@
+[
+  {
+    "clip": "c01",
+    "snapshot": {
+      "patternId": "vertical_pull",
+      "reps": 4,
+      "leftReps": 0,
+      "rightReps": 4,
+      "partials": 1,
+      "phase": "working",
+      "progress": 0.8639611975336171,
+      "angle": 57.7,
+      "rom": 91.4,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": true,
+      "cue": "Pull with the elbows, not the torso.",
+      "faults": [],
+      "counted": false
+    },
+    "rejected": {
+      "timing_failed": 3
+    },
+    "events": [
+      {
+        "type": "partial",
+        "timestampMs": 1468
+      },
+      {
+        "type": "full",
+        "timestampMs": 5268
+      },
+      {
+        "type": "full",
+        "timestampMs": 8268
+      },
+      {
+        "type": "full",
+        "timestampMs": 11868
+      },
+      {
+        "type": "full",
+        "timestampMs": 15801
+      }
+    ]
+  },
+  {
+    "clip": "c06",
+    "snapshot": {
+      "patternId": "curl",
+      "reps": 2,
+      "leftReps": 0,
+      "rightReps": 2,
+      "partials": 5,
+      "phase": "lost",
+      "progress": 0,
+      "angle": null,
+      "rom": 0,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": false,
+      "cue": "Move so shoulder, elbow and wrist stay visible.",
+      "faults": [],
+      "counted": false
+    },
+    "rejected": {},
+    "events": [
+      {
+        "type": "partial",
+        "timestampMs": 6334
+      },
+      {
+        "type": "partial",
+        "timestampMs": 10201
+      },
+      {
+        "type": "partial",
+        "timestampMs": 12534
+      },
+      {
+        "type": "full",
+        "timestampMs": 15134
+      },
+      {
+        "type": "partial",
+        "timestampMs": 15534
+      },
+      {
+        "type": "full",
+        "timestampMs": 16934
+      },
+      {
+        "type": "partial",
+        "timestampMs": 17134
+      }
+    ]
+  },
+  {
+    "clip": "c15",
+    "snapshot": {
+      "patternId": "dip",
+      "reps": 5,
+      "leftReps": 1,
+      "rightReps": 4,
+      "partials": 6,
+      "phase": "lost",
+      "progress": 0,
+      "angle": null,
+      "rom": 84.5,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": false,
+      "cue": "Move so shoulder, elbow and wrist stay visible.",
+      "faults": [],
+      "counted": false
+    },
+    "rejected": {
+      "timing_failed": 6
+    },
+    "events": [
+      {
+        "type": "full",
+        "timestampMs": 8734
+      },
+      {
+        "type": "partial",
+        "timestampMs": 9734
+      },
+      {
+        "type": "full",
+        "timestampMs": 12001
+      },
+      {
+        "type": "partial",
+        "timestampMs": 16134
+      },
+      {
+        "type": "partial",
+        "timestampMs": 33134
+      },
+      {
+        "type": "full",
+        "timestampMs": 35534
+      },
+      {
+        "type": "full",
+        "timestampMs": 42801
+      },
+      {
+        "type": "partial",
+        "timestampMs": 47468
+      },
+      {
+        "type": "partial",
+        "timestampMs": 60268
+      },
+      {
+        "type": "partial",
+        "timestampMs": 70268
+      },
+      {
+        "type": "full",
+        "timestampMs": 72868
+      }
+    ]
+  },
+  {
+    "clip": "c17",
+    "snapshot": {
+      "patternId": "horizontal_push",
+      "reps": 7,
+      "leftReps": 7,
+      "rightReps": 0,
+      "partials": 2,
+      "phase": "lost",
+      "progress": 0,
+      "angle": null,
+      "rom": 0,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": false,
+      "cue": "Move so shoulder, elbow and wrist stay visible.",
+      "faults": [],
+      "counted": false
+    },
+    "rejected": {
+      "timing_failed": 4
+    },
+    "events": [
+      {
+        "type": "partial",
+        "timestampMs": 734
+      },
+      {
+        "type": "full",
+        "timestampMs": 1934
+      },
+      {
+        "type": "full",
+        "timestampMs": 3934
+      },
+      {
+        "type": "full",
+        "timestampMs": 5468
+      },
+      {
+        "type": "full",
+        "timestampMs": 7134
+      },
+      {
+        "type": "full",
+        "timestampMs": 8401
+      },
+      {
+        "type": "full",
+        "timestampMs": 9068
+      },
+      {
+        "type": "full",
+        "timestampMs": 9668
+      },
+      {
+        "type": "partial",
+        "timestampMs": 10134
+      }
+    ]
+  }
+]

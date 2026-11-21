@@ -91,6 +91,31 @@
 .scan-reference .diet-meal > div { min-width: 0; }
 .scan-reference .diet-ai-disclosure { line-height: 1.5; }
 
+/* Meal schedule: a compact, readable sequence of suggested allocations. */
+.scan-reference .diet-schedule { margin-top: 14px; }
+.scan-reference .diet-schedule-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 0 2px 12px; }
+.scan-reference .diet-schedule-heading > div { min-width: 0; }
+.scan-reference .diet-schedule-heading h2 { margin: 0; color: var(--ink); font-size: 17px; line-height: 1.3; }
+.scan-reference .diet-schedule-heading p { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.scan-reference .diet-schedule-heading > span { flex: none; padding-top: 3px; color: var(--green); font-size: 11px; font-weight: 600; }
+.scan-reference .diet-schedule-list { display: grid; gap: 8px; }
+.scan-reference .diet-schedule-meal { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+.scan-reference .diet-schedule-meal-heading { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: start; gap: 10px; }
+.scan-reference .diet-schedule-number { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--green-light); color: var(--green); font-size: 11px; font-weight: 700; }
+.scan-reference .diet-schedule-identity { min-width: 0; }
+.scan-reference .diet-schedule-identity h3 { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--ink); font-size: 14px; line-height: 1.3; }
+.scan-reference .diet-schedule-identity h3 svg { flex: none; color: var(--green); }
+.scan-reference .diet-schedule-identity p { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.scan-reference .diet-schedule-values { display: grid; gap: 4px; min-width: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.scan-reference .diet-schedule-values strong { color: var(--ink); font-size: 13px; }
+.scan-reference .diet-schedule-values span { color: var(--green); font-size: 11px; font-weight: 600; line-height: 1.4; }
+.scan-reference .diet-schedule-description { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.scan-reference .diet-schedule-coach { display: flex; align-items: flex-start; gap: 12px; margin-top: 10px; padding: 14px; border: 1px solid var(--green-light); border-radius: 12px; background: var(--soft); }
+.scan-reference .diet-schedule-coach-icon { display: grid; place-items: center; flex: 0 0 34px; height: 34px; border-radius: 50%; color: var(--surface); background: var(--green); }
+.scan-reference .diet-schedule-coach h3 { margin: 0; color: var(--green); font-size: 13px; }
+.scan-reference .diet-schedule-coach p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+@media (max-width: 340px) { .scan-reference .diet-schedule-meal-heading { grid-template-columns: 30px minmax(0, 1fr); } .scan-reference .diet-schedule-values { grid-column: 2; text-align: left; } }
+
 /* History and consistent empty/error states */
 .scan-reference .history-entry { min-height: 60px; height: auto; gap: 10px; }
 .scan-reference .history-entry > span { min-width: 0; }

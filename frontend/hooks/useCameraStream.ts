@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TrackingKind, TrackingSide } from '../../shared/repCounter';
 import { readinessSessionId, type NativeReadinessContext } from '../../shared/cameraReadiness';
+import { createCameraRecovery, cameraRecoveryMessage, type CameraRecoveryState, type CameraFailure } from '../../shared/cameraRecovery';
 
 export type CameraStatus = 'idle' | 'starting' | 'on' | 'denied' | 'unavailable';
 export type CameraFacing = 'back' | 'front';
@@ -21,7 +22,7 @@ declare global {
 }
 
 type CameraEvent =
-  | { type: 'status'; status: CameraStatus; message?: string }
+  | { type: 'status'; status: CameraStatus; message?: string; reason?: CameraFailure; generation?: number }
   | { type: 'facing'; facing: CameraFacing };
 
 function nativeBridge() {
@@ -37,7 +38,7 @@ function nextFrame(): Promise<void> {
   return new Promise(resolve => requestAnimationFrame(() => resolve()));
 }
 
-export function useCameraStream(previewContext: CameraPreviewContext = { screen: 'camera-check' }) {
+export function useCameraStream(previewContext: CameraPreviewContext = { screen: 'camera-check' }, autoRecover = false) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -54,6 +55,12 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
   const [message, setMessage] = useState('');
   const [nativePreview, setNativePreview] = useState(false);
   const [facing, setFacing] = useState<CameraFacing>(preferredFacing);
+  const [recoveryState,setRecoveryState]=useState<CameraRecoveryState>({phase:'idle',attempt:0});
+  const selectedFacing=useRef(facing);
+  const mounted=useRef(true);
+  const acquireRef=useRef<(facing: CameraFacing, ticket?:number)=>Promise<void>>(async()=>{});
+  const recoveryTicket=useRef(0);
+  const recovery=useRef<ReturnType<typeof createCameraRecovery>|null>(null);
   const nativeContext = useCallback((): CameraPreviewContext => {
     const context=previewContextRef.current, rect=frameRef.current?.getBoundingClientRect();
     return context.screen==='camera-check' ? {screen:'camera-check',readiness:{mode:'readiness',sessionId:readinessSessionId(generationRef.current),
@@ -66,8 +73,16 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
   }, []);
+  if(!recovery.current)recovery.current=createCameraRecovery({
+    setTimer:setTimeout,clearTimer:clearTimeout,
+    eligible:()=>mounted.current && (typeof document==='undefined' || document.visibilityState!=='hidden'),
+    release:()=>{startRequestRef.current++;release();if(nativeActiveRef.current){nativeActiveRef.current=false;nativeBridge()?.postMessage(JSON.stringify({type:'camera-stop'}));}if(mounted.current)setNativePreview(false);},
+    start:ticket=>{recoveryTicket.current=ticket;void acquireRef.current(selectedFacing.current,ticket);},
+    changed:state=>{if(!mounted.current)return;setRecoveryState(state);setStatus(state.phase==='ready'?'on':state.phase==='acquiring'||state.phase==='recovering'?'starting':state.phase==='idle'?'idle':state.reason==='permission_denied'?'denied':'unavailable');},
+  });
 
   const stop = useCallback((resetAutoStart = false) => {
+    if(autoRecover)recovery.current?.stop();
     invalidate();
     startRequestRef.current += 1;
     if (nativeActiveRef.current) {
@@ -79,9 +94,25 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
     setStatus('idle');
     setMessage('');
     if (resetAutoStart) cameraWasEnabled = false;
-  }, [release, invalidate]);
+  }, [release, invalidate, autoRecover]);
 
-  const start = useCallback(async (requestedFacing: CameraFacing = facing) => {
+  // A pending acquisition belongs to one exercise job. Display-only elapsed
+  // updates must not restart the camera, but a replacement job must cancel it.
+  const streamContextKey = JSON.stringify(previewContext.screen === 'live-session'
+    ? [previewContext.screen, previewContext.exerciseName, previewContext.equipment,
+      previewContext.tracking?.requestId, previewContext.tracking?.kind, previewContext.tracking?.side]
+    : [previewContext.screen]);
+  const previousStreamContext = useRef(streamContextKey);
+  useEffect(() => {
+    if (previousStreamContext.current === streamContextKey) return;
+    previousStreamContext.current = streamContextKey;
+    stop(true);
+  }, [streamContextKey, stop]);
+
+  const start = useCallback(async (requestedFacing: CameraFacing = facing, ticket?: number) => {
+    selectedFacing.current=requestedFacing;
+    setFacing(requestedFacing);
+    if(autoRecover && ticket===undefined){recovery.current?.start();return;}
     invalidate();
     const requestId = ++startRequestRef.current;
     preferredFacing = requestedFacing;
@@ -102,6 +133,7 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       }
       if (requestId !== startRequestRef.current) return;
       if (frame.width <= 0 || frame.height <= 0) {
+        if(autoRecover){recovery.current?.error(ticket!,'no_camera');return;}
         nativeActiveRef.current = false;
         setNativePreview(false);
         setStatus('unavailable');
@@ -109,10 +141,11 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
         setMessage('The camera view could not be laid out. Return to Camera Check and try again.');
         return;
       }
-      bridge.postMessage(JSON.stringify({ type: 'camera-start', frame, facing: requestedFacing, previewContext: nativeContext() }));
+      bridge.postMessage(JSON.stringify({ type: 'camera-start', frame, facing: requestedFacing, generation:requestId, previewContext: nativeContext() }));
       return;
     }
     if (typeof window === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      if(autoRecover){recovery.current?.error(ticket!,'no_camera');return;}
       setStatus('unavailable');
       cameraWasEnabled = false;
       setMessage(typeof window !== 'undefined' && window.isSecureContext === false
@@ -125,7 +158,7 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       let stream: MediaStream;
       const facingMode = requestedFacing === 'front' ? 'user' : 'environment';
       const context = previewContextRef.current;
-      const trackingConstraints = context.screen === 'live-session' && context.tracking
+      const trackingConstraints = context.screen === 'live-session'
         ? { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } }
         : {};
       try {
@@ -145,12 +178,18 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       streamRef.current = stream;
       const lost = () => {
         if (requestId !== startRequestRef.current) return;
+        if(autoRecover){recovery.current?.error(ticket!);return;}
         invalidate(); startRequestRef.current += 1; release(); setStatus('unavailable');
         setMessage('Camera delivery stopped. Enable the camera again or continue without it.');
       };
       const tracks = stream.getVideoTracks();
-      tracks.forEach(track => { track.addEventListener('ended', lost); track.addEventListener('mute', lost); });
-      trackCleanupRef.current = () => tracks.forEach(track => { track.removeEventListener('ended', lost); track.removeEventListener('mute', lost); });
+      // Mute is commonly transient during exposure changes or camera switching.
+      // Give delivery time to recover instead of stopping the stream immediately.
+      let muteTimer: ReturnType<typeof setTimeout> | undefined;
+      const muted = () => { clearTimeout(muteTimer); muteTimer = setTimeout(() => { if (tracks.some(track => track.muted)) lost(); }, 5000); };
+      const unmuted = () => { clearTimeout(muteTimer); };
+      tracks.forEach(track => { track.addEventListener('ended', lost); track.addEventListener('mute', muted); track.addEventListener('unmute', unmuted); });
+      trackCleanupRef.current = () => { clearTimeout(muteTimer); tracks.forEach(track => { track.removeEventListener('ended', lost); track.removeEventListener('mute', muted); track.removeEventListener('unmute', unmuted); }); };
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
@@ -158,8 +197,10 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       if (requestId !== startRequestRef.current) { stream.getTracks().forEach(track => track.stop()); return; }
       setFacing(requestedFacing);
       setStatus('on');
+      if(autoRecover)recovery.current?.ready(ticket!);
     } catch (error) {
       if (requestId !== startRequestRef.current) return;
+      if(autoRecover){const denied=error instanceof DOMException && ['NotAllowedError','SecurityError'].includes(error.name);recovery.current?.error(ticket!,denied?'permission_denied':error instanceof DOMException && error.name==='NotFoundError'?'no_camera':'interrupted_too_often');return;}
       invalidate(); release();
       cameraWasEnabled = false;
       const blocked = error instanceof DOMException && (error.name === 'NotAllowedError' || error.name === 'SecurityError');
@@ -168,11 +209,13 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
         ? 'Camera access is blocked. Allow the camera in your browser or phone settings, then tap Enable camera again.'
         : 'No camera was found or it could not start.');
     }
-  }, [facing, release, invalidate, nativeContext]);
+  }, [facing, release, invalidate, nativeContext, autoRecover]);
+  acquireRef.current=start;
 
   const switchFacing = useCallback(() => {
     const nextFacing: CameraFacing = facing === 'back' ? 'front' : 'back';
     preferredFacing = nextFacing;
+    selectedFacing.current=nextFacing;
     setFacing(nextFacing);
     if (status === 'on' || status === 'starting') void start(nextFacing);
   }, [facing, start, status]);
@@ -181,6 +224,9 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
     const handleCameraEvent = (event: Event) => {
       const detail = (event as CustomEvent<CameraEvent>).detail;
       if (!detail) return;
+      if(autoRecover && (detail as {type:string}).type==='interruption'){
+        const active=(detail as unknown as {active:unknown}).active;if(typeof active==='boolean')recovery.current?.activity(active);return;
+      }
       if (detail.type === 'facing') {
         if(detail.facing!=='front' && detail.facing!=='back')return;
         invalidate();
@@ -189,7 +235,9 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
         return;
       }
       if (!nativeActiveRef.current) return;
+      if(autoRecover && detail.type==='status' && detail.status!=='idle' && detail.generation!==startRequestRef.current)return;
       if (!['idle','starting','on','denied','unavailable'].includes(detail.status)) return;
+      if(autoRecover){if(detail.status==='on')recovery.current?.ready(recoveryTicket.current);else if(detail.status==='denied'||detail.status==='unavailable')recovery.current?.error(recoveryTicket.current,detail.status==='denied'?'permission_denied':detail.reason && ['timeout','no_camera','interrupted_too_often','thermal'].includes(detail.reason)?detail.reason:'interrupted_too_often');return;}
       if (detail.status !== 'on' && detail.status !== 'starting') invalidate();
       setStatus(detail.status);
       setMessage(detail.message ?? '');
@@ -224,8 +272,8 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       }
       updateFrame();
     };
-    const lifecycleLost = () => { if(document.visibilityState==='hidden' || !document.hasFocus()) stop(true); };
-    const blurred = () => stop(true);
+    mounted.current=true;
+    const lifecycleLost = () => { if(autoRecover)recovery.current?.activity(document.visibilityState!=='hidden');else if(document.visibilityState==='hidden') stop(true); };
     const resizeObserver = frameRef.current && typeof ResizeObserver !== 'undefined'
       ? new ResizeObserver(geometryChanged)
       : null;
@@ -233,18 +281,17 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
     window.addEventListener('physiquequest-camera', handleCameraEvent);
     window.addEventListener('resize', geometryChanged);
     videoRef.current?.addEventListener('resize', invalidate);
-    window.addEventListener('blur', blurred);
     document.addEventListener('visibilitychange', lifecycleLost);
     window.addEventListener('scroll', updateFrame, true);
     window.visualViewport?.addEventListener('resize', updateFrame);
     window.visualViewport?.addEventListener('scroll', updateFrame);
     return () => {
+      mounted.current=false;if(autoRecover)recovery.current?.stop();
       window.removeEventListener('physiquequest-camera', handleCameraEvent);
       startRequestRef.current += 1;
       generationRef.current += 1;
       window.removeEventListener('resize', geometryChanged);
       videoRef.current?.removeEventListener('resize', invalidate);
-      window.removeEventListener('blur', blurred);
       document.removeEventListener('visibilitychange', lifecycleLost);
       window.removeEventListener('scroll', updateFrame, true);
       window.visualViewport?.removeEventListener('resize', updateFrame);
@@ -254,7 +301,7 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
       nativeActiveRef.current = false;
       release();
     };
-  }, [release, invalidate, stop, nativeContext]);
+  }, [release, invalidate, stop, nativeContext, autoRecover]);
 
   useEffect(() => {
     if (!nativeActiveRef.current) return;
@@ -268,7 +315,8 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
     videoRef,
     frameRef,
     status,
-    message,
+    message: autoRecover ? cameraRecoveryMessage(recoveryState) : message,
+    recoveryState,
     start,
     stop,
     facing,

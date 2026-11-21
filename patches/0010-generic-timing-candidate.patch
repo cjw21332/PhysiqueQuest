@@ -1,0 +1,28 @@
+--- a/shared/genericRepCounter.ts
++++ b/shared/genericRepCounter.ts
+@@ -71,6 +71,7 @@
+ export type CounterEvent = 
+   | { type: 'rep_counted'; count: number; joint: string; durationMs: number; romFraction: number; romVsReference: number; quality: 'full' | 'partial'; tempoSec: number }
+   | { type: 'rep_partial'; progress: number; joint: string; cue: string }
++  | { type: 'rep_rejected'; joint: string; reason: 'timing_failed'; durationMs: number }
+   | { type: 'rep_rejected_fault'; joint: string; faultJoint: string; cue: string }
+   | { type: 'visibility_lost'; joint: string }
+   | { type: 'visibility_restored'; joint: string }
+@@ -904,15 +905,8 @@
+             } else {
+               // Fault already emitted during AT_PEAK
+             }
+-          } else if (this.maxProgressInRep > 0.4) {
+-            // Rep completed but was too fast/slow - treat as partial
+-            this.partialCount++;
+-            this.emitEvent({
+-              type: 'rep_partial',
+-              progress: this.maxProgressInRep,
+-              joint,
+-              cue: this.getPartialCue(joint, this.maxProgressInRep)
+-            });
++          } else if (duration < this.config.minRepDurationMs || duration > this.config.maxRepDurationMs) {
++            this.emitEvent({ type: 'rep_rejected', joint, reason: 'timing_failed', durationMs: duration });
+           }
+           this.state = 'AT_START';
+           this.currentRepStartMs = 0;

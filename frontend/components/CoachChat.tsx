@@ -151,17 +151,18 @@ export default function CoachChat() {
     <dialog ref={dialog} className="coach-chat-dialog" aria-labelledby="coach-chat-title" onClose={() => opener.current?.focus()}>
       <header className="coach-chat-header">
         <span className="coach-chat-avatar"><img src="/phiq-logo.png" alt="" /></span>
-        <div><h2 id="coach-chat-title">Phiq</h2><p>Your PhysiqueQuest guide</p></div>
-        <button type="button" className="coach-chat-clear" onClick={clearChat}>Clear chat</button>
+        <div><span className="coach-chat-eyebrow">YOUR AI GUIDE</span><h2 id="coach-chat-title">Phiq</h2><p>Training, nutrition &amp; your app</p></div>
+        <button type="button" className="coach-chat-clear" onClick={clearChat}><Icon name="trash" size={16}/> <span>Clear chat</span></button>
         <button type="button" aria-label="Close Phiq" autoFocus onClick={() => dialog.current?.close()}><Icon name="close" size={20}/></button>
       </header>
       <div className="coach-chat-messages">
         {!messages.length && <div className="coach-chat-welcome">
-          <div className="coach-chat-message"><span className="coach-chat-avatar"><img src="/phiq-logo.png" alt="" /></span><p>Hi, I’m Phiq. Ask me a question, explore the app, or turn on access to discuss your saved fitness data.</p></div>
+          <div className="coach-chat-welcome-heading"><span className="coach-chat-welcome-icon"><Icon name="coach" size={23}/></span><span>YOUR FITNESS COMPANION</span><h3>How can I help today?</h3><p>Ask about training, nutrition, or finding your way around PhysiqueQuest.</p></div>
+          <div className="coach-chat-prompt-label">TRY ASKING</div>
           <div className="coach-chat-prompts" role="group" aria-label="Suggested questions">
-            <button type="button" disabled={busy} onClick={() => void ask('How do I use this page?')}>Explain this page</button>
-            <button type="button" disabled={busy} onClick={() => void ask('Where can I find the features in PhysiqueQuest?')}>Find a feature</button>
-            <button type="button" disabled={busy} onClick={() => void ask(includePersonalData ? 'What personal data can you read from my account?' : 'How do privacy controls work in PhysiqueQuest?')}>{includePersonalData ? 'My data access' : 'Privacy controls'}</button>
+            <button type="button" disabled={busy} onClick={() => void ask('How do I use this page?')}><Icon name="book-open" size={18}/><span>Explain this page</span><Icon name="chevron-right" size={16}/></button>
+            <button type="button" disabled={busy} onClick={() => void ask('What can you do?')}><Icon name="scan" size={18}/><span>Explore app features</span><Icon name="chevron-right" size={16}/></button>
+            <button type="button" disabled={busy} onClick={() => void ask('What data can you access?')}><Icon name="shield" size={18}/><span>My data access</span><Icon name="chevron-right" size={16}/></button>
           </div>
         </div>}
         {messages.map((message, index) => <div className={`coach-chat-message ${message.role}`} key={index}>
@@ -175,9 +176,8 @@ export default function CoachChat() {
       </div>
       <footer className="coach-chat-dock">
           <div className={`coach-chat-access ${includePersonalData ? 'is-enabled' : ''}`}>
-            <p className="coach-chat-consent-note">Phiq uses your messages to respond. Turn on saved data to include relevant fitness records in your answers.</p>
           <div className="coach-chat-access-row">
-            <label className="coach-chat-consent"><input type="checkbox" checked={includePersonalData} onChange={event => { clearChat(); setIncludePersonalData(event.target.checked); }} aria-describedby="coach-chat-consent-note" /><span>Use my saved fitness data</span></label>
+            <label className="coach-chat-consent"><input type="checkbox" checked={includePersonalData} onChange={event => { clearChat(); setIncludePersonalData(event.target.checked); }} aria-describedby="coach-chat-consent-note" /><Icon name="shield" size={17}/><span>Use my saved fitness data</span></label>
             <span className="coach-chat-access-state" aria-live="polite">{includePersonalData ? 'On' : 'Off'}</span>
           </div>
           <p className="coach-chat-consent-note" id="coach-chat-consent-note">{includePersonalData ? 'Only relevant records from your account' : 'Turn on to ask about your saved records'}</p>

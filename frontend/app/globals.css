@@ -9196,9 +9196,10 @@ button, input, select, textarea { max-width: 100%; }
 .journey-dark-theme.journey-dark-theme .home-ref-edit { min-height: 44px; }
 .journey-dark-theme.journey-dark-theme .home-ref-progress-page .home-ref-page-head .home-ref-edit { font-size: 12px; padding-left: 8px; }
 .coach-dark-theme.coach-dark-theme .coach-view-camera .coach-header h2 { order: 0; }
-.coach-dark-theme.coach-dark-theme .library-dialog.library-dialog { width: min(100%, 560px); min-height: min(80dvh, 760px); max-height: calc(100dvh - 72px); inset: auto 0 0; margin: 0 auto; border-radius: 24px 24px 0 0; }
-.coach-dark-theme.coach-dark-theme .library-dialog .library-exercise-sheet { padding: 22px 20px 30px; }
-.coach-dark-theme.coach-dark-theme .library-dialog .library-sheet-header { position: sticky; top: -22px; z-index: 2; padding-block: 8px; background: var(--surface); }
+.coach-dark-theme.coach-dark-theme .library-dialog.library-dialog { width: min(100%, 560px); height: min(80dvh, 760px); min-height: 0; max-height: calc(100dvh - 72px); inset: auto 0 0; margin: 0 auto; border-radius: 24px 24px 0 0; overflow: hidden; }
+.coach-dark-theme.coach-dark-theme .library-dialog .library-exercise-sheet { height: 100%; min-height: 0; display: flex; flex-direction: column; padding: 22px 20px 0; }
+.coach-dark-theme.coach-dark-theme .library-dialog .library-sheet-header { position: static; flex: 0 0 auto; padding-block: 8px; background: var(--surface); }
+.coach-dark-theme.coach-dark-theme .library-dialog .library-sheet-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-bottom: max(30px, var(--sab)); }
 .coach-dark-theme.coach-dark-theme .library-dialog .sheet-close { width: 44px; height: 44px; min-height: 44px; flex: 0 0 44px; margin: 0; }
 .coach-dark-theme.coach-dark-theme .coach-reference > .coach-scroll { scrollbar-width: thin; }
 :root[data-theme='dark'] .forgot-password-modal { background: var(--surface); border-color: var(--line); color: var(--ink); font-family: 'Inter', sans-serif; }
@@ -9657,6 +9658,36 @@ button, input, select, textarea { max-width: 100%; }
 .food-camera-actions .primary { flex: 1; background: var(--green); color: var(--surface); }
 .food-camera-actions .food-camera-shutter { flex: none; width: 68px; height: 68px; padding: 0; border: 5px solid var(--ink); border-radius: 50%; background: var(--green); box-shadow: inset 0 0 0 3px var(--surface); }
 .food-camera-actions .food-camera-shutter:disabled { opacity: .45; }
+
+/* Food camera: the capture and review controls have their own rows so they
+   remain usable at narrow phone widths and with larger system text. */
+.food-camera-overlay { background: #080d13; }
+.food-camera { box-sizing: border-box; width: min(100%, 480px); height: 100dvh; max-height: 900px; gap: 14px; padding: max(14px, env(safe-area-inset-top)) 20px max(18px, env(safe-area-inset-bottom)); background: #0b1017; color: #f5f8fa; }
+.food-camera .food-camera-header { flex: 0 0 auto; display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 12px; align-items: center; }
+.food-camera .food-camera-header .food-camera-icon { width: 48px; min-height: 48px; display: grid; place-items: center; padding: 0; border-radius: 16px; background: #1a2530; color: #f5f8fa; }
+.food-camera-heading { min-width: 0; text-align: center; }
+.food-camera .food-camera-heading h2 { color: #f5f8fa; font-size: 18px; line-height: 1.25; font-weight: 750; }
+.food-camera-heading span { display: block; margin-top: 3px; color: #b3c2ca; font-size: 12px; line-height: 1.3; }
+.food-camera-viewport { flex: 1 1 0; min-height: 120px; border-radius: 24px; background: #17212b; }
+.food-camera-viewport img { object-fit: contain; }
+.food-camera-viewport p { color: #f5f8fa; background: #121c27e8; border-radius: 14px; margin: 16px; }
+.food-camera-scan-frame { border-color: #61e5b1; border-radius: 18px; box-shadow: 0 0 0 1px #0005; }
+.food-camera-guide { max-width: 85%; text-align: center; }
+.food-camera-capture-panel { flex: 0 0 auto; }
+.food-camera-capture-panel > p { color: #d3dedf; text-align: center; font-size: 13px; line-height: 1.4; margin: 0 0 10px; }
+.food-camera-actions { display: grid; grid-template-columns: 1fr 82px 1fr; align-items: center; gap: 8px; }
+.food-camera .food-camera-actions .food-camera-side-action { justify-self: center; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 72px; padding: 0; color: #e8f0ee; background: transparent; font-size: 12px; font-weight: 600; }
+.food-camera-side-action span { display: grid; place-items: center; width: 48px; height: 48px; background: #1a2530; border-radius: 16px; }
+.food-camera .food-camera-actions .food-camera-shutter { display: grid; place-items: center; width: 76px; height: 76px; min-height: 76px; border: 3px solid #eaf9f3; border-radius: 50%; background: transparent; box-shadow: none; }
+.food-camera-shutter span { width: 58px; height: 58px; border-radius: 50%; background: #27ce78; }
+.food-camera-review { flex: 0 0 auto; display: grid; gap: 14px; }
+.food-camera-review-copy strong { display: block; font-size: 17px; line-height: 1.3; }
+.food-camera-review-copy p { margin: 5px 0 0; color: #b9c8cd; font-size: 13px; line-height: 1.45; }
+.food-camera-review-actions { display: grid; grid-template-columns: minmax(100px, .85fr) minmax(0, 1.5fr); gap: 10px; }
+.food-camera .food-camera-review-actions button { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 52px; padding: 10px; color: #f5f8fa; background: #1a2530; font-size: 14px; font-weight: 700; line-height: 1.2; }
+.food-camera .food-camera-review-actions .primary { background: #27ce78; color: #07150d; }
+.food-camera button:active:not(:disabled) { opacity: .8; }
+@media (max-height: 560px) { .food-camera { gap: 8px; padding-top: 8px; padding-bottom: 8px; } .food-camera-heading span { display: none; } .food-camera-review { gap: 8px; } .food-camera-capture-panel > p { margin-bottom: 3px; } }
 :root[data-theme='dark'] .scan-dashboard-link > svg:last-child { color: var(--muted); }
 .account-dark-theme .quest-v2-streak-days span { color: var(--muted); }
 .account-dark-theme .quest-v2-streak-days span.active { color: var(--surface); }
@@ -10010,6 +10041,39 @@ body:has(.admin-reference-form) .coach-chat-launcher { display: none; }
 .coach-chat-composer input::placeholder { color: var(--muted); opacity: 1; }
 .coach-chat-composer button { display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 48px; border: 0; border-radius: 50%; background: var(--green); color: var(--ink); cursor: pointer; }
 .coach-chat-composer button:disabled, .coach-chat-prompts button:disabled { opacity: .5; cursor: not-allowed; }
+.coach-chat-dialog { background:var(--surface); }
+.coach-chat-dialog::backdrop { background:rgb(0 0 0 / 70%); }
+.coach-chat-header { gap:10px; padding:14px 16px; background:var(--surface); }
+.coach-chat-header .coach-chat-avatar { width:44px; height:44px; flex-basis:44px; border-radius:15px; }
+.coach-chat-eyebrow { display:block; color:var(--green); font-size:9px; font-weight:800; letter-spacing:.1em; }
+.coach-chat-header h2 { margin-top:2px; font-size:17px; font-weight:750; }
+.coach-chat-header p { margin-top:2px; font-size:11px; }
+.coach-chat-header .coach-chat-clear { display:flex; align-items:center; gap:5px; min-width:44px; min-height:44px; padding:0 8px; border-radius:12px; color:var(--muted); text-decoration:none; }
+.coach-chat-header > button:last-child { flex:none; border-radius:12px; background:var(--soft); color:var(--ink); }
+.coach-chat-messages { padding:20px 18px; background:var(--surface); }
+.coach-chat-welcome-heading { padding:4px 2px 8px; }
+.coach-chat-welcome-icon { display:grid; place-items:center; width:48px; height:48px; margin-bottom:16px; border-radius:16px; color:var(--green); background:var(--green-light); }
+.coach-chat-welcome-heading > span:not(.coach-chat-welcome-icon), .coach-chat-prompt-label { color:var(--green); font-size:10px; font-weight:800; letter-spacing:.1em; }
+.coach-chat-welcome-heading h3 { margin:7px 0 6px; color:var(--ink); font-size:22px; line-height:1.25; letter-spacing:-.02em; }
+.coach-chat-welcome-heading p { margin:0; color:var(--muted); font-size:13px; line-height:1.55; }
+.coach-chat-prompt-label { margin:15px 2px 9px; color:var(--muted); }
+.coach-chat-prompts { display:grid; grid-template-columns:1fr; gap:8px; margin:0; }
+.coach-chat-prompts button { display:flex; align-items:center; gap:10px; width:100%; min-height:48px; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:var(--soft); color:var(--ink); text-align:left; font-size:13px; font-weight:650; }
+.coach-chat-prompts button svg:first-child { color:var(--green); flex:none; }
+.coach-chat-prompts button span { flex:1; }
+.coach-chat-prompts button svg:last-child { color:var(--muted); }
+.coach-chat-message { align-items:flex-start; }
+.coach-chat-message p { border:1px solid var(--line); border-radius:5px 16px 16px 16px; }
+.coach-chat-message.user p { border-color:var(--green); color:var(--surface); border-radius:16px 5px 16px 16px; }
+.coach-chat-dock { padding:10px 14px calc(12px + var(--sab, 0px)); }
+.coach-chat-access { padding:4px 10px; border:1px solid var(--line); border-radius:14px; }
+.coach-chat-consent { gap:8px; font-weight:650; }
+.coach-chat-consent > svg { color:var(--green); flex:none; }
+.coach-chat-access-details { margin-left:0; }
+.coach-chat-access-details summary { min-height:40px; }
+.coach-chat-composer input { border-radius:14px; }
+.coach-chat-composer button { border-radius:14px; }
+@media (max-width:359px) { .coach-chat-header .coach-chat-clear span { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); } .coach-chat-header { gap:7px; padding-inline:12px; } }
 .coach-chat-launcher:focus-visible, .coach-chat-header button:focus-visible, .coach-chat-composer button:focus-visible, .coach-chat-access-details summary:focus-visible, .coach-chat-prompts button:focus-visible, .coach-chat-pending button:focus-visible, .coach-chat-retry button:focus-visible { outline: 2px solid var(--green-dark); outline-offset: 3px; }
 @media (max-width: 900px) {
   .coach-chat-launcher { right: max(24px, var(--sar, 0px) + 24px); }

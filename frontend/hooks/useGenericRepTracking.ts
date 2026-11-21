@@ -1,12 +1,24 @@
 'use client';
-import { useEffect, useMemo, useState, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { createLandmarkFilter } from '../../shared/landmarkFilter';
 import { createGenericRepCounter, type GeneratedAngleConfig, type PoseFrame } from '../../shared/genericRepCounter';
 import { trackingFrameInterval, trackingPowerNotice, type BatteryReading } from '../lib/trackingPerformance.mjs';
+import { createExerciseCounter, type PatternId, type ExerciseConfigOverride } from '../../shared/exerciseEngine';
 
 type BatteryMonitor = BatteryReading & { addEventListener(type: string, listener: () => void): void; removeEventListener(type: string, listener: () => void): void };
 
-export function useGenericRepTracking(config: GeneratedAngleConfig, active: boolean, videoRef: RefObject<HTMLVideoElement | null>) {
-  const counter = useMemo(() => createGenericRepCounter(config), [config]);
+export function useGenericRepTracking(config: GeneratedAngleConfig, active: boolean, videoRef: RefObject<HTMLVideoElement | null>, pattern?: PatternId, override?: ExerciseConfigOverride, exerciseName?: string) {
+  const overlayRef = useRef<HTMLCanvasElement>(null);
+  const counter = useMemo(() => {
+    const generic = createGenericRepCounter(config);
+    if (!pattern) return generic;
+    const engine = createExerciseCounter(pattern, { override, exerciseName });
+    const getProgress = () => {
+      const snapshot = engine.snapshot();
+      return { ...generic.getProgress(), repCount: snapshot.reps, partialCount: snapshot.partials, currentProgress: snapshot.progress, currentAngle: snapshot.angle, cue: snapshot.faults[0]?.message ?? snapshot.cue, holdDurationMs: snapshot.holdMs };
+    };
+    return { getProgress, update: (frame: PoseFrame) => { engine.update(frame); return getProgress(); }, tick: (timestamp: number) => { engine.update({ landmarks: [], aspect: 1, timestamp }); return getProgress(); }, suspend: () => engine.suspend() };
+  }, [config, pattern, override, exerciseName]);
   const [progress, setProgress] = useState(() => counter.getProgress());
   const [status, setStatus] = useState('Camera tracking is stopped.');
   const [powerNotice, setPowerNotice] = useState('');
@@ -14,6 +26,7 @@ export function useGenericRepTracking(config: GeneratedAngleConfig, active: bool
     if (!active) return;
     if (!window.Worker || !window.createImageBitmap || !window.OffscreenCanvas) { setStatus('This browser cannot run local pose tracking.'); return; }
     let stopped = false, failed = false, ready = false, busy = false, sent = 0, lastVideoTime = -1, lastSent = 0, interval = 100, inferenceMs = 0, lastResult = 0;
+    const filter = createLandmarkFilter(true);
     let battery: BatteryMonitor | null = null;
     const updatePower = () => { if (!stopped) { interval=trackingFrameInterval(inferenceMs,battery); setPowerNotice(trackingPowerNotice(battery)); } };
     let worker: Worker;
@@ -32,6 +45,27 @@ export function useGenericRepTracking(config: GeneratedAngleConfig, active: bool
       if (event.data.type === 'generic-result') {
         busy = false;
         lastResult = performance.now();
+        if (event.data.subjectChanged) counter.suspend();
+        if (event.data.subjectChanged) filter.reset();
+        const pose = event.data.frame as PoseFrame;
+        const canvas = overlayRef.current, video = videoRef.current;
+        const context = canvas?.getContext('2d');
+        if (canvas && context && video) {
+          if (canvas.width !== video.clientWidth) canvas.width = video.clientWidth;
+          if (canvas.height !== video.clientHeight) canvas.height = video.clientHeight;
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          const scale = Math.max(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+          const ox = (canvas.width - video.videoWidth * scale) / 2, oy = (canvas.height - video.videoHeight * scale) / 2;
+          const points = filter.update(pose.landmarks, pose.timestamp);
+          context.strokeStyle = '#7ef0b2'; context.lineWidth = 3; context.beginPath();
+          for (const [a, b] of [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]]) {
+            const first = points[a], second = points[b];
+            if (!first || !second || Math.min(first.visibility ?? 1, second.visibility ?? 1) < .5) continue;
+            context.moveTo(ox + first.x * video.videoWidth * scale, oy + first.y * video.videoHeight * scale);
+            context.lineTo(ox + second.x * video.videoWidth * scale, oy + second.y * video.videoHeight * scale);
+          }
+          context.stroke();
+        }
         setProgress(counter.update(event.data.frame as PoseFrame));
         inferenceMs = event.data.durationMs;
         interval = trackingFrameInterval(inferenceMs, battery);
@@ -45,7 +79,11 @@ export function useGenericRepTracking(config: GeneratedAngleConfig, active: bool
     const timer = window.setInterval(async () => {
       const now = performance.now();
       // Give slow/battery-conserving inference time to finish before declaring a stall.
-      if (lastResult && now-lastResult > Math.max(750, interval*2+500)) setProgress(counter.tick(now));
+      if (lastResult && now-lastResult > Math.max(750, interval*2+500)) {
+        setProgress(counter.tick(now));
+        const canvas = overlayRef.current;
+        canvas?.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
+      }
       if (busy && now - sent > 5000) { fail('Pose tracking stopped responding.'); return; }
       const video = videoRef.current;
       if (stopped || failed || !ready || busy || !video || video.readyState < 2 || !video.videoWidth || now-lastSent < interval || video.currentTime === lastVideoTime) return;
@@ -57,7 +95,7 @@ export function useGenericRepTracking(config: GeneratedAngleConfig, active: bool
         worker.postMessage({type:'generic-frame',bitmap,timestamp:now},[bitmap]);
       } catch { fail('Could not process the camera frame.'); }
     },50);
-    return () => { stopped=true; battery?.removeEventListener('levelchange',updatePower); battery?.removeEventListener('chargingchange',updatePower); window.clearInterval(timer); window.clearTimeout(timeout); worker.terminate(); };
+    return () => { stopped=true; counter.suspend(); battery?.removeEventListener('levelchange',updatePower); battery?.removeEventListener('chargingchange',updatePower); window.clearInterval(timer); window.clearTimeout(timeout); worker.terminate(); };
   },[active,counter,videoRef]);
-  return { ...progress, status, powerNotice };
+  return { ...progress, status, powerNotice, overlayRef };
 }

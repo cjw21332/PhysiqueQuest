@@ -1,0 +1,13 @@
+{
+  "manifest_sha256": "3ca6147633f47d2940883693abcbf153e999d6f89962531cf8131f836d9be4bb",
+  "status": "PROVISIONAL / UNREVIEWED",
+  "frozen_before_inference": true,
+  "unique_clips": 19,
+  "test_clips": [
+    "c04",
+    "c12",
+    "c14",
+    "c19"
+  ],
+  "runtime_behavior_changed": false
+}

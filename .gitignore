@@ -30,3 +30,8 @@ ml/reports/repcount/**/*.jpg
 *.jks
 *.keystore
 !mobile/android/app/debug.keystore
+output/
+replay-videos/
+*.mp4
+*.mov
+*.zip

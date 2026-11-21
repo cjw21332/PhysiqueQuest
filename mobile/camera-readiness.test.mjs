@@ -14,14 +14,17 @@ function compile(path,dependencies={},globals={}) {
   return module.exports;
 }
 const shared=compile('shared/cameraReadiness.ts');
+const recoveryModule=compile('shared/cameraRecovery.ts');
 const rep=compile('shared/repCounter.ts');
+const poseConfig=compile('shared/poseConfig.ts');
+const poseSubject=compile('shared/poseSubject.ts');
 function nativeModule({available=true,react={},asset={downloadAsync:()=>Promise.resolve({localUri:'local-model'})},listeners=[],globals={}}={}) {
   return compile('mobile/NativeTrackingCamera.tsx',{
     expo:{isRunningInExpoGo:()=>!available,requireOptionalNativeModule:()=>available?{}:null},
     'expo-asset':{Asset:{fromModule:()=>asset}}, react,
     'react-native':{AppState:{currentState:'active',addEventListener:(type,fn)=>{const entry={type,fn,removed:false};listeners.push(entry);return {remove:()=>entry.removed=true};}},Text:'Text',View:'View'},
     'react/jsx-runtime':{jsx:(type,props)=>({type,props})},'expo-mediapipe-pose':{PoseCameraView:'PoseCamera'},
-    '../shared/repCounter':rep,'../shared/cameraReadiness':shared,'./assets/pose_landmarker_lite.task':'asset',
+    '../shared/repCounter':rep,'../shared/cameraReadiness':shared,'../shared/poseConfig':poseConfig,'../shared/poseSubject':poseSubject,'./assets/pose_landmarker_lite.task':'asset',
   },globals);
 }
 const context={mode:'readiness',sessionId:'native-test',geometryGeneration:7,previewWidth:300,previewHeight:400,active:true};
@@ -37,6 +40,14 @@ function envelope(id=1,overrides={}) {
   return {...p.emitted[0],observation:{...p.emitted[0].observation,...overrides}};
 }
 const experimental={...shared.readinessPolicy,dwellMs:1000,calibrated:{web:{fullBody:false,lighting:false,framing:false},native:{fullBody:true,lighting:true,framing:true}},lightingBand:[.2,.8]};
+
+test('tracking tolerates isolated inference errors and fails after three consecutive errors',()=>{
+  const p=callbacks({mode:'tracking',requestId:'transient',kind:'curl',side:'left',active:true,fullLandmarks:true});
+  p.camera.inferenceError();p.camera.inferenceError();assert.equal(p.stops,0);
+  p.camera.frame(frame());
+  p.camera.inferenceError();p.camera.inferenceError();assert.equal(p.stops,0);
+  p.camera.inferenceError();assert.equal(p.stops,1);
+});
 
 test('adapter emits all 33 compact upright/already-mirrored points, luminance, captured session and zero-person frames',()=>{
   const p=callbacks();p.camera.configured();assert.equal(p.emitted[0].type,'reset');
@@ -124,6 +135,116 @@ function hookHarness() {
     useEffect(fn,deps){const i=cursor++;if(changed(slots[i]?.deps,deps)){slots[i]={deps};effects.push(()=>{cleanups[i]?.();cleanups[i]=fn();});}}},
     render(component,props){cursor=0;return component(props);},mount(){effects.forEach(fn=>fn());effects=[];},unmount(){cleanups.forEach(fn=>fn?.());},get writes(){return writes;}};
 }
+function streamHarness(acquire, recover=false) {
+  const h=hookHarness(),window=new EventTarget(),document=new EventTarget(),timers=new Map();
+  let next=0,now=0;
+  document.visibilityState='visible';
+  const module=compile('frontend/hooks/useCameraStream.ts',{react:h.react,'../../shared/cameraReadiness':shared,'../../shared/cameraRecovery':recoveryModule},{window,document,DOMException,
+    navigator:{mediaDevices:{getUserMedia:acquire}},requestAnimationFrame:fn=>fn(),
+    setTimeout:(fn,ms)=>{const id=++next;timers.set(id,{fn,at:now+ms});return id;},clearTimeout:id=>timers.delete(id)});
+  let context={screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'00:00'};
+  const render=()=>h.render(props=>module.useCameraStream(props,recover),context);
+  let camera=render();
+  camera.videoRef.current={srcObject:null,play:async()=>{},addEventListener(){},removeEventListener(){}};
+  h.mount();
+  return {h,window,document,timers,render,setContext:value=>{context=value;},advance(ms){now+=ms;for(const [id,t] of [...timers])if(t.at<=now){timers.delete(id);t.fn();}}};
+}
+function streamFixture() {
+  const track=new EventTarget();let stopped=0;
+  track.muted=false;track.stop=()=>stopped++;
+  return {track,stream:{getTracks:()=>[track],getVideoTracks:()=>[track]},get stopped(){return stopped;}};
+}
+test('browser repeated mute/unmute recovers within five seconds and releases listeners and timers',async()=>{
+  const f=streamFixture(),p=streamHarness(async()=>f.stream);
+  await p.render().start();
+  for(let i=0;i<4;i++) {
+    f.track.muted=true;f.track.dispatchEvent(new Event('mute'));p.advance(4900);
+    f.track.muted=false;f.track.dispatchEvent(new Event('unmute'));p.advance(200);
+    assert.equal(p.render().status,'on');assert.equal(f.stopped,0);assert.equal(p.timers.size,0);
+  }
+  f.track.muted=true;f.track.dispatchEvent(new Event('mute'));p.advance(5000);
+  assert.equal(p.render().status,'unavailable');assert.equal(f.stopped,1);
+  assert.match(p.render().message,/Camera delivery stopped/);
+  assert.equal(p.timers.size,0);p.h.unmount();
+});
+test('browser track ended mid-set reaches explicit unavailable state and supports manual reacquisition',async()=>{
+  const first=streamFixture(),second=streamFixture();let calls=0;
+  const p=streamHarness(async()=>++calls===1?first.stream:second.stream);
+  await p.render().start();first.track.dispatchEvent(new Event('ended'));
+  assert.equal(p.render().status,'unavailable');assert.equal(first.stopped,1);
+  await p.render().start('front');assert.equal(p.render().status,'on');assert.equal(p.render().facing,'front');
+  p.h.unmount();assert.equal(second.stopped,1);
+});
+test('browser rapid front/back requests discard stale streams resolving out of order',async()=>{
+  const pending=[];const p=streamHarness(()=>new Promise(resolve=>pending.push(resolve)));
+  const a=p.render().start('front'),b=p.render().start('back'),c=p.render().start('front');
+  const streams=[streamFixture(),streamFixture(),streamFixture()];
+  pending[2](streams[2].stream);await c;pending[0](streams[0].stream);await a;pending[1](streams[1].stream);await b;
+  assert.equal(p.render().status,'on');assert.equal(p.render().facing,'front');
+  assert.equal(streams[0].stopped,1);assert.equal(streams[1].stopped,1);assert.equal(streams[2].stopped,0);
+  p.h.unmount();assert.equal(streams[2].stopped,1);
+});
+test('browser exercise change while acquiring cancels the old stream but elapsed-label updates do not',async()=>{
+  let resolve;const f=streamFixture(),p=streamHarness(()=>new Promise(r=>resolve=r));
+  const request=p.render().start();
+  p.setContext({screen:'live-session',exerciseName:'Squat',equipment:'Barbell',elapsed:'00:00'});p.render();p.h.mount();
+  resolve(f.stream);await request;
+  assert.equal(f.stopped,1);assert.equal(p.render().status,'idle');assert.equal(p.render().videoRef.current.srcObject,null);
+  const active=streamFixture();let finish;
+  // A second pending acquisition survives changes to a display-only elapsed label.
+  const q=streamHarness(()=>new Promise(r=>finish=r));const next=q.render().start();
+  q.setContext({screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'00:01'});q.render();q.h.mount();
+  finish(active.stream);await next;assert.equal(q.render().status,'on');assert.equal(active.stopped,0);
+  q.h.unmount();p.h.unmount();
+});
+test('recovering live camera resumes automatically after background and keeps the selected facing',async()=>{
+  const fixtures=[];const p=streamHarness(async()=>{const f=streamFixture();fixtures.push(f);return f.stream;},true);
+  await p.render().start('front');await new Promise(r=>setImmediate(r));assert.equal(p.render().status,'on');
+  p.document.visibilityState='hidden';p.document.dispatchEvent(new Event('visibilitychange'));
+  assert.notEqual(p.render().status,'on');assert.equal(fixtures[0].stopped,1);
+  p.document.visibilityState='visible';p.document.dispatchEvent(new Event('visibilitychange'));p.advance(500);await new Promise(r=>setImmediate(r));
+  assert.equal(fixtures.length,2,'foreground must automatically acquire a replacement stream');assert.equal(p.render().status,'on');assert.equal(p.render().facing,'front');p.h.unmount();assert.equal(p.timers.size,0);
+});
+test('recovering acquisition times out, disposes late stream and bounds waiting with an attempt counter',async()=>{
+  const pending=[];const p=streamHarness(()=>new Promise(resolve=>pending.push(resolve)),true);
+  await p.render().start('front');assert.equal(p.render().recoveryState.phase,'acquiring');
+  p.advance(recoveryModule.CAMERA_ACQUIRE_TIMEOUT_MS);assert.equal(p.render().recoveryState.phase,'recovering');
+  const late=streamFixture();pending[0](late.stream);await new Promise(r=>setImmediate(r));assert.equal(late.stopped,1);
+  for(const delay of [500,1000,2000]){p.advance(delay);p.advance(recoveryModule.CAMERA_ACQUIRE_TIMEOUT_MS);}
+  assert.equal(p.render().recoveryState.phase,'failed');assert.equal(p.render().recoveryState.reason,'timeout');assert.match(p.render().message,/timed out.*Try again/);assert.equal(p.timers.size,0);p.h.unmount();
+});
+test('facing switch during recovery cannot attach old stream and background cancels pending retry',async()=>{
+  const pending=[];const p=streamHarness(()=>new Promise(resolve=>pending.push(resolve)),true);
+  await p.render().start('front');p.advance(recoveryModule.CAMERA_ACQUIRE_TIMEOUT_MS);
+  p.render().switchFacing();const last=streamFixture(),old=streamFixture();pending[1](last.stream);pending[0](old.stream);await new Promise(r=>setImmediate(r));
+  assert.equal(p.render().status,'on');assert.equal(p.render().facing,'back');assert.equal(old.stopped,1);
+  last.track.dispatchEvent(new Event('ended'));p.document.visibilityState='hidden';p.document.dispatchEvent(new Event('visibilitychange'));p.advance(500);
+  assert.equal(pending.length,2);assert.equal(p.render().recoveryState.phase,'interrupted');p.h.unmount();
+});
+test('native host interruption automatically reacquires but a native start that never responds times out',async()=>{
+  const p=streamHarness(async()=>{throw Error('must use native');},true),messages=[];
+  p.window.ReactNativeWebView={postMessage:s=>messages.push(JSON.parse(s))};
+  p.render().frameRef.current={getBoundingClientRect:()=>({left:0,top:0,width:300,height:400})};
+  const event=detail=>{const e=new Event('physiquequest-camera');e.detail=detail;p.window.dispatchEvent(e);};
+  await p.render().start('back');await new Promise(r=>setImmediate(r));const oldGeneration=messages.find(m=>m.type==='camera-start').generation;event({type:'status',status:'on',generation:oldGeneration});assert.equal(p.render().status,'on');
+  event({type:'interruption',active:false});event({type:'interruption',active:true});p.advance(500);await new Promise(r=>setImmediate(r));
+  assert.equal(messages.filter(m=>m.type==='camera-start').length,2);assert.equal(messages.filter(m=>m.type==='camera-start').at(-1).facing,'back');
+  event({type:'status',status:'on',generation:oldGeneration});assert.notEqual(p.render().recoveryState.phase,'ready','obsolete host readiness must not complete the replacement acquisition');
+  p.advance(recoveryModule.CAMERA_ACQUIRE_TIMEOUT_MS);assert.equal(p.render().recoveryState.phase,'recovering');p.h.unmount();assert.equal(p.timers.size,0);
+});
+test('native rapid front/back and exercise replacement ignore obsolete model/configuration callbacks',async()=>{
+  const h=hookHarness(),pending=[],emitted=[];let ready=0;
+  const module=nativeModule({react:h.react,asset:{downloadAsync:()=>new Promise(resolve=>pending.push(resolve))}});
+  const props=(facing,requestId)=>({options:{mode:'tracking',requestId,kind:'curl',side:'left',active:true,fullLandmarks:true},facing,style:[],emit:e=>emitted.push(e),ready:()=>ready++});
+  const a=props('front','old'),b=props('back','old'),c=props('front','replacement');
+  h.render(module.default,a);h.mount();h.render(module.default,b);h.mount();h.render(module.default,c);h.mount();
+  pending[2]({localUri:'current'});await new Promise(r=>setImmediate(r));
+  const current=h.render(module.default,c);h.mount();assert.equal(current.type,'PoseCamera');
+  pending[0]({localUri:'obsolete-front'});pending[1]({localUri:'obsolete-back'});await new Promise(r=>setImmediate(r));
+  const stable=h.render(module.default,c);h.mount();assert.equal(stable.props.poseModelAssetPath,'current');
+  stable.props.onCameraConfigured();assert.equal(ready,1);assert.equal(emitted.at(-1).requestId,'replacement');
+  h.unmount();const count=emitted.length;stable.props.onLandmark(frame());stable.props.onCameraConfigured();assert.equal(emitted.length,count);
+});
 test('missing native module, model failure, background/blur and late model promises fail safely with listener cleanup',async()=>{
   assert.equal(nativeModule({available:false}).nativePoseAvailable,false);
   const absent=hookHarness(),unsupported=[];
@@ -152,9 +273,16 @@ test('native host executes bounded context/frame and fixed-vocabulary status val
     'react-native':{StyleSheet:{create:s=>s},Platform:{OS:'android'}},'@react-native-community/netinfo':{},
     'react-native-safe-area-context':{},'react-native-webview':{},'./connection.mjs':{},'./inactivity/nativeMonitor':{},
     './NativeTrackingCamera':{},'./PoseTrackerNative':{},'./FoodScannerCamera':{},'./performance-guard.mjs':{},'../shared/cameraReadiness':shared,
-    'react/jsx-runtime':{},
+    'react/jsx-runtime':{}, './offlineAccount':{},
   });
   assert.equal(host.isNativeCameraContext({screen:'camera-check',readiness:context}),true);
+  for(const raw of ['{broken','null','[]',JSON.stringify({type:3}),JSON.stringify({type:'camera-start',frame:{x:0,y:0,width:0,height:10},facing:'front',previewContext:{screen:'camera-check',readiness:context}}),JSON.stringify({type:'camera-update-overlay',previewContext:{screen:'invalid'}})]) {
+    assert.equal(host.parseCameraHostMessage(raw),null,'malformed messages must be ignored before preview state changes');
+  }
+  assert.equal(host.parseCameraHostMessage(JSON.stringify({type:'camera-stop'})).type,'camera-stop');
+  const hostSource=fs.readFileSync('mobile/App.tsx','utf8');
+  assert.match(hostSource,/const parsedMessage=parseCameraHostMessage\(e.nativeEvent.data\);\s*if\(!parsedMessage\)return/);
+  assert.doesNotMatch(hostSource,/catch \(error\) \{\s*stopNativeCamera\(\);\s*console.warn\('Could not handle malformed/);
   assert.equal(host.isNativeCameraContext({screen:'camera-check'}),false);
   assert.equal(host.isNativeCameraContext({screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'01:00',tracking:{requestId:'rep',kind:'curl',side:'left',active:true}}),true);
   for(const f of [{x:0,y:0,width:Infinity,height:2},{x:0,y:0,width:-1,height:2},{x:999999,y:0,width:2,height:2}])assert.equal(host.isCameraFrame(f),false);
@@ -170,7 +298,7 @@ test('live-session hook suppresses lifecycle auto-restart but preserves ordinary
     const messages=[];
     if(interruption==='native-idle')window.ReactNativeWebView={postMessage:s=>messages.push(JSON.parse(s))};
     const track={stop:()=>stopped++,addEventListener(){},removeEventListener(){}};
-    const module=compile('frontend/hooks/useCameraStream.ts',{react:h.react,'../../shared/cameraReadiness':shared},{window,document,DOMException,
+    const module=compile('frontend/hooks/useCameraStream.ts',{react:h.react,'../../shared/cameraReadiness':shared,'../../shared/cameraRecovery':recoveryModule},{window,document,DOMException,
       navigator:{mediaDevices:{getUserMedia:async()=>{acquisitions++;return {getTracks:()=>[track],getVideoTracks:()=>[track]};}}},requestAnimationFrame:fn=>fn()});
     const context={screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'00:00'};
     const render=()=>h.render(module.useCameraStream,context);
@@ -183,7 +311,11 @@ test('live-session hook suppresses lifecycle auto-restart but preserves ordinary
     // Ordinary pause/navigation still preserves the previously enabled camera preference.
     camera.stop();camera=render();h.mount();assert.equal(camera.shouldAutoStart,true);
     await camera.start();if(interruption==='native-idle')nativeStatus('on');camera=render();h.mount();
-    if(interruption==='blur')window.dispatchEvent(new Event('blur'));
+    if(interruption==='blur') {
+      window.dispatchEvent(new Event('blur'));
+      camera=render();h.mount();assert.equal(camera.status,'on');
+      document.visibilityState='hidden';document.dispatchEvent(new Event('visibilitychange'));
+    }
     if(interruption==='hidden'){document.visibilityState='hidden';document.dispatchEvent(new Event('visibilitychange'));}
     if(interruption==='native-idle')nativeStatus('idle');
     camera=render();h.mount();assert.equal(camera.status,'idle');
@@ -222,4 +354,56 @@ test('native startup deadline covers asset-resolved silent camera initialization
     }
     h.unmount();assert.equal(timers.size,0);
   }
+});
+
+function nativeParentHarness({granted=true}={}) {
+  const h=hookHarness(),timers=new Map(),listeners=[];let next=0,now=0,creations=0,suspends=0;
+  const app={currentState:'active',addEventListener:(type,fn)=>{const item={type,fn,removed:false};listeners.push(item);return {remove:()=>item.removed=true};}};
+  const make=(type,props)=>({type,props});
+  const counter={suspend:()=>suspends++,snapshot:()=>({reps:8,partials:2}),update:()=>({reps:8,partials:2,faults:[],visible:true})};
+  const noop=()=>{};
+  const module=compile('mobile/PoseTrackerNative.tsx',{
+    '../shared/poseConfig':poseConfig,react:h.react,'react-native':{AppState:app,View:'View',Text:'Text',Pressable:'Pressable',ActivityIndicator:'Spinner',StyleSheet:{create:x=>x,absoluteFill:{}},useWindowDimensions:()=>({width:400,height:800})},
+    'expo-camera':{Camera:{requestCameraPermissionsAsync:async()=>({granted})}},'expo-speech':{stop:async()=>{},speak:noop},'expo-haptics':{},'expo-sensors':{Accelerometer:{isAvailableAsync:async()=>false}},'expo-keep-awake':{activateKeepAwakeAsync:async()=>{},deactivateKeepAwake:noop},'react-native-safe-area-context':{useSafeAreaInsets:()=>({top:0,bottom:0})},
+    'react-native-svg':{__esModule:true,default:'Svg',Path:'Path'},'react-native-reanimated':{__esModule:true,default:{createAnimatedComponent:()=> 'AnimatedPath'},cancelAnimation:noop,useAnimatedProps:fn=>fn(),useSharedValue:v=>({value:v}),withDelay:()=>0,withTiming:()=>0},
+    './NativeTrackingCamera':{__esModule:true,default:'NativeCamera'},'./poseStartGate':{createPoseStartGate:()=>({reset:noop,update:()=>({active:true})}),frameStatus:()=> 'OK'},'../shared/cameraRecovery':recoveryModule,
+    '../shared/poseSessionSummary':{createPoseSessionClock:()=>({pause:noop,start:noop,seconds:()=>0}),POSE_ISSUES:{}},'../shared/landmarkFilter':{createLandmarkFilter:()=>({reset:noop,update:x=>x})},'./poseOverlay':{POSE_HOLD_MS:350},'./poseSegments':{createStablePoseSegments:()=>({reset:noop,update:()=>[]})},'./poseCue':{createPoseCueController:()=>({update:()=>({})})},'./poseSafety':{createPoseSafety:()=>({reset:noop})},'./inactivity/nativeAlarm':{startNativeAlarm:noop,stopNativeAlarm:noop},'./inactivity/movement.mjs':{createMovementDetector:()=>({})},'./PoseAlarmScreen':{__esModule:true,default:'Alarm'},
+    '../shared/exerciseEngine':{createExerciseCounter:()=>{creations++;return counter;},isPatternId:()=>true,patternSpec:()=>({mode:'bilateral'}),targetFps:()=>10},'react/jsx-runtime':{jsx:make,jsxs:make},
+  },{setInterval:()=>1,clearInterval:noop,setTimeout:(fn,ms)=>{const id=++next;timers.set(id,{fn,at:now+ms});return id;},clearTimeout:id=>timers.delete(id)});
+  let props={name:'Curl',pattern:'curl',exercise:'one',close:noop,onSafetyAlarm:noop,onSafetyStop:noop,deliveryStatus:'idle'};
+  const render=()=>{const tree=h.render(module.default,props);h.mount();return tree;};
+  const nodes=(tree,type)=>{if(!tree||typeof tree!=='object')return [];const found=tree.type===type?[tree]:[];for(const child of [tree.props?.children].flat(Infinity))found.push(...nodes(child,type));return found;};
+  return {h,app,timers,counter,render,nodes,get creations(){return creations;},get suspends(){return suspends;},exercise(name){props={...props,name,exercise:name};},event(type,value){if(type==='change')app.currentState=value;for(const l of listeners)if(l.type===type&&!l.removed)l.fn(value);},advance(ms){now+=ms;for(const [id,t] of [...timers])if(t.at<=now){timers.delete(id);t.fn();}}};
+}
+test('native parent background recovery preserves totals, bounds blur/focus retries and rechecks pending retry',async()=>{
+  const p=nativeParentHarness();p.render();await new Promise(r=>setImmediate(r));p.render();let tree=p.render();
+  let camera=p.nodes(tree,'NativeCamera')[0];assert.ok(camera);camera.props.ready();
+  p.event('change','background');assert.equal(p.nodes(p.render(),'NativeCamera').length,0);
+  p.event('change','active');p.advance(500);tree=p.render();camera=p.nodes(tree,'NativeCamera')[0];assert.ok(camera);camera.props.ready();
+  assert.equal(p.creations,1);assert.equal(p.counter.snapshot().reps,8);assert.ok(p.suspends>0);
+  camera.props.emit({type:'error',reason:'model-error'});p.event('change','background');p.advance(1000);assert.equal(p.nodes(p.render(),'NativeCamera').length,0);
+  p.event('change','active');p.advance(2000);tree=p.render();camera=p.nodes(tree,'NativeCamera')[0];assert.ok(camera);camera.props.ready();
+  p.event('blur');p.event('focus');p.advance(2000);tree=p.render();assert.equal(p.nodes(tree,'NativeCamera').length,0,'retry budget must be exhausted');
+  assert.ok(JSON.stringify(tree).includes('interrupted too often'));p.h.unmount();assert.equal(p.timers.size,0);
+});
+test('native parent rejects an old retry and old ready callback after the exercise changes',async()=>{
+  const p=nativeParentHarness();p.render();await new Promise(r=>setImmediate(r));p.render();let old=p.nodes(p.render(),'NativeCamera')[0];old.props.ready();old.props.emit({type:'error',reason:'model-error'});
+  const stale=[...p.timers.values()][0].fn;p.exercise('Squat');p.render();const current=p.nodes(p.render(),'NativeCamera')[0];assert.ok(current);current.props.ready();
+  const writes=p.h.writes;stale();assert.equal(p.h.writes,writes,'stale retry must not mutate the replacement exercise');old.props.ready();assert.equal(p.creations,2);assert.equal(p.timers.size,0);assert.equal(p.nodes(p.render(),'NativeCamera').length,1);p.h.unmount();
+});
+test('native permission denial renders a specific failed state and Try again without a preparing spinner',async()=>{
+  const p=nativeParentHarness({granted:false});p.render();await new Promise(r=>setImmediate(r));p.render();const tree=p.render();
+  assert.equal(p.nodes(tree,'NativeCamera').length,0);assert.equal(p.nodes(tree,'Spinner').length,0);assert.match(JSON.stringify(tree),/permission denied/);assert.match(JSON.stringify(tree),/Try again/);assert.equal(p.timers.size,0);p.h.unmount();
+});
+test('live tracking surfaces opt in to recovery without a hidden-page stop overriding it',()=>{
+  for(const name of ['GenericTrackingSession','LiveSession','TrackingSession','SquatFormPreview']) {
+    const source=fs.readFileSync(`frontend/sections/Coach/${name}.tsx`,'utf8');
+    assert.match(source,/useCameraStream\([\s\S]*?\},\s*true\)/,name);
+  }
+  const legacy=fs.readFileSync('frontend/sections/Coach/TrackingSession.tsx','utf8');
+  assert.doesNotMatch(legacy,/if \(!intent\) camera.stop\(\)/);
+  assert.match(legacy,/if \(paused \|\| review\) camera.stop\(\)/);
+  const generic=fs.readFileSync('frontend/sections/Coach/GenericTrackingSession.tsx','utf8');
+  assert.doesNotMatch(generic,/document.hidden\)camera.stop/);
+  assert.match(fs.readFileSync('frontend/hooks/useGenericRepTracking.ts','utf8'),/stopped=true; counter.suspend\(\)/);
 });

@@ -93,7 +93,7 @@ export type ExerciseFilters = { bodyParts: string[]; equipments: string[]; targe
 export interface ProgressRecord { _id: string; metric: 'weight' | 'chest' | 'waist' | 'arms' | 'benchPress'; value: number; unit: string; date?: string; measuredAt?: string; }
 export interface WorkoutExerciseSnapshot { exerciseId: string; name: string; equipment: string; prescription?: string; sets: number; restBetweenSets?: number; restAfterExercise?: number; }
 export interface WorkoutSetResult { setId: string; exerciseId: string; setIndex: number; reps: number; durationSeconds?: number; loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs'; barWeightKg?: number; status: 'completed' | 'skipped'; source: 'manual' | 'local-video'; setType?: 'normal' | 'warmup' | 'drop' | 'failure'; }
-export interface WorkoutSessionRecord { routineName?: string; _id: string; exerciseIds: string[]; exercises?: WorkoutExerciseSnapshot[]; dayIndex?: number; scheduledDate?: string; origin?: 'planned' | 'standalone' | 'recorded-set'; revision?: number; startedAt: string; endedAt?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: WorkoutSetResult[]; }
+export interface WorkoutSessionRecord { routineName?: string; _id: string; exerciseIds: string[]; exercises?: WorkoutExerciseSnapshot[]; dayIndex?: number; scheduledDate?: string; origin?: 'planned' | 'standalone' | 'recorded-set'; revision?: number; startedAt: string; endedAt?: string; timezone?: string; pausedAt?: string; pausedSeconds?: number; durationSeconds?: number; status: 'active' | 'completed'; exerciseResults?: { exerciseId: string; reps: number; loadKg?: number }[]; sets?: WorkoutSetResult[]; }
 export type WorkoutSummary = { trainingDates: string[]; personalRecords: { exerciseId: string; name: string; loadKg?: number; loadValue?: number; loadUnit?: 'kg' | 'lbs'; volumeKg?: number; volumeDate?: string; date: string }[] };
 export type AlertRecord = {
   _id?: string;
@@ -129,7 +129,7 @@ export type AdminAlertRow = {
 
 export type LeaderboardPeriod = 'week' | 'month' | 'all';
 export type StrengthStanding = { userId: string; name: string; rank: number; score: number; maxKg: number; loadKg: number; reps: number; bodyweightKg?: number; isCurrentUser: boolean };
-export type StrengthLeaderboardRecord = { exercises: { id: string; name: string }[]; exerciseId: string | null; metric: 'heaviest' | 'relative'; entries: StrengthStanding[]; self: StrengthStanding | null; hidden: boolean };
+export type StrengthLeaderboardRecord = { exercises: { id: string; name: string }[]; exerciseId: string | null; metric: 'heaviest' | 'relative'; entries: StrengthStanding[]; participants?: { userId: string; name: string; isCurrentUser: boolean }[]; self: StrengthStanding | null; hidden: boolean };
 
 export interface LeaderboardEntryRecord {
   userId: string;

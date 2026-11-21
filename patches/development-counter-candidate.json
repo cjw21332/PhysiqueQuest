@@ -1,0 +1,172 @@
+[
+  {
+    "clip": "c01",
+    "snapshot": {
+      "patternId": "vertical_pull",
+      "reps": 3,
+      "leftReps": 3,
+      "rightReps": 0,
+      "partials": 1,
+      "phase": "returning",
+      "progress": 0.42639547103341435,
+      "angle": 114.6,
+      "rom": 87.9,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": true,
+      "cue": "Pull with the elbows, not the torso.",
+      "faults": [],
+      "counted": false,
+      "rejected": []
+    },
+    "rejected": {
+      "too_few_samples": 4,
+      "timing_failed": 2,
+      "implausible_geometry": 1
+    },
+    "events": [
+      {
+        "type": "partial",
+        "timestampMs": 1601
+      },
+      {
+        "type": "full",
+        "timestampMs": 5501
+      },
+      {
+        "type": "full",
+        "timestampMs": 8201
+      },
+      {
+        "type": "full",
+        "timestampMs": 15801
+      }
+    ]
+  },
+  {
+    "clip": "c06",
+    "snapshot": {
+      "patternId": "curl",
+      "reps": 1,
+      "leftReps": 1,
+      "rightReps": 0,
+      "partials": 4,
+      "phase": "lost",
+      "progress": 0,
+      "angle": null,
+      "rom": 0,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": false,
+      "cue": "Move so shoulder, elbow and wrist stay visible.",
+      "faults": [],
+      "counted": false,
+      "rejected": []
+    },
+    "rejected": {
+      "too_few_samples": 5,
+      "timing_failed": 4,
+      "implausible_geometry": 2
+    },
+    "events": [
+      {
+        "type": "partial",
+        "timestampMs": 6301
+      },
+      {
+        "type": "partial",
+        "timestampMs": 10201
+      },
+      {
+        "type": "partial",
+        "timestampMs": 12401
+      },
+      {
+        "type": "full",
+        "timestampMs": 15501
+      },
+      {
+        "type": "partial",
+        "timestampMs": 17101
+      }
+    ]
+  },
+  {
+    "clip": "c15",
+    "snapshot": {
+      "patternId": "triceps_extension",
+      "reps": 3,
+      "leftReps": 0,
+      "rightReps": 3,
+      "partials": 3,
+      "phase": "lost",
+      "progress": 0.4237397812091988,
+      "angle": 98.7,
+      "rom": 172.8,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": false,
+      "cue": "Move so shoulder, elbow and wrist stay visible.",
+      "faults": [],
+      "counted": false,
+      "rejected": []
+    },
+    "rejected": {
+      "implausible_geometry": 3,
+      "timing_failed": 1
+    },
+    "events": [
+      {
+        "type": "full",
+        "timestampMs": 9901
+      },
+      {
+        "type": "partial",
+        "timestampMs": 23301
+      },
+      {
+        "type": "partial",
+        "timestampMs": 23401
+      },
+      {
+        "type": "partial",
+        "timestampMs": 24301
+      },
+      {
+        "type": "full",
+        "timestampMs": 34401
+      },
+      {
+        "type": "full",
+        "timestampMs": 42601
+      }
+    ]
+  },
+  {
+    "clip": "c17",
+    "snapshot": {
+      "patternId": "horizontal_push",
+      "reps": 0,
+      "leftReps": 0,
+      "rightReps": 0,
+      "partials": 0,
+      "phase": "lost",
+      "progress": 0,
+      "angle": null,
+      "rom": 0,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": false,
+      "cue": "Move so shoulder, elbow and wrist stay visible.",
+      "faults": [],
+      "counted": false,
+      "rejected": []
+    },
+    "rejected": {
+      "too_few_samples": 4,
+      "implausible_geometry": 6,
+      "timing_failed": 2
+    },
+    "events": []
+  }
+]

@@ -1,0 +1,177 @@
+--- a/mobile/PoseTrackerNative.tsx
++++ b/mobile/PoseTrackerNative.tsx
+@@ -11,6 +11,7 @@
+ import Animated, { cancelAnimation, useAnimatedProps, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
+ import NativeTrackingCamera, { type NativeTrackingOptions } from './NativeTrackingCamera';
+ import { createPoseStartGate, frameStatus } from './poseStartGate';
++import { createFramingGuard } from '../shared/framingGuard';
+ import { createPoseSessionClock, POSE_ISSUES, type NativePoseSummary, type PoseIssueId } from '../shared/poseSessionSummary';
+ import { createLandmarkFilter } from '../shared/landmarkFilter';
+ import { POSE_HOLD_MS } from './poseOverlay';
+@@ -98,6 +99,7 @@
+   const hasTracked = useRef(false);
+   const lastUi = useRef(0);
+   const visibilityGate = useRef(createPoseStartGate());
++  const framingGuard = useRef(createFramingGuard());
+   const counting = useRef(false);
+   const systemPromptPending = useRef(false);
+   const patternId: PatternId = isPatternId(pattern) ? pattern : 'squat';
+@@ -201,6 +203,7 @@
+     if (counting.current) counter.current?.suspend();
+     counting.current = false;
+     visibilityGate.current.reset();
++    framingGuard.current.reset();
+     setCountdown(null);
+   };
+   const switchCamera = () => {
+@@ -246,6 +249,7 @@
+     } | undefined;
+     const ts = typeof frame?.timestamp === 'number' ? frame.timestamp : performance.now();
+     if (!frame || !counter.current || !Array.isArray(frame.joints) || frame.joints.length < MIN_DRAW_LANDMARKS) {
++      if (framingGuard.current.update(ts, false).suspend) counter.current?.suspend();
+       const gate = visibilityGate.current.update(ts, false);
+       if (counting.current && !gate.active) { counter.current?.suspend(); counting.current = false; }
+       setCountdown(null);
+@@ -276,14 +280,14 @@
+     const framing = frameStatus(patternId, frame.joints);
+     const fullBodyVisible = framing === 'OK';
+     if (!fullBodyVisible) {
++      if (framingGuard.current.update(ts, false).suspend) counter.current.suspend();
+       const gate = visibilityGate.current.update(ts, false);
+       if (counting.current && !gate.active) { counter.current.suspend(); counting.current = false; }
+       setCountdown(null);
+       setStatus(framing === 'TOO_CLOSE' ? 'Keep the working joints inside the view' : framing === 'TOO_FAR' ? 'Move closer' : 'Show a clear working limb');
+-      // Feed missing evidence into the counter too, so stale cycles expire.
+-      counter.current.update({ landmarks: measurementJoints, timestamp: ts, aspect });
+       return;
+     }
++    if (framingGuard.current.update(ts, true).suspend) counter.current.suspend();
+     const gate = visibilityGate.current.update(ts, true);
+     if (!gate.active) {
+       if (counting.current) { counter.current.suspend(); counting.current = false; }
+--- a/frontend/hooks/useGenericRepTracking.ts
++++ b/frontend/hooks/useGenericRepTracking.ts
+@@ -3,7 +3,17 @@
+ import { createLandmarkFilter } from '../../shared/landmarkFilter';
+ import { createGenericRepCounter, type GeneratedAngleConfig, type PoseFrame } from '../../shared/genericRepCounter';
+ import { trackingFrameInterval, trackingPowerNotice, type BatteryReading } from '../lib/trackingPerformance.mjs';
+-import { createExerciseCounter, type PatternId, type ExerciseConfigOverride } from '../../shared/exerciseEngine';
++import { createExerciseCounter, jointAngle, type PatternId, type ExerciseConfigOverride } from '../../shared/exerciseEngine';
++import { createFramingGuard } from '../../shared/framingGuard';
++import { frameStatus } from '../../mobile/poseStartGate';
++
++const genericTriplets: Record<string, readonly [number, number, number]> = {
++  left_elbow: [11, 13, 15], right_elbow: [12, 14, 16],
++  left_shoulder: [23, 11, 13], right_shoulder: [24, 12, 14],
++  left_hip: [11, 23, 25], right_hip: [12, 24, 26],
++  left_knee: [23, 25, 27], right_knee: [24, 26, 28],
++  left_ankle: [25, 27, 31], right_ankle: [26, 28, 32],
++};
+ 
+ type BatteryMonitor = BatteryReading & { addEventListener(type: string, listener: () => void): void; removeEventListener(type: string, listener: () => void): void };
+ 
+@@ -27,6 +37,7 @@
+     if (!window.Worker || !window.createImageBitmap || !window.OffscreenCanvas) { setStatus('This browser cannot run local pose tracking.'); return; }
+     let stopped = false, failed = false, ready = false, busy = false, sent = 0, lastVideoTime = -1, lastSent = 0, interval = 100, inferenceMs = 0, lastResult = 0;
+     const filter = createLandmarkFilter(true);
++    const framing = createFramingGuard();
+     let battery: BatteryMonitor | null = null;
+     const updatePower = () => { if (!stopped) { interval=trackingFrameInterval(inferenceMs,battery); setPowerNotice(trackingPowerNotice(battery)); } };
+     let worker: Worker;
+@@ -45,9 +56,10 @@
+       if (event.data.type === 'generic-result') {
+         busy = false;
+         lastResult = performance.now();
+-        if (event.data.subjectChanged) counter.suspend();
++        if (event.data.subjectChanged) { counter.suspend(); framing.reset(); }
+         if (event.data.subjectChanged) filter.reset();
+         const pose = event.data.frame as PoseFrame;
++        const points = filter.update(pose.landmarks, pose.timestamp);
+         const canvas = overlayRef.current, video = videoRef.current;
+         const context = canvas?.getContext('2d');
+         if (canvas && context && video) {
+@@ -56,7 +68,6 @@
+           context.clearRect(0, 0, canvas.width, canvas.height);
+           const scale = Math.max(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+           const ox = (canvas.width - video.videoWidth * scale) / 2, oy = (canvas.height - video.videoHeight * scale) / 2;
+-          const points = filter.update(pose.landmarks, pose.timestamp);
+           context.strokeStyle = '#7ef0b2'; context.lineWidth = 3; context.beginPath();
+           for (const [a, b] of [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]]) {
+             const first = points[a], second = points[b];
+@@ -66,10 +77,19 @@
+           }
+           context.stroke();
+         }
+-        setProgress(counter.update(event.data.frame as PoseFrame));
++        const acceptable = pattern ? frameStatus(pattern, points) === 'OK' : config.primaryJoints.some(name => {
++          const indices = genericTriplets[name];
++          return !!indices && indices.every(index => {
++            const p = points[index];
++            return !!p && p.x > 0 && p.x < 1 && p.y > 0 && p.y < 1;
++          }) && jointAngle({ landmarks: points, aspect: pose.aspect }, indices, 0.5) !== null;
++        });
++        const gate = framing.update(pose.timestamp, acceptable);
++        if (gate.suspend) counter.suspend();
++        if (gate.advance) setProgress(counter.update(pose));
+         inferenceMs = event.data.durationMs;
+         interval = trackingFrameInterval(inferenceMs, battery);
+-        setStatus('Experimental tracking active.');
++        setStatus(acceptable ? 'Experimental tracking active.' : 'Show the working joints clearly.');
+       }
+     };
+     worker.onerror = () => fail('Pose tracking failed. Stop and retry.');
+--- /dev/null
++++ b/shared/framingGuard.ts
+@@ -0,0 +1,25 @@
++/** Pause measurements during unreliable framing; never count bad-frame motion. */
++export const FRAMING_GRACE_MS = 500;
++
++/** Preserve the current cycle through a short dropout, then discard it once. */
++export function createFramingGuard(graceMs = FRAMING_GRACE_MS) {
++  let lostAt: number | null = null;
++  let suspended = false;
++  return {
++    reset() { lostAt = null; suspended = false; },
++    update(timestamp: number, acceptable: boolean): { advance: boolean; suspend: boolean } {
++      if (acceptable) {
++        const expired = lostAt !== null && !suspended && timestamp - lostAt >= graceMs;
++        lostAt = null;
++        suspended = false;
++        return { advance: true, suspend: expired };
++      }
++      if (lostAt === null || timestamp < lostAt) lostAt = timestamp;
++      if (!suspended && timestamp - lostAt >= graceMs) {
++        suspended = true;
++        return { advance: false, suspend: true };
++      }
++      return { advance: false, suspend: false };
++    },
++  };
++}
+--- /dev/null
++++ b/shared/__tests__/framingGuard.spec.ts
+@@ -0,0 +1,24 @@
++import { describe, expect, it } from 'vitest';
++import { createFramingGuard } from '../framingGuard';
++
++describe('working-joint framing guard', () => {
++  it('does not advance on bad frames and preserves a brief dropout', () => {
++    const guard = createFramingGuard();
++    expect(guard.update(0, true)).toEqual({ advance: true, suspend: false });
++    expect(guard.update(100, false)).toEqual({ advance: false, suspend: false });
++    expect(guard.update(499, false)).toEqual({ advance: false, suspend: false });
++    expect(guard.update(500, true)).toEqual({ advance: true, suspend: false });
++  });
++  it('suspends exactly once after prolonged loss and resumes cleanly', () => {
++    const guard = createFramingGuard();
++    guard.update(100, false);
++    expect(guard.update(600, false)).toEqual({ advance: false, suspend: true });
++    expect(guard.update(700, false)).toEqual({ advance: false, suspend: false });
++    expect(guard.update(800, true)).toEqual({ advance: true, suspend: false });
++  });
++  it('suspends on recovery if no intermediate frame arrived during a long gap', () => {
++    const guard = createFramingGuard();
++    guard.update(100, false);
++    expect(guard.update(700, true)).toEqual({ advance: true, suspend: true });
++  });
++});

@@ -1,12 +1,21 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { api, type ExerciseRecord } from '../../lib/api';
-import { canTrack, resolveTrackingConfig, type TrackingConfig } from '../../../backend/src/pose-tracker/exercise-registry';
+import { canTrack, resolveTrackingConfig, unsupportedTrackingMessage, type TrackingConfig } from '../../../backend/src/pose-tracker/exercise-registry';
 import { initialTrackingState, reduceProviderEvent, safeProviderError, trackingUrl, trustedProviderEvent } from '../../services/poseTracker/bridge';
 import './posetracker.css';
 import GenericTrackingSession from './GenericTrackingSession';
 import { titleCase } from '../../lib/titleCase';
 import { Icon } from '../Home/icons';
+import { isPatternId } from '../../../shared/exerciseEngine';
+import type { GeneratedAngleConfig } from '../../../backend/src/pose-tracker/exercise-registry';
+// The local pattern engine supplies measurements; this empty generic fallback
+// is never used for counting when a pattern is selected.
+const localPatternConfig: GeneratedAngleConfig = {
+  source: 'gif-derived', verified: false, liveValidated: false, primaryJoints: [], sideMode: 'bilateral',
+  startAngles: {}, peakAngles: {}, directions: {}, referenceRanges: {}, stabilityConstraints: [],
+  viewHint: 'unknown', cycleCount: 0, validFraction: 0, thresholdsUsed: {}, generatorVersion: 'local-pattern', generatedAt: '',
+};
 import { parseNativePoseSummary, POSE_ISSUES, type NativePoseSummary } from '../../../shared/poseSessionSummary';
 const metricLabels: Record<string,string> = {score:'Movement score',avg_score:'Average score',grade:'Grade',overallScore:'Overall similarity',nccScore:'Shape similarity',dtwScore:'Alignment similarity',timingScore:'Timing similarity',distScore:'Stability similarity'};
 const describeScores=(values:Record<string,number|string>)=>Object.entries(values).map(([key,value])=>`${metricLabels[key]??key}: ${value}`).join(' · ');
@@ -100,6 +109,7 @@ export default function PoseTrackerSession({exercise,onExit,adminTest=false,onVe
   };
   const native=Boolean(config.nativePattern && typeof window !== 'undefined' && window.ReactNativeWebView);
   const allowed=(canTrack(config) && (native || config.trackingMode !== 'unavailable'))||(adminTest&&config.trackingMode!=='unavailable'&&config.validationStatus!=='disabled');
+  if (!native && config.validationStatus !== 'disabled' && isPatternId(config.nativePattern)) return <GenericTrackingSession name={exercise.name} config={localPatternConfig} pattern={config.nativePattern} override={config.nativeOverride} onExit={onExit}/>;
   if(config.trackingMode==='generated-angle' && config.generatedAngleConfig && allowed) return <GenericTrackingSession name={exercise.name} config={config.generatedAngleConfig} onExit={onExit}/>;
   if ((stage === 'starting' || stage === 'active') && !native) return <section className="pose-live" aria-label="Live exercise tracking">
     <div className="pose-live-camera">
@@ -133,7 +143,7 @@ export default function PoseTrackerSession({exercise,onExit,adminTest=false,onVe
     <div className="pose-setup-content">
     <div className="pose-setup-exercise">{exercise.gifUrl ? <img className="pose-exercise-thumb" src={exercise.gifUrl} alt=""/> : <span className="pose-setup-placeholder"><Icon name="dumbbell" size={24}/></span>}<div><strong>Your exercise</strong><p>{[config.targetMuscles.join(', '),config.equipment.join(', ')].filter(Boolean).join(' · ') || 'Movement tracking'}</p></div></div>
     <div className="pose-setup-tip"><span><Icon name="camera" size={19}/></span><div><strong>Set up your camera</strong><p>Use good lighting and keep your whole body in view.{config.cameraOrientation === 'front' ? ' Face the camera.' : config.cameraOrientation === 'side' ? ' Turn sideways to the camera.' : ''}</p></div></div>
-    <div className="pose-setup-tip"><span><Icon name="warning" size={19}/></span><div><strong>Review your results</strong><p>{allowed ? `Repetition counts are estimates and may be inaccurate.${config.validationStatus !== 'verified' && config.nativeSupport !== 'FULLY_SUPPORTED' ? ' This exercise has not been validated on real recordings.' : ''}` : 'Camera tracking is not ready for this exercise. You can still log it manually.'} Feedback cannot assess pain or injury risk.</p></div></div>
+    <div className="pose-setup-tip"><span><Icon name="warning" size={19}/></span><div><strong>Review your results</strong><p>{allowed ? `Repetition counts are estimates and may be inaccurate.${config.validationStatus !== 'verified' && config.nativeSupport !== 'FULLY_SUPPORTED' ? ' This exercise has not been validated on real recordings.' : ''}` : unsupportedTrackingMessage} Feedback cannot assess pain or injury risk.</p></div></div>
     {adminTest && <details><summary>Tracking details</summary><ul>{config.limitations.map((s,i)=><li key={i}>{s}</li>)}</ul></details>}
     {allowed&&stage==='setup'&&<div className="pose-consent"><h3>Before you start</h3><p>{native?'Camera images and videos are processed on this phone and are not uploaded or retained by PhysiqueQuest. After tracking starts, if neither body nor phone movement is detected, a countdown is followed by an alarm and an attempt to notify your saved emergency contact. Monitoring continues when you leave the camera frame and stops when tracking is paused. No location is shared.':'PoseTracker is a third-party service. Authentication and usage information may be sent to it. PhysiqueQuest does not retain camera frames from this session. Read the '}{!native&&<a href="https://www.posetracker.com/privacy-policy" target="_blank" rel="noopener noreferrer">PoseTracker privacy policy</a>}{!native&&'.'}</p><label><input type="checkbox" checked={consent} onChange={event=>setConsent(event.target.checked)}/> <span>{native?'I agree to camera analysis and the inactivity alert described above.':'I agree to use my camera with PoseTracker.'}</span></label></div>}
     <div className="pose-actions">{allowed&&stage==='setup'&&<button type="button" className="primary" disabled={!consent} onClick={()=>void start()}><Icon name="camera" size={18}/> Start tracking</button>}{(stage==='active'||stage==='starting')&&<button type="button" className="secondary" onClick={()=>finish()}>Stop tracking</button>}</div>
@@ -141,7 +151,7 @@ export default function PoseTrackerSession({exercise,onExit,adminTest=false,onVe
 
     {error&&<p role="alert">{error}</p>}
     {state.angles!==undefined&&<details><summary>Provider joint angles</summary><pre style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(state.angles,null,2)}</pre></details>}
-    <p className="pose-setup-help">{native?'Allow camera access when asked. If it doesn’t open, check your phone’s camera permissions.':'Allow camera access when asked. This tracking option requires an internet connection.'}</p>
+    {allowed && <p className="pose-setup-help">{native?'Allow camera access when asked. If it doesn’t open, check your phone’s camera permissions.':'Allow camera access when asked. This tracking option requires an internet connection.'}</p>}
     </div>
   </section>;
 }

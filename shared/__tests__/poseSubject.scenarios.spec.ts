@@ -1,0 +1,27 @@
+import { describe, expect, it } from 'vitest';
+import { createPoseSubjectSelector } from '../poseSubject';
+
+const person = (x: number) => Array.from({ length: 33 }, () => ({ x, y: .5, visibility: 1 }));
+
+describe('subject selection scenario limits', () => {
+  it('retains a stationary central subject while a bystander approaches without overlapping', () => {
+    const selector = createPoseSubjectSelector();
+    selector.select([person(.5)]);
+    for (const x of [.05, .15, .25, .35]) {
+      const subject = person(.5);
+      expect(selector.select([person(x), subject]).landmarks).toBe(subject);
+    }
+  });
+  it('selects a lone visible subject near the frame edge', () => {
+    const selector = createPoseSubjectSelector();
+    const subject = person(.08);
+    expect(selector.select([subject]).landmarks).toBe(subject);
+  });
+  it('does not establish identity when two candidates have identical torso centers', () => {
+    const selector = createPoseSubjectSelector();
+    selector.select([person(.5)]);
+    const first = person(.5), second = person(.5);
+    expect(selector.select([first, second]).landmarks).toBe(first);
+    expect(selector.select([second, first]).landmarks).toBe(second);
+  });
+});

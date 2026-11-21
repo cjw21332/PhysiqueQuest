@@ -44,6 +44,8 @@ export type PatternId =
   | 'curl'
   | 'triceps_extension'
   | 'horizontal_pull'
+  | 'chest_fly'
+  | 'hip_abduction'
   | 'vertical_pull'
   | 'lateral_raise'
   | 'front_raise'
@@ -117,7 +119,7 @@ export function resolvePatternSpec(id: PatternId, override?: ExerciseConfigOverr
   const minRepMs = finite(override.minRepMs, base.minRepMs, 200, Math.max(200, maxRepMs - 100));
   const spec: PatternSpec = {
     ...base,
-    mode: base.mode === 'hold' ? 'hold' : override.mode === 'per_side' ? 'per_side' : 'bilateral',
+    mode: base.mode === 'hold' ? 'hold' : override.mode === 'per_side' || override.mode === 'bilateral' ? override.mode : base.mode,
     camera: override.view === 'front' || override.view === 'side' ? override.view : base.camera,
     visibility: finite(override.visibility, base.visibility, 0.2, 0.9),
     minRom: finite(override.minRom, base.minRom, 5, 120),
@@ -161,6 +163,8 @@ export type EngineSnapshot = {
   /** True only on the update that counted a repetition/hold. */
   counted: boolean;
   feedback?: 'depth' | 'tempo';
+  /** A completed candidate rejected on this frame; never a counted rep. */
+  rejection?: 'timing_failed';
 };
 
 /**
@@ -181,6 +185,7 @@ export type ExerciseConfigOverride = {
 };
 
 export type CounterOptions = {
+  exerciseName?: string;
   /** Camera view actually in use; form rules that need another view are skipped. */
   view?: CameraView;
   /** Override the visibility threshold (e.g. uploaded video with small subjects). */
@@ -237,6 +242,7 @@ export function jointAngle(frame: Pick<PoseFrame, 'landmarks' | 'aspect'>, indic
 
 function sideScore(frame: PoseFrame, spec: PatternSpec, side: 'left' | 'right', floor: number) {
   const indices = spec.joints[side];
+  if (!indices.every(index => visibilityOf(frame.landmarks[index], floor))) return -1;
   const score = indices.reduce((total, index) => total + (frame.landmarks[index]?.visibility ?? 0), 0);
   return visibilityOf(frame.landmarks[indices[1]], floor) ? score / indices.length : -1;
 }
@@ -351,16 +357,24 @@ class PatternCounter {
   private lastTimestamp = -Infinity;
   private faults: FormFault[] = [];
   private feedback: 'depth' | 'tempo' | undefined;
+  private rejection: 'timing_failed' | undefined;
+  private faultSince = new Map<FormRuleId, number>();
 
   constructor(spec: PatternSpec, options: CounterOptions = {}) {
     const resolved = resolvePatternSpec(spec.id, options.override);
-    this.spec = resolved;
+    const name = options.exerciseName?.toLowerCase() ?? '';
+    // A bench/machine press does not have a push-up's shoulder-to-ankle line.
+    // Likewise a supported or bent-over row can have an intentionally inclined torso.
+    this.spec = name ? { ...resolved, form: resolved.form.filter(rule =>
+      !(rule === 'body_line' && resolved.id === 'horizontal_push' && !/push[ -]?up/.test(name)) &&
+      !(rule === 'torso_swing' && /seated|preacher|supported|t[ -]?bar|bent.over|incline|lying/.test(name))) } : resolved;
     this.view = options.view ?? resolved.camera;
     this.visibility = options.visibility ?? resolved.visibility;
     this.smoothing = clamp(options.smoothing ?? 0.4, 0.05, 1);
   }
 
   reset() {
+    this.faultSince.clear();
     this.bilateralSide = null;
     this.sides.left = freshSide();
     this.sides.right = freshSide();
@@ -378,6 +392,7 @@ class PatternCounter {
   }
 
   suspend() {
+    this.faultSince.clear();
     this.bilateralSide = null;
     this.sides.left = freshSide();
     this.sides.right = freshSide();
@@ -408,12 +423,22 @@ class PatternCounter {
 
   update(frame: PoseFrame): EngineSnapshot {
     this.feedback = undefined;
-    const faults = screenForm(this.spec, frame, this.view, this.visibility);
-    this.faults = faults;
+    this.rejection = undefined;
     const ts = frame.timestamp;
     if (!Number.isFinite(ts) || ts <= this.lastTimestamp) {
-      return { ...this.primarySnapshot(frame), faults };
+      return this.primarySnapshot(frame);
     }
+    // Require sustained, high-confidence evidence. Occlusion is not bad form.
+    const measurable = jointAngle(frame, this.spec.joints.left, this.visibility) !== null || jointAngle(frame, this.spec.joints.right, this.visibility) !== null;
+    const candidates = measurable ? screenForm(this.spec, frame, this.view, Math.max(.8, this.visibility)) : [];
+    const present = new Set(candidates.map(fault => fault.rule));
+    for (const rule of this.faultSince.keys()) if (!present.has(rule)) this.faultSince.delete(rule);
+    const faults = candidates.filter(fault => {
+      const since = this.faultSince.get(fault.rule);
+      if (since === undefined || ts - this.lastTimestamp > 500) { this.faultSince.set(fault.rule, ts); return false; }
+      return ts - since >= 600;
+    });
+    this.faults = faults;
     if (this.spec.mode === 'hold') return { ...this.updateHold(frame, ts), faults };
 
     const countedBefore = this.reps;
@@ -433,7 +458,13 @@ class PatternCounter {
         ? this.bilateralSide! : leftScore >= rightScore ? 'left' : 'right';
       this.bilateralSide = chosen;
       const other: 'left' | 'right' = chosen === 'left' ? 'right' : 'left';
-      const angle = chosen === 'left' ? leftAngle : rightAngle;
+      // Keep the cycle on its original side. A visible contralateral limb may
+      // supply a bilateral measurement only when it agrees with the last one;
+      // this avoids both dropped occluded reps and jumps between different arms.
+      let angle = chosen === 'left' ? leftAngle : rightAngle;
+      const alternate = chosen === 'left' ? rightAngle : leftAngle;
+      const previous = this.sides[chosen].lastAngle;
+      if (angle === null && alternate !== null && previous !== null && Math.abs(alternate - previous) <= 25) angle = alternate;
       this.stepSide(chosen, angle, ts);
       // Keep the untracked side from firing a duplicate rep when it becomes visible.
       const otherState = this.sides[other];
@@ -443,7 +474,7 @@ class PatternCounter {
     }
     this.lastTimestamp = ts;
     const snapshot = this.primarySnapshot(frame);
-    return { ...snapshot, faults, counted: this.reps > countedBefore, feedback: this.feedback };
+    return { ...snapshot, faults, counted: this.reps > countedBefore, feedback: this.feedback, rejection: this.rejection };
   }
 
   private primarySnapshot(frame: PoseFrame): EngineSnapshot {
@@ -468,6 +499,7 @@ class PatternCounter {
       Object.assign(state, freshSide());
     }
     if (angle === null) {
+      state.phase = 'lost';
       state.lastTimestamp = ts;
       return;
     }
@@ -481,6 +513,13 @@ class PatternCounter {
     state.minAngle = Math.min(state.minAngle, angle);
     state.maxAngle = Math.max(state.maxAngle, angle);
     const progress = progressOf(this.spec, angle);
+
+    // A fast repetition may expose the peak for only one inference sample.
+    // Confirm it on the following return sample, with duration and ROM still
+    // enforced below, instead of requiring two samples inside the peak zone.
+    if (state.peakSince > 0 && progress < this.spec.peakThreshold && ts - state.peakSince >= this.spec.dwellMs && ts - state.peakSince <= 250) {
+      state.peakReached = true;
+    }
 
     if (progress <= this.spec.startThreshold) {
       if (!state.armed) {
@@ -499,8 +538,13 @@ class PatternCounter {
           if (name === 'left') this.leftReps += 1; else this.rightReps += 1;
           state.phase = 'start';
           state.lastRom = Math.round(rom * 10) / 10;
+        } else if (duration < this.spec.minRepMs || duration > this.spec.maxRepMs) {
+          this.feedback = 'tempo';
+          this.rejection = 'timing_failed';
+          state.phase = 'start';
         } else if (rom >= this.spec.minRom * 0.4) {
-          this.feedback = duration < this.spec.minRepMs || duration > this.spec.maxRepMs ? 'tempo' : 'depth';
+          // PROVISIONAL minimum: not tuned or validated on recorded partials.
+          this.feedback = 'depth';
           this.partials += 1;
           state.phase = 'start';
         }
@@ -538,12 +582,10 @@ class PatternCounter {
     }
     if (state.repStartAt === 0) {
       state.repStartAt = ts;
-      state.minAngle = angle;
-      state.maxAngle = angle;
     }
     if (progress >= this.spec.peakThreshold) {
       if (state.peakSince === 0) state.peakSince = ts;
-      if (!state.peakReached && ts - state.peakSince >= this.spec.dwellMs) {
+      if (!state.peakReached && (this.spec.dwellMs === 0 || ts - state.peakSince >= this.spec.dwellMs)) {
         state.peakReached = true;
         state.phase = 'peak';
       }

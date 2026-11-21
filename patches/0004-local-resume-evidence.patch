@@ -1,0 +1,197 @@
+diff --git a/docs/pose-replay/local-resume-report.md b/docs/pose-replay/local-resume-report.md
+new file mode 100644
+--- /dev/null
++++ b/docs/pose-replay/local-resume-report.md
+@@ -0,0 +1,99 @@
++# Local replay resumption — 2026-11-21
++
++## Result and stop point
++
++The video-location blocker is resolved. All 20 uploaded clips are readable locally in `C:\Users\MY PC\Downloads\PhysiqueQuest testing`, and every byte size matches the prior upload inventory. No network fetch, package install, git-index modification or tracking-behavior change was made.
++
++The browser route still fails. The browser-free route successfully decoded and processed three REAL frames from `barbell bench press.mp4`, using ffmpeg, the app's local MediaPipe `.task` model, the CURRENT TypeScript registry/subject selector/counter and display filter.
++
++**Stop for labels/review.** No clip has reviewed full/partial rep counts in the new manifest. There is no labeled subset to score yet. A three-frame infrastructure probe is not a measured exercise-set baseline, and it cannot establish missed/double repetitions or a false-cue rate. No exercise is marked validated.
++
++## Verified local files
++
++`local-video-inventory.json` lists the full absolute path, byte size, SHA-256 and readability of every clip. All paths are under the folder above. Total size: **56,813,048 bytes**.
++
++The 20 files contain **19 unique video hashes**: `machine seated dip.mp4` and `machine seated dip 2nd try.mp4` are byte-identical. Keep both filenames in the manifest, but do not count them as independent validation evidence.
++
++| Filename | Bytes |
++| --- | ---: |
++| rear pull up (regular one).mp4 | 2,227,256 |
++| machine shoulder press.mp4 | 5,039,974 |
++| machine shoulder press 2nd try.mp4 | 7,267,701 |
++| machine seated dip.mp4 | 1,789,674 |
++| machine seated dip 2nd try.mp4 | 1,789,674 |
++| Machine Reverse T-bar Row.mp4 | 1,585,436 |
++| machine preacher curl.mp4 | 1,677,393 |
++| machine narrow grip seated row.mp4 | 2,853,086 |
++| machine narrow grip seated row 2nd try.mp4 | 572,434 |
++| machine incline chest press.mp4 | 2,639,571 |
++| machine incline chest press 2nd try.mp4 | 2,274,599 |
++| machine front pulldown.mp4 | 2,712,994 |
++| machine front pulldown 2nd try.mp4 | 1,585,930 |
++| machine chest press.mp4 | 2,997,663 |
++| machine chest press 3rd try.mp4 | 4,041,084 |
++| weighted triceps dips.mp4 | 7,514,078 |
++| machine chest press 2nd try.mp4 | 3,986,758 |
++| barbell bench press.mp4 | 923,217 |
++| barbell bench press 2nd try.mp4 | 948,415 |
++| barbell bench press 3rd try.mp4 | 2,386,111 |
++
++Searched the repository, Downloads, potential uploads/attachment locations, temporary attachment directories, `C:\Temp` and `C:\app`. Existing unrelated exercise datasets were not substituted for these recordings.
++
++## Manifest to complete
++
++`labels.local.json` contains exactly the requested fields: `file`, `exercise_guess`, `camera_facing`, `plate_occluded`, `full_reps`, `partial_reps`, `notes`. File paths are verified facts; guesses are filename text with attempt suffixes removed. Everything else is null.
++
++For each clip:
++
++- Confirm/correct `exercise_guess`, including whether narrow-grip rows are alternating. Keep seated dips, triceps pushdown and weighted dips distinct.
++- Fill `camera_facing` with front/back, or leave null if unknown.
++- Fill `plate_occluded` with true/false after review, or leave null if unknown. Add occlusion times and affected joints in notes where relevant.
++- Fill `full_reps` and `partial_reps` with reviewed integer counts. Zero means an observed zero; null means unknown. Include the counting unit (per arm, bilateral cycle, alternating pair) and set boundaries in notes.
++- Use `notes` for uncertainty and time-specific form-cue adjudication. Counts alone cannot establish whether a cue was false. To score false cues later, provide rule/time intervals where an independent reviewer says the fault is present, absent or unassessable.
++
++A labeled subset is sufficient to begin a baseline. If labels cannot be established from a recording, keep the corresponding metric unmeasured.
++
++## Replay routes tried, in order
++
++1. Headless Chromium via installed Edge, explicitly with `--no-sandbox`, `--disable-setuid-sandbox`, `--use-gl=angle`, `--use-angle=swiftshader`, `--enable-unsafe-swiftshader` and `--disable-dev-shm-usage`. Launch failed with `browserType.launch: Target page, context or browser has been closed` and `TransactNamedPipe: The pipe has been ended. (0x6D)`. The full stack, launch flags and browser log are retained in `replay-environment-log.json`.
++2. Python imports: MediaPipe **0.10.14** and OpenCV **4.11.0** succeeded. Importing the optional `imageio_ffmpeg` wrapper failed with `ModuleNotFoundError: No module named 'pkg_resources'`. No dependencies were installed. Located its already-installed `ffmpeg-win64-v4.2.2.exe` and invoked that executable directly.
++3. That ffmpeg binary decoded three actual RGB frames; MediaPipe Tasks VIDEO/CPU ran the local model; the Node bridge processed the real landmark outputs with the current app counter. The command completed successfully. Infrastructure result: **3 frames, 0 frames missing both configured working triplets**. Python CPU inference p95 over ONLY those three initial frames was **84.9444 ms**. This small startup sample is not an exercise-set or steady-state performance baseline and is not evidence that any acceptance threshold passed.
++
++Model SHA-256: `59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a`.
++
++Video SHA-256: `dcf3765b43bcc9a84f71ba57104c3ac38048add2fd6117b6b76c213f2e0c722d`.
++
++The runtime backend differs from browser WASM/native phone inference. Identical model bytes and counter source do not establish cross-backend detector parity. The bridge only injects read-only state diagnostics in memory; app source files are unchanged. Python replay does not run the physical camera, native startup gate, spoken-cue controller, React lifecycle, thermal handling or live scheduler.
++
++## Baseline status
++
++| Metric on a labeled full set | Current result |
++| --- | --- |
++| Full-rep count error per exercise | Unmeasured — no reviewed counts |
++| Partial-rep count error per exercise | Unmeasured — no reviewed counts |
++| Frames with missing working joints over each clip | Unmeasured — only a three-frame infrastructure probe ran |
++| False form cue rate, including plate-occluded footage | Unmeasured — no independent cue/time annotations |
++| Per-exercise p95 inference latency | Unmeasured — no complete labeled set replay |
++| Device temperature/thermal state, memory trend, live drops, camera restarts | Unmeasured — no device soak |
++
++Predicted counts from the three-frame probe are not a set count, ground truth, or an error measurement. No before/after behavioral comparison exists. Stop for annotated current-code baseline review before implementing fixes.
++
++## Patch series and soak additions
++
++All deliverable changes are patches under `patches/`, with inspectable payload copies under `patches/files/`. No `.git` workaround or index write was attempted. `git apply --check` is a read-only worktree check, not staging.
++
++- `0001-local-video-labels-and-inventory.patch`: requested simple manifest and exact path/size/hash inventory.
++- `0002-browser-free-replay.patch`: ffmpeg/Python/Node replay tool and usage notes; no runtime app changes.
++- `0003-soak-plan-thermal-latency-endpoints.patch`: thermal state or actual sensor temperature when available; one-minute p50/p90/p95/p99/max latency trends; pull-up/dip endpoint evidence checks.
++- `0004-local-resume-evidence.patch`: this stop report and exact environment error/smoke evidence.
++
++For a pull-up, full arm extension is at the bottom; for a dip, it is at the top. The plan requires BOTH exercise-specific endpoints in the same visible bounded cycle before an event can be judged full, rather than incorrectly requiring straight elbows at the bottom of a dip. No endpoint rule has been changed in the counter in this pass.
++
++Apply from the repository root on the intended worktree:
++
++```powershell
++git apply --check patches/0001-local-video-labels-and-inventory.patch patches/0002-browser-free-replay.patch patches/0003-soak-plan-thermal-latency-endpoints.patch patches/0004-local-resume-evidence.patch
++git apply patches/0001-local-video-labels-and-inventory.patch patches/0002-browser-free-replay.patch patches/0003-soak-plan-thermal-latency-endpoints.patch patches/0004-local-resume-evidence.patch
++```
++
++The patches add new files; they do not modify the current pose tracker. The editable `patches/labels.local.json` is the immediate labeling handoff. Applying patch 1 creates the initial null-filled template in `docs/pose-replay/labels.local.json`; it does not copy later edits from the handoff file. Point `--manifest` to whichever file you actually reviewed.
+diff --git a/docs/pose-replay/replay-environment-log.json b/docs/pose-replay/replay-environment-log.json
+new file mode 100644
+--- /dev/null
++++ b/docs/pose-replay/replay-environment-log.json
+@@ -0,0 +1,88 @@
++{
++  "browser": {
++    "route": "headless Chromium via installed Edge",
++    "executablePath": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
++    "args": [
++      "--no-sandbox",
++      "--disable-setuid-sandbox",
++      "--use-gl=angle",
++      "--use-angle=swiftshader",
++      "--enable-unsafe-swiftshader",
++      "--disable-dev-shm-usage"
++    ],
++    "status": "failed",
++    "error": "browserType.launch: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-setuid-sandbox --use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --disable-dev-shm-usage --user-data-dir=C:\\Users\\MY PC\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{d00f43bb-6dd9-4870-9ac1-e75bd8883585}\\Temp\\playwright_chromiumdev_profile-WFneYT --remote-debugging-pipe --no-startup-window\n<launched> pid=16800\n[pid=16800][err] [1121/201315.490:ERROR:third_party\\crashpad\\crashpad\\util\\win\\registration_protocol_win.cc:136] TransactNamedPipe: The pipe has been ended. (0x6D)\nCall log:\n\u001b[2m  - <launching> C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --no-sandbox --disable-setuid-sandbox --use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --disable-dev-shm-usage --user-data-dir=C:\\Users\\MY PC\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{d00f43bb-6dd9-4870-9ac1-e75bd8883585}\\Temp\\playwright_chromiumdev_profile-WFneYT --remote-debugging-pipe --no-startup-window\u001b[22m\n\u001b[2m  - <launched> pid=16800\u001b[22m\n\u001b[2m  - [pid=16800][err] [1121/201315.490:ERROR:third_party\\crashpad\\crashpad\\util\\win\\registration_protocol_win.cc:136] TransactNamedPipe: The pipe has been ended. (0x6D)\u001b[22m\n\u001b[2m  - [pid=16800] <gracefully close start>\u001b[22m\n\u001b[2m  - [pid=16800] <kill>\u001b[22m\n\u001b[2m  - [pid=16800] <will force kill>\u001b[22m\n\u001b[2m  - [pid=16800] <process did exit: exitCode=0, signal=null>\u001b[22m\n\u001b[2m  - [pid=16800] starting temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=16800] finished temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=16800] <gracefully close end>\u001b[22m\n\n    at [eval]:1:407\n    at [eval]:1:826\n    at [eval]-wrapper:6:24"
++  },
++  "python_wrapper_attempt": {
++    "status": "failed",
++    "error": "ModuleNotFoundError: No module named 'pkg_resources'",
++    "resolution": "Invoked the existing bundled ffmpeg executable directly; no install/download."
++  },
++  "python_direct_attempt": {
++    "status": "infrastructure-smoke-only",
++    "summary": {
++      "status": "infrastructure-smoke-only",
++      "processedFrames": 3,
++      "missingWorkingTripletFrames": 0,
++      "inferenceP95Ms": 84.94440000049508,
++      "fullRepsDetected": 0,
++      "partialRepsDetected": 0,
++      "fullCountError": null,
++      "partialCountError": null,
++      "falseCueRate": null,
++      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
++      "formCueEvents": 0,
++      "cameraRestarts": null,
++      "thermalState": null,
++      "memoryGrowth": null,
++      "validated": false,
++      "limitations": [
++        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
++        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
++        "10 Hz resampling is intentional sampling, not measured live dropped frames."
++      ]
++    },
++    "provenance": {
++      "status": "running",
++      "smokeOnly": true,
++      "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
++      "videoBytes": 923217,
++      "videoSha256": "dcf3765b43bcc9a84f71ba57104c3ac38048add2fd6117b6b76c213f2e0c722d",
++      "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
++      "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
++      "mediapipeVersion": "0.10.14",
++      "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
++      "ffmpegCommand": [
++        "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
++        "-nostdin",
++        "-v",
++        "error",
++        "-i",
++        "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
++        "-vf",
++        "fps=10,scale=368:832",
++        "-frames:v",
++        "3",
++        "-f",
++        "rawvideo",
++        "-pix_fmt",
++        "rgb24",
++        "pipe:1"
++      ],
++      "sourceFps": 30.0,
++      "counterExerciseId": "EIeI8Vf",
++      "sourceHashes": {
++        "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
++        "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
++        "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
++        "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
++        "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
++      },
++      "limitations": [
++        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
++        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
++        "10 Hz resampling is intentional sampling, not measured live dropped frames."
++      ]
++    }
++  }
++}

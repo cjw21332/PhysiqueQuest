@@ -5,8 +5,8 @@ import { AppState, Text, View, type ViewStyle } from 'react-native';
 import type { PoseCameraViewProps, PoseFrame, PosePerformanceMetrics } from 'expo-mediapipe-pose';
 import { jointIndices, type TrackingKind, type TrackingSide } from '../shared/repCounter';
 import { readinessPolicy, validateReadinessObservation, type NativeReadinessContext, type ReadinessReason } from '../shared/cameraReadiness';
-import { TRACKING_FRAME_RATES } from '../shared/exerciseEngine';
-import { CAMERA_CONFIDENCE } from '../shared/poseConfig';
+import { CAMERA_CONFIDENCE, TRACKING_FRAME_RATES } from '../shared/poseConfig';
+import { createPoseSubjectSelector } from '../shared/poseSubject';
 
 export type NativeTrackingOptions = { mode?: 'tracking'; requestId: string; kind: TrackingKind; side: TrackingSide; active: boolean; fullLandmarks?: boolean; targetFps?: number };
 export type NativeReadinessOptions = NativeReadinessContext;
@@ -23,6 +23,8 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
   emit: (detail:Record<string,unknown>)=>void, deactivate:()=>void, throttle:(fps:number)=>void, current:()=>boolean=()=>true,
   now:()=>number=()=>performance.now()) {
   let disposed=false, lastFrame=-1, lastAt=-Infinity, geometry='', configured=false;
+  let inferenceErrors = 0;
+  const subject = createPoseSubjectSelector();
   const readiness=options.mode==='readiness';
   const requestedFps = options.mode === 'readiness' ? TRACKING_FRAME_RATES.normal : (options.targetFps ?? TRACKING_FRAME_RATES.normal);
   const fast = !readiness && requestedFps > TRACKING_FRAME_RATES.normal;
@@ -32,24 +34,31 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
     if(!valid())return;
     emit(readiness ? {...detail,sessionId:options.sessionId,geometryGeneration:options.geometryGeneration} : {...detail,requestId:options.requestId,side:options.side});
   };
-  const fail=(reason:ReadinessReason='model-error',thermal=false)=>{
+  const fail=(reason:ReadinessReason='model-error',thermal=false,timeout=false)=>{
     if(!valid())return;
-    send({type:'error',reason,message:thermal?'Camera paused because the phone is too warm. Let it cool down or continue manually.':reason==='interrupted'?'Camera interrupted. Restart the camera or continue manually.':'Camera tracking unavailable. Restart the camera or continue manually.'});
+    send({type:'error',reason,...(timeout?{code:'timeout'}:{}),message:timeout?'Camera acquisition timed out. Restart the camera or continue manually.':thermal?'Camera paused because the phone is too warm. Let it cool down or continue manually.':reason==='interrupted'?'Camera interrupted. Restart the camera or continue manually.':'Camera tracking unavailable. Restart the camera or continue manually.'});
     disposed=true;deactivate();
   };
   return {
+    inferenceError() { if (readiness || ++inferenceErrors >= 3) fail(); },
     dispose(){disposed=true;}, fail,
     lifecycle(){fail('interrupted');},
     configured(){if(!valid())return false;if(configured){if(readiness)fail('interrupted');return false;}configured=true;send({type:'reset',reason:'pending'});return true;},
     frame(frame:PoseFrame) {
       if(!valid())return;
+      inferenceErrors = 0;
       const data=frame.additionalData, at=now();
       if(data.thermalState==='critical'){fail('interrupted',true);return;}
       if(data.thermalState==='serious' || data.inferenceDurationMs>TRACKING_FRAME_RATES.slowInferenceMs){const fps=readiness?TRACKING_FRAME_RATES.readinessDegraded:fast?TRACKING_FRAME_RATES.fastDegraded:TRACKING_FRAME_RATES.normalDegraded;interval=1000/fps;throttle(fps);}
       if(!Number.isFinite(at) || !Number.isFinite(data.inferenceDurationMs) || data.inferenceDurationMs<0 ||
         !['front','back'].includes(data.cameraFacing) || data.cameraFacing!==facing || !['wide','ultraWide'].includes(data.cameraLens) ||
         !Number.isFinite(data.cameraZoomFactor) || data.cameraZoomFactor<1 || data.cameraZoomFactor>100 || typeof data.cameraMirrored!=='boolean' ||
-        !Number.isSafeInteger(data.frameNumber) || data.frameNumber<0) {fail();return;}
+        !Number.isSafeInteger(data.frameNumber) || data.frameNumber<0) {
+        // A bad tracking frame is not a camera failure. Discard it without
+        // tearing down a working preview; readiness remains fail-closed.
+        if (readiness) fail();
+        return;
+      }
       const identity=JSON.stringify([data.width,data.height,data.cameraFacing,data.cameraLens,data.cameraMirrored,data.cameraZoomFactor]);
       if(geometry && geometry!==identity){
         if(readiness){fail('interrupted');return;}
@@ -68,7 +77,9 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
         send({type:'observation',observation});
       } else {
         // Exercise engine patterns need all 33 points; legacy preview modes keep the four joints.
-        const joints = options.fullLandmarks ? frame.landmarks : frame.landmarks.length ? jointIndices(options.kind,options.side).map(index=>frame.landmarks[index]) : [];
+        const selected = subject.select(frame.poses?.map(pose => pose.landmarks) ?? [frame.landmarks]);
+        if (selected.changed) send({type:'geometry-changed'});
+        const joints = options.fullLandmarks ? selected.landmarks : selected.landmarks.length ? jointIndices(options.kind,options.side).map(index=>selected.landmarks[index]) : [];
         send({type:'frame',frame:{joints,aspect:data.width/data.height,width:data.width,height:data.height,timestamp:at}});
       }
       lastFrame=data.frameNumber;lastAt=at;
@@ -90,7 +101,7 @@ export default function NativeTrackingCamera({ options, facing, style, emit, rea
     let active=true;
     setModelPath(null);setFailed(false);
     if(!nativePoseAvailable){callbacks.fail('unsupported');return ()=>callbacks.dispose();}
-    const timeout=setTimeout(()=>{active=false;callbacks.fail();},readinessPolicy.initializationMs);
+    const timeout=setTimeout(()=>{active=false;callbacks.fail('model-error',false,true);},readinessPolicy.initializationMs);
     startupTimer.current=timeout;
     Asset.fromModule(require('./assets/pose_landmarker_lite.task')).downloadAsync().then(asset=>{
       if(!active || liveIdentity.current!==identity)return;
@@ -106,12 +117,12 @@ export default function NativeTrackingCamera({ options, facing, style, emit, rea
   if (!PoseCamera || !modelPath || failed) return <View style={style}><Text>{failed ? 'Camera tracking unavailable. Continue manually.' : 'Loading camera tracking…'}</Text></View>;
   const props: PoseCameraViewProps = {
     cameraFacing: facing, isActive, poseModelVariant: 'lite', poseModelAssetPath: modelPath,
-    previewFps: TRACKING_FRAME_RATES.preview, frameLimit: limit, callbackFps: limit, maxPoses: 1,
+    previewFps: TRACKING_FRAME_RATES.preview, frameLimit: limit, callbackFps: limit, maxPoses: options.mode === 'readiness' ? 1 : 3,
     segmentationEnabled: false, skeleton: false,
     minPoseDetectionConfidence: CAMERA_CONFIDENCE, minPosePresenceConfidence: CAMERA_CONFIDENCE, minTrackingConfidence: CAMERA_CONFIDENCE,
     onLandmark:callbacks.frame, onPerformanceMetrics:callbacks.metrics,
     onCameraConfigured:()=>{if(callbacks.configured() && liveIdentity.current===identity){clearStartup();ready();}},
-    onInferenceError:()=>callbacks.fail(),
+    onInferenceError:()=>callbacks.inferenceError(),
   };
   return <PoseCamera {...props} style={style}/>;
 }

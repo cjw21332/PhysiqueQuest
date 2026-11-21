@@ -1,0 +1,128 @@
+--- a/mobile/camera-readiness.test.mjs
++++ b/mobile/camera-readiness.test.mjs
+@@ -135,7 +135,7 @@
+     useEffect(fn,deps){const i=cursor++;if(changed(slots[i]?.deps,deps)){slots[i]={deps};effects.push(()=>{cleanups[i]?.();cleanups[i]=fn();});}}},
+     render(component,props){cursor=0;return component(props);},mount(){effects.forEach(fn=>fn());effects=[];},unmount(){cleanups.forEach(fn=>fn?.());},get writes(){return writes;}};
+ }
+-function streamHarness(acquire) {
++function streamHarness(acquire, recover=false) {
+   const h=hookHarness(),window=new EventTarget(),document=new EventTarget(),timers=new Map();
+   let next=0,now=0;
+   document.visibilityState='visible';
+@@ -143,7 +143,7 @@
+     navigator:{mediaDevices:{getUserMedia:acquire}},requestAnimationFrame:fn=>fn(),
+     setTimeout:(fn,ms)=>{const id=++next;timers.set(id,{fn,at:now+ms});return id;},clearTimeout:id=>timers.delete(id)});
+   let context={screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'00:00'};
+-  const render=()=>h.render(module.useCameraStream,context);
++  const render=()=>h.render(props=>module.useCameraStream(props,recover),context);
+   let camera=render();
+   camera.videoRef.current={srcObject:null,play:async()=>{},addEventListener(){},removeEventListener(){}};
+   h.mount();
+@@ -196,6 +196,41 @@
+   q.setContext({screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'00:01'});q.render();q.h.mount();
+   finish(active.stream);await next;assert.equal(q.render().status,'on');assert.equal(active.stopped,0);
+   q.h.unmount();p.h.unmount();
++});
++test('recovering live camera resumes automatically after background and keeps the selected facing',async()=>{
++  const fixtures=[];const p=streamHarness(async()=>{const f=streamFixture();fixtures.push(f);return f.stream;},true);
++  await p.render().start('front');await new Promise(r=>setImmediate(r));assert.equal(p.render().status,'on');
++  p.document.visibilityState='hidden';p.document.dispatchEvent(new Event('visibilitychange'));
++  assert.equal(p.render().recoveryState.phase,'interrupted');assert.equal(fixtures[0].stopped,1);
++  p.document.visibilityState='visible';p.document.dispatchEvent(new Event('visibilitychange'));p.advance(500);await new Promise(r=>setImmediate(r));
++  assert.equal(p.render().status,'on');assert.equal(p.render().facing,'front');assert.equal(fixtures.length,2);p.h.unmount();assert.equal(p.timers.size,0);
++});
++test('recovering acquisition times out, disposes late stream and bounds waiting with an attempt counter',async()=>{
++  const pending=[];const p=streamHarness(()=>new Promise(resolve=>pending.push(resolve)),true);
++  await p.render().start('front');assert.equal(p.render().recoveryState.phase,'acquiring');
++  p.advance(recoveryModule.CAMERA_ACQUIRE_TIMEOUT_MS);assert.equal(p.render().recoveryState.phase,'recovering');
++  const late=streamFixture();pending[0](late.stream);await new Promise(r=>setImmediate(r));assert.equal(late.stopped,1);
++  for(const delay of [500,1000,2000]){p.advance(delay);p.advance(recoveryModule.CAMERA_ACQUIRE_TIMEOUT_MS);}
++  assert.equal(p.render().recoveryState.phase,'failed');assert.equal(p.render().recoveryState.reason,'timeout');assert.match(p.render().message,/timed out.*Try again/);assert.equal(p.timers.size,0);p.h.unmount();
++});
++test('facing switch during recovery cannot attach old stream and background cancels pending retry',async()=>{
++  const pending=[];const p=streamHarness(()=>new Promise(resolve=>pending.push(resolve)),true);
++  await p.render().start('front');p.advance(recoveryModule.CAMERA_ACQUIRE_TIMEOUT_MS);
++  p.render().switchFacing();const last=streamFixture(),old=streamFixture();pending[1](last.stream);pending[0](old.stream);await new Promise(r=>setImmediate(r));
++  assert.equal(p.render().status,'on');assert.equal(p.render().facing,'back');assert.equal(old.stopped,1);
++  last.track.dispatchEvent(new Event('ended'));p.document.visibilityState='hidden';p.document.dispatchEvent(new Event('visibilitychange'));p.advance(500);
++  assert.equal(pending.length,2);assert.equal(p.render().recoveryState.phase,'interrupted');p.h.unmount();
++});
++test('native host interruption automatically reacquires but a native start that never responds times out',async()=>{
++  const p=streamHarness(async()=>{throw Error('must use native');},true),messages=[];
++  p.window.ReactNativeWebView={postMessage:s=>messages.push(JSON.parse(s))};
++  p.render().frameRef.current={getBoundingClientRect:()=>({left:0,top:0,width:300,height:400})};
++  const event=detail=>{const e=new Event('physiquequest-camera');e.detail=detail;p.window.dispatchEvent(e);};
++  await p.render().start('back');await new Promise(r=>setImmediate(r));const oldGeneration=messages.find(m=>m.type==='camera-start').generation;event({type:'status',status:'on',generation:oldGeneration});assert.equal(p.render().status,'on');
++  event({type:'interruption',active:false});event({type:'interruption',active:true});p.advance(500);await new Promise(r=>setImmediate(r));
++  assert.equal(messages.filter(m=>m.type==='camera-start').length,2);assert.equal(messages.filter(m=>m.type==='camera-start').at(-1).facing,'back');
++  event({type:'status',status:'on',generation:oldGeneration});assert.notEqual(p.render().recoveryState.phase,'ready','obsolete host readiness must not complete the replacement acquisition');
++  p.advance(recoveryModule.CAMERA_ACQUIRE_TIMEOUT_MS);assert.equal(p.render().recoveryState.phase,'recovering');p.h.unmount();assert.equal(p.timers.size,0);
+ });
+ test('native rapid front/back and exercise replacement ignore obsolete model/configuration callbacks',async()=>{
+   const h=hookHarness(),pending=[],emitted=[];let ready=0;
+@@ -241,6 +276,13 @@
+     'react/jsx-runtime':{}, './offlineAccount':{},
+   });
+   assert.equal(host.isNativeCameraContext({screen:'camera-check',readiness:context}),true);
++  for(const raw of ['{broken','null','[]',JSON.stringify({type:3}),JSON.stringify({type:'camera-start',frame:{x:0,y:0,width:0,height:10},facing:'front',previewContext:{screen:'camera-check',readiness:context}}),JSON.stringify({type:'camera-update-overlay',previewContext:{screen:'invalid'}})]) {
++    assert.equal(host.parseCameraHostMessage(raw),null,'malformed messages must be ignored before preview state changes');
++  }
++  assert.equal(host.parseCameraHostMessage(JSON.stringify({type:'camera-stop'})).type,'camera-stop');
++  const hostSource=fs.readFileSync('mobile/App.tsx','utf8');
++  assert.match(hostSource,/const parsedMessage=parseCameraHostMessage\(e.nativeEvent.data\);\s*if\(!parsedMessage\)return/);
++  assert.doesNotMatch(hostSource,/catch \(error\) \{\s*stopNativeCamera\(\);\s*console.warn\('Could not handle malformed/);
+   assert.equal(host.isNativeCameraContext({screen:'camera-check'}),false);
+   assert.equal(host.isNativeCameraContext({screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'01:00',tracking:{requestId:'rep',kind:'curl',side:'left',active:true}}),true);
+   for(const f of [{x:0,y:0,width:Infinity,height:2},{x:0,y:0,width:-1,height:2},{x:999999,y:0,width:2,height:2}])assert.equal(host.isCameraFrame(f),false);
+@@ -313,3 +355,51 @@
+     h.unmount();assert.equal(timers.size,0);
+   }
+ });
++
++function nativeParentHarness() {
++  const h=hookHarness(),timers=new Map(),listeners=[];let next=0,now=0,creations=0,suspends=0;
++  const app={currentState:'active',addEventListener:(type,fn)=>{const item={type,fn,removed:false};listeners.push(item);return {remove:()=>item.removed=true};}};
++  const make=(type,props)=>({type,props});
++  const counter={suspend:()=>suspends++,snapshot:()=>({reps:8,partials:2}),update:()=>({reps:8,partials:2,faults:[],visible:true})};
++  const noop=()=>{};
++  const module=compile('mobile/PoseTrackerNative.tsx',{
++    '../shared/poseConfig':poseConfig,react:h.react,'react-native':{AppState:app,View:'View',Text:'Text',Pressable:'Pressable',ActivityIndicator:'Spinner',StyleSheet:{create:x=>x,absoluteFill:{}},useWindowDimensions:()=>({width:400,height:800})},
++    'expo-camera':{Camera:{requestCameraPermissionsAsync:async()=>({granted:true})}},'expo-speech':{stop:async()=>{},speak:noop},'expo-haptics':{},'expo-sensors':{Accelerometer:{isAvailableAsync:async()=>false}},'expo-keep-awake':{activateKeepAwakeAsync:async()=>{},deactivateKeepAwake:noop},'react-native-safe-area-context':{useSafeAreaInsets:()=>({top:0,bottom:0})},
++    'react-native-svg':{__esModule:true,default:'Svg',Path:'Path'},'react-native-reanimated':{__esModule:true,default:{createAnimatedComponent:()=> 'AnimatedPath'},cancelAnimation:noop,useAnimatedProps:fn=>fn(),useSharedValue:v=>({value:v}),withDelay:()=>0,withTiming:()=>0},
++    './NativeTrackingCamera':{__esModule:true,default:'NativeCamera'},'./poseStartGate':{createPoseStartGate:()=>({reset:noop,update:()=>({active:true})}),frameStatus:()=> 'OK'},'../shared/cameraRecovery':recoveryModule,
++    '../shared/poseSessionSummary':{createPoseSessionClock:()=>({pause:noop,start:noop,seconds:()=>0}),POSE_ISSUES:{}},'../shared/landmarkFilter':{createLandmarkFilter:()=>({reset:noop,update:x=>x})},'./poseOverlay':{POSE_HOLD_MS:350},'./poseSegments':{createStablePoseSegments:()=>({reset:noop,update:()=>[]})},'./poseCue':{createPoseCueController:()=>({update:()=>({})})},'./poseSafety':{createPoseSafety:()=>({reset:noop})},'./inactivity/nativeAlarm':{startNativeAlarm:noop,stopNativeAlarm:noop},'./inactivity/movement.mjs':{createMovementDetector:()=>({})},'./PoseAlarmScreen':{__esModule:true,default:'Alarm'},
++    '../shared/exerciseEngine':{createExerciseCounter:()=>{creations++;return counter;},isPatternId:()=>true,patternSpec:()=>({mode:'bilateral'}),targetFps:()=>10},'react/jsx-runtime':{jsx:make,jsxs:make},
++  },{setInterval:()=>1,clearInterval:noop,setTimeout:(fn,ms)=>{const id=++next;timers.set(id,{fn,at:now+ms});return id;},clearTimeout:id=>timers.delete(id)});
++  let props={name:'Curl',pattern:'curl',exercise:'one',close:noop,onSafetyAlarm:noop,onSafetyStop:noop,deliveryStatus:'idle'};
++  const render=()=>{const tree=h.render(module.default,props);h.mount();return tree;};
++  const nodes=(tree,type)=>{if(!tree||typeof tree!=='object')return [];const found=tree.type===type?[tree]:[];for(const child of [tree.props?.children].flat(Infinity))found.push(...nodes(child,type));return found;};
++  return {h,app,timers,counter,render,nodes,get creations(){return creations;},get suspends(){return suspends;},exercise(name){props={...props,name,exercise:name};},event(type,value){if(type==='change')app.currentState=value;for(const l of listeners)if(l.type===type&&!l.removed)l.fn(value);},advance(ms){now+=ms;for(const [id,t] of [...timers])if(t.at<=now){timers.delete(id);t.fn();}}};
++}
++test('native parent background recovery preserves totals, bounds blur/focus retries and rechecks pending retry',async()=>{
++  const p=nativeParentHarness();p.render();await new Promise(r=>setImmediate(r));p.render();let tree=p.render();
++  let camera=p.nodes(tree,'NativeCamera')[0];assert.ok(camera);camera.props.ready();
++  p.event('change','background');assert.equal(p.nodes(p.render(),'NativeCamera').length,0);
++  p.event('change','active');p.advance(500);tree=p.render();camera=p.nodes(tree,'NativeCamera')[0];assert.ok(camera);camera.props.ready();
++  assert.equal(p.creations,1);assert.equal(p.counter.snapshot().reps,8);assert.ok(p.suspends>0);
++  camera.props.emit({type:'error',reason:'model-error'});p.event('change','background');p.advance(1000);assert.equal(p.nodes(p.render(),'NativeCamera').length,0);
++  p.event('change','active');p.advance(2000);tree=p.render();camera=p.nodes(tree,'NativeCamera')[0];assert.ok(camera);camera.props.ready();
++  p.event('blur');p.event('focus');p.advance(2000);tree=p.render();assert.equal(p.nodes(tree,'NativeCamera').length,0,'retry budget must be exhausted');
++  assert.ok(JSON.stringify(tree).includes('interrupted too often'));p.h.unmount();assert.equal(p.timers.size,0);
++});
++test('native parent rejects an old retry and old ready callback after the exercise changes',async()=>{
++  const p=nativeParentHarness();p.render();await new Promise(r=>setImmediate(r));p.render();let old=p.nodes(p.render(),'NativeCamera')[0];old.props.ready();old.props.emit({type:'error',reason:'model-error'});
++  const stale=[...p.timers.values()][0].fn;p.exercise('Squat');p.render();const current=p.nodes(p.render(),'NativeCamera')[0];assert.ok(current);current.props.ready();
++  const writes=p.h.writes;stale();assert.equal(p.h.writes,writes,'stale retry must not mutate the replacement exercise');old.props.ready();assert.equal(p.creations,2);assert.equal(p.timers.size,0);assert.equal(p.nodes(p.render(),'NativeCamera').length,1);p.h.unmount();
++});
++test('live tracking surfaces opt in to recovery without a hidden-page stop overriding it',()=>{
++  for(const name of ['GenericTrackingSession','LiveSession','TrackingSession','SquatFormPreview']) {
++    const source=fs.readFileSync(`frontend/sections/Coach/${name}.tsx`,'utf8');
++    assert.match(source,/useCameraStream\([\s\S]*?\},\s*true\)/,name);
++  }
++  const legacy=fs.readFileSync('frontend/sections/Coach/TrackingSession.tsx','utf8');
++  assert.doesNotMatch(legacy,/if \(!intent\) camera.stop\(\)/);
++  assert.match(legacy,/if \(paused \|\| review\) camera.stop\(\)/);
++  const generic=fs.readFileSync('frontend/sections/Coach/GenericTrackingSession.tsx','utf8');
++  assert.doesNotMatch(generic,/document.hidden\)camera.stop/);
++  assert.match(fs.readFileSync('frontend/hooks/useGenericRepTracking.ts','utf8'),/stopped=true; counter.suspend\(\)/);
++});

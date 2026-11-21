@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { foodPhotoCrop } from '../../../shared/foodCamera';
+import { Icon } from '../Home/icons';
 
 export default function FoodCamera({ onClose, onCapture, onGallery }: {
   onClose: () => void; onCapture: (file: File) => void; onGallery: () => void;
@@ -121,17 +122,14 @@ export default function FoodCamera({ onClose, onCapture, onGallery }: {
 
   return <div className="food-camera-overlay" role="dialog" aria-modal="true" aria-labelledby="food-camera-title">
     <div className="food-camera">
-      <header><button type="button" onClick={onClose} aria-label="Close camera">×</button><h2 id="food-camera-title">Food Scanner</h2><button type="button" disabled={!!preview} onClick={() => setFacing(value => value === 'environment' ? 'user' : 'environment')}>Switch</button></header>
+      <header className="food-camera-header"><button type="button" className="food-camera-icon" onClick={onClose} aria-label="Close camera"><Icon name="close" size={20}/></button><div className="food-camera-heading"><h2 id="food-camera-title">Food Scanner</h2><span>{preview ? 'Review your photo' : 'Capture your meal'}</span></div><span className="food-camera-header-spacer" aria-hidden="true" /></header>
       <div ref={viewport} className="food-camera-viewport">
         {previewUrl ? <img src={previewUrl} alt="Captured meal preview" /> : <video ref={video} playsInline muted aria-label="Live camera preview" />}
         {!preview && !error && <><div className="food-camera-scan-frame" aria-hidden="true" /><span className="food-camera-guide">Only food inside the frame is scanned.</span></>}
         {!ready && !error && !preview && <p role="status">Opening camera…</p>}
         {error && <p role="alert">{error}</p>}
       </div>
-      <div className="food-camera-actions">
-        {preview && <p>Your photo is sent to our AI service to identify the food.</p>}
-        {preview ? <><button type="button" onClick={() => setPreview(null)}>Retake</button><button type="button" className="primary" onClick={() => onCapture(new File([preview], 'meal.jpg', { type: 'image/jpeg' }))}>Confirm and analyse</button></> : <><button type="button" onClick={onGallery}>Choose photo</button><button type="button" className="food-camera-shutter" disabled={!ready} onClick={capture} aria-label="Capture photo" /><button type="button" onClick={() => setFacing(value => value === 'environment' ? 'user' : 'environment')}>Switch camera</button></>}
-      </div>
+      {preview ? <div className="food-camera-review"><div className="food-camera-review-copy"><strong>Ready to scan?</strong><p>Your photo will be sent to our AI service to identify the food.</p></div><div className="food-camera-review-actions"><button type="button" onClick={() => setPreview(null)}><Icon name="retake" size={18}/> Retake</button><button type="button" className="primary" onClick={() => onCapture(new File([preview], 'meal.jpg', { type: 'image/jpeg' }))}>Analyse meal <span aria-hidden="true">→</span></button></div></div> : <div className="food-camera-capture-panel"><p>Place your meal inside the frame</p><div className="food-camera-actions"><button type="button" className="food-camera-side-action" onClick={onGallery}><span><Icon name="image" size={22}/></span>Gallery</button><button type="button" className="food-camera-shutter" disabled={!ready} onClick={capture} aria-label="Capture photo"><span /></button><button type="button" className="food-camera-side-action" onClick={() => setFacing(value => value === 'environment' ? 'user' : 'environment')}><span><Icon name="retake" size={22}/></span>Flip</button></div></div>}
     </div>
   </div>;
 }

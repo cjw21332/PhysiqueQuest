@@ -525,6 +525,18 @@ export class GenericRepCounter {
       this.emaAngle = this.emaAngle * (1 - this.config.emaAlpha) + angle * this.config.emaAlpha;
     }
 
+    // Seed the working rest position from the first visible frame, but only
+    // when it is closer to the configured start than the peak. Rolling
+    // calibration still needs a substantial observed range before updating it.
+    if (this.config.calibration && this.calibratedRest === null && this.calibrationSamples.length === 0) {
+      const first = this.genConfig.primaryJoints[0];
+      const start = this.genConfig.startAngles[first], peak = this.genConfig.peakAngles[first];
+      if (start !== undefined && peak !== undefined && Math.abs(angle - start) < Math.abs(angle - peak) && Math.abs(angle - start) <= 45) {
+        this.calibratedRest = angle;
+        this.calibratedPeak = peak;
+      }
+    }
+
     if (this.genConfig.isIsometric) {
       const joint = this.genConfig.primaryJoints[0];
       const target = this.genConfig.peakAngles[joint] ?? this.genConfig.startAngles[joint];
@@ -787,6 +799,14 @@ export class GenericRepCounter {
   }
 
   /** Handle visibility loss */
+  suspend(): void {
+    this.resetMotion();
+    this.resetCalibration();
+    this.holdStartMs = null;
+    this.holdLastVisibleMs = null;
+    this.holdSamples = [];
+  }
+
   private handleVisibilityLost(joint: string, timestamp: number): void {
     if (this.genConfig.isIsometric) { this.holdStartMs = null; this.holdLastVisibleMs = null; this.holdSamples = []; }
     if (this.visibilityLostMs === null) {
@@ -828,7 +848,14 @@ export class GenericRepCounter {
           this.emitEvent({ type: 'state_change', from: 'MOVING', to: 'AT_PEAK' });
         } else if (progress <= startTol) {
           // Returned to start without reaching peak - partial
-          if (this.maxProgressInRep > 0.4) { // Minimum progress for partial
+          const duration = timestamp - this.currentRepStartMs;
+          const observedRom = this.observedMax - this.observedMin;
+          const firstJoint = this.genConfig.primaryJoints[0];
+          const reference = this.genConfig.referenceRanges[firstJoint] ?? Math.abs(this.genConfig.peakAngles[firstJoint] - this.genConfig.startAngles[firstJoint]);
+          if (this.config.calibration && observedRom >= this.config.minCalibratedRom && duration >= this.config.minRepDurationMs && duration <= this.config.maxRepDurationMs && this.activeFaults.size === 0) {
+            this.repCount++;
+            this.emitEvent({ type: 'rep_counted', count: this.repCount, joint, durationMs: duration, romFraction: this.maxProgressInRep, romVsReference: reference > 0 ? observedRom / reference : 0, quality: 'partial', tempoSec: duration / 1000 });
+          } else if (this.maxProgressInRep > 0.4) { // PROVISIONAL minimum, not tuned on recordings.
             this.partialCount++;
             this.emitEvent({
               type: 'rep_partial',

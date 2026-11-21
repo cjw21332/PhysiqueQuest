@@ -1,0 +1,1391 @@
+{
+  "status": "CURRENT-code screen-recording proxy; all label errors provisional and unreviewed",
+  "manifest_sha256": "3ca6147633f47d2940883693abcbf153e999d6f89962531cf8131f836d9be4bb",
+  "records": [
+    {
+      "clip_id": "c01",
+      "file": "rear pull up (regular one).mp4",
+      "exercise": "rear pull up (regular one)",
+      "split": "DEVELOPMENT",
+      "label_confidence": "medium",
+      "label_status": "PROVISIONAL / UNREVIEWED",
+      "reference_full": 4,
+      "reference_partial": 0,
+      "status": "unvalidated-replay",
+      "processedFrames": 183,
+      "missingWorkingTripletFrames": 5,
+      "inferenceP95Ms": 73.3384000013757,
+      "fullRepsDetected": 4,
+      "partialRepsDetected": 1,
+      "fullCountError": 0,
+      "partialCountError": 1,
+      "falseCueRate": null,
+      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
+      "formCueEvents": 1,
+      "cameraRestarts": null,
+      "thermalState": null,
+      "memoryGrowth": null,
+      "validated": false,
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ],
+      "any_working_arm_incomplete_frames": 9,
+      "no_selected_pose_frames": 4,
+      "latency_thirds": [
+        {
+          "n": 61,
+          "p50": 59.70580000030168,
+          "p90": 63.88409999999567,
+          "p95": 65.64450000041688,
+          "p99": 81.40410000123666,
+          "max": 81.40410000123666,
+          "usable_working_triplet_frames": 61,
+          "usable_triplet_p95": 65.64450000041688
+        },
+        {
+          "n": 61,
+          "p50": 46.99079999954847,
+          "p90": 64.13900000006834,
+          "p95": 66.24840000040422,
+          "p99": 79.61380000051577,
+          "max": 79.61380000051577,
+          "usable_working_triplet_frames": 58,
+          "usable_triplet_p95": 66.69539999893459
+        },
+        {
+          "n": 61,
+          "p50": 58.37049999900046,
+          "p90": 73.3384000013757,
+          "p95": 77.94749999993655,
+          "p99": 86.797399999341,
+          "max": 86.797399999341,
+          "usable_working_triplet_frames": 59,
+          "usable_triplet_p95": 80.24110000042128
+        }
+      ],
+      "latency_p95_last_minus_first_ms": 12.30299999951967,
+      "first_frame_inference_ms": 54.75689999911992,
+      "cue_review": {
+        "false": 1,
+        "true": 0,
+        "unassessable": 0,
+        "evidence": "Original pixels at 5.6,5.9,6.2,6.5,6.8 s show upright torso, no corresponding lateral torso collapse/swing. Replay hip is near shoulder with visibility 1.0.",
+        "false_fraction_among_adjudicated": 1.0,
+        "whole_clip_false_fraction": 1.0
+      },
+      "configuration": {
+        "config": {
+          "exerciseId": "CbFSYC1",
+          "name": "rear pull-up",
+          "normalizedName": "rear pull up",
+          "bodyParts": [
+            "back"
+          ],
+          "targetMuscles": [
+            "latissimus dorsi"
+          ],
+          "equipment": [
+            "bodyweight"
+          ],
+          "category": "repetition",
+          "trackingMode": "unavailable",
+          "trackingTier": "manual",
+          "cameraOrientation": "pending",
+          "capabilities": [
+            "repetitions",
+            "on-device"
+          ],
+          "referenceStatus": "required",
+          "validationStatus": "pending",
+          "limitations": [
+            "Pattern-level on-device tracking only: the joint angles, thresholds and camera angle are shared with related exercises and have not been validated on real recordings of this exercise.",
+            "The catalog mapping is heuristic. It is classified as partially supported or not yet validated, never fully supported.",
+            "Camera cannot assess pain, injury risk or equipment load."
+          ],
+          "configurationVersion": 1,
+          "nativePattern": "vertical_pull",
+          "nativeSupport": "NOT_YET_VALIDATED"
+        },
+        "spec": {
+          "id": "vertical_pull",
+          "label": "Vertical pull",
+          "camera": "front",
+          "joints": {
+            "left": [
+              11,
+              13,
+              15
+            ],
+            "right": [
+              12,
+              14,
+              16
+            ]
+          },
+          "startAngle": 170,
+          "peakAngle": 40,
+          "startThreshold": 0.18,
+          "peakThreshold": 0.82,
+          "minRom": 45,
+          "minRepMs": 500,
+          "maxRepMs": 9000,
+          "dwellMs": 80,
+          "visibility": 0.55,
+          "mode": "bilateral",
+          "form": [
+            "torso_swing"
+          ],
+          "cue": {
+            "start": "Keep hands and elbows in view, body still.",
+            "working": "Pull with the elbows, not the torso.",
+            "peak": "Full contraction, then lower under control.",
+            "lost": "Move so shoulder, elbow and wrist stay visible."
+          }
+        }
+      },
+      "provenance": {
+        "status": "running",
+        "smokeOnly": false,
+        "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\rear pull up (regular one).mp4",
+        "videoBytes": 2227256,
+        "videoSha256": "2ec0468b8f04b5c936cfd2596dd5f2dfb2b3e52a61fa872ddddf94b860885f43",
+        "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
+        "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
+        "mediapipeVersion": "0.10.14",
+        "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "ffmpegCommand": [
+          "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
+          "-nostdin",
+          "-v",
+          "error",
+          "-i",
+          "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\rear pull up (regular one).mp4",
+          "-vf",
+          "fps=10,scale=480:1066",
+          "-f",
+          "rawvideo",
+          "-pix_fmt",
+          "rgb24",
+          "pipe:1"
+        ],
+        "sourceFps": 30.0,
+        "counterExerciseId": "CbFSYC1",
+        "sourceHashes": {
+          "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
+          "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
+          "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
+          "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
+          "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
+        },
+        "limitations": [
+          "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+          "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+          "10 Hz resampling is intentional sampling, not measured live dropped frames."
+        ]
+      }
+    },
+    {
+      "clip_id": "c04",
+      "file": "machine seated dip.mp4",
+      "exercise": "Parallel-bar dip, feet supported (assistance mechanism unconfirmed)",
+      "split": "TEST",
+      "label_confidence": "medium",
+      "label_status": "PROVISIONAL / UNREVIEWED",
+      "reference_full": 5,
+      "reference_partial": 0,
+      "status": "unvalidated-replay",
+      "processedFrames": 214,
+      "missingWorkingTripletFrames": 12,
+      "inferenceP95Ms": 59.40370000098483,
+      "fullRepsDetected": 4,
+      "partialRepsDetected": 3,
+      "fullCountError": -1,
+      "partialCountError": 3,
+      "falseCueRate": null,
+      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
+      "formCueEvents": 0,
+      "cameraRestarts": null,
+      "thermalState": null,
+      "memoryGrowth": null,
+      "validated": false,
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ],
+      "any_working_arm_incomplete_frames": 140,
+      "no_selected_pose_frames": 10,
+      "latency_thirds": [
+        {
+          "n": 71,
+          "p50": 43.87230000065756,
+          "p90": 60.32050000067102,
+          "p95": 63.62290000106441,
+          "p99": 108.91300000002957,
+          "max": 108.91300000002957,
+          "usable_working_triplet_frames": 70,
+          "usable_triplet_p95": 63.62290000106441
+        },
+        {
+          "n": 71,
+          "p50": 44.15580000022601,
+          "p90": 52.58920000051148,
+          "p95": 56.35419999998703,
+          "p99": 104.67450000032841,
+          "max": 104.67450000032841,
+          "usable_working_triplet_frames": 71,
+          "usable_triplet_p95": 56.35419999998703
+        },
+        {
+          "n": 72,
+          "p50": 41.29999999895517,
+          "p90": 45.5035000013595,
+          "p95": 58.208799999192706,
+          "p99": 63.16810000134865,
+          "max": 63.16810000134865,
+          "usable_working_triplet_frames": 61,
+          "usable_triplet_p95": 57.795299999270355
+        }
+      ],
+      "latency_p95_last_minus_first_ms": -5.414100001871702,
+      "first_frame_inference_ms": 55.888700000650715,
+      "cue_review": {
+        "false": 0,
+        "true": 0,
+        "unassessable": 0,
+        "evidence": "No emitted form cue events in this replay.",
+        "false_fraction_among_adjudicated": null,
+        "whole_clip_false_fraction": null
+      },
+      "configuration": {
+        "config": {
+          "exerciseId": "BRImeP8",
+          "name": "Machine Seated Dip",
+          "normalizedName": "machine seated dip",
+          "bodyParts": [
+            "upper arms"
+          ],
+          "targetMuscles": [
+            "triceps"
+          ],
+          "equipment": [
+            "leverage machine"
+          ],
+          "category": "machine-occlusion",
+          "trackingMode": "unavailable",
+          "trackingTier": "manual",
+          "cameraOrientation": "pending",
+          "capabilities": [
+            "repetitions",
+            "on-device"
+          ],
+          "referenceStatus": "required",
+          "validationStatus": "pending",
+          "limitations": [
+            "Pattern-level on-device tracking only: the joint angles, thresholds and camera angle are shared with related exercises and have not been validated on real recordings of this exercise.",
+            "The catalog mapping is heuristic. It is classified as partially supported or not yet validated, never fully supported.",
+            "Camera cannot assess pain, injury risk or equipment load."
+          ],
+          "configurationVersion": 1,
+          "nativePattern": "dip",
+          "nativeSupport": "PARTIALLY_SUPPORTED",
+          "nativeOverride": {
+            "visibility": 0.45
+          }
+        },
+        "spec": {
+          "id": "dip",
+          "label": "Dip",
+          "camera": "side",
+          "joints": {
+            "left": [
+              11,
+              13,
+              15
+            ],
+            "right": [
+              12,
+              14,
+              16
+            ]
+          },
+          "startAngle": 172,
+          "peakAngle": 85,
+          "startThreshold": 0.15,
+          "peakThreshold": 0.85,
+          "minRom": 45,
+          "minRepMs": 500,
+          "maxRepMs": 9000,
+          "dwellMs": 80,
+          "visibility": 0.45,
+          "mode": "bilateral",
+          "form": [],
+          "cue": {
+            "start": "Set up side-on with shoulders, elbows and wrists visible.",
+            "working": "Lower under control.",
+            "peak": "Reach a comfortable depth, then press.",
+            "lost": "Move so shoulder, elbow and wrist stay visible."
+          }
+        }
+      },
+      "provenance": {
+        "status": "running",
+        "smokeOnly": false,
+        "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip.mp4",
+        "videoBytes": 1789674,
+        "videoSha256": "620e7908367198ff388fea0293301796a4e1a44aca073433504fc60124fcc4c0",
+        "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
+        "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
+        "mediapipeVersion": "0.10.14",
+        "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "ffmpegCommand": [
+          "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
+          "-nostdin",
+          "-v",
+          "error",
+          "-i",
+          "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip.mp4",
+          "-vf",
+          "fps=10,scale=368:832",
+          "-f",
+          "rawvideo",
+          "-pix_fmt",
+          "rgb24",
+          "pipe:1"
+        ],
+        "sourceFps": 30.0,
+        "counterExerciseId": "BRImeP8",
+        "sourceHashes": {
+          "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
+          "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
+          "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
+          "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
+          "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
+        },
+        "limitations": [
+          "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+          "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+          "10 Hz resampling is intentional sampling, not measured live dropped frames."
+        ]
+      }
+    },
+    {
+      "clip_id": "c06",
+      "file": "machine preacher curl.mp4",
+      "exercise": "machine preacher curl",
+      "split": "DEVELOPMENT",
+      "label_confidence": "medium",
+      "label_status": "PROVISIONAL / UNREVIEWED",
+      "reference_full": 1,
+      "reference_partial": 0,
+      "status": "unvalidated-replay",
+      "processedFrames": 216,
+      "missingWorkingTripletFrames": 84,
+      "inferenceP95Ms": 60.44889999975567,
+      "fullRepsDetected": 3,
+      "partialRepsDetected": 4,
+      "fullCountError": 2,
+      "partialCountError": 4,
+      "falseCueRate": null,
+      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
+      "formCueEvents": 0,
+      "cameraRestarts": null,
+      "thermalState": null,
+      "memoryGrowth": null,
+      "validated": false,
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ],
+      "any_working_arm_incomplete_frames": 90,
+      "no_selected_pose_frames": 84,
+      "latency_thirds": [
+        {
+          "n": 72,
+          "p50": 38.693300000886666,
+          "p90": 46.07629999918572,
+          "p95": 52.20059999919613,
+          "p99": 67.69859999985783,
+          "max": 67.69859999985783,
+          "usable_working_triplet_frames": 41,
+          "usable_triplet_p95": 52.210899999408866
+        },
+        {
+          "n": 72,
+          "p50": 41.908900000635185,
+          "p90": 54.44799999895622,
+          "p95": 64.32610000047134,
+          "p99": 76.92270000006829,
+          "max": 76.92270000006829,
+          "usable_working_triplet_frames": 66,
+          "usable_triplet_p95": 59.012599998823134
+        },
+        {
+          "n": 72,
+          "p50": 40.12069999953383,
+          "p90": 50.58210000061081,
+          "p95": 61.21290000010049,
+          "p99": 83.61140000124578,
+          "max": 83.61140000124578,
+          "usable_working_triplet_frames": 25,
+          "usable_triplet_p95": 70.08959999984654
+        }
+      ],
+      "latency_p95_last_minus_first_ms": 9.01230000090436,
+      "first_frame_inference_ms": 27.269099999102764,
+      "cue_review": {
+        "false": 0,
+        "true": 0,
+        "unassessable": 0,
+        "evidence": "No emitted form cue events in this replay.",
+        "false_fraction_among_adjudicated": null,
+        "whole_clip_false_fraction": null
+      },
+      "configuration": {
+        "config": {
+          "exerciseId": "b6hQYMb",
+          "name": "Machine Preacher Curl",
+          "normalizedName": "machine preacher curl",
+          "bodyParts": [
+            "upper arms"
+          ],
+          "targetMuscles": [
+            "biceps"
+          ],
+          "equipment": [
+            "leverage machine"
+          ],
+          "category": "machine-occlusion",
+          "trackingMode": "unavailable",
+          "trackingTier": "manual",
+          "cameraOrientation": "pending",
+          "capabilities": [
+            "repetitions",
+            "on-device"
+          ],
+          "referenceStatus": "required",
+          "validationStatus": "pending",
+          "limitations": [
+            "Pattern-level on-device tracking only: the joint angles, thresholds and camera angle are shared with related exercises and have not been validated on real recordings of this exercise.",
+            "The catalog mapping is heuristic. It is classified as partially supported or not yet validated, never fully supported.",
+            "Camera cannot assess pain, injury risk or equipment load."
+          ],
+          "configurationVersion": 1,
+          "nativePattern": "curl",
+          "nativeSupport": "PARTIALLY_SUPPORTED",
+          "nativeOverride": {
+            "visibility": 0.45
+          }
+        },
+        "spec": {
+          "id": "curl",
+          "label": "Elbow curl",
+          "camera": "front",
+          "joints": {
+            "left": [
+              11,
+              13,
+              15
+            ],
+            "right": [
+              12,
+              14,
+              16
+            ]
+          },
+          "startAngle": 165,
+          "peakAngle": 45,
+          "startThreshold": 0.18,
+          "peakThreshold": 0.85,
+          "minRom": 45,
+          "minRepMs": 400,
+          "maxRepMs": 8000,
+          "dwellMs": 80,
+          "visibility": 0.45,
+          "mode": "per_side",
+          "form": [
+            "torso_swing"
+          ],
+          "cue": {
+            "start": "Face the camera with shoulders, elbows and wrists visible.",
+            "working": "Curl without swinging the torso.",
+            "peak": "Squeeze, then lower under control.",
+            "lost": "Move so shoulder, elbow and wrist stay visible."
+          }
+        }
+      },
+      "provenance": {
+        "status": "running",
+        "smokeOnly": false,
+        "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine preacher curl.mp4",
+        "videoBytes": 1677393,
+        "videoSha256": "a2fd1b40c3d8ba973bddf7e0aafd1f4eda1fcd399831322f7dc9ab63c4c084e2",
+        "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
+        "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
+        "mediapipeVersion": "0.10.14",
+        "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "ffmpegCommand": [
+          "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
+          "-nostdin",
+          "-v",
+          "error",
+          "-i",
+          "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine preacher curl.mp4",
+          "-vf",
+          "fps=10,scale=368:832",
+          "-f",
+          "rawvideo",
+          "-pix_fmt",
+          "rgb24",
+          "pipe:1"
+        ],
+        "sourceFps": 30.0,
+        "counterExerciseId": "b6hQYMb",
+        "sourceHashes": {
+          "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
+          "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
+          "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
+          "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
+          "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
+        },
+        "limitations": [
+          "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+          "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+          "10 Hz resampling is intentional sampling, not measured live dropped frames."
+        ]
+      }
+    },
+    {
+      "clip_id": "c12",
+      "file": "machine front pulldown 2nd try.mp4",
+      "exercise": "machine front pulldown",
+      "split": "TEST",
+      "label_confidence": "medium",
+      "label_status": "PROVISIONAL / UNREVIEWED",
+      "reference_full": 1,
+      "reference_partial": 0,
+      "status": "unvalidated-replay",
+      "processedFrames": 131,
+      "missingWorkingTripletFrames": 94,
+      "inferenceP95Ms": 59.71510000017588,
+      "fullRepsDetected": 1,
+      "partialRepsDetected": 1,
+      "fullCountError": 0,
+      "partialCountError": 1,
+      "falseCueRate": null,
+      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
+      "formCueEvents": 2,
+      "cameraRestarts": null,
+      "thermalState": null,
+      "memoryGrowth": null,
+      "validated": false,
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ],
+      "any_working_arm_incomplete_frames": 106,
+      "no_selected_pose_frames": 93,
+      "latency_thirds": [
+        {
+          "n": 43,
+          "p50": 26.414599999043276,
+          "p90": 57.30460000086168,
+          "p95": 59.92579999838199,
+          "p99": 60.59300000015355,
+          "max": 60.59300000015355,
+          "usable_working_triplet_frames": 8,
+          "usable_triplet_p95": 60.59300000015355
+        },
+        {
+          "n": 44,
+          "p50": 41.25879999992321,
+          "p90": 55.80800000097952,
+          "p95": 60.267999999268795,
+          "p99": 83.14719999907538,
+          "max": 83.14719999907538,
+          "usable_working_triplet_frames": 29,
+          "usable_triplet_p95": 60.267999999268795
+        },
+        {
+          "n": 44,
+          "p50": 24.296999999933178,
+          "p90": 29.07699999923352,
+          "p95": 33.864000000903616,
+          "p99": 55.57500000031723,
+          "max": 55.57500000031723,
+          "usable_working_triplet_frames": 0,
+          "usable_triplet_p95": null
+        }
+      ],
+      "latency_p95_last_minus_first_ms": -26.061799997478374,
+      "first_frame_inference_ms": 27.759800001149415,
+      "cue_review": {
+        "false": 0,
+        "true": 0,
+        "unassessable": 2,
+        "evidence": "Moving oblique camera and covered hips prevent independent excessive-swing adjudication at 5.2 and 6.0 s.",
+        "false_fraction_among_adjudicated": null,
+        "whole_clip_false_fraction": null
+      },
+      "configuration": {
+        "config": {
+          "exerciseId": "7F1DVzn",
+          "name": "Machine Front Pulldown",
+          "normalizedName": "machine front pulldown",
+          "bodyParts": [
+            "back"
+          ],
+          "targetMuscles": [
+            "latissimus dorsi"
+          ],
+          "equipment": [
+            "leverage machine"
+          ],
+          "category": "machine-occlusion",
+          "trackingMode": "unavailable",
+          "trackingTier": "manual",
+          "cameraOrientation": "pending",
+          "capabilities": [
+            "repetitions",
+            "on-device"
+          ],
+          "referenceStatus": "required",
+          "validationStatus": "pending",
+          "limitations": [
+            "Pattern-level on-device tracking only: the joint angles, thresholds and camera angle are shared with related exercises and have not been validated on real recordings of this exercise.",
+            "The catalog mapping is heuristic. It is classified as partially supported or not yet validated, never fully supported.",
+            "Camera cannot assess pain, injury risk or equipment load."
+          ],
+          "configurationVersion": 1,
+          "nativePattern": "vertical_pull",
+          "nativeSupport": "PARTIALLY_SUPPORTED",
+          "nativeOverride": {
+            "visibility": 0.45
+          }
+        },
+        "spec": {
+          "id": "vertical_pull",
+          "label": "Vertical pull",
+          "camera": "front",
+          "joints": {
+            "left": [
+              11,
+              13,
+              15
+            ],
+            "right": [
+              12,
+              14,
+              16
+            ]
+          },
+          "startAngle": 170,
+          "peakAngle": 40,
+          "startThreshold": 0.18,
+          "peakThreshold": 0.82,
+          "minRom": 45,
+          "minRepMs": 500,
+          "maxRepMs": 9000,
+          "dwellMs": 80,
+          "visibility": 0.45,
+          "mode": "bilateral",
+          "form": [
+            "torso_swing"
+          ],
+          "cue": {
+            "start": "Keep hands and elbows in view, body still.",
+            "working": "Pull with the elbows, not the torso.",
+            "peak": "Full contraction, then lower under control.",
+            "lost": "Move so shoulder, elbow and wrist stay visible."
+          }
+        }
+      },
+      "provenance": {
+        "status": "running",
+        "smokeOnly": false,
+        "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown 2nd try.mp4",
+        "videoBytes": 1585930,
+        "videoSha256": "f439896d1d85035ccad3381fa654d167775d93f7799d59135e2712a252d0eed2",
+        "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
+        "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
+        "mediapipeVersion": "0.10.14",
+        "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "ffmpegCommand": [
+          "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
+          "-nostdin",
+          "-v",
+          "error",
+          "-i",
+          "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown 2nd try.mp4",
+          "-vf",
+          "fps=10,scale=480:1066",
+          "-f",
+          "rawvideo",
+          "-pix_fmt",
+          "rgb24",
+          "pipe:1"
+        ],
+        "sourceFps": 30.0,
+        "counterExerciseId": "7F1DVzn",
+        "sourceHashes": {
+          "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
+          "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
+          "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
+          "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
+          "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
+        },
+        "limitations": [
+          "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+          "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+          "10 Hz resampling is intentional sampling, not measured live dropped frames."
+        ]
+      }
+    },
+    {
+      "clip_id": "c14",
+      "file": "machine chest press 3rd try.mp4",
+      "exercise": "machine chest press",
+      "split": "TEST",
+      "label_confidence": "high",
+      "label_status": "PROVISIONAL / UNREVIEWED",
+      "reference_full": 7,
+      "reference_partial": 0,
+      "status": "unvalidated-replay",
+      "processedFrames": 243,
+      "missingWorkingTripletFrames": 15,
+      "inferenceP95Ms": 50.986900001589675,
+      "fullRepsDetected": 7,
+      "partialRepsDetected": 3,
+      "fullCountError": 0,
+      "partialCountError": 3,
+      "falseCueRate": null,
+      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
+      "formCueEvents": 0,
+      "cameraRestarts": null,
+      "thermalState": null,
+      "memoryGrowth": null,
+      "validated": false,
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ],
+      "any_working_arm_incomplete_frames": 29,
+      "no_selected_pose_frames": 15,
+      "latency_thirds": [
+        {
+          "n": 81,
+          "p50": 43.34190000008675,
+          "p90": 50.90659999950731,
+          "p95": 52.511400001094444,
+          "p99": 57.52549999851908,
+          "max": 57.52549999851908,
+          "usable_working_triplet_frames": 81,
+          "usable_triplet_p95": 52.511400001094444
+        },
+        {
+          "n": 81,
+          "p50": 41.99739999967278,
+          "p90": 48.29360000076122,
+          "p95": 55.845299999418785,
+          "p99": 67.72769999952288,
+          "max": 67.72769999952288,
+          "usable_working_triplet_frames": 81,
+          "usable_triplet_p95": 55.845299999418785
+        },
+        {
+          "n": 81,
+          "p50": 40.20200000013574,
+          "p90": 42.620199999873876,
+          "p95": 44.226600000911276,
+          "p99": 45.99239999879501,
+          "max": 45.99239999879501,
+          "usable_working_triplet_frames": 66,
+          "usable_triplet_p95": 44.301699999778066
+        }
+      ],
+      "latency_p95_last_minus_first_ms": -8.284800000183168,
+      "first_frame_inference_ms": 52.511400001094444,
+      "cue_review": {
+        "false": 0,
+        "true": 0,
+        "unassessable": 0,
+        "evidence": "No emitted form cue events in this replay.",
+        "false_fraction_among_adjudicated": null,
+        "whole_clip_false_fraction": null
+      },
+      "configuration": {
+        "config": {
+          "exerciseId": "DOoWcnA",
+          "name": "Machine Chest Press",
+          "normalizedName": "machine chest press",
+          "bodyParts": [
+            "chest"
+          ],
+          "targetMuscles": [
+            "pectorals"
+          ],
+          "equipment": [
+            "leverage machine"
+          ],
+          "category": "machine-occlusion",
+          "trackingMode": "unavailable",
+          "trackingTier": "manual",
+          "cameraOrientation": "pending",
+          "capabilities": [
+            "repetitions",
+            "on-device"
+          ],
+          "referenceStatus": "required",
+          "validationStatus": "pending",
+          "limitations": [
+            "Pattern-level on-device tracking only: the joint angles, thresholds and camera angle are shared with related exercises and have not been validated on real recordings of this exercise.",
+            "The catalog mapping is heuristic. It is classified as partially supported or not yet validated, never fully supported.",
+            "Camera cannot assess pain, injury risk or equipment load."
+          ],
+          "configurationVersion": 1,
+          "nativePattern": "horizontal_push",
+          "nativeSupport": "PARTIALLY_SUPPORTED",
+          "nativeOverride": {
+            "visibility": 0.45
+          }
+        },
+        "spec": {
+          "id": "horizontal_push",
+          "label": "Horizontal push",
+          "camera": "side",
+          "joints": {
+            "left": [
+              11,
+              13,
+              15
+            ],
+            "right": [
+              12,
+              14,
+              16
+            ]
+          },
+          "startAngle": 170,
+          "peakAngle": 85,
+          "startThreshold": 0.15,
+          "peakThreshold": 0.85,
+          "minRom": 45,
+          "minRepMs": 400,
+          "maxRepMs": 8000,
+          "dwellMs": 60,
+          "visibility": 0.45,
+          "mode": "bilateral",
+          "form": [
+            "body_line"
+          ],
+          "cue": {
+            "start": "Set up side-on with shoulder, elbow and wrist visible.",
+            "working": "Lower with the body in one line.",
+            "peak": "Chest near the bottom, then press.",
+            "lost": "Move so shoulder, elbow and wrist stay visible."
+          }
+        }
+      },
+      "provenance": {
+        "status": "running",
+        "smokeOnly": false,
+        "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 3rd try.mp4",
+        "videoBytes": 4041084,
+        "videoSha256": "482def00e999a999bcb7e2152dd987001c65a694c85f8ce7f357f3d607672bdc",
+        "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
+        "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
+        "mediapipeVersion": "0.10.14",
+        "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "ffmpegCommand": [
+          "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
+          "-nostdin",
+          "-v",
+          "error",
+          "-i",
+          "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 3rd try.mp4",
+          "-vf",
+          "fps=10,scale=480:1066",
+          "-f",
+          "rawvideo",
+          "-pix_fmt",
+          "rgb24",
+          "pipe:1"
+        ],
+        "sourceFps": 30.0,
+        "counterExerciseId": "DOoWcnA",
+        "sourceHashes": {
+          "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
+          "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
+          "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
+          "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
+          "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
+        },
+        "limitations": [
+          "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+          "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+          "10 Hz resampling is intentional sampling, not measured live dropped frames."
+        ]
+      }
+    },
+    {
+      "clip_id": "c15",
+      "file": "weighted triceps dips.mp4",
+      "exercise": "Parallel-bar dips (added load not visually confirmed)",
+      "split": "DEVELOPMENT",
+      "label_confidence": "medium",
+      "label_status": "PROVISIONAL / UNREVIEWED",
+      "reference_full": 5,
+      "reference_partial": 1,
+      "status": "unvalidated-replay",
+      "processedFrames": 777,
+      "missingWorkingTripletFrames": 296,
+      "inferenceP95Ms": 63.52130000050238,
+      "fullRepsDetected": 5,
+      "partialRepsDetected": 4,
+      "fullCountError": 0,
+      "partialCountError": 3,
+      "falseCueRate": null,
+      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
+      "formCueEvents": 0,
+      "cameraRestarts": null,
+      "thermalState": null,
+      "memoryGrowth": null,
+      "validated": false,
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ],
+      "any_working_arm_incomplete_frames": 702,
+      "no_selected_pose_frames": 265,
+      "latency_thirds": [
+        {
+          "n": 259,
+          "p50": 42.32899999988149,
+          "p90": 57.91300000055344,
+          "p95": 66.13540000034845,
+          "p99": 89.66359999976703,
+          "max": 102.20029999982216,
+          "usable_working_triplet_frames": 154,
+          "usable_triplet_p95": 66.47229999907722
+        },
+        {
+          "n": 259,
+          "p50": 38.88430000006338,
+          "p90": 53.12980000053358,
+          "p95": 56.03350000092178,
+          "p99": 61.18549999882816,
+          "max": 67.03389999893261,
+          "usable_working_triplet_frames": 165,
+          "usable_triplet_p95": 56.396599999061436
+        },
+        {
+          "n": 259,
+          "p50": 40.4683999986446,
+          "p90": 59.767100001408835,
+          "p95": 73.68769999993674,
+          "p99": 110.81979999835312,
+          "max": 153.35870000126306,
+          "usable_working_triplet_frames": 162,
+          "usable_triplet_p95": 75.7145000006858
+        }
+      ],
+      "latency_p95_last_minus_first_ms": 7.552299999588286,
+      "first_frame_inference_ms": 24.241400000391877,
+      "cue_review": {
+        "false": 0,
+        "true": 0,
+        "unassessable": 0,
+        "evidence": "No emitted form cue events in this replay.",
+        "false_fraction_among_adjudicated": null,
+        "whole_clip_false_fraction": null
+      },
+      "configuration": {
+        "config": {
+          "exerciseId": "bZq4bwK",
+          "name": "Weighted Triceps Dips",
+          "normalizedName": "weighted triceps dips",
+          "bodyParts": [
+            "upper arms"
+          ],
+          "targetMuscles": [
+            "triceps"
+          ],
+          "equipment": [
+            "weighted"
+          ],
+          "category": "repetition",
+          "trackingMode": "unavailable",
+          "trackingTier": "manual",
+          "cameraOrientation": "pending",
+          "capabilities": [
+            "repetitions",
+            "on-device"
+          ],
+          "referenceStatus": "required",
+          "validationStatus": "pending",
+          "limitations": [
+            "Pattern-level on-device tracking only: the joint angles, thresholds and camera angle are shared with related exercises and have not been validated on real recordings of this exercise.",
+            "The catalog mapping is heuristic. It is classified as partially supported or not yet validated, never fully supported.",
+            "Camera cannot assess pain, injury risk or equipment load."
+          ],
+          "configurationVersion": 1,
+          "nativePattern": "triceps_extension",
+          "nativeSupport": "PARTIALLY_SUPPORTED"
+        },
+        "spec": {
+          "id": "triceps_extension",
+          "label": "Elbow extension",
+          "camera": "side",
+          "joints": {
+            "left": [
+              11,
+              13,
+              15
+            ],
+            "right": [
+              12,
+              14,
+              16
+            ]
+          },
+          "startAngle": 50,
+          "peakAngle": 165,
+          "startThreshold": 0.18,
+          "peakThreshold": 0.85,
+          "minRom": 45,
+          "minRepMs": 400,
+          "maxRepMs": 8000,
+          "dwellMs": 80,
+          "visibility": 0.55,
+          "mode": "per_side",
+          "form": [],
+          "cue": {
+            "start": "Set up so shoulder, elbow and wrist are visible.",
+            "working": "Extend the elbow without moving the upper arm.",
+            "peak": "Finish long, then return under control.",
+            "lost": "Move so shoulder, elbow and wrist stay visible."
+          }
+        }
+      },
+      "provenance": {
+        "status": "running",
+        "smokeOnly": false,
+        "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\weighted triceps dips.mp4",
+        "videoBytes": 7514078,
+        "videoSha256": "6c6ff84d8d4ce5e004e6407ef088fe6e3f6a7d92c2fb380dc35eff7c97ca9f6d",
+        "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
+        "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
+        "mediapipeVersion": "0.10.14",
+        "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "ffmpegCommand": [
+          "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
+          "-nostdin",
+          "-v",
+          "error",
+          "-i",
+          "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\weighted triceps dips.mp4",
+          "-vf",
+          "fps=10,scale=368:832",
+          "-f",
+          "rawvideo",
+          "-pix_fmt",
+          "rgb24",
+          "pipe:1"
+        ],
+        "sourceFps": 30.0,
+        "counterExerciseId": "bZq4bwK",
+        "sourceHashes": {
+          "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
+          "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
+          "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
+          "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
+          "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
+        },
+        "limitations": [
+          "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+          "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+          "10 Hz resampling is intentional sampling, not measured live dropped frames."
+        ]
+      }
+    },
+    {
+      "clip_id": "c17",
+      "file": "barbell bench press.mp4",
+      "exercise": "barbell bench press",
+      "split": "DEVELOPMENT",
+      "label_confidence": "medium",
+      "label_status": "PROVISIONAL / UNREVIEWED",
+      "reference_full": 5,
+      "reference_partial": 0,
+      "status": "unvalidated-replay",
+      "processedFrames": 157,
+      "missingWorkingTripletFrames": 53,
+      "inferenceP95Ms": 64.96519999927841,
+      "fullRepsDetected": 5,
+      "partialRepsDetected": 3,
+      "fullCountError": 0,
+      "partialCountError": 3,
+      "falseCueRate": null,
+      "falseCueRateReason": "Requires independent rule/time correctness annotations; totals are insufficient",
+      "formCueEvents": 0,
+      "cameraRestarts": null,
+      "thermalState": null,
+      "memoryGrowth": null,
+      "validated": false,
+      "limitations": [
+        "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+        "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+        "10 Hz resampling is intentional sampling, not measured live dropped frames."
+      ],
+      "any_working_arm_incomplete_frames": 103,
+      "no_selected_pose_frames": 53,
+      "latency_thirds": [
+        {
+          "n": 52,
+          "p50": 44.42609999932756,
+          "p90": 64.51820000074804,
+          "p95": 68.27759999941918,
+          "p99": 78.32469999993918,
+          "max": 78.32469999993918,
+          "usable_working_triplet_frames": 49,
+          "usable_triplet_p95": 68.27759999941918
+        },
+        {
+          "n": 52,
+          "p50": 43.07449999942037,
+          "p90": 61.07799999881536,
+          "p95": 65.90420000065933,
+          "p99": 83.69360000142478,
+          "max": 83.69360000142478,
+          "usable_working_triplet_frames": 48,
+          "usable_triplet_p95": 65.90420000065933
+        },
+        {
+          "n": 53,
+          "p50": 23.52440000140632,
+          "p90": 43.10590000022785,
+          "p95": 44.23069999938889,
+          "p99": 45.65860000002431,
+          "max": 45.65860000002431,
+          "usable_working_triplet_frames": 7,
+          "usable_triplet_p95": 45.65860000002431
+        }
+      ],
+      "latency_p95_last_minus_first_ms": -24.04690000003029,
+      "first_frame_inference_ms": 60.73180000021239,
+      "cue_review": {
+        "false": 0,
+        "true": 0,
+        "unassessable": 0,
+        "evidence": "No emitted form cue events in this replay.",
+        "false_fraction_among_adjudicated": null,
+        "whole_clip_false_fraction": null
+      },
+      "configuration": {
+        "config": {
+          "exerciseId": "EIeI8Vf",
+          "name": "barbell bench press",
+          "normalizedName": "barbell bench press",
+          "bodyParts": [
+            "chest"
+          ],
+          "targetMuscles": [
+            "pectorals"
+          ],
+          "equipment": [
+            "barbell"
+          ],
+          "category": "repetition",
+          "trackingMode": "unavailable",
+          "trackingTier": "pose_only",
+          "cameraOrientation": "pending",
+          "capabilities": [
+            "repetitions",
+            "on-device"
+          ],
+          "referenceStatus": "required",
+          "validationStatus": "pending",
+          "limitations": [
+            "Pattern-level on-device tracking only: the joint angles, thresholds and camera angle are shared with related exercises and have not been validated on real recordings of this exercise.",
+            "The catalog mapping is heuristic. It is classified as partially supported or not yet validated, never fully supported.",
+            "Camera cannot assess pain, injury risk or equipment load."
+          ],
+          "configurationVersion": 1,
+          "nativePattern": "horizontal_push",
+          "nativeSupport": "PARTIALLY_SUPPORTED",
+          "nativeOverride": {
+            "visibility": 0.45
+          }
+        },
+        "spec": {
+          "id": "horizontal_push",
+          "label": "Horizontal push",
+          "camera": "side",
+          "joints": {
+            "left": [
+              11,
+              13,
+              15
+            ],
+            "right": [
+              12,
+              14,
+              16
+            ]
+          },
+          "startAngle": 170,
+          "peakAngle": 85,
+          "startThreshold": 0.15,
+          "peakThreshold": 0.85,
+          "minRom": 45,
+          "minRepMs": 400,
+          "maxRepMs": 8000,
+          "dwellMs": 60,
+          "visibility": 0.45,
+          "mode": "bilateral",
+          "form": [
+            "body_line"
+          ],
+          "cue": {
+            "start": "Set up side-on with shoulder, elbow and wrist visible.",
+            "working": "Lower with the body in one line.",
+            "peak": "Chest near the bottom, then press.",
+            "lost": "Move so shoulder, elbow and wrist stay visible."
+          }
+        }
+      },
+      "provenance": {
+        "status": "running",
+        "smokeOnly": false,
+        "video": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
+        "videoBytes": 923217,
+        "videoSha256": "dcf3765b43bcc9a84f71ba57104c3ac38048add2fd6117b6b76c213f2e0c722d",
+        "model": "C:\\Users\\MY PC\\Desktop\\Projects\\PhysiqueQuest\\frontend\\public\\pose\\pose_landmarker_lite.task",
+        "modelSha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a",
+        "mediapipeVersion": "0.10.14",
+        "pythonVersion": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+        "ffmpegCommand": [
+          "C:\\Users\\MY PC\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win64-v4.2.2.exe",
+          "-nostdin",
+          "-v",
+          "error",
+          "-i",
+          "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
+          "-vf",
+          "fps=10,scale=368:832",
+          "-f",
+          "rawvideo",
+          "-pix_fmt",
+          "rgb24",
+          "pipe:1"
+        ],
+        "sourceFps": 30.0,
+        "counterExerciseId": "EIeI8Vf",
+        "sourceHashes": {
+          "shared/exerciseEngine.ts": "acf85ef33ed08538ccc5a202b7ddefe81e09875857239a438d34a1d3450ec3a1",
+          "shared/poseConfig.ts": "1b4af020ceb96a8b2ddbeb48643f69f5168c21c10ebabb01d55e051b5b4d42ce",
+          "shared/poseSubject.ts": "d6a660ad153a436f3ea34c59f3c9d0606f1a2d3bc47069b3da5bd78e0e66c161",
+          "shared/landmarkFilter.ts": "1f53c76c617bba455ef490c03b7a6d2755fb734be32e5fbafaf6d1d8c3f62097",
+          "backend/src/pose-tracker/catalog-tracking.generated.ts": "b56391ec582f3ccad5cb4b14ec5f53bb0cee6e002401f589d8c9ec891f8ceef3"
+        },
+        "limitations": [
+          "Python MediaPipe Tasks CPU backend differs from app browser WASM and native camera; performance is backend-specific.",
+          "No camera, native start gate, spoken cues, React rendering or live frame scheduling is exercised.",
+          "10 Hz resampling is intentional sampling, not measured live dropped frames."
+        ]
+      }
+    }
+  ],
+  "excluded_or_low": [
+    {
+      "clip_id": "c02",
+      "file": "machine shoulder press.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Setup/countdown-dominated recording; overhead endpoints are hidden by the screen counter/camera framing. No reliable full-versus-partial count assigned from 1 fps triage. Needs dense independent review of unaugmented footage; not a zero-rep negative."
+    },
+    {
+      "clip_id": "c03",
+      "file": "machine shoulder press 2nd try.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Two visual passes disagree"
+    },
+    {
+      "clip_id": "c05",
+      "file": "Machine Reverse T-bar Row.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Rotated camera plus persistent alert banner covers the working arm/torso throughout the exercise; independent full/partial endpoints unobservable."
+    },
+    {
+      "clip_id": "c07",
+      "file": "machine narrow grip seated row.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Camera disappears approximately 6.5-10 s and 19 s onward; persistent banner hides working arms during the later movement. Whole-clip independent ROM labels unavailable."
+    },
+    {
+      "clip_id": "c08",
+      "file": "machine narrow grip seated row 2nd try.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Camera disappears approximately 2.5-5.5 s and after 7.5 s; alerts hide working arm endpoints in remaining footage."
+    },
+    {
+      "clip_id": "c09",
+      "file": "machine incline chest press.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Persistent banner covers shoulders/working arms approximately 1-15 s, then camera moves away. Cannot classify complete cycles independently."
+    },
+    {
+      "clip_id": "c10",
+      "file": "machine incline chest press 2nd try.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Persistent banner hides working arms approximately 1-23 s. Full ROM endpoints cannot be established independently."
+    },
+    {
+      "clip_id": "c11",
+      "file": "machine front pulldown.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Two visual passes disagree"
+    },
+    {
+      "clip_id": "c13",
+      "file": "machine chest press.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Intermittent banner covers working shoulders/elbows and hides possible endpoints. No defensible whole-clip full/partial count from triage; requires unaugmented footage or further independent dense review."
+    },
+    {
+      "clip_id": "c16",
+      "file": "machine chest press 2nd try.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Repeated banner covers working shoulders/elbows, then camera moves and countdown restarts. No defensible whole-clip full/partial count from triage; requires unaugmented footage or further independent dense review."
+    },
+    {
+      "clip_id": "c18",
+      "file": "barbell bench press 2nd try.mp4",
+      "confidence": "low",
+      "split": "DEVELOPMENT",
+      "reason": "Bench plate and persistent banner obscure working arm/bar-to-chest endpoints approximately 1-12 s. Do not infer ROM behind opaque UI."
+    },
+    {
+      "clip_id": "c19",
+      "file": "barbell bench press 3rd try.mp4",
+      "confidence": "low",
+      "split": "TEST",
+      "reason": "Plate obscures far arm; persistent/intermittent banner covers bar and elbows for much of set. Retained as TEST, but independent whole-clip ROM count unavailable. No plate-robustness score."
+    }
+  ]
+}

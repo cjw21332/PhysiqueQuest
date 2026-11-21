@@ -1,0 +1,305 @@
+diff --git a/frontend/hooks/useGenericRepTracking.ts b/frontend/hooks/useGenericRepTracking.ts
+--- a/frontend/hooks/useGenericRepTracking.ts
++++ b/frontend/hooks/useGenericRepTracking.ts
+@@ -3,11 +3,17 @@
+ import { createLandmarkFilter } from '../../shared/landmarkFilter';
+ import { createGenericRepCounter, type GeneratedAngleConfig, type PoseFrame } from '../../shared/genericRepCounter';
+ import { trackingFrameInterval, trackingPowerNotice, type BatteryReading } from '../lib/trackingPerformance.mjs';
+-import { createExerciseCounter, type PatternId, type ExerciseConfigOverride } from '../../shared/exerciseEngine';
++import { createMovementTelemetry, type MovementTelemetry } from '../../shared/movementTelemetry';
++import { createExerciseCounter, resolvePatternSpec, type PatternId, type ExerciseConfigOverride } from '../../shared/exerciseEngine';
+ 
+ type BatteryMonitor = BatteryReading & { addEventListener(type: string, listener: () => void): void; removeEventListener(type: string, listener: () => void): void };
+ 
+-export function useGenericRepTracking(config: GeneratedAngleConfig, active: boolean, videoRef: RefObject<HTMLVideoElement | null>, pattern?: PatternId, override?: ExerciseConfigOverride, exerciseName?: string) {
++export function useGenericRepTracking(config: GeneratedAngleConfig, active: boolean, videoRef: RefObject<HTMLVideoElement | null>, pattern?: PatternId, override?: ExerciseConfigOverride, exerciseName?: string, visualOptions = { skeleton: true, guides: true }, cameraGeneration = 0) {
++  const visualRef = useRef(visualOptions); visualRef.current = visualOptions;
++  const geometryRef = useRef(cameraGeneration); geometryRef.current = cameraGeneration;
++  const movement = useMemo(() => { const spec = pattern ? resolvePatternSpec(pattern, override) : null; return createMovementTelemetry(spec?.startThreshold, spec?.peakThreshold, spec ? spec.mode === 'bilateral' : config.sideMode === 'bilateral'); }, [pattern, override, config.sideMode]);
++  const [motion, setMotion] = useState<MovementTelemetry>(() => movement.snapshot());
++  const resetMotion = () => { movement.reset(); setMotion(movement.snapshot()); };
+   const overlayRef = useRef<HTMLCanvasElement>(null);
+   const counter = useMemo(() => {
+     const generic = createGenericRepCounter(config);
+@@ -15,7 +21,7 @@
+     const engine = createExerciseCounter(pattern, { override, exerciseName });
+     const getProgress = () => {
+       const snapshot = engine.snapshot();
+-      return { ...generic.getProgress(), repCount: snapshot.reps, partialCount: snapshot.partials, currentProgress: snapshot.progress, currentAngle: snapshot.angle, cue: snapshot.faults[0]?.message ?? snapshot.cue, holdDurationMs: snapshot.holdMs };
++      return { ...generic.getProgress(), measurementVisible: snapshot.visible, repCount: snapshot.reps, partialCount: snapshot.partials, currentProgress: snapshot.progress, currentAngle: snapshot.angle, cue: snapshot.faults[0]?.message ?? snapshot.cue, holdDurationMs: snapshot.holdMs };
+     };
+     return { getProgress, update: (frame: PoseFrame) => { engine.update(frame); return getProgress(); }, tick: (timestamp: number) => { engine.update({ landmarks: [], aspect: 1, timestamp }); return getProgress(); }, suspend: () => engine.suspend() };
+   }, [config, pattern, override, exerciseName]);
+@@ -23,10 +29,12 @@
+   const [status, setStatus] = useState('Camera tracking is stopped.');
+   const [powerNotice, setPowerNotice] = useState('');
+   useEffect(() => {
++    movement.reset(); setMotion(movement.snapshot());
+     if (!active) return;
+     if (!window.Worker || !window.createImageBitmap || !window.OffscreenCanvas) { setStatus('This browser cannot run local pose tracking.'); return; }
+     let stopped = false, failed = false, ready = false, busy = false, sent = 0, lastVideoTime = -1, lastSent = 0, interval = 100, inferenceMs = 0, lastResult = 0;
+     const filter = createLandmarkFilter(true);
++    let visualGeneration = geometryRef.current, lastMotionUi = 0;
+     let battery: BatteryMonitor | null = null;
+     const updatePower = () => { if (!stopped) { interval=trackingFrameInterval(inferenceMs,battery); setPowerNotice(trackingPowerNotice(battery)); } };
+     let worker: Worker;
+@@ -48,6 +56,12 @@
+         if (event.data.subjectChanged) counter.suspend();
+         if (event.data.subjectChanged) filter.reset();
+         const pose = event.data.frame as PoseFrame;
++        if (event.data.subjectChanged || visualGeneration !== geometryRef.current) { movement.reset(); filter.reset(); visualGeneration = geometryRef.current; }
++        const next = counter.update(pose);
++        const points = filter.update(pose.landmarks, pose.timestamp);
++        const measured = 'measurementVisible' in next ? Boolean(next.measurementVisible) : next.currentAngle !== null && next.state !== 'VISIBILITY_LOST';
++        const observed = movement.update({ ...pose, landmarks: points, progress: next.currentProgress, visible: measured, reps: next.repCount, partials: next.partialCount });
++        if (performance.now() - lastMotionUi >= 200) { setMotion(observed); lastMotionUi = performance.now(); }
+         const canvas = overlayRef.current, video = videoRef.current;
+         const context = canvas?.getContext('2d');
+         if (canvas && context && video) {
+@@ -56,17 +70,29 @@
+           context.clearRect(0, 0, canvas.width, canvas.height);
+           const scale = Math.max(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+           const ox = (canvas.width - video.videoWidth * scale) / 2, oy = (canvas.height - video.videoHeight * scale) / 2;
+-          const points = filter.update(pose.landmarks, pose.timestamp);
++          // Guides observe the same selected person as the counter.
+           context.strokeStyle = '#7ef0b2'; context.lineWidth = 3; context.beginPath();
+           for (const [a, b] of [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]]) {
++            if (!visualRef.current.skeleton) break;
+             const first = points[a], second = points[b];
+             if (!first || !second || Math.min(first.visibility ?? 1, second.visibility ?? 1) < .5) continue;
+             context.moveTo(ox + first.x * video.videoWidth * scale, oy + first.y * video.videoHeight * scale);
+             context.lineTo(ox + second.x * video.videoWidth * scale, oy + second.y * video.videoHeight * scale);
+           }
+           context.stroke();
++          if (visualRef.current.guides && observed.point) {
++            const project = (p: { x: number; y: number }) => ({ x: ox + p.x * video.videoWidth * scale, y: oy + p.y * video.videoHeight * scale });
++            if (observed.reference) {
++              const reference = project(observed.reference);
++              context.setLineDash([5, 7]); context.strokeStyle = '#ffffff80'; context.lineWidth = 1;
++              context.beginPath(); context.moveTo(reference.x, 0); context.lineTo(reference.x, canvas.height); context.stroke(); context.setLineDash([]);
++            }
++            context.strokeStyle = '#ffd580'; context.lineWidth = 2; context.beginPath();
++            observed.path.forEach((point, index) => { const p = project(point); if (index) context.lineTo(p.x, p.y); else context.moveTo(p.x, p.y); }); context.stroke();
++            const point = project(observed.point); context.fillStyle = '#fff'; context.beginPath(); context.arc(point.x, point.y, 4, 0, Math.PI * 2); context.fill();
++          }
+         }
+-        setProgress(counter.update(event.data.frame as PoseFrame));
++        setProgress(next);
+         inferenceMs = event.data.durationMs;
+         interval = trackingFrameInterval(inferenceMs, battery);
+         setStatus('Experimental tracking active.');
+@@ -81,6 +107,7 @@
+       // Give slow/battery-conserving inference time to finish before declaring a stall.
+       if (lastResult && now-lastResult > Math.max(750, interval*2+500)) {
+         setProgress(counter.tick(now));
++        movement.reset(); setMotion(movement.snapshot());
+         const canvas = overlayRef.current;
+         canvas?.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
+       }
+@@ -96,6 +123,6 @@
+       } catch { fail('Could not process the camera frame.'); }
+     },50);
+     return () => { stopped=true; battery?.removeEventListener('levelchange',updatePower); battery?.removeEventListener('chargingchange',updatePower); window.clearInterval(timer); window.clearTimeout(timeout); worker.terminate(); };
+-  },[active,counter,videoRef]);
+-  return { ...progress, status, powerNotice, overlayRef };
++  },[active,counter,videoRef,movement]);
++  return { ...progress, status, powerNotice, overlayRef, motion, resetMotion };
+ }
+diff --git a/frontend/sections/Coach/GenericTrackingSession.tsx b/frontend/sections/Coach/GenericTrackingSession.tsx
+--- a/frontend/sections/Coach/GenericTrackingSession.tsx
++++ b/frontend/sections/Coach/GenericTrackingSession.tsx
+@@ -6,21 +6,29 @@
+ import './posetracker.css';
+ import { Icon } from '../Home/icons';
+ import { titleCase } from '../../lib/titleCase';
+-import type { PatternId, ExerciseConfigOverride } from '../../../shared/exerciseEngine';
++import { movementPhaseLabels } from '../../../shared/movementTelemetry';
++import { patternSpec, type PatternId, type ExerciseConfigOverride } from '../../../shared/exerciseEngine';
+ 
+ export default function GenericTrackingSession({name,config,onExit,pattern,override}:{name:string;config:GeneratedAngleConfig;onExit:()=>void;pattern?:PatternId;override?:ExerciseConfigOverride}) {
+   const [stage,setStage]=useState<'setup'|'active'|'summary'>('setup');
+   const [summary,setSummary]=useState({reps:0,partial:0});
++  const [visualOptions,setVisualOptions]=useState({skeleton:true,guides:true});
++  const phaseLabels=movementPhaseLabels(pattern);
++  const hold=pattern ? patternSpec(pattern).mode==='hold' : false;
+   const localConfig=useMemo(()=>({...config,stabilityConstraints:[]}),[config]);
+   const camera=useCameraStream({screen:'live-session',exerciseName:name,equipment:'',elapsed:''});
+-  const tracking=useGenericRepTracking(localConfig,stage==='active' && camera.status==='on' && !camera.nativePreview,camera.videoRef,pattern,override,name);
++  const tracking=useGenericRepTracking(localConfig,stage==='active' && camera.status==='on' && !camera.nativePreview,camera.videoRef,pattern,override,name,visualOptions,camera.generation);
++  const timing=tracking.motion.current ?? tracking.motion.last;
+   useEffect(()=>{const hide=()=>{if(document.hidden)camera.stop(true);};document.addEventListener('visibilitychange',hide);return()=>document.removeEventListener('visibilitychange',hide);},[camera.stop]);
+   const finish=()=>{setSummary({reps:tracking.repCount,partial:tracking.partialCount});camera.stop(true);setStage('summary');};
+   return <section className="generic-tracking" aria-label="Experimental movement tracking">
+     <header className="generic-tracking-head"><div><span className="generic-tracking-tag">Experimental tracking</span><h3>{titleCase(name)}</h3></div><button className="secondary" type="button" aria-label="Close tracking" onClick={()=>{camera.stop(true);onExit();}}><Icon name="close" size={19}/></button></header>
+     <p className="generic-tracking-note">Counts are estimates. Keep the working joints visible; a full-body view is optional. Tracking cannot assess safe form, pain, injury risk, or load.</p>
+     {stage!=='summary'?<>
+-      <div ref={camera.frameRef} className="live-video generic-tracking-camera"><video ref={camera.videoRef} className={`live-camera ${camera.facing==='front'?'front-facing':''}`} autoPlay muted playsInline /><canvas ref={tracking.overlayRef} aria-hidden="true" style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',transform:camera.facing==='front'?'scaleX(-1)':undefined}} />{camera.status!=='on'&&<div className="generic-camera-placeholder">Your camera preview will appear here.</div>}</div>
++      <div ref={camera.frameRef} className="live-video generic-tracking-camera"><video ref={camera.videoRef} className={`live-camera ${camera.facing==='front'?'front-facing':''}`} autoPlay muted playsInline /><canvas ref={tracking.overlayRef} aria-hidden="true" style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',transform:camera.facing==='front'?'scaleX(-1)':undefined}} />{camera.status==='on'&&<div className="motion-rep-hud" aria-live="polite" aria-atomic="true"><strong>{hold?(tracking.holdDurationMs/1000).toFixed(1):tracking.repCount}</strong><span>{hold?'seconds':'complete reps'}</span>{!hold&&<small>{tracking.partialCount} partial</small>}</div>}{camera.status!=='on'&&<div className="generic-camera-placeholder">Your camera preview will appear here.</div>}</div>
++      <div className="motion-guide-controls"><label><input type="checkbox" checked={visualOptions.skeleton} onChange={event=>setVisualOptions(current=>({...current,skeleton:event.target.checked}))}/>Skeleton</label><label><input type="checkbox" checked={visualOptions.guides} onChange={event=>setVisualOptions(current=>({...current,guides:event.target.checked}))}/>Body path</label><button type="button" className="secondary" onClick={tracking.resetMotion}>Reset reference</button></div>
++      {!hold&&<div className="motion-timing-row" aria-label="Sampled repetition timing">{phaseLabels.map((label,index)=><div key={label}><span>{label}</span><strong>{timing?`${([timing.moveMs,timing.holdMs,timing.returnMs][index]/1000).toFixed(1)}s`:'—'}</strong></div>)}</div>}
++      <p className="generic-tracking-note">The dashed line marks your starting screen position. Timing uses visible samples.</p>
+       <div className="generic-tracking-status" role="status"><strong>{camera.status==='on'?tracking.status:'Camera is off.'}</strong>{camera.status==='on'&&tracking.cue&&<span>{tracking.cue}</span>}</div>
+       <div className="generic-tracking-metrics"><div><strong>{tracking.repCount}</strong><span>Detected reps</span></div><div><strong>{tracking.partialCount}</strong><span>Partial movements</span></div></div>
+       <label className="generic-tracking-progress">Movement progress <progress max={1} value={tracking.currentProgress}/></label>
+diff --git a/frontend/sections/Coach/posetracker.css b/frontend/sections/Coach/posetracker.css
+--- a/frontend/sections/Coach/posetracker.css
++++ b/frontend/sections/Coach/posetracker.css
+@@ -26,3 +26,5 @@
+ .pose-setup-tip strong { font-size:14px; }
+ .pose-setup-tip p { margin:4px 0 0; color:var(--muted); font-size:13px; line-height:1.5; }
+ .pose-setup-content .pose-actions .primary { display:flex; justify-content:center; align-items:center; gap:9px; }
++
++.motion-rep-hud{position:absolute;left:16px;bottom:16px;display:grid;color:#fff;text-shadow:0 2px 12px #000;pointer-events:none}.motion-rep-hud strong{font-size:clamp(48px,12vw,78px);line-height:1;font-variant-numeric:tabular-nums}.motion-rep-hud span{font-size:13px;font-weight:700}.motion-rep-hud small{font-size:12px;margin-top:4px}.motion-guide-controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px}.motion-guide-controls label{display:flex;align-items:center;gap:6px;font-size:13px}.motion-timing-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:12px 0}.motion-timing-row div{display:grid;gap:4px}.motion-timing-row span{font-size:12px;color:var(--muted)}.motion-timing-row strong{font-size:20px;font-variant-numeric:tabular-nums}
+diff --git a/mobile/PoseTrackerNative.tsx b/mobile/PoseTrackerNative.tsx
+--- a/mobile/PoseTrackerNative.tsx
++++ b/mobile/PoseTrackerNative.tsx
+@@ -13,6 +13,7 @@
+ import { createPoseStartGate, frameStatus } from './poseStartGate';
+ import { createPoseSessionClock, POSE_ISSUES, type NativePoseSummary, type PoseIssueId } from '../shared/poseSessionSummary';
+ import { createLandmarkFilter } from '../shared/landmarkFilter';
++import { createMovementTelemetry, movementPhaseLabels, type MovementTelemetry } from '../shared/movementTelemetry';
+ import { POSE_HOLD_MS } from './poseOverlay';
+ import { createStablePoseSegments } from './poseSegments';
+ import { createPoseCueController, type PoseCue } from './poseCue';
+@@ -24,6 +25,7 @@
+   createExerciseCounter,
+   isPatternId,
+   patternSpec,
++  resolvePatternSpec,
+   targetFps,
+   type EngineSnapshot,
+   type ExerciseConfigOverride,
+@@ -71,6 +73,14 @@
+   const cameraRetryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+   const [snapshot, setSnapshot] = useState<EngineSnapshot | null>(null);
+   const [status, setStatus] = useState('Getting your camera ready…');
++  const [showSkeleton, setShowSkeleton] = useState(true);
++  const [showGuides, setShowGuides] = useState(true);
++  const [motion, setMotion] = useState<MovementTelemetry>(() => createMovementTelemetry().snapshot());
++  const motionOpacity = useSharedValue(0);
++  const trailPath = useSharedValue(''), referencePath = useSharedValue(''), markerPath = useSharedValue('');
++  const animatedTrail = useAnimatedProps(() => ({ d: trailPath.value, opacity: motionOpacity.value }));
++  const animatedReference = useAnimatedProps(() => ({ d: referencePath.value, opacity: motionOpacity.value }));
++  const animatedMarker = useAnimatedProps(() => ({ d: markerPath.value, opacity: motionOpacity.value }));
+   const skeletonPath = useSharedValue('');
+   const skeletonOpacity = useSharedValue(0);
+   const faultPath = useSharedValue('');
+@@ -101,6 +111,8 @@
+   const counting = useRef(false);
+   const systemPromptPending = useRef(false);
+   const patternId: PatternId = isPatternId(pattern) ? pattern : 'squat';
++  const movement = useMemo(() => { const spec = resolvePatternSpec(patternId, override); return createMovementTelemetry(spec.startThreshold, spec.peakThreshold, spec.mode === 'bilateral'); }, [patternId, override]);
++  const clearMovement = () => { cancelAnimation(motionOpacity); motionOpacity.value = 0; movement.reset(); setMotion(movement.snapshot()); trailPath.value = ''; referencePath.value = ''; markerPath.value = ''; };
+   const landmarkFilter = useMemo(() => createLandmarkFilter(['horizontal_push', 'jumping_jack', 'high_knees', 'mountain_climber'].includes(patternId)), [patternId]);
+   const finishSession = () => {
+     safetyEnabled.current = false;
+@@ -175,6 +187,7 @@
+   useEffect(() => {
+     counter.current = createExerciseCounter(patternId, { override, exerciseName: name });
+     setSnapshot(null);
++    clearMovement();
+     setStatus('Waiting for you to enter the frame');
+     }, [patternId, override, name]);
+ 
+@@ -193,6 +206,7 @@
+     activeCue.current = null;
+     setCue(null);
+     landmarkFilter.reset();
++    clearMovement();
+     stableSegments.current.reset();
+     cancelAnimation(skeletonOpacity);
+     skeletonOpacity.value = 0;
+@@ -249,6 +263,7 @@
+       const gate = visibilityGate.current.update(ts, false);
+       if (counting.current && !gate.active) { counter.current?.suspend(); counting.current = false; }
+       setCountdown(null);
++      clearMovement();
+       setStatus('Show the working joints clearly.');
+       return;
+     }
+@@ -276,6 +291,7 @@
+     const framing = frameStatus(patternId, frame.joints);
+     const fullBodyVisible = framing === 'OK';
+     if (!fullBodyVisible) {
++      clearMovement();
+       const gate = visibilityGate.current.update(ts, false);
+       if (counting.current && !gate.active) { counter.current.suspend(); counting.current = false; }
+       setCountdown(null);
+@@ -299,6 +315,17 @@
+     safety.current.observe(frame.joints, ts);
+     clock.current.start();
+     const next = counter.current.update({ landmarks: measurementJoints, timestamp: ts, aspect });
++    const observed = movement.update({ timestamp: ts, aspect, landmarks: frame.joints, progress: next.progress, visible: next.visible, reps: next.reps, partials: next.partials });
++    if (frame.width && frame.height && viewSize.width && viewSize.height && observed.point) {
++      cancelAnimation(motionOpacity); motionOpacity.value = 1; motionOpacity.value = withDelay(350, withTiming(0, { duration: 150 }));
++      const scale = Math.max(viewSize.width / frame.width, viewSize.height / frame.height);
++      const ox = (viewSize.width - frame.width * scale) / 2, oy = (viewSize.height - frame.height * scale) / 2;
++      const project = (p: { x: number; y: number }) => ({ x: ox + p.x * frame.width! * scale, y: oy + p.y * frame.height! * scale });
++      trailPath.value = observed.path.map((p, index) => { const point = project(p); return `${index ? 'L' : 'M'}${point.x},${point.y}`; }).join('');
++      const reference = observed.reference ? project(observed.reference) : null;
++      referencePath.value = reference ? `M${reference.x},0L${reference.x},${viewSize.height}` : '';
++      const point = project(observed.point); markerPath.value = `M${point.x},${point.y}l0.01,0`;
++    } else { trailPath.value = ''; referencePath.value = ''; markerPath.value = ''; }
+     const candidateCues: PoseCue[] = next.faults.map(fault => ({ id: fault.rule, message: fault.message, priority: 'alignment' }));
+     if (next.feedback === 'depth') candidateCues.push({ id: 'depth', message: 'Reach a comfortable full range.', priority: 'depth' });
+     if (next.feedback === 'tempo') candidateCues.push({ id: 'tempo', message: 'Move at a steady pace.', priority: 'tempo' });
+@@ -325,6 +352,7 @@
+     const now = Date.now();
+     if (now - lastUi.current < TRACKING_UI_UPDATE_MS && !next.counted) return;
+     lastUi.current = now;
++    setMotion(observed);
+     setSnapshot(next);
+     setStatus(next.visible
+       ? (next.phase === 'lost' ? 'Body partially out of frame' : next.cue)
+@@ -334,6 +362,8 @@
+   const spec = patternSpec(patternId);
+   const hold = spec.mode === 'hold';
+   const primary = hold ? (snapshot?.holdMs ?? 0) : (snapshot?.reps ?? 0);
++  const phaseLabels = movementPhaseLabels(patternId);
++  const timing = motion.current ?? motion.last;
+   const primaryValue = hold ? `${(primary / 1000).toFixed(1)}s` : String(primary);
+ 
+   return (
+@@ -361,8 +391,11 @@
+             {!!cameraError && cameraError !== 'Reconnecting camera…' && <Pressable accessibilityRole="button" style={styles.button} onPress={() => { cameraRetries.current = 0; setCameraError(''); setCameraGeneration(value => value + 1); }}><Text style={styles.buttonText}>Retry camera</Text></Pressable>}
+           </View>}
+           <Svg pointerEvents="none" width={viewSize.width} height={viewSize.height} style={StyleSheet.absoluteFill}>
+-            <AnimatedPath animatedProps={animatedSkeleton} fill="none" stroke="#22e9c0" strokeWidth={3} />
+-            <AnimatedPath animatedProps={animatedFault} fill="none" stroke="#ff3434" strokeWidth={6} />
++            {showSkeleton && <AnimatedPath animatedProps={animatedSkeleton} fill="none" stroke="#22e9c0" strokeWidth={3} />}
++            {showSkeleton && <AnimatedPath animatedProps={animatedFault} fill="none" stroke="#ff3434" strokeWidth={6} />}
++            {showGuides && <AnimatedPath animatedProps={animatedReference} fill="none" stroke="#ffffff80" strokeWidth={1} strokeDasharray="5 7"/>}
++            {showGuides && <AnimatedPath animatedProps={animatedTrail} fill="none" stroke="#ffd580" strokeWidth={2}/>}
++            {showGuides && <AnimatedPath animatedProps={animatedMarker} fill="none" stroke="#fff" strokeWidth={8} strokeLinecap="round"/>}
+           </Svg>
+ 
+           {cue && <View style={styles.cueBanner} accessibilityLiveRegion="assertive"><Text style={styles.cueText}>{cue.message}</Text></View>}
+@@ -382,6 +415,13 @@
+           {countdown !== null && <View style={styles.countdown} accessibilityLiveRegion="polite"><Text style={styles.countdownText}>{countdown}</Text></View>}
+         </View>
+ 
++      <View style={styles.guideControls}>
++        <Pressable accessibilityRole="button" accessibilityState={{selected:showSkeleton}} onPress={()=>setShowSkeleton(value=>!value)}><Text style={styles.text}>Skeleton {showSkeleton?'on':'off'}</Text></Pressable>
++        <Pressable accessibilityRole="button" accessibilityState={{selected:showGuides}} onPress={()=>setShowGuides(value=>!value)}><Text style={styles.text}>Body path {showGuides?'on':'off'}</Text></Pressable>
++        <Pressable accessibilityRole="button" onPress={clearMovement}><Text style={styles.text}>Reset reference</Text></Pressable>
++      </View>
++      {!hold&&<View style={styles.guideControls} accessibilityLabel="Sampled repetition timing">{phaseLabels.map((label,index)=><Text key={label} style={styles.text}>{label}: {timing?`${([timing.moveMs,timing.holdMs,timing.returnMs][index]/1000).toFixed(1)}s`:'—'}</Text>)}</View>}
++      <Text style={styles.text}>The dashed line marks your starting screen position.</Text>
+       <View style={styles.stats}>
+         {!cameraReady && permission && <Text style={styles.text}>Preparing camera…</Text>}
+         {snapshot?.faults.map((fault, index) => <Text key={`${fault.rule}-${index}`} style={styles.fault}>{fault.message}</Text>)}
+@@ -422,11 +462,12 @@
+   cameraPlaceholder: { position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', gap: 10 },
+   countdown: { position: 'absolute', alignSelf: 'center', top: '42%', borderRadius: 48, width: 90, height: 90, alignItems: 'center', justifyContent: 'center', backgroundColor: '#101820dd' },
+   countdownText: { color: '#fff', fontSize: 52, fontWeight: '800' },
+-  counter: { position: 'absolute', top: 10, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', backgroundColor: '#101820ed', borderWidth: 1, borderColor: '#65dcbc', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, minWidth: 200, zIndex: 3 },
++  counter: { position: 'absolute', bottom: 10, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', backgroundColor: '#101820ed', borderWidth: 1, borderColor: '#65dcbc', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, minWidth: 200, zIndex: 3 },
+   counterColumn: { flex: 1, alignItems: 'center', minWidth: 78 },
+   counterDivider: { width: 1, height: 34, backgroundColor: '#719189', marginHorizontal: 8 },
+   counterLabel: { color: '#c6e5dc', fontSize: 9, fontWeight: '700', letterSpacing: 0.4 },
+-  counterValue: { color: '#fff', fontSize: 30, lineHeight: 36, fontWeight: '800', fontVariant: ['tabular-nums'] },
++  counterValue: { color: '#fff', fontSize: 42, lineHeight: 48, fontWeight: '800', fontVariant: ['tabular-nums'] },
++  guideControls: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, paddingVertical: 8, flexWrap: 'wrap' },
+   stats: { gap: 2 },
+   actions: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+   button: { backgroundColor: '#22c55e', minHeight: 48, flexDirection: 'row', gap: 7, justifyContent: 'center', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 12 },

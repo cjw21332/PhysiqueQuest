@@ -85,8 +85,15 @@ test('dark Coach plan, library and exercise details retain filters, playback and
   await page.getByRole('button', { name: /Dumbbell bench press Chest/i }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCSS('background-color', 'rgb(11, 15, 21)');
-  await expect(page.getByText('Manual tracking', { exact: true })).toBeVisible();
-  await expectReferenceLayout(page, ['.coach-scroll', '.library-header', '.library-dialog', '.library-exercise-sheet', '.sheet-close']);
+  await expect(page.getByRole('dialog')).toHaveCSS('overflow', 'hidden');
+  await expect(page.getByRole('dialog')).toHaveCSS('border-top-width', '0px');
+  await expect(page.getByRole('dialog')).toHaveCSS('border-top-left-radius', '24px');
+  await expect(page.locator('.library-exercise-sheet')).toHaveCSS('background-color', 'rgb(11, 15, 21)');
+  await expect(page.locator('.library-detail-topbar')).toHaveCSS('position', 'sticky');
+  await expect(page.locator('.library-detail-topbar')).toHaveCSS('z-index', '10');
+  await expect(page.locator('#library-detail-page .library-sheet-header')).toHaveCSS('position', 'static');
+  await expect(page.getByRole('dialog').getByText('Manual tracking', { exact: true })).toBeVisible();
+  await expectReferenceLayout(page, ['.coach-scroll', '.library-header', '.library-dialog', '.library-exercise-sheet', '.library-detail-back']);
   await capture(page, info, '04-exercise-details');
   await page.getByRole('button', { name: 'Play exercise demonstration', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Pause exercise demonstration', exact: true })).toBeVisible();

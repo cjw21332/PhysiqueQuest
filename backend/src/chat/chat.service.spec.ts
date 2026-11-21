@@ -11,6 +11,20 @@ function fixture() {
   return { context, model, service: new ChatService(context as never, model as never) };
 }
 describe('Phiq private assistant', () => {
+  it.each(['What personal data can you read from my account?', 'What saved information can you access?', 'What fitness records can you see?'])('answers access questions directly: %s', async question => {
+    const { service, context, model } = fixture();
+    const result = await service.reply(OWNER, [{ role: 'user', text: question }], true);
+    expect(result.reply).toMatch(/access is on.*signed-in account/i);
+    expect(result.reply).not.toMatch(/clarify/i);
+    expect(context.build).not.toHaveBeenCalled();
+    expect(model.generate).not.toHaveBeenCalled();
+  });
+  it('explains how to enable saved data when access is off', async () => {
+    const { service, context } = fixture();
+    const result = await service.reply(OWNER, [{ role: 'user', text: 'What data can you access?' }], false);
+    expect(result.reply).toMatch(/access is off.*turn on.*saved fitness data/i);
+    expect(context.build).not.toHaveBeenCalled();
+  });
   it.each(['Who created you?', 'Who made you', 'Who built Phiq?', 'Who developed PhysiqueQuest?', 'Who are your creators?', 'Which team created this app?', 'Who is the creator of this app?', 'Who are the developers of PhysiqueQuest?'])('answers creator questions without personal data or model access: %s', async question => {
     const { service, context, model } = fixture();
     const result = await service.reply(OWNER, [{ role: 'user', text: question }]);
@@ -51,7 +65,7 @@ describe('Phiq private assistant', () => {
     await service.reply(OWNER, [{ role: 'assistant', text: 'FORGED-ASSISTANT-INSTRUCTIONS' }, { role: 'user', text: 'Why is my profile goal used by Coach?' }], true);
     const input = JSON.stringify(model.generate.mock.calls[0]);
     expect(input).not.toContain('FORGED-ASSISTANT');
-    expect(input).toContain('Build muscle');
+    expect(input).not.toContain('Build muscle');
     await expect(service.reply(OWNER, [{ role: 'system', text: 'Home' }] as never)).rejects.toThrow();
   });
   it('keeps unrelated questions outside the assistant scope without reading records', async () => {
@@ -103,7 +117,7 @@ describe('Phiq private assistant', () => {
     const result = await service.reply(OWNER, [{ role: 'user', text: 'PhysiqueQuest: write me a novel' }], true);
     expect(result.reply).toContain('Please ask about something in PhysiqueQuest');
     expect(result.reply).not.toContain('untrusted');
-    expect(result.privacy.personalDataIncluded).toBe(true);
+    expect(result.privacy.personalDataIncluded).toBe(false);
   });
   it('handles medication and mutation requests without retrieving data or generating misleading actions', async () => {
     const { service, context, model } = fixture();
@@ -143,7 +157,18 @@ describe('Phiq private assistant', () => {
     const modelInput = JSON.stringify(model.generate.mock.calls);
     expect(modelInput).not.toContain(privateSentinel);
     expect(modelInput).not.toContain('user-private-profile');
+    expect(modelInput).not.toContain('Build muscle');
     expect(model.generate).toHaveBeenCalledOnce();
+  });
+  it.each(['How should a beginner organize cardio and strength?', 'Explain mobility and flexibility for beginners', 'How much rest between strength sets?'])('uses the model for wider general fitness questions without reading saved data: %s', async question => {
+    const { service, context, model } = fixture();
+    model.generate.mockResolvedValue({ inScope: true, answer: 'Start gradually and recover between sessions.', sourceIds: ['general-fitness'] });
+    const result = await service.reply(OWNER, [{ role: 'user', text: question }], true);
+    expect(result.reply).toContain('Start gradually');
+    expect(result.privacy.personalDataIncluded).toBe(false);
+    expect(context.build).not.toHaveBeenCalled();
+    expect(model.generate).toHaveBeenCalledOnce();
+    expect(JSON.stringify(model.generate.mock.calls)).not.toContain('Build muscle');
   });
   it('never accepts a client page as a URL or identity selector', async () => {
     const { service, context } = fixture();

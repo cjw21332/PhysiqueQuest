@@ -1,0 +1,9 @@
+{
+  "source": "three real bench-press frames from the earlier Python probe",
+  "processedFrames": 3,
+  "visibleMarker": true,
+  "trailPoints": 3,
+  "referenceEstablished": false,
+  "completeRepTimingAvailable": false,
+  "accuracyValidated": false
+}

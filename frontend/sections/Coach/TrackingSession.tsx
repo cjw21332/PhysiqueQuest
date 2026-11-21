@@ -18,7 +18,7 @@ export default function TrackingSession({ exercise, onFinish, onPause }: { exerc
   const [error, setError] = useState('');
   const [seconds, setSeconds] = useState(0);
   const intent = !paused && visible && !review;
-  const camera = useCameraStream({ screen: 'live-session', exerciseName: exercise.name, equipment: exercise.equipment, elapsed: `${seconds}s`, tracking: { requestId, kind, side, active: intent } });
+  const camera = useCameraStream({ screen: 'live-session', exerciseName: exercise.name, equipment: exercise.equipment, elapsed: `${seconds}s`, tracking: { requestId, kind, side, active: intent } }, true);
   const tracking = useRepTracking({ kind, side, active: intent && camera.status === 'on', native: camera.nativePreview, requestId, videoRef: camera.videoRef });
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function TrackingSession({ exercise, onFinish, onPause }: { exerc
     listener(); document.addEventListener('visibilitychange', listener);
     return () => document.removeEventListener('visibilitychange', listener);
   }, []);
-  useEffect(() => { if (!intent) camera.stop(); }, [intent, camera.stop]);
+  useEffect(() => { if (paused || review) camera.stop(); }, [paused, review, camera.stop]);
   useEffect(() => {
     if (!intent) return;
     const timer = window.setInterval(() => setSeconds(value => value + 1), 1000);
@@ -59,7 +59,7 @@ export default function TrackingSession({ exercise, onFinish, onPause }: { exerc
       {tracking.rate > 0 && <small>Processing target: {tracking.rate} frames/sec</small>}
       {camera.message && <p role="alert">{camera.message}</p>}
       <div className="session-controls">
-        {camera.status !== 'on' && <button type="button" className="secondary" disabled={paused || !visible || camera.status === 'starting'} onClick={() => void camera.start()}>{camera.status === 'starting' ? 'Starting camera…' : 'Enable camera'}</button>}
+        {camera.status !== 'on' && <button type="button" className="secondary" disabled={paused || !visible || camera.status === 'starting'} onClick={() => void camera.start()}>{camera.status === 'starting' ? 'Starting camera…' : camera.recoveryState.phase === 'failed' ? 'Try again' : 'Enable camera'}</button>}
         {camera.status === 'on' && !camera.nativePreview && <button type="button" className="secondary" onClick={camera.switchFacing}>Switch camera</button>}
         <button type="button" className="secondary" disabled={busy} onClick={() => void togglePause()}>{paused ? 'Resume' : 'Pause'}</button>
         <button type="button" className="end-button" disabled={busy} onClick={async () => {

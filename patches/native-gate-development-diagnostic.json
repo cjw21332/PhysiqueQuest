@@ -1,0 +1,256 @@
+[
+  {
+    "clip": "c01",
+    "firstGateActiveMs": 4901,
+    "snapshot": {
+      "patternId": "vertical_pull",
+      "reps": 3,
+      "leftReps": 0,
+      "rightReps": 3,
+      "partials": 0,
+      "phase": "working",
+      "progress": 0.5596359535109715,
+      "angle": 97.2,
+      "rom": 107.8,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": true,
+      "cue": "Pull with the elbows, not the torso.",
+      "faults": [],
+      "counted": false
+    },
+    "events": [
+      {
+        "timestampMs": 8401,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 11801,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 16101,
+        "full": 1,
+        "partial": 0,
+        "framingOk": false
+      }
+    ]
+  },
+  {
+    "clip": "c06",
+    "firstGateActiveMs": 6101,
+    "snapshot": {
+      "patternId": "curl",
+      "reps": 3,
+      "leftReps": 1,
+      "rightReps": 2,
+      "partials": 3,
+      "phase": "waiting",
+      "progress": 0,
+      "angle": null,
+      "rom": 0,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": false,
+      "cue": "Move so shoulder, elbow and wrist stay visible.",
+      "faults": [],
+      "counted": false
+    },
+    "events": [
+      {
+        "timestampMs": 10201,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 12401,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 15101,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 15501,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 16901,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 17101,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      }
+    ]
+  },
+  {
+    "clip": "c15",
+    "firstGateActiveMs": 9301,
+    "snapshot": {
+      "patternId": "triceps_extension",
+      "reps": 5,
+      "leftReps": 0,
+      "rightReps": 5,
+      "partials": 8,
+      "phase": "waiting",
+      "progress": 0.4237397812091988,
+      "angle": 98.7,
+      "rom": 0,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": true,
+      "cue": "Extend the elbow without moving the upper arm.",
+      "faults": [],
+      "counted": false
+    },
+    "events": [
+      {
+        "timestampMs": 9901,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 10501,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 18101,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 19201,
+        "full": 0,
+        "partial": 1,
+        "framingOk": false
+      },
+      {
+        "timestampMs": 21501,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 22501,
+        "full": 0,
+        "partial": 1,
+        "framingOk": false
+      },
+      {
+        "timestampMs": 23301,
+        "full": 0,
+        "partial": 1,
+        "framingOk": false
+      },
+      {
+        "timestampMs": 23401,
+        "full": 0,
+        "partial": 1,
+        "framingOk": false
+      },
+      {
+        "timestampMs": 24301,
+        "full": 0,
+        "partial": 1,
+        "framingOk": false
+      },
+      {
+        "timestampMs": 34401,
+        "full": 1,
+        "partial": 0,
+        "framingOk": false
+      },
+      {
+        "timestampMs": 36001,
+        "full": 1,
+        "partial": 0,
+        "framingOk": false
+      },
+      {
+        "timestampMs": 39901,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 42601,
+        "full": 1,
+        "partial": 0,
+        "framingOk": false
+      }
+    ]
+  },
+  {
+    "clip": "c17",
+    "firstGateActiveMs": 4601,
+    "snapshot": {
+      "patternId": "horizontal_push",
+      "reps": 2,
+      "leftReps": 2,
+      "rightReps": 0,
+      "partials": 3,
+      "phase": "waiting",
+      "progress": 0,
+      "angle": null,
+      "rom": 0,
+      "holdMs": 0,
+      "holds": 0,
+      "visible": false,
+      "cue": "Move so shoulder, elbow and wrist stay visible.",
+      "faults": [],
+      "counted": false
+    },
+    "events": [
+      {
+        "timestampMs": 5801,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 7101,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 7301,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 8401,
+        "full": 0,
+        "partial": 1,
+        "framingOk": true
+      },
+      {
+        "timestampMs": 9901,
+        "full": 1,
+        "partial": 0,
+        "framingOk": true
+      }
+    ]
+  }
+]

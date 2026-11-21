@@ -13,7 +13,7 @@ export default function SquatFormPreview({ onExit }: { onExit: () => void }) {
   const [visible, setVisible] = useState(true);
   const [finalReps, setFinalReps] = useState(0);
   const [seconds, setSeconds] = useState(0);
-  const camera = useCameraStream({ screen: 'live-session', exerciseName: movementRules.squat.name, equipment: 'Bodyweight', elapsed: `${seconds}s`, tracking: { requestId, kind: 'squat', side, active: stage === 'active' && visible } });
+  const camera = useCameraStream({ screen: 'live-session', exerciseName: movementRules.squat.name, equipment: 'Bodyweight', elapsed: `${seconds}s`, tracking: { requestId, kind: 'squat', side, active: stage === 'active' && visible } }, true);
   const tracking = useRepTracking({ kind: 'squat', side, active: stage === 'active' && visible && camera.status === 'on', native: camera.nativePreview, requestId, videoRef: camera.videoRef });
   useEffect(() => {
     const changed = () => setVisible(!document.hidden);
@@ -39,7 +39,7 @@ export default function SquatFormPreview({ onExit }: { onExit: () => void }) {
       <div aria-live="polite" className="tracking-summary"><b>{tracking.reps} detected {tracking.reps === 1 ? 'rep' : 'reps'}</b><p>{label}</p><p>{camera.status === 'on' ? tracking.message : 'Enable the camera to begin.'}</p><small>{tracking.status}</small></div>
       {camera.message && <p role="alert">{camera.message}</p>}
       <div className="session-controls">
-        {camera.status !== 'on' && <button type="button" className="secondary" disabled={!visible || camera.status === 'starting'} onClick={() => { setStage('active'); void camera.start(); }}>{camera.status === 'starting' ? 'Starting camera…' : 'Enable camera'}</button>}
+        {camera.status !== 'on' && <button type="button" className="secondary" disabled={!visible || camera.status === 'starting'} onClick={() => { setStage('active'); void camera.start(); }}>{camera.status === 'starting' ? 'Starting camera…' : camera.recoveryState.phase === 'failed' ? 'Try again' : 'Enable camera'}</button>}
         {camera.status === 'on' && <button type="button" className="secondary" onClick={() => { camera.stop(true); setStage('setup'); }}>Stop camera</button>}
         {stage === 'active' && <button type="button" className="primary" onClick={finish}>Finish preview</button>}
       </div>

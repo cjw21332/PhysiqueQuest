@@ -52,7 +52,7 @@ type CameraFrame = { x: number; y: number; width: number; height: number };
 type NativeCameraContext =
   | { screen: 'camera-check'; readiness: NativeReadinessContext }
   | { screen: 'live-session'; exerciseName: string; equipment: string; elapsed: string; tracking?: NativeTrackingOptions };
-type NativeCameraPreview = { frame: CameraFrame; facing: 'back' | 'front'; context: NativeCameraContext; instanceId: number };
+type NativeCameraPreview = { frame: CameraFrame; facing: 'back' | 'front'; context: NativeCameraContext; instanceId: number; generation?: number };
 
 export function isNativeCameraContext(value: unknown): value is NativeCameraContext {
   if (!value || typeof value !== 'object' || !('screen' in value)) return false;
@@ -77,6 +77,22 @@ export function isCameraFrame(frame: unknown): frame is CameraFrame {
   const f=frame as CameraFrame;
   return [f.x,f.y,f.width,f.height].every(n=>Number.isFinite(n) && Math.abs(n)<=32768) && f.width>0 && f.height>0;
 }
+/** Ignore malformed bridge input without changing ownership of a live camera. */
+export function parseCameraHostMessage(raw: string): Record<string,unknown> | null {
+  if(typeof raw!=='string' || raw.length>4000500)return null;
+  try {
+    const m=JSON.parse(raw);
+    if(!m || typeof m!=='object' || Array.isArray(m) || typeof m.type!=='string')return null;
+    if(['camera-start','camera-update-frame'].includes(m.type)) {
+      if(!isCameraFrame(m.frame) || !isNativeCameraContext(m.previewContext))return null;
+      if(m.previewContext.screen==='camera-check' && (m.previewContext.readiness.previewWidth!==m.frame.width || m.previewContext.readiness.previewHeight!==m.frame.height))return null;
+    }
+    if(m.type==='camera-start' && !['front','back'].includes(m.facing))return null;
+    if(m.type==='camera-start' && m.generation!==undefined && (!Number.isSafeInteger(m.generation) || m.generation<0))return null;
+    if(m.type==='camera-update-overlay' && !isNativeCameraContext(m.previewContext))return null;
+    return m;
+  }catch{return null;}
+}
 export function nativeFramingText(check:ReadinessCheck) {
   if(!validateReadinessCheck(check))return 'Framing unavailable';
   if(check.status==='ready')return 'Framing ready';
@@ -84,7 +100,7 @@ export function nativeFramingText(check:ReadinessCheck) {
 }
 
 function getInitialAddress() {
-  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net';
+  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net/?pq-shell=1.1.0-badge-progression';
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_WEB_APP_URL?: string } | undefined;
   return resolveFrontendUrl(selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_WEB_APP_URL, extra?.EXPO_PUBLIC_WEB_APP_URL), Constants.expoConfig?.hostUri);
 }
@@ -133,6 +149,9 @@ function buildGoogleAuthScript(result: { requestId: string; idToken?: string; er
 
 function buildCameraScript(detail: {
   type: string;
+  active?: boolean;
+  reason?: string;
+  generation?: number;
   status?: string;
   message?: string;
   requestId?: string;
@@ -354,12 +373,13 @@ function AppContent() {
     facing: 'back' | 'front',
     context: NativeCameraContext,
     requestId: number,
+    generation?: number,
   ) => {
     const validFrame = isCameraFrame(frame) && (context.screen!=='camera-check' ||
       (context.readiness.previewWidth===frame.width && context.readiness.previewHeight===frame.height));
     if (!validFrame) {
       webRef.current?.injectJavaScript(buildCameraScript({
-        type: 'status',
+        type: 'status', generation,
         status: 'unavailable',
         message: 'The camera preview could not be positioned. Try opening the camera again.',
       }));
@@ -372,20 +392,20 @@ function AppContent() {
       if (requestId !== cameraRequestId.current) return;
       if (!granted) {
         webRef.current?.injectJavaScript(buildCameraScript({
-          type: 'status',
+          type: 'status', generation,
           status: 'denied',
           message: 'Camera access is blocked. Allow camera access in your phone settings, then try again.',
         }));
         return;
       }
       setFraming({status:'unknown',reason:'pending'});
-      setCameraPreview({ frame, facing, context, instanceId:requestId });
-      webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'starting' }));
+      setCameraPreview({ frame, facing, context, instanceId:requestId, generation });
+      webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'starting', generation }));
     } catch (error) {
       console.error('Native camera could not start:', error);
       if (requestId !== cameraRequestId.current) return;
       webRef.current?.injectJavaScript(buildCameraScript({
-        type: 'status',
+        type: 'status', generation,
         status: 'unavailable',
         message: 'The camera could not start. Close other apps using the camera and try again.',
       }));
@@ -408,9 +428,12 @@ function AppContent() {
   }, []);
 
   useEffect(()=>{
-    const change=AppState.addEventListener('change',state=>{if(state!=='active')stopNativeCamera();});
-    const blur=AppState.addEventListener('blur',stopNativeCamera);
-    return ()=>{cameraRequestId.current++;change.remove();blur.remove();};
+    let blurred=false;
+    const signal=(active:boolean)=>webRef.current?.injectJavaScript(buildCameraScript({type:'interruption',active}));
+    const change=AppState.addEventListener('change',state=>{if(state!=='active'){stopNativeCamera();signal(false);}else {blurred=false;signal(true);}});
+    const blur=AppState.addEventListener('blur',()=>{blurred=true;stopNativeCamera();signal(false);});
+    const focus=AppState.addEventListener('focus',()=>{blurred=false;signal(AppState.currentState==='active');});
+    return ()=>{cameraRequestId.current++;change.remove();blur.remove();focus.remove();};
   },[stopNativeCamera]);
 
   const switchNativeCameraFacing = () => {
@@ -494,8 +517,9 @@ function AppContent() {
         onMessage={(e) => {
           if (!isTrustedWebViewUrl(e.nativeEvent.url, loadedAddress)) return;
           try {
-            if(e.nativeEvent.data.length>readinessMessageLimit){stopNativeCamera();return;}
-            const message = JSON.parse(e.nativeEvent.data) as {
+            const parsedMessage=parseCameraHostMessage(e.nativeEvent.data);
+            if(!parsedMessage)return;
+            const message = parsedMessage as {
               type?: string;
               mode?: string;
               ok?: boolean;
@@ -503,6 +527,7 @@ function AppContent() {
               facing?: 'back' | 'front';
               previewContext?: unknown;
               requestId?: string;
+              generation?: number;
               side?: 'left' | 'right';
               sessionId?: string;
               geometryGeneration?: number;
@@ -516,7 +541,16 @@ function AppContent() {
               contactName?: string;
               override?: unknown;
               status?: string;
+              image?: string;
             };
+            if (message.type === 'badge-export' && typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,100}$/.test(message.requestId) && typeof message.image === 'string' && message.image.startsWith('data:image/png;base64,') && typeof message.name === 'string' && (message.intent === 'save' || message.intent === 'share')) {
+              const requestId = message.requestId, origin = new URL(loadedAddress).origin;
+              const respond = (error?: string) => { const detail = JSON.stringify({ requestId, error }); webRef.current?.injectJavaScript(`if(location.origin===${JSON.stringify(origin)})window.dispatchEvent(new CustomEvent('physiquequest:badge-export',{detail:${detail}}));true;`); };
+              if (!NativeModules.PQShell?.exportBadge) respond('Saving images is unavailable in this app version.');
+              else void NativeModules.PQShell.exportBadge(message.image, message.name, message.intent).then(() => respond()).catch((error: Error) => respond(error.message || 'Could not export the image.'));
+              return;
+            }
+            if(e.nativeEvent.data.length>readinessMessageLimit){stopNativeCamera();return;}
             if (apiUrl && ['remember-offline-account','forget-offline-account','restore-offline-account'].includes(message.type ?? '') &&
                 typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,120}$/.test(message.requestId)) {
               const origin = new URL(loadedAddress).origin;
@@ -577,18 +611,18 @@ function AppContent() {
               const requestId = cameraRequestId.current + 1;
               cameraRequestId.current = requestId;
               setCameraPreview(null);
-              if(!isNativeCameraContext(message.previewContext)){stopNativeCamera();return;}
+              if(!isNativeCameraContext(message.previewContext))return;
               const context = message.previewContext;
-              void startNativeCamera(message.frame, message.facing === 'front' ? 'front' : 'back', context, requestId);
+              void startNativeCamera(message.frame, message.facing === 'front' ? 'front' : 'back', context, requestId, message.generation);
             }
             if (message.type === 'camera-update-frame' && message.frame) {
               if(!isNativeCameraContext(message.previewContext) || !isCameraFrame(message.frame) ||
-                (message.previewContext.screen==='camera-check' && (message.previewContext.readiness.previewWidth!==message.frame.width || message.previewContext.readiness.previewHeight!==message.frame.height))) {stopNativeCamera();return;}
+                (message.previewContext.screen==='camera-check' && (message.previewContext.readiness.previewWidth!==message.frame.width || message.previewContext.readiness.previewHeight!==message.frame.height))) return;
               const context = message.previewContext;
               updateNativeCameraFrame(message.frame, context);
             }
             if (message.type === 'camera-update-overlay') {
-              if(!isNativeCameraContext(message.previewContext)){stopNativeCamera();return;}
+              if(!isNativeCameraContext(message.previewContext))return;
               updateNativeCameraContext(message.previewContext);
             }
             if(message.type==='camera-readiness-status' && cameraPreview?.context.screen==='camera-check') {
@@ -611,7 +645,6 @@ function AppContent() {
               if (payload.type === 'inactivity-request-motion-status') void native.reportMotionStatus();
             }
           } catch (error) {
-            stopNativeCamera();
             console.warn('Could not handle malformed WebView message.');
           }
         }}
@@ -653,10 +686,10 @@ function AppContent() {
             webRef.current?.injectJavaScript(poseOptions.mode==='readiness'?readinessScript(detail):poseScript(detail));
             if (detail.type === 'error') {
               setCameraPreview(null);
-              webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'unavailable', message: String(detail.message) }));
+              webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'unavailable', generation:cameraPreview.generation, message: String(detail.message), reason: detail.code==='timeout'?'timeout':String(detail.message).includes('too warm')?'thermal':detail.reason==='unsupported'?'no_camera':'interrupted_too_often' }));
             }
           }}
-          ready={() => {if(cameraPreview.instanceId===cameraRequestId.current)webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }));}}
+          ready={() => {if(cameraPreview.instanceId===cameraRequestId.current)webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on', generation:cameraPreview.generation }));}}
         />
       )}
       {cameraPreview && !posePreview && (
@@ -675,7 +708,7 @@ function AppContent() {
           ]}
           onCameraReady={() => {
             if(cameraPreview.instanceId!==cameraRequestId.current)return;
-            webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }));
+            webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on', generation:cameraPreview.generation }));
             if(cameraPreview.context.screen==='camera-check') {
               const {sessionId,geometryGeneration}=cameraPreview.context.readiness;
               webRef.current?.injectJavaScript(readinessScript({type:'capability',sessionId,geometryGeneration,reason:'unsupported'}));
@@ -691,6 +724,7 @@ function AppContent() {
             webRef.current?.injectJavaScript(buildCameraScript({
               type: 'status',
               status: 'unavailable',
+              generation:cameraPreview.generation,
               message: event.message || 'The camera could not start. Try again.',
             }));
           }}

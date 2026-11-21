@@ -27,6 +27,13 @@ export function createLandmarkFilter(fast = false, bypass = false) {
       const derivativeAlpha = alpha(LANDMARK_FILTER_DEFAULTS.derivativeCutoff, dt);
       previous = points.map((point, i) => {
         const old = previous[i];
+        const credible = (p: FilterPoint) => Number.isFinite(p.x) && Number.isFinite(p.y) && Math.min(p.visibility ?? 1, p.presence ?? 1) >= .4;
+        // Hidden-joint guesses must not drag the skeleton away from the body.
+        // Reacquired points start at their measured location without catch-up lag.
+        if (!credible(point) || !credible(old)) {
+          derivatives[i] = { x: 0, y: 0, z: 0 };
+          return { ...point };
+        }
         const filtered = { ...point };
         for (const axis of ['x', 'y', 'z'] as const) {
           const value = point[axis];

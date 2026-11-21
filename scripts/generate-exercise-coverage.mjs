@@ -26,6 +26,8 @@ if (!Array.isArray(catalog) || catalog.length !== 1500) {
 const norm = (value) => String(value ?? '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
 
 const PATTERNS = {
+  chest_fly: { label: 'Chest fly', joints: 'elbow-shoulder-opposite shoulder', camera: 'front-oblique', count: 'bilateral shoulder horizontal adduction', form: 'none; perspective sensitive' },
+  hip_abduction: { label: 'Hip abduction', joints: 'opposite hip-hip-knee', camera: 'front', count: 'bilateral hip abduction', form: 'none; pads may occlude hips' },
   squat: { label: 'Squat', joints: 'hip–knee–ankle', camera: 'side (front for knee tracking)', count: 'bilateral knee flexion/extension', form: 'knee-in screening (front view only)' },
   squat_hold: { label: 'Wall sit', joints: 'hip–knee–ankle', camera: 'side', count: 'isometric hold timer', form: 'none' },
   lunge: { label: 'Lunge / split squat', joints: 'hip–knee–ankle', camera: 'side', count: 'per-side knee flexion/extension', form: 'knee-past-toe screening' },
@@ -50,6 +52,7 @@ const PATTERNS = {
 
 // Must match the `mode` field of each spec in shared/exerciseEngine.ts.
 const BASE_MODE = {
+  chest_fly: 'bilateral', hip_abduction: 'bilateral',
   squat: 'bilateral', squat_hold: 'hold', lunge: 'per_side', hinge: 'bilateral', hip_thrust: 'bilateral',
   horizontal_push: 'bilateral', vertical_push: 'bilateral', dip: 'bilateral', curl: 'per_side',
   triceps_extension: 'per_side', horizontal_pull: 'bilateral', vertical_pull: 'bilateral',
@@ -169,7 +172,11 @@ for (const exercise of catalog) {
   let pattern = null;
   let gapReason = null;
 
-  if (OVERRIDES.has(normalized)) {
+  if (/^(machine|lever|sled|cable|dumbbell).*\b(chest fly|seated fly|pec deck|butterfly)\b/.test(normalized) && !/reverse|rear/.test(normalized)) {
+    pattern = 'chest_fly';
+  } else if (/\b(machine|lever)\b.*\bhip abduction\b/.test(normalized)) {
+    pattern = 'hip_abduction';
+  } else if (OVERRIDES.has(normalized)) {
     pattern = OVERRIDES.get(normalized);
   } else if (!blocked) {
     const positive = POSITIVE_RULES.find((rule) => rule.test.test(normalized));

@@ -1,0 +1,1121 @@
+{
+  "schemaVersion": 1,
+  "groundTruthPolicy": "Human-reviewed labels only. null means unknown, never zero. Filename matches are candidates, not confirmed exercise identities.",
+  "clips": [
+    {
+      "id": "clip-01",
+      "fileName": "rear pull up (regular one).mp4",
+      "libraryFileId": "libfile_b29567f0aa848191be999a7f0ae1e269",
+      "expectedSizeBytes": 2227256,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "CbFSYC1",
+          "name": "rear pull-up",
+          "pattern": "vertical_pull"
+        },
+        {
+          "exerciseId": "OYFhXVD",
+          "name": "Wide-Grip Rear Pull-Up",
+          "pattern": "vertical_pull"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-02",
+      "fileName": "machine shoulder press.mp4",
+      "libraryFileId": "libfile_fad0adad834481919290d0184013e491",
+      "expectedSizeBytes": 5039974,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "67n3r98",
+          "name": "Machine Shoulder Press",
+          "pattern": "vertical_push"
+        },
+        {
+          "exerciseId": "dNFYIU1",
+          "name": "Machine Shoulder Press",
+          "pattern": "vertical_push"
+        },
+        {
+          "exerciseId": "vqsbmL0",
+          "name": "Machine Shoulder Press",
+          "pattern": "vertical_push"
+        },
+        {
+          "exerciseId": "2KGnL6M",
+          "name": "Machine Single-Arm Shoulder Press",
+          "pattern": "vertical_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-03",
+      "fileName": "machine shoulder press 2nd try.mp4",
+      "libraryFileId": "libfile_3acc07965f2c8191b484df39504aa45e",
+      "expectedSizeBytes": 7267701,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "67n3r98",
+          "name": "Machine Shoulder Press",
+          "pattern": "vertical_push"
+        },
+        {
+          "exerciseId": "dNFYIU1",
+          "name": "Machine Shoulder Press",
+          "pattern": "vertical_push"
+        },
+        {
+          "exerciseId": "vqsbmL0",
+          "name": "Machine Shoulder Press",
+          "pattern": "vertical_push"
+        },
+        {
+          "exerciseId": "2KGnL6M",
+          "name": "Machine Single-Arm Shoulder Press",
+          "pattern": "vertical_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-04",
+      "fileName": "machine seated dip.mp4",
+      "libraryFileId": "libfile_a27baf50388881919ba1eaa6821480e9",
+      "expectedSizeBytes": 1789674,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "BRImeP8",
+          "name": "Machine Seated Dip",
+          "pattern": "dip"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-05",
+      "fileName": "machine seated dip 2nd try.mp4",
+      "libraryFileId": "libfile_f0b1176dc1cc8191a72ecd97b3497ed5",
+      "expectedSizeBytes": 1789674,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "BRImeP8",
+          "name": "Machine Seated Dip",
+          "pattern": "dip"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-06",
+      "fileName": "Machine Reverse T-bar Row.mp4",
+      "libraryFileId": "libfile_7f0f7ab8ef3c8191a1e562858f623b80",
+      "expectedSizeBytes": 1585436,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "BgljGjd",
+          "name": "Machine Reverse T-Bar Row",
+          "pattern": "horizontal_pull"
+        },
+        {
+          "exerciseId": "FVM1AUZ",
+          "name": "Machine T-Bar Reverse-Grip Row",
+          "pattern": "horizontal_pull"
+        },
+        {
+          "exerciseId": "aaXr7ld",
+          "name": "Machine T Bar Row",
+          "pattern": "horizontal_pull"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-07",
+      "fileName": "machine preacher curl.mp4",
+      "libraryFileId": "libfile_1341acaca0408191b51a4c85cabaf755",
+      "expectedSizeBytes": 1677393,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "b6hQYMb",
+          "name": "Machine Preacher Curl",
+          "pattern": "curl"
+        },
+        {
+          "exerciseId": "ye84CTU",
+          "name": "Machine Preacher Curl",
+          "pattern": "curl"
+        },
+        {
+          "exerciseId": "OAguZoG",
+          "name": "Machine Hammer Grip Preacher Curl",
+          "pattern": "curl"
+        },
+        {
+          "exerciseId": "7y9JIMj",
+          "name": "Machine Reverse-Grip Preacher Curl",
+          "pattern": "curl"
+        },
+        {
+          "exerciseId": "kj3hy6W",
+          "name": "Machine Reverse-Grip Preacher Curl",
+          "pattern": "curl"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-08",
+      "fileName": "machine narrow grip seated row.mp4",
+      "libraryFileId": "libfile_c79bd27571448191b9f39e821ba5b1df",
+      "expectedSizeBytes": 2853086,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "1u36hhy",
+          "name": "Machine Narrow Grip Seated Row",
+          "pattern": "horizontal_pull"
+        },
+        {
+          "exerciseId": "iCPqbki",
+          "name": "Machine Narrow Grip Seated Row",
+          "pattern": "horizontal_pull"
+        },
+        {
+          "exerciseId": "IGjKj1v",
+          "name": "Machine Narrow Grip Seated Row",
+          "pattern": "horizontal_pull"
+        },
+        {
+          "exerciseId": "w2oRpuH",
+          "name": "Machine Alternating Narrow Grip Seated Row",
+          "pattern": "horizontal_pull"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-09",
+      "fileName": "machine narrow grip seated row 2nd try.mp4",
+      "libraryFileId": "libfile_414bd5a37c4c819194d2ba11e00d6057",
+      "expectedSizeBytes": 572434,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "1u36hhy",
+          "name": "Machine Narrow Grip Seated Row",
+          "pattern": "horizontal_pull"
+        },
+        {
+          "exerciseId": "iCPqbki",
+          "name": "Machine Narrow Grip Seated Row",
+          "pattern": "horizontal_pull"
+        },
+        {
+          "exerciseId": "IGjKj1v",
+          "name": "Machine Narrow Grip Seated Row",
+          "pattern": "horizontal_pull"
+        },
+        {
+          "exerciseId": "w2oRpuH",
+          "name": "Machine Alternating Narrow Grip Seated Row",
+          "pattern": "horizontal_pull"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-10",
+      "fileName": "machine incline chest press.mp4",
+      "libraryFileId": "libfile_088591f4887c8191aa3cecd87dd13ed0",
+      "expectedSizeBytes": 2639571,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "jHAnWmT",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "o17Jfkt",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "DOoWcnA",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "T0yTjgW",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "wDN97Ca",
+          "name": "machine inner chest press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "vsVoPHt",
+          "name": "Machine Decline Chest Press",
+          "pattern": "horizontal_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-11",
+      "fileName": "machine incline chest press 2nd try.mp4",
+      "libraryFileId": "libfile_910fd1980c9881919560508fa487ca11",
+      "expectedSizeBytes": 2274599,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "jHAnWmT",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "o17Jfkt",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "DOoWcnA",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "T0yTjgW",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "wDN97Ca",
+          "name": "machine inner chest press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "vsVoPHt",
+          "name": "Machine Decline Chest Press",
+          "pattern": "horizontal_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-12",
+      "fileName": "machine front pulldown.mp4",
+      "libraryFileId": "libfile_28bba50322448191bd0e53b294d4f3dd",
+      "expectedSizeBytes": 2712994,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "7F1DVzn",
+          "name": "Machine Front Pulldown",
+          "pattern": "vertical_pull"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-13",
+      "fileName": "machine front pulldown 2nd try.mp4",
+      "libraryFileId": "libfile_d348ce9370f48191b72f68639759a164",
+      "expectedSizeBytes": 1585930,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "7F1DVzn",
+          "name": "Machine Front Pulldown",
+          "pattern": "vertical_pull"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-14",
+      "fileName": "machine chest press.mp4",
+      "libraryFileId": "libfile_ef2c152eb8b88191bc49bdf97bca4612",
+      "expectedSizeBytes": 2997663,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "DOoWcnA",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "T0yTjgW",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "wDN97Ca",
+          "name": "machine inner chest press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "jHAnWmT",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "o17Jfkt",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "vsVoPHt",
+          "name": "Machine Decline Chest Press",
+          "pattern": "horizontal_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-15",
+      "fileName": "machine chest press 3rd try.mp4",
+      "libraryFileId": "libfile_849f26dd4ce88191b4297e5ceb9a6f0c",
+      "expectedSizeBytes": 4041084,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "DOoWcnA",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "T0yTjgW",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "wDN97Ca",
+          "name": "machine inner chest press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "jHAnWmT",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "o17Jfkt",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "vsVoPHt",
+          "name": "Machine Decline Chest Press",
+          "pattern": "horizontal_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-16",
+      "fileName": "weighted triceps dips.mp4",
+      "libraryFileId": "libfile_b1ff1f0f48208191a92ccac897b9960e",
+      "expectedSizeBytes": 7514078,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "bZq4bwK",
+          "name": "Weighted Triceps Dips",
+          "pattern": "triceps_extension"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-17",
+      "fileName": "machine chest press 2nd try.mp4",
+      "libraryFileId": "libfile_5971efd9faf48191a54c6cfb1d3aa3fc",
+      "expectedSizeBytes": 3986758,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "DOoWcnA",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "T0yTjgW",
+          "name": "Machine Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "wDN97Ca",
+          "name": "machine inner chest press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "jHAnWmT",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "o17Jfkt",
+          "name": "Machine Incline Chest Press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "vsVoPHt",
+          "name": "Machine Decline Chest Press",
+          "pattern": "horizontal_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-18",
+      "fileName": "barbell bench press.mp4",
+      "libraryFileId": "libfile_6aa86cadd4d8819185e5c8f0ef65204d",
+      "expectedSizeBytes": 923217,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "EIeI8Vf",
+          "name": "barbell bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "ZsiqXYa",
+          "name": "barbell jm bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "JsKq9so",
+          "name": "barbell wide bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "3TZduzM",
+          "name": "barbell incline bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "9Z23cLE",
+          "name": "barbell incline bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "GrO65fd",
+          "name": "barbell decline bench press",
+          "pattern": "horizontal_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-19",
+      "fileName": "barbell bench press 2nd try.mp4",
+      "libraryFileId": "libfile_4406b4b677588191a3f857399f0a1ba5",
+      "expectedSizeBytes": 948415,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "EIeI8Vf",
+          "name": "barbell bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "ZsiqXYa",
+          "name": "barbell jm bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "JsKq9so",
+          "name": "barbell wide bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "3TZduzM",
+          "name": "barbell incline bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "9Z23cLE",
+          "name": "barbell incline bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "GrO65fd",
+          "name": "barbell decline bench press",
+          "pattern": "horizontal_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    },
+    {
+      "id": "clip-20",
+      "fileName": "barbell bench press 3rd try.mp4",
+      "libraryFileId": "libfile_97969eb7dc6481919b62a3c29cf803d2",
+      "expectedSizeBytes": 2386111,
+      "exerciseId": null,
+      "mappingConfirmed": false,
+      "catalogCandidates": [
+        {
+          "exerciseId": "EIeI8Vf",
+          "name": "barbell bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "ZsiqXYa",
+          "name": "barbell jm bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "JsKq9so",
+          "name": "barbell wide bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "3TZduzM",
+          "name": "barbell incline bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "9Z23cLE",
+          "name": "barbell incline bench press",
+          "pattern": "horizontal_push"
+        },
+        {
+          "exerciseId": "GrO65fd",
+          "name": "barbell decline bench press",
+          "pattern": "horizontal_push"
+        }
+      ],
+      "camera": {
+        "facing": null,
+        "previewMirrored": null,
+        "view": null,
+        "approxYawDegrees": null
+      },
+      "labels": {
+        "reviewStatus": "unreviewed",
+        "reviewedBy": null,
+        "repUnit": null,
+        "sets": [
+          {
+            "id": "set-1",
+            "startMs": null,
+            "endMs": null,
+            "fullReps": null,
+            "partialReps": null,
+            "repEvents": []
+          }
+        ],
+        "occlusionIntervals": null,
+        "subjectIntervals": null,
+        "formIntervals": null,
+        "cueCoverageComplete": false,
+        "notes": null
+      }
+    }
+  ]
+}

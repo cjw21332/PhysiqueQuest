@@ -10,6 +10,7 @@ import { ConnectionContext } from '../../hooks/useBackendConnection';
 import BottomNav from '../../sections/Home/BottomNav';
 import CoachChat from '../../components/CoachChat';
 import OfflineLeaderboard from '../../sections/Quests Section/OfflineLeaderboard';
+import BadgeCelebrations from '../../components/BadgeCelebrations';
 
 export default function AppLayout({
   children,
@@ -96,5 +97,5 @@ export default function AppLayout({
         : 'system-dark-theme';
   const offlineLeaderboard = !connected && pathname === '/quests/leaderboard';
   const blocked = !connected && ['/home/notifications','/coach/prepare','/scan/add-food','/scan/review','/scan/edit-meal'].includes(pathname);
-  return <ConnectionContext.Provider value={connected}><div className={`${theme} signed-in-layout`}> {offlineLeaderboard ? <OfflineLeaderboard /> : blocked ? <main className="app-shell"><p role="status">This page requires a connection.</p><BottomNav/></main> : children}{connected && isClient && isAuthenticated() && <CoachChat />}</div></ConnectionContext.Provider>;
+  return <ConnectionContext.Provider value={connected}><div className={`${theme} signed-in-layout`}> {offlineLeaderboard ? <OfflineLeaderboard /> : blocked ? <main className="app-shell"><p role="status">This page requires a connection.</p><BottomNav/></main> : children}{connected && isClient && isAuthenticated() && <><CoachChat /><BadgeCelebrations /></>}</div></ConnectionContext.Provider>;
 }

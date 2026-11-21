@@ -6,6 +6,8 @@ import { api, type ExerciseCatalog, type ExerciseRecord, type ExerciseFilters, t
 import { prepareExerciseCatalog } from '../../lib/prepareExerciseCatalog';
 import { cachedCatalog, cachedCount, cachedExercise, cachedFilters, readCatalogMetadata, saveExercises, trackingPriority } from '../../lib/exerciseCatalogDb';
 import { exerciseMediaStatus } from '../../lib/exerciseMediaCache';
+import exerciseVideoFallbacks from '../../lib/exerciseVideoFallbacks.json';
+import exerciseGifFallbacks from '../../lib/exerciseGifFallbacks.json';
 import { getCurrentUser } from '../../lib/auth';
 import { Icon } from '../Home/icons';
 import './libraryreference.css';
@@ -15,6 +17,18 @@ import { readPersonalExercises, type PersonalExercise } from '../../lib/personal
 
 const equipmentOptions = ['Any equipment', 'Dumbbells', 'Barbell', 'Bodyweight', 'Cable', 'Machine', 'Kettlebell', 'Resistance bands'];
 const metadata = (item: ExerciseRecord) => [item.targetMuscle || item.group, item.equipment, item.difficulty].filter(Boolean).join(' · ');
+const videoFallbackById = exerciseVideoFallbacks as Record<string, { url: string; sourceName: string; relation: 'exact' | 'equivalent' | 'related' }>;
+const gifFallbackById = exerciseGifFallbacks as Record<string, { url: string; sourceName: string; relation: 'exact' | 'equivalent' | 'related' }>;
+const variationDescriptors: [RegExp, string][] = [
+  [/\b(single[- ]arm|one[- ]arm)\b/i, 'Single arm'], [/\b(single[- ]leg|one[- ]leg)\b/i, 'Single leg'],
+  [/\b(alternate|alternating)\b/i, 'Alternating'], [/\breverse[- ]grip\b/i, 'Reverse grip'],
+  [/\bunderhand\b/i, 'Underhand grip'], [/\bwide[- ]grip\b/i, 'Wide grip'], [/\bclose[- ]grip\b/i, 'Close grip'],
+  [/\bneutral[- ]grip\b/i, 'Neutral grip'], [/\bincline\b/i, 'Incline'], [/\bdecline\b/i, 'Decline'],
+  [/\bseated\b/i, 'Seated'], [/\bstanding\b/i, 'Standing'], [/\bkneeling\b/i, 'Kneeling'], [/\blying\b/i, 'Lying'],
+  [/\bassisted\b/i, 'Assisted'], [/\bbetween benches\b/i, 'Between benches'], [/\bon (?:an? )?exercise ball\b/i, 'On exercise ball'],
+  [/\bon (?:an? )?box\b/i, 'On a box'], [/\bwall\b/i, 'Wall variation'],
+];
+const exerciseVariations = (name: string) => variationDescriptors.filter(([pattern]) => pattern.test(name)).map(([, label]) => label).slice(0, 2);
 
 function FilterPicker({ label, value, options, onChange }: { label: string; value: string; options: { value: string; label: string }[]; onChange: (value: string) => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -51,6 +65,8 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
   const [filters, setFilters] = useState<ExerciseFilters>({ bodyParts: [], equipments: [], targetMuscles: [], secondaryMuscles: [] });
   const [selected, setSelected] = useState<ExerciseRecord | null>(null);
   const [mediaError, setMediaError] = useState(false);
+  const [fallbackError, setFallbackError] = useState(false);
+  const [gifFallbackError, setGifFallbackError] = useState(false);
   const [detail, setDetail] = useState<ExerciseRecord | null>(null);
   const [detailError, setDetailError] = useState('');
   const [detailRetry, setDetailRetry] = useState(0);
@@ -160,7 +176,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
     let current = true;
     const owner = getCurrentUser();
     let refreshed = false;
-    setDetail(selected); setDetailError(''); setMediaError(false); setPlaying(false); setFrameReady(false);
+    setDetail(selected); setDetailError(''); setMediaError(false); setFallbackError(false); setGifFallbackError(false); setPlaying(false); setFrameReady(false);
     const hot = detailCache.current.get(selected._id);
     if (hot && Date.now() - hot.time < 60000 && detailRetry === 0) { setDetail(hot.value); return () => { current = false; }; }
     void cachedExercise(selected._id).then(record => { if (current && record && !refreshed) setDetail(record); }).catch(() => {});
@@ -217,11 +233,14 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
     {!loading && catalog && <>
       <div className="library-caption library-results-heading"><div><h3>Explore exercises</h3><p className="result-count" role="status">{catalog.total} {catalog.total === 1 ? 'exercise' : 'exercises'}</p></div><span>{sort ? 'Open a guide' : 'Camera options first on this page'}</span></div>
       <div className="library-list">
-        {catalog.items.map(item => <button type="button" className="library-item" key={item._id} aria-haspopup="dialog" onClick={event => { openerRef.current = event.currentTarget; setMediaError(false); setSelected(item); }}>
-          <span className="exercise-thumb"><Icon name="library-dumbbells" size={24}/>{item.gifUrl && <i><Icon name="play" size={8}/></i>}</span>
-          <span className="library-copy"><b>{titleCase(item.name)}</b><small>{metadata(item)}</small><span className="library-item-meta"><span className={`tracking-tag ${trackingLabel(item) === 'Manual tracking' ? 'manual' : ''}`}>{trackingLabel(item)}</span>{item.gifUrl && <span className="library-demo-label">Demo</span>}</span></span>
+        {catalog.items.map(item => {
+          const hasDemo = !!item.gifUrl || !!videoFallbackById[item._id] || !!gifFallbackById[item._id];
+          const variations = exerciseVariations(item.name);
+          return <button type="button" className="library-item" key={item._id} aria-haspopup="dialog" onClick={event => { openerRef.current = event.currentTarget; setMediaError(false); setFallbackError(false); setGifFallbackError(false); setSelected(item); }}>
+          <span className="exercise-thumb"><Icon name="library-dumbbells" size={24}/>{hasDemo && <i><Icon name="play" size={8}/></i>}</span>
+          <span className="library-copy"><b>{titleCase(item.name)}</b><small>{metadata(item)}</small>{variations.length > 0 && <span className="library-variation-tag">Variation · {variations.join(' · ')}</span>}<span className="library-item-meta"><span className={`tracking-tag ${trackingLabel(item) === 'Manual tracking' ? 'manual' : ''}`}>{trackingLabel(item)}</span>{hasDemo && <span className="library-demo-label">Demo</span>}</span></span>
           <Icon name="arrow" size={16}/>
-        </button>)}
+        </button>})}
         {!catalog.items.length && <div className="empty-library"><p>No exercises match those filters.</p><button type="button" className="secondary" onClick={reset}>Reset filters</button></div>}
       </div>
       {catalog.pages > 1 && <nav className="library-caption" aria-label="Exercise pages"><button type="button" className="secondary" disabled={page <= 1} onClick={() => setPage(value => value - 1)}>Previous page</button><span>Page {page} of {catalog.pages}</span><button type="button" className="secondary" disabled={page >= catalog.pages} onClick={() => setPage(value => value + 1)}>Next page</button></nav>}
@@ -230,7 +249,8 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
     </>}
     {selected && <dialog ref={dialogRef} className="library-dialog" aria-labelledby="library-exercise-title" onCancel={() => setSelected(null)} onClick={event => { if (event.target === event.currentTarget) setSelected(null); }}>
       <article className="exercise-sheet library-exercise-sheet">
-        <header className="library-sheet-header"><div><h3 id="library-exercise-title">{titleCase(detail?.name || selected.name)}</h3><p>{metadata(detail || selected)}</p></div><button type="button" className="sheet-close" onClick={() => setSelected(null)} aria-label="Close exercise details" autoFocus><Icon name="close" size={18}/></button></header>
+        <header className="library-sheet-header"><div><h3 id="library-exercise-title">{titleCase(detail?.name || selected.name)}</h3><p>{metadata(detail || selected)}</p>{exerciseVariations(detail?.name || selected.name).length > 0 && <span className="library-variation-tag">Movement variation · {exerciseVariations(detail?.name || selected.name).join(' · ')}</span>}</div><button type="button" className="sheet-close" onClick={() => setSelected(null)} aria-label="Close exercise details" autoFocus><Icon name="close" size={18}/></button></header>
+        <div className="library-sheet-content">
         {!detail && !detailError && <p role="status">Loading exercise details…</p>}
         {detailError && <div role="alert" className="empty-library"><p>{detailError}</p><button className="secondary" onClick={() => setDetailRetry(value => value + 1)}>Retry details</button></div>}
         {detail && <>
@@ -239,9 +259,11 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
               <img ref={imageRef} src={detail.gifUrl} loading="lazy" alt={`Exercise demonstration - ${titleCase(detail.name)}`} style={{ visibility: playing || !frameReady ? 'visible' : 'hidden' }} onLoad={() => { freezeFrame(); const url = detail.gifUrl; if (url) void exerciseMediaStatus(url, true).then(cached => { if (imageRef.current?.src === url) setMediaCached(cached); }); }} onError={() => { setMediaError(true); setPlaying(false); }}/>
               <canvas ref={canvasRef} aria-hidden="true" style={{ visibility: !playing && frameReady ? 'visible' : 'hidden' }}/>
               <button type="button" className={`library-demo-toggle ${playing ? 'is-playing' : ''}`} aria-label={playing ? 'Pause exercise demonstration' : 'Play exercise demonstration'} onClick={() => { if (playing) freezeFrame(); setPlaying(value => !value); }}><Icon name={playing ? 'pause' : 'play'} size={22}/></button>
-            </> : <span className="library-video-unavailable"><Icon name="library-dumbbells" size={40}/><small>{mediaError ? 'Could not load this demonstration.' : 'No demonstration available'}</small></span>}
+            </> : videoFallbackById[detail._id] && !fallbackError ? <video className="library-fallback-video" controls playsInline preload="metadata" aria-label={`Exercise demonstration - ${titleCase(detail.name)}`} src={videoFallbackById[detail._id].url} onError={() => setFallbackError(true)} /> : gifFallbackById[detail._id] && !gifFallbackError ? <img className="library-fallback-gif" src={gifFallbackById[detail._id].url} loading="lazy" alt={`Exercise demonstration - ${titleCase(detail.name)}`} onError={() => setGifFallbackError(true)} /> : <span className="library-video-unavailable"><Icon name="library-dumbbells" size={40}/><small>{mediaError || fallbackError || gifFallbackError ? 'Could not load this demonstration.' : 'No demonstration available'}</small></span>}
           </div>
-          {mediaError && <button type="button" className="secondary library-media-retry" onClick={() => setDetailRetry(value => value + 1)}>Retry demonstration</button>}
+          {(!detail.gifUrl || mediaError) && videoFallbackById[detail._id] && <p className="library-preview-note">{videoFallbackById[detail._id].relation === 'related' ? `Related variation shown: ${videoFallbackById[detail._id].sourceName}. ` : `Movement shown: ${videoFallbackById[detail._id].sourceName}. `}<a href="https://github.com/harshvishu/free-exercise-db-with-videos" target="_blank" rel="noreferrer">Free Exercise DB with Videos</a>.</p>}
+          {(!detail.gifUrl || mediaError) && !videoFallbackById[detail._id] && gifFallbackById[detail._id] && <p className="library-preview-note">{gifFallbackById[detail._id].relation === 'related' ? `Related variation shown: ${gifFallbackById[detail._id].sourceName}. ` : `Movement shown: ${gifFallbackById[detail._id].sourceName}. `}<a href="https://github.com/Alejor-Dev/ejercicios-dataset" target="_blank" rel="noreferrer">ExerciseDB media archive</a> (educational use).</p>}
+          {(fallbackError || gifFallbackError || (mediaError && !videoFallbackById[detail._id] && !gifFallbackById[detail._id])) && <button type="button" className="secondary library-media-retry" onClick={() => { setFallbackError(false); setGifFallbackError(false); setDetailRetry(value => value + 1); }}>Retry demonstration</button>}
           {detail.gifUrl && !mediaError && <p className="library-preview-note">{mediaCached ? 'Demonstration available offline.' : 'Demonstration requires a connection.'}</p>}
           <div className="library-recommendation">{detail.recommended && <span>Recommended <b>{detail.recommended}</b></span>}<span className="library-manual-label">{trackingLabel(detail)}</span></div>
           {detail.description && <p className="library-description">{detail.description}</p>}
@@ -250,6 +272,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
           <p className="library-preview-note">Exercise data by <a href="https://ascendapi.com" target="_blank" rel="noreferrer">AscendAPI</a>.</p>
           <section className="library-tracking-cta" aria-label="Exercise tracking"><div><h4>Track your movement</h4><p>{canTrack(trackingConfigs[detail._id] ?? resolveTrackingConfig(detail)) ? 'Camera tracking is available as an estimate. Review the results after your session.' : 'Camera tracking for this movement is not ready yet. You can still log your workout manually.'}</p></div><button type="button" onClick={() => { setSelected(null); setPreview(detail); }}>View tracking options <Icon name="arrow" size={18}/></button></section>
         </>}
+        </div>
       </article>
     </dialog>}
   </div>;

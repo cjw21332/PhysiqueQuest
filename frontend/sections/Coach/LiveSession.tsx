@@ -76,7 +76,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
     exerciseName: exercise.name,
     equipment: exercise.equipment,
     elapsed: time,
-  });
+  }, true);
 
   useEffect(() => {
     if (paused || phase !== 'active') return;
@@ -307,7 +307,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       {camera.status !== 'on' && (
         <div className="live-camera-action">
           <button type="button" className="secondary" disabled={camera.status === 'starting'} onClick={() => void camera.start()}>
-            {camera.status === 'starting' ? 'Starting camera...' : 'Enable camera'}
+            {camera.status === 'starting' ? 'Starting camera...' : camera.recoveryState.phase === 'failed' ? 'Try again' : 'Enable camera'}
           </button>
           {camera.message && <p role="alert">{camera.message}</p>}
         </div>

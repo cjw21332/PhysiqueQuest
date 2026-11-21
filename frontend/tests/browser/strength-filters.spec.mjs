@@ -18,15 +18,21 @@ test('strength filters narrow exercises and keep the selected ranking clear', as
   await page.goto('/quests/leaderboard');
   await page.getByRole('button',{name:/Strength Logged lifts/}).click();
   const panel=page.getByRole('region',{name:'Find an exercise'});
-  await expect(panel.getByRole('combobox',{name:'Exercise',exact:true})).toHaveValue('personal-bench');
-  await panel.getByLabel('Muscle group').selectOption('Back');
-  await panel.getByLabel('Search exercises').fill('row');
+  await expect(panel.getByRole('button',{name:/Exercise Bench Press/})).toBeVisible();
+  await panel.getByRole('button',{name:/Muscle group/}).click();
+  await page.getByRole('dialog',{name:'Muscle group'}).getByRole('button',{name:'Back',exact:true}).click();
+  await expect(panel.getByLabel('Search exercises')).toHaveCount(0);
   await expect(panel.getByRole('status')).toHaveText('1 exercise matches your filters.');
-  await panel.getByRole('combobox',{name:'Exercise',exact:true}).selectOption('personal-row');
-  await expect(panel.getByRole('combobox',{name:'Exercise',exact:true})).toHaveValue('personal-row');
-  await panel.getByLabel('Search exercises').fill('nothing matches');
-  await expect(panel.getByRole('status')).toContainText('No exercises match');
-  await expect(panel.getByRole('combobox',{name:'Exercise',exact:true})).toHaveValue('personal-row');
+  await panel.getByRole('button',{name:/Exercise Bench Press/}).click();
+  await page.getByRole('dialog',{name:'Choose an exercise'}).getByRole('button',{name:'Chest-Supported T-Bar Row'}).click();
+  await expect(panel.getByRole('button',{name:/Exercise Chest-Supported T-Bar Row/})).toBeVisible();
+  await panel.getByRole('button',{name:/Muscle group/}).click();
+  await page.getByRole('dialog',{name:'Muscle group'}).getByRole('button',{name:'All muscles'}).click();
+  await expect(panel.getByRole('button',{name:/Exercise Chest-Supported T-Bar Row/})).toBeVisible();
+  await panel.getByRole('button',{name:/Muscle group/}).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog',{name:'Muscle group'})).toHaveCount(0);
+  await expect(panel.getByRole('button',{name:/Muscle group/})).toBeFocused();
   await page.getByRole('button',{name:/Pound for pound/}).click();
   await expect(page.getByRole('button',{name:/Pound for pound/})).toHaveAttribute('aria-pressed','true');
   for (const width of [320,390,768,1440]) {
@@ -59,7 +65,7 @@ test('strength rankings can be retried after a load failure', async ({ page }) =
   });
   await page.goto('/quests/leaderboard');
   await page.getByRole('button',{name:/Strength Logged lifts/}).click();
-  await expect(page.getByRole('alert').filter({hasText:'Rankings unavailable'})).toBeVisible();
+  await expect(page.getByRole('alert').filter({hasText:'Please try again'})).toBeVisible();
   await page.getByRole('button',{name:'Try again'}).click();
   await expect(page.getByText('No ranked exercises are available yet.')).toBeVisible();
   expect(attempts).toBe(2);

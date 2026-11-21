@@ -1,4 +1,5 @@
 import { FilesetResolver, PoseLandmarker } from '@mediapipe/tasks-vision';
+import { createPoseSubjectSelector } from '../../shared/poseSubject';
 import { jointIndices, type TrackingKind, type TrackingSide } from '../../shared/repCounter';
 
 type Command = { type: 'init'; baseUrl: string } | { type: 'dispose' } |
@@ -8,17 +9,19 @@ type Command = { type: 'init'; baseUrl: string } | { type: 'dispose' } |
 const scope = self as unknown as { onmessage: ((event: MessageEvent<Command>) => void) | null; postMessage: (data: unknown) => void };
 let detector: PoseLandmarker | undefined;
 let generation = 0;
+const subject = createPoseSubjectSelector();
 scope.onmessage = async event => {
   const command = event.data;
   if (command.type === 'dispose') { generation++; detector?.close(); detector=undefined; return; }
   if (command.type === 'init') {
+    subject.reset();
     const current=++generation;
     detector?.close(); detector=undefined;
     try {
       const files = await FilesetResolver.forVisionTasks(`${command.baseUrl}/pose/wasm`);
       const created = await PoseLandmarker.createFromOptions(files, {
         baseOptions: { modelAssetPath: `${command.baseUrl}/pose/pose_landmarker_lite.task`, delegate: 'CPU' },
-        runningMode: 'VIDEO', numPoses: 1, outputSegmentationMasks: false,
+        runningMode: 'VIDEO', numPoses: 3, outputSegmentationMasks: false,
         minPoseDetectionConfidence: 0.6, minPosePresenceConfidence: 0.6, minTrackingConfidence: 0.6,
       });
       if(current!==generation) { created.close(); return; }
@@ -31,9 +34,10 @@ scope.onmessage = async event => {
     if (!detector) throw new Error('Detector unavailable');
     const start = performance.now();
     const result = detector.detectForVideo(command.bitmap, command.timestamp);
-    const landmarks = result.landmarks[0] ?? [];
+    const selected = command.type === 'readiness-frame' ? null : subject.select(result.landmarks);
+    const landmarks = selected?.landmarks ?? result.landmarks[0] ?? [];
     if(command.type === 'generic-frame') {
-      scope.postMessage({type:'generic-result',frame:{landmarks,aspect:command.bitmap.width / command.bitmap.height,timestamp:command.timestamp},durationMs:performance.now()-start});
+      scope.postMessage({type:'generic-result',subjectChanged:selected?.changed,frame:{landmarks,aspect:command.bitmap.width / command.bitmap.height,timestamp:command.timestamp},durationMs:performance.now()-start});
       return;
     }
     if(command.type === 'readiness-frame') {
