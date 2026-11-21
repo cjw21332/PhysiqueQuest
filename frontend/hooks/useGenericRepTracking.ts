@@ -4,11 +4,18 @@ import { createLandmarkFilter } from '../../shared/landmarkFilter';
 import { createGenericRepCounter, type GeneratedAngleConfig, type PoseFrame } from '../../shared/genericRepCounter';
 import { trackingFrameInterval, trackingPowerNotice, type BatteryReading } from '../lib/trackingPerformance.mjs';
 import { createExerciseCounter, type PatternId, type ExerciseConfigOverride } from '../../shared/exerciseEngine';
+import { createTrackingTelemetry } from '../lib/trackingTelemetry';
 
 type BatteryMonitor = BatteryReading & { addEventListener(type: string, listener: () => void): void; removeEventListener(type: string, listener: () => void): void };
+const SKELETON_EDGES = [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]] as const;
 
 export function useGenericRepTracking(config: GeneratedAngleConfig, active: boolean, videoRef: RefObject<HTMLVideoElement | null>, pattern?: PatternId, override?: ExerciseConfigOverride, exerciseName?: string) {
   const overlayRef = useRef<HTMLCanvasElement>(null);
+  const telemetryEnabled = useMemo(() => {
+    try { return typeof window !== 'undefined' && window.sessionStorage.getItem('physiquequest:tracking-debug') === '1'; }
+    catch { return false; }
+  }, []);
+  const telemetry = useMemo(() => telemetryEnabled ? createTrackingTelemetry() : null, [telemetryEnabled]);
   const counter = useMemo(() => {
     const generic = createGenericRepCounter(config);
     if (!pattern) return generic;
@@ -45,6 +52,7 @@ export function useGenericRepTracking(config: GeneratedAngleConfig, active: bool
       if (event.data.type === 'generic-result') {
         busy = false;
         lastResult = performance.now();
+        const drawStart = telemetry ? performance.now() : 0;
         if (event.data.subjectChanged) counter.suspend();
         if (event.data.subjectChanged) filter.reset();
         const pose = event.data.frame as PoseFrame;
@@ -58,7 +66,7 @@ export function useGenericRepTracking(config: GeneratedAngleConfig, active: bool
           const ox = (canvas.width - video.videoWidth * scale) / 2, oy = (canvas.height - video.videoHeight * scale) / 2;
           const points = filter.update(pose.landmarks, pose.timestamp);
           context.strokeStyle = '#7ef0b2'; context.lineWidth = 3; context.beginPath();
-          for (const [a, b] of [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]]) {
+          for (const [a, b] of SKELETON_EDGES) {
             const first = points[a], second = points[b];
             if (!first || !second || Math.min(first.visibility ?? 1, second.visibility ?? 1) < .5) continue;
             context.moveTo(ox + first.x * video.videoWidth * scale, oy + first.y * video.videoHeight * scale);
@@ -66,6 +74,7 @@ export function useGenericRepTracking(config: GeneratedAngleConfig, active: bool
           }
           context.stroke();
         }
+        if (telemetry) telemetry.recordResult(lastResult, lastResult - sent, event.data.durationMs, performance.now() - drawStart);
         setProgress(counter.update(event.data.frame as PoseFrame));
         inferenceMs = event.data.durationMs;
         interval = trackingFrameInterval(inferenceMs, battery);
@@ -86,16 +95,26 @@ export function useGenericRepTracking(config: GeneratedAngleConfig, active: bool
       }
       if (busy && now - sent > 5000) { fail('Pose tracking stopped responding.'); return; }
       const video = videoRef.current;
+      if (busy && ready && video && video.readyState >= 2 && video.videoWidth && now-lastSent >= interval && video.currentTime !== lastVideoTime) telemetry?.recordBusySkip(now);
       if (stopped || failed || !ready || busy || !video || video.readyState < 2 || !video.videoWidth || now-lastSent < interval || video.currentTime === lastVideoTime) return;
       busy = true; sent = now; lastSent = now; lastVideoTime = video.currentTime;
+      let bitmap: ImageBitmap | undefined;
       try {
         const width = Math.min(480,video.videoWidth);
-        const bitmap = await createImageBitmap(video,{resizeWidth:width,resizeHeight:Math.max(1,Math.round(video.videoHeight*width/video.videoWidth))});
+        bitmap = await createImageBitmap(video,{resizeWidth:width,resizeHeight:Math.max(1,Math.round(video.videoHeight*width/video.videoWidth))});
         if(stopped || failed || !ready) { bitmap.close(); return; }
         worker.postMessage({type:'generic-frame',bitmap,timestamp:now},[bitmap]);
-      } catch { fail('Could not process the camera frame.'); }
+        bitmap = undefined; // Ownership passed to the worker, which closes it.
+      } catch { bitmap?.close(); busy = false; fail('Could not process the camera frame.'); }
     },50);
     return () => { stopped=true; counter.suspend(); battery?.removeEventListener('levelchange',updatePower); battery?.removeEventListener('chargingchange',updatePower); window.clearInterval(timer); window.clearTimeout(timeout); worker.terminate(); };
   },[active,counter,videoRef]);
-  return { ...progress, status, powerNotice, overlayRef };
+  const exportTelemetry = () => {
+    if (!telemetry) return;
+    const data = { schema: 1, note: 'Browser tracker only; camera recovery, heap and thermal state are not recorded.', windows: telemetry.snapshot(performance.now()) };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+    const link = document.createElement('a'); link.href = url; link.download = 'physiquequest-tracking-telemetry.json'; link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+  return { ...progress, status, powerNotice, overlayRef, telemetryEnabled, exportTelemetry };
 }
