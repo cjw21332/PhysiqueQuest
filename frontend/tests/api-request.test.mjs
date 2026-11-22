@@ -18,6 +18,9 @@ function client(fetcher, { initialUser = {}, refresh = async current => current 
     './apiBaseUrl.mjs': { resolveApiBaseUrl }, './coachBaseUrl.mjs': { resolveCoachBaseUrl },
     './deviceCache.mjs': { createDeviceCache }, './apiErrors.mjs': errors,
     './dataChanges.mjs': { announceDataChange: () => {} },
+    // getAllWorkouts joins the server page with the local journal; with no
+    // IndexedDB in this context only the module shape has to exist.
+    './workoutJournal': { journals: async () => [], changeJournal: async () => {}, recordAction: async () => ({}), workoutHistorySnapshot: async () => [] },
   };
   const output = ts.transpileModule(readFileSync(new URL('../lib/api.ts', import.meta.url), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -25,6 +28,7 @@ function client(fetcher, { initialUser = {}, refresh = async current => current 
   runInNewContext(output, { exports, require: name => modules[name], fetch: fetcher, URL, URLSearchParams, Intl, AbortController, Event,
     setTimeout, clearTimeout, TypeError, Error, process: { env: {} },
     console: { error: (...args) => warnings.push(args), warn: (...args) => warnings.push(args) },
+    navigator: { onLine: true },
     window: { dispatchEvent: () => {}, location: { protocol: 'http:', hostname: 'localhost', port: '3000' }, localStorage: { getItem: key => key === 'physiquequest-runtime-api-url' ? runtimeApiUrl : null } },
   });
   return { ...exports, warnings, setRuntimeApiUrl: value => { runtimeApiUrl = value; } };
@@ -32,7 +36,9 @@ function client(fetcher, { initialUser = {}, refresh = async current => current 
 
 test('account requests include credentials; independent Coach requests omit them and account-only headers', async () => {
   const calls = [];
-  const { api } = client(async (url, config) => { calls.push({ url, config }); return { ok: true, json: async () => ({}) }; });
+  // getSettings goes through the device cache, which rejects a payload without
+  // a values object, so the double has to answer with the real shape.
+  const { api } = client(async (url, config) => { calls.push({ url, config }); return { ok: true, json: async () => url.endsWith('/settings') ? { values: {} } : ({}) }; });
   await api.getSettings();
   await api.getExercises();
   assert.equal(calls[0].config.credentials, 'include');
@@ -49,12 +55,15 @@ test('failed data refresh reports its endpoint and a successful retry clears the
     if (offline && url.endsWith('/nutrition')) throw new TypeError('Failed to fetch');
     return { ok: true, json: async () => url.endsWith('/nutrition') ? { meals: [], water: [] }
       : url.endsWith('/profile') ? { name: 'Synthetic' } : url.endsWith('/coach/plan') ? { days: [] }
+      : url.includes('/settings') ? { values: {} } : url.includes('/workouts') ? []
       : { state: {}, dailyMissions: [] } };
   });
   assert.ok((await api.preloadAppData()).every(result => result.status === 'fulfilled'));
   offline = true;
   const failed = await api.preloadAppData(true);
-  assert.equal(failed[1].reason.name, 'ApiNetworkError');
+  // Asserted by resource rather than by position: preloadAppData's order has
+  // changed before, and a stale index silently stops testing anything.
+  assert.ok(failed.some(result => result.status === 'rejected' && result.reason?.name === 'ApiNetworkError'));
   assert.match(deviceCache.get('nutrition').error, /Check your internet connection/);
   assert.ok(warnings.some(parts => parts.some(part => String(part).includes('/nutrition'))));
   offline = false;

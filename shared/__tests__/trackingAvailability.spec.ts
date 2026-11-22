@@ -14,7 +14,9 @@ describe('exercise support versus camera access', () => {
     expect(unsupportedTrackingMessage).not.toMatch(/camera|permission|access/i);
   });
   it('uses support wording and hides permission instructions when tracking is unavailable', () => {
-    const screen = readFileSync('frontend/sections/Coach/PoseTrackerSession.tsx', 'utf8');
+    // Resolved from this file, not the working directory: the suite runs from
+    // shared/, where a repo-root relative path does not exist.
+    const screen = readFileSync(new URL('../../frontend/sections/Coach/PoseTrackerSession.tsx', import.meta.url), 'utf8');
     expect(screen).toContain(': unsupportedTrackingMessage');
     expect(screen).toContain('{allowed && <p className="pose-setup-help">');
     expect(screen).not.toContain('Camera tracking is not ready for this exercise.');

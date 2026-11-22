@@ -13,7 +13,7 @@ test('meal scanning offers camera capture and photo upload into the same analysi
   assert.match(camera, /getUserMedia/);
   assert.match(camera, /track\.stop\(\)/);
   assert.match(camera, /canvas\.toBlob/);
-  assert.match(camera, /Confirm and analyse/);
+  assert.match(camera, /Analyse meal/);
   assert.match(scan, /aria-label="Upload a meal photo"/);
   assert.match(scan, /setCameraOpen\(true\)/);
   assert.match(scan, /onClick=\{\(\)=>uploadInput\.current\?\.click\(\)\}/);
@@ -26,7 +26,7 @@ test('meal scanning offers camera capture and photo upload into the same analysi
   assert.match(confirmation, /Your photo is sent to our AI service to identify the food/);
   assert.match(confirmation, /showModal\(\)/);
   assert.match(confirmation, /onCancel=\{event/);
-  assert.match(camera, /Your photo is sent to our AI service to identify the food/);
+  assert.match(camera, /Your photo (?:is|will be) sent to our AI service to identify the food/);
   assert.match(scan, /api\.analyzeImage\(image, undefined, foodDescription, controller\.signal\)/);
   assert.match(scan, /const retake=.*setPhotoSourceOpen\(true\)/);
 });
@@ -48,10 +48,12 @@ test('dashboard shows calorie and macro targets with live meals and water contro
 
   assert.match(types, /nutritionTargets = \{ calories: 2300, protein: 140, carbs: 240, fats: 70 \}/);
   assert.match(dashboard, /nutritionTargets/);
-  assert.match(dashboard, /<CalorieProgress calories=\{calories\} target=\{calorieTarget\}/);
+  // Partial totals are shown as partial rather than silently rounded to zero.
+  assert.match(dashboard, /<CalorieProgress calories=\{calories \?\? knownCalories\.total\} target=\{calorieTarget\}/);
+  assert.match(dashboard, /partial=\{calories === null/);
   assert.match(dashboard, /role="progressbar"/);
   assert.match(dashboard, /onClick=\{onHistory\}/);
-  assert.match(dashboard, /<MealDiary meals=\{meals\} onAdd=\{onAdd\} onEdit=\{onEdit\}/);
+  assert.match(dashboard, /<MealDiary readOnly=\{readOnly\} meals=\{meals\} onAdd=\{onAdd\} onEdit=\{onEdit\}/);
   assert.equal((dashboard.match(/<WaterTracker /g) || []).length, 1);
   assert.match(scan, /onWater=\{setWater\}/);
   assert.doesNotMatch(dashboard, /View log|onLogs/);

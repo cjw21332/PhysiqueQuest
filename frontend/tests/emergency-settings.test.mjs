@@ -18,6 +18,10 @@ async function settingsHook(savedValues) {
     useCallback: fn => fn,
     useEffect: fn => { effect = fn; },
   };
+  // The hook also reads the offline device cache and subscribes to data-change
+  // events, so the module double has to answer for those too.
+  const deviceCache = { get: () => ({ data: undefined }) };
+  const DATA_CHANGE_EVENT = 'physiquequest:data-change';
   const api = {
     getSettings: async () => ({ values: savedValues }),
     updateSettings: async patch => {
@@ -30,7 +34,7 @@ async function settingsHook(savedValues) {
     compilerOptions: { module: ts.ModuleKind.CommonJS },
   });
   const window = { addEventListener() {}, removeEventListener() {}, setInterval: () => 1, clearInterval() {} };
-  new Function('require', 'module', 'exports', 'window', outputText)(name => name === 'react' ? react : { api }, module, module.exports, window);
+  new Function('require', 'module', 'exports', 'window', outputText)(name => name === 'react' ? react : { api, deviceCache, DATA_CHANGE_EVENT }, module, module.exports, window);
   const render = () => { cursor = 0; return module.exports.useSettings(); };
   const initial = render();
   effect();

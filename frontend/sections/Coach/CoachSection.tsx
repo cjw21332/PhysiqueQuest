@@ -22,7 +22,7 @@ import OutcomeDialog from '../../components/OutcomeDialog';
 
 type View = 'plan' | 'library' | 'review' | 'session' | 'report';
 
-export default function CoachSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
+export default function CoachSection({ profile }: { profile: Profile }) {
   const { push: navigate } = useRouter();
   const [view, setView] = useScreenRoute<View>('/coach', { plan: '', library: '/library', review: '/review', session: '/session', report: '/report' }, 'plan');
   const [sessionExercises, setSessionExercises] = useState<CoachExercise[]>([]);

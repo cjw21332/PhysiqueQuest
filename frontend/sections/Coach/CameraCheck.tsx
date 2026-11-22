@@ -64,7 +64,7 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
     <>
       <div className="video-review-view" hidden={reportOpen && Boolean(analysis)}>
       <header className="coach-header pq-page-heading">
-        <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
+        <button type="button" className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
         <h2>Review a video</h2>
       </header>
 
@@ -99,9 +99,6 @@ export default function CameraCheck({ onBack, onStart }: { onBack: () => void; o
 function AnalysisReport({ value, fileName, onBack, onStart, onRetry, retrying, retryError }: { value: unknown; fileName: string; onBack: () => void; onStart: () => void; onRetry: () => void; retrying: boolean; retryError: string }) {
   const data = value && typeof value === 'object' ? value as Record<string, unknown> : {};
   const metrics = data.metrics && typeof data.metrics === 'object' ? data.metrics as Record<string, unknown> : {};
-  const sampled = typeof metrics.sampledFrames === 'number' ? metrics.sampledFrames : 0;
-  const detected = typeof metrics.detectedFrames === 'number' ? metrics.detectedFrames : 0;
-  const joints = Array.isArray(metrics.joints) ? metrics.joints.filter((item): item is { joint: string; minAngle: number; maxAngle: number; visibleFrames: number } => item && typeof item.joint === 'string' && typeof item.minAngle === 'number' && typeof item.maxAngle === 'number' && typeof item.visibleFrames === 'number') : [];
   const observations = Array.isArray(data.observations) ? data.observations.filter((item): item is string => typeof item === 'string') : [];
   const review = data.exerciseReview && typeof data.exerciseReview === 'object' ? data.exerciseReview as Record<string, unknown> : null;
   const movement = data.movementEstimate && typeof data.movementEstimate === 'object' ? data.movementEstimate as Record<string, unknown> : null;

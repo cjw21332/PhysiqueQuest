@@ -11,7 +11,7 @@
 .coach-library .library-copy b,.coach-library .library-copy small { display: block; white-space: normal; overflow-wrap: anywhere; }
 .coach-library .library-copy b { font-size: 13px; font-weight: 500; }
 .coach-library .library-copy small { font-size: 11px; }
-.coach-library .tracking-tag.manual { padding: 3px 8px; font-size: 10px; }
+.coach-library .tracking-tag.manual { padding: 3px 8px; font-size: 11px; }
 .library-dialog.library-dialog { inset: auto 0 0; width: min(100%, 560px); margin: 0 auto; min-height: min(80dvh, 760px); max-height: calc(100dvh - 72px); border-radius: 24px 24px 0 0; }
 .library-dialog .library-exercise-sheet { padding: 20px 18px 30px; }
 .library-dialog .library-sheet-header { align-items: flex-start; gap: 8px; margin-bottom: 10px; }
@@ -79,7 +79,7 @@
 .personal-library-empty { margin: 0; padding: 14px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); font-size: 13px; }
 .library-item-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .library-demo-label { color: var(--muted); font-size: 11px; }
-.library-variation-tag { display: inline-flex; width: fit-content; max-width: 100%; margin-top: 6px; padding: 3px 7px; border-radius: 999px; background: var(--soft); color: var(--muted); font-size: 10px; line-height: 1.3; }
+.library-variation-tag { display: inline-flex; width: fit-content; max-width: 100%; margin-top: 6px; padding: 3px 7px; border-radius: 999px; background: var(--soft); color: var(--muted); font-size: 11px; line-height: 1.3; }
 .coach-library .library-item > svg { flex: 0 0 16px; color: var(--muted); }
 @media (max-width: 340px) { .coach-library .exercise-thumb { width: 40px; height: 40px; flex-basis: 40px; } .coach-library .library-item { gap: 8px; } .coach-library .library-copy b { font-size: 12px; } .library-dialog .library-exercise-sheet { padding-inline: 14px; } }
 

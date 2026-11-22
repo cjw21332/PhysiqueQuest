@@ -2,7 +2,7 @@ import { catalogTiersMap } from './catalog-tiers.ts';
 import { catalogTrackingMap } from './catalog-tracking.generated.ts';
 
 // Shared pure registry: imported by the browser, API and catalog audit. No credentials or I/O.
-export const configurationVersion = 1;
+export const configurationVersion = 2;
 export const providerExercises = ['squat','push_up','plank','lunge','side_lunge','deadlift','glute_bridge','calf_raise','tricep_dip','bicep_curl','hammer_curl','shoulder_press','lateral_raise','mountain_climber','high_knees','jumping_jack','low_impact_jack','leg_raise','wall_sit','balance_leg','balance_leg_left','balance_leg_right','shoulder_roll','shoulder_deep_breath','chair_forward_fold','chair_side_stretch','split','facial_split','pancake','closing','bridge','cobra','bow','tiger','camel','king_pigeon','foot_to_hand','i','needle','back_flexibility_test'] as const;
 export type CatalogExercise = { exerciseId?: string; _id?: string; name: string; bodyParts?: string[]; targetMuscles?: string[]; equipments?: string[]; instructions?: string[]; equipment?: string; targetMuscle?: string; group?: string; movement_pattern?: string };
 
@@ -148,6 +148,12 @@ export function resolveTrackingConfig(row: CatalogExercise, override?: ConfigOve
     }
   }
   return config;
+}
+/** Prefer a newer bundled catalog pattern on-device while retaining explicit server overrides. */
+export function reconcileNativeTrackingConfig(server: TrackingConfig, local: TrackingConfig): TrackingConfig {
+  if (local.configurationVersion <= server.configurationVersion || !local.nativePattern || server.validationStatus === 'disabled' ||
+    server.providerExerciseId || server.referenceUuid || server.generatedAngleConfig || server.trackingMode === 'reference' || server.trackingMode === 'generated-angle') return server;
+  return { ...server, nativePattern: local.nativePattern, nativeSupport: local.nativeSupport, nativeOverride: local.nativeOverride };
 }
 export function validateOverride(value: ConfigOverride) {
   if (!['builtin','reference','generated-angle','unavailable'].includes(value.trackingMode)) throw Error('Invalid tracking mode');

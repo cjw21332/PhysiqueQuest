@@ -207,7 +207,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
 
   return <div className="coach-library" ref={libraryRef}>
     <header className="coach-header library-header pq-page-heading">
-      <button className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button>
+      <button type="button" className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button>
       <h2 ref={headingRef} tabIndex={-1}>Exercise library</h2>
     </header>
     <div className="library-discover-intro"><span aria-hidden="true"><Icon name="library-dumbbells" size={22}/></span><div><strong>Find your next exercise</strong><p>Explore movements, watch demonstrations and choose how to track.</p></div></div>
@@ -252,7 +252,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
         <header className="library-sheet-header"><div><h3 id="library-exercise-title">{titleCase(detail?.name || selected.name)}</h3><p>{metadata(detail || selected)}</p>{exerciseVariations(detail?.name || selected.name).length > 0 && <span className="library-variation-tag">Movement variation · {exerciseVariations(detail?.name || selected.name).join(' · ')}</span>}</div><button type="button" className="sheet-close" onClick={() => setSelected(null)} aria-label="Close exercise details" autoFocus><Icon name="close" size={18}/></button></header>
         <div className="library-sheet-content">
         {!detail && !detailError && <p role="status">Loading exercise details…</p>}
-        {detailError && <div role="alert" className="empty-library"><p>{detailError}</p><button className="secondary" onClick={() => setDetailRetry(value => value + 1)}>Retry details</button></div>}
+        {detailError && <div role="alert" className="empty-library"><p>{detailError}</p><button type="button" className="secondary" onClick={() => setDetailRetry(value => value + 1)}>Retry details</button></div>}
         {detail && <>
           <div className="library-demo">
             {detail.gifUrl && !mediaError ? <>

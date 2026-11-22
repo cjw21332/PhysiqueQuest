@@ -104,8 +104,8 @@ android {
         applicationId 'com.physiquequest.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9
-        versionName "1.5.0"
+        versionCode 10
+        versionName "1.5.1"
         buildConfigField "boolean", "PQ_STANDALONE", "false"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
@@ -174,7 +174,7 @@ android {
 
 // Include the exported site in the standalone APK. This only packages the
 // files; switching the WebView origin requires a verified storage migration.
-def mobileShellExport = file('../../shell-export')
+def mobileShellExport = file('../../../frontend/.next-mobile-export')
 def mobileShellAssets = layout.buildDirectory.dir('generated/physiquequestShellAssets')
 def verifyMobileShellExport = tasks.register('verifyMobileShellExport') {
     doLast {

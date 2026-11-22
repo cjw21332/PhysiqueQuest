@@ -21,6 +21,9 @@
   --red-light: #480909;
   --red-line: #f87171;
   --red-dark: #f87171;
+  /* Readable on the highlighted leaderboard row as well as on --bg;
+     --red-line falls to 4.3:1 against the green row background. */
+  --red-text: #fca5a5;
   --blue-light: #161d27;
   --blue-dark: #94a3b8;
   --gray-light: #161d27;

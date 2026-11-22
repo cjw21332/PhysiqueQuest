@@ -67,7 +67,7 @@ export default function HomeDashboard({ profile, onNotify }: {
           <h1 className="greeting-name">Hi, {profile.name.trim().split(' ')[0] || 'there'}</h1>
         </div>
       </div>
-      <button className="notification-bell" aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'} onClick={onNotify}><Icon name="bell" size={20} />{unread > 0 && <span className="notification-bell-count" aria-hidden="true">{unread > 99 ? '99+' : unread}</span>}</button>
+      <button type="button" className="notification-bell" aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'} onClick={onNotify}><Icon name="bell" size={20} />{unread > 0 && <span className="notification-bell-count" aria-hidden="true">{unread > 99 ? '99+' : unread}</span>}</button>
     </header>
 
     <section className="workout-card home-ref-workout" aria-label="Today's session">
@@ -83,8 +83,8 @@ export default function HomeDashboard({ profile, onNotify }: {
         <span>{profile.equipment?.[0] || 'Equipment not set'}</span>
         {todayPlan?.isWorkoutDay && todayPlan.exercises.length > 0 && <span><Icon name="coach" size={13} />{todayPlan.exercises.some(exercise => exercise.tracking === 'AI tracked') ? 'AI form tracking' : 'Exercise tracking'}</span>}
       </div>
-      <button className="start-button" onClick={() => navigate('/coach')}><Icon name="play" size={14} />{todayPlan?.isWorkoutDay && todayPlan.exercises.length > 0 ? 'Start workout' : 'View plan'}</button>
-      {todayPlan?.isWorkoutDay && todayPlan.exercises.length > 0 && <button className="link-text" onClick={() => navigate('/coach')}>View full plan</button>}
+      <button type="button" className="start-button" onClick={() => navigate('/coach')}><Icon name="play" size={14} />{todayPlan?.isWorkoutDay && todayPlan.exercises.length > 0 ? 'Start workout' : 'View plan'}</button>
+      {todayPlan?.isWorkoutDay && todayPlan.exercises.length > 0 && <button type="button" className="link-text" onClick={() => navigate('/coach')}>View full plan</button>}
     </section>
 
     <section className="stats-row home-ref-stats" aria-label="Activity summary">
@@ -96,12 +96,12 @@ export default function HomeDashboard({ profile, onNotify }: {
     </section>
 
     <section className="content-section home-ref-section">
-      <div className="section-title-row"><h3 className="section-title">Daily missions · {activityLoading ? '…' : `${completed} of ${dailyMissions.length}`}</h3><button className="view-all-link" onClick={() => navigate('/quests')}>View all</button></div>
+      <div className="section-title-row"><h3 className="section-title">Daily missions · {activityLoading ? '…' : `${completed} of ${dailyMissions.length}`}</h3><button type="button" className="view-all-link" onClick={() => navigate('/quests')}>View all</button></div>
       {activityError ? <p role="alert" className="error">{activityError} <button type="button" onClick={() => void refreshActivity()}>Try again</button></p> : activityLoading ? <p role="status">Loading your missions…</p> : dailyMissions.length ? <div className="missions-container">{dailyMissions.map(mission => <MissionCard key={mission.key} kind={mission.key} title={mission.title} current={mission.progress} total={mission.target} />)}</div> : <p>No missions available right now.</p>}
     </section>
 
     <section className="content-section home-ref-section">
-      <div className="section-title-row"><h3 className="section-title">Nutrition today</h3><button className="scan-link" onClick={() => navigate('/scan')}><Icon name="scan" size={12} />Scan meal</button></div>
+      <div className="section-title-row"><h3 className="section-title">Nutrition today</h3><button type="button" className="scan-link" onClick={() => navigate('/scan')}><Icon name="scan" size={12} />Scan meal</button></div>
       {nutritionError ? <p role="alert" className="error">{nutritionError} <button type="button" onClick={() => void refreshNutrition()}>Try again</button></p> : nutritionLoading ? <p role="status">Loading your nutrition…</p> : <><div className="nutrition-overview home-ref-nutrition">
         <CalorieProgress calories={totals.calories ?? knownTotals.calories} target={targets.calories} partial={totals.calories === null && knownTotals.calories !== null}/>
         <div className="macros-list">
@@ -114,8 +114,8 @@ export default function HomeDashboard({ profile, onNotify }: {
     <section className="content-section home-ref-section home-ref-journey">
       <h3 className="section-title">Your journey</h3>
       <div className="journey-cards">
-        <button className="journey-card" onClick={() => navigate('/goals')}><div className="journey-icon journey-icon-goals"><Icon name="goal-milestones" size={20} /></div><div className="journey-info"><div className="journey-title">Goals &amp; milestones</div><div className="journey-subtitle">{profile.goal || 'Set up your goal'}{profile.targetWeight ? ` · ${profile.targetWeight} ${profile.weightUnit} target` : ''}</div></div><Icon name="arrow" size={14} /></button>
-        <button className="journey-card" onClick={() => navigate('/progress')}><div className="journey-icon journey-icon-progress"><Icon name="trend" size={18} /></div><div className="journey-info"><div className="journey-title">Progress</div><div className="journey-subtitle">Review saved measurements</div></div><Icon name="arrow" size={14} /></button>
+        <button type="button" className="journey-card" onClick={() => navigate('/goals')}><div className="journey-icon journey-icon-goals"><Icon name="goal-milestones" size={20} /></div><div className="journey-info"><div className="journey-title">Goals &amp; milestones</div><div className="journey-subtitle">{profile.goal || 'Set up your goal'}{profile.targetWeight ? ` · ${profile.targetWeight} ${profile.weightUnit} target` : ''}</div></div><Icon name="arrow" size={14} /></button>
+        <button type="button" className="journey-card" onClick={() => navigate('/progress')}><div className="journey-icon journey-icon-progress"><Icon name="trend" size={18} /></div><div className="journey-info"><div className="journey-title">Progress</div><div className="journey-subtitle">Review saved measurements</div></div><Icon name="arrow" size={14} /></button>
       </div>
     </section>
   </div>;

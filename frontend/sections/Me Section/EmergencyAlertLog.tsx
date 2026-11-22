@@ -34,7 +34,7 @@ export default function EmergencyAlertLog({ onBack }: { onBack: () => void }) {
       <div className="me-scroll">
         <div className="me-threshold" role="group" aria-label="Date range">
           {([7, 30, 90] as const).map(value => (
-            <button key={value} className={range === value ? 'selected' : ''} onClick={() => setRange(value)}>{value} days</button>
+            <button type="button" key={value} className={range === value ? 'selected' : ''} onClick={() => setRange(value)}>{value} days</button>
           ))}
         </div>
         {loading && <p className="hint" role="status">Loading alerts...</p>}

@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-11-21T11:45:04.864Z",
+  "generatedAt": "2026-11-22T09:09:03.110Z",
   "catalogSize": 1500,
   "uniqueIds": 1500,
   "counts": {
     "FULLY_SUPPORTED": 0,
-    "PARTIALLY_SUPPORTED": 835,
-    "NOT_YET_VALIDATED": 127,
+    "PARTIALLY_SUPPORTED": 834,
+    "NOT_YET_VALIDATED": 128,
     "UNSUPPORTED": 538
   },
   "patternCounts": {
@@ -18,20 +18,20 @@
     "squat": 74,
     "hip_thrust": 11,
     "hinge": 39,
-    "triceps_extension": 88,
+    "triceps_extension": 86,
     "jumping_jack": 1,
     "horizontal_pull": 101,
     "lunge": 36,
     "front_raise": 11,
     "lateral_raise": 24,
     "core_isometric": 6,
-    "dip": 21,
+    "dip": 23,
     "chest_fly": 3,
     "hip_abduction": 1,
     "high_knees": 1,
     "mountain_climber": 1
   },
-  "overrideCount": 365,
+  "overrideCount": 366,
   "modeOverrideCount": 110,
   "records": [
     {
@@ -1876,10 +1876,12 @@
       ],
       "camera": "front",
       "override": {
-        "visibility": 0.45
+        "visibility": 0.45,
+        "view": "side"
       },
       "overrideBasis": [
-        "machine or bench equipment can occlude the measured joints"
+        "machine or bench equipment can occlude the measured joints",
+        "side view keeps the pressing elbow hinge visible through the shoulder press path"
       ]
     },
     {
@@ -2258,12 +2260,10 @@
     {
       "id": "7aVz15j",
       "name": "triceps dips floor",
-      "pattern": "triceps_extension",
-      "support": "PARTIALLY_SUPPORTED",
-      "reason": "Implemented Elbow extension pattern with known limitation: per-side counting attributes a repetition to the more visible side.",
-      "gaps": [
-        "per-side counting attributes a repetition to the more visible side"
-      ],
+      "pattern": "dip",
+      "support": "NOT_YET_VALIDATED",
+      "reason": "Implemented Dip pattern; no real-person validation for this exercise.",
+      "gaps": null,
       "camera": "side",
       "override": {
         "visibility": 0.45
@@ -4557,13 +4557,12 @@
     {
       "id": "bZq4bwK",
       "name": "Weighted Triceps Dips",
-      "pattern": "triceps_extension",
+      "pattern": "dip",
       "support": "PARTIALLY_SUPPORTED",
-      "reason": "Implemented Elbow extension pattern with known limitation: equipment can occlude the measured joints.",
+      "reason": "Implemented Dip pattern with known limitation: equipment can occlude the measured joints.",
       "gaps": [
         "equipment can occlude the measured joints",
-        "external load is not observed; only the body segment angle is measured",
-        "per-side counting attributes a repetition to the more visible side"
+        "external load is not observed; only the body segment angle is measured"
       ],
       "camera": "side",
       "override": null,
@@ -5360,8 +5359,12 @@
         "external load is not observed; only the body segment angle is measured"
       ],
       "camera": "front",
-      "override": null,
-      "overrideBasis": []
+      "override": {
+        "view": "side"
+      },
+      "overrideBasis": [
+        "side view keeps the pressing elbow hinge visible through the shoulder press path"
+      ]
     },
     {
       "id": "DeDThfG",
@@ -5536,10 +5539,12 @@
       ],
       "camera": "front",
       "override": {
-        "visibility": 0.45
+        "visibility": 0.45,
+        "view": "side"
       },
       "overrideBasis": [
-        "machine or bench equipment can occlude the measured joints"
+        "machine or bench equipment can occlude the measured joints",
+        "side view keeps the pressing elbow hinge visible through the shoulder press path"
       ]
     },
     {
@@ -17327,10 +17332,12 @@
       ],
       "camera": "front",
       "override": {
-        "visibility": 0.45
+        "visibility": 0.45,
+        "view": "side"
       },
       "overrideBasis": [
-        "machine or bench equipment can occlude the measured joints"
+        "machine or bench equipment can occlude the measured joints",
+        "side view keeps the pressing elbow hinge visible through the shoulder press path"
       ]
     },
     {

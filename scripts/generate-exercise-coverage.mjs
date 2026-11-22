@@ -80,6 +80,10 @@ const OVERRIDES = new Map(Object.entries({
   'lower back curl': null,
   'cable squat row with rope attachment': 'horizontal_pull',
   'sled single leg calf press on leg press': 'calf_raise',
+  // Plural catalog names miss the singular `dip` movement rule and otherwise
+  // fall through to the broader `triceps` extension rule.
+  'triceps dips floor': 'dip',
+  'weighted triceps dips': 'dip',
   'bridge mountain climber cross body': null,
   'london bridge': null,
   'side bridge': 'core_isometric',
@@ -212,6 +216,10 @@ for (const exercise of catalog) {
       override.dwellMs = 50;
       overrideBasis.push('name describes a fast or ballistic movement');
     }
+    if (pattern === 'vertical_push' && (/^machine shoulder press$/.test(normalized) || normalized === 'barbell standing bradford press')) {
+      override.view = 'side';
+      overrideBasis.push('side view keeps the pressing elbow hinge visible through the shoulder press path');
+    }
   }
 
   const gaps = [];
@@ -286,6 +294,7 @@ const rows = [...byId.values()].map((row) => {
   const override = row.override ? [
     row.override.mode ? `mode ${row.override.mode}` : '',
     row.override.visibility !== undefined ? `visibility ${row.override.visibility}` : '',
+    row.override.view ? `camera view ${row.override.view}` : '',
     row.override.minRepMs !== undefined ? `min rep ${row.override.minRepMs} ms` : '',
     row.override.maxRepMs !== undefined ? `max rep ${row.override.maxRepMs} ms` : '',
     row.override.dwellMs !== undefined ? `dwell ${row.override.dwellMs} ms` : '',

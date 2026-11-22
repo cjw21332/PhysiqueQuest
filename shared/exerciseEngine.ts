@@ -127,6 +127,13 @@ export function resolvePatternSpec(id: PatternId, override?: ExerciseConfigOverr
     maxRepMs,
     dwellMs: finite(override.dwellMs, base.dwellMs, 0, 500),
   };
+  if (spec.camera !== base.camera && id === 'vertical_push' && spec.camera === 'side') {
+    spec.cue = {
+      ...spec.cue,
+      start: 'Turn sideways and keep a working shoulder, elbow and wrist visible.',
+      lost: 'Keep a working shoulder, elbow and wrist visible from the side.',
+    };
+  }
   if (base.hold) {
     spec.hold = {
       ...base.hold,

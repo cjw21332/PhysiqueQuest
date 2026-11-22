@@ -5,7 +5,7 @@
 .pq-goals-header .pq-goals-edit, .pq-goals-section-head button, .pq-goals-text-button, .pq-goals-empty button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--green); font-size: 12px; font-weight: 650; cursor: pointer; }
 .pq-goals-header .pq-goals-edit { min-height: 44px; }
 .pq-goals-intro { margin: 5px 0 23px; }
-.pq-goals-eyebrow { color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: .1em; }
+.pq-goals-eyebrow { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .1em; }
 .pq-goals-intro h2 { margin: 7px 0 5px; font-size: 24px; line-height: 1.2; letter-spacing: -.6px; }
 .pq-goals-intro p, .pq-goals-hero p, .pq-goals-date p, .pq-goals-training p, .pq-goals-empty p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .pq-goals-hero { padding: 20px; border: 1px solid var(--line); border-radius: 23px; background: var(--green-light); overflow-wrap: anywhere; }
@@ -16,7 +16,7 @@
 .pq-goals-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 21px 0 16px; }
 .pq-goals-metrics > div { min-width: 0; }
 .pq-goals-metrics > div + div { border-left: 1px solid var(--line); padding-left: 16px; }
-.pq-goals-metrics small, .pq-goals-date small { display: block; margin-bottom: 7px; color: var(--muted); font-size: 10px; font-weight: 650; letter-spacing: .06em; }
+.pq-goals-metrics small, .pq-goals-date small { display: block; margin-bottom: 7px; color: var(--muted); font-size: 11px; font-weight: 650; letter-spacing: .06em; }
 .pq-goals-metrics strong { font-size: 25px; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
 .pq-goals-metrics strong span { color: var(--muted); font-size: 13px; font-weight: 500; }
 .pq-goals-target { display: flex; align-items: center; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); color: var(--ink); font-size: 12px; }
@@ -73,14 +73,14 @@
 .pq-goals-intro p { margin-top: 9px; font-size: 13px; }
 .pq-goals-intro-mark { display: grid; flex: 0 0 54px; width: 54px; height: 54px; place-items: center; border: 1px solid var(--line); border-radius: 19px; background: var(--soft); color: var(--green); }
 .pq-goals-hero { padding: 22px; border-radius: 24px; background: var(--green-light); }
-.pq-goals-goal-label, .pq-goals-goal-status { display: inline-flex; align-items: center; gap: 7px; color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: .09em; }
+.pq-goals-goal-label, .pq-goals-goal-status { display: inline-flex; align-items: center; gap: 7px; color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .09em; }
 .pq-goals-goal-label svg { flex: 0 0 auto; }
-.pq-goals-goal-status { padding: 7px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 9px; }
+.pq-goals-goal-status { padding: 7px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 11px; }
 .pq-goals-hero h2 { margin: 20px 0 7px; font-size: 29px; }
 .pq-goals-hero > p { max-width: 310px; font-size: 13px; }
 .pq-goals-metrics { gap: 8px; margin: 22px 0 10px; }
 .pq-goals-metrics > div, .pq-goals-metrics > div + div { padding: 14px 12px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
-.pq-goals-metrics small { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; color: var(--muted); font-size: 10px; }
+.pq-goals-metrics small { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; color: var(--muted); font-size: 11px; }
 .pq-goals-metrics small svg { color: var(--green); }
 .pq-goals-metrics strong { display: block; font-size: 27px; line-height: 1; }
 .pq-goals-metrics em { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; font-style: normal; }

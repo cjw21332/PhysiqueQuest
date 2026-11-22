@@ -28,7 +28,10 @@ test('progress uses account data and does not present sample personal records', 
   assert.match(await source('hooks/useWorkoutHistory.ts'), /api\.getAllWorkouts/);
   assert.match(progress, /addMeasurement/);
   assert.match(goals, /useWorkoutSummary/);
-  assert.match(goals, /conic-gradient/);
+  // The weekly ring became a labelled progress track; the accessible
+  // semantics are what matter, not the gradient that used to draw it.
+  assert.match(goals, /role="progressbar"/);
+  assert.match(goals, /aria-valuenow/);
   assert.match(styles, /border-radius: 50%/);
   assert.match(styles, /pq-progress/);
 });

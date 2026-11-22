@@ -161,13 +161,13 @@ export default function AddFood({
   return (
     <div className="add-food-screen">
       <header className="scan-header add-food-header pq-page-heading">
-        <button className="coach-back" onClick={onBack} aria-label="Back"><Icon name="arrow" size={20} /></button>
+        <button type="button" className="coach-back" onClick={onBack} aria-label="Back"><Icon name="arrow" size={20} /></button>
         <h2>Add food</h2>
       </header>
 
       <div className="add-food-content">
         <div className="scan-chips meal-select" aria-label="Choose a meal">
-          {mealNames.map(item => <button key={item} className={meal === item ? 'active' : ''} aria-pressed={meal === item} onClick={() => setMeal(item)}>{item}</button>)}
+          {mealNames.map(item => <button type="button" key={item} className={meal === item ? 'active' : ''} aria-pressed={meal === item} onClick={() => setMeal(item)}>{item}</button>)}
         </div>
 
         <label className="food-search">
@@ -229,7 +229,7 @@ export default function AddFood({
         {selected && !validAmount && <p className="scan-save-hint" role="alert">Enter a valid quantity and serving weight (up to 100,000 g).</p>}
         {error && selected?.detail && <p className="error" role="alert">{error}</p>}
         {calculated && Object.values(calculated).some(value => value === null) && <p>Nutrition information is missing. Known values will be saved.</p>}
-        <button className="primary" disabled={saving || !selected?.detail || detailLoading || !calculated || !validAmount} onClick={()=>void handleSave()}>{saving ? 'Saving…' : `Save to ${meal}`}</button>
+        <button type="button" className="primary" disabled={saving || !selected?.detail || detailLoading || !calculated || !validAmount} onClick={()=>void handleSave()}>{saving ? 'Saving…' : `Save to ${meal}`}</button>
       </footer>
     </div>
   );

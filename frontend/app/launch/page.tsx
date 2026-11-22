@@ -119,12 +119,12 @@ export default function LaunchPage() {
             <div className="ready-row">
               <b className={readiness.cameraPermission === 'granted' ? 'ready-icon' : 'camera-icon'}>{readiness.cameraPermission === 'granted' ? <Icon name="check" size={17}/> : <Icon name="camera" size={16}/>}</b>
               <p>Camera permission<small>{cameraLabel}</small></p>
-              {readiness.cameraPermission !== 'granted' && <button className="allow" disabled={cameraRequesting} onClick={requestCameraPermission}>{cameraRequesting ? 'Waiting…' : 'Allow'}</button>}
+              {readiness.cameraPermission !== 'granted' && <button type="button" className="allow" disabled={cameraRequesting} onClick={requestCameraPermission}>{cameraRequesting ? 'Waiting…' : 'Allow'}</button>}
             </div>
           </div>
           <div className="launch-actions"><Link className="primary" href="/register">Get started</Link><Link className="secondary" href="/login">I already have an account</Link></div>
         </section>
-        {notice && <div className="toast" role="status">{notice}<button onClick={() => setNotice('')} aria-label="Dismiss">×</button></div>}
+        {notice && <div className="toast" role="status">{notice}<button type="button" onClick={() => setNotice('')} aria-label="Dismiss">×</button></div>}
       </div>
     </main>
   );

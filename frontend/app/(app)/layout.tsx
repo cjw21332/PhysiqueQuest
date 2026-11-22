@@ -7,7 +7,6 @@ import { api } from '../../lib/api';
 import { AUTH_STORAGE_KEY, session } from '../../lib/session';
 import { prepareExerciseCatalog } from '../../lib/prepareExerciseCatalog';
 import { ConnectionContext } from '../../hooks/useBackendConnection';
-import BottomNav from '../../sections/Home/BottomNav';
 import CoachChat from '../../components/CoachChat';
 import OfflineLeaderboard from '../../sections/Quests Section/OfflineLeaderboard';
 import BadgeCelebrations from '../../components/BadgeCelebrations';

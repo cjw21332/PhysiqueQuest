@@ -28,7 +28,7 @@ import './scanExperience.css';
 
 type View = 'nutrition' | 'review' | 'add' | 'history' | 'edit' | 'plan';
 type ScanStatus = 'loading' | 'ready' | 'error';
-export default function ScanSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
+export default function ScanSection({ profile }: { profile: Profile }) {
   const connected = useBackendConnection();
   const [view,setView]=useScreenRoute<View>('/scan', { nutrition: '', review: '/review', add: '/add-food', history: '/history', edit: '/edit-meal', plan: '/plan' }, 'nutrition');
   const contentRef=useRef<HTMLDivElement>(null);

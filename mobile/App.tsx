@@ -26,6 +26,7 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
+import * as WebBrowser from 'expo-web-browser';
 import { backendIsReady, isTrustedWebViewUrl, isTrustedWebViewNavigation, normalizeFrontendUrl, resolveApiUrl, resolveFrontendUrl, selectConfiguredUrl } from './connection.mjs';
 import { performanceGuardScript } from './performance-guard.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
@@ -95,6 +96,29 @@ export function parseCameraHostMessage(raw: string): Record<string,unknown> | nu
     return m;
   }catch{return null;}
 }
+/**
+ * Decides what happens to a navigation the shell will not load itself.
+ *
+ * Keeping third-party pages out of the shell is deliberate, but silently
+ * returning false made every outbound link in the web app (exercise
+ * attribution, weighing guidance, provider documentation) do nothing at all
+ * when tapped. Anything that is not trusted but is still an ordinary web page
+ * is handed to the system browser instead of being dropped.
+ */
+export function openExternally(
+  request: { url: string; isTopFrame?: boolean },
+  frontendUrl: string,
+  open: (url: string) => void = url => { void WebBrowser.openBrowserAsync(url).catch(() => {}); },
+) {
+  if (isTrustedWebViewNavigation(request.url, frontendUrl, request.isTopFrame)) return true;
+  if (request.isTopFrame === false) return false;
+  try {
+    const url = new URL(request.url);
+    if ((url.protocol === 'https:' || url.protocol === 'http:') && !url.username && !url.password) open(url.toString());
+  } catch { /* A URL the shell cannot parse is never handed to the browser. */ }
+  return false;
+}
+
 export function nativeFramingText(check:ReadinessCheck) {
   if(!validateReadinessCheck(check))return 'Framing unavailable';
   if(check.status==='ready')return 'Framing ready';
@@ -102,7 +126,7 @@ export function nativeFramingText(check:ReadinessCheck) {
 }
 
 function getInitialAddress() {
-  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net/?pq-shell=1.1.0-badge-progression';
+  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net/?pq-shell=1.5.1';
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_WEB_APP_URL?: string } | undefined;
   return resolveFrontendUrl(selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_WEB_APP_URL, extra?.EXPO_PUBLIC_WEB_APP_URL), Constants.expoConfig?.hostUri);
 }
@@ -479,7 +503,8 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
         style={StyleSheet.absoluteFill}
         containerStyle={styles.webContainer}
         originWhitelist={[new URL(loadedAddress).origin, 'https://app.posetracker.com']}
-        onShouldStartLoadWithRequest={request => isTrustedWebViewNavigation(request.url, loadedAddress, request.isTopFrame)}
+        setSupportMultipleWindows={false}
+        onShouldStartLoadWithRequest={request => openExternally(request, loadedAddress)}
         injectedJavaScriptBeforeContentLoaded={insetScript}
         javaScriptEnabled
         domStorageEnabled
@@ -837,7 +862,7 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
             </Pressable>
             <Text style={[styles.hint, { fontSize: bodySize - 2, lineHeight: (bodySize - 2) * 1.55 }]}>
               The app uses this address for both the website and its /api backend. If the temporary tunnel
-              address changes, tap Change server and enter the new HTTPS address.
+              address changes, enter the new HTTPS address above and tap Connect.
             </Text>
           </View>
         </ScrollView>
@@ -852,13 +877,13 @@ export default function App() {
   const onAuthenticated = useCallback(() => {
     if (updateRequested.current) return;
     updateRequested.current = true;
-    void SecureStore.getItemAsync('pq_update_notice_1_5_0').then(value => {
+    void SecureStore.getItemAsync('pq_update_notice_1_5_1').then(value => {
       if (value !== 'seen') setShowUpdate(true);
     }).catch(() => setShowUpdate(true));
   }, []);
   const dismissUpdate = () => {
     setShowUpdate(false);
-    void SecureStore.setItemAsync('pq_update_notice_1_5_0', 'seen').catch(() => {});
+    void SecureStore.setItemAsync('pq_update_notice_1_5_1', 'seen').catch(() => {});
   };
   return (
     <SafeAreaProvider>
@@ -867,14 +892,13 @@ export default function App() {
         <View style={styles.updateBackdrop} accessibilityViewIsModal>
           <View style={styles.updateCard}>
             <ScrollView contentContainerStyle={styles.updateContent}>
-              <Text style={styles.updateVersion}>VERSION 1.5.0</Text>
+              <Text style={styles.updateVersion}>VERSION 1.5.1</Text>
               <Text accessibilityRole="header" style={styles.updateTitle}>What's new in this update?</Text>
-              <Text style={styles.updateItem}>• Open saved account data while the service reconnects, when an offline session is available.</Text>
-              <Text style={styles.updateItem}>• The app includes your familiar workout screens again.</Text>
-              <Text style={styles.updateItem}>• The camera can detect when its picture stops updating and try to recover.</Text>
-              <Text style={styles.updateItem}>• Exercise guidance focuses on keeping the joints used for your movement in view.</Text>
-              <Text style={styles.updateItem}>• The tracker checks how clearly a joint is detected before starting an exercise.</Text>
-              <Text style={styles.updateItem}>• Use the front or back camera to suit your workout setup.</Text>
+              <Text style={styles.updateItem}>• The weekly day picker on Coach shows all seven days on one row again.</Text>
+              <Text style={styles.updateItem}>• The Phiq button no longer sits on top of the last item on a screen.</Text>
+              <Text style={styles.updateItem}>• Small labels throughout the app are larger and easier to read.</Text>
+              <Text style={styles.updateItem}>• Links to outside pages now open in your browser instead of doing nothing.</Text>
+              <Text style={styles.updateItem}>• The log out prompt closes with the back gesture and works with screen readers.</Text>
               <Pressable accessibilityRole="button" accessibilityLabel="Close update notice" onPress={dismissUpdate} style={styles.updateButton}>
                 <Text style={styles.buttonText}>Got it</Text>
               </Pressable>

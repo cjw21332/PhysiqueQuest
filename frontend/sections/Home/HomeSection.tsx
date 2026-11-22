@@ -10,7 +10,7 @@ import './homeExperience.css';
 
 type View = 'dashboard' | 'notifications';
 
-export default function HomeSection({ profile, onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
+export default function HomeSection({ profile }: { profile: Profile }) {
   const [view, setView] = useScreenRoute<View>('/home', { dashboard: '', notifications: '/notifications' }, 'dashboard');
   const [message, setMessage] = useState('');
   const open = (next: View) => { setView(next); setMessage(''); };

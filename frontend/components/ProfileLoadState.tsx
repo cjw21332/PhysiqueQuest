@@ -12,7 +12,7 @@ export default function ProfileLoadState({ loading, error, onRetry }: {
           {loading ? <div className="section-placeholder" aria-hidden="true" /> : <>
             <h2>Could not load your profile</h2>
             <p>{error || 'Check your internet connection and try again.'}</p>
-            <button className="primary" onClick={onRetry}>Try again</button>
+            <button type="button" className="primary" onClick={onRetry}>Try again</button>
           </>}
         </section>
       </div>

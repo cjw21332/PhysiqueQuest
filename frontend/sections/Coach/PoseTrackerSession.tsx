@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { api, type ExerciseRecord } from '../../lib/api';
-import { canTrack, resolveTrackingConfig, unsupportedTrackingMessage, type TrackingConfig } from '../../../backend/src/pose-tracker/exercise-registry';
+import { canTrack, reconcileNativeTrackingConfig, resolveTrackingConfig, unsupportedTrackingMessage, type TrackingConfig } from '../../../backend/src/pose-tracker/exercise-registry';
 import { initialTrackingState, reduceProviderEvent, safeProviderError, trackingUrl, trustedProviderEvent } from '../../services/poseTracker/bridge';
 import './posetracker.css';
 import GenericTrackingSession from './GenericTrackingSession';
@@ -100,11 +100,12 @@ export default function PoseTrackerSession({exercise,onExit,adminTest=false,onVe
     const current=++generation.current;setError('');setState(initialTrackingState());setNativeSummary(null);setSeconds(0);setEvidence(false);safetyAlert.current=null;setStage('starting');live.current=true;ready.current=false;
     metrics.current={iframeLoadMs:0,readyMs:0,events:0,maxProcessingMs:0};
     try { const response=await api.launchPoseTracker(exercise._id,adminTest,Boolean(window.ReactNativeWebView && config.nativePattern));if(current!==generation.current)return;
-      if(window.ReactNativeWebView && response.config.nativePattern){
+      const nativeConfig=reconcileNativeTrackingConfig(response.config,resolveTrackingConfig(exercise));
+      if(window.ReactNativeWebView && nativeConfig.nativePattern){
         const profile=await api.getProfile().catch(()=>null);if(current!==generation.current)return;
-        nativeLive.current=true;setConfig(response.config);window.ReactNativeWebView.postMessage(JSON.stringify({type:'posetracker-native-start',exercise:exercise._id,name:exercise.name,pattern:response.config.nativePattern,support:response.config.nativeSupport??'NOT_YET_VALIDATED',contactName:typeof profile?.contactName==='string'?profile.contactName.slice(0,100):undefined,override:response.config.nativeOverride??null}));setStage('active');return;
+        nativeLive.current=true;setConfig(nativeConfig);window.ReactNativeWebView.postMessage(JSON.stringify({type:'posetracker-native-start',exercise:exercise._id,name:exercise.name,pattern:nativeConfig.nativePattern,support:nativeConfig.nativeSupport??'NOT_YET_VALIDATED',contactName:typeof profile?.contactName==='string'?profile.contactName.slice(0,100):undefined,override:nativeConfig.nativeOverride??null}));setStage('active');return;
       }
-      const url=trackingUrl(response.config,response.token ?? '',response.developerOutputs,adminTest,Boolean(window.ReactNativeWebView)&&/Android/i.test(navigator.userAgent));setConfig(response.config);started.current=performance.now();lastMessage.current=Date.now();setSrc(url);
+      const url=trackingUrl(response.config,response.token ?? '',response.developerOutputs,adminTest,Boolean(window.ReactNativeWebView)&&/Android/i.test(navigator.userAgent));setConfig(nativeConfig);started.current=performance.now();lastMessage.current=Date.now();setSrc(url);
     }catch{if(current===generation.current){live.current=false;setStage('setup');setError('Could not start PoseTracker. Check the camera, connection, and account configuration, then retry.');}}
   };
   const native=Boolean(config.nativePattern && typeof window !== 'undefined' && window.ReactNativeWebView);
