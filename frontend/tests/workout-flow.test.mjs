@@ -9,7 +9,9 @@ test('workout UI only opens a report after the API confirms completion', async (
   const session = await source('sections/Coach/LiveSession.tsx');
   const routine = await source('sections/Coach/RoutineSession.tsx');
   const report = await source('sections/Coach/WorkoutReport.tsx');
-  assert.match(coach, /useWorkouts/);
+  // CoachSection owns the active workout itself; the useWorkouts hook is no
+  // longer part of that path.
+  assert.match(coach, /api\.getActiveWorkout\(\)/);
   assert.match(routine, /await api.completeWorkout/);
   assert.match(coach, /workout={/);
   assert.match(session, /onPause/);

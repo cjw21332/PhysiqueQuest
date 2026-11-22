@@ -3,14 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Icon } from '../Home/icons';
 import { api, ApiRequestError } from '../../lib/api';
-import { useCameraStream } from '../../hooks/useCameraStream';
-import { useCameraReadiness } from '../../hooks/useCameraReadiness';
-import type { ReadinessCheck } from '../../../shared/cameraReadiness';
 import OutcomeDialog from '../../components/OutcomeDialog';
 import './video-review.css';
 
-export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: { onBack: () => void; onStart: (mode: 'live' | 'manual') => void; initialMode?: 'live' | 'upload' }) {
-  const [mode] = useState<'live' | 'upload'>(initialMode);
+export default function CameraCheck({ onBack, onStart }: { onBack: () => void; onStart: () => void }) {
   const [fileUrl, setFileUrl] = useState('');
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -26,15 +22,9 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
   const [cameraMessage, setCameraMessage] = useState('');
   const [poseAvailable, setPoseAvailable] = useState<boolean | null>(null);
   const [statusCheck, setStatusCheck] = useState(0);
-  const live = useCameraStream();
-  const readiness = useCameraReadiness({ videoRef: live.videoRef, frameRef: live.frameRef,
-    active: mode === 'live' && live.status === 'on', native: live.nativePreview,
-    generation: live.generation, generationRef: live.generationRef, mirrored: live.facing === 'front' });
-  const readyCount = [readiness.connection, readiness.fullBody, readiness.lighting, readiness.framing].filter(check => check.status === 'ready').length;
   useEffect(() => { return () => { if (fileUrl) URL.revokeObjectURL(fileUrl); }; }, [fileUrl]);
   useEffect(() => () => { analysisGeneration.current++; }, []);
   useEffect(() => {
-    if (mode !== 'upload') return;
     let active = true;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const check = async () => {
@@ -49,7 +39,7 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
     };
     void check();
     return () => { active = false; if (timer) clearTimeout(timer); };
-  }, [mode, statusCheck]);
+  }, [statusCheck]);
   const retryAvailability = useCallback(() => setStatusCheck(value => value + 1), []);
   const chooseFile = (file?: File) => { if (!file) return; analysisGeneration.current++; setFileUrl(URL.createObjectURL(file)); setFileName(file.name); setSelectedFile(file); setDuration(null); setPreviewError(false); setAnalysisBusy(false); setAnalysis(null); setAnalysisError(''); };
   const analyzeVideo = async () => {
@@ -68,68 +58,16 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
     } catch (error) { if (analysisGeneration.current === generation) setAnalysisError(error instanceof ApiRequestError && error.statusCode >= 500 ? 'Video analysis is temporarily unavailable. Please try this recording again shortly.' : error instanceof Error ? error.message : 'Video analysis could not be completed. Please try again.'); }
     finally { if (analysisGeneration.current === generation) setAnalysisBusy(false); }
   };
-  const startSession = () => { live.stop(); onStart('live'); };
-  const continueWithoutCamera = () => { live.stop(true); onStart('manual'); };
+  const continueWithoutCamera = () => onStart();
 
   return (
     <>
       <div className="video-review-view" hidden={reportOpen && Boolean(analysis)}>
       <header className="coach-header pq-page-heading">
-        <button className="coach-back" onClick={() => { live.stop(); onBack(); }} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
-        <h2>{mode === 'live' ? 'Live camera setup' : 'Review a video'}</h2>
+        <button type="button" className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={24}/></button>
+        <h2>Review a video</h2>
       </header>
 
-      {mode === 'live' ? (
-        <>
-          <div ref={live.frameRef} className={`camera-preview ${live.status === 'on' ? 'camera-on' : ''}`}>
-            <video className={`camera-preview-video ${live.facing === 'front' ? 'front-facing' : ''}`} ref={live.videoRef} autoPlay muted playsInline style={live.nativePreview ? { opacity: 0 } : undefined}/>
-            {live.status !== 'on' && (
-              <div className="camera-off">
-                <button type="button" className="camera-enable" disabled={live.status === 'starting'} onClick={() => void live.start()}>
-                  {live.status === 'starting' ? 'Starting camera…' : 'Enable camera'}
-                </button>
-              </div>
-            )}
-            {!live.nativePreview && (
-              <button
-                type="button"
-                className="camera-facing-toggle"
-                disabled={live.status === 'starting'}
-                onClick={live.switchFacing}
-                aria-label={`Switch to ${live.facing === 'back' ? 'front' : 'back'} camera`}
-              >
-                {live.facing === 'back' ? 'Front camera' : 'Back camera'}
-              </button>
-            )}
-            <div className="camera-frame" aria-hidden="true">
-              <span/><span/><span/><span/>
-            </div>
-            {live.status === 'on' && <p className="camera-distance-pill"><i aria-hidden="true"/>Approximate framing guidance</p>}
-          </div>
-          {live.message && <p className="camera-message" role="alert">{live.message}</p>}
-
-          <section className="readiness-list" aria-labelledby="readiness-title" data-local-observations={readiness.localObservations}>
-            <div className="section-head">
-              <h3 id="readiness-title">Readiness checks</h3>
-              <small role="status" aria-live="polite" aria-atomic="true">{readyCount} of 4 ready. {readiness.connection.status === 'ready' ? 'Camera frames are arriving.' : 'You can continue without the camera.'}</small>
-            </div>
-            <ul className="readiness-rows">
-              <ReadinessRow label="Camera connection" check={live.status === 'starting' ? { status: 'unknown', reason: 'pending' } : readiness.connection} />
-              <ReadinessRow label="Full body in frame" check={readiness.fullBody} />
-              <ReadinessRow label="Scene brightness" check={readiness.lighting} />
-              <ReadinessRow label="Framing" check={readiness.framing} />
-            </ul>
-            {live.status === 'on' && <button type="button" className="readiness-retry" onClick={() => void live.start()}>Retry camera checks</button>}
-            <p className="camera-note">Live checks run on this device without uploading images. Body and framing guidance await device validation. Scene brightness is a coarse image estimate and cannot establish subject lighting.</p>
-          </section>
-
-          <footer className="coach-footer">
-            <button className="primary" onClick={startSession}>Start session</button>
-            <button className="readiness-continue" onClick={continueWithoutCamera}>Continue without camera</button>
-          </footer>
-        </>
-      ) : (
-        <>
           <section className="video-review" aria-label="Review recording">
             <input ref={videoInputRef} hidden type="file" aria-label="Choose a recorded exercise video" accept="video/mp4,video/quicktime,.mp4,.mov" onChange={e => { chooseFile(e.target.files?.[0]); e.target.value = ''; }}/>
             {fileUrl ? (
@@ -151,8 +89,6 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
             {poseAvailable === false && <button type="button" className="secondary video-review-retry" onClick={retryAvailability}>Try again</button>}
             {fileUrl && <button type="button" className="video-review-manual" disabled={analysisBusy} onClick={continueWithoutCamera}>Continue with a manual session</button>}
           </section>
-        </>
-      )}
       {analysisError && !reportOpen && <OutcomeDialog kind="error" title="Video analysis unavailable" message={analysisError} actionLabel="Choose another video" onAction={() => { setAnalysisError(''); videoInputRef.current?.click(); }} secondaryLabel="Go back" onSecondary={() => setAnalysisError('')} onClose={() => setAnalysisError('')}/>}
       </div>
       {reportOpen && Boolean(analysis) && <AnalysisReport value={analysis} fileName={fileName} onBack={() => setReportOpen(false)} onStart={continueWithoutCamera} onRetry={() => void analyzeVideo()} retrying={analysisBusy} retryError={analysisError}/>}
@@ -163,9 +99,6 @@ export default function CameraCheck({ onBack, onStart, initialMode = 'live' }: {
 function AnalysisReport({ value, fileName, onBack, onStart, onRetry, retrying, retryError }: { value: unknown; fileName: string; onBack: () => void; onStart: () => void; onRetry: () => void; retrying: boolean; retryError: string }) {
   const data = value && typeof value === 'object' ? value as Record<string, unknown> : {};
   const metrics = data.metrics && typeof data.metrics === 'object' ? data.metrics as Record<string, unknown> : {};
-  const sampled = typeof metrics.sampledFrames === 'number' ? metrics.sampledFrames : 0;
-  const detected = typeof metrics.detectedFrames === 'number' ? metrics.detectedFrames : 0;
-  const joints = Array.isArray(metrics.joints) ? metrics.joints.filter((item): item is { joint: string; minAngle: number; maxAngle: number; visibleFrames: number } => item && typeof item.joint === 'string' && typeof item.minAngle === 'number' && typeof item.maxAngle === 'number' && typeof item.visibleFrames === 'number') : [];
   const observations = Array.isArray(data.observations) ? data.observations.filter((item): item is string => typeof item === 'string') : [];
   const review = data.exerciseReview && typeof data.exerciseReview === 'object' ? data.exerciseReview as Record<string, unknown> : null;
   const movement = data.movementEstimate && typeof data.movementEstimate === 'object' ? data.movementEstimate as Record<string, unknown> : null;
@@ -189,19 +122,3 @@ function AnalysisReport({ value, fileName, onBack, onStart, onRetry, retrying, r
   </section>;
 }
 
-function ReadinessRow({ label, check }: { label: string; check: ReadinessCheck }) {
-  const status = check.status === 'ready' ? 'Ready' : check.status === 'adjust' ? 'Adjust' : check.reason === 'pending' ? 'Checking' : 'Unavailable';
-  const explanation = check.reason === 'stable' ? 'Fresh evidence received.' : check.reason === 'uncalibrated' ? 'Device validation is pending. Check your preview and continue manually.' :
-    check.reason === 'pending' ? 'Waiting for fresh evidence…' : check.reason === 'model-error' ? 'Local analysis failed. Retry camera checks or continue manually.' :
-    check.reason === 'unsupported' ? 'Local checks are not supported here. Continue manually.' : check.reason === 'stale' ? 'Fresh evidence expired. Retry the camera or continue manually.' :
-    check.reason === 'clipped' ? 'Move back or center your whole body in the visible preview.' : check.reason === 'too-small' ? 'Approximate guidance: move closer while keeping your whole body visible.' :
-    check.reason === 'too-large' ? 'Approximate guidance: move back slightly.' : check.reason === 'dim' ? 'The camera image looks dim. Try a brighter space.' :
-    check.reason === 'bright' ? 'The camera image looks very bright. Reduce glare.' : check.reason === 'disabled' ? 'Enable the camera or continue without it.' :
-    'A clear whole-body view is needed. Check your preview or continue manually.';
-  return (
-    <li className={`readiness-row ${check.status}`}>
-      <span><i aria-hidden="true">{check.status === 'ready' ? <Icon name="check" size={13} /> : check.status === 'adjust' ? '!' : '?'}</i>{label}</span>
-      <div className="readiness-detail"><b>{status}</b><small>{explanation}</small></div>
-    </li>
-  );
-}

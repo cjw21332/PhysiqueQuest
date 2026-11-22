@@ -211,11 +211,11 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
         <p className="modal-description">{mode === 'change' ? 'Enter the verification code sent to your account email to change your password.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
         <label className="forgot-field"><span>Email address</span><input type="email" value={email} readOnly /></label>
       </div>
-      <div className="modal-footer"><button className="btn-primary" disabled>Send OTP Verification</button></div>
+      <div className="modal-footer"><button type="button" className="btn-primary" disabled>Send OTP Verification</button></div>
     </div>}
     <div className={`forgot-password-modal${step === 'verify' ? ' forgot-password-modal-otp' : ''}`}>
     {step === 'reset' && <>
-      <div className="modal-header"><h3>{mode === 'verify-email' ? 'Verify your email' : mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>{mode === 'verify-email' ? 'Verify your email' : mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
       <form onSubmit={event => void requestCode(event)}>
         <div className="modal-body">
           <p className="modal-description">{mode === 'verify-email' ? 'Confirm your email address to finish verifying your account.' : mode === 'change' ? 'We’ll send a verification code to the email address on your signed-in account.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
@@ -224,12 +224,12 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
             : <label className="forgot-field"><span>Email address</span><input type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} placeholder="you@email.com" /></label>}
           {error && <p className="error-hint" role="alert">{error}</p>}
         </div>
-        <div className="modal-footer"><button className="btn-primary" disabled={busy}>{busy ? 'Sending…' : mode === 'change' || mode === 'verify-email' ? 'Send Verification Code' : 'Send OTP Verification'}</button></div>
+        <div className="modal-footer"><button type="submit" className="btn-primary" disabled={busy}>{busy ? 'Sending…' : mode === 'change' || mode === 'verify-email' ? 'Send Verification Code' : 'Send OTP Verification'}</button></div>
       </form>
     </>}
 
     {step === 'verify' && <>
-      <div className="modal-header"><h3>Verification code</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>Verification code</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
       <form onSubmit={event => void verifyCode(event)}>
         <div className="modal-body">
           <p className="modal-description">We have sent a verification code to <strong>{email}</strong></p>
@@ -254,7 +254,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
           {error && <p className="error-hint" role="alert">{error}</p>}
         </div>
         <div className="modal-footer">
-          <button className="btn-primary" disabled={busy}>{busy ? 'Verifying…' : 'Confirm'}</button>
+          <button type="submit" className="btn-primary" disabled={busy}>{busy ? 'Verifying…' : 'Confirm'}</button>
           <button type="button" className="btn-link resend-code-button" onClick={() => void resendCode()} disabled={busy || resendSeconds > 0}>
             {resendSeconds > 0 ? `Resend Code in ${formatCountdown}` : 'Resend Code'}
           </button>
@@ -263,7 +263,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     </>}
 
     {step === 'password' && <>
-      <div className="modal-header"><h3>{mode === 'change' ? 'Set new password' : 'Create new password'}</h3><button className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>{mode === 'change' ? 'Set new password' : 'Create new password'}</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
       <form onSubmit={event => void confirm(event)}>
         <div className="modal-body">
           <p className="modal-description">Your identity is verified. Please provide a strong new password.</p>
@@ -271,13 +271,13 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
           <label className="forgot-field"><span>Confirm New Password</span><div className="password-input-wrap"><input type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password" required minLength={8} maxLength={15} value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} /><button type="button" className="eye-toggle" onClick={() => setShowConfirmPassword(value => !value)} aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} aria-pressed={showConfirmPassword}><EyeIcon visible={showConfirmPassword} /></button></div></label>
           {error && <p className="error-hint" role="alert">{error}</p>}
         </div>
-        <div className="modal-footer"><button className="btn-primary" disabled={busy}>{busy ? 'Updating…' : 'Update New Password'}</button></div>
+        <div className="modal-footer"><button type="submit" className="btn-primary" disabled={busy}>{busy ? 'Updating…' : 'Update New Password'}</button></div>
       </form>
     </>}
 
     {step === 'success' && <>
       <div className="success-modal-content"><div className="success-icon"><Icon name="check" size={32} /></div><h3 className="success-title">Password updated</h3><p className="success-description">Your password was changed successfully. Sign in with your new password.</p></div>
-      <div className="modal-footer"><button className="btn-primary" onClick={() => { onSuccess(); onClose(); }}>Return to sign in</button></div>
+      <div className="modal-footer"><button type="button" className="btn-primary" onClick={() => { onSuccess(); onClose(); }}>Return to sign in</button></div>
     </>}
   </div></dialog>;
 }

@@ -13,6 +13,12 @@ export interface User {
 
 export { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './session';
 
+function announceSuccessfulAuth(): void {
+  if (typeof window === 'undefined') return;
+  const bridge = (window as Window & { ReactNativeWebView?: { postMessage: (message: string) => void } }).ReactNativeWebView;
+  bridge?.postMessage(JSON.stringify({ type: 'auth-success' }));
+}
+
 export async function register(name: string, email: string, password: string, requestId: string, code: string, profile: unknown): Promise<User> {
   try {
     const response = await api.register({ name, email, password, requestId, code, profile });
@@ -25,6 +31,7 @@ export async function register(name: string, email: string, password: string, re
     };
 
     session.set(response, getApiBaseUrl());
+    announceSuccessfulAuth();
     return user;
   } catch (error) {
     if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
@@ -47,6 +54,7 @@ export async function login(email: string, password: string): Promise<User> {
     };
 
     session.set(response, getApiBaseUrl());
+    announceSuccessfulAuth();
     return user;
   } catch (error) {
     if (!(error instanceof ApiRequestError) || error.statusCode >= 500) {
@@ -60,6 +68,7 @@ export async function login(email: string, password: string): Promise<User> {
 export async function loginWithGoogle(idToken: string): Promise<User> {
   const response = await api.googleLogin(idToken);
   session.set(response, getApiBaseUrl());
+  announceSuccessfulAuth();
   return {
     id: response.user.id,
     name: response.user.name,
@@ -78,6 +87,7 @@ export async function registerWithGoogle(data: {
 }): Promise<User> {
   const response = await api.googleRegister(data);
   session.set(response, getApiBaseUrl());
+  announceSuccessfulAuth();
   return {
     id: response.user.id,
     name: response.user.name,

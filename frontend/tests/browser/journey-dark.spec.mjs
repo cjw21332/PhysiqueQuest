@@ -51,6 +51,114 @@ async function fixtures(page) {
   return { get marks() { return marks; }, get saved() { return saved; } };
 }
 
+test('badge collection groups real progress and returns to quests', async ({ page }, info) => {
+  await fixtures(page);
+  await page.route('**/api/activity/state**', route => route.fulfill({ headers: { 'access-control-allow-origin': '*' }, json: {
+    state: { timezone: 'UTC', level: 2, currentExp: 20, nextLevelExp: 100, dayStreak: 3, earnedPoints: 0, activityDates: ['2026-10-01', '2026-10-02', '2026-10-03'], accountCreatedAt: '2026-10-01' }, dailyMissions: [],
+    badges: [
+      { id: 'streak-30', title: '30-day streak', icon: 'fire', earned: false, description: 'Record activity on 30 consecutive days.', progress: { current: 12, target: 30, unit: 'days' } },
+      { id: 'first-pr', title: 'First PR', icon: 'trophy', earned: true, description: 'Record your first personal best.', progress: { current: 1, target: 1, unit: 'personal record' } },
+      { id: 'perfect-form', title: 'Perfect form', icon: 'medal', earned: false, available: false, description: 'Form scoring is not available yet.' },
+      { id: 'hydrated', title: 'Hydrated', icon: 'water', earned: false, progress: { current: 4, target: 8, unit: 'glasses in one day' } },
+      { id: 'top-10', title: 'Top 10', icon: 'crown', earned: false, available: false, description: 'Leaderboard is unavailable right now.' },
+    ],
+  } }));
+  await page.route('**/api/leaderboard?period=all', route => route.fulfill({ json: { period: 'all', entries: [], self: { rank: 42, points: 300 }, context: null } }));
+  await page.route('**/api/workouts?**', route => route.fulfill({ json: [{ _id: 'w1', exerciseIds: [], status: 'completed', startedAt: '2026-10-19T06:00:00Z', endedAt: '2026-10-19T07:00:00Z', durationSeconds: 3600 }] }));
+  await page.route('**/api/workouts/summary**', route => route.fulfill({ json: { trainingDates: ['2026-10-19'], personalRecords: [{ exerciseId: 'squat', name: 'Squat', loadKg: 100, date: '2026-10-19' }] } }));
+  await page.route('**/api/nutrition**', route => route.fulfill({ json: { meals: [], water: [{ date: '2026-10-19', glasses: 8 }] } }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/quests');
+  await expect(page.getByText(/of \d+ earned/)).toBeVisible();
+  const featured = page.locator('.quest-v2-badge');
+  await expect(featured).toHaveCount(8);
+  await expect(featured.locator('small')).toHaveText(['1-day streak', 'First workout', /Early bird/, 'New Personal Record', /Best Form/, '1-day mission streak', 'First hydration goal', /Macro master/]);
+  await expect(featured.filter({ hasText: '1-day streak' }).locator('.badge-lock')).toHaveCount(0);
+  await expect(featured.filter({ hasText: 'Best Form' }).locator('.badge-lock-unavailable')).toBeVisible();
+  await expect(featured.filter({ hasText: '1-day mission streak' }).locator('.badge-lock')).toBeVisible();
+  await expect(featured.filter({ hasText: 'First workout' }).locator(':scope > span')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(featured.filter({ hasText: 'Best Form' }).locator(':scope > span')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(featured.filter({ hasText: 'Best Form' })).toBeDisabled();
+  const firstWorkout = page.getByRole('button', { name: /First workout: earned, view achievement card/ });
+  await expect(firstWorkout).toBeEnabled();
+  await firstWorkout.click();
+  await expect(page.getByRole('dialog', { name: 'First workout' })).toBeVisible();
+  await page.getByRole('button', { name: 'Close achievement' }).click();
+  await page.getByRole('button', { name: /View all/ }).click();
+  await expect(page).toHaveURL(/\/quests\/badges$/);
+  await expect(page.getByRole('heading', { name: 'All Badges' })).toBeVisible();
+  await expect(page.locator('.badge-collection-row .badge-art')).toHaveCount(21);
+  await expect(page.locator('.badge-collection-row.locked .badge-lock').first()).toBeAttached();
+  await expect(page.locator('.badge-collection-row.locked .badge-collection-icon:has(.badge-art)').first()).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(page.locator('.badge-collection-row.earned .badge-lock')).toHaveCount(0);
+  await expect(page.locator('.badge-tier-starter').first()).toBeAttached();
+  await expect(page.locator('.badge-tier-rising').first()).toBeAttached();
+  await expect(page.locator('.badge-tier-advanced').first()).toBeAttached();
+  await expect(page.locator('.badge-tier-summit').first()).toBeAttached();
+  for (const name of ['Activity streaks', 'Workout milestones', 'Hydration', 'All-time leaderboard']) await expect(page.getByRole('heading', { name, exact: true })).toBeAttached();
+  await expect(page.getByRole('progressbar', { name: '30-day streak progress' })).toHaveAttribute('aria-valuenow', '3');
+  await expect(page.getByRole('heading', { name: 'Top 50 Overall' }).locator('..')).toContainText('Earned');
+  await expect(page.getByRole('heading', { name: 'Number 1 Overall' }).locator('..')).toContainText('In progress');
+  await expect(page.getByText('Current all-time rank: #42').first()).toBeAttached();
+  await expect(page.getByRole('progressbar', { name: '100 estimated calories progress' })).toHaveAttribute('aria-valuenow', '100');
+  await expect(page.getByText('208 / 100 estimated kcal')).toBeAttached();
+  await expect(page.getByRole('heading', { name: '100kg Dominator' }).locator('..')).toContainText('Earned');
+  await page.getByRole('button', { name: 'View 100kg Dominator achievement card' }).click();
+  await expect(page.getByRole('dialog', { name: '100kg Dominator' })).toBeVisible();
+  await page.getByRole('button', { name: 'Close achievement' }).click();
+  await expect(page.getByRole('button', { name: 'View Number 1 Overall achievement card' })).toHaveCount(0);
+  await expect(page.getByText('Form scoring is not available yet.', { exact: true })).toBeAttached();
+  for (const width of [320, 390, 844]) {
+    await page.setViewportSize({ width, height: width === 844 ? 390 : 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: info.outputPath('badge-collection.png') });
+  await page.getByRole('button', { name: 'Back to quests' }).click();
+  await expect(page.getByRole('heading', { name: 'Quests', exact: true })).toBeVisible();
+});
+
+test('newly earned badges celebrate once and create a branded image', async ({ page }, info) => {
+  await fixtures(page);
+  let earned = false;
+  await page.route('**/api/activity/state**', route => route.fulfill({ json: {
+    state: { timezone: 'UTC', level: 1, currentExp: 0, nextLevelExp: 100, dayStreak: 0, earnedPoints: 0, activityDates: [] }, dailyMissions: [],
+    badges: [{ id: 'first-pr', title: 'First PR', icon: 'trophy', earned, description: 'Record a personal best.' }],
+  } }));
+  await page.route('**/api/leaderboard?period=all', route => route.fulfill({ json: { period: 'all', entries: [], self: { rank: 42, points: 300 }, context: null } }));
+  await page.route('**/api/workouts/summary**', route => route.fulfill({ json: { trainingDates: [], personalRecords: [] } }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/quests');
+  await expect.poll(() => page.evaluate(() => Object.keys(localStorage).some(key => key.startsWith('pq-badge-celebrations:')))).toBe(true);
+  await expect(page.getByRole('dialog', { name: 'New Personal Record' })).toHaveCount(0);
+  earned = true;
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent('physiquequest:data-change', { detail: { resources: ['activity'] } })));
+  const dialog = page.getByRole('dialog', { name: 'New Personal Record' });
+  await expect(dialog).toBeVisible();
+  await dialog.screenshot({ path: info.outputPath('badge-celebration.png') });
+  await page.evaluate(() => {
+    window.ReactNativeWebView = { postMessage: raw => { const message = JSON.parse(raw); window.badgeExportTest = { type: message.type, intent: message.intent, name: message.name, png: message.image.startsWith('data:image/png;base64,') }; window.dispatchEvent(new CustomEvent('physiquequest:badge-export', { detail: { requestId: message.requestId } })); } };
+  });
+  await dialog.getByRole('button', { name: 'Share achievement' }).click();
+  await expect.poll(() => page.evaluate(() => window.badgeExportTest)).toEqual({ type: 'badge-export', intent: 'share', name: 'PhysiqueQuest-personal-record.png', png: true });
+  await expect(page.getByRole('dialog', { name: 'Ready to share' })).toBeVisible();
+  await page.getByRole('dialog', { name: 'Ready to share' }).getByRole('button', { name: 'Got it' }).click();
+  await dialog.getByRole('button', { name: 'Save image' }).click();
+  await expect(page.getByRole('dialog', { name: 'Image saved' })).toBeVisible();
+  await page.getByRole('dialog', { name: 'Image saved' }).getByRole('button', { name: 'Got it' }).click();
+  await page.evaluate(() => { delete window.ReactNativeWebView; });
+  const download = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: 'Save image' }).click();
+  const downloaded = await download;
+  expect(downloaded.suggestedFilename()).toBe('PhysiqueQuest-personal-record.png');
+  await downloaded.saveAs(info.outputPath('achievement-card.png'));
+  await page.getByRole('dialog', { name: 'Download started' }).getByRole('button', { name: 'Got it' }).click();
+  await dialog.getByRole('button', { name: 'Continue' }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.reload();
+  await expect(dialog).toHaveCount(0);
+});
+
 test('profile photo can be selected, saved, and removed', async ({ page }) => {
   await fixtures(page);
   await page.goto('/me');

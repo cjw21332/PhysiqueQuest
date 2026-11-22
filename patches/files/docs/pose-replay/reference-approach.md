@@ -1,0 +1,64 @@
+# Reference-inspired tracking overlay candidate
+
+Reference inspected directly in the connected browser:
+https://www.threads.com/@simon.pullups/post/Df92aeolYkA?hl=en
+
+The post was accessible through the browser even though web retrieval failed. The visible media shows a pull-up recording with a small torso marker, a vertical reference, a movement trail, a prominent rep count, set targets and UP/HOLD timing. Another clip presents session/set totals. The author's displayed counts are statements in that demonstration, not ground-truth labels for PhysiqueQuest recordings.
+
+The developer's public app listing also describes on-device counting, movement-path and timing overlays, and recorded-set review:
+https://apps.apple.com/al/app/pull-up-king/id6805496917
+
+Neither source exposes its model, tracking algorithm, thresholds or evaluation results. A polished demo does not establish its occlusion robustness, accuracy or support for other exercises. PhysiqueQuest should implement its own measured behavior, with its own UI and code.
+
+## Implemented as reviewable candidate patches
+
+| Reference idea | PhysiqueQuest candidate | Measurement limit |
+| --- | --- | --- |
+| Torso marker and trail | Confidence-gated midpoint of visible shoulders/hips; shoulders-only fallback; 64-point / 2.5-second maximum history | Screen-position visualization, not physical distance or a form grade |
+| Vertical starting reference | Calibrates after 500 ms of stable observed start samples; manual reset; clears on anchor-group changes, subject/view changes or sustained loss | No physical bar detection; the line is not a rep boundary |
+| Large counter | Browser camera HUD; larger bottom-positioned native complete/partial counter | Existing engine remains the sole rep source |
+| Movement and hold timing | Sampled move/hold/return timing, named for the exercise family, current or last engine-reported cycle | Not a precise biomechanical measurement; native camera-to-screen latency not measured |
+| Less obstructive tracking display | Independent skeleton and body-path switches on browser and native views | Overlay behavior not yet visually tested in a running app/phone |
+
+Timing is deliberately unavailable for per-side/alternating modes because the current snapshot does not provide a stable working-side identity for the observer. The marker and path remain available. Combining changing arm identities into a seemingly precise rep duration would be misleading. Hold patterns retain their existing hold clock.
+
+All timing labels describe progress through the configured movement, rather than assuming that increasing elbow-angle progress always means upward body motion. Unknown/hidden timing stays unavailable. The observer does not create reps, issue faults, modify thresholds, remap exercises or save video. It resets at explicit subject/camera/pause boundaries and native guides fade when frames stop arriving.
+
+The reference's set-program targets are not invented when the current session has no assigned target. Recording/export, automatic bar calibration, chin-clearance counting, per-side timing and a training progression program are outside this overlay patch. MediaPipe Pose has no chin landmark; a nose/shoulder estimate must not be described as observed chin clearance.
+
+## Patch contents and application
+
+- `0005-reference-motion-telemetry.patch`: shared display observer, projection helper and seven unit checks.
+- `0006-reference-tracker-overlays.patch`: browser/native UI integration, toggles and sampled timings. Prepared against the CURRENT dirty working-tree files so existing unrelated changes are preserved in the diff context.
+- `0007-reference-analysis.patch`: this analysis and real-frame probe evidence.
+
+The prior baseline remains unchanged: these patches have been prepared, not applied to the app source. No new APK was built or installed. No exercise is validated and there is no measured count-error or false-cue improvement.
+
+From the repository root:
+
+```powershell
+git apply --check patches/0005-reference-motion-telemetry.patch patches/0006-reference-tracker-overlays.patch patches/0007-reference-analysis.patch
+git apply patches/0005-reference-motion-telemetry.patch patches/0006-reference-tracker-overlays.patch patches/0007-reference-analysis.patch
+```
+
+Applying these display patches does not change the current rep counter. The evidence-first counting work still needs reviewed labels and current-code baseline review before algorithm changes.
+
+## Verification
+
+- Seven observer unit checks cover confidence loss, bounded history, reference stability, no timing across missing evidence, no input mutation, engine-only event timing, ambiguous-side timing suppression and aspect-fill/mirroring math. These are software checks, not exercise validation.
+- Virtual TypeScript compilation substitutes candidate files into the actual frontend and mobile projects, without applying patches or touching `.git`. Both reported zero diagnostics during development; repeat the included checker after any edit.
+- Three REAL bench-press landmark frames from the earlier Python/ffmpeg probe were fed through the candidate observer. It produced a visible marker and three trail points. It did not establish a reference or complete-rep timing, consistent with the limited sample. This does not establish accuracy over a set or a long session.
+- `git apply --check` is required for patch integrity. The current counter, camera model, exercise mappings, full/partial classification and saved results are not altered by the observer.
+
+Reproduction commands while the patch payloads are still unapplied:
+
+```powershell
+rtk proxy npx vitest run patches/files/shared/__tests__/movementTelemetry.spec.ts --reporter=dot
+rtk proxy node patches/check-reference-candidate.cjs
+```
+
+The original 81 focused passing application checks and the separate known four generic-counter failures plus upload assertion failure are unaffected by these display-only additions. Seven new observer checks are not a replacement for those suites or for recording replay.
+
+## Remaining evidence
+
+Review the labels manifest, then replay complete labeled sets and compare counting/cues against the preserved current-code baseline. On a physical phone, verify front/back projection, marker alignment, visibility loss, pause/resume, reference reset, toggles without model reinitialization, and the thermal/memory/latency trends in the soak plan. The three-frame probe does not demonstrate smoothness at high speed, camera stability, calorie/load estimates or any improvement across all 1,500 exercises.

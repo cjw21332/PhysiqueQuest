@@ -89,3 +89,25 @@ test('offline grant is scoped, expires, and carries no server credential', () =>
   session.clear();
   assert.equal(session.current('/api'),null);
 });
+
+test('saved offline session remains available after the server rejects expired credentials', async () => {
+  let finish;
+  const session = createSession({ fetcher: () => new Promise(resolve => { finish = resolve; }) });
+  session.restoreOffline({ id: 'owner', expiresAt: Number.MAX_SAFE_INTEGER }, '/api');
+  const pending = session.restore('/api');
+  assert.equal(session.current('/api')?.offlineOnly, true);
+  finish({ ok: false, status: 401 });
+  assert.equal(await pending, null);
+  assert.equal(session.current('/api')?.offlineOnly, true);
+  assert.equal(session.current('/api')?.sessionExpired, true);
+  assert.equal(session.current('/api')?.token, '');
+});
+
+test('expired online credentials fall back to a local-only session without a server token', async () => {
+  const session = createSession({ fetcher: async () => ({ ok: false, status: 401 }) });
+  session.set({ access_token: 'short-lived', expires_in: 900, user: { id: 'owner', name: 'Owner' } }, '/api');
+  assert.equal(await session.refresh('/api'), null);
+  assert.equal(session.current('/api')?.offlineOnly, true);
+  assert.equal(session.current('/api')?.sessionExpired, true);
+  assert.equal(session.current('/api')?.token, '');
+});

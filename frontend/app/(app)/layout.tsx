@@ -7,9 +7,9 @@ import { api } from '../../lib/api';
 import { AUTH_STORAGE_KEY, session } from '../../lib/session';
 import { prepareExerciseCatalog } from '../../lib/prepareExerciseCatalog';
 import { ConnectionContext } from '../../hooks/useBackendConnection';
-import BottomNav from '../../sections/Home/BottomNav';
 import CoachChat from '../../components/CoachChat';
 import OfflineLeaderboard from '../../sections/Quests Section/OfflineLeaderboard';
+import BadgeCelebrations from '../../components/BadgeCelebrations';
 
 export default function AppLayout({
   children,
@@ -24,7 +24,7 @@ export default function AppLayout({
   useEffect(() => {
     const lost = () => setConnected(false);
     const restored = () => setConnected(navigator.onLine);
-    const native = (event: Event) => setConnected((event as CustomEvent).detail === 'online' && navigator.onLine);
+    const native = (event: Event) => setConnected((event as CustomEvent).detail === 'online');
     if (!navigator.onLine || session.current()?.offlineOnly) lost();
     window.addEventListener('offline',lost);
     window.addEventListener('physiquequest:connection-lost',lost);
@@ -61,23 +61,17 @@ export default function AppLayout({
       else preload();
     };
     const sync = () => { if (isAuthenticated() && document.visibilityState === 'visible') void api.syncManualWorkouts().catch(() => {}); };
-    const timer = window.setInterval(sync, 30000);
-    window.addEventListener('online', sync);
     window.addEventListener('physiquequest:connection-restored', sync);
     window.addEventListener('focus', sync);
     sync();
     preload();
     window.addEventListener('focus', preload);
-    window.addEventListener('online', preload);
     window.addEventListener('physiquequest:session-ended', endSession);
     window.addEventListener('storage', onStorage);
     return () => {
-      clearInterval(timer);
-      window.removeEventListener('online', sync);
       window.removeEventListener('physiquequest:connection-restored', sync);
       window.removeEventListener('focus', sync);
       window.removeEventListener('focus', preload);
-      window.removeEventListener('online', preload);
       window.removeEventListener('physiquequest:session-ended', endSession);
       window.removeEventListener('storage', onStorage);
     };
@@ -95,6 +89,5 @@ export default function AppLayout({
         ? 'journey-dark-theme'
         : 'system-dark-theme';
   const offlineLeaderboard = !connected && pathname === '/quests/leaderboard';
-  const blocked = !connected && ['/home/notifications','/coach/prepare','/scan/add-food','/scan/review','/scan/edit-meal'].includes(pathname);
-  return <ConnectionContext.Provider value={connected}><div className={`${theme} signed-in-layout`}> {offlineLeaderboard ? <OfflineLeaderboard /> : blocked ? <main className="app-shell"><p role="status">This page requires a connection.</p><BottomNav/></main> : children}{connected && isClient && isAuthenticated() && <CoachChat />}</div></ConnectionContext.Provider>;
+  return <ConnectionContext.Provider value={connected}><div className={`${theme} signed-in-layout`}> {offlineLeaderboard ? <OfflineLeaderboard /> : children}{connected && isClient && isAuthenticated() && <><CoachChat /><BadgeCelebrations /></>}</div></ConnectionContext.Provider>;
 }

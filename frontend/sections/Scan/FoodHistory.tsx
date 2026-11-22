@@ -36,8 +36,8 @@ export default function FoodHistory({ meals, onBack, targets: nutritionTargets =
   const records = days.filter(day => day.count > 0).slice().reverse();
   const difference = summary.average === null ? null : nutritionTargets.calories - summary.average;
   return <div className="food-history-screen">
-    <header className="scan-header add-food-header pq-page-heading"><button className="coach-back" onClick={onBack} aria-label={backLabel}><Icon name="arrow" size={20}/></button><h2>Food history</h2></header>
-    <div className="history-tabs" role="group" aria-label="History period">{ranges.map(item => <button key={item.label} className={range.label === item.label ? 'active' : ''} aria-pressed={range.label === item.label} onClick={() => { setRange(item); setOpenedDate(null); }}>{item.label}</button>)}</div>
+    <header className="scan-header add-food-header pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label={backLabel}><Icon name="arrow" size={20}/></button><h2>Food history</h2></header>
+    <div className="history-tabs" role="group" aria-label="History period">{ranges.map(item => <button type="button" key={item.label} className={range.label === item.label ? 'active' : ''} aria-pressed={range.label === item.label} onClick={() => { setRange(item); setOpenedDate(null); }}>{item.label}</button>)}</div>
     {range.days === 90 && accountLoading ? <p className="history-chart-note" role="status">Loading account history…</p> : visibleMeals.length === 0 ? <section className="history-records"><h3>No meals saved</h3><p>Meals you log will appear here.{range.days === 90 && !validAccountDate ? ' Account creation date unavailable; showing up to 90 days.' : ''}</p></section> : <>
       <section className="history-summary" aria-label="Intake summary">
         <div className="history-summary-head"><span className="history-summary-icon"><Icon name="chart-bars" size={20}/></span><div><h3>Average daily intake</h3><p>Based on {records.length} {records.length === 1 ? 'day' : 'days'} with saved meals</p></div></div>

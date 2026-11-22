@@ -2,6 +2,8 @@ package com.physiquequest.app
 
 import android.os.Build
 import android.os.Bundle
+import android.graphics.Color
+import android.view.WindowInsetsController
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -17,6 +19,12 @@ class MainActivity : ReactActivity() {
     // This is required for expo-splash-screen.
     setTheme(R.style.AppTheme);
     super.onCreate(null)
+    window.decorView.setBackgroundColor(Color.rgb(11, 15, 21))
+    window.navigationBarColor = Color.rgb(11, 15, 21)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS)
+    }
   }
 
   /**

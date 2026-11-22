@@ -10,6 +10,14 @@ describe('pose cue debounce', () => {
     expect(createPoseCueController().update(0, [tempo, depth]).cue).toEqual(depth);
     expect(createPoseCueController().update(0, [tempo]).cue).toEqual(tempo);
   });
+  it('immediately replaces a lower priority cue and speaks the displayed cue', () => {
+    const controller = createPoseCueController();
+    const depth: PoseCue = { id: 'depth', message: 'Lower', priority: 'depth' };
+    const alignment: PoseCue = { id: 'alignment', message: 'Align', priority: 'alignment' };
+    expect(controller.update(0, [depth])).toEqual({ cue: depth, speak: true });
+    expect(controller.update(100, [depth, alignment])).toEqual({ cue: alignment, speak: true });
+    expect(controller.update(200, [depth])).toEqual({ cue: alignment, speak: false });
+  });
   it('prioritizes alignment, holds cues and rate limits speech', () => {
     const controller = createPoseCueController();
     const depth: PoseCue = { id: 'depth', message: 'Lower', priority: 'depth' };

@@ -1,0 +1,92 @@
+{
+  "1RIkUHT": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/dumbbell-iron-cross.mp4",
+    "sourceName": "dumbbell iron cross",
+    "relation": "exact"
+  },
+  "2Ty4idJ": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/dumbbell-stiff-leg-deadlift.mp4",
+    "sourceName": "dumbbell stiff leg deadlift",
+    "relation": "exact"
+  },
+  "6vcvsLS": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/hanging-straight-leg-raise.mp4",
+    "sourceName": "Hanging Straight-Leg Raise",
+    "relation": "exact"
+  },
+  "9Z23cLE": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/barbell-incline-bench-press.mp4",
+    "sourceName": "barbell incline bench press",
+    "relation": "exact"
+  },
+  "AwAIlSo": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/reverse-grip-machine-lat-pulldown.mp4",
+    "sourceName": "Reverse-Grip Machine Lat Pulldown",
+    "relation": "exact"
+  },
+  "CUmLRTA": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/cable-kneeling-crunch.mp4",
+    "sourceName": "cable kneeling crunch",
+    "relation": "exact"
+  },
+  "hVzPY5j": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/battling-ropes.mp4",
+    "sourceName": "Battling Ropes",
+    "relation": "exact"
+  },
+  "MDFxU4b": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/squat.mp4",
+    "sourceName": "Squat",
+    "relation": "equivalent"
+  },
+  "MRaFiZP": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/smith-seated-shoulder-press.mp4",
+    "sourceName": "smith seated shoulder press",
+    "relation": "exact"
+  },
+  "oMwyl17": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/barbell-straight-leg-deadlift.mp4",
+    "sourceName": "Barbell Straight-Leg Deadlift",
+    "relation": "exact"
+  },
+  "p5v6rdT": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/stretching-iron-cross-stretch.mp4",
+    "sourceName": "iron cross stretch",
+    "relation": "exact"
+  },
+  "QQwxa8g": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/dumbbell-preacher-curl-over-exercise-ball.mp4",
+    "sourceName": "dumbbell preacher curl over exercise ball",
+    "relation": "exact"
+  },
+  "syUwUKY": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/dumbbell-pronate-grip-triceps-extension.mp4",
+    "sourceName": "dumbbell pronate-grip triceps extension",
+    "relation": "exact"
+  },
+  "Um8xUAc": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/barbell-prone-incline-curl.mp4",
+    "sourceName": "barbell prone incline curl",
+    "relation": "exact"
+  },
+  "Uywa4S5": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/dumbbell-lunge.mp4",
+    "sourceName": "dumbbell lunge",
+    "relation": "exact"
+  },
+  "vN5HB0s": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/cable-standing-crunch.mp4",
+    "sourceName": "cable standing crunch",
+    "relation": "exact"
+  },
+  "VsopqcV": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/close-grip-push-ups.mp4",
+    "sourceName": "close-grip push-up",
+    "relation": "exact"
+  },
+  "YA2HKGz": {
+    "url": "https://pub-585d42eb1aa64a67aedf483ec328d3fe.r2.dev/exercise-videos/male/barbell-reverse-wrist-curl-over-grip.mp4",
+    "sourceName": "barbell reverse wrist curl",
+    "relation": "exact"
+  }
+}

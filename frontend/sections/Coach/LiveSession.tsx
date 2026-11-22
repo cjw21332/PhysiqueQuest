@@ -76,7 +76,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
     exerciseName: exercise.name,
     equipment: exercise.equipment,
     elapsed: time,
-  });
+  }, true);
 
   useEffect(() => {
     if (paused || phase !== 'active') return;
@@ -282,7 +282,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
     <section className={`live-session ${renderRoutine ? 'manual-session' : ''}`}>
       {renderRoutine && <div className="session-controls">
         <button type="button" className="pause-button" aria-label={paused ? 'Resume workout' : 'Pause workout'} disabled={busy || controlsDisabled} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <Icon name="pause" size={16}/>}{paused ? 'Resume' : 'Pause'}</button>
-        <button className="end-button" disabled={busy || controlsDisabled} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
+        <button type="button" className="end-button" disabled={busy || controlsDisabled} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
       </div>}
       <header className="live-session-head">
         <div className="session-meta">{renderRoutine ? routineTitle : titleCase(exercise.name)}</div>
@@ -307,7 +307,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       {camera.status !== 'on' && (
         <div className="live-camera-action">
           <button type="button" className="secondary" disabled={camera.status === 'starting'} onClick={() => void camera.start()}>
-            {camera.status === 'starting' ? 'Starting camera...' : 'Enable camera'}
+            {camera.status === 'starting' ? 'Starting camera...' : camera.recoveryState.phase === 'failed' ? 'Try again' : 'Enable camera'}
           </button>
           {camera.message && <p role="alert">{camera.message}</p>}
         </div>
@@ -318,7 +318,7 @@ export default function LiveSession({ exercise, workoutId, thresholdSeconds, con
       {!renderRoutine && motionAvailable === false && <p className="scan-warning" role="status">Movement detection needs the phone app with an accelerometer. Countdown is off on this device.</p>}
       {!renderRoutine && <div className="session-controls">
         <button type="button" className="pause-button" aria-label={paused ? 'Resume workout' : 'Pause workout'} disabled={busy || controlsDisabled} onClick={() => void togglePause()}>{paused ? <Icon name="play" size={16}/> : <Icon name="pause" size={16}/>}{paused ? 'Resume' : 'Pause'}</button>
-        <button className="end-button" disabled={busy || controlsDisabled} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
+        <button type="button" className="end-button" disabled={busy || controlsDisabled} onClick={() => void end()}>{busy ? 'Saving...' : 'End session'}</button>
       </div>}
       {renderRoutine && <button type="button" className="manual-cancel" disabled={busy || controlsDisabled} onClick={onCancel}>Cancel Workout</button>}
       {paused && <div className="paused-banner">Session paused</div>}

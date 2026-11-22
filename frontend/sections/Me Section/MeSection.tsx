@@ -107,7 +107,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-profile-summary">
         <span className="me-avatar me-reference-avatar" aria-hidden="true">{currentProfile.photo ? <img src={currentProfile.photo} alt=""/> : <Icon name="user" size={28}/>}</span>
         <div className="me-profile-name"><b>{currentProfile.name || '—'}</b><small>{level !== null ? `Level ${level} · ` : ''}member since {memberSince}</small><button type="button" className="me-photo-link" disabled={!connected} onClick={() => setPhotoOpen(true)}>Change photo</button></div>
-        <button className="me-edit" onClick={() => setView('edit-personal')}>Edit</button>
+        <button type="button" className="me-edit" onClick={() => setView('edit-personal')}>Edit</button>
       </div>
 
       <h3 className="me-group-title">Profile</h3>
@@ -140,7 +140,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} disabled={!connected} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
       <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail={accountEmail ? `Verified with a code sent to ${accountEmail}` : 'Verified with a code sent to your account email'} disabled={!connected} onClick={() => setPasswordOpen(true)}/></div>
-      <button className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
+      <button type="button" className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
     </div>
     <BottomNav />
     {photoOpen && <ProfilePhoto photo={currentProfile.photo} onClose={() => setPhotoOpen(false)} onSaved={saved => { setCurrentProfile(current => ({ ...current, ...saved })); setNotice('Profile photo saved'); }}/>}

@@ -12,6 +12,7 @@ const registrySource = (await readFile(new URL('../../backend/src/pose-tracker/e
   .replace(/\.\/catalog-tracking\.generated\.(?:js|ts)/, trackingUrl);
 const registryUrl=`data:text/javascript;base64,${Buffer.from(transpile(registrySource)).toString('base64')}`;
 const registry=await import(registryUrl);
+const tracking=await import(trackingUrl);
 const bridgeSource=(await readFile(new URL('../services/poseTracker/bridge.ts',import.meta.url),'utf8')).replace('../../../backend/src/pose-tracker/exercise-registry',registryUrl);
 const bridge=await import(`data:text/javascript;base64,${Buffer.from(transpile(bridgeSource)).toString('base64')}`);
 const squat={exerciseId:'squat-id',name:'quads (bodyweight squat)',equipments:['bodyweight'],targetMuscles:['quadriceps'],instructions:['Bend knees and hips.']};
@@ -24,6 +25,46 @@ test('mapping requires equipment, target and instructional evidence',()=>{
   assert.equal(registry.resolveTrackingConfig(squat).providerExerciseId,'squat');
   for(const patch of [{equipments:['barbell']},{targetMuscles:['biceps']},{instructions:[]},{name:'single leg bodyweight squat'}])assert.equal(registry.resolveTrackingConfig({...squat,...patch}).trackingMode,'unavailable');
   assert.equal(registry.normalizeName('Push-Up'),'push up');
+});
+test('reported gym exercises resolve to on-device camera patterns',()=>{
+  const expected={
+    EIeI8Vf:'horizontal_push', // Barbell Bench Press
+    '5ipN0iE':'vertical_pull', // Assisted Pull-up
+    CbFSYC1:'vertical_pull', // Rear Pull-up
+    T0yTjgW:'horizontal_push', // Machine Chest Press
+    jHAnWmT:'horizontal_push', // Machine Incline Chest Press
+    '9tvVVM9':'triceps_extension', // Tricep Pushdown
+    w2oRpuH:'horizontal_pull', // Alternating Narrow Grip Seated Row
+    '7F1DVzn':'vertical_pull', // Machine Front Pulldown
+    BgljGjd:'horizontal_pull', // Machine Reverse T-Bar Row
+    v3xmPAR:'chest_fly', // Machine Seated Fly
+    '67n3r98':'vertical_push', // Machine Shoulder Press
+    '7aVz15j':'dip', // Triceps Dips Floor
+    bZq4bwK:'dip', // Weighted Triceps Dips
+    D5yqP2p:'dip', // Machine Overhand Triceps Dip
+    b6hQYMb:'curl', // Machine Preacher Curl
+    dCPESfR:'vertical_push', // Standing Bradford Press
+    '2Qh2J1e':'squat', // Leg Press
+    '8ozhUIZ':'calf_raise', // Barbell Standing Calf Raise
+    CHpahtl:'hip_abduction', // Machine Hip Abduction
+  };
+  for(const [exerciseId,pattern] of Object.entries(expected)){
+    assert.equal(tracking.catalogTrackingMap[exerciseId]?.pattern,pattern,exerciseId);
+    const config=registry.resolveTrackingConfig({exerciseId,name:'Exercise',equipments:['leverage machine']});
+    assert.equal(config.nativePattern,pattern,exerciseId);
+    assert.equal(registry.canTrack(config),true,exerciseId);
+  }
+  for(const exerciseId of ['67n3r98','dNFYIU1','vqsbmL0','dCPESfR']) {
+    assert.equal(tracking.catalogTrackingMap[exerciseId]?.override?.view,'side',exerciseId);
+    assert.equal(registry.resolveTrackingConfig({exerciseId,name:'Machine Shoulder Press',equipments:['leverage machine']}).nativeOverride?.view,'side',exerciseId);
+  }
+});
+test('a newer bundled exercise map corrects stale server patterns but keeps explicit server overrides',()=>{
+  const local=registry.resolveTrackingConfig({exerciseId:'7aVz15j',name:'triceps dips floor',equipments:['bodyweight']});
+  const stale={...local,configurationVersion:1,nativePattern:'triceps_extension',nativeSupport:'PARTIALLY_SUPPORTED'};
+  assert.equal(registry.reconcileNativeTrackingConfig(stale,local).nativePattern,'dip');
+  const explicit={...stale,providerExerciseId:'tricep_dip'};
+  assert.equal(registry.reconcileNativeTrackingConfig(explicit,local),explicit);
 });
 test('all exercise categories retain manual pathways',()=>{
   for(const [name,equipment,category] of [['plank','bodyweight','isometric'],['hamstring stretch','bodyweight','mobility'],['leg curl','leverage machine','machine-occlusion'],['cable fly','cable','additional-camera-setup'],['single arm row','dumbbell','multiple-observations']]){

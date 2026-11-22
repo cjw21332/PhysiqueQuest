@@ -1,0 +1,336 @@
+--- a/frontend/hooks/useCameraStream.ts
++++ b/frontend/hooks/useCameraStream.ts
+@@ -3,6 +3,7 @@
+ import { useCallback, useEffect, useRef, useState } from 'react';
+ import type { TrackingKind, TrackingSide } from '../../shared/repCounter';
+ import { readinessSessionId, type NativeReadinessContext } from '../../shared/cameraReadiness';
++import { createCameraRecovery, cameraRecoveryMessage, type CameraRecoveryState, type CameraFailure } from '../../shared/cameraRecovery';
+ 
+ export type CameraStatus = 'idle' | 'starting' | 'on' | 'denied' | 'unavailable';
+ export type CameraFacing = 'back' | 'front';
+@@ -21,7 +22,7 @@
+ }
+ 
+ type CameraEvent =
+-  | { type: 'status'; status: CameraStatus; message?: string }
++  | { type: 'status'; status: CameraStatus; message?: string; reason?: CameraFailure; generation?: number }
+   | { type: 'facing'; facing: CameraFacing };
+ 
+ function nativeBridge() {
+@@ -37,7 +38,7 @@
+   return new Promise(resolve => requestAnimationFrame(() => resolve()));
+ }
+ 
+-export function useCameraStream(previewContext: CameraPreviewContext = { screen: 'camera-check' }) {
++export function useCameraStream(previewContext: CameraPreviewContext = { screen: 'camera-check' }, autoRecover = false) {
+   const videoRef = useRef<HTMLVideoElement>(null);
+   const frameRef = useRef<HTMLDivElement>(null);
+   const streamRef = useRef<MediaStream | null>(null);
+@@ -54,6 +55,12 @@
+   const [message, setMessage] = useState('');
+   const [nativePreview, setNativePreview] = useState(false);
+   const [facing, setFacing] = useState<CameraFacing>(preferredFacing);
++  const [recoveryState,setRecoveryState]=useState<CameraRecoveryState>({phase:'idle',attempt:0});
++  const selectedFacing=useRef(facing);
++  const mounted=useRef(true);
++  const acquireRef=useRef<(facing: CameraFacing, ticket?:number)=>Promise<void>>(async()=>{});
++  const recoveryTicket=useRef(0);
++  const recovery=useRef<ReturnType<typeof createCameraRecovery>|null>(null);
+   const nativeContext = useCallback((): CameraPreviewContext => {
+     const context=previewContextRef.current, rect=frameRef.current?.getBoundingClientRect();
+     return context.screen==='camera-check' ? {screen:'camera-check',readiness:{mode:'readiness',sessionId:readinessSessionId(generationRef.current),
+@@ -66,8 +73,16 @@
+     streamRef.current = null;
+     if (videoRef.current) videoRef.current.srcObject = null;
+   }, []);
++  if(!recovery.current)recovery.current=createCameraRecovery({
++    setTimer:setTimeout,clearTimer:clearTimeout,
++    eligible:()=>mounted.current && (typeof document==='undefined' || document.visibilityState!=='hidden'),
++    release:()=>{startRequestRef.current++;release();if(nativeActiveRef.current){nativeActiveRef.current=false;nativeBridge()?.postMessage(JSON.stringify({type:'camera-stop'}));}if(mounted.current)setNativePreview(false);},
++    start:ticket=>{recoveryTicket.current=ticket;void acquireRef.current(selectedFacing.current,ticket);},
++    changed:state=>{if(!mounted.current)return;setRecoveryState(state);setStatus(state.phase==='ready'?'on':state.phase==='acquiring'||state.phase==='recovering'?'starting':state.phase==='idle'?'idle':state.reason==='permission_denied'?'denied':'unavailable');},
++  });
+ 
+   const stop = useCallback((resetAutoStart = false) => {
++    if(autoRecover)recovery.current?.stop();
+     invalidate();
+     startRequestRef.current += 1;
+     if (nativeActiveRef.current) {
+@@ -79,7 +94,7 @@
+     setStatus('idle');
+     setMessage('');
+     if (resetAutoStart) cameraWasEnabled = false;
+-  }, [release, invalidate]);
++  }, [release, invalidate, autoRecover]);
+ 
+   // A pending acquisition belongs to one exercise job. Display-only elapsed
+   // updates must not restart the camera, but a replacement job must cancel it.
+@@ -94,7 +109,10 @@
+     stop(true);
+   }, [streamContextKey, stop]);
+ 
+-  const start = useCallback(async (requestedFacing: CameraFacing = facing) => {
++  const start = useCallback(async (requestedFacing: CameraFacing = facing, ticket?: number) => {
++    selectedFacing.current=requestedFacing;
++    setFacing(requestedFacing);
++    if(autoRecover && ticket===undefined){recovery.current?.start();return;}
+     invalidate();
+     const requestId = ++startRequestRef.current;
+     preferredFacing = requestedFacing;
+@@ -115,6 +133,7 @@
+       }
+       if (requestId !== startRequestRef.current) return;
+       if (frame.width <= 0 || frame.height <= 0) {
++        if(autoRecover){recovery.current?.error(ticket!,'no_camera');return;}
+         nativeActiveRef.current = false;
+         setNativePreview(false);
+         setStatus('unavailable');
+@@ -122,10 +141,11 @@
+         setMessage('The camera view could not be laid out. Return to Camera Check and try again.');
+         return;
+       }
+-      bridge.postMessage(JSON.stringify({ type: 'camera-start', frame, facing: requestedFacing, previewContext: nativeContext() }));
++      bridge.postMessage(JSON.stringify({ type: 'camera-start', frame, facing: requestedFacing, generation:requestId, previewContext: nativeContext() }));
+       return;
+     }
+     if (typeof window === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
++      if(autoRecover){recovery.current?.error(ticket!,'no_camera');return;}
+       setStatus('unavailable');
+       cameraWasEnabled = false;
+       setMessage(typeof window !== 'undefined' && window.isSecureContext === false
+@@ -158,6 +178,7 @@
+       streamRef.current = stream;
+       const lost = () => {
+         if (requestId !== startRequestRef.current) return;
++        if(autoRecover){recovery.current?.error(ticket!);return;}
+         invalidate(); startRequestRef.current += 1; release(); setStatus('unavailable');
+         setMessage('Camera delivery stopped. Enable the camera again or continue without it.');
+       };
+@@ -176,8 +197,10 @@
+       if (requestId !== startRequestRef.current) { stream.getTracks().forEach(track => track.stop()); return; }
+       setFacing(requestedFacing);
+       setStatus('on');
++      if(autoRecover)recovery.current?.ready(ticket!);
+     } catch (error) {
+       if (requestId !== startRequestRef.current) return;
++      if(autoRecover){const denied=error instanceof DOMException && ['NotAllowedError','SecurityError'].includes(error.name);recovery.current?.error(ticket!,denied?'permission_denied':error instanceof DOMException && error.name==='NotFoundError'?'no_camera':'interrupted_too_often');return;}
+       invalidate(); release();
+       cameraWasEnabled = false;
+       const blocked = error instanceof DOMException && (error.name === 'NotAllowedError' || error.name === 'SecurityError');
+@@ -186,11 +209,13 @@
+         ? 'Camera access is blocked. Allow the camera in your browser or phone settings, then tap Enable camera again.'
+         : 'No camera was found or it could not start.');
+     }
+-  }, [facing, release, invalidate, nativeContext]);
++  }, [facing, release, invalidate, nativeContext, autoRecover]);
++  acquireRef.current=start;
+ 
+   const switchFacing = useCallback(() => {
+     const nextFacing: CameraFacing = facing === 'back' ? 'front' : 'back';
+     preferredFacing = nextFacing;
++    selectedFacing.current=nextFacing;
+     setFacing(nextFacing);
+     if (status === 'on' || status === 'starting') void start(nextFacing);
+   }, [facing, start, status]);
+@@ -199,6 +224,9 @@
+     const handleCameraEvent = (event: Event) => {
+       const detail = (event as CustomEvent<CameraEvent>).detail;
+       if (!detail) return;
++      if(autoRecover && (detail as {type:string}).type==='interruption'){
++        const active=(detail as unknown as {active:unknown}).active;if(typeof active==='boolean')recovery.current?.activity(active);return;
++      }
+       if (detail.type === 'facing') {
+         if(detail.facing!=='front' && detail.facing!=='back')return;
+         invalidate();
+@@ -207,7 +235,9 @@
+         return;
+       }
+       if (!nativeActiveRef.current) return;
++      if(autoRecover && detail.type==='status' && detail.status!=='idle' && detail.generation!==startRequestRef.current)return;
+       if (!['idle','starting','on','denied','unavailable'].includes(detail.status)) return;
++      if(autoRecover){if(detail.status==='on')recovery.current?.ready(recoveryTicket.current);else if(detail.status==='denied'||detail.status==='unavailable')recovery.current?.error(recoveryTicket.current,detail.status==='denied'?'permission_denied':detail.reason && ['timeout','no_camera','interrupted_too_often','thermal'].includes(detail.reason)?detail.reason:'interrupted_too_often');return;}
+       if (detail.status !== 'on' && detail.status !== 'starting') invalidate();
+       setStatus(detail.status);
+       setMessage(detail.message ?? '');
+@@ -242,7 +272,8 @@
+       }
+       updateFrame();
+     };
+-    const lifecycleLost = () => { if(document.visibilityState==='hidden') stop(true); };
++    mounted.current=true;
++    const lifecycleLost = () => { if(autoRecover)recovery.current?.activity(document.visibilityState!=='hidden');else if(document.visibilityState==='hidden') stop(true); };
+     const resizeObserver = frameRef.current && typeof ResizeObserver !== 'undefined'
+       ? new ResizeObserver(geometryChanged)
+       : null;
+@@ -255,6 +286,7 @@
+     window.visualViewport?.addEventListener('resize', updateFrame);
+     window.visualViewport?.addEventListener('scroll', updateFrame);
+     return () => {
++      mounted.current=false;if(autoRecover)recovery.current?.stop();
+       window.removeEventListener('physiquequest-camera', handleCameraEvent);
+       startRequestRef.current += 1;
+       generationRef.current += 1;
+@@ -269,7 +301,7 @@
+       nativeActiveRef.current = false;
+       release();
+     };
+-  }, [release, invalidate, stop, nativeContext]);
++  }, [release, invalidate, stop, nativeContext, autoRecover]);
+ 
+   useEffect(() => {
+     if (!nativeActiveRef.current) return;
+@@ -283,7 +315,8 @@
+     videoRef,
+     frameRef,
+     status,
+-    message,
++    message: autoRecover ? cameraRecoveryMessage(recoveryState) : message,
++    recoveryState,
+     start,
+     stop,
+     facing,
+--- a/frontend/sections/Coach/GenericTrackingSession.tsx
++++ b/frontend/sections/Coach/GenericTrackingSession.tsx
+@@ -1,5 +1,5 @@
+ 'use client';
+-import { useEffect, useMemo, useState } from 'react';
++import { useMemo, useState } from 'react';
+ import { useCameraStream } from '../../hooks/useCameraStream';
+ import { useGenericRepTracking } from '../../hooks/useGenericRepTracking';
+ import type { GeneratedAngleConfig } from '../../../backend/src/pose-tracker/exercise-registry';
+@@ -12,23 +12,22 @@
+   const [stage,setStage]=useState<'setup'|'active'|'summary'>('setup');
+   const [summary,setSummary]=useState({reps:0,partial:0});
+   const localConfig=useMemo(()=>({...config,stabilityConstraints:[]}),[config]);
+-  const camera=useCameraStream({screen:'live-session',exerciseName:name,equipment:'',elapsed:''});
++  const camera=useCameraStream({screen:'live-session',exerciseName:name,equipment:'',elapsed:''},true);
+   const tracking=useGenericRepTracking(localConfig,stage==='active' && camera.status==='on' && !camera.nativePreview,camera.videoRef,pattern,override,name);
+-  useEffect(()=>{const hide=()=>{if(document.hidden)camera.stop(true);};document.addEventListener('visibilitychange',hide);return()=>document.removeEventListener('visibilitychange',hide);},[camera.stop]);
+   const finish=()=>{setSummary({reps:tracking.repCount,partial:tracking.partialCount});camera.stop(true);setStage('summary');};
+   return <section className="generic-tracking" aria-label="Experimental movement tracking">
+     <header className="generic-tracking-head"><div><span className="generic-tracking-tag">Experimental tracking</span><h3>{titleCase(name)}</h3></div><button className="secondary" type="button" aria-label="Close tracking" onClick={()=>{camera.stop(true);onExit();}}><Icon name="close" size={19}/></button></header>
+     <p className="generic-tracking-note">Counts are estimates. Keep the working joints visible; a full-body view is optional. Tracking cannot assess safe form, pain, injury risk, or load.</p>
+     {stage!=='summary'?<>
+       <div ref={camera.frameRef} className="live-video generic-tracking-camera"><video ref={camera.videoRef} className={`live-camera ${camera.facing==='front'?'front-facing':''}`} autoPlay muted playsInline /><canvas ref={tracking.overlayRef} aria-hidden="true" style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',transform:camera.facing==='front'?'scaleX(-1)':undefined}} />{camera.status!=='on'&&<div className="generic-camera-placeholder">Your camera preview will appear here.</div>}</div>
+-      <div className="generic-tracking-status" role="status"><strong>{camera.status==='on'?tracking.status:'Camera is off.'}</strong>{camera.status==='on'&&tracking.cue&&<span>{tracking.cue}</span>}</div>
++      <div className="generic-tracking-status" role="status"><strong>{camera.status==='on'?tracking.status:camera.message}</strong>{camera.status==='on'&&tracking.cue&&<span>{tracking.cue}</span>}</div>
+       <div className="generic-tracking-metrics"><div><strong>{tracking.repCount}</strong><span>Detected reps</span></div><div><strong>{tracking.partialCount}</strong><span>Partial movements</span></div></div>
+       <label className="generic-tracking-progress">Movement progress <progress max={1} value={tracking.currentProgress}/></label>
+       {stage==='active'&&tracking.powerNotice&&<p className="generic-tracking-note">{tracking.powerNotice}</p>}
+       {stage==='active'&&<p className="generic-tracking-note">Device temperature is not available in this browser. Pause if your device feels warm.</p>}
+       {camera.message&&<p role="alert">{camera.message}</p>}
+-      <div className="generic-tracking-actions">{camera.status!=='on'&&<button className="primary" type="button" disabled={camera.status==='starting'} onClick={()=>{setStage('active');void camera.start();}}>{camera.status==='starting'?'Starting camera…':'Start camera'}</button>}
+-      {camera.status==='on'&&<button className="secondary" type="button" onClick={camera.switchFacing}>Switch camera</button>}
++      <div className="generic-tracking-actions">{camera.status!=='on'&&<button className="primary" type="button" disabled={camera.status==='starting'} onClick={()=>{setStage('active');void camera.start();}}>{camera.status==='starting'?'Starting camera…':camera.recoveryState.phase==='failed'?'Try again':'Start camera'}</button>}
++      {stage==='active'&&camera.recoveryState.phase!=='idle'&&<button className="secondary" type="button" onClick={camera.switchFacing}>Switch camera</button>}
+       {stage==='active'&&<button className="secondary" type="button" onClick={finish}>Finish tracking</button>}</div>
+       {camera.nativePreview&&<p>Experimental tracking is available in a browser, not the native camera view.</p>}
+     </>:<div className="generic-tracking-summary"><h4>Unsaved summary</h4><p>{summary.reps} detected repetitions · {summary.partial} partial movements</p><p>Review and enter your workout values manually. No camera images or results were saved.</p><button className="primary" type="button" onClick={onExit}>Confirm and return</button></div>}
+--- a/frontend/sections/Coach/LiveSession.tsx
++++ b/frontend/sections/Coach/LiveSession.tsx
+@@ -76,7 +76,7 @@
+     exerciseName: exercise.name,
+     equipment: exercise.equipment,
+     elapsed: time,
+-  });
++  }, true);
+ 
+   useEffect(() => {
+     if (paused || phase !== 'active') return;
+@@ -307,7 +307,7 @@
+       {camera.status !== 'on' && (
+         <div className="live-camera-action">
+           <button type="button" className="secondary" disabled={camera.status === 'starting'} onClick={() => void camera.start()}>
+-            {camera.status === 'starting' ? 'Starting camera...' : 'Enable camera'}
++            {camera.status === 'starting' ? 'Starting camera...' : camera.recoveryState.phase === 'failed' ? 'Try again' : 'Enable camera'}
+           </button>
+           {camera.message && <p role="alert">{camera.message}</p>}
+         </div>
+--- a/frontend/sections/Coach/TrackingSession.tsx
++++ b/frontend/sections/Coach/TrackingSession.tsx
+@@ -18,7 +18,7 @@
+   const [error, setError] = useState('');
+   const [seconds, setSeconds] = useState(0);
+   const intent = !paused && visible && !review;
+-  const camera = useCameraStream({ screen: 'live-session', exerciseName: exercise.name, equipment: exercise.equipment, elapsed: `${seconds}s`, tracking: { requestId, kind, side, active: intent } });
++  const camera = useCameraStream({ screen: 'live-session', exerciseName: exercise.name, equipment: exercise.equipment, elapsed: `${seconds}s`, tracking: { requestId, kind, side, active: intent } }, true);
+   const tracking = useRepTracking({ kind, side, active: intent && camera.status === 'on', native: camera.nativePreview, requestId, videoRef: camera.videoRef });
+ 
+   useEffect(() => {
+@@ -26,7 +26,7 @@
+     listener(); document.addEventListener('visibilitychange', listener);
+     return () => document.removeEventListener('visibilitychange', listener);
+   }, []);
+-  useEffect(() => { if (!intent) camera.stop(); }, [intent, camera.stop]);
++  useEffect(() => { if (paused || review) camera.stop(); }, [paused, review, camera.stop]);
+   useEffect(() => {
+     if (!intent) return;
+     const timer = window.setInterval(() => setSeconds(value => value + 1), 1000);
+@@ -59,7 +59,7 @@
+       {tracking.rate > 0 && <small>Processing target: {tracking.rate} frames/sec</small>}
+       {camera.message && <p role="alert">{camera.message}</p>}
+       <div className="session-controls">
+-        {camera.status !== 'on' && <button type="button" className="secondary" disabled={paused || !visible || camera.status === 'starting'} onClick={() => void camera.start()}>{camera.status === 'starting' ? 'Starting camera…' : 'Enable camera'}</button>}
++        {camera.status !== 'on' && <button type="button" className="secondary" disabled={paused || !visible || camera.status === 'starting'} onClick={() => void camera.start()}>{camera.status === 'starting' ? 'Starting camera…' : camera.recoveryState.phase === 'failed' ? 'Try again' : 'Enable camera'}</button>}
+         {camera.status === 'on' && !camera.nativePreview && <button type="button" className="secondary" onClick={camera.switchFacing}>Switch camera</button>}
+         <button type="button" className="secondary" disabled={busy} onClick={() => void togglePause()}>{paused ? 'Resume' : 'Pause'}</button>
+         <button type="button" className="end-button" disabled={busy} onClick={async () => {
+--- a/frontend/sections/Coach/SquatFormPreview.tsx
++++ b/frontend/sections/Coach/SquatFormPreview.tsx
+@@ -13,7 +13,7 @@
+   const [visible, setVisible] = useState(true);
+   const [finalReps, setFinalReps] = useState(0);
+   const [seconds, setSeconds] = useState(0);
+-  const camera = useCameraStream({ screen: 'live-session', exerciseName: movementRules.squat.name, equipment: 'Bodyweight', elapsed: `${seconds}s`, tracking: { requestId, kind: 'squat', side, active: stage === 'active' && visible } });
++  const camera = useCameraStream({ screen: 'live-session', exerciseName: movementRules.squat.name, equipment: 'Bodyweight', elapsed: `${seconds}s`, tracking: { requestId, kind: 'squat', side, active: stage === 'active' && visible } }, true);
+   const tracking = useRepTracking({ kind: 'squat', side, active: stage === 'active' && visible && camera.status === 'on', native: camera.nativePreview, requestId, videoRef: camera.videoRef });
+   useEffect(() => {
+     const changed = () => setVisible(!document.hidden);
+@@ -39,7 +39,7 @@
+       <div aria-live="polite" className="tracking-summary"><b>{tracking.reps} detected {tracking.reps === 1 ? 'rep' : 'reps'}</b><p>{label}</p><p>{camera.status === 'on' ? tracking.message : 'Enable the camera to begin.'}</p><small>{tracking.status}</small></div>
+       {camera.message && <p role="alert">{camera.message}</p>}
+       <div className="session-controls">
+-        {camera.status !== 'on' && <button type="button" className="secondary" disabled={!visible || camera.status === 'starting'} onClick={() => { setStage('active'); void camera.start(); }}>{camera.status === 'starting' ? 'Starting camera…' : 'Enable camera'}</button>}
++        {camera.status !== 'on' && <button type="button" className="secondary" disabled={!visible || camera.status === 'starting'} onClick={() => { setStage('active'); void camera.start(); }}>{camera.status === 'starting' ? 'Starting camera…' : camera.recoveryState.phase === 'failed' ? 'Try again' : 'Enable camera'}</button>}
+         {camera.status === 'on' && <button type="button" className="secondary" onClick={() => { camera.stop(true); setStage('setup'); }}>Stop camera</button>}
+         {stage === 'active' && <button type="button" className="primary" onClick={finish}>Finish preview</button>}
+       </div>
+--- a/frontend/hooks/useGenericRepTracking.ts
++++ b/frontend/hooks/useGenericRepTracking.ts
+@@ -95,7 +95,7 @@
+         worker.postMessage({type:'generic-frame',bitmap,timestamp:now},[bitmap]);
+       } catch { fail('Could not process the camera frame.'); }
+     },50);
+-    return () => { stopped=true; battery?.removeEventListener('levelchange',updatePower); battery?.removeEventListener('chargingchange',updatePower); window.clearInterval(timer); window.clearTimeout(timeout); worker.terminate(); };
++    return () => { stopped=true; counter.suspend(); battery?.removeEventListener('levelchange',updatePower); battery?.removeEventListener('chargingchange',updatePower); window.clearInterval(timer); window.clearTimeout(timeout); worker.terminate(); };
+   },[active,counter,videoRef]);
+   return { ...progress, status, powerNotice, overlayRef };
+ }
+--- a/mobile/camera-readiness.test.mjs
++++ b/mobile/camera-readiness.test.mjs
+@@ -14,6 +14,7 @@
+   return module.exports;
+ }
+ const shared=compile('shared/cameraReadiness.ts');
++const recoveryModule=compile('shared/cameraRecovery.ts');
+ const rep=compile('shared/repCounter.ts');
+ const poseConfig=compile('shared/poseConfig.ts');
+ const poseSubject=compile('shared/poseSubject.ts');
+@@ -138,7 +139,7 @@
+   const h=hookHarness(),window=new EventTarget(),document=new EventTarget(),timers=new Map();
+   let next=0,now=0;
+   document.visibilityState='visible';
+-  const module=compile('frontend/hooks/useCameraStream.ts',{react:h.react,'../../shared/cameraReadiness':shared},{window,document,DOMException,
++  const module=compile('frontend/hooks/useCameraStream.ts',{react:h.react,'../../shared/cameraReadiness':shared,'../../shared/cameraRecovery':recoveryModule},{window,document,DOMException,
+     navigator:{mediaDevices:{getUserMedia:acquire}},requestAnimationFrame:fn=>fn(),
+     setTimeout:(fn,ms)=>{const id=++next;timers.set(id,{fn,at:now+ms});return id;},clearTimeout:id=>timers.delete(id)});
+   let context={screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'00:00'};
+@@ -255,7 +256,7 @@
+     const messages=[];
+     if(interruption==='native-idle')window.ReactNativeWebView={postMessage:s=>messages.push(JSON.parse(s))};
+     const track={stop:()=>stopped++,addEventListener(){},removeEventListener(){}};
+-    const module=compile('frontend/hooks/useCameraStream.ts',{react:h.react,'../../shared/cameraReadiness':shared},{window,document,DOMException,
++    const module=compile('frontend/hooks/useCameraStream.ts',{react:h.react,'../../shared/cameraReadiness':shared,'../../shared/cameraRecovery':recoveryModule},{window,document,DOMException,
+       navigator:{mediaDevices:{getUserMedia:async()=>{acquisitions++;return {getTracks:()=>[track],getVideoTracks:()=>[track]};}}},requestAnimationFrame:fn=>fn()});
+     const context={screen:'live-session',exerciseName:'Curl',equipment:'Dumbbell',elapsed:'00:00'};
+     const render=()=>h.render(module.useCameraStream,context);

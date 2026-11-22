@@ -1,0 +1,334 @@
+diff --git a/docs/pose-replay/labels.local.json b/docs/pose-replay/labels.local.json
+new file mode 100644
+--- /dev/null
++++ b/docs/pose-replay/labels.local.json
+@@ -0,0 +1,182 @@
++[
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\rear pull up (regular one).mp4",
++    "exercise_guess": "rear pull up (regular one)",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine shoulder press.mp4",
++    "exercise_guess": "machine shoulder press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine shoulder press 2nd try.mp4",
++    "exercise_guess": "machine shoulder press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip.mp4",
++    "exercise_guess": "machine seated dip",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip 2nd try.mp4",
++    "exercise_guess": "machine seated dip",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\Machine Reverse T-bar Row.mp4",
++    "exercise_guess": "Machine Reverse T-bar Row",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine preacher curl.mp4",
++    "exercise_guess": "machine preacher curl",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine narrow grip seated row.mp4",
++    "exercise_guess": "machine narrow grip seated row",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine narrow grip seated row 2nd try.mp4",
++    "exercise_guess": "machine narrow grip seated row",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine incline chest press.mp4",
++    "exercise_guess": "machine incline chest press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine incline chest press 2nd try.mp4",
++    "exercise_guess": "machine incline chest press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown.mp4",
++    "exercise_guess": "machine front pulldown",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown 2nd try.mp4",
++    "exercise_guess": "machine front pulldown",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press.mp4",
++    "exercise_guess": "machine chest press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 3rd try.mp4",
++    "exercise_guess": "machine chest press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\weighted triceps dips.mp4",
++    "exercise_guess": "weighted triceps dips",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 2nd try.mp4",
++    "exercise_guess": "machine chest press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
++    "exercise_guess": "barbell bench press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press 2nd try.mp4",
++    "exercise_guess": "barbell bench press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press 3rd try.mp4",
++    "exercise_guess": "barbell bench press",
++    "camera_facing": null,
++    "plate_occluded": null,
++    "full_reps": null,
++    "partial_reps": null,
++    "notes": null
++  }
++]
+diff --git a/docs/pose-replay/local-video-inventory.json b/docs/pose-replay/local-video-inventory.json
+new file mode 100644
+--- /dev/null
++++ b/docs/pose-replay/local-video-inventory.json
+@@ -0,0 +1,142 @@
++[
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\rear pull up (regular one).mp4",
++    "bytes": 2227256,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "2ec0468b8f04b5c936cfd2596dd5f2dfb2b3e52a61fa872ddddf94b860885f43"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine shoulder press.mp4",
++    "bytes": 5039974,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "5893f44c38b0e93321da1f4e3ea252afbc0683304c7546d43c90ba2beb0eb014"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine shoulder press 2nd try.mp4",
++    "bytes": 7267701,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "3c7844126fb19d72c1443c9c5ce916b2cbaab46b280755885761646b23d1ea55"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip.mp4",
++    "bytes": 1789674,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "620e7908367198ff388fea0293301796a4e1a44aca073433504fc60124fcc4c0"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip 2nd try.mp4",
++    "bytes": 1789674,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "620e7908367198ff388fea0293301796a4e1a44aca073433504fc60124fcc4c0"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\Machine Reverse T-bar Row.mp4",
++    "bytes": 1585436,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "a60543bffd79b6ab0090ca74714b4ec2b33e4c91a4c64d7728241a68067b4f0e"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine preacher curl.mp4",
++    "bytes": 1677393,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "a2fd1b40c3d8ba973bddf7e0aafd1f4eda1fcd399831322f7dc9ab63c4c084e2"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine narrow grip seated row.mp4",
++    "bytes": 2853086,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "402a747c83d5912e5d621a637e2b35ddd78215411782c6c81d8a016d6d124222"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine narrow grip seated row 2nd try.mp4",
++    "bytes": 572434,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "69936c5698ae69e9a31d8477a38be2d04f9b6700dffae87061ceb1de6c428dd3"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine incline chest press.mp4",
++    "bytes": 2639571,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "67b29ac59b11460bd16339cd50058a89600a0f1aaa818887d1cb5d3d350837e0"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine incline chest press 2nd try.mp4",
++    "bytes": 2274599,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "d41d2aefac7d067a1fd1301aec94c40a1b4bbae6372b2ab515ea3f022d78d6a1"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown.mp4",
++    "bytes": 2712994,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "2126166f9991a6146db07055d9d1d405d533e19d3bdef7eac545bf6ebff2910c"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown 2nd try.mp4",
++    "bytes": 1585930,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "f439896d1d85035ccad3381fa654d167775d93f7799d59135e2712a252d0eed2"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press.mp4",
++    "bytes": 2997663,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "dc8012e9db30449174953eebbcabd40f973da1ba2c4d9c0b063843817387f828"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 3rd try.mp4",
++    "bytes": 4041084,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "482def00e999a999bcb7e2152dd987001c65a694c85f8ce7f357f3d607672bdc"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\weighted triceps dips.mp4",
++    "bytes": 7514078,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "6c6ff84d8d4ce5e004e6407ef088fe6e3f6a7d92c2fb380dc35eff7c97ca9f6d"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 2nd try.mp4",
++    "bytes": 3986758,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "d1bb6a4dc6d694258e76ed6eeaa907251db360d601bc5afe7e4009f1a5812eb4"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
++    "bytes": 923217,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "dcf3765b43bcc9a84f71ba57104c3ac38048add2fd6117b6b76c213f2e0c722d"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press 2nd try.mp4",
++    "bytes": 948415,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "13a3b9d5c97cb205bd6a029926919974e59aa02fe104ac2c87600a73b64691ef"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press 3rd try.mp4",
++    "bytes": 2386111,
++    "readable": true,
++    "matches_upload_size": true,
++    "sha256": "4eec20bceb7428c0eae47641709ba642458f2c477f1a0d767274bd1ffb17036f"
++  }
++]

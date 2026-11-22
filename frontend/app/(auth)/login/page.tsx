@@ -89,7 +89,7 @@ export default function LoginPage() {
           {notice && (
             <div className="toast" role="status">
               {notice}
-              <button onClick={() => setNotice('')} aria-label="Dismiss">
+              <button type="button" onClick={() => setNotice('')} aria-label="Dismiss">
                 ×
               </button>
             </div>

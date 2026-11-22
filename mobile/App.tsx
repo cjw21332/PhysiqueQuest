@@ -7,11 +7,13 @@ import type { GoogleSignin as GoogleSigninApi } from '@react-native-google-signi
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
 import * as Notifications from 'expo-notifications';
+import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, NativeModules, Platform, TurboModuleRegistry } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
+  Modal,
   Keyboard,
   Pressable,
   ScrollView,
@@ -24,6 +26,7 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
+import * as WebBrowser from 'expo-web-browser';
 import { backendIsReady, isTrustedWebViewUrl, isTrustedWebViewNavigation, normalizeFrontendUrl, resolveApiUrl, resolveFrontendUrl, selectConfiguredUrl } from './connection.mjs';
 import { performanceGuardScript } from './performance-guard.mjs';
 import { createNativeMonitor } from './inactivity/nativeMonitor';
@@ -52,7 +55,7 @@ type CameraFrame = { x: number; y: number; width: number; height: number };
 type NativeCameraContext =
   | { screen: 'camera-check'; readiness: NativeReadinessContext }
   | { screen: 'live-session'; exerciseName: string; equipment: string; elapsed: string; tracking?: NativeTrackingOptions };
-type NativeCameraPreview = { frame: CameraFrame; facing: 'back' | 'front'; context: NativeCameraContext; instanceId: number };
+type NativeCameraPreview = { frame: CameraFrame; facing: 'back' | 'front'; context: NativeCameraContext; instanceId: number; generation?: number };
 
 export function isNativeCameraContext(value: unknown): value is NativeCameraContext {
   if (!value || typeof value !== 'object' || !('screen' in value)) return false;
@@ -77,6 +80,45 @@ export function isCameraFrame(frame: unknown): frame is CameraFrame {
   const f=frame as CameraFrame;
   return [f.x,f.y,f.width,f.height].every(n=>Number.isFinite(n) && Math.abs(n)<=32768) && f.width>0 && f.height>0;
 }
+/** Ignore malformed bridge input without changing ownership of a live camera. */
+export function parseCameraHostMessage(raw: string): Record<string,unknown> | null {
+  if(typeof raw!=='string' || raw.length>4000500)return null;
+  try {
+    const m=JSON.parse(raw);
+    if(!m || typeof m!=='object' || Array.isArray(m) || typeof m.type!=='string')return null;
+    if(['camera-start','camera-update-frame'].includes(m.type)) {
+      if(!isCameraFrame(m.frame) || !isNativeCameraContext(m.previewContext))return null;
+      if(m.previewContext.screen==='camera-check' && (m.previewContext.readiness.previewWidth!==m.frame.width || m.previewContext.readiness.previewHeight!==m.frame.height))return null;
+    }
+    if(m.type==='camera-start' && !['front','back'].includes(m.facing))return null;
+    if(m.type==='camera-start' && m.generation!==undefined && (!Number.isSafeInteger(m.generation) || m.generation<0))return null;
+    if(m.type==='camera-update-overlay' && !isNativeCameraContext(m.previewContext))return null;
+    return m;
+  }catch{return null;}
+}
+/**
+ * Decides what happens to a navigation the shell will not load itself.
+ *
+ * Keeping third-party pages out of the shell is deliberate, but silently
+ * returning false made every outbound link in the web app (exercise
+ * attribution, weighing guidance, provider documentation) do nothing at all
+ * when tapped. Anything that is not trusted but is still an ordinary web page
+ * is handed to the system browser instead of being dropped.
+ */
+export function openExternally(
+  request: { url: string; isTopFrame?: boolean },
+  frontendUrl: string,
+  open: (url: string) => void = url => { void WebBrowser.openBrowserAsync(url).catch(() => {}); },
+) {
+  if (isTrustedWebViewNavigation(request.url, frontendUrl, request.isTopFrame)) return true;
+  if (request.isTopFrame === false) return false;
+  try {
+    const url = new URL(request.url);
+    if ((url.protocol === 'https:' || url.protocol === 'http:') && !url.username && !url.password) open(url.toString());
+  } catch { /* A URL the shell cannot parse is never handed to the browser. */ }
+  return false;
+}
+
 export function nativeFramingText(check:ReadinessCheck) {
   if(!validateReadinessCheck(check))return 'Framing unavailable';
   if(check.status==='ready')return 'Framing ready';
@@ -84,7 +126,7 @@ export function nativeFramingText(check:ReadinessCheck) {
 }
 
 function getInitialAddress() {
-  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net';
+  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net/?pq-shell=1.5.1';
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_WEB_APP_URL?: string } | undefined;
   return resolveFrontendUrl(selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_WEB_APP_URL, extra?.EXPO_PUBLIC_WEB_APP_URL), Constants.expoConfig?.hostUri);
 }
@@ -133,6 +175,9 @@ function buildGoogleAuthScript(result: { requestId: string; idToken?: string; er
 
 function buildCameraScript(detail: {
   type: string;
+  active?: boolean;
+  reason?: string;
+  generation?: number;
   status?: string;
   message?: string;
   requestId?: string;
@@ -143,7 +188,7 @@ function buildCameraScript(detail: {
   return `(function(){window.dispatchEvent(new CustomEvent('physiquequest-camera',{detail:${payload}}));})();true;`;
 }
 
-function AppContent() {
+function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView<object>>(null);
   const googleConfigured = useRef(false);
@@ -260,7 +305,7 @@ function AppContent() {
     probe.current = controller;
     // A free server can take nearly a minute to wake. Keep a single startup
     // request alive instead of repeatedly aborting it and reporting offline.
-    const timeout = setTimeout(() => controller.abort(), backendStatusRef.current === 'checking' ? 65000 : 7000);
+    const timeout = setTimeout(() => controller.abort(), backendStatusRef.current === 'online' ? 7000 : 65000);
     try {
       const ready = apiUrl && await backendIsReady(apiUrl, controller.signal);
       if (probe.current === controller) setBackendStatus(ready ? 'online' : 'offline');
@@ -269,26 +314,27 @@ function AppContent() {
 
   useEffect(() => {
     const checkIfActive = () => { if (AppState.currentState === 'active') void checkBackend(); };
-    const unsubscribe = NetInfo.addEventListener(state => {
-      const available = state.isConnected !== false;
+    const applyNetworkState = (available: boolean) => {
       networkAvailable.current = available;
+      webRef.current?.injectJavaScript(
+        `window.dispatchEvent(new CustomEvent('physiquequest:internet-status',{detail:${JSON.stringify(available ? 'online' : 'offline')}}));true;`
+      );
       if (!available) {
         probe.current?.abort();
         probe.current = null;
         setBackendStatus('offline');
       } else checkIfActive();
+    };
+    const unsubscribe = NetInfo.addEventListener(state => {
+      applyNetworkState(state.isConnected !== false && state.isInternetReachable !== false);
     });
-    const subscription = AppState.addEventListener('change', state => { if (state === 'active') void checkBackend(); });
-    let lastPeriodic = Date.now();
-    const interval = setInterval(() => {
-      const now = Date.now();
-      if (now - lastPeriodic >= (backendStatusRef.current === 'online' ? 30000 : 5000)) {
-        lastPeriodic = now;
-        checkIfActive();
-      }
-    }, 5000);
+    const subscription = AppState.addEventListener('change', state => {
+      if (state !== 'active') return;
+      void NetInfo.fetch().then(network => {
+        applyNetworkState(network.isConnected !== false && network.isInternetReachable !== false);
+      });
+    });
     return () => {
-      clearInterval(interval);
       unsubscribe();
       subscription.remove();
       probe.current?.abort();
@@ -354,12 +400,13 @@ function AppContent() {
     facing: 'back' | 'front',
     context: NativeCameraContext,
     requestId: number,
+    generation?: number,
   ) => {
     const validFrame = isCameraFrame(frame) && (context.screen!=='camera-check' ||
       (context.readiness.previewWidth===frame.width && context.readiness.previewHeight===frame.height));
     if (!validFrame) {
       webRef.current?.injectJavaScript(buildCameraScript({
-        type: 'status',
+        type: 'status', generation,
         status: 'unavailable',
         message: 'The camera preview could not be positioned. Try opening the camera again.',
       }));
@@ -372,20 +419,20 @@ function AppContent() {
       if (requestId !== cameraRequestId.current) return;
       if (!granted) {
         webRef.current?.injectJavaScript(buildCameraScript({
-          type: 'status',
+          type: 'status', generation,
           status: 'denied',
           message: 'Camera access is blocked. Allow camera access in your phone settings, then try again.',
         }));
         return;
       }
       setFraming({status:'unknown',reason:'pending'});
-      setCameraPreview({ frame, facing, context, instanceId:requestId });
-      webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'starting' }));
+      setCameraPreview({ frame, facing, context, instanceId:requestId, generation });
+      webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'starting', generation }));
     } catch (error) {
       console.error('Native camera could not start:', error);
       if (requestId !== cameraRequestId.current) return;
       webRef.current?.injectJavaScript(buildCameraScript({
-        type: 'status',
+        type: 'status', generation,
         status: 'unavailable',
         message: 'The camera could not start. Close other apps using the camera and try again.',
       }));
@@ -408,9 +455,12 @@ function AppContent() {
   }, []);
 
   useEffect(()=>{
-    const change=AppState.addEventListener('change',state=>{if(state!=='active')stopNativeCamera();});
-    const blur=AppState.addEventListener('blur',stopNativeCamera);
-    return ()=>{cameraRequestId.current++;change.remove();blur.remove();};
+    let blurred=false;
+    const signal=(active:boolean)=>webRef.current?.injectJavaScript(buildCameraScript({type:'interruption',active}));
+    const change=AppState.addEventListener('change',state=>{if(state!=='active'){stopNativeCamera();signal(false);}else {blurred=false;signal(true);}});
+    const blur=AppState.addEventListener('blur',()=>{blurred=true;stopNativeCamera();signal(false);});
+    const focus=AppState.addEventListener('focus',()=>{blurred=false;signal(AppState.currentState==='active');});
+    return ()=>{cameraRequestId.current++;change.remove();blur.remove();focus.remove();};
   },[stopNativeCamera]);
 
   const switchNativeCameraFacing = () => {
@@ -453,7 +503,8 @@ function AppContent() {
         style={StyleSheet.absoluteFill}
         containerStyle={styles.webContainer}
         originWhitelist={[new URL(loadedAddress).origin, 'https://app.posetracker.com']}
-        onShouldStartLoadWithRequest={request => isTrustedWebViewNavigation(request.url, loadedAddress, request.isTopFrame)}
+        setSupportMultipleWindows={false}
+        onShouldStartLoadWithRequest={request => openExternally(request, loadedAddress)}
         injectedJavaScriptBeforeContentLoaded={insetScript}
         javaScriptEnabled
         domStorageEnabled
@@ -494,8 +545,9 @@ function AppContent() {
         onMessage={(e) => {
           if (!isTrustedWebViewUrl(e.nativeEvent.url, loadedAddress)) return;
           try {
-            if(e.nativeEvent.data.length>readinessMessageLimit){stopNativeCamera();return;}
-            const message = JSON.parse(e.nativeEvent.data) as {
+            const parsedMessage=parseCameraHostMessage(e.nativeEvent.data);
+            if(!parsedMessage)return;
+            const message = parsedMessage as {
               type?: string;
               mode?: string;
               ok?: boolean;
@@ -503,6 +555,7 @@ function AppContent() {
               facing?: 'back' | 'front';
               previewContext?: unknown;
               requestId?: string;
+              generation?: number;
               side?: 'left' | 'right';
               sessionId?: string;
               geometryGeneration?: number;
@@ -516,7 +569,17 @@ function AppContent() {
               contactName?: string;
               override?: unknown;
               status?: string;
+              image?: string;
             };
+            if (message.type === 'auth-success') { onAuthenticated(); return; }
+            if (message.type === 'badge-export' && typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,100}$/.test(message.requestId) && typeof message.image === 'string' && message.image.startsWith('data:image/png;base64,') && typeof message.name === 'string' && (message.intent === 'save' || message.intent === 'share')) {
+              const requestId = message.requestId, origin = new URL(loadedAddress).origin;
+              const respond = (error?: string) => { const detail = JSON.stringify({ requestId, error }); webRef.current?.injectJavaScript(`if(location.origin===${JSON.stringify(origin)})window.dispatchEvent(new CustomEvent('physiquequest:badge-export',{detail:${detail}}));true;`); };
+              if (!NativeModules.PQShell?.exportBadge) respond('Saving images is unavailable in this app version.');
+              else void NativeModules.PQShell.exportBadge(message.image, message.name, message.intent).then(() => respond()).catch((error: Error) => respond(error.message || 'Could not export the image.'));
+              return;
+            }
+            if(e.nativeEvent.data.length>readinessMessageLimit){stopNativeCamera();return;}
             if (apiUrl && ['remember-offline-account','forget-offline-account','restore-offline-account'].includes(message.type ?? '') &&
                 typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,120}$/.test(message.requestId)) {
               const origin = new URL(loadedAddress).origin;
@@ -538,8 +601,8 @@ function AppContent() {
                   const GoogleSignin = googleSignin.current!;
                   if (!googleConfigured.current) throw new Error('Google sign-in is not configured in this build.');
                   if (Platform.OS === 'android') await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-                  // A cancelled registration must allow the account chooser to appear again.
-                  if (message.intent === 'register') await GoogleSignin.signOut().catch(() => undefined);
+                  // Always show the account chooser so the user can select a different Google account.
+                  await GoogleSignin.signOut().catch(() => undefined);
                   const result = await GoogleSignin.signIn();
                   if (result.type === 'cancelled') {
                     webRef.current?.injectJavaScript(buildGoogleAuthScript({ requestId, cancelled: true }));
@@ -577,18 +640,18 @@ function AppContent() {
               const requestId = cameraRequestId.current + 1;
               cameraRequestId.current = requestId;
               setCameraPreview(null);
-              if(!isNativeCameraContext(message.previewContext)){stopNativeCamera();return;}
+              if(!isNativeCameraContext(message.previewContext))return;
               const context = message.previewContext;
-              void startNativeCamera(message.frame, message.facing === 'front' ? 'front' : 'back', context, requestId);
+              void startNativeCamera(message.frame, message.facing === 'front' ? 'front' : 'back', context, requestId, message.generation);
             }
             if (message.type === 'camera-update-frame' && message.frame) {
               if(!isNativeCameraContext(message.previewContext) || !isCameraFrame(message.frame) ||
-                (message.previewContext.screen==='camera-check' && (message.previewContext.readiness.previewWidth!==message.frame.width || message.previewContext.readiness.previewHeight!==message.frame.height))) {stopNativeCamera();return;}
+                (message.previewContext.screen==='camera-check' && (message.previewContext.readiness.previewWidth!==message.frame.width || message.previewContext.readiness.previewHeight!==message.frame.height))) return;
               const context = message.previewContext;
               updateNativeCameraFrame(message.frame, context);
             }
             if (message.type === 'camera-update-overlay') {
-              if(!isNativeCameraContext(message.previewContext)){stopNativeCamera();return;}
+              if(!isNativeCameraContext(message.previewContext))return;
               updateNativeCameraContext(message.previewContext);
             }
             if(message.type==='camera-readiness-status' && cameraPreview?.context.screen==='camera-check') {
@@ -611,7 +674,6 @@ function AppContent() {
               if (payload.type === 'inactivity-request-motion-status') void native.reportMotionStatus();
             }
           } catch (error) {
-            stopNativeCamera();
             console.warn('Could not handle malformed WebView message.');
           }
         }}
@@ -653,10 +715,10 @@ function AppContent() {
             webRef.current?.injectJavaScript(poseOptions.mode==='readiness'?readinessScript(detail):poseScript(detail));
             if (detail.type === 'error') {
               setCameraPreview(null);
-              webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'unavailable', message: String(detail.message) }));
+              webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'unavailable', generation:cameraPreview.generation, message: String(detail.message), reason: detail.code==='timeout'?'timeout':String(detail.message).includes('too warm')?'thermal':detail.reason==='unsupported'?'no_camera':'interrupted_too_often' }));
             }
           }}
-          ready={() => {if(cameraPreview.instanceId===cameraRequestId.current)webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }));}}
+          ready={() => {if(cameraPreview.instanceId===cameraRequestId.current)webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on', generation:cameraPreview.generation }));}}
         />
       )}
       {cameraPreview && !posePreview && (
@@ -675,7 +737,7 @@ function AppContent() {
           ]}
           onCameraReady={() => {
             if(cameraPreview.instanceId!==cameraRequestId.current)return;
-            webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on' }));
+            webRef.current?.injectJavaScript(buildCameraScript({ type: 'status', status: 'on', generation:cameraPreview.generation }));
             if(cameraPreview.context.screen==='camera-check') {
               const {sessionId,geometryGeneration}=cameraPreview.context.readiness;
               webRef.current?.injectJavaScript(readinessScript({type:'capability',sessionId,geometryGeneration,reason:'unsupported'}));
@@ -691,6 +753,7 @@ function AppContent() {
             webRef.current?.injectJavaScript(buildCameraScript({
               type: 'status',
               status: 'unavailable',
+              generation:cameraPreview.generation,
               message: event.message || 'The camera could not start. Try again.',
             }));
           }}
@@ -799,7 +862,7 @@ function AppContent() {
             </Pressable>
             <Text style={[styles.hint, { fontSize: bodySize - 2, lineHeight: (bodySize - 2) * 1.55 }]}>
               The app uses this address for both the website and its /api backend. If the temporary tunnel
-              address changes, tap Change server and enter the new HTTPS address.
+              address changes, enter the new HTTPS address above and tap Connect.
             </Text>
           </View>
         </ScrollView>
@@ -809,14 +872,52 @@ function AppContent() {
 }
 
 export default function App() {
+  const [showUpdate, setShowUpdate] = useState(false);
+  const updateRequested = useRef(false);
+  const onAuthenticated = useCallback(() => {
+    if (updateRequested.current) return;
+    updateRequested.current = true;
+    void SecureStore.getItemAsync('pq_update_notice_1_5_1').then(value => {
+      if (value !== 'seen') setShowUpdate(true);
+    }).catch(() => setShowUpdate(true));
+  }, []);
+  const dismissUpdate = () => {
+    setShowUpdate(false);
+    void SecureStore.setItemAsync('pq_update_notice_1_5_1', 'seen').catch(() => {});
+  };
   return (
     <SafeAreaProvider>
-      <AppContent />
+      <AppContent onAuthenticated={onAuthenticated} />
+      <Modal visible={showUpdate} transparent animationType="fade" onRequestClose={dismissUpdate}>
+        <View style={styles.updateBackdrop} accessibilityViewIsModal>
+          <View style={styles.updateCard}>
+            <ScrollView contentContainerStyle={styles.updateContent}>
+              <Text style={styles.updateVersion}>VERSION 1.5.1</Text>
+              <Text accessibilityRole="header" style={styles.updateTitle}>What's new in this update?</Text>
+              <Text style={styles.updateItem}>• The weekly day picker on Coach shows all seven days on one row again.</Text>
+              <Text style={styles.updateItem}>• The Phiq button no longer sits on top of the last item on a screen.</Text>
+              <Text style={styles.updateItem}>• Small labels throughout the app are larger and easier to read.</Text>
+              <Text style={styles.updateItem}>• Links to outside pages now open in your browser instead of doing nothing.</Text>
+              <Text style={styles.updateItem}>• The log out prompt closes with the back gesture and works with screen readers.</Text>
+              <Pressable accessibilityRole="button" accessibilityLabel="Close update notice" onPress={dismissUpdate} style={styles.updateButton}>
+                <Text style={styles.buttonText}>Got it</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  updateBackdrop: { flex: 1, backgroundColor: '#000b', justifyContent: 'center', padding: 20 },
+  updateCard: { backgroundColor: '#161d27', borderRadius: 22, borderWidth: 1, borderColor: '#273444', maxHeight: '85%' },
+  updateContent: { padding: 24, gap: 14 },
+  updateVersion: { color: '#22c55e', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  updateTitle: { color: '#f8fafc', fontSize: 24, fontWeight: '700' },
+  updateItem: { color: '#cbd5e1', fontSize: 16, lineHeight: 24 },
+  updateButton: { minHeight: 50, marginTop: 8, borderRadius: 14, backgroundColor: '#22c55e', alignItems: 'center', justifyContent: 'center' },
   root: { flex: 1, backgroundColor: '#0b0f15' },
   webContainer: { flex: 1, backgroundColor: '#0b0f15' },
   nativeCameraPreview: {

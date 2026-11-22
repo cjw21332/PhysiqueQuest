@@ -10,7 +10,10 @@ const nextConfig = (phase: string): NextConfig => ({
   allowedDevOrigins: ['localhost', '*.*.*.*', ...(process.env.DEV_ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean)],
   distDir: mobileExport ? '.next-mobile-export' : phase === PHASE_DEVELOPMENT_SERVER ? (process.env.NEXT_DEV_DIST_DIR || '.next-dev') : '.next',
   devIndicators: false,
-  experimental: { proxyClientMaxBodySize: '28mb', proxyTimeout: 100_000 },
+  // proxyTimeout has to outlast the longest client deadline it carries:
+  // a meal scan gives up at SCAN_TIMEOUT_MS (110s), and a shorter proxy
+  // window turned that into a gateway error before the retry UI could run.
+  experimental: { proxyClientMaxBodySize: '28mb', proxyTimeout: 120_000 },
   ...(mobileExport ? {} : { async headers() {
     const shared = securityHeaders(phase === PHASE_DEVELOPMENT_SERVER);
     const worker = shared.map(header => header.key === 'Content-Security-Policy' ? { ...header, value: header.value.replace("connect-src 'self'", "connect-src 'self' https://static.exercisedb.dev") } : header);

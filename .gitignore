@@ -30,3 +30,15 @@ ml/reports/repcount/**/*.jpg
 *.jks
 *.keystore
 !mobile/android/app/debug.keystore
+output/
+replay-videos/
+*.mp4
+*.mov
+*.zip
+# Local build output, logs and scratch (generated, not source)
+.gradle-local/
+build-logs/
+tmp/
+mobile/shell-export/
+artifacts/android/PhysiqueQuest-v*.apk
+.claude/settings.local.json

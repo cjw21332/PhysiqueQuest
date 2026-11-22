@@ -128,7 +128,7 @@ export default function ReviewEstimate({ imageUrl, status, analysis, error, onBa
   };
   return <div className="review-estimate-screen">
     <header className="scan-header review-estimate-header">
-      <div className="section-back-title pq-page-heading"><button className="coach-back" onClick={onBack} aria-label="Back to Nutrition"><Icon name="arrow" size={20}/></button><h2>Review your meal</h2></div>
+      <div className="section-back-title pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Nutrition"><Icon name="arrow" size={20}/></button><h2>Review your meal</h2></div>
       <button type="button" onClick={onRetake}><Icon name="retake" size={15}/> Retake</button>
     </header>
     <div className="review-estimate-content">
@@ -138,7 +138,7 @@ export default function ReviewEstimate({ imageUrl, status, analysis, error, onBa
           
         </div>
         {status === 'loading' && <div className="detected-list review-loading" role="status"><span className="review-status-icon" aria-hidden="true"><Icon name="scan" size={22}/></span><div><h3>Analysing your meal</h3><p>Identifying foods and matching nutrition records…</p><p className="scan-waiting" aria-hidden="true"><span className="scan-spinner"/><span>Waiting for the result · {elapsed}s</span></p>{hint && <p className="scan-hint">{hint}</p>}<div className="scan-progress" aria-hidden="true"><span style={{ width: `${Math.min(100, elapsed / (SCAN_TIMEOUT_MS / 1000) * 100)}%` }}/></div></div></div>}
-        {status === 'error' && <div className="detected-list" role="alert"><b>Could not analyse this photo</b><p>{error}</p><button className="scan-retry" onClick={onRetry}>Try again</button></div>}
+        {status === 'error' && <div className="detected-list" role="alert"><b>Could not analyse this photo</b><p>{error}</p><button type="button" className="scan-retry" onClick={onRetry}>Try again</button></div>}
         {status === 'ready' && !items.length && <div className="detected-list"><b>No food recognised</b><p>Try a clearer shot, or enter the meal manually.</p></div>}
         {status === 'ready' && !!items.length && <div className="detected-list"><div className="review-items-heading"><div><h3>Foods in your meal</h3><p>Check the foods and adjust their amounts.</p></div><span>{included.length} included</span></div><ul className="detected-items">
           {items.map((item, index) => <li key={index} className={`${item.found ? '' : 'unmatched'} ${excluded.includes(index) ? 'excluded' : ''}`}>
@@ -171,7 +171,7 @@ export default function ReviewEstimate({ imageUrl, status, analysis, error, onBa
       {saveError && <p className="error" role="alert">{saveError}</p>}
       {invalidWeight && <p className="error" role="alert">Enter a weight between 1 and 5000 g for each included food.</p>}
     </div>
-    <footer className="scan-footer split-footer review-estimate-footer"><button className="secondary" onClick={() => onAddManual(meal)}>Add manually</button><button className="primary" disabled={saving || editing !== null || status !== 'ready' || !included.length || invalidWeight} onClick={()=>void save()}>{saving ? 'Saving…' : 'Save meal'}</button></footer>
+    <footer className="scan-footer split-footer review-estimate-footer"><button type="button" className="secondary" onClick={() => onAddManual(meal)}>Add manually</button><button type="button" className="primary" disabled={saving || editing !== null || status !== 'ready' || !included.length || invalidWeight} onClick={()=>void save()}>{saving ? 'Saving…' : 'Save meal'}</button></footer>
     {status === 'error' && !dismissedError && <OutcomeDialog kind="error" title="Could not analyse this photo" message={error} actionLabel="Try again" onAction={onRetry} secondaryLabel="Retake photo" onSecondary={onRetake} onClose={() => setDismissedError(true)}/>}
   </div>;
 }

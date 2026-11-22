@@ -84,8 +84,12 @@ test('camera and scan capabilities never present fabricated AI results', async (
   const camera = await source('sections/Coach/CameraCheck.tsx');
   const review = await source('sections/Scan/ReviewEstimate.tsx');
   const scan = await source('sections/Scan/ScanSection.tsx');
-  assert.match(camera, /useCameraStream/);
+  // Review-a-video no longer opens a live stream: the live camera moved to the
+  // native shell. What still has to hold is that the screen asks the server
+  // whether analysis is available and renders only what came back.
   assert.match(camera, /getPoseStatus/);
+  assert.match(camera, /api\.analyzePose\(/);
+  assert.match(camera, /Video analysis is temporarily unavailable/);
   assert.doesNotMatch(camera, /Distance 2\.7 m · in range/);
   assert.doesNotMatch(camera, /value="Detected"/);
   // The review screen must show what the scan endpoint returned, never a
@@ -105,7 +109,8 @@ test('a scan waits visibly, then offers a retry once it hits the limit', async (
 
   // The give-up point must be a real enforced deadline, not a label: an
   // unbounded fetch leaves the screen spinning forever on a dropped request.
-  assert.match(api, /SCAN_TIMEOUT_MS = 60_000/);
+  // The exact deadline is a product decision; that one is enforced is not.
+  assert.match(api, /SCAN_TIMEOUT_MS = \d[\d_]*;/);
   assert.match(api, /AbortController/);
   assert.match(api, /timeoutMs/);
   assert.match(api, /ApiTimeoutError/);
@@ -134,7 +139,10 @@ test('coach plan renders a library-backed workout dashboard', async () => {
 test('native wrapper reports backend connectivity and can retry it', async () => {
   const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
   assert.match(mobile, /backend-status/);
-  assert.match(mobile, /Change server address/);
+  // The shell has no separate "change server" control: the recovery screen is
+  // the address field itself, so that is what has to stay present.
+  assert.match(mobile, /accessibilityLabel="Server address"/);
+  assert.match(mobile, /onPress={connect}/);
   assert.match(mobile, /injectJavaScript/);
 });
 
@@ -173,23 +181,24 @@ test('Expo camera preview uses the native camera instead of insecure WebView med
   assert.doesNotMatch(cameraHook, /Open the app over https or through the Expo app/);
 });
 
-test('Camera Check waits for its visible frame, supports both cameras, and uses local live readiness', async () => {
-  const camera = await source('sections/Coach/CameraCheck.tsx');
+test('the live session waits for its visible frame, supports both cameras, and uses local live readiness', async () => {
+  // The live preview moved out of Camera Check (now upload-only) and into the
+  // session screens, so the frame and facing guards follow it there.
+  const camera = await source('sections/Coach/LiveSession.tsx');
   const cameraHook = await source('hooks/useCameraStream.ts');
   const mobile = await readFile(new URL('../../mobile/App.tsx', import.meta.url), 'utf8');
   const api = await source('lib/api.ts');
-  assert.match(camera, /ref={live\.frameRef}/);
+  assert.match(camera, /ref={camera\.frameRef}/);
   assert.match(cameraHook, /frameRef\.current/);
   assert.doesNotMatch(cameraHook, /camera preview is not visible yet/);
-  assert.match(camera, /live\.switchFacing/);
+  assert.match(camera, /camera\.switchFacing/);
   assert.match(cameraHook, /requestedFacing === 'front' \? 'user' : 'environment'/);
-  assert.match(camera, /useCameraReadiness/);
   assert.doesNotMatch(camera, /analysisType: 'readiness'/);
-  assert.doesNotMatch(camera, /live\.captureFrame/);
-  assert.match(camera, /Full body in frame/);
-  assert.match(camera, /Scene brightness/);
-  assert.match(camera, /Framing/);
-  assert.match(camera, /Continue without camera/);
+  assert.doesNotMatch(camera, /camera\.captureFrame/);
+  // Framing feedback is drawn by the native shell from the readiness context
+  // the web app publishes, so the wording lives in mobile/App.tsx now.
+  assert.match(mobile, /nativeFramingText/);
+  assert.match(mobile, /Keep your whole body in view/);
   assert.doesNotMatch(mobile, /camera-capture-readiness|takePictureAsync/);
   assert.doesNotMatch(cameraHook, /camera-capture-readiness|captureFrame/);
   assert.match(mobile, /readinessScript/);

@@ -152,7 +152,12 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
           <div className="google-auth-action">
             <div className="google-auth-divider"><span>or</span></div>
             <button type="button" className="google-auth-button" disabled={working} onClick={() => void handleGoogleAuth()}>
-              <span className="google-auth-mark" aria-hidden="true">G</span>
+              <svg className="google-auth-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.44c-.29 1.46-1.12 2.7-2.36 3.53v2.94h3.81c2.23-2.05 3.6-5.07 3.6-8.71Z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.96-1.08 7.95-2.92l-3.81-2.94c-1.08.72-2.46 1.15-4.14 1.15-3.18 0-5.88-2.14-6.84-5.02H1.22v3.04A12 12 0 0 0 12 24Z"/>
+                <path fill="#FBBC05" d="M5.16 14.27A7.2 7.2 0 0 1 4.79 12c0-.79.14-1.55.37-2.27V6.69H1.22A12 12 0 0 0 0 12c0 1.94.46 3.77 1.22 5.31l3.94-3.04Z"/>
+                <path fill="#EA4335" d="M12 4.71c1.77 0 3.35.61 4.6 1.81l3.45-3.45C17.95 1.14 15.24 0 12 0A12 12 0 0 0 1.22 6.69l3.94 3.04C6.12 6.85 8.82 4.71 12 4.71Z"/>
+              </svg>
               {googlePending ? 'Connecting to Google…' : `${register ? 'Register' : 'Log in'} with Google`}
             </button>
           </div>

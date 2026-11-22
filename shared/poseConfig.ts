@@ -24,11 +24,25 @@ export const LM = {
 
 
 export const SPECS: Record<PatternId, PatternSpec> = {
+  chest_fly: {
+    id: 'chest_fly', label: 'Chest fly', camera: 'front',
+    joints: { left: [LM.leftElbow, LM.leftShoulder, LM.rightShoulder], right: [LM.rightElbow, LM.rightShoulder, LM.leftShoulder] },
+    startAngle: 170, peakAngle: 70, startThreshold: .2, peakThreshold: .8,
+    minRom: 35, minRepMs: 400, maxRepMs: 9000, dwellMs: 0, visibility: .55, mode: 'bilateral', form: [],
+    cue: { start: 'Show both shoulders and a working elbow from a front-oblique view.', working: 'Bring the upper arms together.', peak: 'Return under control.', lost: 'Keep both shoulders and a working elbow visible.' },
+  },
+  hip_abduction: {
+    id: 'hip_abduction', label: 'Hip abduction', camera: 'front',
+    joints: { left: [LM.rightHip, LM.leftHip, LM.leftKnee], right: [LM.leftHip, LM.rightHip, LM.rightKnee] },
+    startAngle: 90, peakAngle: 135, startThreshold: .2, peakThreshold: .8,
+    minRom: 20, minRepMs: 400, maxRepMs: 9000, dwellMs: 0, visibility: .55, mode: 'bilateral', form: [],
+    cue: { start: 'Show both hips and a knee from the front.', working: 'Move the knees apart.', peak: 'Return under control.', lost: 'Keep both hips and a knee visible above the pads.' },
+  },
   squat: {
     id: 'squat', label: 'Squat', camera: 'side',
     joints: { left: [LM.leftHip, LM.leftKnee, LM.leftAnkle], right: [LM.rightHip, LM.rightKnee, LM.rightAnkle] },
     startAngle: 172, peakAngle: 95, startThreshold: 0.15, peakThreshold: 0.85,
-    minRom: 55, minRepMs: 500, maxRepMs: 8000, dwellMs: 80, visibility: 0.6, mode: 'bilateral',
+    minRom: 55, minRepMs: 500, maxRepMs: 8000, dwellMs: 0, visibility: 0.6, mode: 'bilateral',
     form: ['knee_valgus'], cue: {
       start: 'Stand tall with hips, knees and ankles in view.',
       working: 'Lower under control.',

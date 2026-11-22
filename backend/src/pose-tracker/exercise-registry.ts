@@ -2,7 +2,7 @@ import { catalogTiersMap } from './catalog-tiers.ts';
 import { catalogTrackingMap } from './catalog-tracking.generated.ts';
 
 // Shared pure registry: imported by the browser, API and catalog audit. No credentials or I/O.
-export const configurationVersion = 1;
+export const configurationVersion = 2;
 export const providerExercises = ['squat','push_up','plank','lunge','side_lunge','deadlift','glute_bridge','calf_raise','tricep_dip','bicep_curl','hammer_curl','shoulder_press','lateral_raise','mountain_climber','high_knees','jumping_jack','low_impact_jack','leg_raise','wall_sit','balance_leg','balance_leg_left','balance_leg_right','shoulder_roll','shoulder_deep_breath','chair_forward_fold','chair_side_stretch','split','facial_split','pancake','closing','bridge','cobra','bow','tiger','camel','king_pigeon','foot_to_hand','i','needle','back_flexibility_test'] as const;
 export type CatalogExercise = { exerciseId?: string; _id?: string; name: string; bodyParts?: string[]; targetMuscles?: string[]; equipments?: string[]; instructions?: string[]; equipment?: string; targetMuscle?: string; group?: string; movement_pattern?: string };
 
@@ -42,7 +42,7 @@ export type TrackingConfig = {
   verificationNotes?: string; verifiedAt?: string; updatedAt?: string;
 };
 // Must match the pattern IDs implemented in shared/exerciseEngine.ts.
-export const nativePatterns = new Set(['squat','squat_hold','hinge','lunge','horizontal_push','vertical_push','horizontal_pull','vertical_pull','curl','triceps_extension','lateral_raise','front_raise','calf_raise','hip_thrust','core_flexion','core_isometric','dip','jumping_jack','high_knees','mountain_climber']);
+export const nativePatterns = new Set(['chest_fly','hip_abduction','squat','squat_hold','hinge','lunge','horizontal_push','vertical_push','horizontal_pull','vertical_pull','curl','triceps_extension','lateral_raise','front_raise','calf_raise','hip_thrust','core_flexion','core_isometric','dip','jumping_jack','high_knees','mountain_climber']);
 export type NativeExerciseOverride = {
   mode?: 'bilateral' | 'per_side';
   view?: 'front' | 'side';
@@ -149,6 +149,12 @@ export function resolveTrackingConfig(row: CatalogExercise, override?: ConfigOve
   }
   return config;
 }
+/** Prefer a newer bundled catalog pattern on-device while retaining explicit server overrides. */
+export function reconcileNativeTrackingConfig(server: TrackingConfig, local: TrackingConfig): TrackingConfig {
+  if (local.configurationVersion <= server.configurationVersion || !local.nativePattern || server.validationStatus === 'disabled' ||
+    server.providerExerciseId || server.referenceUuid || server.generatedAngleConfig || server.trackingMode === 'reference' || server.trackingMode === 'generated-angle') return server;
+  return { ...server, nativePattern: local.nativePattern, nativeSupport: local.nativeSupport, nativeOverride: local.nativeOverride };
+}
 export function validateOverride(value: ConfigOverride) {
   if (!['builtin','reference','generated-angle','unavailable'].includes(value.trackingMode)) throw Error('Invalid tracking mode');
   if (!['front','side','reference','pending'].includes(value.cameraOrientation)) throw Error('Invalid camera orientation');
@@ -167,6 +173,8 @@ export const canTrack = (config: TrackingConfig) => config.validationStatus !== 
   (config.trackingMode === 'generated-angle' && ['auto_count_beta', 'auto_count_verified'].includes(config.trackingTier ?? '')) ||
   !!config.nativePattern
 );
+/** Tracking support is independent of whether camera permission is granted. */
+export const unsupportedTrackingMessage = 'Tracking is not supported for this exercise. Manual logging is available.';
 export function auditCoverage(rows: CatalogExercise[], overrides: Record<string, ConfigOverride> = {}) {
   const records = rows.map(row => resolveTrackingConfig(row, overrides[row.exerciseId ?? row._id ?? '']));
   const ids = rows.map(r => r.exerciseId ?? r._id ?? '');

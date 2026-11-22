@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-16T04:18:05.777Z",
+  "generatedAt": "2026-11-22T09:09:03.110Z",
   "catalogSize": 1500,
   "uniqueIds": 1500,
   "counts": {
     "FULLY_SUPPORTED": 0,
-    "PARTIALLY_SUPPORTED": 831,
-    "NOT_YET_VALIDATED": 127,
-    "UNSUPPORTED": 542
+    "PARTIALLY_SUPPORTED": 834,
+    "NOT_YET_VALIDATED": 128,
+    "UNSUPPORTED": 538
   },
   "patternCounts": {
     "core_flexion": 93,
@@ -18,19 +18,21 @@
     "squat": 74,
     "hip_thrust": 11,
     "hinge": 39,
-    "triceps_extension": 88,
+    "triceps_extension": 86,
     "jumping_jack": 1,
     "horizontal_pull": 101,
     "lunge": 36,
     "front_raise": 11,
     "lateral_raise": 24,
     "core_isometric": 6,
-    "dip": 21,
+    "dip": 23,
+    "chest_fly": 3,
+    "hip_abduction": 1,
     "high_knees": 1,
     "mountain_climber": 1
   },
-  "overrideCount": 361,
-  "modeOverrideCount": 108,
+  "overrideCount": 366,
+  "modeOverrideCount": 110,
   "records": [
     {
       "id": "01qpYSe",
@@ -1874,10 +1876,12 @@
       ],
       "camera": "front",
       "override": {
-        "visibility": 0.45
+        "visibility": 0.45,
+        "view": "side"
       },
       "overrideBasis": [
-        "machine or bench equipment can occlude the measured joints"
+        "machine or bench equipment can occlude the measured joints",
+        "side view keeps the pressing elbow hinge visible through the shoulder press path"
       ]
     },
     {
@@ -2256,12 +2260,10 @@
     {
       "id": "7aVz15j",
       "name": "triceps dips floor",
-      "pattern": "triceps_extension",
-      "support": "PARTIALLY_SUPPORTED",
-      "reason": "Implemented Elbow extension pattern with known limitation: per-side counting attributes a repetition to the more visible side.",
-      "gaps": [
-        "per-side counting attributes a repetition to the more visible side"
-      ],
+      "pattern": "dip",
+      "support": "NOT_YET_VALIDATED",
+      "reason": "Implemented Dip pattern; no real-person validation for this exercise.",
+      "gaps": null,
       "camera": "side",
       "override": {
         "visibility": 0.45
@@ -4357,13 +4359,23 @@
     {
       "id": "Bpkf41o",
       "name": "Dumbbell Single-Arm Chest Fly On Exercise Ball",
-      "pattern": null,
-      "support": "UNSUPPORTED",
-      "reason": "Determinant motion is shoulder horizontal adduction/abduction with a near-static elbow; the implemented patterns would measure the wrong joint.",
-      "gaps": null,
-      "camera": null,
-      "override": null,
-      "overrideBasis": []
+      "pattern": "chest_fly",
+      "support": "PARTIALLY_SUPPORTED",
+      "reason": "Implemented Chest fly pattern with known limitation: equipment can occlude the measured joints.",
+      "gaps": [
+        "equipment can occlude the measured joints",
+        "external load is not observed; only the body segment angle is measured",
+        "per-side counting attributes a repetition to the more visible side"
+      ],
+      "camera": "front-oblique",
+      "override": {
+        "mode": "per_side",
+        "visibility": 0.45
+      },
+      "overrideBasis": [
+        "name/instructions describe a unilateral or alternating movement",
+        "machine or bench equipment can occlude the measured joints"
+      ]
     },
     {
       "id": "BqgCRif",
@@ -4545,13 +4557,12 @@
     {
       "id": "bZq4bwK",
       "name": "Weighted Triceps Dips",
-      "pattern": "triceps_extension",
+      "pattern": "dip",
       "support": "PARTIALLY_SUPPORTED",
-      "reason": "Implemented Elbow extension pattern with known limitation: equipment can occlude the measured joints.",
+      "reason": "Implemented Dip pattern with known limitation: equipment can occlude the measured joints.",
       "gaps": [
         "equipment can occlude the measured joints",
-        "external load is not observed; only the body segment angle is measured",
-        "per-side counting attributes a repetition to the more visible side"
+        "external load is not observed; only the body segment angle is measured"
       ],
       "camera": "side",
       "override": null,
@@ -4897,13 +4908,20 @@
     {
       "id": "CHpahtl",
       "name": "Machine Seated Hip Abduction",
-      "pattern": null,
-      "support": "UNSUPPORTED",
-      "reason": "Machine isolation with the working joint against a pad; landmarks are occluded and the visible angle does not track the load.",
-      "gaps": null,
-      "camera": null,
-      "override": null,
-      "overrideBasis": []
+      "pattern": "hip_abduction",
+      "support": "PARTIALLY_SUPPORTED",
+      "reason": "Implemented Hip abduction pattern with known limitation: equipment can occlude the measured joints.",
+      "gaps": [
+        "equipment can occlude the measured joints",
+        "floor/bench position hides the far-side landmarks"
+      ],
+      "camera": "front",
+      "override": {
+        "visibility": 0.45
+      },
+      "overrideBasis": [
+        "machine or bench equipment can occlude the measured joints"
+      ]
     },
     {
       "id": "CI6baTY",
@@ -5341,8 +5359,12 @@
         "external load is not observed; only the body segment angle is measured"
       ],
       "camera": "front",
-      "override": null,
-      "overrideBasis": []
+      "override": {
+        "view": "side"
+      },
+      "overrideBasis": [
+        "side view keeps the pressing elbow hinge visible through the shoulder press path"
+      ]
     },
     {
       "id": "DeDThfG",
@@ -5517,10 +5539,12 @@
       ],
       "camera": "front",
       "override": {
-        "visibility": 0.45
+        "visibility": 0.45,
+        "view": "side"
       },
       "overrideBasis": [
-        "machine or bench equipment can occlude the measured joints"
+        "machine or bench equipment can occlude the measured joints",
+        "side view keeps the pressing elbow hinge visible through the shoulder press path"
       ]
     },
     {
@@ -16850,13 +16874,20 @@
     {
       "id": "v3xmPAR",
       "name": "Machine Seated Fly",
-      "pattern": null,
-      "support": "UNSUPPORTED",
-      "reason": "Determinant motion is shoulder horizontal adduction/abduction with a near-static elbow; the implemented patterns would measure the wrong joint.",
-      "gaps": null,
-      "camera": null,
-      "override": null,
-      "overrideBasis": []
+      "pattern": "chest_fly",
+      "support": "PARTIALLY_SUPPORTED",
+      "reason": "Implemented Chest fly pattern with known limitation: equipment can occlude the measured joints.",
+      "gaps": [
+        "equipment can occlude the measured joints",
+        "floor/bench position hides the far-side landmarks"
+      ],
+      "camera": "front-oblique",
+      "override": {
+        "visibility": 0.45
+      },
+      "overrideBasis": [
+        "machine or bench equipment can occlude the measured joints"
+      ]
     },
     {
       "id": "V4ryaZa",
@@ -17301,10 +17332,12 @@
       ],
       "camera": "front",
       "override": {
-        "visibility": 0.45
+        "visibility": 0.45,
+        "view": "side"
       },
       "overrideBasis": [
-        "machine or bench equipment can occlude the measured joints"
+        "machine or bench equipment can occlude the measured joints",
+        "side view keeps the pressing elbow hinge visible through the shoulder press path"
       ]
     },
     {
@@ -17633,13 +17666,20 @@
     {
       "id": "w4dLzSx",
       "name": "Cable Single-Arm Decline Chest Fly",
-      "pattern": null,
-      "support": "UNSUPPORTED",
-      "reason": "Determinant motion is shoulder horizontal adduction/abduction with a near-static elbow; the implemented patterns would measure the wrong joint.",
-      "gaps": null,
-      "camera": null,
-      "override": null,
-      "overrideBasis": []
+      "pattern": "chest_fly",
+      "support": "PARTIALLY_SUPPORTED",
+      "reason": "Implemented Chest fly pattern with known limitation: equipment can occlude the measured joints.",
+      "gaps": [
+        "equipment can occlude the measured joints",
+        "per-side counting attributes a repetition to the more visible side"
+      ],
+      "camera": "front-oblique",
+      "override": {
+        "mode": "per_side"
+      },
+      "overrideBasis": [
+        "name/instructions describe a unilateral or alternating movement"
+      ]
     },
     {
       "id": "W6PxUkg",

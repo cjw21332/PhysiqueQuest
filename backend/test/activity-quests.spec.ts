@@ -25,7 +25,7 @@ describe('activity quest authority', () => {
     const nutrition = { read: async () => ({ meals: ['a', 'b', 'c'].map(scanGroupId => ({ date, scanGroupId, scanSavedAt: new Date() })), water: [{ date, glasses: 8 }] }) } as any;
     const workouts = { creditHistory: async () => [{ status: 'completed', endedAt: new Date() }], personalRecordDays: async () => [date] } as any;
     const result = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, { get: async () => ({ self: { rank: 2, points: 100 } }) } as any, users).get('507f1f77bcf86cd799439011');
-    expect(result.badges).toHaveLength(8);
+    expect(result.badges).toHaveLength(27);
     expect(result.badges.find(badge => badge.id === 'top-10')?.earned).toBe(true);
     expect(result.dailyMissions.every(mission => mission.complete)).toBe(true);
     expect(result.state.questProgress).toEqual({ workout: 1, meals: 3, water: 8 });

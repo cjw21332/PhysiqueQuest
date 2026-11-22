@@ -36,12 +36,14 @@ export class StrengthService {
     const candidates = [...best.values()].filter(item => item.exerciseId === selected);
     const ids = candidates.map(item => item.userId).filter(Types.ObjectId.isValid).map(id => new Types.ObjectId(id));
     const [users, profiles] = await Promise.all([
-      this.users.find({ _id: { $in: ids }, isActive: { $ne: false }, deletedAt: null }).select('name').lean().exec(),
+      this.users.find({ isActive: { $ne: false }, deletedAt: null }).select('name').lean().exec(),
       this.profiles.collection.find({ userId: { $in: ids } }, { projection: { userId: 1, weight: 1, weightUnit: 1 } }).toArray(),
     ]);
     const names = new Map(users.map(user => [String(user._id), user.name]));
     const weights = new Map(profiles.map(profile => { const weight = Number(profile.weight); return [String(profile.userId), profile.weightUnit === 'lbs' ? weight / 2.2046226218 : profile.weightUnit === 'kg' ? weight : NaN] as const; }));
     const ranked = candidates.filter(item => names.has(item.userId) && (!hidden.has(item.userId) || item.userId === userId)).map(item => ({ ...item, name: names.get(item.userId)!, bodyweightKg: weights.get(item.userId), score: metric === 'relative' ? item.maxKg / (weights.get(item.userId) ?? NaN) : item.maxKg })).filter(item => Number.isFinite(item.score) && item.score > 0).sort((a, b) => b.score - a.score || a.userId.localeCompare(b.userId)).map((item, index) => ({ ...item, rank: index + 1, isCurrentUser: item.userId === userId }));
-    return { exercises: options, exerciseId: selected, metric, entries: ranked.filter(item => !hidden.has(item.userId)), self: ranked.find(item => item.isCurrentUser) ?? null, hidden: hidden.has(userId) };
+    const rankedIds = new Set(ranked.map(item => item.userId));
+    const participants = users.filter(user => !hidden.has(String(user._id)) && !rankedIds.has(String(user._id))).map(user => ({ userId: String(user._id), name: user.name || 'Athlete', isCurrentUser: String(user._id) === userId })).sort((a, b) => a.name.localeCompare(b.name) || a.userId.localeCompare(b.userId));
+    return { exercises: options, exerciseId: selected, metric, entries: ranked.filter(item => !hidden.has(item.userId)), participants, self: ranked.find(item => item.isCurrentUser) ?? null, hidden: hidden.has(userId) };
   }
 }

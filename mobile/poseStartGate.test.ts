@@ -2,22 +2,29 @@ import { describe, expect, it } from 'vitest';
 import { createPoseStartGate, frameStatus, requiredLandmarks } from './poseStartGate';
 
 describe('framing guidance', () => {
-  const points = () => Array.from({ length: 33 }, (_, i) => ({ x: 0.5, y: i < 23 ? 0.2 : 0.7, visibility: 1 }));
+  const points = () => Array.from({ length: 33 }, (_, i) => ({ x: 0.5, y: i < 23 ? 0.2 : i < 25 ? .45 : i < 27 ? .65 : .85, visibility: 1 }));
   it('uses family-specific landmarks without requiring the nose', () => {
     expect(requiredLandmarks('curl')).toContain(15);
     expect(requiredLandmarks('squat')).toContain(27);
-    expect(requiredLandmarks('horizontal_push')).not.toContain(15);
+    expect(requiredLandmarks('horizontal_push')).toContain(15);
+    expect(requiredLandmarks('horizontal_push')).not.toContain(27);
     for (const family of ['curl', 'squat', 'horizontal_push']) expect(requiredLandmarks(family)).not.toContain(0);
   });
   it('reports visible, far, cropped, and missing poses', () => {
     const p = points();
     expect(frameStatus('squat', p)).toBe('OK');
-    const far = p.map(point => ({ ...point, y: 0.5 + (point.y - 0.5) * 0.2 }));
+    const far = p.map(point => ({ ...point, y: 0.5 + (point.y - 0.5) * 0.1 }));
     expect(frameStatus('squat', far)).toBe('TOO_FAR');
-    const cropped = points(); cropped[27].x = 0;
+    const cropped = points(); cropped[27].x = 0; cropped[28].x = 0;
     expect(frameStatus('squat', cropped)).toBe('TOO_CLOSE');
-    const missing = points(); missing[27].visibility = 0;
+    const missing = points(); missing[27].visibility = 0; missing[28].visibility = 0;
     expect(frameStatus('squat', missing)).toBe('NOT_VISIBLE');
+  });
+  it('allows a bench press with legs and the far arm hidden', () => {
+    const p = points();
+    p.forEach(point => { point.visibility = 0; });
+    for (const [index, y] of [[11, .35], [13, .5], [15, .65]]) p[index] = { x: .5, y, visibility: 1 };
+    expect(frameStatus('horizontal_push', p)).toBe('OK');
   });
 });
 

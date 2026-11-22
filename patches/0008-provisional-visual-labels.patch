@@ -1,0 +1,1473 @@
+--- a/docs/pose-replay/labels.local.json
++++ b/docs/pose-replay/labels.local.json
+@@ -3,180 +3,1317 @@
+     "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\rear pull up (regular one).mp4",
+     "exercise_guess": "rear pull up (regular one)",
+     "camera_facing": null,
+-    "plate_occluded": null,
++    "plate_occluded": false,
++    "full_reps": 4,
++    "partial_reps": 0,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations. Chin clearance is indirect in rear view; medium confidence.",
++    "clip_id": "c01",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "rear",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      4.3,
++      10.8,
++      18
++    ],
++    "validated": false,
++    "video_sha256": "2ec0468b8f04b5c936cfd2596dd5f2dfb2b3e52a61fa872ddddf94b860885f43",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "medium",
++    "excluded": false,
++    "exclude_from_baseline": false,
++    "visual_sampling_fps": 6,
++    "visual_offsets_s": [
++      0,
++      0.08333333333333333
++    ],
++    "exercise_definition": "Start at full/near-full hang; rise until chin at/over bar; return to hang. Full requires both endpoints; a clear closed cycle short of either is partial. Rear view limits direct chin assessment.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 3.2,
++        "far_endpoint_s": 4.3,
++        "return_s": 6.2
++      },
++      {
++        "type": "full",
++        "start_s": 6.2,
++        "far_endpoint_s": 7.5,
++        "return_s": 9.4
++      },
++      {
++        "type": "full",
++        "start_s": 9.4,
++        "far_endpoint_s": 10.8,
++        "return_s": 13.2
++      },
++      {
++        "type": "full",
++        "start_s": 13.2,
++        "far_endpoint_s": 14.5,
++        "return_s": 16.7
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 0,
++        "reason": "Begins already flexed; missing preceding hang."
++      },
++      {
++        "timestamp_s": 18,
++        "reason": "Last ascent cut off before return to hang."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 4,
++        "partial_reps": 0
++      },
++      {
++        "full_reps": 4,
++        "partial_reps": 0
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free.",
++    "app_exercise_id": "CbFSYC1"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine shoulder press.mp4",
++    "exercise_guess": "machine shoulder press",
++    "camera_facing": null,
++    "plate_occluded": false,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine shoulder press.mp4",
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps.",
++    "clip_id": "c02",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "front-oblique; moving camera",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      6,
++      38,
++      64
++    ],
++    "validated": false,
++    "video_sha256": "5893f44c38b0e93321da1f4e3ea252afbc0683304c7546d43c90ba2beb0eb014",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Setup/countdown-dominated recording; overhead endpoints are hidden by the screen counter/camera framing. No reliable full-versus-partial count assigned from 1 fps triage. Needs dense independent review of unaugmented footage; not a zero-rep negative.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with handles at ear/chin level; press to near lockout overhead; return to ear/chin level. A clear closed cycle short of either endpoint is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 6,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 38,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 64,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine shoulder press 2nd try.mp4",
+     "exercise_guess": "machine shoulder press",
+     "camera_facing": null,
+-    "plate_occluded": null,
++    "plate_occluded": false,
++    "full_reps": 10,
++    "partial_reps": 0,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations. Two counts disagree: A=11/0, B=10/0 plus ambiguous cycle at 69.5 s. Final labels retain only 10 clear cycles. Dense sheets 40-87 s; outside interval is coarse triage only. Low confidence; do not score.",
++    "clip_id": "c03",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-to-front",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      69.5,
++      77.5,
++      86.5
++    ],
++    "validated": false,
++    "video_sha256": "3c7844126fb19d72c1443c9c5ce916b2cbaab46b280755885761646b23d1ea55",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": false,
++    "exclude_from_baseline": true,
++    "visual_sampling_fps": 4,
++    "visual_offsets_s": [
++      0,
++      0.125
++    ],
++    "exercise_definition": "Start with handles at ear/chin level; press to near lockout overhead; return to ear/chin level. A clear closed cycle short of either endpoint is partial.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 44.5,
++        "far_endpoint_s": 46.7,
++        "return_s": 48.7
++      },
++      {
++        "type": "full",
++        "start_s": 48.7,
++        "far_endpoint_s": 50.5,
++        "return_s": 52.5
++      },
++      {
++        "type": "full",
++        "start_s": 52.5,
++        "far_endpoint_s": 54.5,
++        "return_s": 56.8
++      },
++      {
++        "type": "full",
++        "start_s": 56.8,
++        "far_endpoint_s": 58.5,
++        "return_s": 60.7
++      },
++      {
++        "type": "full",
++        "start_s": 60.7,
++        "far_endpoint_s": 63.3,
++        "return_s": 65.8
++      },
++      {
++        "type": "full",
++        "start_s": 65.8,
++        "far_endpoint_s": 67.2,
++        "return_s": 68.8
++      },
++      {
++        "type": "full",
++        "start_s": 70.3,
++        "far_endpoint_s": 71.7,
++        "return_s": 73.4
++      },
++      {
++        "type": "full",
++        "start_s": 73.4,
++        "far_endpoint_s": 74.8,
++        "return_s": 76.7
++      },
++      {
++        "type": "full",
++        "start_s": 76.7,
++        "far_endpoint_s": 79.0,
++        "return_s": 81.5
++      },
++      {
++        "type": "full",
++        "start_s": 81.5,
++        "far_endpoint_s": 84.0,
++        "return_s": 85.8
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 69.5,
++        "reason": "Short extra cycle; overhead endpoint uncertain. Pass A 11 full, pass B 10 full plus this ambiguous cycle."
++      },
++      {
++        "timestamp_s": 86.5,
++        "reason": "Final cycle interrupted before return."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 11,
++        "partial_reps": 0
++      },
++      {
++        "full_reps": 10,
++        "partial_reps": 0
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip.mp4",
++    "exercise_guess": "Parallel-bar dip, feet supported (assistance mechanism unconfirmed)",
++    "camera_facing": null,
++    "plate_occluded": false,
++    "full_reps": 5,
++    "partial_reps": 0,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations. Filename/app selection says Machine Seated Dip, but body moves against fixed side handles. Preserve recorded catalog mapping for baseline. Includes complete early cycle at 1.6-8.2 s, even though app was setting up; first pass and second both 5/0. Duplicate file excluded by hash.",
++    "clip_id": "c04",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "front-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "TEST",
++    "spot_check_seconds": [
++      3.5,
++      17.8,
++      20.8
++    ],
++    "validated": false,
++    "video_sha256": "620e7908367198ff388fea0293301796a4e1a44aca073433504fc60124fcc4c0",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "medium",
++    "excluded": false,
++    "exclude_from_baseline": false,
++    "visual_sampling_fps": 12,
++    "visual_offsets_s": [
++      0,
++      0.041666666666666664
++    ],
++    "exercise_definition": "Start with elbows extended at top; lower until upper arm approximately parallel or below; return to extended top. Full requires both endpoints; a clear closed shallower cycle is partial. Mounting/dismounting and static holds are not reps.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 1.6,
++        "far_endpoint_s": 3.0,
++        "return_s": 8.2
++      },
++      {
++        "type": "full",
++        "start_s": 8.2,
++        "far_endpoint_s": 10.3,
++        "return_s": 11.4
++      },
++      {
++        "type": "full",
++        "start_s": 11.4,
++        "far_endpoint_s": 13.0,
++        "return_s": 14.3
++      },
++      {
++        "type": "full",
++        "start_s": 14.3,
++        "far_endpoint_s": 15.2,
++        "return_s": 16.2
++      },
++      {
++        "type": "full",
++        "start_s": 16.2,
++        "far_endpoint_s": 17.8,
++        "return_s": 18.5
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 0,
++        "reason": "Begins partway through extension."
++      },
++      {
++        "timestamp_s": 20.8,
++        "reason": "Final descent has no return to extended top before recording ends."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 5,
++        "partial_reps": 0
++      },
++      {
++        "full_reps": 5,
++        "partial_reps": 0
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free.",
++    "app_exercise_id": "BRImeP8",
++    "duplicate_files": [
++      "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip 2nd try.mp4"
++    ]
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\Machine Reverse T-bar Row.mp4",
++    "exercise_guess": "Machine Reverse T-bar Row",
++    "camera_facing": null,
++    "plate_occluded": false,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine shoulder press 2nd try.mp4",
+-    "exercise_guess": "machine shoulder press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps.",
++    "clip_id": "c05",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side; rotated",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      4,
++      12,
++      18
++    ],
++    "validated": false,
++    "video_sha256": "a60543bffd79b6ab0090ca74714b4ec2b33e4c91a4c64d7728241a68067b4f0e",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Rotated camera plus persistent alert banner covers the working arm/torso throughout the exercise; independent full/partial endpoints unobservable.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with near-full arm extension; pull to full elbow flexion with visible retraction; return to extension. A clear closed cycle short of either endpoint is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 4,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 12,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 18,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine preacher curl.mp4",
++    "exercise_guess": "machine preacher curl",
++    "camera_facing": null,
++    "plate_occluded": false,
++    "full_reps": 1,
++    "partial_reps": 0,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations. One full observed cycle includes sustained flexed hold about 14.7-16.4 s. Camera interruption makes final curl ambiguous. Original-size endpoint sheet also inspected.",
++    "clip_id": "c06",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      14.7,
++      17.3,
++      18.6
++    ],
++    "validated": false,
++    "video_sha256": "a2fd1b40c3d8ba973bddf7e0aafd1f4eda1fcd399831322f7dc9ab63c4c084e2",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "medium",
++    "excluded": false,
++    "exclude_from_baseline": false,
++    "visual_sampling_fps": 6,
++    "visual_offsets_s": [
++      0,
++      0.08333333333333333
++    ],
++    "exercise_definition": "Start near full elbow extension; curl to full flexion; return near full extension. A clear closed cycle short of either endpoint is partial. Sustained flexed hold is one endpoint, not repeated cycles.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 13.5,
++        "far_endpoint_s": 14.7,
++        "return_s": 17.3
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 18.6,
++        "reason": "Second curl rises after 18 s but camera disappears around 18.8 s before observed return."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 1,
++        "partial_reps": 0
++      },
++      {
++        "full_reps": 1,
++        "partial_reps": 0
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free.",
++    "app_exercise_id": "b6hQYMb"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine narrow grip seated row.mp4",
++    "exercise_guess": "machine narrow grip seated row",
++    "camera_facing": null,
++    "plate_occluded": false,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip.mp4",
+-    "exercise_guess": "machine seated dip",
+-    "camera_facing": null,
+-    "plate_occluded": null,
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps.",
++    "clip_id": "c07",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      6.5,
++      11,
++      17
++    ],
++    "validated": false,
++    "video_sha256": "402a747c83d5912e5d621a637e2b35ddd78215411782c6c81d8a016d6d124222",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Camera disappears approximately 6.5-10 s and 19 s onward; persistent banner hides working arms during the later movement. Whole-clip independent ROM labels unavailable.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with near-full arm extension; pull to full elbow flexion with visible retraction; return to extension. A clear closed cycle short of either endpoint is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 6.5,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 11,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 17,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine narrow grip seated row 2nd try.mp4",
++    "exercise_guess": "machine narrow grip seated row",
++    "camera_facing": null,
++    "plate_occluded": false,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine seated dip 2nd try.mp4",
+-    "exercise_guess": "machine seated dip",
+-    "camera_facing": null,
+-    "plate_occluded": null,
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps.",
++    "clip_id": "c08",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "front-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      2,
++      5.5,
++      7
++    ],
++    "validated": false,
++    "video_sha256": "69936c5698ae69e9a31d8477a38be2d04f9b6700dffae87061ceb1de6c428dd3",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Camera disappears approximately 2.5-5.5 s and after 7.5 s; alerts hide working arm endpoints in remaining footage.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with near-full arm extension; pull to full elbow flexion with visible retraction; return to extension. A clear closed cycle short of either endpoint is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 2,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 5.5,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 7,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine incline chest press.mp4",
++    "exercise_guess": "machine incline chest press",
++    "camera_facing": null,
++    "plate_occluded": false,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\Machine Reverse T-bar Row.mp4",
+-    "exercise_guess": "Machine Reverse T-bar Row",
+-    "camera_facing": null,
+-    "plate_occluded": null,
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps.",
++    "clip_id": "c09",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      2,
++      8,
++      14
++    ],
++    "validated": false,
++    "video_sha256": "67b29ac59b11460bd16339cd50058a89600a0f1aaa818887d1cb5d3d350837e0",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Persistent banner covers shoulders/working arms approximately 1-15 s, then camera moves away. Cannot classify complete cycles independently.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with handles near chest and elbows flexed; press to near elbow lockout; return to chest. Full requires both endpoints; a clear closed cycle visibly short of either is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 2,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 8,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 14,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine incline chest press 2nd try.mp4",
++    "exercise_guess": "machine incline chest press",
++    "camera_facing": null,
++    "plate_occluded": false,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine preacher curl.mp4",
+-    "exercise_guess": "machine preacher curl",
+-    "camera_facing": null,
+-    "plate_occluded": null,
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps.",
++    "clip_id": "c10",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "front-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      3,
++      15,
++      22
++    ],
++    "validated": false,
++    "video_sha256": "d41d2aefac7d067a1fd1301aec94c40a1b4bbae6372b2ab515ea3f022d78d6a1",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Persistent banner hides working arms approximately 1-23 s. Full ROM endpoints cannot be established independently.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with handles near chest and elbows flexed; press to near elbow lockout; return to chest. Full requires both endpoints; a clear closed cycle visibly short of either is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 3,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 15,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 22,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown.mp4",
++    "exercise_guess": "machine front pulldown",
++    "camera_facing": null,
++    "plate_occluded": false,
++    "full_reps": 5,
++    "partial_reps": 0,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations. Two counts disagree: A=5/0, B=6/0; disputed cycle crosses banner at 27-28.5 s. Retain 5 clear cycles only. Dense sheets 16-48 s, outside coarse triage only. Low confidence; do not score.",
++    "clip_id": "c11",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      23.8,
++      28.7,
++      47.7
++    ],
++    "validated": false,
++    "video_sha256": "2126166f9991a6146db07055d9d1d405d533e19d3bdef7eac545bf6ebff2910c",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": false,
++    "exclude_from_baseline": true,
++    "visual_sampling_fps": 6,
++    "visual_offsets_s": [
++      0,
++      0.08333333333333333
++    ],
++    "exercise_definition": "Start with near-full overhead arm extension; pull bar/handles to upper-chest/shoulder level with full elbow flexion; return overhead. A clear closed cycle short of either endpoint is partial.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 30.8,
++        "far_endpoint_s": 32.9,
++        "return_s": 34.2
++      },
++      {
++        "type": "full",
++        "start_s": 34.2,
++        "far_endpoint_s": 36.0,
++        "return_s": 37.2
++      },
++      {
++        "type": "full",
++        "start_s": 37.2,
++        "far_endpoint_s": 38.8,
++        "return_s": 40.1
++      },
++      {
++        "type": "full",
++        "start_s": 40.1,
++        "far_endpoint_s": 41.7,
++        "return_s": 43.1
++      },
++      {
++        "type": "full",
++        "start_s": 43.1,
++        "far_endpoint_s": 44.8,
++        "return_s": 46.2
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 23.8,
++        "reason": "Bystanders and banner obscure the possible pull endpoint."
++      },
++      {
++        "timestamp_s": 28.7,
++        "reason": "Cycle starts behind an occluding banner; pass A excluded it, pass B counted it."
++      },
++      {
++        "timestamp_s": 47.7,
++        "reason": "Last pull interrupted before overhead return."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 5,
++        "partial_reps": 0
++      },
++      {
++        "full_reps": 6,
++        "partial_reps": 0
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown 2nd try.mp4",
++    "exercise_guess": "machine front pulldown",
++    "camera_facing": null,
++    "plate_occluded": false,
++    "full_reps": 1,
++    "partial_reps": 0,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations.",
++    "clip_id": "c12",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "front-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "TEST",
++    "spot_check_seconds": [
++      5.8,
++      7.2,
++      8
++    ],
++    "validated": false,
++    "video_sha256": "f439896d1d85035ccad3381fa654d167775d93f7799d59135e2712a252d0eed2",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "medium",
++    "excluded": false,
++    "exclude_from_baseline": false,
++    "visual_sampling_fps": 6,
++    "visual_offsets_s": [
++      0,
++      0.08333333333333333
++    ],
++    "exercise_definition": "Start with near-full overhead arm extension; pull bar/handles to upper-chest/shoulder level with full elbow flexion; return overhead. A clear closed cycle short of either endpoint is partial.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 4.4,
++        "far_endpoint_s": 5.8,
++        "return_s": 7.2
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 8,
++        "reason": "Alert hides working joints before camera disappears; possible next cycle unobservable."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 1,
++        "partial_reps": 0
++      },
++      {
++        "full_reps": 1,
++        "partial_reps": 0
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free.",
++    "app_exercise_id": "7F1DVzn"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press.mp4",
++    "exercise_guess": "machine chest press",
++    "camera_facing": null,
++    "plate_occluded": false,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine narrow grip seated row.mp4",
+-    "exercise_guess": "machine narrow grip seated row",
+-    "camera_facing": null,
+-    "plate_occluded": null,
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps.",
++    "clip_id": "c13",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      4,
++      10,
++      15
++    ],
++    "validated": false,
++    "video_sha256": "dc8012e9db30449174953eebbcabd40f973da1ba2c4d9c0b063843817387f828",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Intermittent banner covers working shoulders/elbows and hides possible endpoints. No defensible whole-clip full/partial count from triage; requires unaugmented footage or further independent dense review.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with handles near chest and elbows flexed; press to near elbow lockout; return to chest. Full requires both endpoints; a clear closed cycle visibly short of either is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 4,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 10,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 15,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 3rd try.mp4",
++    "exercise_guess": "machine chest press",
++    "camera_facing": null,
++    "plate_occluded": false,
++    "full_reps": 7,
++    "partial_reps": 0,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations.",
++    "clip_id": "c14",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "TEST",
++    "spot_check_seconds": [
++      0,
++      18.2,
++      22.5
++    ],
++    "validated": false,
++    "video_sha256": "482def00e999a999bcb7e2152dd987001c65a694c85f8ce7f357f3d607672bdc",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "high",
++    "excluded": false,
++    "exclude_from_baseline": false,
++    "visual_sampling_fps": 12,
++    "visual_offsets_s": [
++      0,
++      0.041666666666666664
++    ],
++    "exercise_definition": "Start with handles near chest and elbows flexed; press to near elbow lockout; return to chest. Full requires both endpoints; a clear closed cycle visibly short of either is partial.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 0.0,
++        "far_endpoint_s": 1.8,
++        "return_s": 3.5
++      },
++      {
++        "type": "full",
++        "start_s": 3.5,
++        "far_endpoint_s": 4.8,
++        "return_s": 6.5
++      },
++      {
++        "type": "full",
++        "start_s": 6.5,
++        "far_endpoint_s": 7.8,
++        "return_s": 9.4
++      },
++      {
++        "type": "full",
++        "start_s": 9.4,
++        "far_endpoint_s": 10.4,
++        "return_s": 12.1
++      },
++      {
++        "type": "full",
++        "start_s": 12.1,
++        "far_endpoint_s": 13.4,
++        "return_s": 15.1
++      },
++      {
++        "type": "full",
++        "start_s": 15.1,
++        "far_endpoint_s": 16.5,
++        "return_s": 18.2
++      },
++      {
++        "type": "full",
++        "start_s": 18.2,
++        "far_endpoint_s": 19.7,
++        "return_s": 21.2
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 22.5,
++        "reason": "Final press is cut off before return to chest; not a completed cycle."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 7,
++        "partial_reps": 0
++      },
++      {
++        "full_reps": 7,
++        "partial_reps": 0
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free.",
++    "app_exercise_id": "DOoWcnA"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\weighted triceps dips.mp4",
++    "exercise_guess": "Parallel-bar dips (added load not visually confirmed)",
++    "camera_facing": null,
++    "plate_occluded": false,
++    "full_reps": 5,
++    "partial_reps": 1,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations. Two participants: first white-shirt shallow cycle and later black-shirt cycles are separate movements; all visible exercise cycles are included in clip total. Dense review windows 3-9,25-49,57-75 s; other intervals are triaged setup/black camera. Static extended-arm hold around 60-67 s is not repetitions. Small posture movement 43-47 s is not confidently an elbow-flexion cycle; not counted. App selection kept as Weighted Triceps Dips; added load unconfirmed.",
++    "clip_id": "c15",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side then front-oblique; multiple participants",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      5.8,
++      38,
++      74.7
++    ],
++    "validated": false,
++    "video_sha256": "6c6ff84d8d4ce5e004e6407ef088fe6e3f6a7d92c2fb380dc35eff7c97ca9f6d",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "medium",
++    "excluded": false,
++    "exclude_from_baseline": false,
++    "visual_sampling_fps": 12,
++    "visual_offsets_s": [
++      0,
++      0.041666666666666664
++    ],
++    "exercise_definition": "Start with elbows extended at top; lower until upper arm approximately parallel or below; return to extended top. Full requires both endpoints; a clear closed shallower cycle is partial. Mounting/dismounting and static holds are not reps.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 31.2,
++        "far_endpoint_s": 32.8,
++        "return_s": 33.5
++      },
++      {
++        "type": "full",
++        "start_s": 33.5,
++        "far_endpoint_s": 34.8,
++        "return_s": 35.9
++      },
++      {
++        "type": "full",
++        "start_s": 35.9,
++        "far_endpoint_s": 37.8,
++        "return_s": 42.3
++      },
++      {
++        "type": "full",
++        "start_s": 67.6,
++        "far_endpoint_s": 69.4,
++        "return_s": 70.3
++      },
++      {
++        "type": "full",
++        "start_s": 70.3,
++        "far_endpoint_s": 72.0,
++        "return_s": 73.2
++      },
++      {
++        "type": "partial",
++        "start_s": 4,
++        "far_endpoint_s": 5.8,
++        "return_s": 7.5,
++        "participant": "white shirt"
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 57.3,
++        "reason": "Camera resumes in flexed position; mounting versus preceding descent unknown."
++      },
++      {
++        "timestamp_s": 74.7,
++        "reason": "Final descent cut off before return."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 5,
++        "partial_reps": 1
++      },
++      {
++        "full_reps": 5,
++        "partial_reps": 1
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free.",
++    "app_exercise_id": "bZq4bwK"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 2nd try.mp4",
++    "exercise_guess": "machine chest press",
++    "camera_facing": null,
++    "plate_occluded": false,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine narrow grip seated row 2nd try.mp4",
+-    "exercise_guess": "machine narrow grip seated row",
+-    "camera_facing": null,
+-    "plate_occluded": null,
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps.",
++    "clip_id": "c16",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      4,
++      13,
++      20
++    ],
++    "validated": false,
++    "video_sha256": "d1bb6a4dc6d694258e76ed6eeaa907251db360d601bc5afe7e4009f1a5812eb4",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Repeated banner covers working shoulders/elbows, then camera moves and countdown restarts. No defensible whole-clip full/partial count from triage; requires unaugmented footage or further independent dense review.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with handles near chest and elbows flexed; press to near elbow lockout; return to chest. Full requires both endpoints; a clear closed cycle visibly short of either is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 4,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 13,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 20,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
++    "exercise_guess": "barbell bench press",
++    "camera_facing": null,
++    "plate_occluded": false,
++    "full_reps": 5,
++    "partial_reps": 0,
++    "notes": "PROVISIONAL / UNREVIEWED. Counts transcribed from two separately decoded, shifted contact-sheet passes. Tracker outputs were not used as labels. Screen recordings contain baked-in skeleton/UI; masking was imperfect and cannot restore obscured anatomy. Per-rep timestamps are approximate visual review anchors, not exact frame annotations. Camera content rotated for visual inspection only; replay input remains original pixels. Original-size endpoint crops inspected. Last press/racking has no observed return; not counted.",
++    "clip_id": "c17",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-oblique; camera image rotated 90 degrees",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      0,
++      8.9,
++      9.8
++    ],
++    "validated": false,
++    "video_sha256": "dcf3765b43bcc9a84f71ba57104c3ac38048add2fd6117b6b76c213f2e0c722d",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "medium",
++    "excluded": false,
++    "exclude_from_baseline": false,
++    "visual_sampling_fps": 12,
++    "visual_offsets_s": [
++      0,
++      0.041666666666666664
++    ],
++    "exercise_definition": "Start with bar at/near chest; press to near elbow lockout; return to chest. Full requires both endpoints. A clear closed cycle visibly short of either endpoint is partial.",
++    "per_rep_timestamps": [
++      {
++        "type": "full",
++        "start_s": 0.0,
++        "far_endpoint_s": 0.8,
++        "return_s": 1.8
++      },
++      {
++        "type": "full",
++        "start_s": 1.8,
++        "far_endpoint_s": 2.7,
++        "return_s": 3.6
++      },
++      {
++        "type": "full",
++        "start_s": 3.6,
++        "far_endpoint_s": 4.4,
++        "return_s": 5.3
++      },
++      {
++        "type": "full",
++        "start_s": 5.3,
++        "far_endpoint_s": 6.2,
++        "return_s": 7.1
++      },
++      {
++        "type": "full",
++        "start_s": 7.1,
++        "far_endpoint_s": 7.9,
++        "return_s": 8.9
++      }
++    ],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 9.8,
++        "reason": "Final press goes into rack/hold; no return to chest observed."
++      }
++    ],
++    "pass_counts": [
++      {
++        "full_reps": 5,
++        "partial_reps": 0
++      },
++      {
++        "full_reps": 5,
++        "partial_reps": 0
++      }
++    ],
++    "nyquist_risk": false,
++    "nyquist_note": "No accepted visually counted cycle exceeds half the dense sampling rate. Hidden intervals are unknown, not certified alias-free.",
++    "app_exercise_id": "EIeI8Vf"
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press 2nd try.mp4",
++    "exercise_guess": "barbell bench press",
++    "camera_facing": null,
++    "plate_occluded": true,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine incline chest press.mp4",
+-    "exercise_guess": "machine incline chest press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps. Plate weight cannot be read reliably; do not assert 25 kg from appearance.",
++    "clip_id": "c18",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "side-oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [
++      {
++        "start_s": 0,
++        "end_s": 12,
++        "precision": "coarse visual interval; overlaps UI occlusion"
++      }
++    ],
++    "split": "DEVELOPMENT",
++    "spot_check_seconds": [
++      2,
++      7,
++      11
++    ],
++    "validated": false,
++    "video_sha256": "13a3b9d5c97cb205bd6a029926919974e59aa02fe104ac2c87600a73b64691ef",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Bench plate and persistent banner obscure working arm/bar-to-chest endpoints approximately 1-12 s. Do not infer ROM behind opaque UI.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with bar at/near chest; press to near elbow lockout; return to chest. Full requires both endpoints. A clear closed cycle visibly short of either endpoint is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 2,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 7,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 11,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
++  },
++  {
++    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press 3rd try.mp4",
++    "exercise_guess": "barbell bench press",
++    "camera_facing": null,
++    "plate_occluded": true,
+     "full_reps": null,
+     "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine incline chest press 2nd try.mp4",
+-    "exercise_guess": "machine incline chest press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown.mp4",
+-    "exercise_guess": "machine front pulldown",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine front pulldown 2nd try.mp4",
+-    "exercise_guess": "machine front pulldown",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press.mp4",
+-    "exercise_guess": "machine chest press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 3rd try.mp4",
+-    "exercise_guess": "machine chest press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\weighted triceps dips.mp4",
+-    "exercise_guess": "weighted triceps dips",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\machine chest press 2nd try.mp4",
+-    "exercise_guess": "machine chest press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press.mp4",
+-    "exercise_guess": "barbell bench press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press 2nd try.mp4",
+-    "exercise_guess": "barbell bench press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
+-  },
+-  {
+-    "file": "C:\\Users\\MY PC\\Downloads\\PhysiqueQuest testing\\barbell bench press 3rd try.mp4",
+-    "exercise_guess": "barbell bench press",
+-    "camera_facing": null,
+-    "plate_occluded": null,
+-    "full_reps": null,
+-    "partial_reps": null,
+-    "notes": null
++    "notes": "PROVISIONAL / UNREVIEWED. Excluded from scoring; null is unknown, not zero. No two-pass count claimed. Spot-check timestamps identify blocked/setup intervals, not invented reps. Plate weight cannot be read reliably; do not assert 25 kg from appearance.",
++    "clip_id": "c19",
++    "label_status": "PROVISIONAL",
++    "review_status": "UNREVIEWED",
++    "label_source": "codex_visual_provisional",
++    "camera_view": "foot-end oblique",
++    "camera_facing_note": "Front/back hardware camera is not independently identifiable from screen pixels.",
++    "plate_occlusion_ranges": [
++      {
++        "start_s": 0,
++        "end_s": 30,
++        "precision": "coarse visual interval; overlaps UI occlusion"
++      }
++    ],
++    "split": "TEST",
++    "spot_check_seconds": [
++      9,
++      16,
++      27
++    ],
++    "validated": false,
++    "video_sha256": "4eec20bceb7428c0eae47641709ba642458f2c477f1a0d767274bd1ffb17036f",
++    "full_cycle_rule": "One rep is a complete start -> far endpoint -> return to start cycle. Ambiguous/incomplete cycles are excluded from both counts. Counts are movement cycles, not sums of independently moving arms.",
++    "label_confidence": "low",
++    "excluded": true,
++    "exclude_from_baseline": true,
++    "exclusion_reason": "Plate obscures far arm; persistent/intermittent banner covers bar and elbows for much of set. Retained as TEST, but independent whole-clip ROM count unavailable. No plate-robustness score.",
++    "visual_sampling_fps": 1,
++    "visual_offsets_s": [
++      0
++    ],
++    "exercise_definition": "Start with bar at/near chest; press to near elbow lockout; return to chest. Full requires both endpoints. A clear closed cycle visibly short of either endpoint is partial.",
++    "per_rep_timestamps": [],
++    "ambiguous_reps": [
++      {
++        "timestamp_s": 9,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 16,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      },
++      {
++        "timestamp_s": 27,
++        "reason": "Review anchor in unscorable interval; not an enumerated rep."
++      }
++    ],
++    "pass_counts": null,
++    "nyquist_risk": null,
++    "nyquist_note": "1 fps triage only, not a rep count. No counts assigned; no aliasing claim."
+   }
+ ]

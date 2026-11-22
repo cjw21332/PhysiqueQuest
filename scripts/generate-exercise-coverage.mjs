@@ -26,6 +26,8 @@ if (!Array.isArray(catalog) || catalog.length !== 1500) {
 const norm = (value) => String(value ?? '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, ' ').trim();
 
 const PATTERNS = {
+  chest_fly: { label: 'Chest fly', joints: 'elbow-shoulder-opposite shoulder', camera: 'front-oblique', count: 'bilateral shoulder horizontal adduction', form: 'none; perspective sensitive' },
+  hip_abduction: { label: 'Hip abduction', joints: 'opposite hip-hip-knee', camera: 'front', count: 'bilateral hip abduction', form: 'none; pads may occlude hips' },
   squat: { label: 'Squat', joints: 'hip–knee–ankle', camera: 'side (front for knee tracking)', count: 'bilateral knee flexion/extension', form: 'knee-in screening (front view only)' },
   squat_hold: { label: 'Wall sit', joints: 'hip–knee–ankle', camera: 'side', count: 'isometric hold timer', form: 'none' },
   lunge: { label: 'Lunge / split squat', joints: 'hip–knee–ankle', camera: 'side', count: 'per-side knee flexion/extension', form: 'knee-past-toe screening' },
@@ -50,6 +52,7 @@ const PATTERNS = {
 
 // Must match the `mode` field of each spec in shared/exerciseEngine.ts.
 const BASE_MODE = {
+  chest_fly: 'bilateral', hip_abduction: 'bilateral',
   squat: 'bilateral', squat_hold: 'hold', lunge: 'per_side', hinge: 'bilateral', hip_thrust: 'bilateral',
   horizontal_push: 'bilateral', vertical_push: 'bilateral', dip: 'bilateral', curl: 'per_side',
   triceps_extension: 'per_side', horizontal_pull: 'bilateral', vertical_pull: 'bilateral',
@@ -77,6 +80,10 @@ const OVERRIDES = new Map(Object.entries({
   'lower back curl': null,
   'cable squat row with rope attachment': 'horizontal_pull',
   'sled single leg calf press on leg press': 'calf_raise',
+  // Plural catalog names miss the singular `dip` movement rule and otherwise
+  // fall through to the broader `triceps` extension rule.
+  'triceps dips floor': 'dip',
+  'weighted triceps dips': 'dip',
   'bridge mountain climber cross body': null,
   'london bridge': null,
   'side bridge': 'core_isometric',
@@ -169,7 +176,11 @@ for (const exercise of catalog) {
   let pattern = null;
   let gapReason = null;
 
-  if (OVERRIDES.has(normalized)) {
+  if (/^(machine|lever|sled|cable|dumbbell).*\b(chest fly|seated fly|pec deck|butterfly)\b/.test(normalized) && !/reverse|rear/.test(normalized)) {
+    pattern = 'chest_fly';
+  } else if (/\b(machine|lever)\b.*\bhip abduction\b/.test(normalized)) {
+    pattern = 'hip_abduction';
+  } else if (OVERRIDES.has(normalized)) {
     pattern = OVERRIDES.get(normalized);
   } else if (!blocked) {
     const positive = POSITIVE_RULES.find((rule) => rule.test.test(normalized));
@@ -204,6 +215,10 @@ for (const exercise of catalog) {
       override.maxRepMs = 6000;
       override.dwellMs = 50;
       overrideBasis.push('name describes a fast or ballistic movement');
+    }
+    if (pattern === 'vertical_push' && (/^machine shoulder press$/.test(normalized) || normalized === 'barbell standing bradford press')) {
+      override.view = 'side';
+      overrideBasis.push('side view keeps the pressing elbow hinge visible through the shoulder press path');
     }
   }
 
@@ -279,6 +294,7 @@ const rows = [...byId.values()].map((row) => {
   const override = row.override ? [
     row.override.mode ? `mode ${row.override.mode}` : '',
     row.override.visibility !== undefined ? `visibility ${row.override.visibility}` : '',
+    row.override.view ? `camera view ${row.override.view}` : '',
     row.override.minRepMs !== undefined ? `min rep ${row.override.minRepMs} ms` : '',
     row.override.maxRepMs !== undefined ? `max rep ${row.override.maxRepMs} ms` : '',
     row.override.dwellMs !== undefined ? `dwell ${row.override.dwellMs} ms` : '',

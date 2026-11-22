@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createLandmarkFilter } from '../landmarkFilter';
 import {
   analyzeSequence,
   createExerciseCounter,
@@ -78,6 +79,70 @@ describe('jointAngle', () => {
 });
 
 describe('repetition counting', () => {
+  it.each(['chest_fly', 'hip_abduction'] as const)('counts %s using its working shoulder/hip geometry', pattern => {
+    const spec = patternSpec(pattern), counter = createExerciseCounter(pattern);
+    const angles = [spec.startAngle, (spec.startAngle + spec.peakAngle) / 2, spec.peakAngle, spec.peakAngle, (spec.startAngle + spec.peakAngle) / 2, spec.startAngle];
+    angles.forEach((angle, i) => {
+      const landmarks = blank().map(p => ({ ...p, visibility: 0 }));
+      setAngle(landmarks, spec.joints.left, angle);
+      counter.update({ landmarks, timestamp: i * 150 + 1, aspect: 1 });
+    });
+    expect(counter.snapshot().reps).toBe(1);
+  });
+  it('keeps per-side mode when an override changes visibility alone', () => {
+    expect(resolvePatternSpec('curl', { visibility: .45 }).mode).toBe('per_side');
+    expect(resolvePatternSpec('horizontal_pull', { mode: 'per_side' }).mode).toBe('per_side');
+  });
+  it('counts a single sampled peak during a continuous press', () => {
+    const counter = createExerciseCounter('horizontal_push');
+    [170, 140, 110, 85, 110, 140, 170].forEach((angle, i) => counter.update(frame('horizontal_push', angle, i * 100 + 1)));
+    expect(counter.snapshot().reps).toBe(1);
+  });
+  it('continues a bilateral press when the near wrist is briefly occluded', () => {
+    const counter = createExerciseCounter('horizontal_push');
+    [170, 150, 130, 110, 90, 85, 85, 100, 120, 140, 170].forEach((angle, i) => {
+      const sample = frame('horizontal_push', angle, i * 100 + 1);
+      if (i >= 2 && i <= 8) sample.landmarks = sample.landmarks.map((p, index) => index === 15 ? { ...p, visibility: 0 } : p);
+      counter.update(sample);
+    });
+    expect(counter.snapshot().reps).toBe(1);
+  });
+  it('counts continuous near-threshold squats from measurements even when display smoothing reduces their depth', () => {
+    const raw = createExerciseCounter('squat');
+    const filtered = createExerciseCounter('squat');
+    const display = createLandmarkFilter();
+    const fps = 15, rate = 0.7, seconds = 10 / rate;
+    for (let index = 0; index <= Math.ceil(seconds * fps); index++) {
+      const t = Math.min(index / fps, seconds);
+      const angle = 172 - 72 * (1 - Math.cos(2 * Math.PI * rate * t)) / 2;
+      const pose = frame('squat', angle, index * 1000 / fps);
+      raw.update(pose);
+      filtered.update({ ...pose, landmarks: display.update(pose.landmarks, pose.timestamp) });
+    }
+    expect(raw.snapshot().reps).toBeGreaterThanOrEqual(9);
+    expect(filtered.snapshot().reps).toBeLessThan(raw.snapshot().reps);
+  });
+  it('includes the standing angle when measuring a squat that returns to the standing threshold', () => {
+    const counter = createExerciseCounter('squat');
+    for (const [index, angle] of [172, 155, 135, 106, 135, 155, 161].entries()) {
+      counter.update(frame('squat', angle, index * 150));
+    }
+    expect(counter.snapshot()).toMatchObject({ reps: 1, partials: 0 });
+  });
+  it('preserves the starting angle for another repetition family', () => {
+    const counter = createExerciseCounter('horizontal_push');
+    for (const [index, angle] of [170, 145, 125, 95, 95, 125, 145, 158].entries()) {
+      counter.update(frame('horizontal_push', angle, index * 150));
+    }
+    expect(counter.snapshot()).toMatchObject({ reps: 1, partials: 0 });
+  });
+  it('counts a squat that reaches full depth for only one sampled frame', () => {
+    const counter = createExerciseCounter('squat');
+    for (const [index, angle] of [172, 155, 130, 105, 130, 155, 172].entries()) {
+      counter.update(frame('squat', angle, index * 150));
+    }
+    expect(counter.snapshot()).toMatchObject({ reps: 1, partials: 0 });
+  });
   it('emits depth and tempo feedback from incomplete movements', () => {
     const depth = createExerciseCounter('squat');
     let result = depth.snapshot();
@@ -86,6 +151,14 @@ describe('repetition counting', () => {
     const tempo = createExerciseCounter('squat');
     for (const [index, angle] of [172, 150, 110, 95, 95, 140, 172].entries()) result = tempo.update(frame('squat', angle, index * 20));
     expect(result.feedback).toBe('tempo');
+  });
+  it('rejects a peak-reaching cycle that is too fast without counting a partial', () => {
+    const counter = createExerciseCounter('squat');
+    let result = counter.snapshot();
+    for (const [index, angle] of [172, 150, 110, 95, 95, 140, 172].entries()) result = counter.update(frame('squat', angle, index * 20));
+    expect(result.rejection).toBe('timing_failed');
+    expect(result.reps).toBe(0);
+    expect(result.partials).toBe(0);
   });
   it.each(['squat', 'horizontal_push'] as const)('keeps %s counts stable with handheld motion', pattern => {
     let seed = 1234567;
@@ -215,7 +288,7 @@ describe('repetition counting', () => {
     const during = counter.update({ ...missing, timestamp: 1450 + gap });
     expect(during.reps).toBe(1);
     expect(during.partials).toBe(before.partials);
-    expect(during.phase).toBe(gap > 3000 ? 'waiting' : before.phase);
+    expect(during.phase).toBe('lost');
     counter.update(frame('squat', 172, 1500 + gap));
     expect(counter.snapshot().reps).toBe(gap > 3000 ? 1 : 2);
     counter.update(frame('squat', 172, 1650 + gap));

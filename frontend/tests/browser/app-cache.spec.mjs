@@ -229,6 +229,26 @@ test('dietary plan keeps its divided header visible while scrolling', async ({ p
   await expect(header.getByRole('button', { name: 'Back to Nutrition' })).toBeVisible();
 });
 
+test('meal schedule displays calculated allocations in a compact mobile layout', async ({ page }, info) => {
+  await setup(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/scan/plan');
+  await page.getByRole('button', { name: 'Meal Schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Suggested Meal Schedule' })).toBeVisible();
+  const meals = page.locator('.diet-schedule-meal');
+  await expect(meals).toHaveCount(4);
+  await expect(meals.first()).toContainText('~506 kcal');
+  await expect(meals.first()).toContainText('38g P');
+  await expect(page.getByText(/Meal allocations and timing are suggestions/)).toHaveCount(1);
+  for (const width of [320, 390, 844]) {
+    await page.setViewportSize({ width, height: width === 844 ? 390 : 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    for (const meal of await meals.all()) expect(await meal.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: info.outputPath('meal-schedule.png') });
+});
+
 test('restores saved Home, Coach and Scan data while refreshing, then replaces it', async ({ page }) => {
   const fixture = await setup(page);
   await page.goto('/home');

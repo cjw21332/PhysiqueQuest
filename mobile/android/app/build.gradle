@@ -104,8 +104,8 @@ android {
         applicationId 'com.physiquequest.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.0.0"
+        versionCode 10
+        versionName "1.5.1"
         buildConfigField "boolean", "PQ_STANDALONE", "false"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
@@ -196,7 +196,7 @@ tasks.configureEach { task ->
 }
 
 gradle.taskGraph.whenReady { graph ->
-    if (graph.allTasks.any { it.project == project && it.name.matches('(?i)(assemble|bundle|package|sign).*release.*') } && !releaseSigningReady) {
+    if (graph.allTasks.any { it.project == project && it.name.matches('(?i)(assemble|bundle|package|sign).*release.*') } && !releaseSigningReady && System.getenv('EAS_BUILD') != 'true') {
         throw new GradleException('Release signing requires PQ_ANDROID_KEYSTORE_PATH, PQ_ANDROID_KEYSTORE_PASSWORD, PQ_ANDROID_KEY_ALIAS and PQ_ANDROID_KEY_PASSWORD.')
     }
 }

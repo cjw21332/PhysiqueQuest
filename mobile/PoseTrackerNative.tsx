@@ -8,12 +8,14 @@ import { Accelerometer } from 'expo-sensors';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-import Animated, { cancelAnimation, useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { cancelAnimation, useAnimatedProps, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
 import NativeTrackingCamera, { type NativeTrackingOptions } from './NativeTrackingCamera';
 import { createPoseStartGate, frameStatus } from './poseStartGate';
+import { createCameraRecovery, cameraRecoveryMessage, type CameraRecoveryState } from '../shared/cameraRecovery';
 import { createPoseSessionClock, POSE_ISSUES, type NativePoseSummary, type PoseIssueId } from '../shared/poseSessionSummary';
 import { createLandmarkFilter } from '../shared/landmarkFilter';
 import { POSE_HOLD_MS } from './poseOverlay';
+import { createStablePoseSegments } from './poseSegments';
 import { createPoseCueController, type PoseCue } from './poseCue';
 import { createPoseSafety, type SafetyPhase } from './poseSafety';
 import { startNativeAlarm, stopNativeAlarm } from './inactivity/nativeAlarm';
@@ -65,14 +67,13 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
   const [countdown, setCountdown] = useState<number | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraGeneration, setCameraGeneration] = useState(0);
-  const [cameraError, setCameraError] = useState('');
-  const cameraRetries = useRef(0);
-  const cameraRetryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [recoveryState, setRecoveryState] = useState<CameraRecoveryState>({phase:'idle',attempt:0});
   const [snapshot, setSnapshot] = useState<EngineSnapshot | null>(null);
   const [status, setStatus] = useState('Getting your camera ready…');
   const skeletonPath = useSharedValue('');
   const skeletonOpacity = useSharedValue(0);
   const faultPath = useSharedValue('');
+  const stableSegments = useRef(createStablePoseSegments(bones, DRAW_VISIBILITY, POSE_HOLD_MS + 150));
   const animatedSkeleton = useAnimatedProps(() => ({ d: skeletonPath.value, opacity: skeletonOpacity.value }));
   const animatedFault = useAnimatedProps(() => ({ d: faultPath.value, opacity: skeletonOpacity.value }));
   const cueController = useRef(createPoseCueController());
@@ -89,6 +90,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
   const issueCounts = useRef<Partial<Record<PoseIssueId, number>>>({});
   const previousIssues = useRef(new Set<string>());
   const [viewSize, setViewSize] = useState({ width: 0, height: 0 });
+  const speechGeneration = useRef(0);
   const [facing, setFacing] = useState<'front' | 'back'>('front');
   const counter = useRef<ReturnType<typeof createExerciseCounter> | null>(null);
   const clock = useRef(createPoseSessionClock(() => performance.now()));
@@ -99,6 +101,18 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
   const systemPromptPending = useRef(false);
   const patternId: PatternId = isPatternId(pattern) ? pattern : 'squat';
   const landmarkFilter = useMemo(() => createLandmarkFilter(['horizontal_push', 'jumping_jack', 'high_knees', 'mountain_climber'].includes(patternId)), [patternId]);
+  const lifecycle = useRef({paused,permission,blurred:false});
+  lifecycle.current.paused=paused; lifecycle.current.permission=permission;
+  const nativeTicket = useRef(0);
+  const recovery = useRef<ReturnType<typeof createCameraRecovery> | null>(null);
+  if (!recovery.current) recovery.current=createCameraRecovery({
+    setTimer:setTimeout,clearTimer:clearTimeout,
+    eligible:()=>alive.current && AppState.currentState==='active' && !lifecycle.current.blurred && !lifecycle.current.paused && lifecycle.current.permission===true,
+    start:ticket=>{nativeTicket.current=ticket;setCameraReady(false);setCameraGeneration(value=>value+1);},
+    release:()=>{clock.current.pause();counter.current?.suspend();counting.current=false;visibilityGate.current.reset();if(alive.current)setCameraReady(false);},
+    changed:state=>{if(alive.current)setRecoveryState(state);},
+  });
+  const cameraTicket=nativeTicket.current;
   const finishSession = () => {
     safetyEnabled.current = false;
     deactivateKeepAwake('pose-safety');
@@ -114,7 +128,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       if (!safetyEnabled.current) return;
       const next = safety.current.tick(performance.now());
       if (next.phase !== safetyPhaseRef.current) {
-        if (next.phase === 'alarm') { void Speech.stop(); setAlarmSound(startNativeAlarm()); onSafetyAlarm(); }
+        if (next.phase === 'alarm') { speechGeneration.current++; void Speech.stop(); setAlarmSound(startNativeAlarm()); onSafetyAlarm(); }
         safetyPhaseRef.current = next.phase;
         setSafetyPhase(next.phase);
       }
@@ -147,12 +161,14 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
     alive.current = true;
     systemPromptPending.current = true;
     void Camera.requestCameraPermissionsAsync().then(result => {
-      if (alive.current) setPermission(result.granted);
-    }).catch(() => { if (alive.current) setPermission(false); }).finally(() => {
+      if (alive.current) {setPermission(result.granted);if(!result.granted)setRecoveryState({phase:'failed',attempt:0,reason:'permission_denied'});}
+    }).catch(() => { if (alive.current) {setPermission(false);setRecoveryState({phase:'failed',attempt:0,reason:'permission_denied'});} }).finally(() => {
       systemPromptPending.current = false;
     });
     const listener = AppState.addEventListener('change', state => {
       setAppActive(state === 'active');
+      if(state==='active')lifecycle.current.blurred=false;
+      recovery.current?.activity(state==='active' && !lifecycle.current.blurred);
       if (state === 'background' && !systemPromptPending.current) {
         clock.current.pause();
         counter.current?.suspend();
@@ -161,19 +177,28 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
         setCameraReady(false);
       }
     });
+    const blur = AppState.addEventListener('blur',()=>{lifecycle.current.blurred=true;recovery.current?.activity(false);setAppActive(false);});
+    const focus = AppState.addEventListener('focus',()=>{lifecycle.current.blurred=false;setAppActive(AppState.currentState==='active');recovery.current?.activity(AppState.currentState==='active');});
     return () => {
       alive.current = false;
-      if (cameraRetryTimer.current) clearTimeout(cameraRetryTimer.current);
+      recovery.current?.stop();
       void Speech.stop();
       listener.remove();
+      blur.remove(); focus.remove();
     };
-  }, [close]);
+  }, []);
 
   useEffect(() => {
-    counter.current = createExerciseCounter(patternId, { override });
+    counter.current = createExerciseCounter(patternId, { override, exerciseName: name });
     setSnapshot(null);
-    setStatus('Waiting for you to enter the frame');
-  }, [patternId, override]);
+    setStatus('Show the joints used for this movement in the camera view.');
+    }, [patternId, override, name]);
+
+  useEffect(()=>{
+    if(permission && !paused){recovery.current?.activity(AppState.currentState==='active' && !lifecycle.current.blurred);recovery.current?.start();}
+    else {recovery.current?.stop();if(permission===false)setRecoveryState({phase:'failed',attempt:0,reason:'permission_denied'});}
+    return ()=>recovery.current?.stop();
+  },[permission,paused,patternId,override,name]);
 
   const suspendCounting = (preserveSafety = false) => {
     if (!preserveSafety && safetyPhaseRef.current !== 'alarm') {
@@ -184,7 +209,13 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       setSafetyPhase('unavailable');
     }
     previousIssues.current.clear();
+    speechGeneration.current++;
+    void Speech.stop();
+    cueController.current = createPoseCueController();
+    activeCue.current = null;
+    setCue(null);
     landmarkFilter.reset();
+    stableSegments.current.reset();
     cancelAnimation(skeletonOpacity);
     skeletonOpacity.value = 0;
     skeletonPath.value = '';
@@ -196,19 +227,14 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
   };
   const switchCamera = () => {
     suspendCounting(true);
-    if (cameraRetryTimer.current) clearTimeout(cameraRetryTimer.current);
-    cameraRetries.current = 0;
-    setCameraError('');
     setCameraReady(false);
     setStatus('Switching camera…');
     setFacing(value => value === 'front' ? 'back' : 'front');
+    recovery.current?.start();
   };
   const togglePause = () => {
     if (!paused) clock.current.pause();
     suspendCounting();
-    if (cameraRetryTimer.current) clearTimeout(cameraRetryTimer.current);
-    cameraRetries.current = 0;
-    setCameraError('');
     setCameraReady(false);
     setPaused(value => !value);
     setStatus(paused ? 'Getting your camera ready…' : 'Tracking paused');
@@ -222,12 +248,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       setCameraReady(false);
       const message = typeof detail.message === 'string' ? detail.message : 'Camera tracking unavailable.';
       setStatus(message);
-      const canRetry = detail.reason !== 'unsupported' && !message.includes('too warm') && cameraRetries.current < 3 && AppState.currentState === 'active';
-      if (canRetry) {
-        cameraRetries.current++;
-        setCameraError('Reconnecting camera…');
-        cameraRetryTimer.current = setTimeout(() => { cameraRetryTimer.current = null; if (alive.current) { setCameraError(''); setCameraGeneration(value => value + 1); } }, 1000);
-      } else setCameraError(message);
+      recovery.current?.error(cameraTicket,detail.code==='timeout'?'timeout':message.includes('too warm')?'thermal':detail.reason==='unsupported'?'no_camera':'interrupted_too_often');
       return;
     }
     if (detail.type !== 'frame') return;
@@ -240,23 +261,27 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       const gate = visibilityGate.current.update(ts, false);
       if (counting.current && !gate.active) { counter.current?.suspend(); counting.current = false; }
       setCountdown(null);
-      setStatus('Step back so your whole body is in frame.');
+      setStatus('Show the working joints clearly.');
       return;
     }
-    frame.joints = landmarkFilter.update(frame.joints, ts);
+    // Smooth only the drawing and framing guidance. Filtering joint positions
+    // before measuring angles can flatten the bottom of continuous reps.
+    const measurementJoints = frame.joints;
+    frame.joints = landmarkFilter.update(measurementJoints, ts);
     if (frame.width && frame.height && viewSize.width && viewSize.height) {
       const scale = Math.max(viewSize.width / frame.width, viewSize.height / frame.height);
       const ox = (viewSize.width - frame.width * scale) / 2, oy = (viewSize.height - frame.height * scale) / 2;
       const points = frame.joints;
-      const mapped = points.map(point => mapPoint(point, frame.width!, frame.height!, scale, ox, oy));
-      const path = bones.flatMap(([a,b]) => mapped[a] && mapped[b] && (points[a]?.visibility ?? 1) >= DRAW_VISIBILITY && (points[b]?.visibility ?? 1) >= DRAW_VISIBILITY ? [`M${mapped[a]!.x},${mapped[a]!.y}L${mapped[b]!.x},${mapped[b]!.y}`] : []).join('');
+      const mapped = points.map(point => { const mappedPoint = mapPoint(point, frame.width!, frame.height!, scale, ox, oy); return mappedPoint && point ? { ...mappedPoint, visibility: point.visibility } : undefined; });
+      const paths = stableSegments.current.update(mapped, ts);
+      const path = paths.join('');
       if (path) {
         skeletonPath.value = path;
         const highlighted = faultJoints[activeCue.current?.id ?? ''] ?? [];
-        faultPath.value = bones.flatMap(([a,b]) => highlighted.includes(a) && highlighted.includes(b) && mapped[a] && mapped[b] && (points[a]?.visibility ?? 1) >= DRAW_VISIBILITY && (points[b]?.visibility ?? 1) >= DRAW_VISIBILITY ? [`M${mapped[a]!.x},${mapped[a]!.y}L${mapped[b]!.x},${mapped[b]!.y}`] : []).join('');
+        faultPath.value = bones.map(([a,b], index) => highlighted.includes(a) && highlighted.includes(b) ? paths[index] : '').join('');
         cancelAnimation(skeletonOpacity);
         skeletonOpacity.value = 1;
-        skeletonOpacity.value = withTiming(0, { duration: POSE_HOLD_MS });
+        skeletonOpacity.value = withDelay(POSE_HOLD_MS, withTiming(0, { duration: 150 }));
       }
     }
     const aspect = typeof frame.aspect === 'number' && frame.aspect > 0 ? frame.aspect : 1;
@@ -266,7 +291,9 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       const gate = visibilityGate.current.update(ts, false);
       if (counting.current && !gate.active) { counter.current.suspend(); counting.current = false; }
       setCountdown(null);
-      setStatus(framing === 'TOO_CLOSE' ? 'Move back' : framing === 'TOO_FAR' ? 'Move closer' : 'Show your full body');
+      setStatus(framing === 'TOO_CLOSE' ? 'Keep the working joints inside the view' : framing === 'TOO_FAR' ? 'Move closer' : 'Show a clear working limb');
+      // Feed missing evidence into the counter too, so stale cycles expire.
+      counter.current.update({ landmarks: measurementJoints, timestamp: ts, aspect });
       return;
     }
     const gate = visibilityGate.current.update(ts, true);
@@ -283,7 +310,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
     safetyEnabled.current = true;
     safety.current.observe(frame.joints, ts);
     clock.current.start();
-    const next = counter.current.update({ landmarks: frame.joints, timestamp: ts, aspect });
+    const next = counter.current.update({ landmarks: measurementJoints, timestamp: ts, aspect });
     const candidateCues: PoseCue[] = next.faults.map(fault => ({ id: fault.rule, message: fault.message, priority: 'alignment' }));
     if (next.feedback === 'depth') candidateCues.push({ id: 'depth', message: 'Reach a comfortable full range.', priority: 'depth' });
     if (next.feedback === 'tempo') candidateCues.push({ id: 'tempo', message: 'Move at a steady pace.', priority: 'tempo' });
@@ -294,15 +321,18 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       issueCounts.current[id] = (issueCounts.current[id] ?? 0) + 1;
     }
     previousIssues.current = seen;
-    const spoken = fresh.find(item => item.priority === 'alignment') ?? fresh.find(item => item.priority === 'depth') ?? fresh[0];
-    if (spoken && !muted && safetyPhaseRef.current !== 'alarm') {
-      void Speech.stop().then(() => Speech.speak(spoken.message));
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
-    }
     const cueResult = cueController.current.update(ts, candidateCues, muted);
     if (cueResult.cue?.id !== activeCue.current?.id) {
+      speechGeneration.current++;
       activeCue.current = cueResult.cue;
       setCue(cueResult.cue);
+    }
+    if (cueResult.speak && cueResult.cue && safetyPhaseRef.current !== 'alarm') {
+      const message = cueResult.cue.message;
+      speechGeneration.current++;
+      void Speech.stop();
+      Speech.speak(message);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     }
     const now = Date.now();
     if (now - lastUi.current < TRACKING_UI_UPDATE_MS && !next.counted) return;
@@ -310,7 +340,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
     setSnapshot(next);
     setStatus(next.visible
       ? (next.phase === 'lost' ? 'Body partially out of frame' : next.cue)
-      : 'Body not detected. Step back so your whole body is in frame.');
+      : 'Working joints obscured. Adjust the camera for a clearer view.');
   };
 
   const spec = patternSpec(patternId);
@@ -328,19 +358,19 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
 
       {permission === false && <Text style={styles.warning}>Allow camera access in your phone settings to start tracking.</Text>}
 
-        <View style={styles.camera} onLayout={event => setViewSize(event.nativeEvent.layout)}>
-          {permission && appActive && !paused && <NativeTrackingCamera
+        <View style={[styles.camera, { height: Math.max(160, height * (landscape ? 0.38 : 0.48)) }]} onLayout={event => setViewSize(event.nativeEvent.layout)}>
+          {permission && appActive && !paused && recovery.current?.current(cameraTicket) && (recoveryState.phase==='acquiring' || recoveryState.phase==='recovering' || recoveryState.phase==='ready') && <NativeTrackingCamera
             key={`${facing}:${cameraGeneration}`}
             options={options}
             facing={facing}
             style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }]}
-            emit={onFrame}
-            ready={() => { setCameraReady(true); setCameraError(''); setStatus('Camera ready. Step back so your whole body is visible.'); }}
+            emit={detail=>{if(recovery.current?.current(cameraTicket))onFrame(detail);}}
+            ready={() => { if(!recovery.current?.current(cameraTicket))return;recovery.current.ready(cameraTicket);setCameraReady(true);setStatus('Camera ready. Frame your working joints clearly to begin.'); }}
           />}
           {(!cameraReady || paused) && <View style={styles.cameraPlaceholder}>
-            {!paused && permission !== false && <ActivityIndicator color="#22c55e" />}
-            <Text style={styles.text}>{paused ? 'Tracking paused' : permission === false ? 'Camera access needed' : cameraError || 'Preparing camera…'}</Text>
-            {!!cameraError && cameraError !== 'Reconnecting camera…' && <Pressable accessibilityRole="button" style={styles.button} onPress={() => { cameraRetries.current = 0; setCameraError(''); setCameraGeneration(value => value + 1); }}><Text style={styles.buttonText}>Retry camera</Text></Pressable>}
+            {!paused && permission !== false && ['acquiring','recovering'].includes(recoveryState.phase) && <ActivityIndicator color="#22c55e" />}
+            <Text style={styles.text}>{paused ? 'Tracking paused' : permission === null ? 'Waiting for camera permission.' : permission === false ? 'Camera permission denied. Allow access in settings, then try again.' : cameraRecoveryMessage(recoveryState)}</Text>
+            {(recoveryState.phase==='failed' || permission===false) && <Pressable accessibilityRole="button" style={styles.button} onPress={() => {if(permission===false){void Camera.requestCameraPermissionsAsync().then(result=>{if(alive.current)setPermission(result.granted);});}else recovery.current?.start();}}><Text style={styles.buttonText}>Try again</Text></Pressable>}
           </View>}
           <Svg pointerEvents="none" width={viewSize.width} height={viewSize.height} style={StyleSheet.absoluteFill}>
             <AnimatedPath animatedProps={animatedSkeleton} fill="none" stroke="#22e9c0" strokeWidth={3} />
@@ -362,19 +392,18 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
             </View>
           </View>
           {countdown !== null && <View style={styles.countdown} accessibilityLiveRegion="polite"><Text style={styles.countdownText}>{countdown}</Text></View>}
-          {!counting.current && <View pointerEvents="none" style={styles.framing} />}
         </View>
 
       <View style={styles.stats}>
-        {!cameraReady && permission && <Text style={styles.text}>Preparing camera…</Text>}
+        {!cameraReady && permission && <Text style={styles.text}>{cameraRecoveryMessage(recoveryState)}</Text>}
         {snapshot?.faults.map((fault, index) => <Text key={`${fault.rule}-${index}`} style={styles.fault}>{fault.message}</Text>)}
-        {!snapshot?.faults.length && <Text style={styles.text}>{snapshot?.cue ?? 'Stand back so your whole body is in frame.'}</Text>}
+        {!snapshot?.faults.length && <Text style={styles.text}>{snapshot?.cue ?? 'Keep the joints used for this movement in view.'}</Text>}
       </View>
 
       <View style={styles.actions}>
         <Pressable accessibilityRole="button" style={styles.button} onPress={switchCamera}><ActionIcon name="switch"/><Text style={styles.buttonText}>Switch camera</Text></Pressable>
         <Pressable accessibilityRole="button" style={styles.button} onPress={togglePause}><ActionIcon name={paused ? 'play' : 'pause'}/><Text style={styles.buttonText}>{paused ? 'Resume' : 'Pause'}</Text></Pressable>
-        <Pressable accessibilityRole="button" accessibilityState={{ checked: muted }} style={styles.button} onPress={() => { if (!muted) void Speech.stop(); setMuted(value => !value); }}><Text style={styles.buttonText}>{muted ? 'Unmute cues' : 'Mute cues'}</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityState={{ checked: muted }} style={styles.button} onPress={() => { if (!muted) { speechGeneration.current++; void Speech.stop(); } setMuted(value => !value); }}><Text style={styles.buttonText}>{muted ? 'Unmute cues' : 'Mute cues'}</Text></Pressable>
         <Pressable accessibilityRole="button" style={[styles.button, styles.stop]} onPress={finishSession}><ActionIcon name="stop"/><Text style={styles.stopText}>End session</Text></Pressable>
       </View>
       {!landscape && <Text style={styles.text}>Reps and holds are movement estimates, not technique grades. This screen cannot assess pain, injury risk or equipment load.</Text>}
@@ -401,11 +430,10 @@ const styles = StyleSheet.create({
   fault: { color: '#ff9f6b', fontSize: 12 },
   cueBanner: { position: 'absolute', top: 80, left: 12, right: 12, zIndex: 4, backgroundColor: '#ad2525', padding: 12, borderRadius: 12, alignItems: 'center' },
   cueText: { color: '#fff', fontSize: 30, lineHeight: 36, fontWeight: '800', textAlign: 'center' },
-  camera: { flex: 1, minHeight: 160, borderRadius: 16, overflow: 'hidden', backgroundColor: '#05080c' },
+  camera: { flexShrink: 0, minHeight: 160, borderRadius: 16, overflow: 'hidden', backgroundColor: '#05080c' },
   cameraPlaceholder: { position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, alignItems: 'center', justifyContent: 'center', gap: 10 },
   countdown: { position: 'absolute', alignSelf: 'center', top: '42%', borderRadius: 48, width: 90, height: 90, alignItems: 'center', justifyContent: 'center', backgroundColor: '#101820dd' },
   countdownText: { color: '#fff', fontSize: 52, fontWeight: '800' },
-  framing: { position: 'absolute', top: '8%', bottom: '8%', left: '12%', right: '12%', borderWidth: 2, borderColor: '#ffffff99', borderRadius: 18 },
   counter: { position: 'absolute', top: 10, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', backgroundColor: '#101820ed', borderWidth: 1, borderColor: '#65dcbc', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, minWidth: 200, zIndex: 3 },
   counterColumn: { flex: 1, alignItems: 'center', minWidth: 78 },
   counterDivider: { width: 1, height: 34, backgroundColor: '#719189', marginHorizontal: 8 },

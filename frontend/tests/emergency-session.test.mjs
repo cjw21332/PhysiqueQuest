@@ -41,7 +41,7 @@ test('a native alarm reveals stop controls after a late cancellation and stays s
     '../Home/icons': { Icon: () => null },
     './InactivityViews': { InactivityCountdown: Countdown, EmergencyAlarm: Alarm },
     '../../lib/api': { api },
-    '../../hooks/useCameraStream': { useCameraStream: () => ({ stop() {}, status: 'idle' }) },
+    '../../hooks/useCameraStream': { useCameraStream: () => ({ stop() {}, status: 'idle', recoveryState: { phase: 'idle', attempt: 0 } }) },
     '../../lib/alarmAudio': { startAlarm: () => { browserStarts++; }, stopAlarm() {} },
     '../../lib/inactivityConstants.mjs': { COUNTDOWN_SECONDS: 30 },
     '../../lib/titleCase': { titleCase },

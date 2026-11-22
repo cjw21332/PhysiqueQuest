@@ -55,6 +55,11 @@ def seedCxxStandardLibraries = { project ->
 }
 
 subprojects { project ->
-  project.plugins.withId('com.android.library') { seedCxxStandardLibraries(project) }
+  project.plugins.withId('com.android.library') {
+    seedCxxStandardLibraries(project)
+    if (project.name == 'react-native-reanimated' && findProperty('pqCxxDir')) {
+      project.android.externalNativeBuild.cmake.buildStagingDirectory = file("${findProperty('pqCxxDir')}/reanimated")
+    }
+  }
   project.plugins.withId('com.android.application') { seedCxxStandardLibraries(project) }
 }

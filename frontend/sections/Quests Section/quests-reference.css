@@ -23,8 +23,74 @@
 .account-dark-theme .quests-reference .quest-v2-mission-main > strong { font-size: 13px; }
 .account-dark-theme .quests-reference .quest-v2-mission-icon { width: 34px; height: 34px; flex-basis: 34px; border-radius: 8px; }
 .account-dark-theme .quests-reference .quest-v2-mission-progress { max-width: 150px; }
-.account-dark-theme .quests-reference .quest-v2-badges { margin-top: 24px; }
+.account-dark-theme .quests-reference .quest-v2-badges { margin-top: 24px; padding-bottom: 0; }
 .account-dark-theme .quests-reference .quest-v2-badge-grid { gap: 16px 8px; }
 .account-dark-theme .quests-reference .quest-v2-badge > span { width: 48px; height: 48px; }
 .account-dark-theme .quests-reference .quest-v2-badge > small { max-width: 86px; font-size: 11px; line-height: 1.35; }
+.quest-v2-badge { padding: 0; border: 0; background: transparent; font: inherit; cursor: pointer; }
+.quest-v2-badge:disabled { opacity: 1; cursor: default; }
+.quest-v2-badge:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 10px; }
+.account-dark-theme .quests-reference .quest-v2-scroll { padding-bottom: 12px; }
+.account-dark-theme .quests-reference .quest-badge-heading { align-items: center; gap: 8px; }
+.quest-badge-heading > div { display: flex; align-items: center; gap: 10px; }
+.quest-badge-heading > div > span { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.quest-badge-heading button { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 6px 0 6px 8px; border: 0; background: transparent; color: var(--green); font-size: 12px; font-weight: 600; cursor: pointer; }
+.quest-badge-heading button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.badge-art { display: block; width: 100%; height: 100%; object-fit: contain; }
+.badge-generated { width: 100%; height: 100%; display: grid; place-items: center; position: relative; color: #9eff35; border: 4px solid #86c72d; background: #101a0b; border-radius: 30%; }
+.badge-generated b { position: absolute; bottom: 0; right: 0; min-width: 19px; padding: 2px; border-radius: 8px; background: #9eff35; color: #10200b; font-size: 9px; text-align: center; }
+.badge-generated-streak { border-color: #ed614a; color: #ff725b; background: #28100e; border-radius: 40%; }
+.badge-generated-streak b { background: #ff725b; }
+.badge-generated-hydration { border-color: #36cce6; color: #36cce6; background: #0a252d; border-radius: 55% 55% 55% 10%; transform: rotate(-45deg); }
+.badge-generated-hydration > * { transform: rotate(45deg); }
+.badge-generated-hydration b { background: #36cce6; }
+.badge-generated-lift { border-color: #f29538; color: #f29538; background: #26180c; border-radius: 40%; }
+.badge-generated-lift b { background: #f29538; }
+.badge-generated-special { border-color: #8d70ef; color: #ad9aff; background: #19132c; }
+.badge-generated-goal { border-color: #25cf9d; color: #25cf9d; background: #09251d; border-radius: 50%; }
+.badge-generated-goal b { background: #25cf9d; }
+.badge-generated-early-bird { border-color: #f2b64c; color: #f2b64c; background: #2c200b; border-radius: 50% 50% 32% 32%; }
+.badge-generated-macro-master { border-color: #a889f5; color: #d1baff; background: #21172f; border-radius: 28%; }
+.badge-tier-rising { border-style: double; border-width: 6px; border-radius: 38%; }
+.badge-tier-advanced { border-width: 4px; border-style: dashed; border-radius: 50%; box-shadow: inset 0 0 0 2px currentColor; }
+.badge-tier-summit { border-width: 5px; border-style: double; border-radius: 28%; box-shadow: inset 0 0 0 2px currentColor, 0 0 0 2px currentColor; }
+.badge-generated-hydration.badge-tier-rising { border-radius: 55% 55% 55% 10%; }
+.badge-generated-hydration.badge-tier-advanced { border-radius: 55% 55% 55% 10%; }
+.badge-generated-hydration.badge-tier-summit { border-radius: 55% 55% 55% 10%; }
+.badge-lock { position: absolute; z-index: 1; right: -5px; bottom: -4px; display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid var(--soft); border-radius: 50%; background: #b9ff63; color: #11260c; box-shadow: 0 1px 5px #0006; }
+.badge-lock-unavailable { background: #d3d7db; color: #303943; }
+.badge-collection-icon { position: relative; }
+.badge-collection-title > span { font-weight: 700; }
+.badge-collection-row.locked .badge-collection-title > span { color: var(--ink); }
+.quest-v2-badge > span:has(.badge-art), .badge-collection-icon:has(.badge-art) { background: transparent; }
+.badge-collection .leaderboard-scroll { padding: 18px 20px calc(28px + var(--sab, 0px)); }
+.badge-collection-intro { display: flex; align-items: center; gap: 12px; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--green-light); }
+.badge-collection-intro > span { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border-radius: 12px; color: var(--green); background: var(--soft); }
+.badge-collection-intro > div { flex: 1; min-width: 0; }
+.badge-collection-intro h3 { margin: 0; color: var(--ink); font-size: 16px; }
+.badge-collection-intro p { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.badge-collection-intro > strong { color: var(--ink); font-size: 23px; white-space: nowrap; }
+.badge-collection-intro > strong small { color: var(--muted); font-size: 11px; }
+.badge-category { margin-top: 24px; }
+.badge-category-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.badge-category-heading h3 { margin: 0; color: var(--ink); font-size: 15px; }
+.badge-category-heading span { color: var(--muted); font-size: 12px; }
+.badge-collection-list { display: grid; gap: 8px; }
+.badge-collection-row { position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); }
+.badge-row-action { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; border: 0; border-radius: inherit; background: transparent; cursor: pointer; }
+.badge-row-action:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+.badge-collection-icon { display: grid; place-items: center; flex: 0 0 48px; height: 48px; border-radius: 14px; color: var(--green); background: var(--green-light); }
+.badge-collection-row.locked .badge-collection-icon { color: var(--muted); background: var(--bg-tertiary); }
+.quests-reference .quest-v2-badge > span:has(.badge-art),
+.account-dark-theme .quests-reference .quest-v2-badge.earned > span:has(.badge-art),
+.badge-collection .badge-collection-row .badge-collection-icon:has(.badge-art) { background: transparent; }
+.badge-collection-details { flex: 1; min-width: 0; }
+.badge-collection-title { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+.badge-collection-title h4 { margin: 0; color: var(--ink); font-size: 14px; overflow-wrap: anywhere; }
+.badge-collection-title > span { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.badge-collection-row.earned .badge-collection-title > span { color: var(--green); }
+.badge-collection-details p { margin: 5px 0 8px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.badge-collection-details small, .badge-collection-empty { color: var(--muted); font-size: 11px; }
+.badge-collection-progress { height: 5px; margin: 8px 0 5px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.badge-collection-progress span { display: block; height: 100%; border-radius: inherit; background: var(--green); }
 @media (max-width: 350px) { .account-dark-theme .quests-reference .quest-v2-scroll { padding-inline: 14px; } }

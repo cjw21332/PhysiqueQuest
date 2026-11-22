@@ -3,6 +3,34 @@ import { test, expect } from '@playwright/test';
 const exercise = { _id: 'api-press', slug: 'api-press', name: 'Backend seated press', targetMuscle: 'Shoulders', equipment: 'Dumbbells', trackingStatus: 'Manual', instructions: ['Keep feet planted.', 'Press overhead slowly.'], gifUrl: 'https://exercise.test/demo.gif', pose: 'missing', status: 'published', source: 'ExerciseDB V1' };
 const gif = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
 
+test('missing GIF uses the matching exercise video and does not use it for another variation', async ({ page }) => {
+  const first = { ...exercise, _id: '1RIkUHT', name: 'Dumbbell Iron Cross', gifUrl: 'https://exercise.test/missing.gif' };
+  const second = { ...first, _id: 'different-variation', name: 'Dumbbell Iron Cross Variation' };
+  await page.route('https://exercise.test/missing.gif', route => route.fulfill({ status: 404 }));
+  await page.route('**/dumbbell-iron-cross.mp4', async route => { await new Promise(resolve => setTimeout(resolve, 30000)); await route.abort().catch(() => {}); });
+  await setup(page, (route, url, headers) => route.fulfill({ json: { items: [first, second], total: 2, page: 1, pages: 1, limit: 12 }, headers }));
+  await page.route('**/exercises/1RIkUHT', route => route.fulfill({ json: first }));
+  await page.route('**/exercises/different-variation', route => route.fulfill({ json: second }));
+  await page.getByRole('button', { name: /Dumbbell Iron Cross/ }).first().click();
+  await expect(page.locator('video.library-fallback-video')).toHaveAttribute('src', /dumbbell-iron-cross\.mp4/);
+  await page.getByRole('button', { name: 'Close exercise details' }).click();
+  await page.getByRole('button', { name: /Dumbbell Iron Cross Variation/ }).click();
+  await expect(page.locator('video.library-fallback-video')).toHaveCount(0);
+  await expect(page.getByText('Could not load this demonstration.')).toBeVisible();
+});
+
+test('missing API GIF uses its ID-matched archive demo and labels grip variations', async ({ page }) => {
+  const missing = { ...exercise, _id: '0I5fUyn', name: 'Band Underhand Pulldown', gifUrl: 'https://exercise.test/missing-archive.gif' };
+  await page.route('https://exercise.test/missing-archive.gif', route => route.fulfill({ status: 404 }));
+  await page.route('**/videos/1013-k6tUeqS.gif', route => route.fulfill({ contentType: 'image/gif', body: gif }));
+  await setup(page, (route, url, headers) => route.fulfill({ json: { items: [missing], total: 1, page: 1, pages: 1, limit: 12 }, headers }));
+  await page.route('**/exercises/0I5fUyn', route => route.fulfill({ json: missing, headers: { 'access-control-allow-origin': '*' } }));
+  await page.getByRole('button', { name: /Band Underhand Pulldown/ }).click();
+  await expect(page.locator('img.library-fallback-gif')).toHaveAttribute('src', /videos\/1013-k6tUeqS\.gif/);
+  await expect(page.getByText('Movement shown: band underhand pulldown.')).toBeVisible();
+  await expect(page.getByText('Movement variation · Underhand grip')).toBeVisible();
+});
+
 async function setup(page, catalog, detailHandler) {
   await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'test', token: 'test-token' })));
   await page.route('https://exercise.test/demo.gif', route => route.fulfill({ contentType: 'image/gif', body: gif }));
@@ -19,6 +47,27 @@ async function setup(page, catalog, detailHandler) {
   await page.goto('/coach');
   await page.getByRole('button', { name: /Exercise library/ }).click();
 }
+
+test('exercise details scroll beneath a stationary, fully visible header', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  const long = { ...exercise, name: 'Alternating seated press', instructions: Array(18).fill('Press overhead slowly and return with control.') };
+  await setup(page, (route, url, headers) => route.fulfill({ json: { items: [long], total: 1, page: 1, pages: 1, limit: 12 }, headers }), (route, headers) => route.fulfill({ json: long, headers }));
+  await page.getByRole('button', { name: /Alternating seated press/i }).click();
+  const dialog = page.getByRole('dialog');
+  const header = dialog.locator('.library-sheet-header');
+  const content = dialog.locator('.library-sheet-content');
+  await expect(dialog.getByText('Movement variation · Alternating')).toBeVisible();
+  const before = await header.boundingBox();
+  await content.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  await expect.poll(() => content.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+  const after = await header.boundingBox();
+  const bounds = await dialog.boundingBox();
+  expect(after.y).toBe(before.y);
+  expect(after.y).toBeGreaterThanOrEqual(bounds.y);
+  await expect(dialog.getByRole('button', { name: 'Close exercise details' })).toBeVisible();
+  await content.evaluate(el => { el.scrollTop = 0; });
+  await expect.poll(() => content.evaluate(el => el.scrollTop)).toBe(0);
+});
 
 test('library highlights available camera options and keeps filters usable on mobile', async ({ page }, info) => {
   const manual = { ...exercise, _id: '01qpYSe', name: 'Manual example', gifUrl: '' };

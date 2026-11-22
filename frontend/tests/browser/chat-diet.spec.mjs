@@ -101,6 +101,21 @@ async function ask(dialog, question) {
   return reply;
 }
 
+test('every suggested question receives a direct answer with personal data off or on', async ({ page }) => {
+  const { dialog, state } = await fixture(page);
+  for (const [button, expected] of [['Explain this page', /scan|nutrition|meal/i], ['Explore app features', /Home.*Coach.*Scan/i], ['My data access', /account.*personal data/i]]) {
+    await dialog.getByRole('button', { name: button }).click();
+    const reply = dialog.locator('.coach-chat-message.assistant p').last();
+    await expect(reply).toContainText(expected);
+    await expect(reply).not.toContainText(/could you clarify/i);
+    await dialog.getByRole('button', { name: 'Clear chat' }).click();
+  }
+  await dialog.getByRole('checkbox', { name: 'Use my saved fitness data' }).check();
+  await dialog.getByRole('button', { name: 'My data access' }).click();
+  await expect(dialog.locator('.coach-chat-message.assistant p').last()).toContainText(/account.*personal data/i);
+  expect(state.generations).toBe(0);
+});
+
 test('reported current diet question asks consent, then returns the actual saved plan', async ({ page }) => {
   const { dialog, state } = await fixture(page);
   const question = "what's my current diet plan?";
@@ -231,7 +246,7 @@ test('keeps consent and chat controls usable on narrow mobile and desktop layout
   expect(composerBox.y + composerBox.height).toBeLessThanOrEqual(720);
 
   await disclosure.click();
-  await expect(dialog.locator('.coach-chat-access-details p')).toContainText(/health profile and emergency contact/i);
+  await expect(dialog.locator('.coach-chat-access-details p')).toContainText(/health and emergency contact/i);
   await expect(dialog.locator('.coach-chat-access-details p')).toContainText(/other accounts/i);
   await consent.check();
   await expect(dialog.locator('.coach-chat-access-state')).toHaveText('On');

@@ -1,0 +1,178 @@
+--- a/mobile/PoseTrackerNative.tsx
++++ b/mobile/PoseTrackerNative.tsx
+@@ -11,6 +11,7 @@
+ import Animated, { cancelAnimation, useAnimatedProps, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
+ import NativeTrackingCamera, { type NativeTrackingOptions } from './NativeTrackingCamera';
+ import { createPoseStartGate, frameStatus } from './poseStartGate';
++import { createCameraRecovery, cameraRecoveryMessage, type CameraRecoveryState } from '../shared/cameraRecovery';
+ import { createPoseSessionClock, POSE_ISSUES, type NativePoseSummary, type PoseIssueId } from '../shared/poseSessionSummary';
+ import { createLandmarkFilter } from '../shared/landmarkFilter';
+ import { POSE_HOLD_MS } from './poseOverlay';
+@@ -66,9 +67,7 @@
+   const [countdown, setCountdown] = useState<number | null>(null);
+   const [cameraReady, setCameraReady] = useState(false);
+   const [cameraGeneration, setCameraGeneration] = useState(0);
+-  const [cameraError, setCameraError] = useState('');
+-  const cameraRetries = useRef(0);
+-  const cameraRetryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
++  const [recoveryState, setRecoveryState] = useState<CameraRecoveryState>({phase:'idle',attempt:0});
+   const [snapshot, setSnapshot] = useState<EngineSnapshot | null>(null);
+   const [status, setStatus] = useState('Getting your camera ready…');
+   const skeletonPath = useSharedValue('');
+@@ -102,6 +101,18 @@
+   const systemPromptPending = useRef(false);
+   const patternId: PatternId = isPatternId(pattern) ? pattern : 'squat';
+   const landmarkFilter = useMemo(() => createLandmarkFilter(['horizontal_push', 'jumping_jack', 'high_knees', 'mountain_climber'].includes(patternId)), [patternId]);
++  const lifecycle = useRef({paused,permission,blurred:false});
++  lifecycle.current.paused=paused; lifecycle.current.permission=permission;
++  const nativeTicket = useRef(0);
++  const recovery = useRef<ReturnType<typeof createCameraRecovery> | null>(null);
++  if (!recovery.current) recovery.current=createCameraRecovery({
++    setTimer:setTimeout,clearTimer:clearTimeout,
++    eligible:()=>alive.current && AppState.currentState==='active' && !lifecycle.current.blurred && !lifecycle.current.paused && lifecycle.current.permission===true,
++    start:ticket=>{nativeTicket.current=ticket;setCameraReady(false);setCameraGeneration(value=>value+1);},
++    release:()=>{clock.current.pause();counter.current?.suspend();counting.current=false;visibilityGate.current.reset();if(alive.current)setCameraReady(false);},
++    changed:state=>{if(alive.current)setRecoveryState(state);},
++  });
++  const cameraTicket=nativeTicket.current;
+   const finishSession = () => {
+     safetyEnabled.current = false;
+     deactivateKeepAwake('pose-safety');
+@@ -150,12 +161,14 @@
+     alive.current = true;
+     systemPromptPending.current = true;
+     void Camera.requestCameraPermissionsAsync().then(result => {
+-      if (alive.current) setPermission(result.granted);
+-    }).catch(() => { if (alive.current) setPermission(false); }).finally(() => {
++      if (alive.current) {setPermission(result.granted);if(!result.granted)setRecoveryState({phase:'failed',attempt:0,reason:'permission_denied'});}
++    }).catch(() => { if (alive.current) {setPermission(false);setRecoveryState({phase:'failed',attempt:0,reason:'permission_denied'});} }).finally(() => {
+       systemPromptPending.current = false;
+     });
+     const listener = AppState.addEventListener('change', state => {
+       setAppActive(state === 'active');
++      if(state==='active')lifecycle.current.blurred=false;
++      recovery.current?.activity(state==='active' && !lifecycle.current.blurred);
+       if (state === 'background' && !systemPromptPending.current) {
+         clock.current.pause();
+         counter.current?.suspend();
+@@ -164,11 +177,14 @@
+         setCameraReady(false);
+       }
+     });
++    const blur = AppState.addEventListener('blur',()=>{lifecycle.current.blurred=true;recovery.current?.activity(false);setAppActive(false);});
++    const focus = AppState.addEventListener('focus',()=>{lifecycle.current.blurred=false;setAppActive(AppState.currentState==='active');recovery.current?.activity(AppState.currentState==='active');});
+     return () => {
+       alive.current = false;
+-      if (cameraRetryTimer.current) clearTimeout(cameraRetryTimer.current);
++      recovery.current?.stop();
+       void Speech.stop();
+       listener.remove();
++      blur.remove(); focus.remove();
+     };
+   }, []);
+ 
+@@ -177,6 +193,12 @@
+     setSnapshot(null);
+     setStatus('Waiting for you to enter the frame');
+     }, [patternId, override, name]);
++
++  useEffect(()=>{
++    if(permission && !paused){recovery.current?.activity(AppState.currentState==='active' && !lifecycle.current.blurred);recovery.current?.start();}
++    else recovery.current?.stop();
++    return ()=>recovery.current?.stop();
++  },[permission,paused,patternId,override,name]);
+ 
+   const suspendCounting = (preserveSafety = false) => {
+     if (!preserveSafety && safetyPhaseRef.current !== 'alarm') {
+@@ -205,19 +227,14 @@
+   };
+   const switchCamera = () => {
+     suspendCounting(true);
+-    if (cameraRetryTimer.current) clearTimeout(cameraRetryTimer.current);
+-    cameraRetries.current = 0;
+-    setCameraError('');
+     setCameraReady(false);
+     setStatus('Switching camera…');
+     setFacing(value => value === 'front' ? 'back' : 'front');
++    recovery.current?.start();
+   };
+   const togglePause = () => {
+     if (!paused) clock.current.pause();
+     suspendCounting();
+-    if (cameraRetryTimer.current) clearTimeout(cameraRetryTimer.current);
+-    cameraRetries.current = 0;
+-    setCameraError('');
+     setCameraReady(false);
+     setPaused(value => !value);
+     setStatus(paused ? 'Getting your camera ready…' : 'Tracking paused');
+@@ -231,12 +248,7 @@
+       setCameraReady(false);
+       const message = typeof detail.message === 'string' ? detail.message : 'Camera tracking unavailable.';
+       setStatus(message);
+-      const canRetry = detail.reason !== 'unsupported' && !message.includes('too warm') && cameraRetries.current < 3 && AppState.currentState === 'active';
+-      if (canRetry) {
+-        cameraRetries.current++;
+-        setCameraError('Reconnecting camera…');
+-        cameraRetryTimer.current = setTimeout(() => { cameraRetryTimer.current = null; if (alive.current) { setCameraError(''); setCameraGeneration(value => value + 1); } }, 1000);
+-      } else setCameraError(message);
++      recovery.current?.error(cameraTicket,detail.code==='timeout'?'timeout':message.includes('too warm')?'thermal':detail.reason==='unsupported'?'no_camera':'interrupted_too_often');
+       return;
+     }
+     if (detail.type !== 'frame') return;
+@@ -347,18 +359,18 @@
+       {permission === false && <Text style={styles.warning}>Allow camera access in your phone settings to start tracking.</Text>}
+ 
+         <View style={[styles.camera, { height: Math.max(160, height * (landscape ? 0.38 : 0.48)) }]} onLayout={event => setViewSize(event.nativeEvent.layout)}>
+-          {permission && appActive && !paused && <NativeTrackingCamera
++          {permission && appActive && !paused && recovery.current?.current(cameraTicket) && (recoveryState.phase==='acquiring' || recoveryState.phase==='recovering' || recoveryState.phase==='ready') && <NativeTrackingCamera
+             key={`${facing}:${cameraGeneration}`}
+             options={options}
+             facing={facing}
+             style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }]}
+-            emit={onFrame}
+-            ready={() => { setCameraReady(true); setCameraError(''); setStatus('Camera ready. Step back so your whole body is visible.'); }}
++            emit={detail=>{if(recovery.current?.current(cameraTicket))onFrame(detail);}}
++            ready={() => { if(!recovery.current?.current(cameraTicket))return;recovery.current.ready(cameraTicket);setCameraReady(true);setStatus('Camera ready. Step back so your whole body is visible.'); }}
+           />}
+           {(!cameraReady || paused) && <View style={styles.cameraPlaceholder}>
+-            {!paused && permission !== false && <ActivityIndicator color="#22c55e" />}
+-            <Text style={styles.text}>{paused ? 'Tracking paused' : permission === false ? 'Camera access needed' : cameraError || 'Preparing camera…'}</Text>
+-            {!!cameraError && cameraError !== 'Reconnecting camera…' && <Pressable accessibilityRole="button" style={styles.button} onPress={() => { cameraRetries.current = 0; setCameraError(''); setCameraGeneration(value => value + 1); }}><Text style={styles.buttonText}>Retry camera</Text></Pressable>}
++            {!paused && permission !== false && ['acquiring','recovering'].includes(recoveryState.phase) && <ActivityIndicator color="#22c55e" />}
++            <Text style={styles.text}>{paused ? 'Tracking paused' : permission === null ? 'Waiting for camera permission.' : permission === false ? 'Camera permission denied. Allow access in settings, then try again.' : cameraRecoveryMessage(recoveryState)}</Text>
++            {(recoveryState.phase==='failed' || permission===false) && <Pressable accessibilityRole="button" style={styles.button} onPress={() => {if(permission===false){void Camera.requestCameraPermissionsAsync().then(result=>{if(alive.current)setPermission(result.granted);});}else recovery.current?.start();}}><Text style={styles.buttonText}>Try again</Text></Pressable>}
+           </View>}
+           <Svg pointerEvents="none" width={viewSize.width} height={viewSize.height} style={StyleSheet.absoluteFill}>
+             <AnimatedPath animatedProps={animatedSkeleton} fill="none" stroke="#22e9c0" strokeWidth={3} />
+@@ -383,7 +395,7 @@
+         </View>
+ 
+       <View style={styles.stats}>
+-        {!cameraReady && permission && <Text style={styles.text}>Preparing camera…</Text>}
++        {!cameraReady && permission && <Text style={styles.text}>{cameraRecoveryMessage(recoveryState)}</Text>}
+         {snapshot?.faults.map((fault, index) => <Text key={`${fault.rule}-${index}`} style={styles.fault}>{fault.message}</Text>)}
+         {!snapshot?.faults.length && <Text style={styles.text}>{snapshot?.cue ?? 'Stand back so your whole body is in frame.'}</Text>}
+       </View>
+--- a/mobile/NativeTrackingCamera.tsx
++++ b/mobile/NativeTrackingCamera.tsx
+@@ -34,9 +34,9 @@
+     if(!valid())return;
+     emit(readiness ? {...detail,sessionId:options.sessionId,geometryGeneration:options.geometryGeneration} : {...detail,requestId:options.requestId,side:options.side});
+   };
+-  const fail=(reason:ReadinessReason='model-error',thermal=false)=>{
++  const fail=(reason:ReadinessReason='model-error',thermal=false,timeout=false)=>{
+     if(!valid())return;
+-    send({type:'error',reason,message:thermal?'Camera paused because the phone is too warm. Let it cool down or continue manually.':reason==='interrupted'?'Camera interrupted. Restart the camera or continue manually.':'Camera tracking unavailable. Restart the camera or continue manually.'});
++    send({type:'error',reason,...(timeout?{code:'timeout'}:{}),message:timeout?'Camera acquisition timed out. Restart the camera or continue manually.':thermal?'Camera paused because the phone is too warm. Let it cool down or continue manually.':reason==='interrupted'?'Camera interrupted. Restart the camera or continue manually.':'Camera tracking unavailable. Restart the camera or continue manually.'});
+     disposed=true;deactivate();
+   };
+   return {
+@@ -101,7 +101,7 @@
+     let active=true;
+     setModelPath(null);setFailed(false);
+     if(!nativePoseAvailable){callbacks.fail('unsupported');return ()=>callbacks.dispose();}
+-    const timeout=setTimeout(()=>{active=false;callbacks.fail();},readinessPolicy.initializationMs);
++    const timeout=setTimeout(()=>{active=false;callbacks.fail('model-error',false,true);},readinessPolicy.initializationMs);
+     startupTimer.current=timeout;
+     Asset.fromModule(require('./assets/pose_landmarker_lite.task')).downloadAsync().then(asset=>{
+       if(!active || liveIdentity.current!==identity)return;
