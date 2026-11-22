@@ -25,7 +25,7 @@ function nativeModule({available=true,react={},asset={downloadAsync:()=>Promise.
     'react-native':{AppState:{currentState:'active',addEventListener:(type,fn)=>{const entry={type,fn,removed:false};listeners.push(entry);return {remove:()=>entry.removed=true};}},Text:'Text',View:'View'},
     'react/jsx-runtime':{jsx:(type,props)=>({type,props})},'expo-mediapipe-pose':{PoseCameraView:'PoseCamera'},
     '../shared/repCounter':rep,'../shared/cameraReadiness':shared,'../shared/poseConfig':poseConfig,'../shared/poseSubject':poseSubject,'./assets/pose_landmarker_lite.task':'asset',
-  },globals);
+  },{setInterval,clearInterval,...globals});
 }
 const context={mode:'readiness',sessionId:'native-test',geometryGeneration:7,previewWidth:300,previewHeight:400,active:true};
 const points=()=>Array.from({length:33},()=>({x:.5,y:.5,z:1,visibility:.9,presence:.8}));
@@ -47,6 +47,14 @@ test('tracking tolerates isolated inference errors and fails after three consecu
   p.camera.frame(frame());
   p.camera.inferenceError();p.camera.inferenceError();assert.equal(p.stops,0);
   p.camera.inferenceError();assert.equal(p.stops,1);
+});
+
+test('tracking camera watchdog retries after frame delivery stalls, with its timeout starting after camera configuration',()=>{
+  const p=callbacks({mode:'tracking',requestId:'watchdog',kind:'curl',side:'left',active:true,fullLandmarks:true});
+  p.setTime(20000);p.camera.configured();p.camera.watchdog();assert.equal(p.stops,0);
+  p.setTime(25999);p.camera.watchdog();assert.equal(p.stops,0);
+  p.setTime(26001);p.camera.watchdog();assert.equal(p.stops,1);
+  assert.equal(p.emitted.at(-1).type,'error');
 });
 
 test('adapter emits all 33 compact upright/already-mirrored points, luminance, captured session and zero-person frames',()=>{
@@ -269,7 +277,7 @@ test('missing native module, model failure, background/blur and late model promi
 });
 test('native host executes bounded context/frame and fixed-vocabulary status validation',()=>{
   const host=compile('mobile/App.tsx',{
-    'expo-constants':{},'expo-camera':{},'expo-device':{},'expo-network':{},'expo-notifications':{setNotificationHandler(){}},react:{},'./googleSignInError':{},
+    'expo-constants':{},'expo-camera':{},'expo-device':{},'expo-network':{},'expo-secure-store':{},'expo-notifications':{setNotificationHandler(){}},react:{},'./googleSignInError':{},
     'react-native':{StyleSheet:{create:s=>s},Platform:{OS:'android'}},'@react-native-community/netinfo':{},
     'react-native-safe-area-context':{},'react-native-webview':{},'./connection.mjs':{},'./inactivity/nativeMonitor':{},
     './NativeTrackingCamera':{},'./PoseTrackerNative':{},'./FoodScannerCamera':{},'./performance-guard.mjs':{},'../shared/cameraReadiness':shared,

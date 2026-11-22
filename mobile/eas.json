@@ -8,6 +8,11 @@
       "env": { "EXPO_PUBLIC_PQ_LOCAL_DEV": "0" },
       "android": { "buildType": "apk" }
     },
+    "standalone": {
+      "distribution": "internal",
+      "env": { "EXPO_PUBLIC_PQ_LOCAL_DEV": "0" },
+      "android": { "gradleCommand": ":app:assembleStandalone", "buildType": "apk" }
+    },
     "development": {
       "developmentClient": true,
       "distribution": "internal",

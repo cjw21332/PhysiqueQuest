@@ -11,13 +11,13 @@ export function requiredLandmarks(pattern: string): number[] {
   if (['horizontal_push', 'core_isometric', 'core_flexion'].includes(pattern)) return [11, 12, 23, 24, 25, 26];
   return [11, 12, 23, 24, 25, 26, 27, 28];
 }
-export function frameStatus(pattern: string, points: readonly { x: number; y: number; visibility?: number }[]): FrameStatus {
+export function frameStatus(pattern: string, points: readonly { x: number; y: number; visibility?: number; presence?: number }[]): FrameStatus {
   const spec = isPatternId(pattern) ? patternSpec(pattern) : null;
   // One complete working limb is sufficient; unrelated cropped joints do not
   // prevent a bench press, seated curl, leg press or calf raise from starting.
   const credible = (index: number) => {
     const p = points[index];
-    return p && Number.isFinite(p.x) && Number.isFinite(p.y) && (p.visibility ?? 1) >= FRAME_GUIDANCE.visibility;
+    return p && Number.isFinite(p.x) && Number.isFinite(p.y) && (p.visibility ?? 1) >= FRAME_GUIDANCE.visibility && (p.presence ?? 1) >= FRAME_GUIDANCE.visibility;
   };
   const groups = spec ? [spec.joints.left, spec.joints.right] : [requiredLandmarks(pattern)];
   const visible = groups.filter(group => group.every(credible));

@@ -69,17 +69,26 @@ test('logout and account switches ignore late responses and errors', async () =>
   assert.equal(f.cache.get('profile').data, undefined);
 });
 
-test('expires old snapshots, rolls over daily missions, and ignores damaged storage', () => {
+test('retains personal and activity snapshots indefinitely and ignores damaged storage', () => {
   const f = fixture();
   f.cache.publish('activity', { dailyMissions: ['yesterday'] });
   f.cache.publish('coach', { days: [1] });
   f.advance(24 * 60 * 60 * 1000);
-  assert.equal(f.cache.get('activity').data, undefined);
+  assert.deepEqual(f.cache.get('activity').data, { dailyMissions: ['yesterday'] });
   assert.deepEqual(f.cache.get('coach').data, { days: [1] });
   f.advance(7 * 24 * 60 * 60 * 1000);
-  assert.equal(f.cache.get('coach').data, undefined);
+  assert.deepEqual(f.cache.get('coach').data, { days: [1] });
   for (const key of f.values.keys()) f.values.set(key, '{broken');
   assert.equal(createDeviceCache(f.options).get('coach').data, undefined);
+});
+
+test('explicit logout clears persisted account snapshots', () => {
+  const f = fixture();
+  f.cache.publish('profile', { name: 'Ana' });
+  assert.ok(f.values.size > 0);
+  f.cache.clear();
+  assert.equal(f.values.size, 0);
+  assert.equal(f.cache.get('profile').data, undefined);
 });
 
 test('storage failures and oversized records never break successful API responses', async () => {
@@ -124,13 +133,13 @@ test('rejects valid JSON with an invalid resource shape and does not reuse old s
   assert.equal(cache.get('profile').data.name, 'Ana');
 });
 
-test('expiry clears yesterday\'s failed refresh so today\'s quests can load', async () => {
+test('failed activity refresh preserves the last saved missions across day changes', async () => {
   const f = fixture();
   f.cache.publish('activity', { dailyMissions: ['old'] });
   await assert.rejects(f.cache.fetch('activity', async () => { throw Error('Offline'); }, true));
   f.advance(24 * 60 * 60 * 1000);
-  assert.equal(f.cache.get('activity').data, undefined);
-  assert.equal(f.cache.get('activity').error, '');
+  assert.deepEqual(f.cache.get('activity').data, { dailyMissions: ['old'] });
+  assert.equal(f.cache.get('activity').error, 'Offline');
   await f.cache.fetch('activity', async () => ({ dailyMissions: ['today'] }));
   assert.deepEqual(f.cache.get('activity').data.dailyMissions, ['today']);
 });

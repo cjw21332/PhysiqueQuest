@@ -2,7 +2,7 @@ export function createSession({ fetcher = (...args) => fetch(...args), storage =
   let user = null, base = null, generation = 0, pending = null, restoring = null, legacyToken = null, legacyBase = null;
   const listeners = new Set();
   const notify = () => { for (const listener of listeners) listener(); };
-  const current = (url) => (!url || url === base) && (!user?.offlineOnly || user.expiresAt > Date.now()) ? user : null;
+  const current = (url) => (!url || url === base) ? user : null;
   const clear = () => { user = null; base = null; legacyToken = null; legacyBase = null; generation++; notify(); };
   const accept = (body, url) => {
     if (body.refresh_token || typeof body.access_token !== 'string' || !body.user?.id || typeof body.expires_in !== 'number') throw Error('Invalid session response');
@@ -18,7 +18,16 @@ export function createSession({ fetcher = (...args) => fetch(...args), storage =
         method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json', ...headers(), ...(legacy ? { Authorization: `Bearer ${legacy}` } : {}) }, body: '{}', signal: AbortSignal.timeout(15_000),
       });
       if (revision !== generation) return null;
-      if (response.status === 401) { clear(); return null; }
+      if (response.status === 401) {
+        if (user?.offlineOnly) {
+          user = { ...user, sessionExpired: true };
+          notify();
+        } else if (user?.id && user.token) {
+          user = { ...user, token: '', offlineOnly: true, sessionExpired: true, expiresAt: Number.MAX_SAFE_INTEGER, sessionKey: ++generation };
+          notify();
+        } else clear();
+        return null;
+      }
       if (!response.ok) throw Error('Could not restore your session. Check your connection and retry.');
       const body = await response.json();
       if (revision !== generation) return null;
@@ -54,7 +63,7 @@ export function createSession({ fetcher = (...args) => fetch(...args), storage =
   const restoreOffline = (account,url) => {
     if (current(url) || !account?.id || !Number.isFinite(account.expiresAt) || account.expiresAt <= Date.now()) return current(url);
     base = url;
-    user = {id:account.id,name:'',email:'',token:'',offlineOnly:true,emailVerified:true,sessionKey:++generation,expiresAt:account.expiresAt};
+    user = {id:account.id,name:'',email:'',token:'',offlineOnly:true,sessionExpired:true,emailVerified:true,sessionKey:++generation,expiresAt:account.expiresAt};
     notify();
     return user;
   };

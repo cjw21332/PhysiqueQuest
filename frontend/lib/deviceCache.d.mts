@@ -1,3 +1,4 @@
+export const DEVICE_CACHE_STORAGE_KEY: string;
 export type CachedResource = 'profile' | 'settings' | 'nutrition' | 'activity' | 'coach' | 'notifications' | 'progress:weight' | 'progress:chest' | 'progress:waist' | 'progress:arms' | 'progress:benchPress' | 'workouts' | 'workout-summary' | 'exercise-library';
 export type CacheState<T = any> = { data: T | undefined; savedAt?: number; refreshing: boolean; error: string };
 export function createDeviceCache(options: {
@@ -10,6 +11,7 @@ export function createDeviceCache(options: {
   publish(key: CachedResource, data: unknown): void;
   invalidate(key: CachedResource): void;
   invalidateExternal(keys: string[]): void;
+  clear(): void;
   fetch<T>(key: CachedResource, load: () => Promise<T>, force?: boolean): Promise<T>;
   subscribe(listener: () => void): () => void;
 };

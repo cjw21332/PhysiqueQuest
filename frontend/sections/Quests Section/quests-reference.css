@@ -23,13 +23,14 @@
 .account-dark-theme .quests-reference .quest-v2-mission-main > strong { font-size: 13px; }
 .account-dark-theme .quests-reference .quest-v2-mission-icon { width: 34px; height: 34px; flex-basis: 34px; border-radius: 8px; }
 .account-dark-theme .quests-reference .quest-v2-mission-progress { max-width: 150px; }
-.account-dark-theme .quests-reference .quest-v2-badges { margin-top: 24px; padding-bottom: 84px; }
+.account-dark-theme .quests-reference .quest-v2-badges { margin-top: 24px; padding-bottom: 0; }
 .account-dark-theme .quests-reference .quest-v2-badge-grid { gap: 16px 8px; }
 .account-dark-theme .quests-reference .quest-v2-badge > span { width: 48px; height: 48px; }
 .account-dark-theme .quests-reference .quest-v2-badge > small { max-width: 86px; font-size: 11px; line-height: 1.35; }
 .quest-v2-badge { padding: 0; border: 0; background: transparent; font: inherit; cursor: pointer; }
 .quest-v2-badge:disabled { opacity: 1; cursor: default; }
 .quest-v2-badge:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 10px; }
+.account-dark-theme .quests-reference .quest-v2-scroll { padding-bottom: 12px; }
 .account-dark-theme .quests-reference .quest-badge-heading { align-items: center; gap: 8px; }
 .quest-badge-heading > div { display: flex; align-items: center; gap: 10px; }
 .quest-badge-heading > div > span { color: var(--muted); font-size: 12px; white-space: nowrap; }

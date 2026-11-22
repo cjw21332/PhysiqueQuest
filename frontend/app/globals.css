@@ -8672,7 +8672,7 @@ button, input, select, textarea { max-width: 100%; }
 .google-auth-button:hover:not(:disabled) { border-color: var(--muted); background: var(--soft); }
 .google-auth-button:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
 .google-auth-button:disabled { opacity: .65; cursor: wait; }
-.google-auth-mark { color: #4285f4; font-size: 18px; font-weight: 800; line-height: 1; }
+.google-auth-mark { width: 20px; height: 20px; object-fit: contain; background: transparent; }
 .google-auth-cancel { width: 100%; min-height: 46px; margin-top: 10px; border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--ink); font-size: 14px; font-weight: 600; }
 :root[data-theme="dark"] .auth-screen .password-requirements { background: var(--soft); border-color: var(--line); color: var(--muted); }
 :root[data-theme="dark"] .auth-screen .password-requirements .met { color: var(--green); }
@@ -10467,7 +10467,7 @@ body:has(.admin-reference-form) .coach-chat-launcher { display: none; }
 }
 
 /* Keep the full brand centered inside the launch artwork on short screens too. */
-.connection-online-notice { position: fixed; z-index: 200; top: calc(env(safe-area-inset-top, 0px) + 16px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; max-width: calc(100% - 32px); padding: 12px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 5px 20px #0003; font-size: 14px; font-weight: 600; }
+.connection-online-notice, .connection-offline-notice { position: fixed; z-index: 200; top: calc(env(safe-area-inset-top, 0px) + 16px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; max-width: calc(100% - 32px); padding: 12px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 5px 20px #0003; font-size: 14px; font-weight: 600; }
 .connection-online-notice svg { color: var(--green); flex: none; }
 :root[data-theme="dark"] .launch .launch-logo {
   display: grid;

@@ -191,7 +191,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
   useEffect(() => {
     counter.current = createExerciseCounter(patternId, { override, exerciseName: name });
     setSnapshot(null);
-    setStatus('Waiting for you to enter the frame');
+    setStatus('Show the joints used for this movement in the camera view.');
     }, [patternId, override, name]);
 
   useEffect(()=>{
@@ -365,7 +365,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
             facing={facing}
             style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }]}
             emit={detail=>{if(recovery.current?.current(cameraTicket))onFrame(detail);}}
-            ready={() => { if(!recovery.current?.current(cameraTicket))return;recovery.current.ready(cameraTicket);setCameraReady(true);setStatus('Camera ready. Step back so your whole body is visible.'); }}
+            ready={() => { if(!recovery.current?.current(cameraTicket))return;recovery.current.ready(cameraTicket);setCameraReady(true);setStatus('Camera ready. Frame your working joints clearly to begin.'); }}
           />}
           {(!cameraReady || paused) && <View style={styles.cameraPlaceholder}>
             {!paused && permission !== false && ['acquiring','recovering'].includes(recoveryState.phase) && <ActivityIndicator color="#22c55e" />}
@@ -397,7 +397,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       <View style={styles.stats}>
         {!cameraReady && permission && <Text style={styles.text}>{cameraRecoveryMessage(recoveryState)}</Text>}
         {snapshot?.faults.map((fault, index) => <Text key={`${fault.rule}-${index}`} style={styles.fault}>{fault.message}</Text>)}
-        {!snapshot?.faults.length && <Text style={styles.text}>{snapshot?.cue ?? 'Stand back so your whole body is in frame.'}</Text>}
+        {!snapshot?.faults.length && <Text style={styles.text}>{snapshot?.cue ?? 'Keep the joints used for this movement in view.'}</Text>}
       </View>
 
       <View style={styles.actions}>

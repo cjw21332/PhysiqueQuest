@@ -3,6 +3,7 @@
 import { useRef, useState, type Ref, type FormEvent } from 'react';
 import PasswordStrengthChecker, { validatePassword } from '../../components/PasswordStrengthChecker';
 import PolicyConsent from './PolicyConsent';
+import Image from 'next/image';
 
 type Props = {
   mode: 'register' | 'login';
@@ -152,7 +153,7 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
           <div className="google-auth-action">
             <div className="google-auth-divider"><span>or</span></div>
             <button type="button" className="google-auth-button" disabled={working} onClick={() => void handleGoogleAuth()}>
-              <span className="google-auth-mark" aria-hidden="true">G</span>
+              <Image className="google-auth-mark" src="/google-g.png" alt="" width={20} height={20}/>
               {googlePending ? 'Connecting to Google…' : `${register ? 'Register' : 'Log in'} with Google`}
             </button>
           </div>

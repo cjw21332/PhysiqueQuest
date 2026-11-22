@@ -183,18 +183,48 @@ export function useCameraStream(previewContext: CameraPreviewContext = { screen:
         setMessage('Camera delivery stopped. Enable the camera again or continue without it.');
       };
       const tracks = stream.getVideoTracks();
+      let frameWatchdog: ReturnType<typeof setInterval> | undefined;
+      let frameCallback: number | undefined;
+      let lastDeliveredFrameAt = performance.now();
+      let lastObservedVideoTime = videoRef.current?.currentTime ?? 0;
+      const video = videoRef.current;
+      const supportsVideoFrameCallback = video
+        ? typeof (video as unknown as { requestVideoFrameCallback?: unknown }).requestVideoFrameCallback === 'function'
+        : false;
+      const observeVideoFrame = () => {
+        lastDeliveredFrameAt = performance.now();
+        if (video && supportsVideoFrameCallback) frameCallback = video.requestVideoFrameCallback(observeVideoFrame);
+      };
       // Mute is commonly transient during exposure changes or camera switching.
       // Give delivery time to recover instead of stopping the stream immediately.
       let muteTimer: ReturnType<typeof setTimeout> | undefined;
       const muted = () => { clearTimeout(muteTimer); muteTimer = setTimeout(() => { if (tracks.some(track => track.muted)) lost(); }, 5000); };
       const unmuted = () => { clearTimeout(muteTimer); };
       tracks.forEach(track => { track.addEventListener('ended', lost); track.addEventListener('mute', muted); track.addEventListener('unmute', unmuted); });
-      trackCleanupRef.current = () => { clearTimeout(muteTimer); tracks.forEach(track => { track.removeEventListener('ended', lost); track.removeEventListener('mute', muted); track.removeEventListener('unmute', unmuted); }); };
+      trackCleanupRef.current = () => {
+        clearTimeout(muteTimer);
+        if (frameWatchdog) clearInterval(frameWatchdog);
+        if (video && frameCallback !== undefined) video.cancelVideoFrameCallback(frameCallback);
+        tracks.forEach(track => { track.removeEventListener('ended', lost); track.removeEventListener('mute', muted); track.removeEventListener('unmute', unmuted); });
+      };
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
       if (requestId !== startRequestRef.current) { stream.getTracks().forEach(track => track.stop()); return; }
+      if (context.screen === 'live-session' && video && (supportsVideoFrameCallback || Number.isFinite(video.currentTime))) {
+        if (supportsVideoFrameCallback) frameCallback = video.requestVideoFrameCallback(observeVideoFrame);
+        frameWatchdog = setInterval(() => {
+          if (supportsVideoFrameCallback) {
+            if (performance.now() - lastDeliveredFrameAt > 6000) lost();
+            return;
+          }
+          if (video.currentTime !== lastObservedVideoTime) {
+            lastObservedVideoTime = video.currentTime;
+            lastDeliveredFrameAt = performance.now();
+          } else if (performance.now() - lastDeliveredFrameAt > 6000) lost();
+        }, 1500);
+      }
       setFacing(requestedFacing);
       setStatus('on');
       if(autoRecover)recovery.current?.ready(ticket!);

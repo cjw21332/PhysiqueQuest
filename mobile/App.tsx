@@ -7,11 +7,13 @@ import type { GoogleSignin as GoogleSigninApi } from '@react-native-google-signi
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
 import * as Notifications from 'expo-notifications';
+import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, NativeModules, Platform, TurboModuleRegistry } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
+  Modal,
   Keyboard,
   Pressable,
   ScrollView,
@@ -162,7 +164,7 @@ function buildCameraScript(detail: {
   return `(function(){window.dispatchEvent(new CustomEvent('physiquequest-camera',{detail:${payload}}));})();true;`;
 }
 
-function AppContent() {
+function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView<object>>(null);
   const googleConfigured = useRef(false);
@@ -279,7 +281,7 @@ function AppContent() {
     probe.current = controller;
     // A free server can take nearly a minute to wake. Keep a single startup
     // request alive instead of repeatedly aborting it and reporting offline.
-    const timeout = setTimeout(() => controller.abort(), backendStatusRef.current === 'checking' ? 65000 : 7000);
+    const timeout = setTimeout(() => controller.abort(), backendStatusRef.current === 'online' ? 7000 : 65000);
     try {
       const ready = apiUrl && await backendIsReady(apiUrl, controller.signal);
       if (probe.current === controller) setBackendStatus(ready ? 'online' : 'offline');
@@ -288,26 +290,27 @@ function AppContent() {
 
   useEffect(() => {
     const checkIfActive = () => { if (AppState.currentState === 'active') void checkBackend(); };
-    const unsubscribe = NetInfo.addEventListener(state => {
-      const available = state.isConnected !== false;
+    const applyNetworkState = (available: boolean) => {
       networkAvailable.current = available;
+      webRef.current?.injectJavaScript(
+        `window.dispatchEvent(new CustomEvent('physiquequest:internet-status',{detail:${JSON.stringify(available ? 'online' : 'offline')}}));true;`
+      );
       if (!available) {
         probe.current?.abort();
         probe.current = null;
         setBackendStatus('offline');
       } else checkIfActive();
+    };
+    const unsubscribe = NetInfo.addEventListener(state => {
+      applyNetworkState(state.isConnected !== false && state.isInternetReachable !== false);
     });
-    const subscription = AppState.addEventListener('change', state => { if (state === 'active') void checkBackend(); });
-    let lastPeriodic = Date.now();
-    const interval = setInterval(() => {
-      const now = Date.now();
-      if (now - lastPeriodic >= (backendStatusRef.current === 'online' ? 30000 : 5000)) {
-        lastPeriodic = now;
-        checkIfActive();
-      }
-    }, 5000);
+    const subscription = AppState.addEventListener('change', state => {
+      if (state !== 'active') return;
+      void NetInfo.fetch().then(network => {
+        applyNetworkState(network.isConnected !== false && network.isInternetReachable !== false);
+      });
+    });
     return () => {
-      clearInterval(interval);
       unsubscribe();
       subscription.remove();
       probe.current?.abort();
@@ -543,6 +546,7 @@ function AppContent() {
               status?: string;
               image?: string;
             };
+            if (message.type === 'auth-success') { onAuthenticated(); return; }
             if (message.type === 'badge-export' && typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,100}$/.test(message.requestId) && typeof message.image === 'string' && message.image.startsWith('data:image/png;base64,') && typeof message.name === 'string' && (message.intent === 'save' || message.intent === 'share')) {
               const requestId = message.requestId, origin = new URL(loadedAddress).origin;
               const respond = (error?: string) => { const detail = JSON.stringify({ requestId, error }); webRef.current?.injectJavaScript(`if(location.origin===${JSON.stringify(origin)})window.dispatchEvent(new CustomEvent('physiquequest:badge-export',{detail:${detail}}));true;`); };
@@ -572,8 +576,8 @@ function AppContent() {
                   const GoogleSignin = googleSignin.current!;
                   if (!googleConfigured.current) throw new Error('Google sign-in is not configured in this build.');
                   if (Platform.OS === 'android') await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-                  // A cancelled registration must allow the account chooser to appear again.
-                  if (message.intent === 'register') await GoogleSignin.signOut().catch(() => undefined);
+                  // Always show the account chooser so the user can select a different Google account.
+                  await GoogleSignin.signOut().catch(() => undefined);
                   const result = await GoogleSignin.signIn();
                   if (result.type === 'cancelled') {
                     webRef.current?.injectJavaScript(buildGoogleAuthScript({ requestId, cancelled: true }));
@@ -843,14 +847,53 @@ function AppContent() {
 }
 
 export default function App() {
+  const [showUpdate, setShowUpdate] = useState(false);
+  const updateRequested = useRef(false);
+  const onAuthenticated = useCallback(() => {
+    if (updateRequested.current) return;
+    updateRequested.current = true;
+    void SecureStore.getItemAsync('pq_update_notice_1_5_0').then(value => {
+      if (value !== 'seen') setShowUpdate(true);
+    }).catch(() => setShowUpdate(true));
+  }, []);
+  const dismissUpdate = () => {
+    setShowUpdate(false);
+    void SecureStore.setItemAsync('pq_update_notice_1_5_0', 'seen').catch(() => {});
+  };
   return (
     <SafeAreaProvider>
-      <AppContent />
+      <AppContent onAuthenticated={onAuthenticated} />
+      <Modal visible={showUpdate} transparent animationType="fade" onRequestClose={dismissUpdate}>
+        <View style={styles.updateBackdrop} accessibilityViewIsModal>
+          <View style={styles.updateCard}>
+            <ScrollView contentContainerStyle={styles.updateContent}>
+              <Text style={styles.updateVersion}>VERSION 1.5.0</Text>
+              <Text accessibilityRole="header" style={styles.updateTitle}>What's new in this update?</Text>
+              <Text style={styles.updateItem}>• Open saved account data while the service reconnects, when an offline session is available.</Text>
+              <Text style={styles.updateItem}>• The app includes your familiar workout screens again.</Text>
+              <Text style={styles.updateItem}>• The camera can detect when its picture stops updating and try to recover.</Text>
+              <Text style={styles.updateItem}>• Exercise guidance focuses on keeping the joints used for your movement in view.</Text>
+              <Text style={styles.updateItem}>• The tracker checks how clearly a joint is detected before starting an exercise.</Text>
+              <Text style={styles.updateItem}>• Use the front or back camera to suit your workout setup.</Text>
+              <Pressable accessibilityRole="button" accessibilityLabel="Close update notice" onPress={dismissUpdate} style={styles.updateButton}>
+                <Text style={styles.buttonText}>Got it</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
+  updateBackdrop: { flex: 1, backgroundColor: '#000b', justifyContent: 'center', padding: 20 },
+  updateCard: { backgroundColor: '#161d27', borderRadius: 22, borderWidth: 1, borderColor: '#273444', maxHeight: '85%' },
+  updateContent: { padding: 24, gap: 14 },
+  updateVersion: { color: '#22c55e', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  updateTitle: { color: '#f8fafc', fontSize: 24, fontWeight: '700' },
+  updateItem: { color: '#cbd5e1', fontSize: 16, lineHeight: 24 },
+  updateButton: { minHeight: 50, marginTop: 8, borderRadius: 14, backgroundColor: '#22c55e', alignItems: 'center', justifyContent: 'center' },
   root: { flex: 1, backgroundColor: '#0b0f15' },
   webContainer: { flex: 1, backgroundColor: '#0b0f15' },
   nativeCameraPreview: {

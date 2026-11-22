@@ -24,6 +24,7 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
   now:()=>number=()=>performance.now()) {
   let disposed=false, lastFrame=-1, lastAt=-Infinity, geometry='', configured=false;
   let inferenceErrors = 0;
+  let lastFrameAt = now();
   const subject = createPoseSubjectSelector();
   const readiness=options.mode==='readiness';
   const requestedFps = options.mode === 'readiness' ? TRACKING_FRAME_RATES.normal : (options.targetFps ?? TRACKING_FRAME_RATES.normal);
@@ -41,11 +42,15 @@ export function createNativeCameraCallbacks(options: NativeTrackingOptions | Nat
   };
   return {
     inferenceError() { if (readiness || ++inferenceErrors >= 3) fail(); },
+    watchdog() {
+      if (configured && valid() && now() - lastFrameAt > 6000) fail('interrupted');
+    },
     dispose(){disposed=true;}, fail,
     lifecycle(){fail('interrupted');},
-    configured(){if(!valid())return false;if(configured){if(readiness)fail('interrupted');return false;}configured=true;send({type:'reset',reason:'pending'});return true;},
+    configured(){if(!valid())return false;if(configured){if(readiness)fail('interrupted');return false;}configured=true;lastFrameAt=now();send({type:'reset',reason:'pending'});return true;},
     frame(frame:PoseFrame) {
       if(!valid())return;
+      lastFrameAt=now();
       inferenceErrors = 0;
       const data=frame.additionalData, at=now();
       if(data.thermalState==='critical'){fail('interrupted',true);return;}
@@ -113,6 +118,10 @@ export default function NativeTrackingCamera({ options, facing, style, emit, rea
     if(AppState.currentState!=='active')callbacks.lifecycle();
     return ()=>{active=false;clearTimeout(timeout);if(startupTimer.current===timeout)startupTimer.current=null;callbacks.dispose();change.remove();blur.remove();};
   },[callbacks,identity]);
+  useEffect(()=>{
+    const timer=setInterval(()=>callbacks.watchdog(),2000);
+    return()=>clearInterval(timer);
+  },[callbacks]);
   const isActive=options.active && !failed;
   if (!PoseCamera || !modelPath || failed) return <View style={style}><Text>{failed ? 'Camera tracking unavailable. Continue manually.' : 'Loading camera tracking…'}</Text></View>;
   const props: PoseCameraViewProps = {

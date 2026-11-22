@@ -1,5 +1,6 @@
 {
   "extends": "expo/tsconfig.base",
+  "exclude": ["shell-export", "android/app/build", "node_modules"],
   "compilerOptions": {
     "strict": true
   }

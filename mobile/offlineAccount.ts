@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import { OFFLINE_GRANT_LIFETIME_MS, validOfflineGrant } from './offlineGrant.mjs';
+import { validOfflineGrant } from './offlineGrant.mjs';
 
 const key = 'pq.offline.account.v1';
 type Grant = { id:string; scope:string; issuedAt:number; expiresAt:number };
@@ -18,13 +18,23 @@ export function handleOfflineAccount(action:string, origin:string, base:string, 
       const user = await response.json();
       if (typeof user.id !== 'string' || !/^[a-f0-9]{24}$/i.test(user.id) || !(user.emailVerified || user.legacyEmailAccess)) return null;
       const issuedAt = Date.now();
-      const grant = {id:user.id,scope,issuedAt,expiresAt:issuedAt+OFFLINE_GRANT_LIFETIME_MS};
+      // This device-bound identity preserves offline access indefinitely. It
+      // does not carry a server credential; online actions still reauthenticate.
+      const grant = {id:user.id,scope,issuedAt,expiresAt:0};
       await SecureStore.setItemAsync(key,JSON.stringify(grant),{keychainAccessible:SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY});
       return grant;
     }
     const raw = await SecureStore.getItemAsync(key);
     if (!raw) return null;
-    try { return validOfflineGrant(JSON.parse(raw), scope); }
+    try {
+      const grant = validOfflineGrant(JSON.parse(raw), scope);
+      if (!grant) return null;
+      const indefinite = { ...grant, expiresAt: 0 };
+      if (grant.expiresAt !== 0) {
+        await SecureStore.setItemAsync(key,JSON.stringify(indefinite),{keychainAccessible:SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY});
+      }
+      return { ...indefinite, expiresAt: Number.MAX_SAFE_INTEGER };
+    }
     catch { return null; }
   };
   const task = queue.then(run);

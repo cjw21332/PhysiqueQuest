@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { usePathname } from 'next/navigation';
 import ForgotPasswordFlow from '../sections/Forgot Password/ForgotPasswordFlow';
-import { api, deviceCache, getApiBaseUrl } from '../lib/api';
+import { deviceCache, getApiBaseUrl } from '../lib/api';
 import { nativeOfflineAccount } from '../lib/nativeOfflineAccount';
 import OutcomeDialog from './OutcomeDialog';
 import { Icon } from '../sections/Home/icons';
@@ -17,44 +17,117 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   const [error, setError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [connectionLost, setConnectionLost] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [serviceReconnecting, setServiceReconnecting] = useState(false);
   const [retrying, setRetrying] = useState(false);
+  const [onlinePopup, setOnlinePopup] = useState(false);
   const [retryFailed, setRetryFailed] = useState(false);
   const [onlineNotice, setOnlineNotice] = useState(false);
   const dismissedOffline = useRef(false);
   const wasOffline = useRef(false);
+  const onlineCheckInFlight = useRef(false);
   const onlineTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (onlineTimer.current) clearTimeout(onlineTimer.current); }, []);
+  const onlinePopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (onlineTimer.current) clearTimeout(onlineTimer.current);
+    if (onlinePopupTimer.current) clearTimeout(onlinePopupTimer.current);
+  }, []);
   useEffect(() => {
-    if (!user) { setConnectionLost(false); dismissedOffline.current = false; return; }
+    if (!user) {
+      setConnectionLost(false); setSessionExpired(false); setServiceReconnecting(false); setOnlinePopup(false);
+      dismissedOffline.current = false; wasOffline.current = false;
+      try { sessionStorage.removeItem('pq-was-offline'); sessionStorage.removeItem('pq-offline-dismissed'); } catch { /* Storage may be unavailable. */ }
+      return;
+    }
+    setSessionExpired(Boolean(user.sessionExpired));
     try { dismissedOffline.current = sessionStorage.getItem('pq-offline-dismissed') === '1'; wasOffline.current = sessionStorage.getItem('pq-was-offline') === '1'; } catch { /* Storage may be unavailable. */ }
-    const lost = () => { if (onlineTimer.current) clearTimeout(onlineTimer.current); setOnlineNotice(false); wasOffline.current = true; try { sessionStorage.setItem('pq-was-offline', '1'); } catch {} if (!dismissedOffline.current) setConnectionLost(true); };
-    const restored = () => {
+    const lost = (forceOffline = false) => {
+      if (!forceOffline && navigator.onLine) { setServiceReconnecting(true); return; }
+      if (onlineTimer.current) clearTimeout(onlineTimer.current);
+      setOnlineNotice(false); setServiceReconnecting(false); wasOffline.current = true;
+      try { sessionStorage.setItem('pq-was-offline', '1'); } catch {}
+      if (!dismissedOffline.current) setConnectionLost(true);
+    };
+    const internetRestored = () => {
       if (wasOffline.current) {
         setOnlineNotice(true);
+        setOnlinePopup(true);
+        if (onlinePopupTimer.current) clearTimeout(onlinePopupTimer.current);
+        onlinePopupTimer.current = setTimeout(() => setOnlinePopup(false), 5500);
         if (onlineTimer.current) clearTimeout(onlineTimer.current);
         onlineTimer.current = setTimeout(() => setOnlineNotice(false), 4000);
       }
       wasOffline.current = false; dismissedOffline.current = false;
       try { sessionStorage.removeItem('pq-was-offline'); sessionStorage.removeItem('pq-offline-dismissed'); } catch {}
-      setConnectionLost(false); setRetryFailed(false);
+      setConnectionLost(false); setRetryFailed(false); setServiceReconnecting(true);
     };
-    const backendStatus = (event: Event) => { const status = (event as CustomEvent).detail; if (status === 'offline') lost(); else if (status === 'online') restored(); };
-    const online = () => {
-      if (session.current()?.offlineOnly) return;
-      void api.getProfile(true).then(() => window.dispatchEvent(new Event('physiquequest:connection-restored'))).catch(() => {});
+    const restored = () => { setServiceReconnecting(false); setConnectionLost(false); setRetryFailed(false); };
+    const backendStatus = (event: Event) => {
+      const status = (event as CustomEvent).detail;
+      if (status === 'offline') { if (navigator.onLine) { setServiceReconnecting(true); setConnectionLost(false); } else lost(true); }
+      else if (status === 'online') { restored(); window.dispatchEvent(new Event('physiquequest:connection-restored')); }
     };
-    if (!navigator.onLine) lost();
-    window.addEventListener('offline', lost);
-    window.addEventListener('online', online);
-    window.addEventListener('physiquequest:connection-lost', lost);
+    const online = (fromNative = false) => {
+      if (!fromNative && !navigator.onLine) return;
+      if (onlineCheckInFlight.current) return;
+      onlineCheckInFlight.current = true;
+      // The operating system has reported internet connectivity. Tell the user
+      // immediately; the hosted service may still need time to wake up.
+      if (wasOffline.current) internetRestored();
+      void (async () => {
+        try {
+          const base = getApiBaseUrl();
+          const readyUrl = base.replace(/\/api\/?$/i, '/ready');
+          const response = await fetch(readyUrl, { credentials: 'omit', cache: 'no-store', headers: { 'Cache-Control': 'no-cache' }, signal: AbortSignal.timeout(10_000) });
+          if (!response.ok || (await response.json())?.status !== 'ready') throw new Error('Service is still waking up.');
+          const active = session.current();
+          if (active && !active.offlineOnly) {
+            const restored = await session.refresh(base);
+            setSessionExpired(!restored);
+          } else if (active?.offlineOnly) {
+            const restored = await session.refresh(base);
+            setSessionExpired(!restored);
+          }
+          setServiceReconnecting(false);
+          setConnectionLost(false);
+          window.dispatchEvent(new Event('physiquequest:connection-restored'));
+        } catch {
+          // Internet is back even if a free hosted service is still waking up.
+          setServiceReconnecting(true);
+        } finally {
+          onlineCheckInFlight.current = false;
+        }
+      })();
+    };
+    const offline = () => lost(true);
+    const apiConnectionLost = () => lost();
+    const browserOnline = () => online();
+    const onFocus = () => online();
+    const internetStatus = (event: Event) => {
+      const status = (event as CustomEvent).detail;
+      if (status === 'offline') lost(true);
+      else if (status === 'online') online(true);
+    };
+    window.addEventListener('offline', offline);
+    window.addEventListener('online', browserOnline);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('physiquequest:connection-lost', apiConnectionLost);
     window.addEventListener('physiquequest:connection-restored', restored);
     window.addEventListener('physiquequest:backend-status', backendStatus);
-    return () => { window.removeEventListener('offline', lost); window.removeEventListener('online', online); window.removeEventListener('physiquequest:connection-lost', lost); window.removeEventListener('physiquequest:connection-restored', restored); window.removeEventListener('physiquequest:backend-status', backendStatus); };
+    window.addEventListener('physiquequest:internet-status', internetStatus);
+    if (!navigator.onLine) lost(true);
+    else online();
+    return () => { window.removeEventListener('offline', offline); window.removeEventListener('online', browserOnline); window.removeEventListener('focus', onFocus); window.removeEventListener('physiquequest:connection-lost', apiConnectionLost); window.removeEventListener('physiquequest:connection-restored', restored); window.removeEventListener('physiquequest:backend-status', backendStatus); window.removeEventListener('physiquequest:internet-status', internetStatus); };
   }, [user]);
   const retryConnection = async () => {
     if (retrying) return;
     setRetrying(true); setRetryFailed(false);
-    try { await api.getProfile(true); setConnectionLost(false); dismissedOffline.current = false; }
+    try {
+      const restored = await session.refresh(getApiBaseUrl());
+      if (!restored) throw new Error('Please log in again to restore your online session.');
+      setConnectionLost(false); setSessionExpired(false); dismissedOffline.current = false;
+      window.dispatchEvent(new Event('physiquequest:connection-restored'));
+    }
     catch { setRetryFailed(true); }
     finally { setRetrying(false); }
   };
@@ -62,16 +135,29 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   useEffect(() => {
     let active = true;
     const base = getApiBaseUrl();
-    void session.restore(base).then(restored => {
-      if (!active) return;
-      if (!restored) void nativeOfflineAccount('forget-offline-account');
-      setReady(true);
-    }).catch(async () => {
+    const nativeApp = typeof window !== 'undefined' && Boolean(window.ReactNativeWebView);
+    // Do not hold the mobile shell behind a network refresh. A device-bound
+    // offline grant restores cached data; otherwise show login immediately.
+    if (nativeApp) setReady(true);
+    void (async () => {
+      // Open an existing, device-bound offline session before waiting for a
+      // potentially sleeping server. A server rejection still ends it.
       const grant = await nativeOfflineAccount('restore-offline-account');
       if (!active) return;
-      if (grant && session.restoreOffline(grant,base)) setReady(true);
-      else setError('Could not restore your session. Check your connection and retry.');
-    });
+      const offline = grant && session.restoreOffline(grant, base);
+      if (offline) setReady(true);
+      try {
+        const restored = await session.restore(base);
+        if (!active) return;
+        if (!restored && offline) setSessionExpired(true);
+        if (!restored && !offline) void nativeOfflineAccount('forget-offline-account');
+        setReady(true);
+      } catch {
+        if (!active) return;
+        if (offline) setSessionExpired(true);
+        else setError('Could not restore your session. Check your connection and retry.');
+      }
+    })();
     const onStorage = (event: StorageEvent) => {
       if (event.key === 'physiquequest-logout' || event.key === 'physiquequest-runtime-api-url') { clearAuthSession(false); window.location.assign('/'); }
       if (event.key === DATA_CHANGE_KEY && event.newValue) {
@@ -87,27 +173,13 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     return () => { active = false; window.removeEventListener('storage', onStorage); };
   }, [attempt]);
   useEffect(() => {
-    if (!user?.id) return;
-    if (user.token) {
-      void nativeOfflineAccount('remember-offline-account',user.token).then(grant => {
-        if (grant && session.current(getApiBaseUrl())?.id === grant.id) navigator.serviceWorker?.ready.then(reg => reg.active?.postMessage({type:'PREPARE_OFFLINE_APP'})).catch(()=>{});
-      });
-      return;
-    }
-    if (!user.offlineOnly) return;
-    const retry = () => {
-      if (navigator.onLine && document.visibilityState === 'visible') void session.refresh(getApiBaseUrl()).then(next => {
-        if (!next) clearAuthSession();
-        else window.dispatchEvent(new Event('physiquequest:connection-restored'));
-      }).catch(()=>{});
-    };
-    const expire = window.setTimeout(() => { if (session.current()?.offlineOnly || !session.current()) clearAuthSession(); },Math.max(0,user.expiresAt-Date.now()));
-    const timer = window.setInterval(retry,15000);
-    window.addEventListener('online',retry);
-    window.addEventListener('focus',retry);
-    return () => { clearInterval(timer); clearTimeout(expire); window.removeEventListener('online',retry); window.removeEventListener('focus',retry); };
-  },[user]);
+    if (!user?.id || !user.token) return;
+    void nativeOfflineAccount('remember-offline-account',user.token).then(grant => {
+      if (grant && session.current(getApiBaseUrl())?.id === grant.id) navigator.serviceWorker?.ready.then(reg => reg.active?.postMessage({type:'PREPARE_OFFLINE_APP'})).catch(()=>{});
+    });
+  }, [user]);
   if (!ready) return error ? <div role="alert">{error}<button type="button" onClick={() => { setError(''); setAttempt(value => value + 1); }}>Retry</button></div> : null;
   const continueOffline = () => { dismissedOffline.current = true; try { sessionStorage.setItem('pq-offline-dismissed', '1'); } catch {} setConnectionLost(false); };
-  return <>{children}{user?.emailVerified === false && dismissedUser !== user.id && pathname !== '/verify-email' && <ForgotPasswordFlow mode="verify-email" accountEmail={user.email} onClose={() => setDismissedUser(user.id)} onSuccess={() => { setDismissedUser(user.id); void session.refresh(getApiBaseUrl()).catch(() => {}); }} />}{connectionLost && user && !pathname?.startsWith('/coach/session') && <OutcomeDialog kind="info" title="You're offline" message={`${retryFailed ? 'Still unable to connect. ' : 'PhysiqueQuest is unavailable right now. '}Continue offline to use saved content and log manual workouts. Completed sessions sync when you reconnect. Food logging requires a connection.`} actionLabel="Continue offline" onAction={continueOffline} secondaryLabel={retrying ? 'Checking…' : 'Try again'} onSecondary={() => { if (!retrying) void retryConnection(); }} onClose={continueOffline}/>} {onlineNotice && user && <div className="connection-online-notice" role="status"><Icon name="check" size={18}/><span>You&apos;re back online</span></div>}</>;
+  const nativeApp = typeof window !== 'undefined' && Boolean(window.ReactNativeWebView);
+  return <>{children}{user?.emailVerified === false && dismissedUser !== user.id && pathname !== '/verify-email' && <ForgotPasswordFlow mode="verify-email" accountEmail={user.email} onClose={() => { setDismissedUser(user.id); }} onSuccess={() => { setDismissedUser(user.id); void session.refresh(getApiBaseUrl()).catch(() => {}); }} />}{sessionExpired && user && nativeApp && <div className="connection-offline-notice" role="status">Session expired — offline mode. Saved content and on-device workouts remain available. Log in again to use online features and sync.</div>}{connectionLost && user && !sessionExpired && nativeApp && !pathname?.startsWith('/coach/session') && <div className="connection-offline-notice" role="status">Offline — saved data may be out of date.</div>}{serviceReconnecting && user && nativeApp && <div className="connection-offline-notice" role="status">Internet restored — PhysiqueQuest is reconnecting. Saved data remains available.</div>}{connectionLost && user && !nativeApp && !pathname?.startsWith('/coach/session') && <OutcomeDialog kind="info" title="You're offline" message={`${retryFailed ? 'Still unable to connect. ' : 'PhysiqueQuest is unavailable right now. '}Continue offline to use saved content and log manual workouts. Completed sessions sync when you reconnect. Food logging requires a connection.`} actionLabel="Continue offline" onAction={continueOffline} secondaryLabel={retrying ? 'Checking…' : 'Try again'} onSecondary={() => { if (!retrying) void retryConnection(); }} onClose={continueOffline}/>} {onlinePopup && user && <OutcomeDialog kind="info" title="You’re back online" message={sessionExpired ? 'The internet is available again, but your session has expired. Your saved data remains on this device. Log in again to use online features and sync.' : serviceReconnecting ? 'Your internet is back. PhysiqueQuest is reconnecting; your saved data remains available while the service wakes up.' : 'Your connection is restored. Saved workouts can now sync and online features are available.'} actionLabel={sessionExpired ? 'Continue offline' : 'Continue'} onAction={() => setOnlinePopup(false)} onClose={() => setOnlinePopup(false)}/>} {onlineNotice && user && <div className="connection-online-notice" role="status"><Icon name="check" size={18}/><span>You&apos;re back online</span></div>}</>;
 }

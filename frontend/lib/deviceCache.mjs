@@ -1,8 +1,6 @@
-const STORAGE_KEY = 'physiquequest-device-cache-v1';
+export const DEVICE_CACHE_STORAGE_KEY = 'physiquequest-device-cache-v1';
 const RESOURCES = ['profile', 'settings', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:chest', 'progress:waist', 'progress:arms', 'progress:benchPress', 'workouts', 'workout-summary', 'exercise-library'];
-const MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const MAX_BYTES = 512_000;
-const day = time => new Date(time).toLocaleDateString('en-CA');
 
 // One bounded snapshot for the last account. Server responses remain authoritative.
 export function createDeviceCache({ context, storage, now = Date.now, validate = () => true }) {
@@ -14,10 +12,9 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
     const current = context();
     return value && current?.scope === value.scope && current.session === value.session;
   };
-  const usable = (key, entry) => entry && typeof entry.savedAt === 'number'
-    && now() >= entry.savedAt && now() - entry.savedAt < MAX_AGE
-    && (key !== 'activity' || day(entry.savedAt) === day(now()))
-    && entry.data !== null && typeof entry.data === 'object' && validate(key, entry.data);
+  const usable = (_key, entry) => entry && typeof entry.savedAt === 'number'
+    && now() >= entry.savedAt
+    && entry.data !== null && typeof entry.data === 'object' && validate(_key, entry.data);
   const activate = () => {
     const current = context();
     if (current?.scope === active?.scope && current?.session === active?.session) return current;
@@ -25,7 +22,7 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
     entries = {};
     if (current) {
       try {
-        const raw = storage()?.getItem(STORAGE_KEY) ?? 'null';
+        const raw = storage()?.getItem(DEVICE_CACHE_STORAGE_KEY) ?? 'null';
         const snapshot = raw.length * 2 <= MAX_BYTES * RESOURCES.length + 4096 ? JSON.parse(raw) : null;
         if (snapshot?.version === 1 && snapshot.scope === current.scope) {
           for (const key of RESOURCES) {
@@ -46,8 +43,8 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
           saved[key] = { data: entry.data, savedAt: entry.savedAt };
         }
       }
-      if (Object.keys(saved).length) storage()?.setItem(STORAGE_KEY, JSON.stringify({ version: 1, scope: active.scope, entries: saved }));
-      else storage()?.removeItem(STORAGE_KEY);
+      if (Object.keys(saved).length) storage()?.setItem(DEVICE_CACHE_STORAGE_KEY, JSON.stringify({ version: 1, scope: active.scope, entries: saved }));
+      else storage()?.removeItem(DEVICE_CACHE_STORAGE_KEY);
     } catch { /* Quota or storage restrictions must not turn a successful save into an error. */ }
   };
   const get = key => {
@@ -83,6 +80,12 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
     // The other tab already wrote its snapshot; do not overwrite it with ours.
     if (changed) notify();
   };
+  const clear = () => {
+    active = null;
+    entries = {};
+    try { storage()?.removeItem(DEVICE_CACHE_STORAGE_KEY); } catch { /* Logout must complete even when storage is unavailable. */ }
+    notify();
+  };
   const fetch = (key, load, force = false) => {
     if (!RESOURCES.includes(key)) return Promise.reject(new Error('Unknown cached resource'));
     const owner = activate();
@@ -114,5 +117,5 @@ export function createDeviceCache({ context, storage, now = Date.now, validate =
     notify();
     return request;
   };
-  return { get, publish, invalidate, invalidateExternal, fetch, subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); } };
+  return { get, publish, invalidate, invalidateExternal, fetch, clear, subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); } };
 }

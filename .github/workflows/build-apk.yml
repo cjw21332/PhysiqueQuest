@@ -1,0 +1,100 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-android-apk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build PhysiqueQuest 1.5.0 APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Set up project-pinned Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build packages
+        run: sdkmanager "platforms;android-37" "build-tools;36.0.0" "ndk;27.1.12297006" "cmake;3.22.1"
+
+      - name: Verify release version
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const app = JSON.parse(fs.readFileSync('mobile/app.json', 'utf8')).expo;
+          const pkg = JSON.parse(fs.readFileSync('mobile/package.json', 'utf8'));
+          const gradle = fs.readFileSync('mobile/android/app/build.gradle', 'utf8');
+          if (app.version !== '1.5.0' || app.android.versionCode !== 9 || pkg.version !== '1.5.0' ||
+              !/versionCode\s+9\b/.test(gradle) || !/versionName\s+["']1\.5\.0["']/.test(gradle)) {
+            throw new Error('Expected app version 1.5.0 and Android versionCode 9 in all project manifests.');
+          }
+          NODE
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Build bundled mobile frontend
+        run: npm run build:mobile-shell --workspace frontend
+
+      - name: Refresh exported mobile shell
+        shell: bash
+        run: |
+          test -f frontend/.next-mobile-export/index.html
+          test -f frontend/.next-mobile-export/home.html
+          test -f frontend/.next-mobile-export/coach.html
+          test -f frontend/.next-mobile-export/scan.html
+          rm -rf mobile/shell-export
+          mkdir -p mobile/shell-export
+          cp -a frontend/.next-mobile-export/. mobile/shell-export/
+
+      - name: Build signed sideloadable APK
+        working-directory: mobile/android
+        run: bash ./gradlew --no-daemon :app:assembleStandalone
+
+      - name: Verify APK metadata and signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=mobile/android/app/build/outputs/apk/standalone/app-standalone.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.physiquequest.app' versionCode='9' versionName='1.5.0'"
+          unzip -q "$APK" 'assets/physiquequest-shell/*' -d "$RUNNER_TEMP/apk-check"
+          diff -qr frontend/.next-mobile-export "$RUNNER_TEMP/apk-check/assets/physiquequest-shell"
+          unzip -p "$APK" assets/index.android.bundle > "$RUNNER_TEMP/index.android.bundle"
+          test -s "$RUNNER_TEMP/index.android.bundle"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK"
+          sha256sum "$APK"
+          stat -c 'APK size: %s bytes' "$APK"
+          mkdir -p artifacts/android
+          cp "$APK" artifacts/android/PhysiqueQuest-v1.5.0.apk
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging artifacts/android/PhysiqueQuest-v1.5.0.apk | grep -F "package: name='com.physiquequest.app' versionCode='9' versionName='1.5.0'"
+          sha256sum artifacts/android/PhysiqueQuest-v1.5.0.apk
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhysiqueQuest-v1.5.0-APK
+          path: artifacts/android/PhysiqueQuest-v1.5.0.apk
+          if-no-files-found: error
+          retention-days: 30

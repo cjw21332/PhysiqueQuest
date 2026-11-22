@@ -1,4 +1,5 @@
 import { nativeOfflineAccount } from './nativeOfflineAccount';
+import { DEVICE_CACHE_STORAGE_KEY } from './deviceCache.mjs';
 export const AUTH_STORAGE_KEY = 'physiquequest-auth';
 export const PROFILE_STORAGE_KEY = 'physiquequest-profile';
 
@@ -9,6 +10,7 @@ export function clearAuthSession(broadcast = true): void {
   try {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     localStorage.removeItem(PROFILE_STORAGE_KEY);
+    localStorage.removeItem(DEVICE_CACHE_STORAGE_KEY);
     if (broadcast) localStorage.setItem('physiquequest-logout', String(Date.now()));
   } catch { /* Session clearing must work when storage is unavailable. */ }
   window.dispatchEvent(new Event('physiquequest:session-ended'));
