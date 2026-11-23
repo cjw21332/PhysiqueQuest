@@ -280,8 +280,8 @@ test('native host executes bounded context/frame and fixed-vocabulary status val
     'expo-constants':{},'expo-camera':{},'expo-device':{},'expo-network':{},'expo-secure-store':{},'expo-notifications':{setNotificationHandler(){}},react:{},'./googleSignInError':{},
     'react-native':{StyleSheet:{create:s=>s},Platform:{OS:'android'}},'@react-native-community/netinfo':{},
     'react-native-safe-area-context':{},'react-native-webview':{},'./connection.mjs':{},'./inactivity/nativeMonitor':{},
-    './NativeTrackingCamera':{},'./PoseTrackerNative':{},'./FoodScannerCamera':{},'./performance-guard.mjs':{},'../shared/cameraReadiness':shared,
-    'react/jsx-runtime':{}, './offlineAccount':{},
+    './BrandIntro':{},'./NativeTrackingCamera':{},'./PoseTrackerNative':{},'./FoodScannerCamera':{},'./performance-guard.mjs':{},'../shared/cameraReadiness':shared,
+    'react/jsx-runtime':{}, './offlineAccount':{}, 'expo-web-browser':{},
   });
   assert.equal(host.isNativeCameraContext({screen:'camera-check',readiness:context}),true);
   for(const raw of ['{broken','null','[]',JSON.stringify({type:3}),JSON.stringify({type:'camera-start',frame:{x:0,y:0,width:0,height:10},facing:'front',previewContext:{screen:'camera-check',readiness:context}}),JSON.stringify({type:'camera-update-overlay',previewContext:{screen:'invalid'}})]) {

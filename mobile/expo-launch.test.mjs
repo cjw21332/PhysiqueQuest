@@ -36,6 +36,7 @@ test('Expo Go never probes or imports the custom pose module during app startup'
     if (name === 'react-native') return {};
     if (name.endsWith('/repCounter')) return { jointIndices() {} };
     if (name.endsWith('/cameraReadiness')) return sharedModule.exports;
+    if (name.endsWith('/poseConfig') || name.endsWith('/poseSubject')) return {};
     return require(name);
   }, module, module.exports);
   assert.equal(module.exports.nativePoseAvailable, false);

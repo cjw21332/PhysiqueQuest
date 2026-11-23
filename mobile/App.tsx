@@ -1,4 +1,5 @@
 import { handleOfflineAccount } from './offlineAccount';
+import BrandIntro from './BrandIntro';
 import Constants from 'expo-constants';
 import { googleSignInError } from './googleSignInError';
 import FoodScannerCamera, { type FoodCameraRequest } from './FoodScannerCamera';
@@ -872,6 +873,8 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
 }
 
 export default function App() {
+  const [intro, setIntro] = useState(true);
+  const finishIntro = useCallback(() => setIntro(false), []);
   const [showUpdate, setShowUpdate] = useState(false);
   const updateRequested = useRef(false);
   const onAuthenticated = useCallback(() => {
@@ -888,6 +891,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AppContent onAuthenticated={onAuthenticated} />
+      {intro && <BrandIntro onDone={finishIntro}/>}
       <Modal visible={showUpdate} transparent animationType="fade" onRequestClose={dismissUpdate}>
         <View style={styles.updateBackdrop} accessibilityViewIsModal>
           <View style={styles.updateCard}>
