@@ -134,7 +134,7 @@ export class ChatService {
     const knownProcedure = /\bhow (?:do|can|should|to) (?:i )?(?:open|find|view|use|log|add|enter|edit|change|update|delete|export|save|start|pause|resume|finish|complete|set|enable|disable|scan|search|check|reset|sign|register|recover|upload|switch|cancel)\b|\bwhere (?:can|do|should) i (?:open|find|view|see|log|edit|change|save)\b|\bthis (?:page|screen|section)\b/i.test(intent.normalized);
     const procedure = knownProcedure && intent.guide ? fastPageAnswer(retrievalQuestion, page) : undefined;
     if (procedure) return response(cleanChatReply(procedure.reply), procedure.sourceIds.map(id => ({ id, label: 'Reviewed page guide' })));
-    if ((!intent.personal || /\bmy (?:squat|deadlift|push.?up|lunge|plank|lifting) (?:form|technique)\b/i.test(retrievalQuestion)) && (!needsSemanticRouting(retrievalQuestion, page) || /\b(?:beginner|between (?:strength )?sets|(?:squat|deadlift|push.?up|lunge|plank|lifting) (?:form|technique))\b/i.test(retrievalQuestion)) && !APP_REFERENCE.test(retrievalQuestion) && !ACCOUNT_QUESTION.test(retrievalQuestion) && GENERAL_FITNESS.test(retrievalQuestion)) {
+    if ((!intent.personal || /\bmy (?:squat|deadlift|push.?up|lunge|plank|lifting) (?:form|technique)\b/i.test(retrievalQuestion)) && (!needsSemanticRouting(retrievalQuestion, page) || /\b(?:beginners?|between (?:strength )?sets|(?:squat|deadlift|push.?up|lunge|plank|lifting) (?:form|technique))\b/i.test(retrievalQuestion)) && !APP_REFERENCE.test(retrievalQuestion) && !ACCOUNT_QUESTION.test(retrievalQuestion) && GENERAL_FITNESS.test(retrievalQuestion)) {
       if (this.activeUsers.has(userId)) throw new HttpException('Phiq is still answering your previous message.', 429);
       this.activeUsers.add(userId);
       try {
