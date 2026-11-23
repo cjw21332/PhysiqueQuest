@@ -251,6 +251,7 @@ export class GenericRepCounter {
   private faultStartMs: Record<string, number> = {};
   private activeFaults: Set<string> = new Set();
   private calibrationSamples: Array<{ timestamp: number; angle: number }> = [];
+  private initialRest: number | null = null;
   private calibratedRest: number | null = null;
   private calibratedPeak: number | null = null;
   private calibrationReps = 0;
@@ -373,6 +374,7 @@ export class GenericRepCounter {
 
   private resetCalibration(): void {
     this.calibrationSamples = [];
+    this.initialRest = null;
     this.calibratedRest = null;
     this.calibratedPeak = null;
     this.calibrationReps = 0;
@@ -528,12 +530,11 @@ export class GenericRepCounter {
     // Seed the working rest position from the first visible frame, but only
     // when it is closer to the configured start than the peak. Rolling
     // calibration still needs a substantial observed range before updating it.
-    if (this.config.calibration && this.calibratedRest === null && this.calibrationSamples.length === 0) {
+    if (this.config.calibration && this.initialRest === null && this.calibratedRest === null && this.calibrationSamples.length === 0) {
       const first = this.genConfig.primaryJoints[0];
       const start = this.genConfig.startAngles[first], peak = this.genConfig.peakAngles[first];
       if (start !== undefined && peak !== undefined && Math.abs(angle - start) < Math.abs(angle - peak) && Math.abs(angle - start) <= 45) {
-        this.calibratedRest = angle;
-        this.calibratedPeak = peak;
+        this.initialRest = angle;
       }
     }
 
@@ -732,7 +733,7 @@ export class GenericRepCounter {
 
   /** Compute normalized progress 0-1 (matches Python) */
   private computeNormalizedProgress(angle: number, joint: string): number {
-    const start = this.calibratedRest ?? this.genConfig.startAngles[joint];
+    const start = this.calibratedRest ?? this.initialRest ?? this.genConfig.startAngles[joint];
     const peak = this.calibratedPeak ?? this.genConfig.peakAngles[joint];
     if (start === undefined || peak === undefined) return 0;
 
@@ -746,7 +747,7 @@ export class GenericRepCounter {
    * Uses the first joint's angle range as reference. */
   private computeNormalizedProgressUnified(angle: number): number {
     const firstJoint = this.genConfig.primaryJoints[0];
-    const start = this.calibratedRest ?? (firstJoint ? this.genConfig.startAngles[firstJoint] : undefined);
+    const start = this.calibratedRest ?? this.initialRest ?? (firstJoint ? this.genConfig.startAngles[firstJoint] : undefined);
     const peak = this.calibratedPeak ?? (firstJoint ? this.genConfig.peakAngles[firstJoint] : undefined);
     if (start === undefined || peak === undefined) return 0;
 

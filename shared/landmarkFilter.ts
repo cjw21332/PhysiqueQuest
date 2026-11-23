@@ -15,7 +15,8 @@ export function createLandmarkFilter(fast = false, bypass = false) {
     update(points: readonly FilterPoint[], timestamp: number): FilterPoint[] {
       if (bypass) return points.map(point => ({ ...point }));
       if (!Number.isFinite(timestamp)) return points.map(point => ({ ...point }));
-      if (lastTime === undefined || timestamp <= lastTime || timestamp - lastTime > FILTER_RESET_MS || previous.length !== points.length) {
+      if (lastTime !== undefined && timestamp <= lastTime) return previous.map(point => ({ ...point }));
+      if (lastTime === undefined || timestamp - lastTime > FILTER_RESET_MS || previous.length !== points.length) {
         lastTime = timestamp;
         previous = points.map(point => ({ ...point }));
         previousRaw = points.map(point => ({ ...point }));
@@ -38,7 +39,10 @@ export function createLandmarkFilter(fast = false, bypass = false) {
         for (const axis of ['x', 'y', 'z'] as const) {
           const value = point[axis];
           const prior = old[axis];
-          if (value === undefined || prior === undefined) continue;
+          if (value === undefined || prior === undefined || !Number.isFinite(value) || !Number.isFinite(prior)) {
+            derivatives[i][axis] = 0;
+            continue;
+          }
           const rawPrior = previousRaw[i][axis] ?? value;
           const derivative = derivativeAlpha * ((value - rawPrior) / dt) + (1 - derivativeAlpha) * derivatives[i][axis];
           derivatives[i][axis] = derivative;

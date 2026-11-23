@@ -73,6 +73,9 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
   const skeletonPath = useSharedValue('');
   const skeletonOpacity = useSharedValue(0);
   const faultPath = useSharedValue('');
+  const recentRepTimes = useRef<number[]>([]);
+  const [cadence, setCadence] = useState<number | null>(null);
+  const lastCaptureTime = useRef<number | null>(null);
   const stableSegments = useRef(createStablePoseSegments(bones, DRAW_VISIBILITY, POSE_HOLD_MS + 150));
   const animatedSkeleton = useAnimatedProps(() => ({ d: skeletonPath.value, opacity: skeletonOpacity.value }));
   const animatedFault = useAnimatedProps(() => ({ d: faultPath.value, opacity: skeletonOpacity.value }));
@@ -215,6 +218,9 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
     activeCue.current = null;
     setCue(null);
     landmarkFilter.reset();
+    recentRepTimes.current = [];
+    setCadence(null);
+    lastCaptureTime.current = null;
     stableSegments.current.reset();
     cancelAnimation(skeletonOpacity);
     skeletonOpacity.value = 0;
@@ -256,7 +262,12 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       joints?: readonly { x: number; y: number; visibility?: number }[];
       aspect?: number; width?: number; height?: number; timestamp?: number;
     } | undefined;
-    const ts = typeof frame?.timestamp === 'number' ? frame.timestamp : performance.now();
+    const captureTime = frame?.timestamp;
+    if (typeof captureTime === 'number' && Number.isFinite(captureTime)) {
+      if (lastCaptureTime.current !== null && captureTime <= lastCaptureTime.current) return;
+      lastCaptureTime.current = captureTime;
+    }
+    const ts = typeof captureTime === 'number' && Number.isFinite(captureTime) ? captureTime : performance.now();
     if (!frame || !counter.current || !Array.isArray(frame.joints) || frame.joints.length < MIN_DRAW_LANDMARKS) {
       const gate = visibilityGate.current.update(ts, false);
       if (counting.current && !gate.active) { counter.current?.suspend(); counting.current = false; }
@@ -311,6 +322,9 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
     safety.current.observe(frame.joints, ts);
     clock.current.start();
     const next = counter.current.update({ landmarks: measurementJoints, timestamp: ts, aspect });
+    if (next.counted) {
+      recentRepTimes.current = [...recentRepTimes.current.filter(time => ts - time <= 20000), ts].slice(-4);
+    }
     const candidateCues: PoseCue[] = next.faults.map(fault => ({ id: fault.rule, message: fault.message, priority: 'alignment' }));
     if (next.feedback === 'depth') candidateCues.push({ id: 'depth', message: 'Reach a comfortable full range.', priority: 'depth' });
     if (next.feedback === 'tempo') candidateCues.push({ id: 'tempo', message: 'Move at a steady pace.', priority: 'tempo' });
@@ -337,6 +351,9 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
     const now = Date.now();
     if (now - lastUi.current < TRACKING_UI_UPDATE_MS && !next.counted) return;
     lastUi.current = now;
+    const times = recentRepTimes.current;
+    const lastRep = times[times.length - 1];
+    setCadence(times.length >= 3 && ts - lastRep < 10000 ? Math.round(60000 * (times.length - 1) / (lastRep - times[0])) : null);
     setSnapshot(next);
     setStatus(next.visible
       ? (next.phase === 'lost' ? 'Body partially out of frame' : next.cue)
@@ -353,6 +370,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
       <Text style={styles.title} numberOfLines={1}>{name}</Text>
       <Text style={styles.badge}>{supportLabel(support)}</Text>
       <Text style={styles.status} numberOfLines={2}>{status}</Text>
+      {!hold && !paused && cadence !== null && <Text style={styles.status}>Recent pace: {cadence} reps/min</Text>}
       {hasTracked.current && safetyPhase === 'unavailable' && !paused && <Text style={styles.warning} accessibilityLiveRegion="polite">Safety monitoring is paused.</Text>}
       {motionSensorAvailable === false && <Text style={styles.warning} accessibilityLiveRegion="polite">Phone movement sensor unavailable; monitoring uses visible body movement only.</Text>}
 
@@ -402,6 +420,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
 
       <View style={styles.actions}>
         <Pressable accessibilityRole="button" style={styles.button} onPress={switchCamera}><ActionIcon name="switch"/><Text style={styles.buttonText}>Switch camera</Text></Pressable>
+        {!paused && <Pressable accessibilityRole="button" style={styles.button} onPress={() => { togglePause(); setStatus('Paused for recovery. Resume when you feel ready.'); }}><Text style={styles.buttonText}>Effort too high</Text></Pressable>}
         <Pressable accessibilityRole="button" style={styles.button} onPress={togglePause}><ActionIcon name={paused ? 'play' : 'pause'}/><Text style={styles.buttonText}>{paused ? 'Resume' : 'Pause'}</Text></Pressable>
         <Pressable accessibilityRole="button" accessibilityState={{ checked: muted }} style={styles.button} onPress={() => { if (!muted) { speechGeneration.current++; void Speech.stop(); } setMuted(value => !value); }}><Text style={styles.buttonText}>{muted ? 'Unmute cues' : 'Mute cues'}</Text></Pressable>
         <Pressable accessibilityRole="button" style={[styles.button, styles.stop]} onPress={finishSession}><ActionIcon name="stop"/><Text style={styles.stopText}>End session</Text></Pressable>
