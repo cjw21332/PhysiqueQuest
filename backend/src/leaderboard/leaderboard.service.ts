@@ -1,3 +1,4 @@
+import { mealMissionGoal, mealMissionPoints } from '../activity/meal-mission.js';
 import { savedScanMealDates } from '../nutrition/saved-scan-meals.js';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -17,7 +18,7 @@ const PERIODS: LeaderboardPeriod[] = ['week', 'month', 'all'];
 
 // Point values mirror the daily-mission rewards in ActivityService.
 const WORKOUT_POINTS = WORKOUT_CREDIT_POINTS;
-const MEAL_DAY_POINTS = 60;
+
 const WATER_DAY_POINTS = 40;
 
 export interface Standing {
@@ -120,9 +121,12 @@ export class LeaderboardService {
       const id = String(record.userId);
       const mealDays = new Map<string, number>();
       for (const date of savedScanMealDates(record.meals ?? [], record.scanSaveReceipts)) {
-        if (date >= startDate) mealDays.set(date, (mealDays.get(date) ?? 0) + 1);
+        mealDays.set(date, (mealDays.get(date) ?? 0) + 1);
       }
-      for (const count of mealDays.values()) if (count >= 3) add(id, MEAL_DAY_POINTS);
+      for (const [date, count] of mealDays) {
+        const earned = mealMissionPoints(count, mealMissionGoal(date, mealDays));
+        if (date >= startDate && earned > 0) add(id, earned);
+      }
       for (const entry of record.water ?? []) if (entry.date && entry.date >= startDate && entry.glasses >= 8) add(id, WATER_DAY_POINTS);
     }
     return points;

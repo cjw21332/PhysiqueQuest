@@ -1,3 +1,4 @@
+import { mealMissionGoal, mealMissionPoints } from './meal-mission.js';
 import { savedScanMealDates } from '../nutrition/saved-scan-meals.js';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -68,16 +69,18 @@ export class ActivityService {
     const completedWorkouts = workouts.filter(workout => earnsWorkoutCredit(workout) && workout.endedAt);
 
     const todayStats = computeTodayStats(savedMealDates, completedWorkouts, waterByDate, today, timezone);
-    const dailyMissions = buildDailyMissions({ ...todayStats, records: Number(records.includes(today)) });
+
 
     const allMeals = buildMealCountMap(savedMealDates);
+    const mealGoal = mealMissionGoal(today, allMeals);
+    const dailyMissions = buildDailyMissions({ ...todayStats, records: Number(records.includes(today)) }, mealGoal);
     const allWorkoutDates = new Set(completedWorkouts.map(workout => workout.activityDate || activityDate(workout.endedAt!, timezone)));
     const activityDates = buildActivityDates(mealDates, nutrition.water, allWorkoutDates);
 
     const dayStreak = computeStreak(activityDates, today);
     const currentExp = computeExp(allMeals, allWorkoutDates, waterByDate) + records.length * 150;
     const earnedPoints = dailyMissions.filter(m => m.complete).reduce((sum, m) => sum + m.points, 0);
-    const goalDays = new Set([...allWorkoutDates].filter(date => (allMeals.get(date) ?? 0) >= 3 && (waterByDate.get(date) ?? 0) >= 8 && records.includes(date)));
+    const goalDays = new Set([...allWorkoutDates].filter(date => (allMeals.get(date) ?? 0) >= mealMissionGoal(date, allMeals) && (waterByDate.get(date) ?? 0) >= 8 && records.includes(date)));
     const level = Math.floor(currentExp / 100) + 1;
     const maxLift = liftSummary ? liftSummary.personalRecords.reduce((max: number, record: { loadKg?: number }) => Number.isFinite(record.loadKg) ? Math.max(max, record.loadKg!) : max, 0) : null;
     const badges = buildBadges(completedWorkouts, nutrition.meals, waterByDate, activityDates, records, ranking?.self.points ? ranking.self.rank : null, ranking !== null, { level, goalDays, maxLift });
@@ -87,7 +90,7 @@ export class ActivityService {
         timezone,
         questProgress: {
           workout: Math.min(todayStats.workouts, 1),
-          meals: Math.min(todayStats.meals, 3),
+          meals: Math.min(todayStats.meals, mealGoal),
           water: Math.min(todayStats.water, 8),
         },
         level: Math.floor(currentExp / 100) + 1,
@@ -132,11 +135,12 @@ function computeTodayStats(savedMealDates: string[], completedWorkouts: any[], w
   };
 }
 
-function buildDailyMissions(todayStats: { meals: number, water: number, workouts: number, records: number }) {
+function buildDailyMissions(todayStats: { meals: number, water: number, workouts: number, records: number }, mealGoal: number) {
   return missionRules.map(rule => {
     const progress = rule.key === 'workout' ? todayStats.workouts :
                      rule.key === 'meals' ? todayStats.meals :
                      rule.key === 'water' ? todayStats.water : todayStats.records;
+    if (rule.key === 'meals' && mealGoal === 2) return { ...rule, title: 'Build on yesterday: log 2 meals', target: 2, points: progress >= 3 ? 60 : 40, progress: Math.min(progress, 2), complete: progress >= 2 };
     return { ...rule, progress: Math.min(progress, rule.target), complete: progress >= rule.target };
   });
 }
@@ -172,7 +176,8 @@ function computeExp(allMeals: Map<string, number>, allWorkouts: Set<string>, all
   const historicalDates = new Set([...allMeals.keys(), ...allWorkouts, ...allWater.keys()]);
   for (const date of historicalDates) {
     if (allWorkouts.has(date)) currentExp += 100;
-    if ((allMeals.get(date) ?? 0) >= 3) currentExp += 60;
+    const target = mealMissionGoal(date, allMeals);
+    currentExp += mealMissionPoints(allMeals.get(date) ?? 0, target);
     if ((allWater.get(date) ?? 0) >= 8) currentExp += 40;
   }
   return currentExp;
@@ -202,6 +207,7 @@ function buildBadges(completedWorkouts: any[], meals: { date: string; protein?: 
   const liftBadge = (target: number) => ({ id: `lift-${target}`, title: `${target}kg Dominator`, icon: 'dumbbell', earned: extras.maxLift !== null && extras.maxLift >= target, available: extras.maxLift !== null, description: extras.maxLift === null ? 'Saved lift data is unavailable.' : `Complete a logged set with at least ${target} kg. Self-reported loads.`, ...(extras.maxLift !== null ? { progress: { current: extras.maxLift, target, unit: 'kg lifted' } } : {}) });
   const calorieBadge = (target: number) => ({ id: `calories-${target}`, title: `${target.toLocaleString('en-US')} calories burned`, icon: 'fire', earned: false, available: false, description: 'Total calories burned are not tracked yet.' });
   return [
+    { id: 'streak-3', title: 'Finding your rhythm', icon: 'fire', earned: longest >= 3, description: 'Record activity on three consecutive days.', progress: { current: Math.min(longest, 3), target: 3, unit: 'days' } },
     { id: 'streak-10', title: '10-day streak', icon: 'fire', earned: longest >= 10, description: 'Record activity on 10 consecutive days.', progress: { current: longest, target: 10, unit: 'days' } },
     { id: 'first-pr', title: 'First PR', icon: 'trophy', earned: records.length > 0, description: 'Record your first personal best.', progress: { current: Math.min(records.length, 1), target: 1, unit: 'personal record' } },
     { id: 'perfect-form', title: 'Perfect form', icon: 'medal', earned: false, available: false, description: 'Form scoring is not available yet.' },
