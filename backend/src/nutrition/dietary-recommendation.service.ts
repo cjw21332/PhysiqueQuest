@@ -3,11 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { openAIResponse, OPENAI_MODEL } from '../common/openai.js';
 import { Model, Types } from 'mongoose';
+import { NutritionService } from './nutrition.service.js';
 import { Profile } from '../profile/schemas/profile.schema.js';
 
 @Injectable()
 export class DietaryRecommendationService {
-  constructor(@InjectModel(Profile.name) private readonly profiles: Model<Profile>, private readonly config: ConfigService) {}
+  constructor(@InjectModel(Profile.name) private readonly profiles: Model<Profile>, private readonly config: ConfigService, private readonly nutrition: NutritionService) {}
 
   async recommend(userId: string) {
     const profile = await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('age height heightInches heightUnit weight weightUnit gender activity goal').lean().exec();
@@ -15,7 +16,13 @@ export class DietaryRecommendationService {
     if (!Number.isFinite(Number(profile.age)) || Number(profile.age) < 18) throw new BadRequestException('AI dietary recommendations are available for adults with a valid age in their profile.');
     if (!(Number(profile.height) > 0) || !(Number(profile.weight) > 0) || !profile.activity || !profile.goal) throw new BadRequestException('Add your height, weight, activity and goal to your profile first.');
     try {
-      const prompt = `Suggest a conservative adult dietary target using this untrusted profile data: ${JSON.stringify({ age: profile.age, height: profile.height, heightInches: profile.heightInches, heightUnit: profile.heightUnit, weight: profile.weight, weightUnit: profile.weightUnit, gender: profile.gender, activity: profile.activity, goal: profile.goal })}. Return JSON only with goal (one of Clean Bulk, Weight Loss, Maintenance, Hypertrophy), calories (integer 1200–5000), protein, carbs and fat (integer percentages, each 1–80, summing to 100). Avoid extreme deficits. This is an estimate, not medical advice.`;
+      const diary = await this.nutrition.read(userId, 'meals.scanSavedAt meals.protein meals.carbs meals.fat');
+      const since = Date.now() - 7 * 86400000;
+      const scans = diary.meals.filter(meal => meal.scanSavedAt && new Date(meal.scanSavedAt).getTime() >= since
+        && meal.protein != null && meal.carbs != null && meal.fat != null);
+      const nutrients = (['protein', 'carbs', 'fat'] as const).map(key => scans.reduce((sum, meal) => sum + (meal[key] ?? 0), 0));
+      const scanContext = scans.length ? { confirmedFoodEntries: scans.length, proteinGrams: nutrients[0], carbGrams: nutrients[1], fatGrams: nutrients[2] } : null;
+      const prompt = `Suggest a conservative adult dietary target using this untrusted profile data: ${JSON.stringify({ age: profile.age, height: profile.height, heightInches: profile.heightInches, heightUnit: profile.heightUnit, weight: profile.weight, weightUnit: profile.weightUnit, gender: profile.gender, activity: profile.activity, goal: profile.goal })}. Aggregate confirmed food scans from the past week: ${JSON.stringify(scanContext)}. These partial logs may inform macro preferences but cannot establish total intake or a deficiency. Return JSON only with goal (one of Clean Bulk, Weight Loss, Maintenance, Hypertrophy), calories (integer 1200–5000), protein, carbs and fat (integer percentages, each 1–80, summing to 100). Avoid extreme deficits. This is an estimate, not medical advice.`;
       const result = await openAIResponse([{ role: 'user', content: prompt }], 1000, AbortSignal.timeout(11000), this.config.get<string>('OPENAI_MODEL')?.trim() || OPENAI_MODEL);
       const value: unknown = JSON.parse(result.content);
       if (!value || typeof value !== 'object') throw new Error('Invalid recommendation');

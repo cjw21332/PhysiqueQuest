@@ -189,7 +189,7 @@ export default function ScanSection({ profile }: { profile: Profile }) {
     <div ref={contentRef} className="scan-content">
     {loading ? <div className="profile-load-state" role="status" aria-label="Loading nutrition" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div> : error ? <p>Your saved nutrition is unavailable.</p> :
       view === 'history' ? <FoodHistory targets={targets} previousCalorieTarget={previousCalorieTarget} meals={meals} onBack={()=>setView('nutrition')}/> :
-      view === 'plan' ? dietaryPlan ? <DietaryPlan key="offline-plan" readOnly saved={dietaryPlan} profile={profile} meals={meals} onBack={()=>setView('nutrition')}/> : <p>No saved dietary plan.</p> :
+      view === 'plan' ? dietaryPlan ? <DietaryPlan key="offline-plan" readOnly saved={dietaryPlan} profile={profile} meals={todayMeals} onBack={()=>setView('nutrition')}/> : <p>No saved dietary plan.</p> :
       <NutritionDashboard readOnly targets={targets} onPlan={()=>setView('plan')} meals={meals.filter(row=>row.date===formatLocalDate())} historyMeals={meals} water={water} onWater={async()=>{}} onScan={()=>{}} onAdd={()=>{}} onEdit={()=>{}} onHistory={openHistory}/>}
     </div>
     <BottomNav/>
