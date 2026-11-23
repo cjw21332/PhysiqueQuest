@@ -25,6 +25,9 @@ export type Profile = {
   equipment?: string[];
   days?: string[];
   conditions?: string[];
+  healthConsentAt?: string | null;
+  injuries?: string[];
+  healthRisks?: string[];
   healthNotes?: string;
   contactName?: string;
   contactPhone?: string;
