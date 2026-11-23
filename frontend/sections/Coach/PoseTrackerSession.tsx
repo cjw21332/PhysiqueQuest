@@ -1,4 +1,6 @@
 'use client';
+import EquipmentCheck from './EquipmentCheck';
+import WorkoutFeedback from './WorkoutFeedback';
 import { useEffect, useRef, useState } from 'react';
 import { api, type ExerciseRecord } from '../../lib/api';
 import { canTrack, reconcileNativeTrackingConfig, resolveTrackingConfig, unsupportedTrackingMessage, type TrackingConfig } from '../../../backend/src/pose-tracker/exercise-registry';
@@ -25,6 +27,7 @@ export default function PoseTrackerSession({exercise,onExit,adminTest=false,onVe
   const [config,setConfig]=useState<TrackingConfig>(()=>resolveTrackingConfig(exercise));
   const [state,setState]=useState(initialTrackingState);
   const [src,setSrc]=useState('');
+  const [equipmentIssue,setEquipmentIssue]=useState(false);
   const [stage,setStage]=useState<'setup'|'starting'|'active'|'summary'>('setup');
   const [seconds,setSeconds]=useState(0);
   const [nativeSummary,setNativeSummary]=useState<NativePoseSummary|null>(null);
@@ -135,6 +138,7 @@ export default function PoseTrackerSession({exercise,onExit,adminTest=false,onVe
       </div>
       {error && <p role="alert">{error}</p>}
       <p className="pose-summary-note">Feedback and counts are estimates, not a diagnosis or a measure of injury risk. This summary is not saved to your workout; review it before logging your sets.</p>
+      {!adminTest && <WorkoutFeedback source="pose" exercise={exercise.name}/>}
       {adminTest && evidence && <button type="button" className="secondary" onClick={() => onVerified?.(`Administrator observed provider initialization and a completed counter event on ${new Date().toISOString()}; ${JSON.stringify(metrics.current)}`)}>Use this provider test as verification evidence</button>}
       <button type="button" className="pose-summary-done" onClick={() => setStage('setup')}>Done</button>
     </div>
@@ -147,7 +151,8 @@ export default function PoseTrackerSession({exercise,onExit,adminTest=false,onVe
     <div className="pose-setup-tip"><span><Icon name="warning" size={19}/></span><div><strong>Review your results</strong><p>{allowed ? `Repetition counts are estimates and may be inaccurate.${config.validationStatus !== 'verified' && config.nativeSupport !== 'FULLY_SUPPORTED' ? ' This exercise has not been validated on real recordings.' : ''}` : unsupportedTrackingMessage} Feedback cannot assess pain or injury risk.</p></div></div>
     {adminTest && <details><summary>Tracking details</summary><ul>{config.limitations.map((s,i)=><li key={i}>{s}</li>)}</ul></details>}
     {allowed&&stage==='setup'&&<div className="pose-consent"><h3>Before you start</h3><p>{native?'Camera images and videos are processed on this phone and are not uploaded or retained by PhysiqueQuest. After tracking starts, if neither body nor phone movement is detected, a countdown is followed by an alarm and an attempt to notify your saved emergency contact. Monitoring continues when you leave the camera frame and stops when tracking is paused. No location is shared.':'PoseTracker is a third-party service. Authentication and usage information may be sent to it. PhysiqueQuest does not retain camera frames from this session. Read the '}{!native&&<a href="https://www.posetracker.com/privacy-policy" target="_blank" rel="noopener noreferrer">PoseTracker privacy policy</a>}{!native&&'.'}</p><label><input type="checkbox" checked={consent} onChange={event=>setConsent(event.target.checked)}/> <span>{native?'I agree to camera analysis and the inactivity alert described above.':'I agree to use my camera with PoseTracker.'}</span></label></div>}
-    <div className="pose-actions">{allowed&&stage==='setup'&&<button type="button" className="primary" disabled={!consent} onClick={()=>void start()}><Icon name="camera" size={18}/> Start tracking</button>}{(stage==='active'||stage==='starting')&&<button type="button" className="secondary" onClick={()=>finish()}>Stop tracking</button>}</div>
+    {stage === 'setup' && <EquipmentCheck issue={equipmentIssue} onIssue={setEquipmentIssue}/>}
+      <div className="pose-actions">{allowed&&stage==='setup'&&<button type="button" className="primary" disabled={equipmentIssue || !consent} onClick={()=>void start()}><Icon name="camera" size={18}/> Start tracking</button>}{(stage==='active'||stage==='starting')&&<button type="button" className="secondary" onClick={()=>finish()}>Stop tracking</button>}</div>
     {src&&<iframe ref={frame} src={src} title={`PoseTracker: ${exercise.name}`} allow="camera https://app.posetracker.com" referrerPolicy="no-referrer" onLoad={()=>{metrics.current.iframeLoadMs=performance.now()-started.current;}} onError={()=>{setError('The tracking page could not load.');finish(true);}}/>}
 
     {error&&<p role="alert">{error}</p>}

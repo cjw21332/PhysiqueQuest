@@ -12,7 +12,7 @@ const module = { exports: {} };
 const { outputText } = ts.transpileModule(readFileSync(new URL('../sections/Coach/WorkoutReport.tsx', import.meta.url), 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
 });
-new Function('require', 'module', 'exports', outputText)(name => name === '../Home/icons' ? { Icon: () => null } : name.endsWith('/titleCase') ? { titleCase } : name.endsWith('/api') || name.endsWith('.css') ? {} : require(name), module, module.exports);
+new Function('require', 'module', 'exports', outputText)(name => name === './WorkoutFeedback' ? { default: () => null } : name === '../Home/icons' ? { Icon: () => null } : name.endsWith('/titleCase') ? { titleCase } : name.endsWith('/api') || name.endsWith('.css') ? {} : require(name), module, module.exports);
 const Report = module.exports.default;
 const workout = { _id: 'saved', exerciseIds: ['bench', 'press'], startedAt: '2026-10-19T08:00:00Z', status: 'completed', durationSeconds: 2536 };
 

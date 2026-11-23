@@ -420,6 +420,7 @@ class ApiClient {
         }
         if (endpoint.startsWith('/workouts')) { deviceCache.invalidate('activity'); deviceCache.invalidate('workouts'); deviceCache.invalidate('workout-summary'); changed.push('activity', 'workouts', 'workout-summary'); if (endpoint.endsWith('/complete')) { deviceCache.invalidate('notifications'); changed.push('notifications'); } }
         if (endpoint.startsWith('/progress')) for (const metric of ['weight', 'chest', 'waist', 'arms', 'benchPress'] as const) { deviceCache.invalidate(`progress:${metric}`); changed.push(`progress:${metric}`); }
+        if (endpoint === '/feedback') { deviceCache.invalidate('coach'); changed.push('coach'); }
         if (endpoint === '/settings') { deviceCache.invalidate('coach'); changed.push('coach', 'settings'); }
         if (endpoint.startsWith('/admin/exercises')) { deviceCache.invalidate('exercise-library'); changed.push('exercise-library'); }
         if (endpoint.startsWith('/notifications/')) { deviceCache.publish('notifications', result); changed.push('notifications'); }
@@ -567,6 +568,14 @@ class ApiClient {
     return this.request<{ reply: string; sources?: { id: string; label: string }[]; privacy: { personalDataIncluded: boolean; historyStored: false; provider: 'openai' } }>('/chat', { method: 'POST', body: JSON.stringify({ messages, includePersonalData, page }), timeoutMs: 60000, signal });
   }
   async getCoachPlan(force = false) { return deviceCache.fetch('coach', () => this.request<CoachPlanRecord>('/coach/plan', { timeoutMs: 30_000 }), force); }
+  async checkEquipment(photo: string) {
+    return this.request<{status: 'visible_damage' | 'inconclusive'}>('/coach/equipment-check', {
+      method: 'POST', body: JSON.stringify({ photo, consent: true }), timeoutMs: 20000,
+    });
+  }
+  async saveWorkoutFeedback(input: { source: 'manual' | 'pose'; exercise: string; sessionRef?: string; rpe: number; difficulty: string; enjoyment?: number; painLocations: string[]; notes?: string }) {
+    await this.request('/feedback', { method: 'POST', body: JSON.stringify(input) });
+  }
   async getWorkoutAiSummary(id: string) {
     if (id.startsWith('local-')) {
       const row = (await journals(this.workoutOwner())).find(row => row.id === id);
@@ -800,8 +809,9 @@ class ApiClient {
   async getExerciseFilters() { return this.request<ExerciseFilters>('/exercises/filters', { timeoutMs: 30_000 }, getCoachApiBaseUrl()); }
   async getExercise(slug: string) { return this.request<ExerciseRecord>(`/exercises/${encodeURIComponent(slug)}`, { timeoutMs: 30_000 }, getCoachApiBaseUrl()); }
   async getIndependentCoachPlan(profile: Record<string, unknown>) {
-    const { goal, days, duration, equipment, conditions, createdAt } = profile;
-    return this.request<CoachPlanRecord>('/coach/plan', { method: 'POST', timeoutMs: 60_000, body: JSON.stringify({ profile: { goal, days, duration, equipment, conditions, createdAt } }) }, getCoachApiBaseUrl());
+    const { goal, days, duration, equipment, conditions, createdAt, age, healthConsentAt } = profile;
+    const health = healthConsentAt ? { healthConsentAt, injuries: profile.injuries, healthRisks: profile.healthRisks } : {};
+    return this.request<CoachPlanRecord>('/coach/plan', { method: 'POST', timeoutMs: 60_000, body: JSON.stringify({ profile: { goal, days, duration, equipment, conditions, createdAt, age, ...health } }) }, getCoachApiBaseUrl());
   }
 
   // Food scanning

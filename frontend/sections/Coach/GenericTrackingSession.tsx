@@ -1,4 +1,6 @@
 'use client';
+import EquipmentCheck from './EquipmentCheck';
+import WorkoutFeedback from './WorkoutFeedback';
 import { useMemo, useState } from 'react';
 import { useCameraStream } from '../../hooks/useCameraStream';
 import { useGenericRepTracking } from '../../hooks/useGenericRepTracking';
@@ -9,6 +11,7 @@ import { titleCase } from '../../lib/titleCase';
 import type { PatternId, ExerciseConfigOverride } from '../../../shared/exerciseEngine';
 
 export default function GenericTrackingSession({name,config,onExit,pattern,override}:{name:string;config:GeneratedAngleConfig;onExit:()=>void;pattern?:PatternId;override?:ExerciseConfigOverride}) {
+  const [equipmentIssue,setEquipmentIssue]=useState(false);
   const [stage,setStage]=useState<'setup'|'active'|'summary'>('setup');
   const [summary,setSummary]=useState({reps:0,partial:0});
   const localConfig=useMemo(()=>({...config,stabilityConstraints:[]}),[config]);
@@ -27,10 +30,11 @@ export default function GenericTrackingSession({name,config,onExit,pattern,overr
       {stage==='active'&&tracking.powerNotice&&<p className="generic-tracking-note">{tracking.powerNotice}</p>}
       {stage==='active'&&<p className="generic-tracking-note">Device temperature is not available in this browser. Pause if your device feels warm.</p>}
       {camera.message&&<p role="alert">{camera.message}</p>}
-      <div className="generic-tracking-actions">{camera.status!=='on'&&<button className="primary" type="button" disabled={camera.status==='starting'} onClick={()=>{setStage('active');void camera.start();}}>{camera.status==='starting'?'Starting camera…':camera.recoveryState.phase==='failed'?'Try again':'Start camera'}</button>}
+      {stage === 'setup' && <EquipmentCheck issue={equipmentIssue} onIssue={setEquipmentIssue}/>}
+      <div className="generic-tracking-actions">{camera.status!=='on'&&<button className="primary" type="button" disabled={equipmentIssue || camera.status==='starting'} onClick={()=>{setStage('active');void camera.start();}}>{camera.status==='starting'?'Starting camera…':camera.recoveryState.phase==='failed'?'Try again':'Start camera'}</button>}
       {stage==='active'&&camera.recoveryState.phase!=='idle'&&<button className="secondary" type="button" onClick={camera.switchFacing}>Switch camera</button>}
       {stage==='active'&&<button className="secondary" type="button" onClick={finish}>Finish tracking</button>}</div>
       {camera.nativePreview&&<p>Experimental tracking is available in a browser, not the native camera view.</p>}
-    </>:<div className="generic-tracking-summary"><h4>Unsaved summary</h4><p>{summary.reps} detected repetitions · {summary.partial} partial movements</p><p>Review and enter your workout values manually. No camera images or results were saved.</p><button className="primary" type="button" onClick={onExit}>Confirm and return</button></div>}
+    </>:<div className="generic-tracking-summary"><h4>Unsaved summary</h4><WorkoutFeedback source="pose" exercise={name}/><p>{summary.reps} detected repetitions · {summary.partial} partial movements</p><p>Review and enter your workout values manually. No camera images or results were saved.</p><button className="primary" type="button" onClick={onExit}>Confirm and return</button></div>}
   </section>;
 }
