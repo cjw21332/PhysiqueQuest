@@ -10,7 +10,7 @@ function encryptionKey() {
   if (key.length !== 32 || key.toString('base64') !== value) throw new Error('Health data encryption unavailable');
   return key;
 }
-function transform(value: unknown, owner: unknown, field: string, encrypt: boolean): unknown {
+function transform(value: unknown, owner: unknown, field: string, encrypt: boolean, scope = 'profile'): unknown {
   if (typeof value !== 'string' || value === '') return value;
   try {
     const key = encryptionKey();
@@ -19,7 +19,7 @@ function transform(value: unknown, owner: unknown, field: string, encrypt: boole
       return value;
     }
     if (!/^[a-f0-9]{24}$/i.test(String(owner))) throw new Error();
-    const aad = Buffer.from(`profile:${owner}:${field}`);
+    const aad = Buffer.from(`${scope}:${owner}:${field}`);
     if (value.startsWith(PREFIX)) {
       const parts = value.slice(PREFIX.length).split('.');
       if (parts.length !== 3) throw new Error();
@@ -53,3 +53,13 @@ export function transformProfile<T extends HealthRecord>(profile: T, encrypt: bo
   return profile;
 }
 export const decryptProfile = <T extends HealthRecord>(profile: T): T => transformProfile(profile, false);
+
+/** Workout feedback pain locations and notes are health data, so they are
+ * encrypted at rest with the same key as profile health fields. The AAD scope
+ * keeps a feedback ciphertext from being replayed into a profile field. */
+export function transformFeedbackHealth<T extends HealthRecord>(record: T, encrypt: boolean): T {
+  const owner = record.userId;
+  if (Array.isArray(record.painLocations)) (record as HealthRecord).painLocations = record.painLocations.map((entry: unknown, index: number) => transform(entry, owner, `painLocations.${index}`, encrypt, 'feedback'));
+  if (record.notes !== undefined) (record as HealthRecord).notes = transform(record.notes, owner, 'notes', encrypt, 'feedback');
+  return record;
+}

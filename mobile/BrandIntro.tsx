@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const word = 'PHYSIQUEQUEST';
-export default function BrandIntro({ onDone }: { onDone: () => void }) {
+export default function BrandIntro({ onDone: notifyDone }: { onDone: () => void }) {
   const [letters, setLetters] = useState(0);
+  // Skip, reduced motion and the animation end can all race; finish once.
+  const finished = useRef(false);
+  const onDone = useCallback(() => { if (!finished.current) { finished.current = true; notifyDone(); } }, [notifyDone]);
   const morph = useRef(new Animated.Value(0)).current;
   const curl = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -35,7 +38,7 @@ export default function BrandIntro({ onDone }: { onDone: () => void }) {
       <Animated.Image source={require('./assets/physiquequest-icon.png')} style={{width:110,height:110,borderRadius:22}}/>
       <Animated.View accessibilityLabel="Dumbbell curl" style={[styles.bar,{ transform:[{translateY:curl.interpolate({inputRange:[0,1],outputRange:[8,-12]})},{rotate:curl.interpolate({inputRange:[0,1],outputRange:['-12deg','24deg']})}] }]}><View style={styles.plate}/><View style={styles.plate}/></Animated.View>
     </Animated.View>
-    <Pressable onPress={onDone} accessibilityRole="button" style={styles.skip}><Text style={{color:'white'}}>Skip intro</Text></Pressable>
+    <Pressable onPress={onDone} accessibilityRole="button" accessibilityLabel="Skip intro" hitSlop={12} style={styles.skip}><Text style={{color:'white',fontWeight:'600'}}>Skip intro</Text></Pressable>
   </View>;
 }
 const styles = StyleSheet.create({
@@ -43,5 +46,5 @@ const styles = StyleSheet.create({
   word:{position:'absolute',color:'white',fontWeight:'800',fontSize:26,letterSpacing:3},
   bar:{width:48,height:5,backgroundColor:'#52e2ad',flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:12},
   plate:{width:9,height:20,backgroundColor:'#52e2ad',borderRadius:3},
-  skip:{position:'absolute',bottom:50,padding:12}
+  skip:{position:'absolute',bottom:50,minHeight:44,minWidth:44,paddingHorizontal:16,justifyContent:'center'}
 });

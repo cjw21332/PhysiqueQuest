@@ -147,7 +147,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} disabled={!connected} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
       <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail={accountEmail ? `Verified with a code sent to ${accountEmail}` : 'Verified with a code sent to your account email'} disabled={!connected} onClick={() => setPasswordOpen(true)}/></div>
-      {connected && adminAccess && <button type="button" onClick={() => router.push('/admin')}>Open admin analytics</button>}
+      {connected && adminAccess && <><h3 className="me-group-title">Administrator</h3><div className="me-list"><SettingRow icon="trend" title="Admin analytics" detail="Accounts, sessions, retention and emergency events" onClick={() => router.push('/admin')}/></div></>}
       <button type="button" className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
     </div>
     <BottomNav />

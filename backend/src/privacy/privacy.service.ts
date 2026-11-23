@@ -5,7 +5,7 @@ import type { Connection } from 'mongoose';
 import { createHmac, randomUUID } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { afterDays, assertJobPayload, auditExpiry, retention } from './retention.js';
-import { decryptProfile } from './health-encryption.js';
+import { decryptProfile, transformFeedbackHealth } from './health-encryption.js';
 import { StorageService } from '../storage/storage.service.js';
 
 const generic = () => new UnauthorizedException('Unable to recover account');
@@ -109,6 +109,7 @@ export class PrivacyService implements OnModuleInit, OnModuleDestroy {
       if (['users', 'audit_logs', 'background_jobs', 'password_recovery_tokens', 'email_verifications', 'auth_sessions', 'push_devices'].includes(name) || name.startsWith('system.')) continue;
       const records = await this.db.collection(name).find({ $or: [{ userId: id }, { subjectId: id }] }).toArray();
       if (name === 'profiles') records.forEach(record => decryptProfile(record));
+      if (name === 'workout_feedback') records.forEach(record => transformFeedbackHealth(record, false));
       if (records.length) data[name] = records;
     }
     await this.audit({ actorId: userId, action: 'account_exported' });

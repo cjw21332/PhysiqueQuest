@@ -1,0 +1,85 @@
+/* Workout feedback: bare controls inherit no field styling from the app shell,
+   so give the form its own card and visible inputs. */
+.workout-feedback {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--soft);
+  color: var(--ink);
+}
+.workout-feedback > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.workout-feedback > summary:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 8px; }
+.workout-feedback > summary::-webkit-details-marker { display: none; }
+.workout-feedback > summary::after {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-left: auto;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform 150ms ease;
+}
+.workout-feedback[open] > summary::after { transform: rotate(-135deg); }
+.workout-feedback form { display: grid; gap: 12px; margin-top: 10px; }
+.workout-feedback label { display: grid; gap: 6px; min-width: 0; font-size: 12px; font-weight: 600; color: var(--muted); }
+.workout-feedback :is(input, select, textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+.workout-feedback textarea { min-height: 84px; padding: 12px; resize: vertical; }
+.workout-feedback button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--green);
+  color: var(--surface);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.workout-feedback button:disabled { opacity: 0.6; cursor: default; }
+.workout-feedback button:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.workout-feedback-note { margin: 0; font-size: 11px; line-height: 1.45; color: var(--muted); }
+.workout-feedback-error { margin: 0; font-size: 12px; line-height: 1.45; color: var(--red-dark); }
+.workout-feedback-status { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); font-size: 13px; }
+
+/* The pose summary is already a card, so nest as a divided section instead of
+   drawing a second surface of the same colour inside it. */
+.pose-summary :is(.workout-feedback, .workout-feedback-status) {
+  margin-top: 18px;
+  padding: 16px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Inside a manual report exercise card, sit as a divided footer of that card. */
+.manual-report-exercise :is(.workout-feedback, .workout-feedback-status) {
+  margin-top: 12px;
+  padding: 12px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}

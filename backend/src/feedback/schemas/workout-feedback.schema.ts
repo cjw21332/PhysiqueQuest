@@ -12,9 +12,12 @@ export class WorkoutFeedback {
   @Prop({ required: true, min: 1, max: 10 }) rpe: number;
   @Prop({ required: true, enum: ['too_easy', 'just_right', 'too_hard'] }) difficulty: string;
   @Prop({ min: 1, max: 5 }) enjoyment?: number;
+  // Encrypted at rest when HEALTH_DATA_ENCRYPTION_KEY is set; length limits are
+  // enforced on the plaintext by CreateFeedbackDto, not here on the ciphertext.
   @Prop({ type: [String], default: [] }) painLocations: string[];
-  @Prop({ maxlength: 500 }) notes?: string;
+  @Prop() notes?: string;
 }
 
 export const WorkoutFeedbackSchema = SchemaFactory.createForClass(WorkoutFeedback);
 WorkoutFeedbackSchema.index({ userId: 1, createdAt: -1 });
+WorkoutFeedbackSchema.index({ userId: 1, sessionRef: 1, exercise: 1 }, { partialFilterExpression: { sessionRef: { $type: 'string' } } });

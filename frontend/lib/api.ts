@@ -809,9 +809,15 @@ class ApiClient {
   async getExerciseFilters() { return this.request<ExerciseFilters>('/exercises/filters', { timeoutMs: 30_000 }, getCoachApiBaseUrl()); }
   async getExercise(slug: string) { return this.request<ExerciseRecord>(`/exercises/${encodeURIComponent(slug)}`, { timeoutMs: 30_000 }, getCoachApiBaseUrl()); }
   async getIndependentCoachPlan(profile: Record<string, unknown>) {
-    const { goal, days, duration, equipment, conditions, createdAt, age, healthConsentAt } = profile;
-    const health = healthConsentAt ? { healthConsentAt, injuries: profile.injuries, healthRisks: profile.healthRisks } : {};
-    return this.request<CoachPlanRecord>('/coach/plan', { method: 'POST', timeoutMs: 60_000, body: JSON.stringify({ profile: { goal, days, duration, equipment, conditions, createdAt, age, ...health } }) }, getCoachApiBaseUrl());
+    const { goal, days, duration, equipment, conditions, createdAt } = profile;
+    // The standalone coach validates strictly: an empty or numeric age, a
+    // non-ISO consent date or non-string list entries would reject the whole
+    // plan request, so only send optional fields in the exact accepted shape.
+    const age = String(profile.age ?? '').trim();
+    const consent = typeof profile.healthConsentAt === 'string' && !Number.isNaN(Date.parse(profile.healthConsentAt)) ? new Date(profile.healthConsentAt).toISOString() : null;
+    const list = (value: unknown) => Array.isArray(value) ? [...new Set(value.filter((item): item is string => typeof item === 'string').map(item => item.trim()).filter(item => item && item.length <= 80))].slice(0, 10) : [];
+    const health = consent ? { healthConsentAt: consent, injuries: list(profile.injuries), healthRisks: list(profile.healthRisks) } : {};
+    return this.request<CoachPlanRecord>('/coach/plan', { method: 'POST', timeoutMs: 60_000, body: JSON.stringify({ profile: { goal, days, duration, equipment, conditions, createdAt, ...(/^\d{1,3}$/.test(age) && { age }), ...health } }) }, getCoachApiBaseUrl());
   }
 
   // Food scanning

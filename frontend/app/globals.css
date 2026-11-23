@@ -5614,7 +5614,9 @@ body{min-height:100dvh}
   border-bottom: 1px solid var(--line);
 }
 .engagement-stat-grid > div { min-width: 0; display: grid; gap: 3px; padding: 0 8px; border-left: 1px solid var(--line); }
-.engagement-stat-grid > div:first-child { padding-left: 0; border-left: 0; }
+.engagement-stat-grid > div:nth-child(odd) { padding-left: 0; border-left: 0; }
+/* Four stats (the live dashboard adds total enabled accounts) need two rows. */
+.engagement-stat-grid:has(> div:nth-child(4)) { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 12px; }
 .engagement-stat-grid b { color: var(--ink); font-size: 12px; }
 .engagement-stat-grid small { color: var(--muted); font-size: 11px; line-height: 1.35; }
 .engagement-section-head { min-height: 34px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -8536,6 +8538,10 @@ button, input, select, textarea { max-width: 100%; }
 .admin-reference .engagement-stat-grid > div { padding: 0 10px; border-right: 1px solid var(--line); background: transparent; border-radius: 0; }
 .admin-reference .engagement-stat-grid > div:first-child { padding-left: 0; }
 .admin-reference .engagement-stat-grid > div:last-child { border-right: 0; }
+/* With a fourth stat the grid becomes two rows; the base border-left already
+   divides the columns, so the per-row border-right would only draw a stray
+   edge on the first row. */
+.admin-reference .engagement-stat-grid:has(> div:nth-child(4)) > div { border-right: 0; }
 .admin-reference .engagement-stat-grid b { font-size: 17px; font-weight: 600; }
 .admin-reference .engagement-stat-grid small { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; }
 .admin-reference .engagement-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
@@ -10537,3 +10543,8 @@ body:has(.admin-reference-form) .signed-in-layout :is(.home-content, .scan-conte
 .connection-offline-notice span { display: grid; gap: 4px; }
 .connection-offline-notice strong { font-size: 14px; font-weight: 600; }
 .connection-offline-notice small { font-size: 12px; line-height: 1.45; opacity: .8; }
+
+/* Admin route: access check and denied state before the analytics dashboard. */
+.admin-access-state { max-width: 520px; margin: 0 auto; padding: 32px 20px; display: grid; gap: 12px; color: var(--ink); }
+.admin-access-state h1 { margin: 0; font-size: 22px; }
+.admin-access-state p { margin: 0; line-height: 1.5; }

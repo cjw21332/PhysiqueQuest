@@ -5,7 +5,7 @@ import { Profile } from '../profile/schemas/profile.schema.js';
 import { Settings } from '../settings/schemas/settings.schema.js';
 import { ExerciseDbService } from '../exercises/exercisedb.service.js';
 import { FeedbackService } from '../feedback/feedback.service.js';
-import { CoachPlanner, type CoachFeedback } from './coach-planner.js';
+import { CoachPlanner, feedbackSignals, type CoachFeedback } from './coach-planner.js';
 import { createHash } from 'node:crypto';
 import { CoachProgram } from './coach-program.schema.js';
 import { z } from 'zod';
@@ -24,13 +24,14 @@ export function coachProgramContext(profile: Profile, values: Record<string, unk
   const healthRisks = profile.healthConsentAt ? profile.healthRisks ?? [] : [];
   const context = { ...profile, injuries, healthRisks, equipment, duration };
   const schedule = new CoachPlanner().build(context, []);
+  const signals = feedbackSignals(feedback);
   const sorted = (items: string[]) => [...new Set(items.map(value => value.trim().toLowerCase()))].sort();
   const contextHash = createHash('sha256').update(JSON.stringify({
     version: 1, goal: profile.goal, days: schedule.days.filter(day => day.isWorkoutDay).map(day => day.index),
-    ...(Number(profile.age) >= 35 && { preventive: true }),
+    ...(Number(profile.age) >= 50 && { olderAdult: true }),
     ...(injuries.length && { injuries: sorted(injuries) }),
     ...(healthRisks.length && { healthRisks: sorted(healthRisks) }),
-    ...(feedback.length && { feedback }),
+    ...(signals.length && { feedback: signals }),
     duration, equipment: sorted(equipment), conditions: sorted(profile.conditions ?? []),
   })).digest('hex');
   return { context, contextHash, equipment, schedule };

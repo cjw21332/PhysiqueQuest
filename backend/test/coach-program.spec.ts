@@ -49,12 +49,13 @@ describe('saved per-user Coach programs', () => {
     expect(test.feedback.list).toHaveBeenCalledWith(user, 20);
   });
 
-  it('applies the age boundary and reviews an unrecognized consented restriction', async () => {
+  it('keeps volume at the age boundary and reviews an unrecognized consented restriction', async () => {
     const test = setup(), service = test.service();
-    test.change({ age: '34' });
+    test.change({ age: '49' });
     expect((await service.getPlan(user)).days[0].exercises[0].prescription).toBe('4 × 10');
-    test.change({ age: '35' });
-    expect((await service.getPlan(user)).days[0].exercises[0].prescription).toBe('2 × 8 at easy effort');
+    // Age alone never cuts volume; only high-impact moves are left out from 50.
+    test.change({ age: '50' });
+    expect((await service.getPlan(user)).days[0].exercises[0].prescription).toBe('4 × 10');
     test.change({ healthConsentAt: new Date(), injuries: ['other restriction'] });
     expect((await service.getPlan(user)).days[0]).toMatchObject({ availabilityNote: expect.stringContaining('needs review') });
   });
@@ -138,5 +139,27 @@ describe('saved per-user Coach programs', () => {
     test.provider.getForPlan.mockResolvedValue([]);
     expect((await service.getPlan(user)).libraryReady).toBe(false);
     expect(test.records.size).toBe(1);
+  });
+});
+
+describe('coach planner adaptation signals', () => {
+  it('leaves out high-impact moves from 50 without cutting volume', async () => {
+    const { CoachPlanner } = await import('../src/coach/coach-planner.js');
+    const library = [
+      { id: 'burpee', name: 'Burpee', group: 'Cardio', targetMuscle: 'cardiovascular system', equipment: 'Body weight', pose: 'missing', instructions: [] },
+      { id: 'walk', name: 'Brisk walk', group: 'Cardio', targetMuscle: 'cardiovascular system', equipment: 'Body weight', pose: 'missing', instructions: [] },
+    ];
+    const base = { goal: 'Endurance', days: ['M', 'T', 'W'], duration: '45 min', equipment: [] as string[] };
+    const names = (age: string) => new CoachPlanner().build({ ...base, age }, library).days.flatMap(day => day.exercises.map(exercise => exercise.name));
+    expect(names('30')).toContain('Burpee');
+    expect(names('50')).not.toContain('Burpee');
+    expect(new CoachPlanner().build({ ...base, age: '60' }, library).sets).toBe(new CoachPlanner().build({ ...base, age: '30' }, library).sets);
+  });
+
+  it('does not regenerate a program for feedback that changes nothing', async () => {
+    const { coachProgramContext } = await import('../src/coach/coach.service.js');
+    const hash = (rpe: number) => coachProgramContext(profile as any, {}, [{ exercise: 'Row', rpe, difficulty: 'just_right', pain: false }]).contextHash;
+    expect(hash(6)).toBe(hash(7));
+    expect(hash(6)).not.toBe(hash(9));
   });
 });

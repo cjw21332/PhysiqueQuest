@@ -120,6 +120,34 @@ function exclusionsFor(label: string) {
   return canonical ? EXCLUSIONS[canonical] : undefined;
 }
 
+const OLDER_ADULT_AGE = 50;
+const HIGH_IMPACT_TERMS = ['max effort', 'sprint', 'plyometric', 'depth jump', 'box jump', 'jump squat', 'burpee'];
+
+function feedbackEffort(entry?: CoachFeedback): 'hard' | 'easy' | 'normal' {
+  if (!entry) return 'normal';
+  if (entry.difficulty === 'too_hard' || entry.rpe >= 8) return 'hard';
+  if (entry.difficulty === 'too_easy' && entry.rpe <= 5) return 'easy';
+  return 'normal';
+}
+
+/** Most recent report per exercise; input is newest first. */
+function latestFeedback(feedback: CoachFeedback[]) {
+  const latest = new Map<string, CoachFeedback>();
+  for (const entry of feedback) {
+    const key = normalized(entry.exercise);
+    if (key && !latest.has(key)) latest.set(key, entry);
+  }
+  return latest;
+}
+
+/** Only the signals the planner acts on. Hashing these instead of raw reports
+ * means a new RPE that changes nothing (6 → 7) does not regenerate the program. */
+export function feedbackSignals(feedback: CoachFeedback[]) {
+  return [...latestFeedback(feedback)].map(([exercise, entry]) => ({ exercise, effort: feedbackEffort(entry), pain: entry.pain, enjoyment: entry.enjoyment ?? null }))
+    .filter(signal => signal.pain || signal.effort !== 'normal' || signal.enjoyment !== null)
+    .sort((a, b) => a.exercise.localeCompare(b.exercise));
+}
+
 export interface PlanProfile { goal: string; age?: string; injuries?: string[]; healthRisks?: string[]; days?: string[]; duration?: string; equipment?: string[]; conditions?: string[]; createdAt?: string | Date; }
 
 export class CoachPlanner {
@@ -130,18 +158,16 @@ export class CoachPlanner {
     const scheduled = scheduledWeekdays(profile.days);
     const sessionCount = scheduled.size;
     const focusRotation = FOCUS_BY_GOAL[profile.goal] ?? FOCUS_BY_GOAL['General fitness'];
-    const preventive = Number(profile.age) >= 35;
-    const typicalCount = EXERCISES_BY_DURATION[duration] ?? 5;
-    const perWorkout = preventive ? Math.min(4, typicalCount) : typicalCount;
+    // Age alone is not a reason to cut training volume: resistance training
+    // matters more with age. From 50, only leave out high-impact and maximal
+    // efforts; reported effort and pain still ease individual exercises.
+    const olderAdult = Number(profile.age) >= OLDER_ADULT_AGE;
+    const perWorkout = EXERCISES_BY_DURATION[duration] ?? 5;
     const restrictions = [...(profile.injuries ?? []), ...(profile.healthRisks ?? [])];
     const unknownRestriction = restrictions.some(label => !exclusionsFor(label));
     const excluded = [...(profile.conditions ?? []), ...restrictions].flatMap(label => exclusionsFor(label) ?? []);
-    if (preventive) excluded.push('max effort', 'sprint', 'plyometric', 'depth jump');
-    const latest = new Map<string, CoachFeedback>();
-    for (const entry of feedback) {
-      const key = normalized(entry.exercise);
-      if (!latest.has(key)) latest.set(key, entry);
-    }
+    if (olderAdult) excluded.push(...HIGH_IMPACT_TERMS);
+    const latest = latestFeedback(feedback);
     let workoutIndex = 0;
 
     const days = WEEKDAYS.map(weekday => {
@@ -149,7 +175,7 @@ export class CoachPlanner {
         return { ...weekday, isWorkoutDay: false, title: weekday.index === 6 ? 'Rest day' : 'Recovery day', focus: null, exercises: [] };
       }
       const [title, keywords] = focusRotation[workoutIndex % focusRotation.length];
-      const picked = unknownRestriction ? [] : this.pickExercises(available, keywords, excluded, perWorkout, profile.goal, latest, preventive);
+      const picked = unknownRestriction ? [] : this.pickExercises(available, keywords, excluded, perWorkout, profile.goal, latest);
       workoutIndex += 1;
       const tip = picked.find(exercise => /press|squat|row|deadlift/i.test(exercise.name) && exercise.formTip) ?? picked.find(exercise => exercise.formTip);
       return { ...weekday, isWorkoutDay: true, title, focus: title, exercises: picked,
@@ -167,7 +193,7 @@ export class CoachPlanner {
       sessionCount,
       duration,
       libraryReady: available.length > 0,
-      sets: preventive ? '2 sets at easy effort' : SETS_BY_GOAL[profile.goal] ?? SETS_BY_GOAL['General fitness'],
+      sets: SETS_BY_GOAL[profile.goal] ?? SETS_BY_GOAL['General fitness'],
       days,
     };
   }
@@ -184,7 +210,7 @@ export class CoachPlanner {
     });
   }
 
-  private pickExercises(library: LibraryExercise[], keywords: string[], excluded: string[], count: number, goal: string, feedback: Map<string, CoachFeedback>, preventive: boolean) {
+  private pickExercises(library: LibraryExercise[], keywords: string[], excluded: string[], count: number, goal: string, feedback: Map<string, CoachFeedback>) {
     const report = (exercise: LibraryExercise) => feedback.get(normalized(exercise.name)) ?? feedback.get(normalized(exercise.id));
     const safe = library.filter(exercise => {
       const haystack = normalized(`${exercise.name} ${exercise.group} ${exercise.targetMuscle}`);
@@ -222,9 +248,9 @@ export class CoachPlanner {
     function prescription(exercise: LibraryExercise) {
       const entry = report(exercise);
       const timed = primaryCategory(exercise.targetMuscle, exercise.group) === 'Cardio' || /plank|wall sit|hold/i.test(exercise.name);
-      if (preventive || entry?.difficulty === 'too_hard' || (entry?.rpe ?? 0) >= 8) return timed ? '2 × 20 s at easy effort' : '2 × 8 at easy effort';
+      if (feedbackEffort(entry) === 'hard') return timed ? '2 × 20 s at easy effort' : '2 × 8 at easy effort';
       const base = timed ? '3 × 45 s' : goal === 'Build muscle' ? (/bench|incline|floor press|squat|row|deadlift/i.test(exercise.name) ? '4 × 10' : /lateral raise/i.test(exercise.name) ? '3 × 15' : /overhead|shoulder press/i.test(exercise.name) ? '3 × 10' : '3 × 12') : SETS_BY_GOAL[goal] ?? SETS_BY_GOAL['General fitness'];
-      if (entry?.difficulty === 'too_easy' && entry.rpe <= 5) {
+      if (feedbackEffort(entry) === 'easy') {
         return base.replace(/× (\d+)/, (_, amount) => '× ' + (Number(amount) + (timed ? 5 : 1)));
       }
       return base;

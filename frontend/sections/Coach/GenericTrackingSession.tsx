@@ -35,6 +35,6 @@ export default function GenericTrackingSession({name,config,onExit,pattern,overr
       {stage==='active'&&camera.recoveryState.phase!=='idle'&&<button className="secondary" type="button" onClick={camera.switchFacing}>Switch camera</button>}
       {stage==='active'&&<button className="secondary" type="button" onClick={finish}>Finish tracking</button>}</div>
       {camera.nativePreview&&<p>Experimental tracking is available in a browser, not the native camera view.</p>}
-    </>:<div className="generic-tracking-summary"><h4>Unsaved summary</h4><WorkoutFeedback source="pose" exercise={name}/><p>{summary.reps} detected repetitions · {summary.partial} partial movements</p><p>Review and enter your workout values manually. No camera images or results were saved.</p><button className="primary" type="button" onClick={onExit}>Confirm and return</button></div>}
+    </>:<div className="generic-tracking-summary"><h4>Unsaved summary</h4><p>{summary.reps} detected repetitions · {summary.partial} partial movements</p><p>Review and enter your workout values manually. No camera images were saved.</p><WorkoutFeedback source="pose" exercise={name}/><button className="primary" type="button" onClick={onExit}>Confirm and return</button></div>}
   </section>;
 }

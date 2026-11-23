@@ -53,7 +53,7 @@ export default function DietaryPlan({ saved, profile, meals: loggedMeals, onBack
     <div className="diet-tabs" role="group" aria-label="Dietary plan sections">{(['Active Plan', 'Custom Goals', 'Meal Schedule'] as const).map(item => <button type="button" className={tab === item ? 'active' : ''} aria-pressed={tab === item} key={item} disabled={readOnly && item === 'Custom Goals'} onClick={() => setTab(item)}>{item}</button>)}</div>
     {message && <p role="status" className="diet-message">{message}</p>}
     {tab === 'Active Plan' && scanned.length > 0 && <section className="diet-card"><h3>Today's scans and your plan</h3>
-      <p>{scanned.length} scanned food entries are included in today's diary. Your current plan targets {targets.protein} g of protein.</p>
+      <p>{scanned.length === 1 ? '1 scanned food entry is' : `${scanned.length} scanned food entries are`} included in today's diary. Your current plan targets {targets.protein} g of protein.</p>
       {loggedProtein !== null ? <p>{nutrientLabel(loggedProtein, 'g')} protein logged across all meals today.</p> : <p>Some entries are missing protein values. Review the portions before comparing your intake with your target.</p>}
       {age >= 18 && saved && loggedProtein !== null && loggedProtein < targets.protein && <p>For your next meal, consider beans, tofu, eggs or another protein source you eat. If you regularly struggle to meet your target with food, ask a dietitian whether a protein supplement fits your diet.</p>}
       <a href="https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/" target="_blank" rel="noreferrer">NIH guide to exercise supplements</a>

@@ -56,6 +56,9 @@ const faultJoints: Record<string, readonly number[]> = {
 const mapPoint = (landmark: { x: number; y: number } | undefined, width: number, height: number, scale: number, ox: number, oy: number) =>
   landmark ? { x: ox + landmark.x * width * scale, y: oy + landmark.y * height * scale } : null;
 
+// Backward capture-clock jumps larger than this are a camera restart, not a late frame.
+const CAPTURE_CLOCK_RESET_MS = 2000;
+
 export default function PoseTrackerNative({ name, pattern, support, contactName, override, close, onSafetyAlarm, onSafetyStop, deliveryStatus }: Props) {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
@@ -264,7 +267,16 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
     } | undefined;
     const captureTime = frame?.timestamp;
     if (typeof captureTime === 'number' && Number.isFinite(captureTime)) {
-      if (lastCaptureTime.current !== null && captureTime <= lastCaptureTime.current) return;
+      const last = lastCaptureTime.current;
+      if (last !== null && captureTime <= last) {
+        // A small step back is a late or duplicate frame: drop it. A large jump
+        // back means the camera restarted its clock (for example a stale frame
+        // from the previous camera arrived first); start a fresh timeline
+        // instead of discarding every frame from now on.
+        if (last - captureTime < CAPTURE_CLOCK_RESET_MS) return;
+        landmarkFilter.reset();
+        recentRepTimes.current = [];
+      }
       lastCaptureTime.current = captureTime;
     }
     const ts = typeof captureTime === 'number' && Number.isFinite(captureTime) ? captureTime : performance.now();
@@ -420,7 +432,7 @@ export default function PoseTrackerNative({ name, pattern, support, contactName,
 
       <View style={styles.actions}>
         <Pressable accessibilityRole="button" style={styles.button} onPress={switchCamera}><ActionIcon name="switch"/><Text style={styles.buttonText}>Switch camera</Text></Pressable>
-        {!paused && <Pressable accessibilityRole="button" style={styles.button} onPress={() => { togglePause(); setStatus('Paused for recovery. Resume when you feel ready.'); }}><Text style={styles.buttonText}>Effort too high</Text></Pressable>}
+        {!paused && <Pressable accessibilityRole="button" accessibilityHint="Pauses tracking so you can recover" style={styles.button} onPress={() => { togglePause(); setStatus('Paused for recovery. Breathe, rest and resume only when you feel ready.'); }}><Text style={styles.buttonText}>Effort too high</Text></Pressable>}
         <Pressable accessibilityRole="button" style={styles.button} onPress={togglePause}><ActionIcon name={paused ? 'play' : 'pause'}/><Text style={styles.buttonText}>{paused ? 'Resume' : 'Pause'}</Text></Pressable>
         <Pressable accessibilityRole="button" accessibilityState={{ checked: muted }} style={styles.button} onPress={() => { if (!muted) { speechGeneration.current++; void Speech.stop(); } setMuted(value => !value); }}><Text style={styles.buttonText}>{muted ? 'Unmute cues' : 'Mute cues'}</Text></Pressable>
         <Pressable accessibilityRole="button" style={[styles.button, styles.stop]} onPress={finishSession}><ActionIcon name="stop"/><Text style={styles.stopText}>End session</Text></Pressable>

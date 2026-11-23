@@ -1,0 +1,109 @@
+/* Equipment check: the fieldset gets no styling from the app shell, so give it
+   a group title plus a panel, readable warning text and real controls. */
+.equipment-check {
+  margin: 14px 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.equipment-check > legend {
+  display: block;
+  padding: 0;
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.equipment-check-body {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--bg-tertiary);
+}
+.equipment-check-body > label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+  cursor: pointer;
+}
+.equipment-check-body > label input[type='checkbox'] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--green);
+}
+.equipment-check-alert {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--red-dark);
+}
+.equipment-check-body > details > summary {
+  padding: 10px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.equipment-check-body > details > summary:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.equipment-check-body > details > p {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.equipment-check-body input[type='file'] {
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.equipment-check-body input[type='file']::file-selector-button {
+  margin-right: 10px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--soft);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.equipment-check-body button {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--green);
+  color: var(--surface);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.equipment-check-body button:disabled { opacity: 0.5; cursor: default; }
+.equipment-check-body button:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.equipment-check-message {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.equipment-check-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 10px 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink);
+  cursor: pointer;
+}
+.equipment-check-consent input[type='checkbox'] { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--green); }
+.equipment-check-consent input[type='checkbox']:disabled { opacity: 0.5; }
