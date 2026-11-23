@@ -99,6 +99,15 @@ export class Profile {
   @Prop()
   contactRelationship?: string;
 
+  @Prop({ type: [String], default: [] })
+  injuries: string[];
+
+  @Prop({ type: [String], default: [] })
+  healthRisks: string[];
+
+  @Prop()
+  healthConsentAt?: Date;
+
   @Prop()
   createdAt?: Date;
 

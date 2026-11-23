@@ -21,14 +21,19 @@ describe.skipIf(process.env.PQ_SECURITY_DB_TEST !== '1' || !process.env.MONGODB_
   it('encrypts stored create/save/update fields while hydrated, lean and JSON reads return plaintext', async () => {
     const model = connection.model(Profile.name, ProfileSchema); await model.init();
     const userId = new Types.ObjectId();
-    const profile = await model.create({ userId, name: 'Synthetic', age: '25', height: '170', heightUnit: 'cm', weight: '70', weightUnit: 'kg', gender: 'Other', activity: 'active', goal: 'fitness', seriousness: 'casual', equipment: [], days: [], duration: '30', conditions: ['Asthma'], healthNotes: 'Private', contactName: 'Contact', contactPhone: '123' });
+    const profile = await model.create({ userId, name: 'Synthetic', age: '25', height: '170', heightUnit: 'cm', weight: '70', weightUnit: 'kg', gender: 'Other', activity: 'active', goal: 'fitness', seriousness: 'casual', equipment: [], days: [], duration: '30', conditions: ['Asthma'], injuries: ['Knee'], healthRisks: ['Hypertension'], healthNotes: 'Private', contactName: 'Contact', contactPhone: '123' });
     expect(profile.healthNotes).toBe('Private');
     expect(profile.toJSON().conditions).toEqual(['Asthma']);
+    expect(profile.toJSON().injuries).toEqual(['Knee']);
+    expect(profile.toJSON().healthRisks).toEqual(['Hypertension']);
     const stored = await model.collection.findOne({ userId });
     expect(stored!.healthNotes).toMatch(/^pqenc:v1:/);
     expect(stored!.conditions[0]).toMatch(/^pqenc:v1:/);
+    expect(stored!.injuries[0]).toMatch(/^pqenc:v1:/);
+    expect(stored!.healthRisks[0]).toMatch(/^pqenc:v1:/);
     expect((await model.findOne({ userId }))!.contactName).toBe('Contact');
     expect((await model.findOne({ userId }).lean())!.healthNotes).toBe('Private');
+    expect((await model.findOne({ userId }).lean())!.injuries).toEqual(['Knee']);
     const changed = await model.findOneAndUpdate({ userId }, { $set: { healthNotes: 'Updated', conditions: ['Changed'] } }, { returnDocument: 'after', runValidators: true });
     expect(changed!.healthNotes).toBe('Updated');
     expect((await model.collection.findOne({ userId }))!.healthNotes).toMatch(/^pqenc:v1:/);

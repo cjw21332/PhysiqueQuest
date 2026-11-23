@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
-export const HEALTH_FIELDS = ['conditions', 'healthNotes', 'contactName', 'contactPhone', 'contactRelationship'] as const;
+export const HEALTH_FIELDS = ['conditions', 'healthNotes', 'contactName', 'contactPhone', 'contactRelationship', 'injuries', 'healthRisks'] as const;
 const PREFIX = 'pqenc:v1:';
 type HealthRecord = Record<string, any>;
 function encryptionKey() {
@@ -40,7 +40,7 @@ function transform(value: unknown, owner: unknown, field: string, encrypt: boole
 export function transformProfile<T extends HealthRecord>(profile: T, encrypt: boolean): T {
   for (const field of HEALTH_FIELDS) {
     const value = profile[field];
-    const result = field === 'conditions' && Array.isArray(value)
+    const result = Array.isArray(value)
       ? value.map((entry, index) => transform(entry, profile.userId, `${field}.${index}`, encrypt))
       : transform(value, profile.userId, field, encrypt);
     const changed = Array.isArray(value) && Array.isArray(result) ? value.some((entry, index) => entry !== result[index]) : value !== result;

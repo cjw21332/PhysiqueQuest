@@ -126,6 +126,10 @@ export class CreateProfileDto {
   @IsOptional()
   @IsIn(['Parent', 'Partner', 'Sibling', 'Friend', 'Other'])
   contactRelationship?: string;
+
+  @IsOptional() @IsArray() @ArrayMaxSize(30) @IsString({ each: true }) @MaxLength(80, { each: true }) injuries?: string[];
+  @IsOptional() @IsArray() @ArrayMaxSize(30) @IsString({ each: true }) @MaxLength(80, { each: true }) healthRisks?: string[];
+  @IsOptional() @IsDateString() healthConsentAt?: string;
 }
 
 export class UpdateProfileDto {
@@ -157,4 +161,7 @@ export class UpdateProfileDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(100) contactName?: string;
   @IsOptional() @IsString() @MinLength(3) @MaxLength(30) contactPhone?: string;
   @IsOptional() @IsIn(['Parent', 'Partner', 'Sibling', 'Friend', 'Other']) contactRelationship?: string;
+  @IsOptional() @IsArray() @ArrayMaxSize(30) @IsString({ each: true }) @MaxLength(80, { each: true }) injuries?: string[];
+  @IsOptional() @IsArray() @ArrayMaxSize(30) @IsString({ each: true }) @MaxLength(80, { each: true }) healthRisks?: string[];
+  @IsOptional() @IsDateString() healthConsentAt?: string;
 }

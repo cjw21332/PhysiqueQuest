@@ -30,6 +30,7 @@ import { SyncModule } from './sync/sync.module.js';
 import { AnalysisJobsModule } from './jobs/analysis-jobs.module.js';
 import { ChatModule } from './chat/chat.module.js';
 import { DatasetModule } from './dataset/dataset.module.js';
+import { FeedbackModule } from './feedback/feedback.module.js';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { DatasetModule } from './dataset/dataset.module.js';
     AnalysisJobsModule,
     ChatModule,
     DatasetModule,
+    FeedbackModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],
