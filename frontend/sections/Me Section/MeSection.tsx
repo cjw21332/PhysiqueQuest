@@ -40,13 +40,6 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const router = useRouter();
   const connected = useBackendConnection();
   const { settings, loading: settingsLoading, error: settingsError, updateSettings, retry: retrySettings } = useSettings();
-  const [adminAccess, setAdminAccess] = useState(false);
-  useEffect(() => {
-    let active = true;
-    setAdminAccess(false);
-    if (connected) void api.getAuthMe().then(user => { if (active) setAdminAccess(user.role === 'admin'); }).catch(() => {});
-    return () => { active = false; };
-  }, [connected, profile.email]);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [photoOpen, setPhotoOpen] = useState(false);
   const [currentProfile, setCurrentProfile] = useState(profile);
@@ -147,7 +140,6 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} disabled={!connected} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
       <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail={accountEmail ? `Verified with a code sent to ${accountEmail}` : 'Verified with a code sent to your account email'} disabled={!connected} onClick={() => setPasswordOpen(true)}/></div>
-      {connected && adminAccess && <><h3 className="me-group-title">Administrator</h3><div className="me-list"><SettingRow icon="trend" title="Admin analytics" detail="Accounts, sessions, retention and emergency events" onClick={() => router.push('/admin')}/></div></>}
       <button type="button" className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
     </div>
     <BottomNav />

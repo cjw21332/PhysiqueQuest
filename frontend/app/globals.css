@@ -10544,7 +10544,3 @@ body:has(.admin-reference-form) .signed-in-layout :is(.home-content, .scan-conte
 .connection-offline-notice strong { font-size: 14px; font-weight: 600; }
 .connection-offline-notice small { font-size: 12px; line-height: 1.45; opacity: .8; }
 
-/* Admin route: access check and denied state before the analytics dashboard. */
-.admin-access-state { max-width: 520px; margin: 0 auto; padding: 32px 20px; display: grid; gap: 12px; color: var(--ink); }
-.admin-access-state h1 { margin: 0; font-size: 22px; }
-.admin-access-state p { margin: 0; line-height: 1.5; }
