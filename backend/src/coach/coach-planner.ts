@@ -100,17 +100,48 @@ export interface LibraryExercise {
   gifUrl?: string;
 }
 
-export interface PlanProfile { goal: string; days?: string[]; duration?: string; equipment?: string[]; conditions?: string[]; createdAt?: string | Date; }
+const normalized = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+export interface CoachFeedback {
+  exercise: string;
+  rpe: number;
+  difficulty: string;
+  enjoyment?: number;
+  pain: boolean;
+}
+
+const restrictionAliases: Record<string, string> = {
+  knee: 'Knee injury', shoulder: 'Shoulder impingement', 'lower back': 'Lower back pain',
+  'high blood pressure': 'Hypertension',
+};
+function exclusionsFor(label: string) {
+  const key = normalized(label);
+  const canonical = restrictionAliases[key] ?? Object.keys(EXCLUSIONS).find(name => normalized(name) === key);
+  return canonical ? EXCLUSIONS[canonical] : undefined;
+}
+
+export interface PlanProfile { goal: string; age?: string; injuries?: string[]; healthRisks?: string[]; days?: string[]; duration?: string; equipment?: string[]; conditions?: string[]; createdAt?: string | Date; }
 
 export class CoachPlanner {
-  build(profile: PlanProfile, library: LibraryExercise[]) {
+  build(profile: PlanProfile, library: LibraryExercise[], feedback: CoachFeedback[] = []) {
     const equipment = profile.equipment ?? [];
     const duration = profile.duration ?? '45 min';
     const available = this.filterByEquipment(library, equipment);
     const scheduled = scheduledWeekdays(profile.days);
     const sessionCount = scheduled.size;
     const focusRotation = FOCUS_BY_GOAL[profile.goal] ?? FOCUS_BY_GOAL['General fitness'];
-    const perWorkout = EXERCISES_BY_DURATION[duration] ?? 5;
+    const preventive = Number(profile.age) >= 35;
+    const typicalCount = EXERCISES_BY_DURATION[duration] ?? 5;
+    const perWorkout = preventive ? Math.min(4, typicalCount) : typicalCount;
+    const restrictions = [...(profile.injuries ?? []), ...(profile.healthRisks ?? [])];
+    const unknownRestriction = restrictions.some(label => !exclusionsFor(label));
+    const excluded = [...(profile.conditions ?? []), ...restrictions].flatMap(label => exclusionsFor(label) ?? []);
+    if (preventive) excluded.push('max effort', 'sprint', 'plyometric', 'depth jump');
+    const latest = new Map<string, CoachFeedback>();
+    for (const entry of feedback) {
+      const key = normalized(entry.exercise);
+      if (!latest.has(key)) latest.set(key, entry);
+    }
     let workoutIndex = 0;
 
     const days = WEEKDAYS.map(weekday => {
@@ -118,13 +149,13 @@ export class CoachPlanner {
         return { ...weekday, isWorkoutDay: false, title: weekday.index === 6 ? 'Rest day' : 'Recovery day', focus: null, exercises: [] };
       }
       const [title, keywords] = focusRotation[workoutIndex % focusRotation.length];
-      const picked = this.pickExercises(available, keywords, profile.conditions ?? [], perWorkout, profile.goal);
+      const picked = unknownRestriction ? [] : this.pickExercises(available, keywords, excluded, perWorkout, profile.goal, latest, preventive);
       workoutIndex += 1;
       const tip = picked.find(exercise => /press|squat|row|deadlift/i.test(exercise.name) && exercise.formTip) ?? picked.find(exercise => exercise.formTip);
       return { ...weekday, isWorkoutDay: true, title, focus: title, exercises: picked,
         equipmentLabel: [...new Set(picked.map(exercise => exercise.equipment))].join(' + '),
         formTip: tip ? { exerciseName: tip.name, text: tip.formTip } : null,
-        availabilityNote: picked.length < perWorkout ? `Only ${picked.length} matching exercises are available for this program with your equipment and health preferences.` : null,
+        availabilityNote: unknownRestriction ? 'A reported health restriction needs review before exercises can be suggested.' : picked.length < perWorkout ? `Only ${picked.length} matching exercises are available for this program with your equipment and health preferences.` : null,
       };
     });
 
@@ -136,7 +167,7 @@ export class CoachPlanner {
       sessionCount,
       duration,
       libraryReady: available.length > 0,
-      sets: SETS_BY_GOAL[profile.goal] ?? SETS_BY_GOAL['General fitness'],
+      sets: preventive ? '2 sets at easy effort' : SETS_BY_GOAL[profile.goal] ?? SETS_BY_GOAL['General fitness'],
       days,
     };
   }
@@ -153,19 +184,18 @@ export class CoachPlanner {
     });
   }
 
-  private pickExercises(library: LibraryExercise[], keywords: string[], conditions: string[], count: number, goal: string) {
-    const normalized = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-    const excluded = conditions.flatMap(condition => EXCLUSIONS[condition] ?? []).map(normalized);
+  private pickExercises(library: LibraryExercise[], keywords: string[], excluded: string[], count: number, goal: string, feedback: Map<string, CoachFeedback>, preventive: boolean) {
+    const report = (exercise: LibraryExercise) => feedback.get(normalized(exercise.name)) ?? feedback.get(normalized(exercise.id));
     const safe = library.filter(exercise => {
       const haystack = normalized(`${exercise.name} ${exercise.group} ${exercise.targetMuscle}`);
       const category = primaryCategory(exercise.targetMuscle, exercise.group);
       const eligible = category === 'Cardio' ? goal === 'Endurance' : suitableStrengthMovement(exercise.name);
-      return !excluded.some(term => haystack.includes(term)) && eligible && matchesFocus(category, exercise.name, keywords);
+      return !report(exercise)?.pain && !excluded.some(term => haystack.includes(normalized(term))) && eligible && matchesFocus(category, exercise.name, keywords);
     });
     const priority = (exercise: LibraryExercise) => ['bodyweight push', 'horizontal push', 'vertical push', 'squat', 'hinge', 'row', 'vertical pull'].includes(movementFamily(exercise.name)) ? 0 : primaryCategory(exercise.targetMuscle, exercise.group) === 'Core' ? 2 : 1;
     const scored = safe
       .map(exercise => ({ exercise, score: commonMovementScore(exercise.name) }))
-      .sort((a, b) => priority(a.exercise) - priority(b.exercise) || b.score - a.score || a.exercise.name.localeCompare(b.exercise.name))
+      .sort((a, b) => (report(b.exercise)?.enjoyment ?? 3) - (report(a.exercise)?.enjoyment ?? 3) || priority(a.exercise) - priority(b.exercise) || b.score - a.score || a.exercise.name.localeCompare(b.exercise.name))
       .map(entry => entry.exercise);
     // Prefer distinct movement families before adding a second variant.
     const coreFocus = keywords.includes('core') || keywords.includes('ab');
@@ -186,8 +216,18 @@ export class CoachPlanner {
       targetMuscle: exercise.targetMuscle,
       equipment: exercise.equipment,
       tracking: 'Manual',
-      prescription: primaryCategory(exercise.targetMuscle, exercise.group) === 'Cardio' || /plank|wall sit|hold/i.test(exercise.name) ? '3 × 45 s' : goal === 'Build muscle' ? (/bench|incline|floor press|squat|row|deadlift/i.test(exercise.name) ? '4 × 10' : /lateral raise/i.test(exercise.name) ? '3 × 15' : /overhead|shoulder press/i.test(exercise.name) ? '3 × 10' : '3 × 12') : SETS_BY_GOAL[goal] ?? SETS_BY_GOAL['General fitness'],
+      prescription: prescription(exercise),
       formTip: exercise.instructions.find(step => step.trim()) ?? null,
     }));
+    function prescription(exercise: LibraryExercise) {
+      const entry = report(exercise);
+      const timed = primaryCategory(exercise.targetMuscle, exercise.group) === 'Cardio' || /plank|wall sit|hold/i.test(exercise.name);
+      if (preventive || entry?.difficulty === 'too_hard' || (entry?.rpe ?? 0) >= 8) return timed ? '2 × 20 s at easy effort' : '2 × 8 at easy effort';
+      const base = timed ? '3 × 45 s' : goal === 'Build muscle' ? (/bench|incline|floor press|squat|row|deadlift/i.test(exercise.name) ? '4 × 10' : /lateral raise/i.test(exercise.name) ? '3 × 15' : /overhead|shoulder press/i.test(exercise.name) ? '3 × 10' : '3 × 12') : SETS_BY_GOAL[goal] ?? SETS_BY_GOAL['General fitness'];
+      if (entry?.difficulty === 'too_easy' && entry.rpe <= 5) {
+        return base.replace(/× (\d+)/, (_, amount) => '× ' + (Number(amount) + (timed ? 5 : 1)));
+      }
+      return base;
+    }
   }
 }

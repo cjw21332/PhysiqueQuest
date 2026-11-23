@@ -14,6 +14,9 @@ export class ProfileService {
 
   async create(userId: string, createProfileDto: CreateProfileDto): Promise<HydratedDocument<Profile>> {
     validateProfileMeasurements(createProfileDto);
+    if ((createProfileDto.injuries?.length || createProfileDto.healthRisks?.length) && !createProfileDto.healthConsentAt) {
+      throw new BadRequestException('Consent is required to store injuries or health risks.');
+    }
     const ownerId = new Types.ObjectId(userId);
     // Check if profile already exists for this user
     const existingProfile = await this.profileModel.findOne({ userId: ownerId });
@@ -52,8 +55,18 @@ export class ProfileService {
       if (value !== undefined) patch[key] = value;
     }
     validateProfileMeasurements({ ...current.toObject(), ...patch });
+    const storingHealth = Boolean(updateProfileDto.injuries?.length || updateProfileDto.healthRisks?.length);
+    if (patch.healthConsentAt === null) {
+      patch.injuries = [];
+      patch.healthRisks = [];
+    } else if (storingHealth && !patch.healthConsentAt && !current.healthConsentAt) {
+      throw new BadRequestException('Consent is required to store injuries or health risks.');
+    }
+    // Match stored consent so a concurrent withdrawal wins over a stale edit.
+    const consentFilter = storingHealth && patch.healthConsentAt === undefined
+      ? { healthConsentAt: current.healthConsentAt } : {};
     const profile = await new AccountLifecycleFence(this.profileModel.db).withActiveWrite(userId, async session => this.profileModel.findOneAndUpdate(
-      { userId: new Types.ObjectId(userId) },
+      { userId: new Types.ObjectId(userId), ...consentFilter },
       { $set: patch },
       { returnDocument: 'after', runValidators: true },
     ).session(session));
@@ -80,7 +93,9 @@ export class ProfileService {
   }
 }
 
-export function validateProfileMeasurements(profile: Partial<Profile>): void {
+export function validateProfileMeasurements<T extends Partial<Pick<Profile,
+  'age' | 'weight' | 'weightUnit' | 'height' | 'heightUnit' | 'heightInches' | 'targetWeight' |
+  'chest' | 'waist' | 'arms' | 'chestUnit' | 'waistUnit' | 'armsUnit' | 'measurementUnit'>>>(profile: T): void {
   const age = Number(profile.age);
   if (!Number.isInteger(age) || age < 13 || age > 100) {
     throw new BadRequestException('Age must be between 13 and 100.');

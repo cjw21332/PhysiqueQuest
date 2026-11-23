@@ -34,6 +34,10 @@ const profileSchema = z.object({
   duration: z.enum(['20 min', '30 min', '45 min', '60 min']),
   equipment: z.array(z.enum(['Full gym', 'Dumbbells', 'Dumbbell', 'Barbell', 'Bodyweight', 'Bodyweight only', 'Resistance bands', 'Cable', 'Machine', 'Kettlebell'])).max(10),
   conditions: z.array(z.string().trim().min(1).max(80)).max(10),
+  age: z.string().trim().regex(/^\d{1,3}$/).optional(),
+  injuries: z.array(z.string().trim().min(1).max(80)).max(10).optional(),
+  healthRisks: z.array(z.string().trim().min(1).max(80)).max(10).optional(),
+  healthConsentAt: z.iso.datetime().optional(),
   createdAt: z.iso.datetime().optional(),
 }).strict();
 
@@ -47,8 +51,10 @@ export class StandaloneCoachController {
   async plan(@Body() body: unknown) {
     const parsed = z.object({ profile: profileSchema }).strict().safeParse(body);
     if (!parsed.success) throw new BadRequestException({ message: 'Invalid program context', errors: parsed.error.flatten() });
-    const rows = await this.catalog.getForPlan(parsed.data.profile.equipment, parsed.data.profile.goal);
-    return { ...new CoachPlanner().build(parsed.data.profile, rows.map(row => ({ ...row, id: row._id }))), source: SOURCE, coverageNote: 'Plan generated from a bounded live ExerciseDB selection.' };
+    const profile = parsed.data.profile;
+    const context = profile.healthConsentAt ? profile : { ...profile, injuries: [], healthRisks: [] };
+    const rows = await this.catalog.getForPlan(profile.equipment, profile.goal);
+    return { ...new CoachPlanner().build(context, rows.map(row => ({ ...row, id: row._id }))), source: SOURCE, coverageNote: 'Plan generated from a bounded live ExerciseDB selection.' };
   }
 }
 

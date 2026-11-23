@@ -26,11 +26,39 @@ function setup() {
   const provider = { getForPlan: vi.fn(async () => [{ _id: 'provider-bench', name: 'Dumbbell bench press', group: 'Chest', targetMuscle: 'Chest', equipment: 'Dumbbell', pose: 'missing', instructions: ['Keep wrists straight.'], gifUrl: 'https://example.com/fresh.gif' }]) };
   const profiles = { findOne: () => query(() => current) };
   const settings = { findOne: () => query(() => null) };
-  const service = () => new CoachService(profiles as any, settings as any, provider as any, lifecycleModel(programs as any));
-  return { service, provider, programs, records, change: (patch: any) => { current = { ...current, ...patch }; } };
+  const feedback = { list: vi.fn(async (_user: string, _limit: number): Promise<any[]> => []) };
+  const service = () => new CoachService(profiles as any, settings as any, provider as any, lifecycleModel(programs as any), feedback as any);
+  return { service, feedback, provider, programs, records, change: (patch: any) => { current = { ...current, ...patch }; } };
 }
 
 describe('saved per-user Coach programs', () => {
+  it('refreshes cached prescriptions and removes painful exercises using only the owner feedback', async () => {
+    const test = setup(), service = test.service();
+    const exercise = 'Dumbbell bench press';
+    const original = await service.getPlan(user);
+    test.feedback.list.mockResolvedValue([{ exercise, difficulty: 'too_easy', rpe: 4 }]);
+    const easy = await service.getPlan(user);
+    expect(easy.programVersion).not.toBe(original.programVersion);
+    expect(easy.days[0].exercises[0].prescription).toBe('4 × 11');
+    test.feedback.list.mockResolvedValue([{ exercise, difficulty: 'just_right', rpe: 9 }]);
+    expect((await service.getPlan(user)).days[0].exercises[0].prescription).toContain('easy effort');
+    test.feedback.list.mockResolvedValue([{ exercise, difficulty: 'too_hard', rpe: 9, painLocations: ['shoulder'], notes: 'private note' }]);
+    const painful = await service.getPlan(user);
+    expect(painful.days.flatMap(day => day.exercises)).toHaveLength(0);
+    expect(JSON.stringify(painful)).not.toMatch(/shoulder|private note/i);
+    expect(test.feedback.list).toHaveBeenCalledWith(user, 20);
+  });
+
+  it('applies the age boundary and reviews an unrecognized consented restriction', async () => {
+    const test = setup(), service = test.service();
+    test.change({ age: '34' });
+    expect((await service.getPlan(user)).days[0].exercises[0].prescription).toBe('4 × 10');
+    test.change({ age: '35' });
+    expect((await service.getPlan(user)).days[0].exercises[0].prescription).toBe('2 × 8 at easy effort');
+    test.change({ healthConsentAt: new Date(), injuries: ['other restriction'] });
+    expect((await service.getPlan(user)).days[0]).toMatchObject({ availabilityNote: expect.stringContaining('needs review') });
+  });
+
   it('saves an edited day for its owner and reloads it without changing another account', async () => {
     const test = setup(), service = test.service();
     const first = await service.getPlan(user);

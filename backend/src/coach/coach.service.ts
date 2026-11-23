@@ -4,7 +4,8 @@ import { Model, Types } from 'mongoose';
 import { Profile } from '../profile/schemas/profile.schema.js';
 import { Settings } from '../settings/schemas/settings.schema.js';
 import { ExerciseDbService } from '../exercises/exercisedb.service.js';
-import { CoachPlanner } from './coach-planner.js';
+import { FeedbackService } from '../feedback/feedback.service.js';
+import { CoachPlanner, type CoachFeedback } from './coach-planner.js';
 import { createHash } from 'node:crypto';
 import { CoachProgram } from './coach-program.schema.js';
 import { z } from 'zod';
@@ -16,14 +17,20 @@ const dayUpdateSchema = z.object({ programVersion: z.string().regex(/^[a-f0-9]{6
 
 type Program = ReturnType<CoachPlanner['build']> & { source: string; programVersion?: string };
 
-export function coachProgramContext(profile: Profile, values: Record<string, unknown>) {
+export function coachProgramContext(profile: Profile, values: Record<string, unknown>, feedback: CoachFeedback[] = []) {
   const equipment = profile.equipment ?? (Array.isArray(values.equipment) ? values.equipment as string[] : []);
   const duration = profile.duration ?? (typeof values.duration === 'string' ? values.duration : '45 min');
-  const context = { ...profile, equipment, duration };
+  const injuries = profile.healthConsentAt ? profile.injuries ?? [] : [];
+  const healthRisks = profile.healthConsentAt ? profile.healthRisks ?? [] : [];
+  const context = { ...profile, injuries, healthRisks, equipment, duration };
   const schedule = new CoachPlanner().build(context, []);
   const sorted = (items: string[]) => [...new Set(items.map(value => value.trim().toLowerCase()))].sort();
   const contextHash = createHash('sha256').update(JSON.stringify({
     version: 1, goal: profile.goal, days: schedule.days.filter(day => day.isWorkoutDay).map(day => day.index),
+    ...(Number(profile.age) >= 35 && { preventive: true }),
+    ...(injuries.length && { injuries: sorted(injuries) }),
+    ...(healthRisks.length && { healthRisks: sorted(healthRisks) }),
+    ...(feedback.length && { feedback }),
     duration, equipment: sorted(equipment), conditions: sorted(profile.conditions ?? []),
   })).digest('hex');
   return { context, contextHash, equipment, schedule };
@@ -32,17 +39,21 @@ export function coachProgramContext(profile: Profile, values: Record<string, unk
 @Injectable()
 export class CoachService {
   private readonly generating = new Map<string, Promise<Program>>();
-  constructor(@InjectModel(Profile.name) private readonly profiles: Model<Profile>, @InjectModel(Settings.name) private readonly settings: Model<Settings>, private readonly exercises: ExerciseDbService, @InjectModel(CoachProgram.name) private readonly programs: Model<CoachProgram>) {}
+  constructor(@InjectModel(Profile.name) private readonly profiles: Model<Profile>, @InjectModel(Settings.name) private readonly settings: Model<Settings>, private readonly exercises: ExerciseDbService, @InjectModel(CoachProgram.name) private readonly programs: Model<CoachProgram>, private readonly feedback?: FeedbackService) {}
   async getPlan(userId: string) {
     const fence = new AccountLifecycleFence(this.programs.db);
     if (!Types.ObjectId.isValid(userId)) throw new NotFoundException('Profile not found');
-    const [profile, settings, lifecycleGeneration] = await Promise.all([
+    const [profile, settings, lifecycleGeneration, reports] = await Promise.all([
       this.profileModel(userId),
       this.settings.findOne({ userId: new Types.ObjectId(userId) }).lean().exec(),
       fence.generation(userId),
+      this.feedback?.list(userId, 20) ?? [],
     ]);
     const values = (settings as { values?: Record<string, unknown> } | null)?.values ?? {};
-    const { equipment, context, schedule, contextHash } = coachProgramContext(profile, values);
+    const feedback = reports.map(({ exercise, rpe, difficulty, enjoyment, painLocations }) => ({
+      exercise, rpe, difficulty, enjoyment, pain: Boolean(painLocations?.some(location => location.trim())),
+    }));
+    const { equipment, context, schedule, contextHash } = coachProgramContext(profile, values, feedback);
     const filter = { userId: new Types.ObjectId(userId), contextHash };
     const saved = await this.programs.findOne(filter).lean().exec();
     // Refresh the week label locally; exercise selection never needs a daily API call.
@@ -52,7 +63,7 @@ export class CoachService {
     if (pending) return pending;
     const generation = (async (): Promise<Program> => {
       const library = (await this.exercises.getForPlan(equipment, profile.goal)).map(row => ({ ...row, id: row._id }));
-      const base = new CoachPlanner().build(context, library);
+      const base = new CoachPlanner().build(context, library, feedback);
       let ordered = base;
       if (base.libraryReady && base.days.some(day => day.exercises.length)) {
         try { ordered = await orderPlanWithOpenAI(base); }
