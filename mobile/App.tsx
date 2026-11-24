@@ -254,7 +254,7 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [readiness, setReadiness] = useState<DeviceReadiness | null>(null);
   const [cameraPreview, setCameraPreview] = useState<NativeCameraPreview | null>(null);
-  const [providerSession, setProviderSession] = useState<{token?:string;exercise:string;name:string;pattern:string;support:string;contactName?:string;override?:ExerciseConfigOverride}|null>(null);
+  const [providerSession, setProviderSession] = useState<{token?:string;exercise:string;name:string;pattern:string;support:string;contactName?:string;age?:number;override?:ExerciseConfigOverride}|null>(null);
   const [poseDeliveryStatus, setPoseDeliveryStatus] = useState<'idle' | 'pending' | 'delivered' | 'failed'>('idle');
   const poseSafetyAlarm = useCallback(() => {
     setPoseDeliveryStatus('pending');
@@ -514,6 +514,8 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
         allowsBackForwardNavigationGestures
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction={false}
+        // iOS: let the app's own site reuse camera access instead of prompting every session.
+        mediaCapturePermissionGrantType="grantIfSameHostElsePrompt"
         startInLoadingState
         bounces={false}
         overScrollMode="never"
@@ -568,6 +570,7 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
               pattern?: string;
               support?: string;
               contactName?: string;
+              age?: unknown;
               override?: unknown;
               status?: string;
               image?: string;
@@ -620,7 +623,7 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
             if (message.type === 'posetracker-native-start' && typeof message.exercise === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(message.exercise) && typeof message.name === 'string' && message.name.length <= 160 && typeof message.pattern === 'string' && /^[a-z_]{1,40}$/.test(message.pattern) && ['FULLY_SUPPORTED','PARTIALLY_SUPPORTED','NOT_YET_VALIDATED'].includes(message.support ?? '')) {
               stopNativeCamera();
               setPoseDeliveryStatus('idle');
-              setProviderSession({token:typeof message.token === 'string' && message.token.length <= 200 ? message.token : undefined,exercise:message.exercise,name:message.name,pattern:message.pattern,support:message.support!,contactName:typeof message.contactName === 'string' && message.contactName.length <= 100 ? message.contactName : undefined,override:message.override&&typeof message.override==='object'&&!Array.isArray(message.override)?message.override as ExerciseConfigOverride:undefined});
+              setProviderSession({token:typeof message.token === 'string' && message.token.length <= 200 ? message.token : undefined,exercise:message.exercise,name:message.name,pattern:message.pattern,support:message.support!,contactName:typeof message.contactName === 'string' && message.contactName.length <= 100 ? message.contactName : undefined,age:Number.isInteger(message.age) && (message.age as number) >= 13 && (message.age as number) <= 120 ? message.age as number : undefined,override:message.override&&typeof message.override==='object'&&!Array.isArray(message.override)?message.override as ExerciseConfigOverride:undefined});
             }
             if (message.type === 'posetracker-native-stop') setProviderSession(null);
             if (message.type === 'pose-safety-status' && providerSession && ['pending', 'delivered', 'failed'].includes(message.status ?? '')) setPoseDeliveryStatus(message.status as 'pending' | 'delivered' | 'failed');
@@ -891,7 +894,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AppContent onAuthenticated={onAuthenticated} />
-      {intro && <BrandIntro onDone={finishIntro}/>}
+      {intro && <BrandIntro onAnimationComplete={finishIntro}/>}
       <Modal visible={showUpdate} transparent animationType="fade" onRequestClose={dismissUpdate}>
         <View style={styles.updateBackdrop} accessibilityViewIsModal>
           <View style={styles.updateCard}>

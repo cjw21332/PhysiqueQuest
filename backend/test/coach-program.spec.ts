@@ -49,13 +49,15 @@ describe('saved per-user Coach programs', () => {
     expect(test.feedback.list).toHaveBeenCalledWith(user, 20);
   });
 
-  it('keeps volume at the age boundary and reviews an unrecognized consented restriction', async () => {
+  it('applies preventive age limits from 35 and reviews an unrecognized consented restriction', async () => {
     const test = setup(), service = test.service();
-    test.change({ age: '49' });
+    test.change({ age: '34' });
     expect((await service.getPlan(user)).days[0].exercises[0].prescription).toBe('4 × 10');
-    // Age alone never cuts volume; only high-impact moves are left out from 50.
-    test.change({ age: '50' });
-    expect((await service.getPlan(user)).days[0].exercises[0].prescription).toBe('4 × 10');
+    // From 35 sets are capped at 3; the plan says why.
+    test.change({ age: '35' });
+    const capped = await service.getPlan(user);
+    expect(capped.days[0].exercises[0].prescription).toBe('3 × 10');
+    expect(capped.ageNote).toContain('35+');
     test.change({ healthConsentAt: new Date(), injuries: ['other restriction'] });
     expect((await service.getPlan(user)).days[0]).toMatchObject({ availabilityNote: expect.stringContaining('needs review') });
   });
@@ -143,7 +145,16 @@ describe('saved per-user Coach programs', () => {
 });
 
 describe('coach planner adaptation signals', () => {
-  it('leaves out high-impact moves from 50 without cutting volume', async () => {
+  it('caps prescriptions by age band', async () => {
+    const { limitPrescription } = await import('../src/coach/coach-planner.js');
+    expect(limitPrescription('4 × 6', 'under35')).toBe('4 × 6');
+    expect(limitPrescription('4 × 6', '35to49')).toBe('3 × 8');
+    expect(limitPrescription('4 × 6', '50to64')).toBe('3 × 10');
+    expect(limitPrescription('3 × 45 s at easy effort', '65plus')).toBe('3 × 30 s at easy effort');
+    expect(limitPrescription('2 × 8 at easy effort', '65plus')).toBe('2 × 10 at easy effort');
+  });
+
+  it('leaves out high-impact moves from 50 and keeps exercises in the plan', async () => {
     const { CoachPlanner } = await import('../src/coach/coach-planner.js');
     const library = [
       { id: 'burpee', name: 'Burpee', group: 'Cardio', targetMuscle: 'cardiovascular system', equipment: 'Body weight', pose: 'missing', instructions: [] },

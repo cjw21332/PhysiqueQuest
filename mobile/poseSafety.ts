@@ -1,10 +1,11 @@
 type Point = { x: number; y: number; visibility?: number };
 export type SafetyPhase = 'unavailable' | 'monitoring' | 'countdown' | 'alarm';
 const LANDMARKS = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28];
-const VISIBILITY = 0.4, STILL_MS = 30_000, COUNTDOWN_MS = 30_000, FRESH_MS = 1500, MOTION = 0.10;
+const VISIBILITY = 0.4, FRESH_MS = 1500, MOTION = 0.10;
 
-/** Camera-motion-resistant relative body motion; no images or landmarks are retained outside this session. */
-export function createPoseSafety() {
+/** Camera-motion-resistant relative body motion; no images or landmarks are retained outside this session.
+ * Stillness and countdown windows follow the exercise intensity (see SAFETY_PROFILE). */
+export function createPoseSafety({ stillMs: STILL_MS = 30_000, countdownMs: COUNTDOWN_MS = 30_000 } = {}) {
   let phase: SafetyPhase = 'unavailable', lastFrame = -Infinity, lastMove = 0, countdownAt = 0;
   let baseline: Map<number, { x: number; y: number }> | null = null;
   const reset = () => { phase = 'unavailable'; baseline = null; lastFrame = -Infinity; };

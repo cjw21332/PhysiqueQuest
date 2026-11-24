@@ -104,8 +104,8 @@ android {
         applicationId 'com.physiquequest.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11
-        versionName "1.5.2"
+        versionCode 12
+        versionName "1.5.3"
         buildConfigField "boolean", "PQ_STANDALONE", "false"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""

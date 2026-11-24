@@ -4,7 +4,7 @@
     "slug": "physiquequest",
     "scheme": "physiquequest",
     "icon": "./assets/physiquequest-icon.png",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "platforms": [
       "android",
       "ios"
@@ -17,13 +17,19 @@
           "recordAudioAndroid": false
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "PhysiqueQuest uses your location only when an inactivity alarm goes off during a workout, to include it in the alert sent to your emergency contact."
+        }
+      ]
     ],
     "orientation": "default",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0b0f15",
     "android": {
-      "versionCode": 11,
+      "versionCode": 12,
       "package": "com.physiquequest.app",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {

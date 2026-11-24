@@ -41,6 +41,13 @@ describe('pose inactivity monitoring', () => {
     expect(safety.tick(30000).phase).toBe('monitoring');
     expect(safety.tick(32000).phase).toBe('monitoring');
   });
+  it('uses shorter windows for high intensity and longer ones for holds', () => {
+    const high = createPoseSafety({ stillMs: 20000, countdownMs: 20000 }); high.start(0); high.observe(pose(), 0);
+    expect(high.tick(20000)).toEqual({ phase: 'countdown', seconds: 20 });
+    expect(high.tick(40000).phase).toBe('alarm');
+    const hold = createPoseSafety({ stillMs: 60000 }); hold.start(0); hold.observe(pose(), 0);
+    expect(hold.tick(45000).phase).toBe('monitoring');
+  });
   it('cancels a countdown when the phone moves', () => {
     const safety = createPoseSafety(), p = pose(); safety.start(0);
     for (let t = 0; t <= 30000; t += 1000) { safety.observe(p, t); safety.tick(t); }

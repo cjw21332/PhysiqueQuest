@@ -14,7 +14,11 @@ export const POSE_ISSUES = {
   torso_swing: { title: 'Torso movement', advice: 'Brace your trunk and move the working joint under control.' },
   depth: { title: 'Movement range', advice: 'Use a comfortable full range of motion without forcing depth.' },
   tempo: { title: 'Movement tempo', advice: 'Move at a steady pace and keep each repetition controlled.' },
+  injury_risk: { title: 'Injury-risk form stops', advice: 'The tracker stopped you for form that can lead to injury. Use a lighter load until the movement stays clean.' },
+  fatigue: { title: 'Fatigue warning', advice: 'Your reps slowed sharply. Rest longer between sets or reduce the load next time.' },
+  equipment: { title: 'Equipment problem reported', advice: 'Do not use that equipment again until gym staff have inspected it.' },
 } as const;
+export const SAFETY_ISSUES: readonly PoseIssueId[] = ['injury_risk', 'fatigue', 'equipment'];
 export type PoseIssueId = keyof typeof POSE_ISSUES;
 
 export function parseNativePoseSummary(value: unknown): NativePoseSummary | null {

@@ -5,7 +5,7 @@ import { Profile } from '../profile/schemas/profile.schema.js';
 import { Settings } from '../settings/schemas/settings.schema.js';
 import { ExerciseDbService } from '../exercises/exercisedb.service.js';
 import { FeedbackService } from '../feedback/feedback.service.js';
-import { CoachPlanner, feedbackSignals, type CoachFeedback } from './coach-planner.js';
+import { ageBand, CoachPlanner, feedbackSignals, type CoachFeedback } from './coach-planner.js';
 import { createHash } from 'node:crypto';
 import { CoachProgram } from './coach-program.schema.js';
 import { z } from 'zod';
@@ -27,8 +27,8 @@ export function coachProgramContext(profile: Profile, values: Record<string, unk
   const signals = feedbackSignals(feedback);
   const sorted = (items: string[]) => [...new Set(items.map(value => value.trim().toLowerCase()))].sort();
   const contextHash = createHash('sha256').update(JSON.stringify({
-    version: 1, goal: profile.goal, days: schedule.days.filter(day => day.isWorkoutDay).map(day => day.index),
-    ...(Number(profile.age) >= 50 && { olderAdult: true }),
+    version: 2, goal: profile.goal, days: schedule.days.filter(day => day.isWorkoutDay).map(day => day.index),
+    ...(ageBand(profile.age) !== 'under35' && { ageBand: ageBand(profile.age) }),
     ...(injuries.length && { injuries: sorted(injuries) }),
     ...(healthRisks.length && { healthRisks: sorted(healthRisks) }),
     ...(signals.length && { feedback: signals }),
@@ -58,7 +58,7 @@ export class CoachService {
     const filter = { userId: new Types.ObjectId(userId), contextHash };
     const saved = await this.programs.findOne(filter).lean().exec();
     // Refresh the week label locally; exercise selection never needs a daily API call.
-    if (saved) return { ...saved.plan, weekLabel: schedule.weekLabel, programVersion: contextHash } as Program;
+    if (saved) return { ...saved.plan, weekLabel: schedule.weekLabel, ageNote: schedule.ageNote, programVersion: contextHash } as Program;
     const key = `${userId}:${lifecycleGeneration}:${contextHash}`;
     const pending = this.generating.get(key);
     if (pending) return pending;
@@ -75,7 +75,7 @@ export class CoachService {
       // Persist the user's program, not provider media. Details/GIFs are refreshed on opening the library.
       const snapshot = { ...plan, days: plan.days.map(day => ({ ...day, exercises: day.exercises.map(({ gifUrl: _gifUrl, ...exercise }) => exercise) })) };
       const stored = await fence.withActiveWrite(userId, async session => this.programs.findOneAndUpdate(filter, { $setOnInsert: { ...filter, plan: snapshot } }, { upsert: true, new: true, runValidators: true, session }).lean().exec(), lifecycleGeneration);
-      return { ...stored!.plan, weekLabel: schedule.weekLabel, programVersion: contextHash } as Program;
+      return { ...stored!.plan, weekLabel: schedule.weekLabel, ageNote: schedule.ageNote, programVersion: contextHash } as Program;
     })();
     this.generating.set(key, generation);
     try { return await generation; } finally { this.generating.delete(key); }

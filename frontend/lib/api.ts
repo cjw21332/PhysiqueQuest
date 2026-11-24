@@ -175,6 +175,7 @@ export interface CoachPlanRecord {
   programVersion?: string;
   goal: string;
   weekLabel: string;
+  ageNote?: string | null;
   sessionCount: number;
   duration: string;
   libraryReady: boolean;

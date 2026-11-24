@@ -120,8 +120,35 @@ function exclusionsFor(label: string) {
   return canonical ? EXCLUSIONS[canonical] : undefined;
 }
 
-const OLDER_ADULT_AGE = 50;
-const HIGH_IMPACT_TERMS = ['max effort', 'sprint', 'plyometric', 'depth jump', 'box jump', 'jump squat', 'burpee'];
+const MAXIMAL_TERMS = ['max effort', 'one rep max', '1rm', 'depth jump'];
+const HIGH_IMPACT_TERMS = [...MAXIMAL_TERMS, 'sprint', 'plyometric', 'box jump', 'jump squat', 'burpee'];
+const SENIOR_TERMS = [...HIGH_IMPACT_TERMS, 'jump', 'snatch', 'clean and jerk', 'power clean', 'hang clean', 'kipping'];
+
+export type AgeBand = 'under35' | '35to49' | '50to64' | '65plus';
+export function ageBand(age: unknown): AgeBand {
+  const years = Number(age);
+  if (!Number.isFinite(years) || years < 35) return 'under35';
+  return years < 50 ? '35to49' : years < 65 ? '50to64' : '65plus';
+}
+
+/** Preventive limits that grow with age: fewer maximal/impact moves, no more than 3 sets,
+ * moderate rep ranges (lighter loads) and shorter holds. Volume is capped, not cut to "easy". */
+const AGE_LIMITS: Record<AgeBand, { excluded: string[]; maxSets: number; minReps: number; maxHoldSeconds: number; note: string | null }> = {
+  under35: { excluded: [], maxSets: 99, minReps: 0, maxHoldSeconds: 999, note: null },
+  '35to49': { excluded: MAXIMAL_TERMS, maxSets: 3, minReps: 8, maxHoldSeconds: 60,
+    note: 'Age 35+: maximal-effort lifts are left out, sets are capped at 3 and heavy low-rep work uses 8+ reps to protect joints and recovery.' },
+  '50to64': { excluded: HIGH_IMPACT_TERMS, maxSets: 3, minReps: 10, maxHoldSeconds: 45,
+    note: 'Age 50+: high-impact and maximal efforts are left out, sets are capped at 3 and loads stay moderate (10+ reps).' },
+  '65plus': { excluded: SENIOR_TERMS, maxSets: 3, minReps: 10, maxHoldSeconds: 30,
+    note: 'Age 65+: jumping, Olympic lifts and maximal efforts are left out; sets are capped at 3 with moderate loads and holds up to 30 s. Keep a stable support nearby for balance.' },
+};
+
+/** Applies the age caps to a prescription such as "4 × 6" or "3 × 45 s at easy effort". */
+export function limitPrescription(prescription: string, band: AgeBand) {
+  const limits = AGE_LIMITS[band];
+  return prescription.replace(/^(\d+) × (\d+)( s)?/, (_, sets: string, amount: string, timed?: string) =>
+    `${Math.min(Number(sets), limits.maxSets)} × ${timed ? Math.min(Number(amount), limits.maxHoldSeconds) : Math.max(Number(amount), limits.minReps)}${timed ?? ''}`);
+}
 
 function feedbackEffort(entry?: CoachFeedback): 'hard' | 'easy' | 'normal' {
   if (!entry) return 'normal';
@@ -158,15 +185,14 @@ export class CoachPlanner {
     const scheduled = scheduledWeekdays(profile.days);
     const sessionCount = scheduled.size;
     const focusRotation = FOCUS_BY_GOAL[profile.goal] ?? FOCUS_BY_GOAL['General fitness'];
-    // Age alone is not a reason to cut training volume: resistance training
-    // matters more with age. From 50, only leave out high-impact and maximal
-    // efforts; reported effort and pain still ease individual exercises.
-    const olderAdult = Number(profile.age) >= OLDER_ADULT_AGE;
+    // Resistance training matters more with age, so the program keeps its
+    // exercises but applies graduated preventive limits from 35 (AGE_LIMITS).
+    const band = ageBand(profile.age);
     const perWorkout = EXERCISES_BY_DURATION[duration] ?? 5;
     const restrictions = [...(profile.injuries ?? []), ...(profile.healthRisks ?? [])];
     const unknownRestriction = restrictions.some(label => !exclusionsFor(label));
     const excluded = [...(profile.conditions ?? []), ...restrictions].flatMap(label => exclusionsFor(label) ?? []);
-    if (olderAdult) excluded.push(...HIGH_IMPACT_TERMS);
+    excluded.push(...AGE_LIMITS[band].excluded);
     const latest = latestFeedback(feedback);
     let workoutIndex = 0;
 
@@ -175,7 +201,7 @@ export class CoachPlanner {
         return { ...weekday, isWorkoutDay: false, title: weekday.index === 6 ? 'Rest day' : 'Recovery day', focus: null, exercises: [] };
       }
       const [title, keywords] = focusRotation[workoutIndex % focusRotation.length];
-      const picked = unknownRestriction ? [] : this.pickExercises(available, keywords, excluded, perWorkout, profile.goal, latest);
+      const picked = unknownRestriction ? [] : this.pickExercises(available, keywords, excluded, perWorkout, profile.goal, latest, band);
       workoutIndex += 1;
       const tip = picked.find(exercise => /press|squat|row|deadlift/i.test(exercise.name) && exercise.formTip) ?? picked.find(exercise => exercise.formTip);
       return { ...weekday, isWorkoutDay: true, title, focus: title, exercises: picked,
@@ -193,7 +219,8 @@ export class CoachPlanner {
       sessionCount,
       duration,
       libraryReady: available.length > 0,
-      sets: SETS_BY_GOAL[profile.goal] ?? SETS_BY_GOAL['General fitness'],
+      sets: limitPrescription(SETS_BY_GOAL[profile.goal] ?? SETS_BY_GOAL['General fitness'], band),
+      ageNote: AGE_LIMITS[band].note,
       days,
     };
   }
@@ -210,7 +237,7 @@ export class CoachPlanner {
     });
   }
 
-  private pickExercises(library: LibraryExercise[], keywords: string[], excluded: string[], count: number, goal: string, feedback: Map<string, CoachFeedback>) {
+  private pickExercises(library: LibraryExercise[], keywords: string[], excluded: string[], count: number, goal: string, feedback: Map<string, CoachFeedback>, band: AgeBand = 'under35') {
     const report = (exercise: LibraryExercise) => feedback.get(normalized(exercise.name)) ?? feedback.get(normalized(exercise.id));
     const safe = library.filter(exercise => {
       const haystack = normalized(`${exercise.name} ${exercise.group} ${exercise.targetMuscle}`);
@@ -242,7 +269,7 @@ export class CoachPlanner {
       targetMuscle: exercise.targetMuscle,
       equipment: exercise.equipment,
       tracking: 'Manual',
-      prescription: prescription(exercise),
+      prescription: limitPrescription(prescription(exercise), band),
       formTip: exercise.instructions.find(step => step.trim()) ?? null,
     }));
     function prescription(exercise: LibraryExercise) {

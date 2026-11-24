@@ -1,7 +1,7 @@
 {
   "name": "physique-quest-expo",
   "private": true,
-  "version": "1.5.2",
+  "version": "1.5.3",
   "main": "index.ts",
   "scripts": {
     "expo": "node start-local.mjs --go",
