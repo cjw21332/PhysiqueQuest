@@ -17,29 +17,58 @@ export function exerciseHistory(workouts: WorkoutSessionRecord[], exerciseId: st
   }).sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
 }
 
-/** A starting point, never a saved set. Weight is the entered load, excluding a known bar. */
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** How much to ease off after time away from an exercise: share of the last load, sets and reps to drop. */
+export function breakEase(elapsedMs: number) {
+  const days = elapsedMs / DAY_MS;
+  if (days >= 30) return { load: .6, fewerSets: 1, fewerReps: 2, label: 'a month or more' };
+  if (days >= 21) return { load: .7, fewerSets: 1, fewerReps: 2, label: 'three weeks' };
+  if (days >= 14) return { load: .8, fewerSets: 1, fewerReps: 0, label: 'two weeks' };
+  if (days >= 7) return { load: .9, fewerSets: 0, fewerReps: 0, label: 'a week' };
+  return null;
+}
+const halfKgDown = (kg: number) => Math.floor(kg * 2) / 2;
+
+/** A starting point, never a saved set. Weight is the entered load, excluding a known bar.
+ * After a break the first session is eased (load, sets, reps) and the next one climbs halfway back to the pre-break load. */
 export function suggestedWorkingSet(workouts: WorkoutSessionRecord[], exerciseId: string, equipment: string, sessionAt: string, usesBar = false, workingSetIndex?: number) {
   const at = Date.parse(sessionAt);
   if (!Number.isFinite(at)) return null;
-  const latest = exerciseAnalytics(workouts, exerciseId).filter(row => Number.isFinite(Date.parse(row.date)) && Date.parse(row.date) <= at).at(-1);
+  const rows = exerciseAnalytics(workouts, exerciseId).filter(row => Number.isFinite(Date.parse(row.date)) && Date.parse(row.date) <= at);
+  const latest = rows.at(-1), prior = rows.at(-2);
   if (!latest) return null;
-  const ordered = [...latest.sets].sort((a, b) => a.setIndex - b.setIndex);
-  const last = workingSetIndex === undefined ? ordered.at(-1)! : ordered[Math.min(Math.max(0, workingSetIndex), ordered.length - 1)];
+  const pick = (sets: typeof latest.sets) => { const ordered = [...sets].sort((a, b) => a.setIndex - b.setIndex); return workingSetIndex === undefined ? ordered.at(-1)! : ordered[Math.min(Math.max(0, workingSetIndex), ordered.length - 1)]; };
+  const last = pick(latest.sets);
   const elapsed = at - Date.parse(latest.date);
   const bodyweight = /body\s*weight|bodyweight|none/i.test(equipment);
-  const loadKg = last.loadKg;
   // Older bar records may include a bar without recording its weight. Do not
   // silently treat that total as added plates.
-  const canSuggestLoad = typeof loadKg === 'number' && loadKg >= 0 && (!usesBar || last.barWeightKg !== undefined);
-  const addedKg = canSuggestLoad ? Math.max(0, loadKg - (last.barWeightKg ?? 0)) : undefined;
-  const longBreak = elapsed >= 14 * 24 * 60 * 60 * 1000;
-  const suggestedKg = addedKg === undefined || bodyweight ? undefined : longBreak ? Math.floor(addedKg * .9 * 2) / 2 : addedKg;
+  const added = (set: typeof last) => typeof set.loadKg === 'number' && set.loadKg >= 0 && (!usesBar || set.barWeightKg !== undefined) ? Math.max(0, set.loadKg - (set.barWeightKg ?? 0)) : undefined;
+  const addedKg = added(last);
+  const base = { preferredUnit: last.loadUnit, unknownBar: usesBar && addedKg === undefined };
+  const loadFor = (kg: number | undefined) => kg === undefined || bodyweight ? undefined : kg;
+
+  const ease = breakEase(elapsed);
+  if (ease) {
+    const sets = Math.max(1, latest.sets.length - ease.fewerSets);
+    const reps = Math.max(Math.min(last.reps, 5), last.reps - ease.fewerReps);
+    const load = bodyweight ? '' : `about ${Math.round(ease.load * 100)}% of your last load, `;
+    return { ...base, reps, sets, weightKg: loadFor(addedKg === undefined ? undefined : halfKgDown(addedKg * ease.load)),
+      note: `After ${ease.label} off this exercise: ${load}${sets} working ${sets === 1 ? 'set' : 'sets'} of ${reps} reps. Your next session builds back up.` };
+  }
+  // Second session after a break: halfway back to the pre-break load with the full set count.
+  const returning = prior && breakEase(Date.parse(latest.date) - Date.parse(prior.date));
+  const before = prior && added(pick(prior.sets));
+  if (returning && addedKg !== undefined && before !== undefined && before > addedKg) {
+    return { ...base, reps: last.reps, sets: prior.sets.length, weightKg: loadFor(halfKgDown((addedKg + before) / 2)),
+      note: `Building back after your break: halfway to your pre-break load, ${prior.sets.length} working sets.` };
+  }
   return {
     reps: last.reps,
-    weightKg: suggestedKg,
-    preferredUnit: last.loadUnit,
-    note: elapsed < 48 * 60 * 60 * 1000 ? 'Less than 48 hours since your last session. Consider more rest.' : longBreak ? 'A lighter starting load after your break.' : 'Based on your last working sets.',
-    unknownBar: usesBar && !canSuggestLoad,
+    weightKg: loadFor(addedKg),
+    ...base,
+    note: elapsed < 48 * 60 * 60 * 1000 ? 'Less than 48 hours since your last session. Consider more rest.' : 'Based on your last working sets.',
   };
 }
 
@@ -58,7 +87,8 @@ export function nextTrainingSuggestion(workouts: WorkoutSessionRecord[], exercis
   const loadBasis = last.barWeightKg !== undefined || /added plates only/i.test(latest.equipment) ? ` This is added plate weight, excluding the bar${last.barWeightKg !== undefined ? ` (estimated ${last.barWeightKg} kg)` : ''}.` : /assumed|estimated/i.test(latest.equipment) ? ` ${latest.equipment}; confirm the actual bar weight before choosing a load.` : '';
   const baseline = `Last set: ${weightLabel} × ${last.reps} reps.${loadBasis} `;
   if (Number.isFinite(elapsed) && elapsed < 48 * 60 * 60 * 1000) return `${baseline}Less than 48 hours since your last session: consider more rest. If training, start with up to ${last.reps} reps at ${weightLabel}.`;
-  if (Number.isFinite(elapsed) && elapsed >= 14 * 24 * 60 * 60 * 1000) return `${baseline}After a longer break, start lighter than ${weightLabel}, for up to ${last.reps} reps.`;
+  const ease = Number.isFinite(elapsed) ? breakEase(elapsed) : null;
+  if (ease) { const sets = Math.max(1, latest.sets.length - ease.fewerSets); return `${baseline}After ${ease.label} off, start around ${Math.round(ease.load * 100)}% of ${weightLabel} for ${sets} ${sets === 1 ? 'set' : 'sets'} of up to ${Math.max(Math.min(last.reps, 5), last.reps - ease.fewerReps)} reps.`; }
   const loads = new Set(latest.sets.map(s => s.loadKg));
   if (loads.size !== 1 || latest.sets.length < expectedSets) return `${baseline}Try ${weightLabel} for ${last.reps} reps again before increasing.`;
   const weight = latest.sets[0].loadKg!;

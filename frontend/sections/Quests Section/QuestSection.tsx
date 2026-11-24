@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import type { Profile } from '../Home/types';
-import { useActivity, type ActivityBadge } from '../../hooks/useActivity';
+import { useActivity, type ActivityBadge, type DailyMission } from '../../hooks/useActivity';
 import { useLeaderboard } from '../../hooks/useLeaderboard';
 import { useSettings } from '../../hooks/useSettings';
 import { api, type LeaderboardEntryRecord, type LeaderboardPeriod, type StrengthLeaderboardRecord } from '../../lib/api';
@@ -63,7 +63,7 @@ function movementLabel(movement: LeaderboardEntryRecord['movement']) {
 }
 
 export default function QuestSection({ profile, onLogoutRequest: _onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
-  const { activity, dailyMissions, badges: savedBadges, loading, error, refresh } = useActivity();
+  const { activity, dailyMissions, personalQuests, weeklyChallenges, badges: savedBadges, loading, error, refresh } = useActivity();
   const [badgeData, setBadgeData] = useState<{ ranking: LeaderboardRecord | null; workouts: WorkoutSessionRecord[] | null; summary: WorkoutSummary | null; nutrition: { water: {date: string; glasses: number}[]; meals: {id?: string; date?: string; scanSavedAt?: string; scanGroupId?: string}[]; scanSaveReceipts?: {key: string; mealIds: string[]}[] } | null }>({ ranking: null, workouts: null, summary: null, nutrition: null });
   const { settings } = useSettings();
   const [screen, setScreen] = useScreenRoute<Screen>('/quests', { quests: '', leaderboard: '/leaderboard', badges: '/badges' }, 'quests');
@@ -207,19 +207,27 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
         </div> : <p role="status">Streak history is unavailable. Refresh to try again.</p>}
         <p>Your streak tracks consecutive days with saved activity.</p>
       </section>
-      <section className="quest-v2-missions" aria-labelledby="quest-v2-missions-title">
-        <div className="quest-v2-section-heading"><h3 id="quest-v2-missions-title">Daily missions</h3><span>Resets daily</span></div>
-        {dailyMissions.length ? <div className="quest-v2-mission-list">{dailyMissions.map(mission => <div key={mission.key} className={`quest-v2-mission ${mission.complete ? 'complete' : ''}`} aria-label={`${mission.title}, ${mission.progress} of ${mission.target}`}>
-          <span className="quest-v2-mission-icon"><Icon name={mission.complete ? 'check' : mission.key === 'workout' ? 'dumbbell' : mission.key === 'meals' ? 'meal' : mission.key === 'water' ? 'water' : 'trophy'} size={17}/></span>
-          <span className="quest-v2-mission-main"><strong>{mission.title}</strong><span className="quest-v2-mission-progress"><i><b style={{ width: `${Math.min(mission.progress / mission.target * 100, 100)}%` }}/></i><small>{mission.progress}/{mission.target}</small></span></span>
-          <strong className="quest-v2-mission-points">+{mission.points}</strong>
-        </div>)}</div> : <p className="quest-v2-empty">No daily missions are available.</p>}
-      </section>
+      <QuestList id="missions" title="Daily missions" note="Same for everyone · resets daily" items={dailyMissions} empty="No daily missions are available."/>
+      <QuestList id="personal" title="Personal quests" note="Made from your profile · resets Monday" items={personalQuests} empty="Complete your profile to unlock personal quests."/>
+      <QuestList id="weekly" title="Weekly challenges" note="Targets grow with last week · resets Monday" items={weeklyChallenges} empty="No weekly challenges are available."/>
       <section className="quest-v2-badges" aria-labelledby="quest-v2-badges-title">
         <div className="quest-v2-section-heading quest-badge-heading"><h3 id="quest-v2-badges-title">Badges</h3><div><span>{badges.filter(badge => badge.earned).length} of {badges.length} earned</span><button type="button" onClick={() => setScreen('badges')}>View all <Icon name="chevron-right" size={16}/></button></div></div>
         <div className="quest-v2-badge-grid">{featuredBadgeIds.map(id => badges.find(badge => badge.id === id)).filter((badge): badge is ActivityBadge => Boolean(badge)).map(badge => <button type="button" key={badge.id} className={`quest-v2-badge ${badge.earned ? 'earned' : 'locked'}`} title={badge.description} disabled={!badge.earned || badge.available === false} onClick={() => openBadgeCard(badge)} aria-label={`${badge.title}: ${badge.available === false ? 'unavailable' : badge.earned ? 'earned, view achievement card' : 'locked'}${badge.description ? `. ${badge.description}` : ''}`}><span><BadgeMark badge={badge}/></span><small>{badge.title}{badge.available === false && <><br/>Unavailable</>}</small></button>)}</div>
       </section>
     </div>
     <BottomNav />
+  </section>;
+}
+
+const questIcon = (key: string) => /workout|train|plan/.test(key) ? 'dumbbell' : /meal|protein/.test(key) ? 'meal' : /water|hydrat/.test(key) ? 'water' : 'trophy';
+
+function QuestList({ id, title, note, items, empty }: { id: string; title: string; note: string; items: DailyMission[]; empty: string }) {
+  return <section className="quest-v2-missions" aria-labelledby={`quest-v2-${id}-title`}>
+    <div className="quest-v2-section-heading"><h3 id={`quest-v2-${id}-title`}>{title}</h3><span>{note}</span></div>
+    {items.length ? <div className="quest-v2-mission-list">{items.map(mission => <div key={mission.key} className={`quest-v2-mission ${mission.complete ? 'complete' : ''}`} aria-label={`${mission.title}, ${mission.progress} of ${mission.target}`}>
+      <span className="quest-v2-mission-icon"><Icon name={mission.complete ? 'check' : questIcon(mission.key)} size={17}/></span>
+      <span className="quest-v2-mission-main"><strong>{mission.title}</strong><span className="quest-v2-mission-progress"><i><b style={{ width: `${Math.min(mission.progress / mission.target * 100, 100)}%` }}/></i><small>{mission.progress}/{mission.target}</small></span></span>
+      <strong className="quest-v2-mission-points">+{mission.points}</strong>
+    </div>)}</div> : <p className="quest-v2-empty">{empty}</p>}
   </section>;
 }

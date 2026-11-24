@@ -33,7 +33,7 @@ const LEGACY_INITIALS: Record<string, number[]> = {
   s: [5, 6],
 };
 
-export function scheduledWeekdays(days: string[] | undefined): Set<number> {
+function scheduledWeekdays(days: string[] | undefined): Set<number> {
   const selected = new Set<number>();
   const totals = new Map<string, number>();
   const occurrences = new Map<string, number>();

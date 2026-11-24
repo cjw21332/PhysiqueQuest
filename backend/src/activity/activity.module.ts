@@ -8,6 +8,5 @@ import { WorkoutsModule } from '../workouts/workouts.module.js';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module.js';
 import { User, UserSchema } from '../auth/schemas/user.schema.js';
 import { Profile, ProfileSchema } from '../profile/schemas/profile.schema.js';
-import { FeedbackModule } from '../feedback/feedback.module.js';
-@Module({ imports: [MongooseModule.forFeature([{ name: Activity.name, schema: ActivitySchema }, { name: User.name, schema: UserSchema }, { name: Profile.name, schema: ProfileSchema }]), NutritionModule, WorkoutsModule, LeaderboardModule, FeedbackModule], controllers: [ActivityController], providers: [ActivityService], exports: [ActivityService] })
+@Module({ imports: [MongooseModule.forFeature([{ name: Activity.name, schema: ActivitySchema }, { name: User.name, schema: UserSchema }, { name: Profile.name, schema: ProfileSchema }]), NutritionModule, WorkoutsModule, LeaderboardModule], controllers: [ActivityController], providers: [ActivityService], exports: [ActivityService] })
 export class ActivityModule {}

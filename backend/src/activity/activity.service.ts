@@ -2,8 +2,7 @@ import { mealMissionGoal, mealMissionPoints } from './meal-mission.js';
 import { savedScanMealDates } from '../nutrition/saved-scan-meals.js';
 import { BadRequestException, Injectable, Optional } from '@nestjs/common';
 import { Profile } from '../profile/schemas/profile.schema.js';
-import { FeedbackService } from '../feedback/feedback.service.js';
-import { ageBand, scheduledWeekdays } from '../coach/coach-planner.js';
+import { type DayData, type QuestProfile, personalQuests, questExp, weekStart, weeklyChallenges } from './quests.js';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { NutritionService } from '../nutrition/nutrition.service.js';
@@ -41,9 +40,8 @@ export class ActivityService {
     private readonly workouts: WorkoutsService,
     private readonly leaderboard: LeaderboardService,
     @InjectModel(User.name) private readonly users: Model<User>,
-    // Optional so missions still load (with the default set) where profile or feedback is not wired.
+    // Optional so missions still load where the profile model is not wired (unit tests, chat context).
     @Optional() @InjectModel(Profile.name) private readonly profiles?: Model<Profile>,
-    @Optional() private readonly feedback?: FeedbackService,
   ) {}
 
   private async userState(userId: string) {
@@ -80,17 +78,19 @@ export class ActivityService {
     const allMeals = buildMealCountMap(savedMealDates);
     const mealGoal = mealMissionGoal(today, allMeals);
     const allWorkoutDates = new Set(completedWorkouts.map(workout => workout.activityDate || activityDate(workout.endedAt!, timezone)));
-    const [profile, feedback] = await Promise.all([
-      this.profiles ? this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('age injuries healthRisks healthConsentAt days').lean().exec().catch(() => null) : null,
-      this.feedback ? this.feedback.list(userId, 20).catch(() => []) : [],
-    ]);
-    const feedbackToday = (feedback as { createdAt?: Date }[]).filter(row => row.createdAt && zoneDate(new Date(row.createdAt), timezone) === today).length;
-    const dailyMissions = buildDailyMissions({ ...todayStats, records: Number(records.includes(today)), feedback: feedbackToday }, mealGoal,
-      missionContext(profile as MissionProfile | null, today, allWorkoutDates, Boolean(this.feedback)));
+    const dailyMissions = buildDailyMissions({ ...todayStats, records: Number(records.includes(today)) }, mealGoal);
     const activityDates = buildActivityDates(mealDates, nutrition.water, allWorkoutDates);
 
+    // A missing or unreadable profile only hides personal quests; missions and challenges still load.
+    const profile = this.profiles ? await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('age weight weightUnit goal days injuries healthRisks conditions healthConsentAt').lean().exec().catch(() => null) as QuestProfile | null : null;
+    const protein = new Map<string, number>();
+    for (const meal of nutrition.meals) if (typeof meal.date === 'string' && Number.isFinite(meal.protein)) protein.set(meal.date, (protein.get(meal.date) ?? 0) + meal.protein!);
+    const dayData: DayData = { workouts: allWorkoutDates, records: new Set(records), active: activityDates, water: waterByDate, protein,
+      mealsDone: date => (allMeals.get(date) ?? 0) >= mealMissionGoal(date, allMeals) };
+    const thisWeek = weekStart(today);
+
     const dayStreak = computeStreak(activityDates, today);
-    const currentExp = computeExp(allMeals, allWorkoutDates, waterByDate) + records.length * 150;
+    const currentExp = computeExp(allMeals, allWorkoutDates, waterByDate) + records.length * 150 + questExp(profile, dayData, today);
     const earnedPoints = dailyMissions.filter(m => m.complete).reduce((sum, m) => sum + m.points, 0);
     const goalDays = new Set([...allWorkoutDates].filter(date => (allMeals.get(date) ?? 0) >= mealMissionGoal(date, allMeals) && (waterByDate.get(date) ?? 0) >= 8 && records.includes(date)));
     const level = Math.floor(currentExp / 100) + 1;
@@ -114,6 +114,8 @@ export class ActivityService {
         earnedPoints,
       },
       dailyMissions,
+      personalQuests: personalQuests(profile, dayData, thisWeek, today),
+      weeklyChallenges: weeklyChallenges(dayData, thisWeek, today),
       badges,
     };
   }
@@ -147,38 +149,12 @@ function computeTodayStats(savedMealDates: string[], completedWorkouts: any[], w
   };
 }
 
-type MissionProfile = { age?: string; injuries?: string[]; healthRisks?: string[]; healthConsentAt?: Date; days?: string[] };
-type MissionContext = { cautious: boolean; restDay: boolean; comeback: boolean };
-
-const shiftDate = (date: string, days: number) => { const [y, m, d] = date.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10); };
-
-/** Reads the user's data that changes which missions they get today. */
-export function missionContext(profile: MissionProfile | null, today: string, workoutDates: Set<string>, feedbackAvailable: boolean): MissionContext {
-  // Injuries and health risks count only with health-data consent, as in Coach.
-  const health = profile?.healthConsentAt ? [...(profile.injuries ?? []), ...(profile.healthRisks ?? [])] : [];
-  const cautious = feedbackAvailable && !!profile && (ageBand(profile.age) !== 'under35' || health.length > 0);
-  // scheduledWeekdays falls back to default days for an empty list, so only trust days the user chose.
-  const scheduled = profile?.days?.length ? scheduledWeekdays(profile.days) : new Set<number>();
-  const restDay = scheduled.size > 0 && !scheduled.has((new Date(`${today}T00:00:00Z`).getUTCDay() + 6) % 7);
-  // A comeback needs earlier training history; a brand-new user keeps the default workout mission.
-  const weekAgo = shiftDate(today, -7);
-  const comeback = !restDay && [...workoutDates].some(date => date < weekAgo) && ![...workoutDates].some(date => date >= weekAgo && date < today);
-  return { cautious, restDay, comeback };
-}
-
-export function buildDailyMissions(todayStats: { meals: number, water: number, workouts: number, records: number, feedback?: number }, mealGoal: number, context: MissionContext = { cautious: false, restDay: false, comeback: false }) {
+function buildDailyMissions(todayStats: { meals: number, water: number, workouts: number, records: number }, mealGoal: number) {
   return missionRules.map(rule => {
     const progress = rule.key === 'workout' ? todayStats.workouts :
                      rule.key === 'meals' ? todayStats.meals :
                      rule.key === 'water' ? todayStats.water : todayStats.records;
     if (rule.key === 'meals' && mealGoal === 2) return { ...rule, title: 'Build on yesterday: log 2 meals', target: 2, points: progress >= 3 ? 60 : 40, progress: Math.min(progress, 2), complete: progress >= 2 };
-    if (rule.key === 'workout' && context.restDay) return { ...rule, title: 'Rest day: an optional light session', points: 50, progress: Math.min(progress, 1), complete: progress >= 1 };
-    if (rule.key === 'workout' && context.comeback) return { ...rule, title: 'Comeback: any workout counts, even 10 minutes', points: 120, progress: Math.min(progress, 1), complete: progress >= 1 };
-    // Age 35+ or a reported injury/health risk: reward rating the workout (which tunes Coach) instead of chasing a maximal lift.
-    if (rule.key === 'personal-record' && context.cautious) {
-      const rated = todayStats.feedback ?? 0;
-      return { key: 'workout-feedback', title: "Rate how today's workout felt", target: 1, points: rule.points, progress: Math.min(rated, 1), complete: rated >= 1 };
-    }
     return { ...rule, progress: Math.min(progress, rule.target), complete: progress >= rule.target };
   });
 }

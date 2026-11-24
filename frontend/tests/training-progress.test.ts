@@ -28,7 +28,7 @@ test('a single working set gives a load and rep target with timing context', () 
   const session = workout([8]);
   assert.match(nextTrainingSuggestion([session], 'bench', 'dumbbell', '', 3, undefined, '2026-01-02T00:00:00Z'), /40 kg.*8 reps.*Less than 48 hours/);
   assert.match(nextTrainingSuggestion([session], 'bench', 'dumbbell', '', 3, undefined, at), /Try 40 kg for 8 reps/);
-  assert.match(nextTrainingSuggestion([session], 'bench', 'dumbbell', '', 3, undefined, '2026-02-01T00:00:00Z'), /start lighter than 40 kg/);
+  assert.match(nextTrainingSuggestion([session], 'bench', 'dumbbell', '', 3, undefined, '2026-02-01T00:00:00Z'), /a month or more off, start around 60% of 40 kg for 1 set of up to 6 reps/);
   assert.match(nextTrainingSuggestion([session], 'bench', 'dumbbell', '', 3, undefined, '2025-12-31T00:00:00Z'), /Log a completed working set/);
 });
 test('mixed loads and pounds use the last working set, excluding warmups', () => {
@@ -65,7 +65,7 @@ test('editable defaults preserve pounds and adjust after a long break', () => {
   const recent = suggestedWorkingSet([session], 'bench', 'Dumbbells', '2026-01-02T00:00:00Z');
   assert.equal(recent?.preferredUnit, 'lbs');
   assert.match(recent!.note, /48 hours/);
-  assert.equal(suggestedWorkingSet([session], 'bench', 'Dumbbells', '2026-02-01T00:00:00Z')?.weightKg, 10);
+  assert.equal(suggestedWorkingSet([session], 'bench', 'Dumbbells', '2026-02-01T00:00:00Z')?.weightKg, 6.5);
 });
 test('analytics include bodyweight sets, exclude warmups and order sessions', () => {
   const bodyweight = workout([12, 10]);
@@ -77,4 +77,21 @@ test('analytics include bodyweight sets, exclude warmups and order sessions', ()
   assert.equal(rows[1].maxLoad, null);
   assert.equal(rows[1].maxReps, 12);
   assert.equal(rows[1].volumeKg, null);
+});
+test('breaks ease load, sets and reps by length, then build back up', () => {
+  const session = (date: string, kg: number, reps: number[]): WorkoutSessionRecord => ({ _id: date, exerciseIds: ['row'], startedAt: date, endedAt: date, status: 'completed',
+    sets: reps.map((value, index) => ({ setId: String(index), exerciseId: 'row', setIndex: index, reps: value, loadKg: kg, status: 'completed', source: 'manual', setType: 'normal' })) });
+  const before = session('2026-03-01T10:00:00Z', 50, [10, 10, 10]);
+  const after = (days: number) => suggestedWorkingSet([before], 'row', 'Barbell row', new Date(Date.parse(before.startedAt) + days * 864e5).toISOString())!;
+  assert.deepEqual([3, 7, 14, 21, 30, 60].map(days => { const s = after(days); return [s.weightKg, s.sets, s.reps]; }),
+    [[50, undefined, 10], [45, 3, 10], [40, 2, 10], [35, 2, 8], [30, 2, 8], [30, 2, 8]]);
+  assert.match(after(21).note, /three weeks off/);
+  // Second session back climbs halfway toward the pre-break load with full sets; the third is normal again.
+  const firstBack = session('2026-04-15T10:00:00Z', 30, [8, 8]);
+  const second = suggestedWorkingSet([before, firstBack], 'row', 'Barbell row', '2026-04-18T10:00:00Z')!;
+  assert.deepEqual([second.weightKg, second.sets, second.reps], [40, 3, 8]);
+  const secondBack = session('2026-04-18T10:00:00Z', 40, [10, 10, 10]);
+  assert.equal(suggestedWorkingSet([before, firstBack, secondBack], 'row', 'Barbell row', '2026-04-21T10:00:00Z')!.weightKg, 40);
+  // Bodyweight work eases sets and reps but never invents a load.
+  assert.deepEqual((({ weightKg, sets, reps }) => [weightKg, sets, reps])(suggestedWorkingSet([before], 'row', 'Body weight', '2026-04-15T10:00:00Z')!), [undefined, 2, 8]);
 });
