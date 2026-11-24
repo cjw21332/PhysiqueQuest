@@ -123,3 +123,11 @@
   .badge-crest.is-earned.badge-tier-legendary, .bc-tile.earned::after { animation: none; }
   .bc-tile:active, .bc-tile-crest { scale: none; transition: none; }
 }
+
+/* Featured badges on the Quests page: the crest replaces the old 54px circle tile. */
+.signed-in-layout .quest-v2-badge.quest-v2-badge > span { width: 64px; height: 64px; border-radius: 0; background: transparent; }
+.signed-in-layout .quest-v2-badge .badge-crest { width: 64px; height: 64px; }
+.signed-in-layout .quest-v2-badge.quest-v2-badge > span .badge-lock { right: -2px; bottom: 0; }
+.pq-journal footer span { min-width: 0; }
+/* In a pill the gradient-text trick has no background to clip; use a tinted pill with solid text. */
+.bc-detail-tags span.bc-tier-legendary { color: #f3e8ff; -webkit-background-clip: border-box; background-clip: border-box; background: linear-gradient(90deg, rgb(216 180 254 / .28), rgb(103 232 249 / .28), rgb(250 204 21 / .28)); }

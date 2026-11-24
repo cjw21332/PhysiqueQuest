@@ -292,6 +292,6 @@ function PersonalJournal({ quests, goal }: { quests: DailyMission[] | undefined;
       <div><strong>{quest.title}</strong>{quest.reason && <small>{quest.reason}</small>}<em>{quest.progress} / {quest.target}</em></div>
       <span className="pq-xp">+{quest.points}<small>XP</small></span>
     </li>; })}</ul> : <p className="pq-journal-empty">{quests ? 'Complete your profile to unlock personal quests.' : 'Personal quests appear after your account syncs. Connect to the internet and sign in.'}</p>}
-    <footer><Icon name="medal" size={14}/> Finish them all in a week to forge your <b>Self-Made</b> crest.</footer>
+    <footer><Icon name="medal" size={14}/><span>Finish them all in a week to forge your <b>Self-Made</b> crest.</span></footer>
   </section>;
 }
