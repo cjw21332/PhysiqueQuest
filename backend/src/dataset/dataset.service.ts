@@ -9,6 +9,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Types, type Model } from 'mongoose';
 import { gzipSync, gunzipSync } from 'node:zlib';
+import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { CONSENT_TEXT, CONSENT_VERSION, consentTextHash, pseudonymize } from './dataset-consent.js';
 import { payloadHash, validatePayload, type DatasetPayload } from './dataset-payload.js';
 import type { AcceptDatasetConsentDto, AnnotateDatasetClipDto, SubmitDatasetClipDto } from './dto/dataset.dto.js';
@@ -53,6 +54,11 @@ export class DatasetService {
     return pseudonymize(userId, this.secret());
   }
 
+  /** Owner writes must not land on an account that is being deleted. */
+  private fence() {
+    return new AccountLifecycleFence(this.clips.db);
+  }
+
   consentDocument() {
     return { version: CONSENT_VERSION, text: CONSENT_TEXT, textHash: consentTextHash() };
   }
@@ -80,7 +86,7 @@ export class DatasetService {
       throw new BadRequestException({ code: 'DATASET_CONSENT_STALE', message: 'The consent text changed. Reload it and accept again.' });
     }
     const subjectPseudonym = this.subject(userId);
-    const record = await this.consents.findOneAndUpdate(
+    const record = await this.fence().withActiveWrite(userId, session => this.consents.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       {
         $set: {
@@ -91,8 +97,8 @@ export class DatasetService {
           withdrawnAt: null,
         },
       },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
-    );
+      { upsert: true, new: true, setDefaultsOnInsert: true, session },
+    ));
     return { contributable: true, version: record.consentVersion, acceptedAt: record.acceptedAt, subjectPseudonym };
   }
 
@@ -102,15 +108,17 @@ export class DatasetService {
    */
   async withdrawConsent(userId: string) {
     const objectId = new Types.ObjectId(userId);
-    const owned = await this.clips.find({ userId: objectId }, { _id: 1 }).lean();
-    const ids = owned.map(clip => clip._id);
-    await this.payloads.deleteMany({ clipId: { $in: ids } });
-    const deleted = await this.clips.deleteMany({ userId: objectId });
-    await this.consents.updateOne(
-      { userId: objectId },
-      { $set: { withdrawnAt: new Date() } },
-      { upsert: false },
-    );
+    const deleted = await this.fence().withActiveWrite(userId, async session => {
+      const owned = await this.clips.find({ userId: objectId }, { _id: 1 }, { session }).lean();
+      await this.payloads.deleteMany({ clipId: { $in: owned.map(clip => clip._id) } }, { session });
+      const result = await this.clips.deleteMany({ userId: objectId }, { session });
+      await this.consents.updateOne(
+        { userId: objectId },
+        { $set: { withdrawnAt: new Date() } },
+        { upsert: false, session },
+      );
+      return result;
+    });
     this.logger.log({ event: 'dataset_consent_withdrawn', clips: deleted.deletedCount });
     return { withdrawn: true, deletedClips: deleted.deletedCount };
   }
@@ -146,27 +154,32 @@ export class DatasetService {
     const data = gzipSync(Buffer.from(JSON.stringify({ payloadVersion: PAYLOAD_VERSION, ...payload })), { level: 9 });
     let clip;
     try {
-      clip = await this.clips.create({
-        userId: new Types.ObjectId(userId),
-        subjectPseudonym: consent.subjectPseudonym ?? this.subject(userId),
-        exerciseId: dto.exerciseId,
-        exerciseName: dto.exerciseName,
-        pattern: dto.pattern as Pattern,
-        cameraPlacement: dto.cameraPlacement,
-        cameraFacing: dto.cameraFacing,
-        orientation: dto.orientation,
-        durationSeconds: quality.durationSeconds,
-        frameCount: quality.frames,
-        detectionRate: quality.detectionRate,
-        medianFrameIntervalMs: quality.medianFrameIntervalMs,
-        appVersion: dto.appVersion,
-        consentVersion: consent.version,
-        repBoundaries: boundaries,
-        declaredReps: dto.declaredReps,
-        payloadSha256: sha256,
-        payloadBytes: data.length,
-        status: 'pending_annotation',
-        qualityFlags: quality.detectionRate < 0.85 ? ['low_detection'] : [],
+      // Clip and payload commit together, so a deletion race cannot leave either one behind.
+      clip = await this.fence().withActiveWrite(userId, async session => {
+        const [created] = await this.clips.create([{
+          userId: new Types.ObjectId(userId),
+          subjectPseudonym: consent.subjectPseudonym ?? this.subject(userId),
+          exerciseId: dto.exerciseId,
+          exerciseName: dto.exerciseName,
+          pattern: dto.pattern as Pattern,
+          cameraPlacement: dto.cameraPlacement,
+          cameraFacing: dto.cameraFacing,
+          orientation: dto.orientation,
+          durationSeconds: quality.durationSeconds,
+          frameCount: quality.frames,
+          detectionRate: quality.detectionRate,
+          medianFrameIntervalMs: quality.medianFrameIntervalMs,
+          appVersion: dto.appVersion,
+          consentVersion: consent.version,
+          repBoundaries: boundaries,
+          declaredReps: dto.declaredReps,
+          payloadSha256: sha256,
+          payloadBytes: data.length,
+          status: 'pending_annotation',
+          qualityFlags: quality.detectionRate < 0.85 ? ['low_detection'] : [],
+        }], { session });
+        await this.payloads.create([{ clipId: created._id, data, sha256 }], { session });
+        return created;
       });
     } catch (error) {
       if ((error as { code?: number }).code === 11000) {
@@ -174,7 +187,6 @@ export class DatasetService {
       }
       throw error;
     }
-    await this.payloads.create({ clipId: clip._id, data, sha256 });
     this.logger.log({ event: 'dataset_clip_submitted', clip: String(clip._id) });
     return { id: String(clip._id), status: clip.status, quality };
   }
@@ -209,9 +221,12 @@ export class DatasetService {
   /** Owner-side removal of a single contribution. */
   async removeClip(userId: string, id: string) {
     if (!Types.ObjectId.isValid(id)) throw new NotFoundException();
-    const clip = await this.clips.findOneAndDelete({ _id: new Types.ObjectId(id), userId: new Types.ObjectId(userId) });
+    const clip = await this.fence().withActiveWrite(userId, async session => {
+      const removed = await this.clips.findOneAndDelete({ _id: new Types.ObjectId(id), userId: new Types.ObjectId(userId) }, { session });
+      if (removed) await this.payloads.deleteOne({ clipId: removed._id }, { session });
+      return removed;
+    });
     if (!clip) throw new NotFoundException();
-    await this.payloads.deleteOne({ clipId: clip._id });
     return { deleted: true };
   }
 

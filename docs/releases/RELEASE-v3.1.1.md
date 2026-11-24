@@ -21,4 +21,4 @@ Fresh release checks: 159 frontend/mobile Node tests and 382 backend tests passe
 
 Camera readiness Phase 1 remains human_needed: all 45 physical trials and six calibration decisions are pending. Body/brightness/framing flags stay false until supported by actual-device evidence. Native pose tracking requires an appropriate development build; Expo Go provides fallback behavior. Policy routes remain drafts pending team review. Provider/deployment and live database behavior are not newly certified by automated tests.
 
-See [checklist](./checklist.md), [device verification steps](../.planning/phases/01-camera-readiness/01-UAT.md) and [release preparation report](../ProgressReports/PROGRESS-56.md).
+See [checklist](../checklist.md), [device verification steps](../../.planning/phases/01-camera-readiness/01-UAT.md) and [release preparation report](../../ProgressReports/PROGRESS-56.md).

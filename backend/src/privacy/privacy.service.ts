@@ -129,6 +129,13 @@ export class PrivacyService implements OnModuleInit, OnModuleDestroy {
     if (!user) return {};
     await this.storage.deleteUserObjects(userId);
     const counts: Record<string, number> = {};
+    // Payloads are keyed by clip, not owner, so the userId sweep below cannot see them.
+    // Delete them first: a retry after a crash still finds the clips that point at them.
+    const clipIds = await this.db.collection('dataset_clips').find({ userId: id }, { projection: { _id: 1 } }).map(clip => clip._id).toArray();
+    if (clipIds.length) {
+      const payloads = await this.db.collection('dataset_clip_payloads').deleteMany({ clipId: { $in: clipIds } });
+      if (payloads.deletedCount) counts.dataset_clip_payloads = payloads.deletedCount;
+    }
     for (const { name } of await this.db.listCollections({}, { nameOnly: true }).toArray()) {
       if (['users', 'account_lifecycle', 'audit_logs', 'background_jobs'].includes(name) || name.startsWith('system.')) continue;
       const result = await this.db.collection(name).deleteMany({ $or: [{ userId: id }, { subjectId: id }, { userId }, { subjectId: userId }] });

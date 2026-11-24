@@ -15,13 +15,13 @@ Configuration observed October 21, 2026: `SERVICE_ID=service_pdqqhio`, `TEMPLATE
 
 `backend/email-templates/otp.html` is the old dark reference copy. It is not imported, read or uploaded by runtime code. It remains historical; **do not paste it**. Earlier documentation claiming the live dashboard had been updated was not evidence of a saved template or inbox verification.
 
-The replacement files are [HTML](../../emails/otp-template.html) and [plain text](../../emails/otp-template.txt). Editing them does not update EmailJS. OTP generation, expiry, sending behavior and backend templates are unchanged by this task.
+The replacement files are [HTML](../../docs/emails/otp-template.html) and [plain text](../../docs/emails/otp-template.txt). Editing them does not update EmailJS. OTP generation, expiry, sending behavior and backend templates are unchanged by this task.
 
 ## Apply in EmailJS
 
-1. **Email Templates → select template_a9s1vuh → Content → HTML code editor (`<>`)**. Replace the entire HTML with `emails/otp-template.html`, then **Save**. Do not paste HTML into the rich-text view as ordinary text.
+1. **Email Templates → select template_a9s1vuh → Content → HTML code editor (`<>`)**. Replace the entire HTML with `docs/emails/otp-template.html`, then **Save**. Do not paste HTML into the rich-text view as ordinary text.
 2. Set **Subject** to `Reset your password`, **To Email** to `{{email}}`, and **From Name** to `PhysiqueQuest`. Keep the authenticated sender associated with `service_pdqqhio`; do not invent an unverified sender. Leave CC and BCC empty.
-3. If a plain-text content field is available, paste `emails/otp-template.txt` there. Otherwise retain it as the fallback copy; do not append it to the HTML body. Save again.
+3. If a plain-text content field is available, paste `docs/emails/otp-template.txt` there. Otherwise retain it as the fallback copy; do not append it to the HTML body. Save again.
 4. The supplied HTML has no EmailJS branding line. Remove that line if editable in Content. If EmailJS injects it, footer removal is a paid-plan white-label feature; local HTML cannot remove provider-injected branding. Do not upgrade automatically.
 5. Press **Test**, select `service_pdqqhio`, and enter your own recipient as `email`, a test first name as `name`, `012345` as `passcode`, and `10 minutes` as `time`. Send the test. This synthetic code checks formatting only and will not reset an account.
 6. Check the newest message in Gmail desktop and Gmail mobile. Confirm subject/heading, small logo, one row `012345` including its leading zero, and `This code expires in 10 minutes and can be used once.` Check narrow-screen fit, blocked-image fallback and branding. Then request a real app code to confirm the real first name, six digits and expiry match; never log/share that code.

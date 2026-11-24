@@ -4,7 +4,7 @@
 
 **Blocked at Step 1. No recordings have been replayed, no tracking behavior has been changed in this pass, and no exercise has been promoted to validated.** This is a baseline preflight and evidence inventory, not a completed before/after accuracy report.
 
-Read `docs/pose-tracker-reassessment.md` first, then inspected the current worker, shared counter/configuration, subject selector, filter, browser hook, native camera callbacks, native session gate/cue flow and registry. Captured the actual dirty source and model before attempting replay. Git HEAD alone does not represent the current working tree.
+Read `docs/pose-tracker/pose-tracker-reassessment.md` first, then inspected the current worker, shared counter/configuration, subject selector, filter, browser hook, native camera callbacks, native session gate/cue flow and registry. Captured the actual dirty source and model before attempting replay. Git HEAD alone does not represent the current working tree.
 
 The baseline snapshot fingerprint is `11daa07e951decfd27e0b060e9c221ee5319bad331cea8abb1fb5017d52c5dbb`. Exact source/model copies and individual SHA-256 hashes are in `output/pose-replay-private/current-source-snapshot/`. This identifies a **source baseline**, not a measured replay baseline.
 

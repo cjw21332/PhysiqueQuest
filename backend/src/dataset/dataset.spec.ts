@@ -42,13 +42,25 @@ function modelMock(overrides: Record<string, Mock> = {}) {
   return overrides as unknown as Model<never>;
 }
 
+/** Fake connection for AccountLifecycleFence; `active: false` means the account is deleting. */
+function lifecycleDb(active: boolean) {
+  const lifecycle = {
+    findOne: vi.fn(async () => (active ? { status: 'active', generation: 0 } : null)),
+    updateOne: vi.fn(async () => ({ matchedCount: active ? 1 : 0 })),
+  };
+  const session = { inTransaction: () => true, withTransaction: async (fn: () => Promise<unknown>) => fn(), endSession: async () => {} };
+  return { lifecycle, db: { collection: () => lifecycle, startSession: async () => session } };
+}
+
 function service(overrides: {
   consent?: Record<string, unknown> | null;
   exists?: boolean;
   clips?: Record<string, Mock>;
   payloads?: Record<string, Mock>;
   consents?: Record<string, Mock>;
+  db?: ReturnType<typeof lifecycleDb>['db'];
 } = {}) {
+  const db = overrides.db ?? lifecycleDb(true).db;
   const consents = modelMock({
     findOne: vi.fn().mockReturnValue({ lean: () => Promise.resolve(overrides.consent ?? null) }),
     findOneAndUpdate: vi.fn().mockResolvedValue({
@@ -61,18 +73,19 @@ function service(overrides: {
   }) as unknown as Model<DatasetConsent>;
   const clips = modelMock({
     exists: vi.fn().mockResolvedValue(overrides.exists ? { _id: 'x' } : null),
-    create: vi.fn().mockResolvedValue({ _id: new Types.ObjectId(), status: 'pending_annotation' }),
+    create: vi.fn().mockResolvedValue([{ _id: new Types.ObjectId(), status: 'pending_annotation' }]),
     find: vi.fn().mockReturnValue({ lean: () => Promise.resolve([{ _id: new Types.ObjectId() }, { _id: new Types.ObjectId() }]) }),
     deleteMany: vi.fn().mockResolvedValue({ deletedCount: 2 }),
     findOneAndDelete: vi.fn().mockResolvedValue({ _id: new Types.ObjectId() }),
     ...overrides.clips,
   }) as unknown as Model<DatasetClip>;
   const payloads = modelMock({
-    create: vi.fn().mockResolvedValue({}),
+    create: vi.fn().mockResolvedValue([{}]),
     deleteMany: vi.fn().mockResolvedValue({ deletedCount: 2 }),
     deleteOne: vi.fn().mockResolvedValue({}),
     ...overrides.payloads,
   }) as unknown as Model<DatasetClipPayload>;
+  for (const model of [consents, clips, payloads]) Object.assign(model, { db });
   return new DatasetService(consents, clips, payloads);
 }
 
@@ -158,10 +171,10 @@ describe('dataset consent and pseudonymisation', () => {
       acceptedAt: new Date(),
       subjectPseudonym: 'study-code-123456789012',
     };
-    const created = vi.fn().mockResolvedValue({ _id: new Types.ObjectId(), status: 'pending_annotation' });
+    const created = vi.fn().mockResolvedValue([{ _id: new Types.ObjectId(), status: 'pending_annotation' }]);
     const result = await service({ consent, clips: { create: created } }).submit(USER, clipDto() as never);
     expect(result.status).toBe('pending_annotation');
-    const stored = created.mock.calls[0][0];
+    const stored = created.mock.calls[0][0][0];
     expect(stored.subjectPseudonym).toBe('study-code-123456789012');
     // The stored clip is owned by the account (needed for withdrawal) but the
     // subject identity used for training is only the pseudonym.
@@ -189,5 +202,43 @@ describe('dataset consent and pseudonymisation', () => {
     expect(document.version).toBe(CONSENT_VERSION);
     expect(document.text).toContain('separate from camera permission');
     expect(document.textHash).toBe(consentTextHash(CONSENT_TEXT));
+  });
+});
+
+describe('dataset writes and the account lifecycle fence', () => {
+  const consent = { consentVersion: CONSENT_VERSION, consentTextHash: consentTextHash(), withdrawnAt: null, acceptedAt: new Date(), subjectPseudonym: 'study-code-123456789012' };
+  beforeEach(() => {
+    process.env.DATASET_PSEUDONYM_SECRET = 'test-secret-that-is-long-enough';
+  });
+
+  it('refuses every owner write once the account is no longer active, before touching data', async () => {
+    const writes = {
+      consentUpsert: vi.fn(), consentUpdate: vi.fn(),
+      clipCreate: vi.fn(), clipDelete: vi.fn(), clipDeleteMany: vi.fn(),
+      payloadCreate: vi.fn(), payloadDelete: vi.fn(), payloadDeleteMany: vi.fn(),
+    };
+    const svc = service({
+      consent,
+      db: lifecycleDb(false).db,
+      consents: { findOneAndUpdate: writes.consentUpsert, updateOne: writes.consentUpdate },
+      clips: { create: writes.clipCreate, findOneAndDelete: writes.clipDelete, deleteMany: writes.clipDeleteMany },
+      payloads: { create: writes.payloadCreate, deleteOne: writes.payloadDelete, deleteMany: writes.payloadDeleteMany },
+    });
+    await expect(svc.acceptConsent(USER, { version: CONSENT_VERSION, accepted: true, textHash: consentTextHash() })).rejects.toThrow(ForbiddenException);
+    await expect(svc.submit(USER, clipDto() as never)).rejects.toThrow(ForbiddenException);
+    await expect(svc.removeClip(USER, new Types.ObjectId().toHexString())).rejects.toThrow(ForbiddenException);
+    await expect(svc.withdrawConsent(USER)).rejects.toThrow(ForbiddenException);
+    for (const write of Object.values(writes)) expect(write).not.toHaveBeenCalled();
+  });
+
+  it('stores the clip and its payload inside one fenced transaction', async () => {
+    const { db, lifecycle } = lifecycleDb(true);
+    const clipCreate = vi.fn().mockResolvedValue([{ _id: new Types.ObjectId(), status: 'pending_annotation' }]);
+    const payloadCreate = vi.fn().mockResolvedValue([{}]);
+    await service({ consent, db, clips: { create: clipCreate }, payloads: { create: payloadCreate } }).submit(USER, clipDto() as never);
+    expect(lifecycle.updateOne).toHaveBeenCalledTimes(1);
+    const session = clipCreate.mock.calls[0][1].session;
+    expect(session).toBeDefined();
+    expect(payloadCreate.mock.calls[0][1].session).toBe(session);
   });
 });

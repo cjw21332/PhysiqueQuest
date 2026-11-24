@@ -36,6 +36,10 @@ describe.skipIf(!enabled)('privacy retention on isolated MongoDB', () => {
       await db.collection(name).insertMany([name === 'profiles' ? transformProfile(record, true) : record, { userId: other }]);
     }
     await db.collection('leaderboard_snapshots').insertMany([{ subjectId: id }, { subjectId: other }]);
+    // Payloads reference their clip, not the owner, so the generic userId sweep cannot see them.
+    const [mine, theirs] = [new Types.ObjectId(), new Types.ObjectId()];
+    await db.collection('dataset_clips').insertMany([{ _id: mine, userId: id }, { _id: theirs, userId: other }]);
+    await db.collection('dataset_clip_payloads').insertMany([{ clipId: mine }, { clipId: theirs }]);
     const exported = await service.exportData(String(id));
     expect(JSON.stringify(exported)).toContain('synthetic health');
     expect(JSON.stringify(exported)).not.toContain('passwordHash');
@@ -61,6 +65,8 @@ describe.skipIf(!enabled)('privacy retention on isolated MongoDB', () => {
       expect(await db.collection(name).countDocuments({ userId: other })).toBe(1);
     }
     expect(await db.collection('leaderboard_snapshots').countDocuments({ subjectId: id })).toBe(0);
+    expect(await db.collection('dataset_clip_payloads').countDocuments({ clipId: mine })).toBe(0);
+    expect(await db.collection('dataset_clip_payloads').countDocuments({ clipId: theirs })).toBe(1);
     expect(await db.collection('audit_logs').countDocuments({ actorId: String(id) })).toBe(0);
     expect(await db.collection('audit_logs').countDocuments({ action: 'account_purged' })).toBe(1);
     const job = await db.collection('background_jobs').findOne({ status: 'completed' });

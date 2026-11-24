@@ -10,6 +10,7 @@ import PhotoConfirmation from './PhotoConfirmation';
 import FoodDescriptionDialog from './FoodDescriptionDialog';
 import EditMeal from './EditMeal';
 import DietaryPlan, { planTargets } from './DietaryPlan';
+import SupplementGuide from './SupplementGuide';
 import { type FoodEntry, type MealName } from './types';
 import { defaultMeal } from './defaultMeal';
 import { canPreviewNutrition, createNutritionPreview, previewScan } from './nutritionPresentation';
@@ -26,11 +27,11 @@ import OutcomeDialog from '../../components/OutcomeDialog';
 import { beginPendingScanSave, clearPendingScanSave, readPendingScanSave, scanSaveScope, withScanSaveLock, type PendingScanSave } from '../../lib/scanSaveRecovery';
 import './scanExperience.css';
 
-type View = 'nutrition' | 'review' | 'add' | 'history' | 'edit' | 'plan';
+type View = 'nutrition' | 'review' | 'add' | 'history' | 'edit' | 'plan' | 'supplements';
 type ScanStatus = 'loading' | 'ready' | 'error';
 export default function ScanSection({ profile }: { profile: Profile }) {
   const connected = useBackendConnection();
-  const [view,setView]=useScreenRoute<View>('/scan', { nutrition: '', review: '/review', add: '/add-food', history: '/history', edit: '/edit-meal', plan: '/plan' }, 'nutrition');
+  const [view,setView]=useScreenRoute<View>('/scan', { nutrition: '', review: '/review', add: '/add-food', history: '/history', edit: '/edit-meal', plan: '/plan', supplements: '/supplements' }, 'nutrition');
   const contentRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{contentRef.current?.scrollTo(0,0);},[view]);
   const [photoSourceOpen,setPhotoSourceOpen]=useState(false);
@@ -189,8 +190,9 @@ export default function ScanSection({ profile }: { profile: Profile }) {
     <div ref={contentRef} className="scan-content">
     {loading ? <div className="profile-load-state" role="status" aria-label="Loading nutrition" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div> : error ? <p>Your saved nutrition is unavailable.</p> :
       view === 'history' ? <FoodHistory targets={targets} previousCalorieTarget={previousCalorieTarget} meals={meals} onBack={()=>setView('nutrition')}/> :
+      view === 'supplements' ? <SupplementGuide profile={profile} onBack={()=>setView('nutrition')}/> :
       view === 'plan' ? dietaryPlan ? <DietaryPlan key="offline-plan" readOnly saved={dietaryPlan} profile={profile} meals={todayMeals} onBack={()=>setView('nutrition')}/> : <p>No saved dietary plan.</p> :
-      <NutritionDashboard readOnly targets={targets} onPlan={()=>setView('plan')} meals={meals.filter(row=>row.date===formatLocalDate())} historyMeals={meals} water={water} onWater={async()=>{}} onScan={()=>{}} onAdd={()=>{}} onEdit={()=>{}} onHistory={openHistory}/>}
+      <NutritionDashboard readOnly targets={targets} onPlan={()=>setView('plan')} onSupplements={()=>setView('supplements')} meals={meals.filter(row=>row.date===formatLocalDate())} historyMeals={meals} water={water} onWater={async()=>{}} onScan={()=>{}} onAdd={()=>{}} onEdit={()=>{}} onHistory={openHistory}/>}
     </div>
     <BottomNav/>
   </section>;
@@ -225,7 +227,8 @@ export default function ScanSection({ profile }: { profile: Profile }) {
     {preview && (view!=='review'||sampleReview) && <p className="scan-preview-label">Sample preview · not your saved nutrition data <button type="button" onClick={()=>{setPreviewRequested(false);setSampleReview(false);setNotice('');setActionError('');setView('nutrition');}}>Start my log</button></p>}
     {!preview && previewEligible && !loading && !error && meals.length===0 && water===0 && view==='nutrition' && <button type="button" className="scan-preview-toggle" onClick={()=>{setPreviewSnapshot(createNutritionPreview());setPreviewRequested(true);}}>View sample nutrition</button>}
     {error&&<button type="button" className="scan-retry" onClick={()=>void refresh()}>Retry nutrition</button>}
-    {view==='nutrition'&&<NutritionDashboard targets={targets} onPlan={()=>setView('plan')} meals={todayMeals} historyMeals={displayMeals} water={displayWater} onWater={setWater} onScan={scan} onAdd={add} onEdit={edit} onHistory={openHistory} highlightedMeal={highlightedMeal}/>}
+    {view==='nutrition'&&<NutritionDashboard targets={targets} onPlan={()=>setView('plan')} onSupplements={()=>setView('supplements')} meals={todayMeals} historyMeals={displayMeals} water={displayWater} onWater={setWater} onScan={scan} onAdd={add} onEdit={edit} onHistory={openHistory} highlightedMeal={highlightedMeal}/>}
+    {view==='supplements'&&<SupplementGuide profile={profile} onBack={()=>setView('nutrition')}/>}
     {view==='plan'&&<DietaryPlan saved={dietaryPlan} profile={profile} meals={todayMeals} onBack={()=>setView('nutrition')}/>}
     {view==='review'&&<ReviewEstimate imageUrl={imageUrl} preview={sampleReview} status={scanStatus} analysis={analysis} error={scanError} onBack={()=>{cancelAnalysis();setView('nutrition');}} onRetake={retake} onRetry={retryScan} onAddManual={add} onSave={saveScan}/>}
 
@@ -233,7 +236,7 @@ export default function ScanSection({ profile }: { profile: Profile }) {
     {view==='edit'&&editingEntries.length>0&&<EditMeal key={editingEntries[0].id} entries={editingEntries} onBack={()=>setView('nutrition')} onSave={saveEdit} onDelete={async entry => { if(editingPreview){setPreviewSnapshot(current => ({ ...current, meals: current.meals.filter(item => item.id !== entry.id) }));} else await deleteMeal(entry.id); setHighlightedMeal(entry.meal); setView('nutrition'); }}/>}
     {view==='history'&&<FoodHistory targets={targets} previousCalorieTarget={previousCalorieTarget} meals={displayMeals} backLabel="Back to Nutrition" onBack={()=>setView('nutrition')}/>}
     </>}
-    </div>{(view === 'nutrition' || view === 'history' || view === 'plan') && <BottomNav />}
+    </div>{(view === 'nutrition' || view === 'history' || view === 'plan' || view === 'supplements') && <BottomNav />}
     {actionError && <OutcomeDialog kind="error" title="Could not save meal" message={actionError} onClose={()=>setActionError('')} actionLabel="Try again"/>}
     {notice && !actionError && <OutcomeDialog kind={notice.includes('Sample') ? 'info' : 'success'} title={notice.includes('Sample') ? 'Sample updated' : 'Meal saved'} message={notice} onClose={()=>setNotice('')}/>}
   </section>;

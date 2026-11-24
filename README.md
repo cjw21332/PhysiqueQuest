@@ -4,7 +4,7 @@ A responsive, mobile-first fitness application with a Next.js frontend, Expo Go 
 
 ## System status
 
-**Release:** [PhysiqueQuest v3.1.1](./docs/RELEASE-v3.1.1.md) — connected workout improvements, calibration drafts, accessibility and local camera-readiness integration. Actual-device camera calibration remains pending.
+**Release:** [PhysiqueQuest v3.1.1](./docs/releases/RELEASE-v3.1.1.md) — connected workout improvements, calibration drafts, accessibility and local camera-readiness integration. Actual-device camera calibration remains pending.
 
 **[Open the full system functionality checklist](./docs/checklist.md)** for all 17 modules, specific completed and outstanding functions, verification dates, and progress totals.
 
@@ -52,6 +52,24 @@ Registration, login, profiles, nutrition, settings, notifications, workout sessi
 All reports live in [ProgressReports/](./ProgressReports/). See [PROGRESS.md](./ProgressReports/PROGRESS.md) for the initial onboarding handoff, [PROGRESS-2.md](./ProgressReports/PROGRESS-2.md) for Home, [PROGRESS-3.md](./ProgressReports/PROGRESS-3.md) for Coach, [PROGRESS-4.md](./ProgressReports/PROGRESS-4.md) for Scan, [PROGRESS-5.md](./ProgressReports/PROGRESS-5.md) for Quests, and [PROGRESS-6.md](./ProgressReports/PROGRESS-6.md) for Me.
 
 See [PROGRESS-10.md](./ProgressReports/PROGRESS-10.md) and [PROGRESS-11.md](./ProgressReports/PROGRESS-11.md) for backend integration, unit-aware profile persistence, and Expo Go improvements.
+
+## Project layout
+
+| Folder | What lives there |
+|---|---|
+| `frontend/` | Next.js web app (the UI the mobile app also loads) |
+| `backend/` | NestJS API, MongoDB models, maintenance scripts in `backend/scripts/` |
+| `mobile/` | Expo / React Native app and Android project |
+| `shared/` | Rep counting and pose logic shared by web and mobile |
+| `pose-service/`, `ml/`, `ai/` | Pose service, ML training/evaluation (`ml/scripts/debug/` holds one-off data checks), local AI coach setup |
+| `scripts/` | Repo-level helper scripts; Windows build/push launchers are in `scripts/windows/` |
+| `tools/` | Developer tooling: `eval/`, `gif-config/`, and AI-agent skill setup in `agent-setup/` |
+| `patches/` | Patch series applied to dependencies |
+| `docs/` | All documentation — see [docs/README.md](./docs/README.md) |
+| `Progress/`, `ProgressReports/` | Per-service progress logs and numbered progress reports |
+| `artifacts/`, `output/` | Built APKs, test runs and generated reports (older APKs in `artifacts/android/archive/`) |
+
+Root files kept on purpose: `README.md`, `RUNNING.md` (how to run), `DESIGN.md` / `PRODUCT.md` (design and product rules), agent instructions (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `RTK.md`), `THIRD_PARTY_NOTICES.md`, and workspace config (`package.json`, `tsconfig.json`, `metro.config.js`, `seed.ts`, `opencode.json`, `skills-lock.json`).
 
 ## Documentation
 

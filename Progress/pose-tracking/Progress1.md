@@ -182,7 +182,7 @@ type RawExercise = {
 
 ## 6. Documentation
 
-### `docs/POSETRACKER_INTEGRATION.md`
+### `docs/pose-tracker/POSETRACKER_INTEGRATION.md`
 - Implementation date: 2026-11-06
 - Infrastructure complete, live provider verification pending
 - 15 built-in mappings covering 9 provider IDs

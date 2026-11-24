@@ -59,7 +59,7 @@
 }
 .workout-feedback button:disabled { opacity: 0.6; cursor: default; }
 .workout-feedback button:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
-.workout-feedback-note { margin: 0; font-size: 11px; line-height: 1.45; color: var(--muted); }
+.workout-feedback-note { margin: 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
 .workout-feedback-error { margin: 0; font-size: 12px; line-height: 1.45; color: var(--red-dark); }
 .workout-feedback-status { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); font-size: 13px; }
 

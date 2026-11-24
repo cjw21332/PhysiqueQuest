@@ -46,7 +46,7 @@ Prompt: "Create a simple landing page"
 
 ### Start OpenCode
 ```bash
-cd "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest"
+cd "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\tools\agent-setup"
 opencode
 ```
 
@@ -78,11 +78,11 @@ If you want a specific skill, just mention it:
 | `opencode.json` | **Main config** - model, plugin, skills, permissions |
 | `OPENCODE_OMNIROUTE_SETUP.md` | Complete setup guide |
 | `OMNIROUTE_SKILLS_SETUP.md` | Skill inventory + install scripts |
-| `omniroute-skills-manifest.json` | All 444 skills with metadata |
-| `install-all-skills.ps1` | PowerShell auto-installer |
-| `install-all-skills.sh` | Bash auto-installer |
-| `generate-manifest.js` | Manifest generator |
-| `install-skills.js` | Node.js installer |
+| `tools/agent-setup/omniroute-skills-manifest.json` | All 444 skills with metadata |
+| `tools/agent-setup/install-all-skills.ps1` | PowerShell auto-installer |
+| `tools/agent-setup/install-all-skills.sh` | Bash auto-installer |
+| `tools/agent-setup/generate-manifest.js` | Manifest generator |
+| `tools/agent-setup/install-skills.js` | Node.js installer |
 | `COMPLETE_SETUP_SUMMARY.md` | This file |
 
 ## Verification Checklist

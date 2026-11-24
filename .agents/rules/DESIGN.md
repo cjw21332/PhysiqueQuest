@@ -4,13 +4,17 @@ description: PhysiqueQuest visual and responsive design system for the Next.js w
 
 # PhysiqueQuest Design System (2026-10-21 - local camera readiness)
 
+**Connection toasts (November 24, 2026):** Offline, Connecting to PhysiqueQuest, Sign in to sync and You’re back online all use one top toast (`components/ConnectionToast.tsx`, `.pq-toast` in globals.css), never a modal. Only one shows at a time, in this priority: back online, sign in to sync, offline, connecting. Each has a status icon (a spinner while connecting), a title, a short message and a 44px close button with a descriptive name. The offline close button is named Continue offline and keeps its session-remembered dismissal. Swipe left, right or up past about 72px or 36px to dismiss; shorter drags snap back. Offline offers Try again. Back online hides itself after 5.5s. Dismissed Connecting and Sign in to sync stay hidden until that state ends and returns. Accent colors: coral for offline, muted for connecting and sign-in, green for online. Position respects `--sat`, and reduced motion removes slide and fade. Covered by `tests/browser/connection-toast.spec.mjs`.
+
+**Readability and iPhone pass (November 24, 2026):** Text is never smaller than 12px: every `font-size` below 12px (fixed values and `clamp()` bounds) was raised to 12px across `globals.css` and the scoped section stylesheets. Layouts, colors and fonts are otherwise unchanged. Form fields stay at 16px or larger so iOS Safari never zooms on focus. Below 390px wide, the Coach week strip and the Me training day grid use a 3px gap so seven day buttons stay at least 44px wide down to the iPhone SE/mini (375px). At 320px they stay about 36×55px, the most that fits. The Scan meal summary wraps to two lines instead of clipping. Safe areas come from the native `--safe-*` insets with `env(safe-area-inset-*)` as the fallback (`--sat`/`--sab`/`--sal`/`--sar`); new pinned bars must pad with `var(--sab)`. `tests/browser/ui-audit.spec.mjs` (`npx playwright test -c playwright.ui-audit.config.mjs`) crawls every route with iPhone emulation at 320, 375, 390 and 430px. It reports contrast, text under 12px, targets under 44px, unnamed controls, overflow, clipping and iOS input zoom to `test-results/ui-audit/report-<width>.json`.
+
 **Mobile usability audit (November 16, 2026):** On narrow phones, exercise-library filters use a single column so selected values remain readable. The Phiq sheet opens with focus on its close control rather than immediately opening the keyboard. Notification back navigation uses a left-pointing indicator. Keep the existing dark tokens, focus treatment, and 44px minimum targets.
 
 **Camera readiness (October 21, 2026):** Camera check preserves its layout and dark tokens with independent Camera connection, Full body in frame, Scene brightness and Framing rows. Use text/icons plus Ready/Adjust/Checking/Unavailable and one polite stable summary; never announce every frame or rely on color. Framing is approximate, never measured meters; brightness is a coarse image estimate, never lux or guaranteed subject lighting. Body/brightness/framing remain Unavailable while device calibration flags are false. Keep Start session unrestricted and explicit Continue without camera available, with camera teardown. Retry is available after recoverable failures; controls are at least 48px/dp and labels wrap with enlarged text. Unsupported native runtimes retain honest preview/manual fallback. Do not describe software fixtures as physical-camera validation.
 
 **Launch/calibration copy clarification (October 20, 2026):** Launch describes workout plans, exercise guides, food logs and quests; it does not promise live form analysis. Device results are checks, not an entry gate. Camera access is optional for photos/previews and denial messaging explains that users can continue. Calibration discloses shared nutrition targets, treats commitment as a saved preference, and avoids automatic diet/progression or guaranteed-safety claims. Camera guidance describes a preview and unavailable live analysis; the existing required checkbox acknowledges that guidance rather than promising a physical setup. The final action is **Save profile & continue**, matching the existing profile-save/navigation flow. Goal values, validation branches, persistence and layouts remain unchanged.
 
-**Auth and first-log hardening (October 20, 2026):** Auth uses native form submission and prevents concurrent requests while preserving failed inputs. Recovery and auth outcome overlays use native modal dialogs; retain accessible names, background inertness, stage focus and opener restoration. Recovery supports Escape; the account-created outcome keeps its explicit Start calibration action. Registration links to `/terms`, `/privacy`, and `/camera-consent` in new tabs. These are empty, clearly marked **Draft, pending team review** placeholders, not approved policies; see `docs/policy-review-todo.md`. Nutrition starts with the user's actual empty state. Only the explicit **View sample nutrition** action enters samples after a successful empty response; **Start my log** exits, and selecting a real photo also exits sample mode. Sample writes remain local. Normal first meal/water writes use the existing authenticated APIs and show failures. This supersedes older automatic-empty-preview descriptions below.
+**Auth and first-log hardening (October 20, 2026):** Auth uses native form submission and prevents concurrent requests while preserving failed inputs. Recovery and auth outcome overlays use native modal dialogs; retain accessible names, background inertness, stage focus and opener restoration. Recovery supports Escape; the account-created outcome keeps its explicit Start calibration action. Registration links to `/terms`, `/privacy`, and `/camera-consent` in new tabs. These are empty, clearly marked **Draft, pending team review** placeholders, not approved policies; see `docs/reports/policy-review-todo.md`. Nutrition starts with the user's actual empty state. Only the explicit **View sample nutrition** action enters samples after a successful empty response; **Start my log** exits, and selecting a real photo also exits sample mode. Sample writes remain local. Normal first meal/water writes use the existing authenticated APIs and show failures. This supersedes older automatic-empty-preview descriptions below.
 
 **Launch scrolling follow-up (October 19, 2026):** The landing page is non-scrollable (`overflow: clip`). Its compact short-screen layout keeps the brand, readiness details and both account actions inside the viewport, with 44px account buttons. Do not restore overflow scrolling or merely hide its scrollbar. Other pages retain their shared scrollbar styling.
 
@@ -163,9 +167,9 @@ Approved reference screens use bundled Inter (`/fonts/Inter-Variable.ttf`), incl
 | Subsection heading (h3) | `clamp(14px, 2.8vw, 17px)` | 700 | `--ink` | Card titles, mission titles, nested section labels |
 | Body copy | `clamp(13px, 2.5vw, 16px)` | 400 | `--ink` | Main content text, descriptions, list items |
 | Secondary text | `clamp(12px, 2.4vw, 14px)` | 400 | `--muted` | Captions, subtitles, metadata, helper text |
-| Label / badge | `clamp(11px, 1.6vw, 13px)` | 600 | `--ink` | Form labels, button text, chip labels |
-| Hint / small | `clamp(10px, 1.4vw, 12px)` | 400 | `--muted` | Inline hints, error messages, timestamp, very small copy |
-| Micro / tag | `clamp(9px, 1.3vw, 11px)` | 400 | `--muted` | Tags, badges, mini metadata, icon labels |
+| Label / badge | `clamp(12px, 1.6vw, 13px)` | 600 | `--ink` | Form labels, button text, chip labels |
+| Hint / small | `12px` | 400 | `--muted` | Inline hints, error messages, timestamp, very small copy |
+| Micro / tag | `12px` | 400 | `--muted` | Tags, badges, mini metadata, icon labels |
 
 **Weight Rules:**
 - **700 (semibold)**: Headings, labels, selected states, emphasis
@@ -397,6 +401,7 @@ Landscape phones (width > height) have limited vertical space. Test these scenar
 
 **Minimum Touch Target:** 44px × 44px (iOS standard)
 - Buttons, links, form controls, and tappable list items must meet or exceed this
+- Verify on iPhone widths (320, 375, 390, 430px) with touch emulation; seven-across day pickers tighten their gap below 390px rather than shrinking buttons
 - If visual size is smaller, add padding to expand the hit area
 
 **Focus Visible State:**
@@ -550,6 +555,7 @@ Before committing any UI changes, verify:
 - [ ] Headings, body, and secondary text use correct size/weight from type scale
 - [ ] Colors use CSS custom properties (`--ink`, `--green`, `--muted`, etc.)
 - [ ] Color contrast meets WCAG AA standards for all text
+- [ ] No text below 12px; text inputs, selects and textareas at 16px or larger (prevents iOS focus zoom)
 - [ ] Status information not communicated by color alone (pair with icons/text)
 - [ ] Demo/sample data clearly labeled as such
 

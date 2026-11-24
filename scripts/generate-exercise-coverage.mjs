@@ -11,7 +11,7 @@
  *   shared/exerciseTracking.generated.ts
  *   backend/src/pose-tracker/catalog-tracking.generated.ts
  *   output/exercisedb-v1-tracking-coverage.json
- *   EXERCISEDB_V1_TRACKING_COVERAGE.md
+ *   docs/pose-tracker/EXERCISEDB_V1_TRACKING_COVERAGE.md
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -382,7 +382,7 @@ ${rows}
   (live ≈15 fps, video 10 fps). The parity test checks identical landmark sequences at both rates;
   it does not replace device testing on recorded video.
 `;
-writeFileSync(join(root, 'EXERCISEDB_V1_TRACKING_COVERAGE.md'), md);
+writeFileSync(join(root, 'docs', 'pose-tracker', 'EXERCISEDB_V1_TRACKING_COVERAGE.md'), md);
 
 console.log('catalog', catalog.length, 'unique', ids.length);
 console.log(counts);

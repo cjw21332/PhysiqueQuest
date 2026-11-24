@@ -11,4 +11,4 @@ Release date: October 15, 2026. Includes the complete v2.7.2 codebase and the Co
 
 Verified: 309 backend tests across 41 files, 120 frontend/mobile Node tests, 10 browser tests, frontend/backend production builds, live provider categories/search/GIF playback, account workout persistence, and saved-program restoration from MongoDB with zero provider calls. Physical-device camera accuracy and production deployment are not certified by these checks.
 
-See [AI Coach setup](AI_COACH.md) for both backend processes, provider limits and attribution, and [the checklist](checklist.md) for evidence boundaries.
+See [AI Coach setup](../AI_COACH.md) for both backend processes, provider limits and attribution, and [the checklist](../checklist.md) for evidence boundaries.

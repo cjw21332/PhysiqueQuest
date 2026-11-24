@@ -5,7 +5,7 @@
 .coach-section .routine-session .manual-session .session-controls .end-button { background: var(--green); color: var(--surface); border-color: var(--green); font-weight: 700; }
 .coach-section .routine-session .manual-session .live-session-head { height: auto; flex: none; display: grid; gap: 10px; padding: 0; margin-bottom: 22px; }
 .coach-section .routine-session .manual-session .session-meta { white-space: normal; overflow: visible; }
-.manual-eyebrow { display: block; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; margin-bottom: 8px; }
+.manual-eyebrow { display: block; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .12em; margin-bottom: 8px; }
 .routine-session .manual-title-edit { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; border: 0; background: transparent; padding: 0; text-align: left; color: var(--ink); }
 .manual-title-edit h1 { font-size: clamp(23px, 5vw, 30px); line-height: 1.2; margin: 0; overflow-wrap: anywhere; }
 .manual-title-edit span { color: var(--green); font-size: 13px; }
@@ -35,7 +35,7 @@
 .routine-session .manual-session .routine-set-heading { display: grid; padding: 0 0 8px; font-size: 12px; color: var(--muted); }
 .routine-session .manual-session .routine-set { display: grid; align-items: center; gap: 8px; border: 0; padding: 6px 0; margin: 0; }
 .routine-session .manual-session .routine-set input { width: 100%; min-width: 0; min-height: 46px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--ink); font-size: 17px; text-align: center; padding: 6px; }
-.routine-session .manual-session .routine-set p { font-size: 11px; margin: 0; color: var(--muted); }
+.routine-session .manual-session .routine-set p { font-size: 12px; margin: 0; color: var(--muted); }
 .routine-session .manual-session .routine-set button { min-width: 44px; min-height: 46px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--ink); }
 .routine-session .manual-session .routine-set .is-saved { background: var(--green); color: var(--surface); }
 .routine-session .manual-session .manual-add-set { width: 100%; min-height: 46px; border-radius: 10px; background: var(--green-light); color: var(--green); border: 1px solid var(--line); font-weight: 700; margin-top: 8px; }

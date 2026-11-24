@@ -6,6 +6,8 @@ const groups = {
   activity: ['activity', 'PROTECTED AND TESTED', 'active fence/session; HTTP generation', 'lifecycle-remaining-writers e2e; unit tests'],
   auth: ['users, sessions, sign-ins, recovery/verification', 'PROTECTED — TEST COVERAGE INCOMPLETE', 'fence/session or atomic registration; token generation', 'registration, session-database, email-verification, password-recovery e2e'],
   coach: ['coach_programs', 'PROTECTED AND TESTED', 'fence/session; generation captured before catalog work', 'lifecycle-remaining-writers e2e; coach unit tests'],
+  dataset: ['dataset_consents, dataset_clips, dataset_clip_payloads', 'PROTECTED — TEST COVERAGE INCOMPLETE', 'owner writes fence/session; HTTP generation; reviewer annotate only updates an existing clip', 'dataset unit tests; lifecycle-remaining-writers consent e2e; submit/remove/withdraw races untested'],
+  feedback: ['workout_feedback (pain locations and notes encrypted)', 'PROTECTED — TEST COVERAGE INCOMPLETE', 'fence/session; HTTP generation; purged with account', 'feedback unit tests; no lifecycle e2e yet'],
   foodscan: ['food_scan_usage', 'PROTECTED AND TESTED', 'fence/session; stored generation; legacy quarantine', 'lifecycle-all-writers, lifecycle-usage-jobs, foodscan-persistence e2e'],
   jobs: ['analysis_jobs, analysis_results, users', 'PROTECTED AND TESTED', 'fence/session; stored generation; CAS lease', 'analysis-jobs, lifecycle-all-writers, lifecycle-processes e2e'],
   leaderboard: ['leaderboard_snapshots', 'PROTECTED — TEST COVERAGE INCOMPLETE', 'per-subject fence/session; generations captured before scoring', 'unit tests only'],
@@ -38,5 +40,5 @@ for(const file of walk('src').filter(f=>f.endsWith('.ts')&&!f.endsWith('.spec.ts
   } ts.forEachChild(node,visit);
  }visit(ast);
 }
-fs.writeFileSync('../docs/account-lifecycle-writer-inventory.md', '# Lifecycle writer inventory\n\nGenerated from the current source AST; classifications require the accompanying architecture review. Each row identifies the actual mutation. Operational purge/TTL deletion is distinguished from ordinary account writes. Tests do not prove every interleaving.\n\n| Service/method and line | Data | Fence, session and generation / deletion behavior | Evidence | Status |\n|---|---|---|---|---|\n'+rows.join('\n')+'\n');
+fs.writeFileSync('../docs/account-lifecycle/account-lifecycle-writer-inventory.md', '# Lifecycle writer inventory\n\nGenerated from the current source AST; classifications require the accompanying architecture review. Each row identifies the actual mutation. Operational purge/TTL deletion is distinguished from ordinary account writes. Tests do not prove every interleaving.\n\n| Service/method and line | Data | Fence, session and generation / deletion behavior | Evidence | Status |\n|---|---|---|---|---|\n'+rows.join('\n')+'\n');
 console.log(`${rows.length} mutation call sites inventoried`);

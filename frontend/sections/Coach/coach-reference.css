@@ -57,7 +57,7 @@
 .coach-reference .exercise-details { gap: 4px; }
 .coach-reference .exercise-name { color: #111a2c; font-size: 14px; font-weight: 400; line-height: 1.35; }
 .coach-reference .exercise-sets { color: #536176; font-size: 12px; font-weight: 400; }
-.coach-reference .tracking-badge { padding: 4px 9px; color: #167336; background: #eefaf0; border-radius: 20px; font-size: 11px; font-weight: 400; }
+.coach-reference .tracking-badge { padding: 4px 9px; color: #167336; background: #eefaf0; border-radius: 20px; font-size: 12px; font-weight: 400; }
 .coach-reference .tracking-badge.manual { color: #536176; background: #f4f7f4; }
 .coach-reference .form-tip-card { margin: 22px 0 16px; padding: 16px; gap: 12px; border: 0; border-radius: 14px; background: #eefaf0; }
 .coach-reference .tip-icon { width: 18px; height: 20px; flex: 0 0 18px; background: transparent; border-radius: 0; color: #167336; }
@@ -87,7 +87,7 @@
 .coach-reference .home-bottom-nav button { min-height: 44px; gap: 5px; padding: 0; color: #536176; }
 .coach-reference .home-bottom-nav button .nav-icon { width: 50px; height: 30px; min-height: 30px; border-radius: 18px; }
 .coach-reference .home-bottom-nav button.active .nav-icon { background: #80e687; }
-.coach-reference .home-bottom-nav small { font-size: 11px; line-height: 1.2; font-weight: 400; }
+.coach-reference .home-bottom-nav small { font-size: 12px; line-height: 1.2; font-weight: 400; }
 .coach-reference .home-bottom-nav button.active small { color: #111a2c; font-weight: 600; }
 .coach-reference .coach-plan-note { padding: 12px 0 0; color: #536176; font-size: 12px; line-height: 1.5; }
 .coach-reference .rest-day-message { margin-top: 0; background: #f4f7f4; }
@@ -96,13 +96,13 @@
   .coach-reference .coach-plan-header { width: calc(100% + 32px); margin-inline: -16px; padding-inline: 20px; }
   .coach-reference .exercise-item { gap: 9px; }
   .coach-reference .exercise-name { font-size: 13px; }
-  .coach-reference .tracking-badge { padding-inline: 7px; font-size: 11px; }
+  .coach-reference .tracking-badge { padding-inline: 7px; font-size: 12px; }
 }
 .program-edit-bar { display:flex; align-items:center; justify-content:space-between; margin:20px 0 12px; color:var(--muted); font-size:13px; font-weight:600; }
 .program-edit-bar button, .program-editor-heading button { min-height:44px; padding:8px 14px; border:1px solid var(--line); border-radius:12px; color:var(--ink); background:var(--surface); font-weight:700; }
 .program-editor { padding:20px; margin:16px 0; border:1px solid var(--line); border-radius:20px; background:var(--surface); }
 .program-editor-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
-.program-editor-heading p { color:var(--green); font-size:11px; font-weight:800; letter-spacing:.08em; }
+.program-editor-heading p { color:var(--green); font-size:12px; font-weight:800; letter-spacing:.08em; }
 .program-editor-heading h3 { margin-top:5px; font-size:20px; font-weight:750; }
 .program-editor label { display:grid; gap:8px; font-size:14px; font-weight:700; }
 .program-editor input { width:100%; min-height:48px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); }

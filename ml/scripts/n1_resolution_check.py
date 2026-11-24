@@ -7,7 +7,7 @@ import mediapipe as mp
 ROOT = Path(__file__).resolve().parents[2]
 MODEL = ROOT / 'ml/models/pose_landmarker_lite.task'
 VIDEO = next((ROOT / 'ml/data/raw/real_video/pushupbench').glob('01e83deb_0015*.mp4'))
-PHOTO = ROOT / 'images.jpg'
+PHOTO = ROOT / 'ml' / 'fixtures' / 'images.jpg'
 
 def fit(frame, width, height):
     h, w = frame.shape[:2]; scale = min(width/w, height/h)

@@ -6,7 +6,7 @@
 .video-review-file { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 15px; background: var(--soft); }
 .video-review-file-icon, .video-review-upload-icon { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 13px; color: var(--green); background: var(--green-light); }
 .video-review-file > div { display: grid; min-width: 0; gap: 3px; }
-.video-review-file div > span { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.video-review-file div > span { color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
 .video-review-file strong { overflow-wrap: anywhere; font-size: 14px; line-height: 1.35; }
 .video-review-file small, .video-review-empty small { color: var(--muted); font-size: 12px; }
 .video-review-actions { display: grid; gap: 10px; }

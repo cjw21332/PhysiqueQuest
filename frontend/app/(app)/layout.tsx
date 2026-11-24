@@ -10,6 +10,7 @@ import { ConnectionContext } from '../../hooks/useBackendConnection';
 import CoachChat from '../../components/CoachChat';
 import OfflineLeaderboard from '../../sections/Quests Section/OfflineLeaderboard';
 import BadgeCelebrations from '../../components/BadgeCelebrations';
+import WhatsNew from '../../components/WhatsNew';
 
 export default function AppLayout({
   children,
@@ -19,6 +20,8 @@ export default function AppLayout({
   const { push: navigate } = useRouter();
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
+  // Badge celebrations wait until the what's-new popup is closed so two dialogs never stack.
+  const [whatsNewDone, setWhatsNewDone] = useState(false);
 
   const [connected,setConnected] = useState(true);
   useEffect(() => {
@@ -89,5 +92,5 @@ export default function AppLayout({
         ? 'journey-dark-theme'
         : 'system-dark-theme';
   const offlineLeaderboard = !connected && pathname === '/quests/leaderboard';
-  return <ConnectionContext.Provider value={connected}><div className={`${theme} signed-in-layout`}> {offlineLeaderboard ? <OfflineLeaderboard /> : children}{connected && isClient && isAuthenticated() && <><CoachChat /><BadgeCelebrations /></>}</div></ConnectionContext.Provider>;
+  return <ConnectionContext.Provider value={connected}><div className={`${theme} signed-in-layout`}> {offlineLeaderboard ? <OfflineLeaderboard /> : children}{isClient && isAuthenticated() && <WhatsNew onClose={() => setWhatsNewDone(true)} />}{connected && isClient && isAuthenticated() && <><CoachChat />{whatsNewDone && <BadgeCelebrations />}</>}</div></ConnectionContext.Provider>;
 }

@@ -16,6 +16,10 @@ import { Settings, SettingsSchema } from '../src/settings/schemas/settings.schem
 import { User, UserSchema } from '../src/auth/schemas/user.schema.js';
 import { PrivacyService } from '../src/privacy/privacy.service.js';
 import { lifecycleContext } from '../src/privacy/lifecycle-context.js';
+import { DatasetService } from '../src/dataset/dataset.service.js';
+import { CONSENT_VERSION, consentTextHash } from '../src/dataset/dataset-consent.js';
+import { DatasetClip, DatasetClipPayload, DatasetClipPayloadSchema, DatasetClipSchema } from '../src/dataset/schemas/dataset-clip.schema.js';
+import { DatasetConsent, DatasetConsentSchema } from '../src/dataset/schemas/dataset-consent.schema.js';
 
 const uri = process.env.PQ_TEST_REPLICA_URI;
 const expoToken = 'ExponentPushToken[synthetic-lifecycle-token]';
@@ -24,6 +28,7 @@ describe.skipIf(!uri)('remaining lifecycle application writers', () => {
   let connection: Connection, owner: Types.ObjectId, userId: string, privacy: PrivacyService;
   beforeEach(async () => {
     process.env.JWT_SECRET = 'isolated-remaining-writers-secret';
+    process.env.DATASET_PSEUDONYM_SECRET = 'isolated-remaining-writers-dataset';
     connection = await createConnection(uri!, { dbName: `pq_remaining_writers_${randomBytes(12).toString('hex')}` }).asPromise();
     owner = new Types.ObjectId(); userId = String(owner);
     await connection.collection('users').insertOne({ _id: owner, email: 'synthetic@example.test', name: 'Synthetic', isActive: true, deletedAt: null, purgingAt: null, passwordHash: await bcrypt.hash('synthetic', 4) });
@@ -59,7 +64,11 @@ describe.skipIf(!uri)('remaining lifecycle application writers', () => {
     const service = new CoachService(connection.model(Profile.name, ProfileSchema), connection.model(Settings.name, SettingsSchema), exercises as never, connection.model(CoachProgram.name, CoachProgramSchema));
     return () => service.getPlan(userId);
   }
-  const writers = { activity, coach, profile, push, safety };
+  function dataset() {
+    const service = new DatasetService(connection.model(DatasetConsent.name, DatasetConsentSchema), connection.model(DatasetClip.name, DatasetClipSchema), connection.model(DatasetClipPayload.name, DatasetClipPayloadSchema));
+    return () => service.acceptConsent(userId, { version: CONSENT_VERSION, accepted: true, textHash: consentTextHash() });
+  }
+  const writers = { activity, coach, dataset, profile, push, safety };
   for (const [name, factory] of Object.entries(writers)) {
     it(`${name}: active write succeeds and a purged account cannot recreate records`, async () => {
       const action = factory();

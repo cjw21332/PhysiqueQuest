@@ -1,6 +1,6 @@
 # PoseTracker model inventory
 
-Audit date: 2026-11-17. Source: live repository inspection and the recursive SHA-256 inventory in [`audit_snapshot.json`](../ml/reports/experiments/pose_audit_20261117/audit_snapshot.json). The snapshot records 53 project-owned model/checkpoint files across `ml/`, Android assets, and web assets, excluding bundled framework test fixtures inside the isolated Python environment. Generated quantization variants and historical checkpoints are included; this is not a count of deployable models.
+Audit date: 2026-11-17. Source: live repository inspection and the recursive SHA-256 inventory in [`audit_snapshot.json`](../../ml/reports/experiments/pose_audit_20261117/audit_snapshot.json). The snapshot records 53 project-owned model/checkpoint files across `ml/`, Android assets, and web assets, excluding bundled framework test fixtures inside the isolated Python environment. Generated quantization variants and historical checkpoints are included; this is not a count of deployable models.
 
 | Component | Current implementation | Model/checkpoint | Training source | Runtime location | Current status |
 |---|---|---|---|---|---|

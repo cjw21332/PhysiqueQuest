@@ -1,6 +1,6 @@
 # PoseTracker dataset and feature audit
 
-Audit date: 2026-11-17. See [`audit_snapshot.json`](../ml/reports/experiments/pose_audit_20261117/audit_snapshot.json) for content fingerprint and exact per-class counts.
+Audit date: 2026-11-17. See [`audit_snapshot.json`](../../ml/reports/experiments/pose_audit_20261117/audit_snapshot.json) for content fingerprint and exact per-class counts.
 
 ## PushUpBench snapshot
 

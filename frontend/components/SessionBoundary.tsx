@@ -4,8 +4,7 @@ import { usePathname } from 'next/navigation';
 import ForgotPasswordFlow from '../sections/Forgot Password/ForgotPasswordFlow';
 import { deviceCache, getApiBaseUrl } from '../lib/api';
 import { nativeOfflineAccount } from '../lib/nativeOfflineAccount';
-import OutcomeDialog from './OutcomeDialog';
-import { Icon } from '../sections/Home/icons';
+import ConnectionToast from './ConnectionToast';
 import { clearAuthSession, session } from '../lib/session';
 import { DATA_CHANGE_EVENT, DATA_CHANGE_KEY, parseDataChange } from '../lib/dataChanges.mjs';
 
@@ -22,16 +21,13 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   const [retrying, setRetrying] = useState(false);
   const [onlinePopup, setOnlinePopup] = useState(false);
   const [retryFailed, setRetryFailed] = useState(false);
-  const [onlineNotice, setOnlineNotice] = useState(false);
+  // Dismissed connecting/sign-in toasts stay hidden until that state ends and returns.
+  const [hidden, setHidden] = useState<{ connecting?: boolean; sync?: boolean }>({});
   const dismissedOffline = useRef(false);
   const wasOffline = useRef(false);
   const onlineCheckInFlight = useRef(false);
-  const onlineTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onlinePopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => {
-    if (onlineTimer.current) clearTimeout(onlineTimer.current);
-    if (onlinePopupTimer.current) clearTimeout(onlinePopupTimer.current);
-  }, []);
+  useEffect(() => { if (!serviceReconnecting) setHidden(current => ({ ...current, connecting: false })); }, [serviceReconnecting]);
+  useEffect(() => { if (!sessionExpired) setHidden(current => ({ ...current, sync: false })); }, [sessionExpired]);
   useEffect(() => {
     if (!user) {
       setConnectionLost(false); setSessionExpired(false); setServiceReconnecting(false); setOnlinePopup(false);
@@ -43,20 +39,12 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     try { dismissedOffline.current = sessionStorage.getItem('pq-offline-dismissed') === '1'; wasOffline.current = sessionStorage.getItem('pq-was-offline') === '1'; } catch { /* Storage may be unavailable. */ }
     const lost = (forceOffline = false) => {
       if (!forceOffline && navigator.onLine) { setServiceReconnecting(true); return; }
-      if (onlineTimer.current) clearTimeout(onlineTimer.current);
-      setOnlineNotice(false); setServiceReconnecting(false); wasOffline.current = true;
+      setOnlinePopup(false); setServiceReconnecting(false); wasOffline.current = true;
       try { sessionStorage.setItem('pq-was-offline', '1'); } catch {}
       if (!dismissedOffline.current) setConnectionLost(true);
     };
     const internetRestored = () => {
-      if (wasOffline.current) {
-        setOnlineNotice(true);
-        setOnlinePopup(true);
-        if (onlinePopupTimer.current) clearTimeout(onlinePopupTimer.current);
-        onlinePopupTimer.current = setTimeout(() => setOnlinePopup(false), 5500);
-        if (onlineTimer.current) clearTimeout(onlineTimer.current);
-        onlineTimer.current = setTimeout(() => setOnlineNotice(false), 4000);
-      }
+      if (wasOffline.current) setOnlinePopup(true);
       wasOffline.current = false; dismissedOffline.current = false;
       try { sessionStorage.removeItem('pq-was-offline'); sessionStorage.removeItem('pq-offline-dismissed'); } catch {}
       setConnectionLost(false); setRetryFailed(false); setServiceReconnecting(true);
@@ -181,5 +169,17 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   if (!ready) return error ? <div role="alert">{error}<button type="button" onClick={() => { setError(''); setAttempt(value => value + 1); }}>Retry</button></div> : null;
   const continueOffline = () => { dismissedOffline.current = true; try { sessionStorage.setItem('pq-offline-dismissed', '1'); } catch {} setConnectionLost(false); };
   const nativeApp = typeof window !== 'undefined' && Boolean(window.ReactNativeWebView);
-  return <>{children}{user?.emailVerified === false && dismissedUser !== user.id && pathname !== '/verify-email' && <ForgotPasswordFlow mode="verify-email" accountEmail={user.email} onClose={() => { setDismissedUser(user.id); }} onSuccess={() => { setDismissedUser(user.id); void session.refresh(getApiBaseUrl()).catch(() => {}); }} />}{sessionExpired && user && nativeApp && !onlinePopup && <div className="connection-offline-notice" role="status"> <span><strong>Sign in to sync</strong><small>Your saved content and on-device workouts are available.</small></span></div>}{connectionLost && user && !sessionExpired && !onlinePopup && nativeApp && !pathname?.startsWith('/coach/session') && <div className="connection-offline-notice" role="status">Offline — saved data may be out of date.</div>}{serviceReconnecting && user && nativeApp && !sessionExpired && !onlinePopup && <div className="connection-offline-notice" role="status"> <span><strong>Connecting to PhysiqueQuest</strong><small>You can keep using your saved content.</small></span></div>}{connectionLost && user && !nativeApp && !pathname?.startsWith('/coach/session') && <OutcomeDialog kind="info" title="You're offline" message={`${retryFailed ? 'Still unable to connect. ' : 'PhysiqueQuest is unavailable right now. '}Continue offline to use saved content and log manual workouts. Completed sessions sync when you reconnect. Food logging requires a connection.`} actionLabel="Continue offline" onAction={continueOffline} secondaryLabel={retrying ? 'Checking…' : 'Try again'} onSecondary={() => { if (!retrying) void retryConnection(); }} onClose={continueOffline}/>} {onlinePopup && user && <OutcomeDialog kind="info" title="You’re back online" message={sessionExpired ? 'The internet is available again, but your session has expired. Your saved data remains on this device. Log in again to use online features and sync.' : serviceReconnecting ? 'Your internet is back. PhysiqueQuest is reconnecting; your saved data remains available while the service wakes up.' : 'Your connection is restored. Saved workouts can now sync and online features are available.'} actionLabel={sessionExpired ? 'Continue offline' : 'Continue'} onAction={() => setOnlinePopup(false)} onClose={() => setOnlinePopup(false)}/>} {onlineNotice && user && !onlinePopup && !sessionExpired && !serviceReconnecting && <div className="connection-online-notice" role="status"><Icon name="check" size={18}/><span>You&apos;re back online</span></div>}</>;
+  const inSession = Boolean(pathname?.startsWith('/coach/session'));
+  // One toast at a time, in the same priority the separate notices used.
+  const connectionToast = () => {
+    if (onlinePopup) return <ConnectionToast key="online" tone="online" title="You’re back online" autoHideMs={5500} dismissLabel="Dismiss online message" onDismiss={() => setOnlinePopup(false)}
+      message={sessionExpired ? 'Your session expired. Log in again to sync; saved data stays on this device.' : serviceReconnecting ? 'PhysiqueQuest is reconnecting. Your saved data stays available.' : 'Saved workouts can sync and online features are available.'}/>;
+    if (sessionExpired && nativeApp && !hidden.sync) return <ConnectionToast key="sync" tone="sync" title="Sign in to sync" message="Your saved content and on-device workouts are available." dismissLabel="Dismiss sign-in message" onDismiss={() => setHidden(current => ({ ...current, sync: true }))}/>;
+    if (connectionLost && !sessionExpired && !inSession) return <ConnectionToast key="offline" tone="offline" title="You’re offline"
+      message={nativeApp ? 'Saved data may be out of date.' : `${retryFailed ? 'Still unable to connect. ' : ''}Saved content and manual workouts still work; they sync when you reconnect. Food logging needs a connection.`}
+      action={{ label: 'Try again', onClick: () => { void retryConnection(); }, busy: retrying }} dismissLabel="Continue offline" onDismiss={continueOffline}/>;
+    if (serviceReconnecting && nativeApp && !sessionExpired && !hidden.connecting) return <ConnectionToast key="connecting" tone="connecting" title="Connecting to PhysiqueQuest" message="You can keep using your saved content." dismissLabel="Dismiss connecting message" onDismiss={() => setHidden(current => ({ ...current, connecting: true }))}/>;
+    return null;
+  };
+  return <>{children}{user?.emailVerified === false && dismissedUser !== user.id && pathname !== '/verify-email' && <ForgotPasswordFlow mode="verify-email" accountEmail={user.email} onClose={() => { setDismissedUser(user.id); }} onSuccess={() => { setDismissedUser(user.id); void session.refresh(getApiBaseUrl()).catch(() => {}); }} />}{user && connectionToast()}</>;
 }

@@ -13,7 +13,7 @@
 .account-dark-theme .quests-reference .streak-week-heading button:disabled { opacity: .35; cursor: default; }
 .account-dark-theme .quests-reference .streak-week-heading button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .account-dark-theme .quests-reference .streak-week-day { display: grid; gap: 6px; min-width: 0; text-align: center; }
-.account-dark-theme .quests-reference .streak-week-day small { color: var(--ink); font-size: 11px; line-height: 1.2; }
+.account-dark-theme .quests-reference .streak-week-day small { color: var(--ink); font-size: 12px; line-height: 1.2; }
 .account-dark-theme .quests-reference .streak-week-day span { width: 100%; }
 .account-dark-theme .quests-reference .streak-week-day span.unavailable { opacity: .3; }
 .account-dark-theme .quests-reference .quest-v2-level-card > p { margin-top: 12px; }
@@ -26,7 +26,7 @@
 .account-dark-theme .quests-reference .quest-v2-badges { margin-top: 24px; padding-bottom: 0; }
 .account-dark-theme .quests-reference .quest-v2-badge-grid { gap: 16px 8px; }
 .account-dark-theme .quests-reference .quest-v2-badge > span { width: 48px; height: 48px; }
-.account-dark-theme .quests-reference .quest-v2-badge > small { max-width: 86px; font-size: 11px; line-height: 1.35; }
+.account-dark-theme .quests-reference .quest-v2-badge > small { max-width: 86px; font-size: 12px; line-height: 1.35; }
 .quest-v2-badge { padding: 0; border: 0; background: transparent; font: inherit; cursor: pointer; }
 .quest-v2-badge:disabled { opacity: 1; cursor: default; }
 .quest-v2-badge:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 10px; }
@@ -38,7 +38,7 @@
 .quest-badge-heading button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .badge-art { display: block; width: 100%; height: 100%; object-fit: contain; }
 .badge-generated { width: 100%; height: 100%; display: grid; place-items: center; position: relative; color: #9eff35; border: 4px solid #86c72d; background: #101a0b; border-radius: 30%; }
-.badge-generated b { position: absolute; bottom: 0; right: 0; min-width: 19px; padding: 2px; border-radius: 8px; background: #9eff35; color: #10200b; font-size: 9px; text-align: center; }
+.badge-generated b { position: absolute; bottom: 0; right: 0; min-width: 19px; padding: 2px; border-radius: 8px; background: #9eff35; color: #10200b; font-size: 12px; text-align: center; }
 .badge-generated-streak { border-color: #ed614a; color: #ff725b; background: #28100e; border-radius: 40%; }
 .badge-generated-streak b { background: #ff725b; }
 .badge-generated-hydration { border-color: #36cce6; color: #36cce6; background: #0a252d; border-radius: 55% 55% 55% 10%; transform: rotate(-45deg); }
@@ -70,7 +70,7 @@
 .badge-collection-intro h3 { margin: 0; color: var(--ink); font-size: 16px; }
 .badge-collection-intro p { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .badge-collection-intro > strong { color: var(--ink); font-size: 23px; white-space: nowrap; }
-.badge-collection-intro > strong small { color: var(--muted); font-size: 11px; }
+.badge-collection-intro > strong small { color: var(--muted); font-size: 12px; }
 .badge-category { margin-top: 24px; }
 .badge-category-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .badge-category-heading h3 { margin: 0; color: var(--ink); font-size: 15px; }
@@ -87,10 +87,10 @@
 .badge-collection-details { flex: 1; min-width: 0; }
 .badge-collection-title { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
 .badge-collection-title h4 { margin: 0; color: var(--ink); font-size: 14px; overflow-wrap: anywhere; }
-.badge-collection-title > span { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.badge-collection-title > span { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .badge-collection-row.earned .badge-collection-title > span { color: var(--green); }
 .badge-collection-details p { margin: 5px 0 8px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-.badge-collection-details small, .badge-collection-empty { color: var(--muted); font-size: 11px; }
+.badge-collection-details small, .badge-collection-empty { color: var(--muted); font-size: 12px; }
 .badge-collection-progress { height: 5px; margin: 8px 0 5px; border-radius: 99px; background: var(--line); overflow: hidden; }
 .badge-collection-progress span { display: block; height: 100%; border-radius: inherit; background: var(--green); }
 @media (max-width: 350px) { .account-dark-theme .quests-reference .quest-v2-scroll { padding-inline: 14px; } }

@@ -128,8 +128,9 @@ test('offline tabs open their own screens and personal exercises persist locally
 test('offline leaderboard shows a preview and reconnects only after a successful check', async ({ page }) => {
   const fixture = await setup(page);
   await page.addInitScript(() => sessionStorage.setItem('pq-offline-dismissed', '1'));
-  await page.addLocatorHandler(page.getByRole('dialog', { name: "You're offline" }), async dialog => {
-    await dialog.getByRole('button', { name: 'Continue offline' }).click();
+  await page.addLocatorHandler(page.locator('.pq-toast-offline'), async toast => {
+    await toast.getByRole('button', { name: 'Continue offline' }).click();
+    await toast.waitFor({ state: 'detached' });
   });
   let leaderboardAvailable = false;
   await page.route('**/api/leaderboard?*', route => leaderboardAvailable

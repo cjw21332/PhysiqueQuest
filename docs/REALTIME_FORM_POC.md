@@ -1,6 +1,6 @@
 # Real-time squat movement preview
 
-Historical proof-of-concept report. The user-facing entry has since been replaced by the catalog-aware PoseTracker integration; see [POSETRACKER_INTEGRATION.md](POSETRACKER_INTEGRATION.md). The local preview code is retained, not offered as an automatic fallback. Measurements below describe the earlier MediaPipe experiment only.
+Historical proof-of-concept report. The user-facing entry has since been replaced by the catalog-aware PoseTracker integration; see [POSETRACKER_INTEGRATION.md](pose-tracker/POSETRACKER_INTEGRATION.md). The local preview code is retained, not offered as an automatic fallback. Measurements below describe the earlier MediaPipe experiment only.
 
 This is an experimental local proof of concept, not validated form assessment or medical advice. In the Exercise Library, search for `bodyweight squat`, open the row marked **Experimental squat preview** (ExerciseDB ID `6YUfHPL`), and choose **Try squat movement preview**. The preview is separate from saved workouts and does not upload, record, or store video. Other catalog exercises remain unsupported; no catalog-wide AI support is implied.
 

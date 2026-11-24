@@ -12,7 +12,7 @@ Audit date: 2026-11-17. Results distinguish historic held-out reports, fresh gro
 | Desktop CPU ONNX p50 / p95, batch 1 | v1: 0.1317 / 0.1571 ms | attention: 0.1436 / 0.1838 ms | +0.0119 / +0.0267 ms |
 | Android latency/memory | N/A; no phone measurement | N/A; not integrated | N/A |
 
-Fresh grouped CV is train/validation-only and uses the same four subject folds. The best candidate here is the baseline, because attention underperformed. Historic test scores come from existing artifacts/reports and must not be compared as if measured in the fresh run. Desktop ONNX numbers use 100 warmed batch-one CPU inferences and are not mobile estimates; repeated snapshots varied, so the refreshed snapshot values are presented without implying meaningful speed differences. Snapshot hashes, environment, inputs/outputs, and frozen test IDs are in [`audit_snapshot.json`](../ml/reports/experiments/pose_audit_20261117/audit_snapshot.json).
+Fresh grouped CV is train/validation-only and uses the same four subject folds. The best candidate here is the baseline, because attention underperformed. Historic test scores come from existing artifacts/reports and must not be compared as if measured in the fresh run. Desktop ONNX numbers use 100 warmed batch-one CPU inferences and are not mobile estimates; repeated snapshots varied, so the refreshed snapshot values are presented without implying meaningful speed differences. Snapshot hashes, environment, inputs/outputs, and frozen test IDs are in [`audit_snapshot.json`](../../ml/reports/experiments/pose_audit_20261117/audit_snapshot.json).
 
 ### Historical context
 

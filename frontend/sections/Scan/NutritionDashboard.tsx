@@ -11,7 +11,7 @@ import WaterTracker from './WaterTracker';
 import { summarizeHistory } from './nutritionPresentation';
 
 export default function NutritionDashboard({
-  targets = nutritionTargets, onPlan,
+  targets = nutritionTargets, onPlan, onSupplements,
   meals,
   historyMeals = meals,
   water,
@@ -24,6 +24,7 @@ export default function NutritionDashboard({
 }: {
   targets?: typeof nutritionTargets;
   onPlan: () => void;
+  onSupplements: () => void;
   meals: FoodEntry[];
   historyMeals?: FoodEntry[];
   water: number;
@@ -87,6 +88,7 @@ export default function NutritionDashboard({
       <section className="scan-dashboard-more" aria-labelledby="scan-more-heading">
         <h2 id="scan-more-heading">More</h2>
         <button type="button" className="scan-dashboard-link" onClick={onPlan}><span className="scan-dashboard-link-icon"><Icon name="meal" size={19} /></span><span><strong>My dietary plan</strong><small>{readOnly ? 'View saved targets and meal schedule' : 'Manage targets and meal schedule'}</small></span><Icon name="arrow" size={16} /></button>
+        <button type="button" className="scan-dashboard-link" onClick={onSupplements}><span className="scan-dashboard-link-icon"><Icon name="shield" size={19} /></span><span><strong>Supplement guide</strong><small>Benefits, doses, side effects and safety marks</small></span><Icon name="arrow" size={16} /></button>
         <button type="button" className="scan-dashboard-link" onClick={onHistory}>
           <span className="scan-dashboard-link-icon history"><Icon name="chart-bars" size={19} /></span>
           <span><strong>Food history</strong><small>{historyAverage ? `7-day average ${historyAverage.toLocaleString()} kcal` : 'Review your saved meals'}</small></span>

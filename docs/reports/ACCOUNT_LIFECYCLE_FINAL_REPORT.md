@@ -61,10 +61,10 @@ All eight phases of the staging migration rehearsal and production-readiness aud
 
 | File | Action | Key Changes |
 |---|---|---|
-| `docs/account-lifecycle-verification.md` | Updated | Added staging rehearsal section (5/5 pass); added "Known gaps and coordination items" table |
-| `docs/account-lifecycle-writer-inventory.md` | Updated | Added `scripts/delete-user.ts` gap row; added monitoring/shallow-counters gap row |
-| `docs/account-deletion-lifecycle.md` | Updated | Added `scripts/delete-user.ts` to remaining release blockers |
-| `docs/account-lifecycle-deployment-runbook.md` | Created | Full runbook: pre-deployment checklist, migration rehearsal, startup validation, coordination table, monitoring additions, rollback procedure, decision matrix |
+| `docs/account-lifecycle/account-lifecycle-verification.md` | Updated | Added staging rehearsal section (5/5 pass); added "Known gaps and coordination items" table |
+| `docs/account-lifecycle/account-lifecycle-writer-inventory.md` | Updated | Added `scripts/delete-user.ts` gap row; added monitoring/shallow-counters gap row |
+| `docs/account-lifecycle/account-deletion-lifecycle.md` | Updated | Added `scripts/delete-user.ts` to remaining release blockers |
+| `docs/account-lifecycle/account-lifecycle-deployment-runbook.md` | Created | Full runbook: pre-deployment checklist, migration rehearsal, startup validation, coordination table, monitoring additions, rollback procedure, decision matrix |
 | `backend/scripts/delete-user.ts` | Hard-guarded | Added lifecycle state machine guard: refuses deletion if no `account_lifecycle` row, status != `active`, or generation != `0` |
 | `backend/src/health.controller.ts` | Updated | `GET /ready` includes `lifecycleRejections` count; `GET /api/admin/metrics` includes `fenceRejections` count |
 | `backend/test/lifecycle-delete-user-gap.e2e-spec.ts` | Removed | Was evidence test; documented in runbook and verification doc instead |

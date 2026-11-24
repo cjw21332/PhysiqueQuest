@@ -12,12 +12,12 @@
 .manual-report-overview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 16px; padding: 17px 4px; border: 1px solid var(--line); border-radius: 18px; background: var(--soft); }
 .manual-report-overview > div { display: flex; min-width: 0; flex-direction: column; gap: 7px; padding: 0 10px; }
 .manual-report-overview > div + div { border-left: 1px solid var(--line); }
-.manual-report-overview span, .manual-report-overview small { color: var(--muted); font-size: 11px; line-height: 1.3; }
+.manual-report-overview span, .manual-report-overview small { color: var(--muted); font-size: 12px; line-height: 1.3; }
 .manual-report-overview strong { font-size: clamp(17px, 5vw, 22px); line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .manual-report-overview strong small { font-size: 12px; font-weight: 500; }
 .manual-report-exercises { margin-top: 30px; }
 .manual-report-section-title { display: flex; align-items: end; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
-.manual-report-section-title span { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.manual-report-section-title span { color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
 .manual-report-section-title h3 { margin: 5px 0 0; font-size: 19px; }
 .manual-report-section-title small { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .manual-report-exercise { margin-bottom: 10px; padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); }

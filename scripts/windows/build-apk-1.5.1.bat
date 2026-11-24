@@ -1,6 +1,6 @@
 @echo off
 setlocal
-set "ROOT=%~dp0"
+for %%I in ("%~dp0..\..") do set "ROOT=%%~fI"
 if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
 set "LOG=%ROOT%\build-logs\apk-1.5.1.log"
 set "STATUS=%ROOT%\build-logs\apk-1.5.1.status"

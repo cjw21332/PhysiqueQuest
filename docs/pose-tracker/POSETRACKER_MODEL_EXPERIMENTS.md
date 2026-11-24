@@ -1,6 +1,6 @@
 # PoseTracker controlled experiments
 
-Run directory: [`ml/reports/experiments/pose_audit_20261117`](../ml/reports/experiments/pose_audit_20261117). Full fold results are in `summary.json`, `e0_v1_baseline.json`, and `e2_attention.json`; the provenance snapshot is `audit_snapshot.json`. Existing model/checkpoint artifacts were not overwritten and no candidate was exported.
+Run directory: [`ml/reports/experiments/pose_audit_20261117`](../../ml/reports/experiments/pose_audit_20261117). Full fold results are in `summary.json`, `e0_v1_baseline.json`, and `e2_attention.json`; the provenance snapshot is `audit_snapshot.json`. Existing model/checkpoint artifacts were not overwritten and no candidate was exported.
 
 ## Rationale and protocol
 

@@ -96,7 +96,7 @@ Get-Process -Name node | Where-Object { $_.Id -eq 1836 }
 Start OpenCode and test:
 
 ```bash
-cd "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest"
+cd "C:\Users\MY PC\Desktop\Projects\PhysiqueQuest\tools\agent-setup"
 opencode
 ```
 
@@ -242,11 +242,11 @@ cp opencode.json opencode.json.backup
 ## Files Created
 
 - `OMNIROUTE_SKILLS_SETUP.md` - Complete skill inventory with install scripts
-- `omniroute-skills-manifest.json` - All 444 skills with metadata
-- `install-all-skills.ps1` / `.sh` - Auto-install scripts
-- `generate-manifest.js` - Manifest generator
-- `install-skills.js` - Node.js installer (for OmniRoute server skills)
-- `smart-skill-router.json` - JSON skill definition
+- `tools/agent-setup/omniroute-skills-manifest.json` - All 444 skills with metadata
+- `tools/agent-setup/install-all-skills.ps1` / `.sh` - Auto-install scripts
+- `tools/agent-setup/generate-manifest.js` - Manifest generator
+- `tools/agent-setup/install-skills.js` - Node.js installer (for OmniRoute server skills)
+- `tools/agent-setup/smart-skill-router.json` - JSON skill definition
 
 ---
 

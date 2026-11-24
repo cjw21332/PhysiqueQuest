@@ -9,4 +9,4 @@
 
 Browser inference, shared-counter tests, source checks and mobile bundling are
 verified. Native compilation and physical-device accuracy/battery testing remain
-pending. See [camera tracking setup](CAMERA_TRACKING.md).
+pending. See [camera tracking setup](../CAMERA_TRACKING.md).

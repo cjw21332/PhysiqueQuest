@@ -40,5 +40,8 @@ replay-videos/
 build-logs/
 tmp/
 mobile/shell-export/
-artifacts/android/PhysiqueQuest-v*.apk
+*.apk
 .claude/settings.local.json
+
+# Local debug output from ml/scripts/debug_pose.py
+debug_out/

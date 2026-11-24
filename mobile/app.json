@@ -4,7 +4,7 @@
     "slug": "physiquequest",
     "scheme": "physiquequest",
     "icon": "./assets/physiquequest-icon.png",
-    "version": "1.5.3",
+    "version": "1.5.4",
     "platforms": [
       "android",
       "ios"
@@ -29,7 +29,7 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0b0f15",
     "android": {
-      "versionCode": 12,
+      "versionCode": 13,
       "package": "com.physiquequest.app",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
