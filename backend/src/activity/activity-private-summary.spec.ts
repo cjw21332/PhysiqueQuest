@@ -28,7 +28,7 @@ describe('private assistant quest computation', () => {
     const { service, findOne, findOneAndUpdate, nutrition, workouts, leaderboard } = fixture();
     const summary = await service.getForAssistant(OWNER);
     expect(String(findOne.mock.calls[0][0].userId)).toBe(OWNER);
-    expect(nutrition.read).toHaveBeenCalledExactlyOnceWith(OWNER, 'userId meals.id meals.date meals.scanSavedAt meals.scanGroupId meals.protein meals.carbs meals.fat scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses');
+    expect(nutrition.read).toHaveBeenCalledExactlyOnceWith(OWNER, 'userId meals.id meals.date meals.scanSavedAt meals.scanGroupId meals.protein meals.carbs meals.fat meals.calories dietaryPlan.calories scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses');
     expect(workouts.creditHistory).toHaveBeenCalledExactlyOnceWith(OWNER, 'Asia/Singapore');
     expect(workouts.personalRecordDays).toHaveBeenCalledExactlyOnceWith(OWNER, 'Asia/Singapore');
     expect(leaderboard.get).not.toHaveBeenCalled();

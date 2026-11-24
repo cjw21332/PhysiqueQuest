@@ -1,6 +1,6 @@
-import { ageBand } from '../coach/coach-planner.js';
+import { ageBand, scheduledWeekdays } from '../coach/coach-planner.js';
 
-/** Per-day evidence already loaded for daily missions, keyed by YYYY-MM-DD in the user's timezone. */
+/** Per-day evidence keyed by YYYY-MM-DD in the user's timezone. */
 export type DayData = {
   workouts: Set<string>;
   records: Set<string>;
@@ -8,45 +8,76 @@ export type DayData = {
   water: Map<string, number>;
   protein: Map<string, number>;
   mealsDone: (date: string) => boolean;
+  /** Days with a saved weight check-in. */
+  weighIns?: Set<string>;
+  /** Logged calories per day, and the saved dietary plan's daily target. */
+  calories?: Map<string, number>;
+  calorieTarget?: number | null;
 };
-export type QuestProfile = { age?: string; weight?: string; weightUnit?: string; goal?: string; days?: string[]; injuries?: string[]; healthRisks?: string[]; conditions?: string[]; healthConsentAt?: Date };
-export type Quest = { key: string; title: string; target: number; progress: number; points: number; complete: boolean };
+export type QuestProfile = { age?: string; weight?: string; weightUnit?: string; goal?: string; targetWeight?: string; days?: string[]; injuries?: string[]; healthRisks?: string[]; conditions?: string[]; healthConsentAt?: Date };
+export type Quest = { key: string; title: string; target: number; progress: number; points: number; complete: boolean; reason?: string };
 
 export const shiftDate = (date: string, days: number) => { const [y, m, d] = date.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10); };
 /** Weeks start on Monday. */
 export const weekStart = (date: string) => shiftDate(date, -((new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7));
 const weekDays = (start: string, until: string) => Array.from({ length: 7 }, (_, index) => shiftDate(start, index)).filter(date => date <= until);
+const weekdayIndex = (date: string) => (new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7;
+const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
-const quest = (key: string, title: string, target: number, progress: number, points: number): Quest =>
-  ({ key, title, target, points, progress: Math.min(progress, target), complete: progress >= target });
+const quest = (key: string, title: string, target: number, progress: number, points: number, reason: string): Quest =>
+  ({ key, title, target, points, progress: Math.min(progress, target), complete: progress >= target, reason });
 const days = (count: number) => `${count} ${count === 1 ? 'day' : 'days'}`;
 
-/** Quests built from the user's own profile: training plan, goal, body weight, age and consented health data. */
+/**
+ * Journey quests built from the user's own plan, goal, body and health. They deliberately use evidence
+ * the shared lists never touch (planned weekdays, calorie and protein targets, weigh-ins, rest),
+ * so they never repeat a daily mission or weekly challenge.
+ */
 export function personalQuests(profile: QuestProfile | null, data: DayData, start: string, until: string): Quest[] {
   if (!profile) return [];
   const week = weekDays(start, until);
   const count = (test: (date: string) => boolean) => week.filter(test).length;
   // Health data counts only with consent, as in Coach.
   const health = profile.healthConsentAt ? [...(profile.injuries ?? []), ...(profile.healthRisks ?? []), ...(profile.conditions ?? [])] : [];
-  const planned = clamp(profile.days?.length || 3, 1, 7);
-  const quests = [quest('plan', `Train on ${days(planned)} this week, as planned`, planned, count(date => data.workouts.has(date)), 200)];
-
-  const kg = Number.parseFloat(profile.weight ?? '') * (profile.weightUnit === 'lbs' ? 0.45359237 : 1);
   const goal = profile.goal ?? '';
-  // 1.6 g/kg is the usual muscle-gain target; skipped for minors and anyone with a health condition on file.
-  if (/muscle|strength/i.test(goal) && Number(profile.age) >= 18 && !health.length && kg >= 30 && kg <= 300) {
-    const grams = Math.round(kg * 1.6 / 5) * 5;
-    quests.push(quest('protein', `Reach ${grams} g of protein on 4 days`, 4, count(date => (data.protein.get(date) ?? 0) >= grams), 150));
-  } else if (/weight loss/i.test(goal)) {
-    quests.push(quest('hydration', 'Drink 8 glasses of water on 5 days', 5, count(date => (data.water.get(date) ?? 0) >= 8), 150));
-  } else {
-    const target = /endurance/i.test(goal) ? 6 : 5;
-    quests.push(quest('active', `Stay active on ${target} days`, target, count(date => data.active.has(date)), 150));
+  const kg = Number.parseFloat(profile.weight ?? '') * (profile.weightUnit === 'lbs' ? 0.45359237 : 1);
+  const targetWeight = Number.parseFloat(profile.targetWeight ?? '');
+  const unit = profile.weightUnit === 'lbs' ? 'lbs' : 'kg';
+  const quests: Quest[] = [];
+
+  // 1. The plan: only workouts on the weekdays the user chose count.
+  const planned = profile.days?.length ? scheduledWeekdays(profile.days) : new Set<number>();
+  if (planned.size) {
+    const labels = WEEKDAY_LABELS.filter((_, index) => planned.has(index)).join(' · ');
+    quests.push(quest('plan', 'Show up on your planned days', planned.size, count(date => planned.has(weekdayIndex(date)) && data.workouts.has(date)), 200, `You planned ${labels}`));
   }
 
-  // Age 35+ or a health risk: reward recovery instead of chasing a maximal lift.
-  if (ageBand(profile.age) !== 'under35' || health.length) quests.push(quest('recovery', 'Take 2 full rest days this week', 2, count(date => date < until && !data.workouts.has(date)), 100));
-  else quests.push(quest('record', 'Set a personal record this week', 1, count(date => data.records.has(date)), 150));
+  // 2. The goal.
+  if (/muscle|strength/i.test(goal) && Number(profile.age) >= 18 && !health.length && kg >= 30 && kg <= 300) {
+    // 1.6 g/kg is the usual muscle-gain target; skipped for minors and anyone with a health condition on file.
+    const grams = Math.round(kg * 1.6 / 5) * 5;
+    quests.push(quest('protein', `Hit ${grams} g of protein on 4 days`, 4, count(date => (data.protein.get(date) ?? 0) >= grams), 150, `1.6 g per kg of your ${Math.round(kg)} kg body weight`));
+  } else if (/weight loss/i.test(goal) && data.calorieTarget && data.calorieTarget > 0) {
+    const target = data.calorieTarget;
+    quests.push(quest('calories', 'Stay within your calorie target on 4 days', 4, count(date => { const kcal = data.calories?.get(date) ?? 0; return kcal > 0 && kcal <= target; }), 150, `Your plan: ${target.toLocaleString('en-US')} kcal a day`));
+  } else if (/endurance/i.test(goal)) {
+    const longest = week.reduce((s, date) => { const run = data.workouts.has(date) ? s.run + 1 : 0; return { run, best: Math.max(s.best, run) }; }, { run: 0, best: 0 }).best;
+    quests.push(quest('back-to-back', 'Train on 2 days in a row', 2, longest, 150, 'Back-to-back sessions build endurance'));
+  } else {
+    quests.push(quest('active', 'Stay active on 5 days', 5, count(date => data.active.has(date)), 150, /weight loss/i.test(goal) ? 'Save a dietary plan to get a calorie quest instead' : 'Steady movement is the heart of general fitness'));
+  }
+
+  // 3. The journey: a weekly weigh-in toward the target weight.
+  if (/weight loss|muscle/i.test(goal) || Number.isFinite(targetWeight)) {
+    quests.push(quest('weigh-in', 'Log a weigh-in this week', 1, count(date => data.weighIns?.has(date) ?? false), 100,
+      Number.isFinite(targetWeight) ? `Track the way to ${targetWeight} ${unit}` : 'See your progress over time'));
+  }
+
+  // 4. The body: age 35+ or a consented health risk earns rest instead of more load.
+  if (ageBand(profile.age) !== 'under35' || health.length) {
+    quests.push(quest('recovery', 'Take 2 full rest days this week', 2, count(date => date < until && !data.workouts.has(date)), 100,
+      health.length ? 'Because of your health profile' : 'Recovery matters more from age 35'));
+  }
   return quests;
 }
 
@@ -61,19 +92,29 @@ export function weeklyChallenges(data: DayData, start: string, until: string): Q
   ];
   return rules.map(([key, title, done, min, max, points]) => {
     const target = clamp(lastWeek.filter(done).length + 1, min, max);
-    return quest(key, title(target), target, week.filter(done).length, points);
+    const last = lastWeek.filter(done).length;
+    return quest(key, title(target), target, week.filter(done).length, points, last ? `Last week: ${days(last)}` : 'Starting target');
   });
 }
 
-/** XP from every completed personal quest and weekly challenge since the first recorded activity. */
-export function questExp(profile: QuestProfile | null, data: DayData, today: string) {
+/**
+ * XP from every completed personal quest and weekly challenge since the first recorded activity,
+ * plus how many weeks each set was fully completed (used by the quest badges).
+ */
+export function questHistory(profile: QuestProfile | null, data: DayData, today: string) {
+  const history = { exp: 0, personalWeeks: 0, planWeeks: 0, challengeWeeks: 0 };
   const first = [...data.active, ...data.records].sort()[0];
-  if (!first || first > today) return 0;
-  let exp = 0;
+  if (!first || first > today) return history;
   // shortcut: past weeks are scored with today's profile, so changing goal or plan can shift old quest XP; store awards if that matters.
   for (let start = weekStart(first); start <= today; start = shiftDate(start, 7)) {
     const until = start === weekStart(today) ? today : shiftDate(start, 6);
-    for (const item of [...personalQuests(profile, data, start, until), ...weeklyChallenges(data, start, until)]) if (item.complete) exp += item.points;
+    const personal = personalQuests(profile, data, start, until), challenges = weeklyChallenges(data, start, until);
+    for (const item of [...personal, ...challenges]) if (item.complete) history.exp += item.points;
+    if (personal.length && personal.every(item => item.complete)) history.personalWeeks++;
+    if (personal.some(item => item.key === 'plan' && item.complete)) history.planWeeks++;
+    if (challenges.every(item => item.complete)) history.challengeWeeks++;
   }
-  return exp;
+  return history;
 }
+
+export const questExp = (profile: QuestProfile | null, data: DayData, today: string) => questHistory(profile, data, today).exp;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import type { Profile } from '../Home/types';
@@ -13,23 +13,18 @@ import { formatLocalDate } from '../../lib/localDate.mjs';
 import './leaderboard.css';
 import './quests-reference.css';
 import StrengthFilters from './StrengthFilters';
-import { badgeGroups, buildBadgeCollection } from './badgeProgress';
+import { buildBadgeCollection } from './badgeProgress';
+import BadgeCrest from './BadgeCrest';
+import { BADGE_CATEGORIES, TIER_LABEL, TIER_ORDER, badgeMeta } from './badgeCatalog';
+import './badge-collection.css';
 import type { LeaderboardRecord, WorkoutSessionRecord, WorkoutSummary } from '../../lib/api';
 
 type Screen = 'quests' | 'leaderboard' | 'badges';
-const featuredBadgeIds = ['streak-1', 'first-workout', 'early-bird', 'personal-record', 'best-form', 'goal-1', 'hydration-1', 'macro-master'];
+const featuredBadgeIds = ['oath-1', 'self-made-1', 'streak-3', 'first-workout', 'personal-record', 'seven-suns', 'hydration-1', 'goal-1'];
 
+/** Badge art: an original crest whose shape shows the category and whose rim shows the rarity. */
 export function BadgeIcon({ badge }: { badge: ActivityBadge }) {
-  const custom = /^(personal-record|goal-7|top-(100|50|10|1)|best-form|level-(beginner|amateur|pro|veteran)|calories-(100|1000|10000|100000)|lift-(50|150)|hydration-20|streak-(30|100)|first-workout)$/.test(badge.id);
-  if (custom) return <img className="badge-art" src={`/badges/${badge.id}.png`} alt="" width={72} height={72}/>;
-  const [family, count] = badge.id.split('-');
-  const contextualIcon = badge.id === 'early-bird' ? 'sunrise' : badge.id === 'macro-master' ? 'meal-lunch' : family === 'goal' ? 'goal-milestones' : family === 'lift' || family === 'workouts' ? 'library-dumbbells' : badge.icon;
-  if (['streak', 'workouts', 'hydration', 'lift', 'goal'].includes(family)) {
-    const milestone = Number(count);
-    const tier = milestone >= (family === 'lift' ? 100 : 50) ? 'summit' : milestone >= (family === 'lift' ? 75 : 10) ? 'advanced' : milestone >= 3 ? 'rising' : 'starter';
-    return <span className={`badge-generated badge-generated-${family} badge-tier-${tier}`} aria-hidden="true"><Icon name={contextualIcon} size={22}/><b>{count}</b></span>;
-  }
-  return <span className={`badge-generated badge-generated-special badge-generated-${badge.id}`} aria-hidden="true"><Icon name={contextualIcon} size={22}/></span>;
+  return <BadgeCrest id={badge.id} earned={badge.earned}/>;
 }
 
 function BadgeMark({ badge }: { badge: ActivityBadge }) {
@@ -114,18 +109,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
   if (loading) return <section className="quest-section"><header className="quest-v2-header"><h2>Quests</h2></header><div className="profile-load-state" role="status" aria-label="Loading quests" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div><BottomNav /></section>;
   if (error) return <section className="quest-section"><div className="profile-load-state" role="alert"><h2>Could not load quests</h2><p>{error}</p><button type="button" onClick={() => void refresh()}>Try again</button></div><BottomNav /></section>;
 
-  if (screen === 'badges') {
-    const earned = badges.filter(badge => badge.earned).length;
-    const known = new Set(badgeGroups.flatMap(group => group.ids));
-    const groups = [...badgeGroups, { name: 'Other achievements', ids: badges.filter(badge => !known.has(badge.id)).map(badge => badge.id) }];
-    return <section className="quest-section badge-collection" aria-label="Badge collection">
-      <header className="leaderboard-header pq-page-heading"><button className="coach-back" type="button" onClick={() => setScreen('quests')} aria-label="Back to quests"><Icon name="arrow" size={20}/></button><h2>All Badges</h2></header>
-      <div className="leaderboard-scroll badge-collection-scroll"><div className="badge-collection-intro"><span><Icon name="medal" size={23}/></span><div><h3>Your achievements</h3><p>Explore the milestones you can earn.</p></div><strong>{earned} <small>of {badges.length}</small></strong></div>
-        {badges.length === 0 && <p className="badge-collection-empty">No badges are available right now.</p>}
-        {groups.map(group => { const entries = group.ids.map(id => badges.find(badge => badge.id === id)).filter((badge): badge is ActivityBadge => Boolean(badge)); if (!entries.length) return null; return <section className="badge-category" key={group.name}><div className="badge-category-heading"><h3>{group.name}</h3><span>{entries.filter(badge => badge.earned).length} / {entries.length}</span></div><div className="badge-collection-list">{entries.map(badge => <article className={`badge-collection-row ${badge.earned ? 'earned' : 'locked'}`} key={badge.id}>{badge.earned && badge.available !== false && <button type="button" className="badge-row-action" aria-label={`View ${badge.title} achievement card`} onClick={() => openBadgeCard(badge)}/>}<div className="badge-collection-icon"><BadgeMark badge={badge}/></div><div className="badge-collection-details"><div className="badge-collection-title"><h4>{badge.title}</h4><span>{badge.available === false ? 'Unavailable' : badge.earned ? 'Earned' : 'In progress'}</span></div><p>{badge.description || (badge.earned ? 'Achievement earned.' : 'Keep going to unlock this badge.')}</p>{badge.progress && badge.available !== false ? <><div className="badge-collection-progress" role="progressbar" aria-label={`${badge.title} progress`} aria-valuemin={0} aria-valuemax={badge.progress.target} aria-valuenow={Math.min(badge.progress.current, badge.progress.target)}><span style={{width: `${Math.min(100, badge.progress.current / badge.progress.target * 100)}%`}}/></div><small>{badge.progress.current} / {badge.progress.target} {badge.progress.unit}</small></> : badge.progressText && badge.available !== false ? <small>{badge.progressText}</small> : badge.available !== false && !badge.earned ? <small>Detailed progress is unavailable.</small> : null}</div></article>)}</div></section>; })}
-      </div><BottomNav />
-    </section>;
-  }
+  if (screen === 'badges') return <BadgeVault badges={badges} onBack={() => setScreen('quests')}/>;
 
   if (screen === 'leaderboard') {
     const entries = leaderboard?.entries ?? [];
@@ -208,7 +192,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
         <p>Your streak tracks consecutive days with saved activity.</p>
       </section>
       <QuestList id="missions" title="Daily missions" note="Same for everyone · resets daily" items={dailyMissions} empty="No daily missions are available."/>
-      <QuestList id="personal" title="Personal quests" note="Made from your profile · resets Monday" items={personalQuests ?? []} empty={personalQuests ? 'Complete your profile to unlock personal quests.' : 'Personal quests appear after your account syncs. Connect to the internet and sign in.'}/>
+      <PersonalJournal quests={personalQuests} goal={profile.goal}/>
       <QuestList id="weekly" title="Weekly challenges" note="Targets grow with last week · resets Monday" items={weeklyChallenges} empty="No weekly challenges are available."/>
       <section className="quest-v2-badges" aria-labelledby="quest-v2-badges-title">
         <div className="quest-v2-section-heading quest-badge-heading"><h3 id="quest-v2-badges-title">Badges</h3><div><span>{badges.filter(badge => badge.earned).length} of {badges.length} earned</span><button type="button" onClick={() => setScreen('badges')}>View all <Icon name="chevron-right" size={16}/></button></div></div>
@@ -226,8 +210,88 @@ function QuestList({ id, title, note, items, empty }: { id: string; title: strin
     <div className="quest-v2-section-heading quest-v2-heading-stacked"><h3 id={`quest-v2-${id}-title`}>{title}</h3><span>{note}</span></div>
     {items.length ? <div className="quest-v2-mission-list">{items.map(mission => <div key={mission.key} className={`quest-v2-mission ${mission.complete ? 'complete' : ''}`} aria-label={`${mission.title}, ${mission.progress} of ${mission.target}`}>
       <span className="quest-v2-mission-icon"><Icon name={mission.complete ? 'check' : questIcon(mission.key)} size={17}/></span>
-      <span className="quest-v2-mission-main"><strong>{mission.title}</strong><span className="quest-v2-mission-progress"><i><b style={{ width: `${Math.min(mission.progress / mission.target * 100, 100)}%` }}/></i><small>{mission.progress}/{mission.target}</small></span></span>
+      <span className="quest-v2-mission-main"><strong>{mission.title}</strong>{mission.reason && <small className="quest-v2-mission-reason">{mission.reason}</small>}<span className="quest-v2-mission-progress"><i><b style={{ width: `${Math.min(mission.progress / mission.target * 100, 100)}%` }}/></i><small>{mission.progress}/{mission.target}</small></span></span>
       <strong className="quest-v2-mission-points">+{mission.points}</strong>
     </div>)}</div> : <p className="quest-v2-empty">{empty}</p>}
+  </section>;
+}
+
+/** The badge vault: a showcase of your rarest crest, rarity totals, filters, and one section per category. */
+function BadgeVault({ badges, onBack }: { badges: ActivityBadge[]; onBack: () => void }) {
+  const [filter, setFilter] = useState<'all' | 'earned' | 'locked'>('all');
+  const [open, setOpen] = useState<ActivityBadge | null>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => { if (open && !dialog.current?.open) dialog.current?.showModal(); }, [open]);
+  const earned = badges.filter(badge => badge.earned);
+  const rank = (badge: ActivityBadge) => TIER_ORDER.indexOf(badgeMeta(badge.id).tier);
+  const showcase = [...earned].sort((a, b) => rank(a) - rank(b))[0];
+  const percent = badges.length ? Math.round(earned.length / badges.length * 100) : 0;
+  const visible = (badge: ActivityBadge) => filter === 'all' || (filter === 'earned' ? badge.earned : !badge.earned);
+  const meta = open ? badgeMeta(open.id) : null;
+  const category = meta ? BADGE_CATEGORIES.find(item => item.id === meta.category) : null;
+  return <section className="quest-section badge-collection bc" aria-label="Badge vault">
+    <header className="leaderboard-header pq-page-heading"><button className="coach-back" type="button" onClick={onBack} aria-label="Back to quests"><Icon name="arrow" size={20}/></button><h2>Badge vault</h2></header>
+    <div className="leaderboard-scroll badge-collection-scroll bc-scroll">
+      <section className="bc-hero" aria-label="Collection summary">
+        <div className="bc-hero-crest">{showcase ? <BadgeCrest id={showcase.id} earned size={104}/> : <BadgeCrest id="first-workout" earned={false} size={104}/>}</div>
+        <div className="bc-hero-copy">
+          <small>{showcase ? `Rarest crest · ${TIER_LABEL[badgeMeta(showcase.id).tier]}` : 'Your vault is waiting'}</small>
+          <h3>{showcase?.title ?? 'Earn your first crest'}</h3>
+          <div className="bc-hero-bar" role="progressbar" aria-label="Badges earned" aria-valuemin={0} aria-valuemax={badges.length} aria-valuenow={earned.length}><span style={{ width: `${percent}%` }}/></div>
+          <p><strong>{earned.length}</strong> of {badges.length} crests · {percent}%</p>
+        </div>
+      </section>
+      <div className="bc-rarity" aria-label="Earned by rarity">{TIER_ORDER.map(tier => <span key={tier} className={`bc-rarity-${tier}`}><i aria-hidden="true"/>{earned.filter(badge => badgeMeta(badge.id).tier === tier).length} {TIER_LABEL[tier]}</span>)}</div>
+      <div className="bc-filters" role="group" aria-label="Filter badges">{(['all', 'earned', 'locked'] as const).map(key => <button type="button" key={key} aria-pressed={filter === key} className={filter === key ? 'active' : ''} onClick={() => setFilter(key)}>{key === 'all' ? 'All' : key === 'earned' ? 'Earned' : 'Locked'}</button>)}</div>
+      {BADGE_CATEGORIES.map(group => {
+        const all = badges.filter(badge => badgeMeta(badge.id).category === group.id);
+        const entries = all.filter(visible);
+        if (!entries.length) return null;
+        const got = all.filter(badge => badge.earned).length;
+        return <section key={group.id} className={`bc-category bc-category-${group.id}`} style={{ '--bc-hue': group.hue } as CSSProperties} aria-labelledby={`bc-${group.id}`}>
+          <header><span className="bc-category-icon" aria-hidden="true"><Icon name={group.glyph} size={18}/></span><div><h3 id={`bc-${group.id}`}>{group.name}</h3><p>{group.tagline}</p></div><strong>{got}<small>/{all.length}</small></strong></header>
+          <div className="bc-category-bar" aria-hidden="true"><span style={{ width: `${all.length ? got / all.length * 100 : 0}%` }}/></div>
+          <div className="bc-grid">{entries.map(badge => { const tier = badgeMeta(badge.id).tier; return <button type="button" key={badge.id} className={`bc-tile ${badge.earned ? 'earned' : 'locked'} tier-${tier}`} onClick={() => setOpen(badge)} aria-label={`${badge.title}, ${TIER_LABEL[tier]}, ${badge.earned ? 'earned' : badge.available === false ? 'unavailable' : 'locked'}`}>
+            <span className="bc-tile-crest"><BadgeCrest id={badge.id} earned={badge.earned} size={64}/>{!badge.earned && <span className="bc-lock" aria-hidden="true"><Icon name="lock" size={11}/></span>}</span>
+            <strong>{badge.title}</strong>
+            <small className={`bc-tier bc-tier-${tier}`}>{TIER_LABEL[tier]}</small>
+            {!badge.earned && badge.progress && badge.available !== false && <span className="bc-mini-bar" aria-hidden="true"><i style={{ width: `${Math.min(100, badge.progress.current / badge.progress.target * 100)}%` }}/></span>}
+          </button>; })}</div>
+        </section>;
+      })}
+      {!badges.length && <p className="badge-collection-empty">No badges are available right now.</p>}
+    </div>
+    {open && meta && <dialog ref={dialog} className="bc-detail" aria-labelledby="bc-detail-title" onClose={() => setOpen(null)} style={{ '--bc-hue': category?.hue } as CSSProperties}>
+      <button type="button" className="bc-detail-x" onClick={() => dialog.current?.close()} aria-label="Close badge details"><Icon name="close" size={18}/></button>
+      <div className="bc-detail-crest"><BadgeCrest id={open.id} earned={open.earned} size={148}/></div>
+      <div className="bc-detail-tags"><span>{category?.name}</span><span className={`bc-tier bc-tier-${meta.tier}`}>{TIER_LABEL[meta.tier]}</span></div>
+      <h3 id="bc-detail-title">{open.title}</h3>
+      <p>{open.description || (open.earned ? 'Achievement earned.' : 'Keep going to unlock this crest.')}</p>
+      {open.progress && open.available !== false && !open.earned && <><div className="bc-detail-bar" role="progressbar" aria-label={`${open.title} progress`} aria-valuemin={0} aria-valuemax={open.progress.target} aria-valuenow={Math.min(open.progress.current, open.progress.target)}><span style={{ width: `${Math.min(100, open.progress.current / open.progress.target * 100)}%` }}/></div><small>{open.progress.current.toLocaleString('en-US')} / {open.progress.target.toLocaleString('en-US')} {open.progress.unit}</small></>}
+      {open.progressText && <small>{open.progressText}</small>}
+      <div className="bc-detail-status">{open.earned ? <><Icon name="check-circle" size={16}/> Earned</> : open.available === false ? 'Not available yet' : <><Icon name="lock" size={14}/> Locked</>}</div>
+      {open.earned && open.available !== false && <button type="button" className="bc-detail-share" onClick={() => { const badge = open; dialog.current?.close(); openBadgeCard(badge); }}><Icon name="share" size={17}/> Share this crest</button>}
+    </dialog>}
+    <BottomNav/>
+  </section>;
+}
+
+/** Personal quests look and read differently from the shared lists: a violet journal with rings and a "why it's yours" line. */
+function PersonalJournal({ quests, goal }: { quests: DailyMission[] | undefined; goal?: string }) {
+  const list = quests ?? [];
+  const done = list.filter(quest => quest.complete).length;
+  const icon = (key: string) => ({ plan: 'calendar', protein: 'meal', calories: 'meal', 'back-to-back': 'pulse', active: 'trend', 'weigh-in': 'scale', recovery: 'health' } as Record<string, string>)[key] ?? 'target';
+  return <section className="pq-journal" aria-labelledby="pq-journal-title">
+    <header>
+      <span className="pq-journal-sigil" aria-hidden="true"><Icon name="user" size={20}/></span>
+      <div><h3 id="pq-journal-title">Personal quests</h3><p>{goal ? `Built for you · ${goal}` : 'Built for you'} · resets Monday</p></div>
+      {list.length > 0 && <strong aria-label={`${done} of ${list.length} complete`}>{done}<small>/{list.length}</small></strong>}
+    </header>
+    {list.length ? <ul>{list.map(quest => { const share = Math.min(1, quest.progress / Math.max(1, quest.target)); return <li key={quest.key} className={quest.complete ? 'done' : ''} aria-label={`${quest.title}, ${quest.progress} of ${quest.target}`}>
+      <span className="pq-ring" aria-hidden="true"><svg className="pq-ring-svg" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" className="pq-ring-track"/><circle cx="22" cy="22" r="18" className="pq-ring-fill" strokeDasharray={`${(share * 113.1).toFixed(1)} 113.1`}/></svg><Icon name={quest.complete ? 'check' : icon(quest.key)} size={17}/></span>
+      <div><strong>{quest.title}</strong>{quest.reason && <small>{quest.reason}</small>}<em>{quest.progress} / {quest.target}</em></div>
+      <span className="pq-xp">+{quest.points}<small>XP</small></span>
+    </li>; })}</ul> : <p className="pq-journal-empty">{quests ? 'Complete your profile to unlock personal quests.' : 'Personal quests appear after your account syncs. Connect to the internet and sign in.'}</p>}
+    <footer><Icon name="medal" size={14}/> Finish them all in a week to forge your <b>Self-Made</b> crest.</footer>
   </section>;
 }

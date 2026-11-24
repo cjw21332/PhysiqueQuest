@@ -2,7 +2,8 @@ import { mealMissionGoal, mealMissionPoints } from './meal-mission.js';
 import { savedScanMealDates } from '../nutrition/saved-scan-meals.js';
 import { BadRequestException, Injectable, Optional } from '@nestjs/common';
 import { Profile } from '../profile/schemas/profile.schema.js';
-import { type DayData, type QuestProfile, personalQuests, questExp, weekStart, weeklyChallenges } from './quests.js';
+import { type DayData, type QuestProfile, personalQuests, questHistory, weekStart, weeklyChallenges } from './quests.js';
+import { ProgressEntry } from '../progress/schemas/progress-entry.schema.js';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { NutritionService } from '../nutrition/nutrition.service.js';
@@ -42,6 +43,7 @@ export class ActivityService {
     @InjectModel(User.name) private readonly users: Model<User>,
     // Optional so missions still load where the profile model is not wired (unit tests, chat context).
     @Optional() @InjectModel(Profile.name) private readonly profiles?: Model<Profile>,
+    @Optional() @InjectModel(ProgressEntry.name) private readonly progress?: Model<ProgressEntry>,
   ) {}
 
   private async userState(userId: string) {
@@ -64,7 +66,7 @@ export class ActivityService {
   private async summary(userId: string, requestedTimezone: string | undefined, includeLeaderboard: boolean) {
     const record = await this.model.findOne({ userId: new Types.ObjectId(userId) }).exec();
     const timezone = resolveTimezone(requestedTimezone ?? record?.state?.timezone);
-    const [nutrition, workouts, records, ranking, user, liftSummary] = await Promise.all([this.nutrition.read(userId, 'userId meals.id meals.date meals.scanSavedAt meals.scanGroupId meals.protein meals.carbs meals.fat scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? this.leaderboard.get(userId, 'all').catch(() => null) : Promise.resolve(null), this.users.findById(userId).select('createdAt').lean().exec(), typeof this.workouts.summary === 'function' ? this.workouts.summary(userId, timezone).catch(() => null) : Promise.resolve(null)]);
+    const [nutrition, workouts, records, ranking, user, liftSummary] = await Promise.all([this.nutrition.read(userId, 'userId meals.id meals.date meals.scanSavedAt meals.scanGroupId meals.protein meals.carbs meals.fat meals.calories dietaryPlan.calories scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? this.leaderboard.get(userId, 'all').catch(() => null) : Promise.resolve(null), this.users.findById(userId).select('createdAt').lean().exec(), typeof this.workouts.summary === 'function' ? this.workouts.summary(userId, timezone).catch(() => null) : Promise.resolve(null)]);
     const today = zoneDate(new Date(), timezone);
 
     const mealDates = nutrition.meals.map(meal => meal.date).filter((date): date is string => typeof date === 'string');
@@ -82,15 +84,21 @@ export class ActivityService {
     const activityDates = buildActivityDates(mealDates, nutrition.water, allWorkoutDates);
 
     // userId must be selected: it is the AAD that decrypts the health fields. A missing or unreadable profile only hides personal quests.
-    const profile = this.profiles ? await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('userId age weight weightUnit goal days injuries healthRisks conditions healthConsentAt').lean().exec().catch(() => null) as QuestProfile | null : null;
+    const profile = this.profiles ? await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('userId age weight weightUnit goal targetWeight days injuries healthRisks conditions healthConsentAt').lean().exec().catch(() => null) as QuestProfile | null : null;
+    // Weigh-in dates feed the personal check-in quest; a read failure only hides that quest.
+    const weighIns = new Set(this.progress ? (await this.progress.find({ userId: new Types.ObjectId(userId), metric: 'weight' }).select('measuredAt').lean().exec().catch(() => [])).map(entry => zoneDate(new Date(entry.measuredAt), timezone)) : []);
+    const calories = new Map<string, number>();
+    for (const meal of nutrition.meals as { date?: string; calories?: number | null }[]) if (typeof meal.date === 'string' && Number.isFinite(meal.calories)) calories.set(meal.date, (calories.get(meal.date) ?? 0) + meal.calories!);
+    const calorieTarget = (nutrition as { dietaryPlan?: { calories?: number } }).dietaryPlan?.calories ?? null;
     const protein = new Map<string, number>();
     for (const meal of nutrition.meals) if (typeof meal.date === 'string' && Number.isFinite(meal.protein)) protein.set(meal.date, (protein.get(meal.date) ?? 0) + meal.protein!);
-    const dayData: DayData = { workouts: allWorkoutDates, records: new Set(records), active: activityDates, water: waterByDate, protein,
+    const dayData: DayData = { workouts: allWorkoutDates, records: new Set(records), active: activityDates, water: waterByDate, protein, weighIns, calories, calorieTarget,
       mealsDone: date => (allMeals.get(date) ?? 0) >= mealMissionGoal(date, allMeals) };
     const thisWeek = weekStart(today);
 
+    const quests = questHistory(profile, dayData, today);
     const dayStreak = computeStreak(activityDates, today);
-    const currentExp = computeExp(allMeals, allWorkoutDates, waterByDate) + records.length * 150 + questExp(profile, dayData, today);
+    const currentExp = computeExp(allMeals, allWorkoutDates, waterByDate) + records.length * 150 + quests.exp;
     const earnedPoints = dailyMissions.filter(m => m.complete).reduce((sum, m) => sum + m.points, 0);
     const goalDays = new Set([...allWorkoutDates].filter(date => (allMeals.get(date) ?? 0) >= mealMissionGoal(date, allMeals) && (waterByDate.get(date) ?? 0) >= 8 && records.includes(date)));
     const level = Math.floor(currentExp / 100) + 1;
@@ -112,6 +120,7 @@ export class ActivityService {
         activityDates: [...activityDates].sort(),
         accountCreatedAt: user?.createdAt ?? null,
         earnedPoints,
+        questWeeks: { personal: quests.personalWeeks, plan: quests.planWeeks, challenges: quests.challengeWeeks },
       },
       dailyMissions,
       personalQuests: personalQuests(profile, dayData, thisWeek, today),

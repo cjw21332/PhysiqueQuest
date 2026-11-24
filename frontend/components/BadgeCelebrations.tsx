@@ -119,18 +119,13 @@ export default function BadgeCelebrations() {
     ctx.textAlign = 'right'; ctx.fillStyle = '#a9cfb9'; ctx.font = 'bold 24px sans-serif'; ctx.fillText('ACHIEVEMENT  /  UNLOCKED', 996, 126);
     ctx.strokeStyle = '#326249'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(84, 175); ctx.lineTo(996, 175); ctx.stroke();
     ctx.textAlign = 'center'; ctx.fillStyle = '#73e8a6'; ctx.font = 'bold 30px sans-serif'; ctx.fillText('YOUR HARD WORK SHOWS', 540, 244);
-    const custom = badgeRef.current?.querySelector<HTMLImageElement>('.badge-art');
-    if (custom) { const art = await image(custom.src); ctx.drawImage(art, 260, 275, 560, 560); }
-    else {
-      const generated = badgeRef.current?.querySelector<HTMLElement>('.badge-generated');
-      const style = generated ? getComputedStyle(generated) : null;
-      ctx.save(); ctx.translate(540, 545); if (generated?.classList.contains('badge-generated-hydration')) ctx.rotate(-Math.PI / 4);
-      ctx.fillStyle = style?.backgroundColor || '#10271e'; ctx.strokeStyle = style?.borderTopColor || '#8cffa9'; ctx.lineWidth = 18;
-      ctx.beginPath(); ctx.roundRect(-220, -220, 440, 440, generated?.classList.contains('badge-tier-advanced') ? 220 : 110); ctx.fill(); ctx.stroke(); ctx.restore();
-      const svg = badgeRef.current?.querySelector('.badge-generated svg');
-      if (svg) { const clone = svg.cloneNode(true) as SVGElement; clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); clone.setAttribute('stroke', style?.color || '#9bffb4'); const icon = await image(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(clone))}`); ctx.drawImage(icon, 420, 400, 240, 240); }
-      const n = badgeRef.current?.querySelector('.badge-generated b')?.textContent;
-      if (n) { ctx.fillStyle = style?.color || '#c0ffd0'; ctx.font = 'bold 72px sans-serif'; ctx.fillText(n, 540, 720); }
+    // The crest is one self-contained SVG, so it renders on the card at any size.
+    const crest = badgeRef.current?.querySelector<SVGSVGElement>('svg.badge-crest');
+    if (crest) {
+      const clone = crest.cloneNode(true) as SVGSVGElement;
+      clone.setAttribute('width', '560'); clone.setAttribute('height', '560');
+      const art = await image(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(clone))}`);
+      ctx.drawImage(art, 260, 275, 560, 560);
     }
     ctx.fillStyle = '#83eeb0'; ctx.font = 'bold 26px sans-serif'; ctx.fillText('BADGE EARNED', 540, 895);
     ctx.fillStyle = '#fff'; ctx.font = 'bold 68px sans-serif';

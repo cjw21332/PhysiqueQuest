@@ -57,8 +57,9 @@ describe('activity quest authority', () => {
     const withProfile = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, leaderboard, users, profiles).get('507f1f77bcf86cd799439011');
     const without = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, leaderboard, users).get('507f1f77bcf86cd799439011');
     expect(withProfile.dailyMissions).toEqual(without.dailyMissions);
-    expect(withProfile.personalQuests.map(quest => quest.key)).toEqual(['plan', 'protein', 'record']);
-    expect(withProfile.personalQuests[1]).toMatchObject({ title: 'Reach 130 g of protein on 4 days', progress: 1 });
+    expect(withProfile.personalQuests.map(quest => quest.key)).toEqual(['plan', 'protein', 'weigh-in']);
+    expect(withProfile.personalQuests[1]).toMatchObject({ title: 'Hit 130 g of protein on 4 days', progress: 1, reason: expect.stringContaining('80 kg') });
+    expect(withProfile.state.questWeeks).toEqual({ personal: expect.any(Number), plan: expect.any(Number), challenges: expect.any(Number) });
     expect(without.personalQuests).toEqual([]);
     expect(withProfile.weeklyChallenges.map(challenge => challenge.key)).toEqual(['train', 'hydrate', 'meals']);
     // Health fields decrypt with userId as AAD; without it the live profile reads as missing.
