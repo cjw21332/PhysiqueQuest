@@ -589,6 +589,11 @@ export class WorkoutsService implements OnModuleInit {
       policyVersion: 2,
     };
   }
+  /** Completed sessions with exercise names and sets, oldest first: the source for personal quest chains. */
+  async trainingLog(userId: string) {
+    return this.model.find({ userId: new Types.ObjectId(userId), status: 'completed', endedAt: { $type: 'date' }, origin: { $ne: 'recorded-set' } })
+      .select('endedAt routineName exercises.exerciseId exercises.name sets.exerciseId sets.reps sets.loadKg sets.status sets.setType').sort({ endedAt: 1 }).lean().exec();
+  }
   async personalRecordDays(userId: string, timezone = 'UTC') {
     const rows = await this.model.find({ userId: new Types.ObjectId(userId), status: 'completed' }).select('userId endedAt timezone status sets').lean().exec();
     return [...(personalRecordDays(rows, timezone).get(userId) ?? [])];

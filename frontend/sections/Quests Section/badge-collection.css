@@ -131,3 +131,13 @@
 .pq-journal footer span { min-width: 0; }
 /* In a pill the gradient-text trick has no background to clip; use a tinted pill with solid text. */
 .bc-detail-tags span.bc-tier-legendary { color: #f3e8ff; -webkit-background-clip: border-box; background-clip: border-box; background: linear-gradient(90deg, rgb(216 180 254 / .28), rgb(103 232 249 / .28), rgb(250 204 21 / .28)); }
+
+/* Quest chain: level chip per quest and the recently completed log. */
+.pq-level { justify-self: start; padding: 2px 8px; border-radius: 999px; background: rgb(181 123 255 / .2); color: #e9d5ff; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.pq-log { padding: 10px 12px; border-radius: 14px; background: rgb(255 255 255 / .03); border: 1px dashed rgb(181 123 255 / .28); }
+.pq-log h4 { margin: 0 0 6px; color: #c4b5fd; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.pq-log ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.pq-log li { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 12.5px; }
+.pq-log li svg { flex: none; color: var(--green); }
+.pq-log li span { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pq-log li b { color: #e9d5ff; font-size: 12px; }

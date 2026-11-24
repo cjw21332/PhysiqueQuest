@@ -2,15 +2,16 @@
 import { api } from '../lib/api';
 import { useAppResource } from './useAppResource';
 
-export type DailyMission = { key: string; title: string; target: number; progress: number; points: number; complete: boolean; reason?: string };
+export type DailyMission = { key: string; title: string; target: number; progress: number; points: number; complete: boolean; reason?: string; level?: number };
+export type QuestLogEntry = { title: string; points: number; completedAt: string };
 export type ActivityBadge = { id: string; title: string; icon: string; earned: boolean; available?: boolean; description?: string; progressText?: string; progress?: { current: number; target: number; unit: string } };
-export type ActivityState = { timezone: string; questProgress: { workout: number; meals: number; water: number }; level: number; currentExp: number; nextLevelExp: number; dayStreak: number; earnedPoints: number; activityDates?: string[]; accountCreatedAt?: string | null; questWeeks?: { personal: number; plan: number; challenges: number } };
-export type ActivityResponse = { state: ActivityState; dailyMissions: DailyMission[]; personalQuests?: DailyMission[]; weeklyChallenges?: DailyMission[]; badges: ActivityBadge[] };
+export type ActivityState = { timezone: string; questProgress: { workout: number; meals: number; water: number }; level: number; currentExp: number; nextLevelExp: number; dayStreak: number; earnedPoints: number; activityDates?: string[]; accountCreatedAt?: string | null; questWeeks?: { plan: number; challenges: number }; personalQuestsCompleted?: number };
+export type ActivityResponse = { state: ActivityState; dailyMissions: DailyMission[]; personalQuests?: DailyMission[]; personalQuestLog?: QuestLogEntry[]; weeklyChallenges?: DailyMission[]; badges: ActivityBadge[] };
 const empty: ActivityResponse = { state: { timezone: 'UTC', questProgress: { workout: 0, meals: 0, water: 0 }, level: 1, currentExp: 0, nextLevelExp: 100, dayStreak: 0, earnedPoints: 0 }, dailyMissions: [], badges: [] };
 const load = (force?: boolean) => api.getActivity(force);
 export function useActivity() {
   const { data, loading, error, refresh } = useAppResource<ActivityResponse>('activity', load);
   const result = data ?? empty;
   return { activity: { ...empty.state, ...result.state }, dailyMissions: result.dailyMissions ?? [], // undefined means the server has not sent quests yet (offline or not synced); [] means none apply.
-  personalQuests: result.personalQuests, weeklyChallenges: result.weeklyChallenges ?? [], badges: result.badges ?? [], loading, error, refresh };
+  personalQuests: result.personalQuests, personalQuestLog: result.personalQuestLog ?? [], weeklyChallenges: result.weeklyChallenges ?? [], badges: result.badges ?? [], loading, error, refresh };
 }

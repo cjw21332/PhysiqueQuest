@@ -102,7 +102,7 @@ export function buildBadgeCollection({ activity, saved, ranking, workouts, summa
   const weeks = activity.questWeeks;
   for (const [n, title] of [[1, 'Gauntlet Runner'], [4, 'Gauntlet Marshal'], [12, 'Gauntlet Legend']] as const) result.push(milestone(`gauntlet-${n}`, title, 'shield', weeks?.challenges ?? null, n, n === 1 ? 'week' : 'weeks', `Finish every weekly challenge in ${n} ${n === 1 ? 'week' : 'separate weeks'}.`));
   for (const [n, title] of [[1, 'Oath Sworn'], [4, 'Oathkeeper'], [12, 'Unbroken Oath']] as const) result.push(milestone(`oath-${n}`, title, 'calendar', weeks?.plan ?? null, n, n === 1 ? 'week' : 'weeks', `Train on every day you planned, for ${n} ${n === 1 ? 'week' : 'weeks'}. Your plan, your oath.`));
-  for (const [n, title] of [[1, 'Self-Made'], [4, 'Architect of Self'], [12, 'Legend of One']] as const) result.push(milestone(`self-made-${n}`, title, 'user', weeks?.personal ?? null, n, n === 1 ? 'week' : 'weeks', `Complete every personal quest in ${n} ${n === 1 ? 'week' : 'separate weeks'}.`));
+  for (const [n, title] of [[3, 'Self-Made'], [10, 'Architect of Self'], [25, 'Legend of One']] as const) result.push(milestone(`self-made-${n}`, title, 'user', activity.personalQuestsCompleted ?? null, n, 'quests', `Complete ${n} personal quests. Each one is built from your own records and gets harder as you go.`));
   const target = Number.parseFloat(profile.targetWeight ?? ''), current = Number.parseFloat(profile.weight);
   const losing = /weight loss/i.test(profile.goal ?? ''), gaining = /muscle/i.test(profile.goal ?? '');
   const summitKnown = Number.isFinite(target) && Number.isFinite(current) && (losing || gaining);

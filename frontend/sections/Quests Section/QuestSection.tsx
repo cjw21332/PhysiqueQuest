@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
 import type { Profile } from '../Home/types';
-import { useActivity, type ActivityBadge, type DailyMission } from '../../hooks/useActivity';
+import { useActivity, type ActivityBadge, type DailyMission, type QuestLogEntry } from '../../hooks/useActivity';
 import { useLeaderboard } from '../../hooks/useLeaderboard';
 import { useSettings } from '../../hooks/useSettings';
 import { api, type LeaderboardEntryRecord, type LeaderboardPeriod, type StrengthLeaderboardRecord } from '../../lib/api';
@@ -20,7 +20,7 @@ import './badge-collection.css';
 import type { LeaderboardRecord, WorkoutSessionRecord, WorkoutSummary } from '../../lib/api';
 
 type Screen = 'quests' | 'leaderboard' | 'badges';
-const featuredBadgeIds = ['oath-1', 'self-made-1', 'streak-3', 'first-workout', 'personal-record', 'seven-suns', 'hydration-1', 'goal-1'];
+const featuredBadgeIds = ['oath-1', 'self-made-3', 'streak-3', 'first-workout', 'personal-record', 'seven-suns', 'hydration-1', 'goal-1'];
 
 /** Badge art: an original crest whose shape shows the category and whose rim shows the rarity. */
 export function BadgeIcon({ badge }: { badge: ActivityBadge }) {
@@ -58,7 +58,7 @@ function movementLabel(movement: LeaderboardEntryRecord['movement']) {
 }
 
 export default function QuestSection({ profile, onLogoutRequest: _onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
-  const { activity, dailyMissions, personalQuests, weeklyChallenges, badges: savedBadges, loading, error, refresh } = useActivity();
+  const { activity, dailyMissions, personalQuests, personalQuestLog, weeklyChallenges, badges: savedBadges, loading, error, refresh } = useActivity();
   const [badgeData, setBadgeData] = useState<{ ranking: LeaderboardRecord | null; workouts: WorkoutSessionRecord[] | null; summary: WorkoutSummary | null; nutrition: { water: {date: string; glasses: number}[]; meals: {id?: string; date?: string; scanSavedAt?: string; scanGroupId?: string}[]; scanSaveReceipts?: {key: string; mealIds: string[]}[] } | null }>({ ranking: null, workouts: null, summary: null, nutrition: null });
   const { settings } = useSettings();
   const [screen, setScreen] = useScreenRoute<Screen>('/quests', { quests: '', leaderboard: '/leaderboard', badges: '/badges' }, 'quests');
@@ -192,7 +192,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
         <p>Your streak tracks consecutive days with saved activity.</p>
       </section>
       <QuestList id="missions" title="Daily missions" note="Same for everyone · resets daily" items={dailyMissions} empty="No daily missions are available."/>
-      <PersonalJournal quests={personalQuests} goal={profile.goal}/>
+      <PersonalJournal quests={personalQuests} log={personalQuestLog}/>
       <QuestList id="weekly" title="Weekly challenges" note="Targets grow with last week · resets Monday" items={weeklyChallenges} empty="No weekly challenges are available."/>
       <section className="quest-v2-badges" aria-labelledby="quest-v2-badges-title">
         <div className="quest-v2-section-heading quest-badge-heading"><h3 id="quest-v2-badges-title">Badges</h3><div><span>{badges.filter(badge => badge.earned).length} of {badges.length} earned</span><button type="button" onClick={() => setScreen('badges')}>View all <Icon name="chevron-right" size={16}/></button></div></div>
@@ -277,21 +277,21 @@ function BadgeVault({ badges, onBack }: { badges: ActivityBadge[]; onBack: () =>
 }
 
 /** Personal quests look and read differently from the shared lists: a violet journal with rings and a "why it's yours" line. */
-function PersonalJournal({ quests, goal }: { quests: DailyMission[] | undefined; goal?: string }) {
+function PersonalJournal({ quests, log }: { quests: DailyMission[] | undefined; log: QuestLogEntry[] }) {
   const list = quests ?? [];
-  const done = list.filter(quest => quest.complete).length;
-  const icon = (key: string) => ({ plan: 'calendar', protein: 'meal', calories: 'meal', 'back-to-back': 'pulse', active: 'trend', 'weigh-in': 'scale', recovery: 'health' } as Record<string, string>)[key] ?? 'target';
+  const icon = (key: string) => ({ record: 'trophy', routine: 'dumbbell', volume: 'chart-bars' } as Record<string, string>)[key] ?? 'target';
   return <section className="pq-journal" aria-labelledby="pq-journal-title">
     <header>
       <span className="pq-journal-sigil" aria-hidden="true"><Icon name="user" size={20}/></span>
-      <div><h3 id="pq-journal-title">Personal quests</h3><p>{goal ? `Built for you · ${goal}` : 'Built for you'} · resets Monday</p></div>
-      {list.length > 0 && <strong aria-label={`${done} of ${list.length} complete`}>{done}<small>/{list.length}</small></strong>}
+      <div><h3 id="pq-journal-title">Personal quests</h3><p>Built from your own training · each win unlocks the next</p></div>
+      {log.length > 0 && <strong aria-label={`${log.length} recently completed`}>{log.length}<small> won</small></strong>}
     </header>
     {list.length ? <ul>{list.map(quest => { const share = Math.min(1, quest.progress / Math.max(1, quest.target)); return <li key={quest.key} className={quest.complete ? 'done' : ''} aria-label={`${quest.title}, ${quest.progress} of ${quest.target}`}>
       <span className="pq-ring" aria-hidden="true"><svg className="pq-ring-svg" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" className="pq-ring-track"/><circle cx="22" cy="22" r="18" className="pq-ring-fill" strokeDasharray={`${(share * 113.1).toFixed(1)} 113.1`}/></svg><Icon name={quest.complete ? 'check' : icon(quest.key)} size={17}/></span>
-      <div><strong>{quest.title}</strong>{quest.reason && <small>{quest.reason}</small>}<em>{quest.progress} / {quest.target}</em></div>
+      <div><span className="pq-level">Quest {quest.level ?? 1}</span><strong>{quest.title}</strong>{quest.reason && <small>{quest.reason}</small>}<em>{quest.target > 1 ? `${quest.progress.toLocaleString('en-US')} / ${quest.target.toLocaleString('en-US')}` : quest.progress ? 'Done' : 'Not yet'}</em></div>
       <span className="pq-xp">+{quest.points}<small>XP</small></span>
     </li>; })}</ul> : <p className="pq-journal-empty">{quests ? 'Complete your profile to unlock personal quests.' : 'Personal quests appear after your account syncs. Connect to the internet and sign in.'}</p>}
-    <footer><Icon name="medal" size={14}/><span>Finish them all in a week to forge your <b>Self-Made</b> crest.</span></footer>
+    {log.length > 0 && <div className="pq-log" aria-label="Recently completed personal quests"><h4>Recently completed</h4><ul>{log.slice(0, 3).map(entry => <li key={entry.completedAt + entry.title}><Icon name="check" size={13}/><span>{entry.title}</span><b>+{entry.points}</b></li>)}</ul></div>}
+    <footer><Icon name="medal" size={14}/><span>Beat a quest and the next one unlocks, a little harder. Complete 3 to forge your <b>Self-Made</b> crest.</span></footer>
   </section>;
 }

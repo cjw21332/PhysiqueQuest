@@ -53,7 +53,7 @@ export function badgeMeta(id: string): Meta {
     case 'goal': return { category: 'questline', tier: tierBy(n, [[7, 'rare'], [14, 'epic'], [30, 'legendary']]), glyph: 'goal-milestones', label: String(n) };
     case 'gauntlet': return { category: 'questline', tier: tierBy(n, [[4, 'epic'], [12, 'legendary']], 'rare'), glyph: 'shield', label: `${n}w` };
     case 'oath': return { category: 'personal', tier: tierBy(n, [[4, 'epic'], [12, 'legendary']], 'rare'), glyph: 'calendar', label: `${n}w` };
-    case 'self-made': return { category: 'personal', tier: tierBy(n, [[4, 'epic'], [12, 'legendary']], 'rare'), glyph: 'user', label: `${n}w` };
+    case 'self-made': return { category: 'personal', tier: tierBy(n, [[10, 'epic'], [25, 'legendary']], 'rare'), glyph: 'user', label: `${n}` };
     case 'top': return { category: 'ascension', tier: n === 1 ? 'legendary' : n <= 10 ? 'epic' : 'rare', glyph: 'crown', label: `#${n}` };
     default: return { category: 'questline', tier: 'common', glyph: 'medal' };
   }

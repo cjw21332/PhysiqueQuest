@@ -9,7 +9,7 @@ const workout = (endedAt: string, sets: { exerciseId: string; loadKg: number; re
 }) as never;
 
 const base = {
-  activity: { timezone: 'UTC', level: 3, activityDates: ['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20', '2026-11-21', '2026-11-22'], questWeeks: { personal: 1, plan: 4, challenges: 0 } },
+  activity: { timezone: 'UTC', level: 3, activityDates: ['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20', '2026-11-21', '2026-11-22'], questWeeks: { plan: 4, challenges: 0 }, personalQuestsCompleted: 3 },
   saved: [], ranking: null, summary: null, nutrition: null,
 } as never as Parameters<typeof buildBadgeCollection>[0];
 
@@ -39,7 +39,8 @@ test('new badges are earned from real data', () => {
   assert.equal(badges.find(b => b.id === 'volume-10000')?.progress?.current, 2100);
   assert.equal(earned('oath-4'), true);
   assert.equal(earned('oath-12'), false);
-  assert.equal(earned('self-made-1'), true);
+  assert.equal(earned('self-made-3'), true);
+  assert.equal(earned('self-made-10'), false);
   assert.equal(earned('summit'), true);
 });
 

@@ -45,25 +45,34 @@ describe('activity quest authority', () => {
     expect(await progress()).toMatchObject({ progress: 3, complete: true });
   });
 
-  it('returns shared daily missions, personal quests from the profile, and weekly challenges', async () => {
+  it('returns shared daily missions, a saved personal quest chain from the training log, and weekly challenges', async () => {
     const date = new Date().toISOString().slice(0, 10);
-    const activityModel = { findOne: () => ({ exec: async () => ({ state: { timezone: 'UTC' } }) }) } as any;
+    const saved: unknown[] = [];
+    const activityModel = { findOne: () => ({ exec: async () => ({ state: { timezone: 'UTC' } }) }), updateOne: (filter: unknown, update: unknown) => { saved.push([filter, update]); return { exec: async () => ({}) }; } } as any;
     const nutrition = { read: async () => ({ meals: [{ date, protein: 140 }], water: [{ date, glasses: 8 }] }) } as any;
-    const workouts = { creditHistory: async () => [{ status: 'completed', endedAt: new Date(), activityDate: date }], personalRecordDays: async () => [] } as any;
+    const log = [{ endedAt: new Date(Date.now() - 86400000), routineName: 'upper body', exercises: [{ exerciseId: 'bench', name: 'bench press' }], sets: [{ exerciseId: 'bench', loadKg: 40, reps: 10, status: 'completed' }] }];
+    const workouts = { creditHistory: async () => [{ status: 'completed', endedAt: new Date(), activityDate: date }], personalRecordDays: async () => [], trainingLog: async () => log } as any;
     const leaderboard = { get: async () => ({ self: { rank: 1, points: 0 } }) } as any;
-    const profile = { age: '30', weight: '80', weightUnit: 'kg', goal: 'Build muscle', days: ['Monday', 'Thursday'] };
-    let selected = '';
-    const profiles = { findOne: () => ({ select: (fields: string) => { selected = fields; return { lean: () => ({ exec: async () => profile }) }; } }) } as any;
-    const withProfile = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, leaderboard, users, profiles).get('507f1f77bcf86cd799439011');
-    const without = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, leaderboard, users).get('507f1f77bcf86cd799439011');
-    expect(withProfile.dailyMissions).toEqual(without.dailyMissions);
-    expect(withProfile.personalQuests.map(quest => quest.key)).toEqual(['plan', 'protein', 'weigh-in']);
-    expect(withProfile.personalQuests[1]).toMatchObject({ title: 'Hit 130 g of protein on 4 days', progress: 1, reason: expect.stringContaining('80 kg') });
-    expect(withProfile.state.questWeeks).toEqual({ personal: expect.any(Number), plan: expect.any(Number), challenges: expect.any(Number) });
-    expect(without.personalQuests).toEqual([]);
-    expect(withProfile.weeklyChallenges.map(challenge => challenge.key)).toEqual(['train', 'hydrate', 'meals']);
-    // Health fields decrypt with userId as AAD; without it the live profile reads as missing.
-    expect(selected.split(' ')).toContain('userId');
+    const profiles = { findOne: () => ({ select: () => ({ lean: () => ({ exec: async () => ({ days: ['Monday'] }) }) }) }) } as any;
+    const result = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, leaderboard, users, profiles).get('507f1f77bcf86cd799439011');
+    expect(result.personalQuests.map(quest => quest.key)).toEqual(['record', 'routine', 'volume']);
+    expect(result.personalQuests[0]).toMatchObject({ title: 'Beat your record in Bench Press', level: 1 });
+    expect(result.personalQuests[1].title).toBe('One more rep on every exercise in Upper Body');
+    expect(result.state.personalQuestsCompleted).toBe(0);
+    expect(result.weeklyChallenges.map(challenge => challenge.key)).toEqual(['train', 'hydrate', 'meals']);
+    // The new chain is saved once, only where none exists yet.
+    expect(saved).toHaveLength(1);
+    expect(saved[0]).toMatchObject([{ 'state.questChain': { $exists: false } }, { $set: { 'state.questChain': { version: 1 } } }]);
+  });
+
+  it('never writes the quest chain on the assistant path', async () => {
+    const writes: unknown[] = [];
+    const activityModel = { findOne: () => ({ exec: async () => ({ state: { timezone: 'UTC' } }) }), updateOne: () => { writes.push(1); return { exec: async () => ({}) }; } } as any;
+    const nutrition = { read: async () => ({ meals: [], water: [] }) } as any;
+    const workouts = { creditHistory: async () => [], personalRecordDays: async () => [], trainingLog: async () => [] } as any;
+    const result = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, { get: async () => null } as any, users).getForAssistant('507f1f77bcf86cd799439011');
+    expect(result.personalQuests).toHaveLength(3);
+    expect(writes).toHaveLength(0);
   });
 
   it('derives the reference badges from saved evidence and marks form unavailable', async () => {
