@@ -52,9 +52,9 @@ export default function HealthProfileEdit({ profile, onBack, onSave, error }: Pr
       isSaving={saving}
       error={error}
     >
-      <fieldset><legend>Health data consent</legend>
+      <fieldset className="health-consent"><legend>Health data consent</legend>
         <p>Allow PhysiqueQuest to store your injuries and health risks and use them to adapt your workouts. Turning this off and saving clears these entries.</p>
-        <label><input type="checkbox" checked={Boolean(data.healthConsentAt)} onChange={({ target: { checked } }) => setData(current => checked
+        <label className="health-consent-toggle"><input type="checkbox" checked={Boolean(data.healthConsentAt)} onChange={({ target: { checked } }) => setData(current => checked
           ? { ...current, healthConsentAt: new Date().toISOString() }
           : { ...current, healthConsentAt: null, injuries: [], healthRisks: [] })}/> Allow health-based coaching</label>
       </fieldset>

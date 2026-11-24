@@ -1,14 +1,17 @@
 /* "What's new" popup shown once per app launch for signed-in users. */
-.whats-new { width: min(92vw, 420px); max-height: min(86vh, 640px); margin: auto; padding: 22px 20px calc(20px + var(--sab, 0px)); border: 1px solid var(--line); border-radius: 24px; background: var(--surface); color: var(--ink); box-shadow: 0 24px 60px rgb(0 0 0 / .35); overflow-y: auto; }
+.whats-new { width: min(92vw, 420px); max-height: min(86vh, 640px); margin: auto; padding: 22px 20px 20px; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); color: var(--ink); box-shadow: 0 24px 60px rgb(0 0 0 / .35); overflow-y: auto; }
 .whats-new::backdrop { background: rgb(8 12 20 / .62); backdrop-filter: blur(2px); }
-.whats-new[open] { animation: whats-new-in .22s ease-out; }
+/* Column layout: the list scrolls, so "Got it" stays visible on short or zoomed screens. */
+.whats-new[open] { display: flex; flex-direction: column; overflow: hidden; animation: whats-new-in .22s ease-out; }
+.whats-new[open] > ul { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.whats-new[open] > .whats-new-done { flex: none; }
 @keyframes whats-new-in { from { opacity: 0; transform: translateY(12px) scale(.98); } }
 @media (prefers-reduced-motion: reduce) { .whats-new[open] { animation: none; } }
 .whats-new header { position: relative; display: grid; gap: 6px; padding-right: 44px; }
 .whats-new-badge { justify-self: start; padding: 4px 10px; border-radius: 999px; background: var(--green-light); color: var(--green-dark); font-size: 12px; font-weight: 800; }
 .whats-new h2 { margin: 0; font-size: 22px; line-height: 1.25; }
 .whats-new-x { position: absolute; top: -6px; right: -6px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); cursor: pointer; }
-.whats-new ul { list-style: none; margin: 16px 0 18px; padding: 0; display: grid; gap: 12px; }
+.whats-new ul { list-style: none; margin: 14px 0 16px; padding: 0; display: grid; align-content: start; gap: 12px; }
 .whats-new li { display: flex; gap: 12px; align-items: flex-start; }
 .whats-new-icon { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--green-light); color: var(--green-dark); }
 .whats-new li strong { display: block; font-size: 15px; line-height: 1.35; }

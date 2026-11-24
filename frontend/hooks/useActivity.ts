@@ -11,5 +11,6 @@ const load = (force?: boolean) => api.getActivity(force);
 export function useActivity() {
   const { data, loading, error, refresh } = useAppResource<ActivityResponse>('activity', load);
   const result = data ?? empty;
-  return { activity: { ...empty.state, ...result.state }, dailyMissions: result.dailyMissions ?? [], personalQuests: result.personalQuests ?? [], weeklyChallenges: result.weeklyChallenges ?? [], badges: result.badges ?? [], loading, error, refresh };
+  return { activity: { ...empty.state, ...result.state }, dailyMissions: result.dailyMissions ?? [], // undefined means the server has not sent quests yet (offline or not synced); [] means none apply.
+  personalQuests: result.personalQuests, weeklyChallenges: result.weeklyChallenges ?? [], badges: result.badges ?? [], loading, error, refresh };
 }

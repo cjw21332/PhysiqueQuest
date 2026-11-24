@@ -10,7 +10,7 @@ import * as Network from 'expo-network';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, NativeModules, Platform, TurboModuleRegistry } from 'react-native';
+import { AppState, BackHandler, NativeModules, Platform, TurboModuleRegistry } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
@@ -126,6 +126,11 @@ export function nativeFramingText(check:ReadinessCheck) {
   return ({'too-small':'Move a little closer','too-large':'Move a little farther away','clipped':'Keep your whole body in view',pending:'Checking framing…',uncalibrated:'Framing validation pending',bent:'Stand upright to check framing'} as Partial<Record<ReadinessCheck['reason'],string>>)[check.reason]??'Framing unavailable';
 }
 
+/** Main tabs and the start page: Back there exits the app instead of returning to sign-in screens. */
+export function isMainTabUrl(url: string) {
+  try { return /^\/(home|coach|scan|quests|me)?(\.html)?\/?$/.test(new URL(url).pathname); } catch { return true; }
+}
+
 function getInitialAddress() {
   if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net/?pq-shell=1.5.1';
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_WEB_APP_URL?: string } | undefined;
@@ -192,6 +197,18 @@ function buildCameraScript(detail: {
 function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView<object>>(null);
+  // Android Back walks the web history; on a main tab (or with no history) it leaves the app as usual.
+  const webHistory = useRef({ canGoBack: false, url: '' });
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      const { canGoBack, url } = webHistory.current;
+      if (!canGoBack || isMainTabUrl(url)) return false;
+      webRef.current?.goBack();
+      return true;
+    });
+    return () => subscription.remove();
+  }, []);
   const googleConfigured = useRef(false);
   const googleSignin = useRef<typeof GoogleSigninApi | null>(null);
   const pendingNotificationOpen = useRef(false);
@@ -499,6 +516,7 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
       <StatusBar barStyle="light-content" />
       {loadedAddress ? <WebView<object>
         ref={webRef}
+        onNavigationStateChange={state => { webHistory.current = { canGoBack: state.canGoBack, url: state.url }; }}
         key={key}
         source={{ uri: loadedAddress }}
         style={StyleSheet.absoluteFill}

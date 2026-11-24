@@ -55,6 +55,10 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
       if (status === 'offline') { if (navigator.onLine) { setServiceReconnecting(true); setConnectionLost(false); } else lost(true); }
       else if (status === 'online') { restored(); window.dispatchEvent(new Event('physiquequest:connection-restored')); }
     };
+    // A reconnect is often reported before the network can reach the server; retry so a
+    // session that only looked expired while offline is confirmed without relaunching.
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let retryAttempts = 0;
     const online = (fromNative = false) => {
       if (!fromNative && !navigator.onLine) return;
       if (onlineCheckInFlight.current) return;
@@ -78,10 +82,12 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
           }
           setServiceReconnecting(false);
           setConnectionLost(false);
+          retryAttempts = 0;
           window.dispatchEvent(new Event('physiquequest:connection-restored'));
         } catch {
           // Internet is back even if a free hosted service is still waking up.
           setServiceReconnecting(true);
+          if (retryAttempts++ < 12) { clearTimeout(retryTimer); retryTimer = setTimeout(() => online(true), 5000); }
         } finally {
           onlineCheckInFlight.current = false;
         }
@@ -105,7 +111,7 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     window.addEventListener('physiquequest:internet-status', internetStatus);
     if (!navigator.onLine) lost(true);
     else online();
-    return () => { window.removeEventListener('offline', offline); window.removeEventListener('online', browserOnline); window.removeEventListener('focus', onFocus); window.removeEventListener('physiquequest:connection-lost', apiConnectionLost); window.removeEventListener('physiquequest:connection-restored', restored); window.removeEventListener('physiquequest:backend-status', backendStatus); window.removeEventListener('physiquequest:internet-status', internetStatus); };
+    return () => { clearTimeout(retryTimer); window.removeEventListener('offline', offline); window.removeEventListener('online', browserOnline); window.removeEventListener('focus', onFocus); window.removeEventListener('physiquequest:connection-lost', apiConnectionLost); window.removeEventListener('physiquequest:connection-restored', restored); window.removeEventListener('physiquequest:backend-status', backendStatus); window.removeEventListener('physiquequest:internet-status', internetStatus); };
   }, [user]);
   const retryConnection = async () => {
     if (retrying) return;
@@ -174,8 +180,11 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   const connectionToast = () => {
     if (onlinePopup) return <ConnectionToast key="online" tone="online" title="You’re back online" autoHideMs={5500} dismissLabel="Dismiss online message" onDismiss={() => setOnlinePopup(false)}
       message={sessionExpired ? 'Your session expired. Log in again to sync; saved data stays on this device.' : serviceReconnecting ? 'PhysiqueQuest is reconnecting. Your saved data stays available.' : 'Saved workouts can sync and online features are available.'}/>;
-    if (sessionExpired && nativeApp && !hidden.sync) return <ConnectionToast key="sync" tone="sync" title="Sign in to sync" message="Your saved content and on-device workouts are available." dismissLabel="Dismiss sign-in message" onDismiss={() => setHidden(current => ({ ...current, sync: true }))}/>;
-    if (connectionLost && !sessionExpired && !inSession) return <ConnectionToast key="offline" tone="offline" title="You’re offline"
+    // Without internet a session cannot be confirmed, so it can look expired; telling the user
+    // to sign in would be wrong. The device's own connection state decides which notice applies.
+    const deviceOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+    if (sessionExpired && nativeApp && !hidden.sync && !deviceOffline) return <ConnectionToast key="sync" tone="sync" title="Sign in to sync" message="Your saved content and on-device workouts are available." dismissLabel="Dismiss sign-in message" onDismiss={() => setHidden(current => ({ ...current, sync: true }))}/>;
+    if ((connectionLost || (deviceOffline && !dismissedOffline.current)) && (!sessionExpired || deviceOffline) && !inSession) return <ConnectionToast key="offline" tone="offline" title="You’re offline"
       message={nativeApp ? 'Saved data may be out of date.' : `${retryFailed ? 'Still unable to connect. ' : ''}Saved content and manual workouts still work; they sync when you reconnect. Food logging needs a connection.`}
       action={{ label: 'Try again', onClick: () => { void retryConnection(); }, busy: retrying }} dismissLabel="Continue offline" onDismiss={continueOffline}/>;
     if (serviceReconnecting && nativeApp && !sessionExpired && !hidden.connecting) return <ConnectionToast key="connecting" tone="connecting" title="Connecting to PhysiqueQuest" message="You can keep using your saved content." dismissLabel="Dismiss connecting message" onDismiss={() => setHidden(current => ({ ...current, connecting: true }))}/>;

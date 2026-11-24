@@ -52,7 +52,8 @@ describe('activity quest authority', () => {
     const workouts = { creditHistory: async () => [{ status: 'completed', endedAt: new Date(), activityDate: date }], personalRecordDays: async () => [] } as any;
     const leaderboard = { get: async () => ({ self: { rank: 1, points: 0 } }) } as any;
     const profile = { age: '30', weight: '80', weightUnit: 'kg', goal: 'Build muscle', days: ['Monday', 'Thursday'] };
-    const profiles = { findOne: () => ({ select: () => ({ lean: () => ({ exec: async () => profile }) }) }) } as any;
+    let selected = '';
+    const profiles = { findOne: () => ({ select: (fields: string) => { selected = fields; return { lean: () => ({ exec: async () => profile }) }; } }) } as any;
     const withProfile = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, leaderboard, users, profiles).get('507f1f77bcf86cd799439011');
     const without = await new ActivityService(lifecycleModel(activityModel), nutrition, workouts, leaderboard, users).get('507f1f77bcf86cd799439011');
     expect(withProfile.dailyMissions).toEqual(without.dailyMissions);
@@ -60,6 +61,8 @@ describe('activity quest authority', () => {
     expect(withProfile.personalQuests[1]).toMatchObject({ title: 'Reach 130 g of protein on 4 days', progress: 1 });
     expect(without.personalQuests).toEqual([]);
     expect(withProfile.weeklyChallenges.map(challenge => challenge.key)).toEqual(['train', 'hydrate', 'meals']);
+    // Health fields decrypt with userId as AAD; without it the live profile reads as missing.
+    expect(selected.split(' ')).toContain('userId');
   });
 
   it('derives the reference badges from saved evidence and marks form unavailable', async () => {

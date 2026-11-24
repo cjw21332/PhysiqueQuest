@@ -208,7 +208,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
         <p>Your streak tracks consecutive days with saved activity.</p>
       </section>
       <QuestList id="missions" title="Daily missions" note="Same for everyone · resets daily" items={dailyMissions} empty="No daily missions are available."/>
-      <QuestList id="personal" title="Personal quests" note="Made from your profile · resets Monday" items={personalQuests} empty="Complete your profile to unlock personal quests."/>
+      <QuestList id="personal" title="Personal quests" note="Made from your profile · resets Monday" items={personalQuests ?? []} empty={personalQuests ? 'Complete your profile to unlock personal quests.' : 'Personal quests appear after your account syncs. Connect to the internet and sign in.'}/>
       <QuestList id="weekly" title="Weekly challenges" note="Targets grow with last week · resets Monday" items={weeklyChallenges} empty="No weekly challenges are available."/>
       <section className="quest-v2-badges" aria-labelledby="quest-v2-badges-title">
         <div className="quest-v2-section-heading quest-badge-heading"><h3 id="quest-v2-badges-title">Badges</h3><div><span>{badges.filter(badge => badge.earned).length} of {badges.length} earned</span><button type="button" onClick={() => setScreen('badges')}>View all <Icon name="chevron-right" size={16}/></button></div></div>
@@ -223,7 +223,7 @@ const questIcon = (key: string) => /workout|train|plan/.test(key) ? 'dumbbell' :
 
 function QuestList({ id, title, note, items, empty }: { id: string; title: string; note: string; items: DailyMission[]; empty: string }) {
   return <section className="quest-v2-missions" aria-labelledby={`quest-v2-${id}-title`}>
-    <div className="quest-v2-section-heading"><h3 id={`quest-v2-${id}-title`}>{title}</h3><span>{note}</span></div>
+    <div className="quest-v2-section-heading quest-v2-heading-stacked"><h3 id={`quest-v2-${id}-title`}>{title}</h3><span>{note}</span></div>
     {items.length ? <div className="quest-v2-mission-list">{items.map(mission => <div key={mission.key} className={`quest-v2-mission ${mission.complete ? 'complete' : ''}`} aria-label={`${mission.title}, ${mission.progress} of ${mission.target}`}>
       <span className="quest-v2-mission-icon"><Icon name={mission.complete ? 'check' : questIcon(mission.key)} size={17}/></span>
       <span className="quest-v2-mission-main"><strong>{mission.title}</strong><span className="quest-v2-mission-progress"><i><b style={{ width: `${Math.min(mission.progress / mission.target * 100, 100)}%` }}/></i><small>{mission.progress}/{mission.target}</small></span></span>

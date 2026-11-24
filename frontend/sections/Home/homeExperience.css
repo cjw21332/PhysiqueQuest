@@ -51,7 +51,6 @@
   .home-section .records-controls { grid-template-columns: 1fr; }
 }
 
-.home-section .home-notifications .coach-back svg { transform: none; }
 .home-section .notification-intro { gap: 12px; }
 .home-section .notification-intro > div { min-width: 0; }
 .home-section .notification-count { flex: none; }

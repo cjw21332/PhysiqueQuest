@@ -81,8 +81,8 @@ export class ActivityService {
     const dailyMissions = buildDailyMissions({ ...todayStats, records: Number(records.includes(today)) }, mealGoal);
     const activityDates = buildActivityDates(mealDates, nutrition.water, allWorkoutDates);
 
-    // A missing or unreadable profile only hides personal quests; missions and challenges still load.
-    const profile = this.profiles ? await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('age weight weightUnit goal days injuries healthRisks conditions healthConsentAt').lean().exec().catch(() => null) as QuestProfile | null : null;
+    // userId must be selected: it is the AAD that decrypts the health fields. A missing or unreadable profile only hides personal quests.
+    const profile = this.profiles ? await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('userId age weight weightUnit goal days injuries healthRisks conditions healthConsentAt').lean().exec().catch(() => null) as QuestProfile | null : null;
     const protein = new Map<string, number>();
     for (const meal of nutrition.meals) if (typeof meal.date === 'string' && Number.isFinite(meal.protein)) protein.set(meal.date, (protein.get(meal.date) ?? 0) + meal.protein!);
     const dayData: DayData = { workouts: allWorkoutDates, records: new Set(records), active: activityDates, water: waterByDate, protein,
