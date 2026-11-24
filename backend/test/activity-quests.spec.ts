@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { describe, expect, it } from 'vitest';
-import { ActivityService } from '../src/activity/activity.service.js';
+import { ActivityService, buildDailyMissions, missionContext } from '../src/activity/activity.service.js';
 import { UpdateActivityDto } from '../src/activity/dto/activity.dto.js';
 
 describe('activity quest authority', () => {
@@ -43,6 +43,37 @@ describe('activity quest authority', () => {
     expect((await progress()).progress).toBe(1);
     meals.push({ date, scanGroupId: 'two', scanSavedAt: new Date() }, { date, scanGroupId: 'three', scanSavedAt: new Date() });
     expect(await progress()).toMatchObject({ progress: 3, complete: true });
+  });
+
+  describe('personalized daily missions', () => {
+    const today = '2026-11-25'; // a Wednesday
+    const recent = new Set(['2026-11-23']);
+    const stats = { meals: 0, water: 0, workouts: 1, records: 0, feedback: 1 };
+    const keys = (missions: { key: string }[]) => missions.map(mission => mission.key);
+
+    it('keeps the default set without a profile', () => {
+      expect(keys(buildDailyMissions(stats, 3, missionContext(null, today, recent, true)))).toEqual(['workout', 'meals', 'water', 'personal-record']);
+    });
+    it('swaps the personal-record chase for workout feedback at age 35+ and tracks today\'s ratings', () => {
+      const missions = buildDailyMissions(stats, 3, missionContext({ age: '52' }, today, recent, true));
+      expect(missions.find(mission => mission.key === 'workout-feedback')).toMatchObject({ progress: 1, complete: true, points: 150 });
+      expect(keys(missions)).not.toContain('personal-record');
+    });
+    it('counts injuries only with health-data consent', () => {
+      expect(missionContext({ age: '25', injuries: ['Knee injury'] }, today, recent, true).cautious).toBe(false);
+      expect(missionContext({ age: '25', injuries: ['Knee injury'], healthConsentAt: new Date() }, today, recent, true).cautious).toBe(true);
+    });
+    it('keeps the record mission when feedback cannot be read', () => {
+      expect(missionContext({ age: '70' }, today, recent, false).cautious).toBe(false);
+    });
+    it('makes the workout optional on a rest day and offers a comeback after a quiet week', () => {
+      const restDay = buildDailyMissions(stats, 3, missionContext({ days: ['Monday', 'Friday'] }, today, recent, true))[0];
+      expect(restDay).toMatchObject({ key: 'workout', points: 50, title: expect.stringMatching(/rest day/i) });
+      const comeback = buildDailyMissions(stats, 3, missionContext({ days: ['Wednesday'] }, today, new Set(['2026-11-10']), true))[0];
+      expect(comeback).toMatchObject({ key: 'workout', points: 120, title: expect.stringMatching(/comeback/i) });
+      // No earlier history means a new user, not a comeback.
+      expect(missionContext({ days: ['Wednesday'] }, today, new Set(), true).comeback).toBe(false);
+    });
   });
 
   it('derives the reference badges from saved evidence and marks form unavailable', async () => {

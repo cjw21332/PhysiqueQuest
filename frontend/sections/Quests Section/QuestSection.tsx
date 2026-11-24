@@ -210,7 +210,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
       <section className="quest-v2-missions" aria-labelledby="quest-v2-missions-title">
         <div className="quest-v2-section-heading"><h3 id="quest-v2-missions-title">Daily missions</h3><span>Resets daily</span></div>
         {dailyMissions.length ? <div className="quest-v2-mission-list">{dailyMissions.map(mission => <div key={mission.key} className={`quest-v2-mission ${mission.complete ? 'complete' : ''}`} aria-label={`${mission.title}, ${mission.progress} of ${mission.target}`}>
-          <span className="quest-v2-mission-icon"><Icon name={mission.complete ? 'check' : mission.key === 'workout' ? 'dumbbell' : mission.key === 'meals' ? 'meal' : mission.key === 'personal-record' ? 'trophy' : 'water'} size={17}/></span>
+          <span className="quest-v2-mission-icon"><Icon name={mission.complete ? 'check' : mission.key === 'workout' ? 'dumbbell' : mission.key === 'meals' ? 'meal' : mission.key === 'water' ? 'water' : 'trophy'} size={17}/></span>
           <span className="quest-v2-mission-main"><strong>{mission.title}</strong><span className="quest-v2-mission-progress"><i><b style={{ width: `${Math.min(mission.progress / mission.target * 100, 100)}%` }}/></i><small>{mission.progress}/{mission.target}</small></span></span>
           <strong className="quest-v2-mission-points">+{mission.points}</strong>
         </div>)}</div> : <p className="quest-v2-empty">No daily missions are available.</p>}
