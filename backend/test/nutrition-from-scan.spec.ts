@@ -2,6 +2,8 @@ import { BadRequestException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NutritionService } from '../src/nutrition/nutrition.service.js';
 import type { MealFromScanDto } from '../src/nutrition/dto/nutrition.dto.js';
+// Scans may be logged up to 30 days back, so the fixture uses today's date.
+const TODAY = new Date().toISOString().slice(0, 10);
 import { issueEvidenceProof } from '../src/foodscan/services/evidence-proof.js';
 
 /**
@@ -30,7 +32,7 @@ describe('NutritionService.addMealsFromScan', () => {
   const payload = (overrides: Partial<MealFromScanDto> = {}): MealFromScanDto =>
     ({
       meal: 'Lunch',
-      date: '2026-01-05',
+      date: TODAY,
       items: [
         {
           food_name: 'chicken breast',
@@ -70,7 +72,7 @@ describe('NutritionService.addMealsFromScan', () => {
       carbs: 0,
       fat: 3.9,
       detail: 'Chicken breast, raw',
-      date: '2026-01-05',
+      date: TODAY,
       source: 'Scanned',
     });
   });

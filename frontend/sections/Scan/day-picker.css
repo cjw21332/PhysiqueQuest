@@ -1,0 +1,20 @@
+/* Scan page day picker: step a day back, jump within the week, return to today. */
+.scan-day-picker { display: grid; gap: 10px; margin: 0 0 16px; padding: 12px; border-radius: 20px; border: 1px solid var(--line); background: linear-gradient(180deg, rgb(34 197 94 / .08), transparent 70%), var(--soft); }
+.scan-day-head { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 6px; text-align: center; }
+.scan-day-head button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); }
+.scan-day-head button:disabled { opacity: .35; }
+.scan-day-head strong { display: block; color: var(--ink); font-size: 17px; }
+.scan-day-head small { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+.scan-day-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.scan-day-week button { display: grid; justify-items: center; gap: 2px; min-height: 58px; padding: 6px 0; border: 1px solid transparent; border-radius: 14px; background: transparent; color: var(--text-secondary); font: inherit; }
+.scan-day-week button small { font-size: 11px; color: var(--muted); }
+.scan-day-week button b { font-size: 15px; color: var(--ink); }
+.scan-day-week button i { width: 5px; height: 5px; border-radius: 50%; background: transparent; }
+.scan-day-week button i.logged { background: var(--green); }
+.scan-day-week button.today { border-color: color-mix(in srgb, var(--green) 45%, transparent); }
+.scan-day-week button.active { background: var(--green); border-color: var(--green); }
+.scan-day-week button.active :is(small, b) { color: #0b1f12; }
+.scan-day-week button.active i.logged { background: #0b1f12; }
+.scan-day-week button:disabled { opacity: .3; }
+.scan-day-today { justify-self: center; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--green) 50%, transparent); border-radius: 999px; background: transparent; color: var(--green); font: inherit; font-size: 13px; font-weight: 700; }
+.scan-day-picker :is(button):focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }

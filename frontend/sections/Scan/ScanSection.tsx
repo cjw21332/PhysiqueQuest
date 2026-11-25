@@ -11,6 +11,7 @@ import FoodDescriptionDialog from './FoodDescriptionDialog';
 import EditMeal from './EditMeal';
 import DietaryPlan, { planTargets } from './DietaryPlan';
 import SupplementGuide from './SupplementGuide';
+import DayPicker from './DayPicker';
 import { type FoodEntry, type MealName } from './types';
 import { defaultMeal } from './defaultMeal';
 import { canPreviewNutrition, createNutritionPreview, previewScan } from './nutritionPresentation';
@@ -46,7 +47,9 @@ export default function ScanSection({ profile }: { profile: Profile }) {
   useEffect(()=>()=>cancelAnalysis(),[cancelAnalysis]);
   useEffect(()=>{ if (view !== 'review') cancelAnalysis(); },[view,cancelAnalysis]);
   const [highlightedMeal,setHighlightedMeal]=useState<MealName>();
-  const { dietaryPlan, previousCalorieTarget, meals, water, loading, error, addMeal, addMealsFromScan, updateMeal, deleteMeal, setWater: saveWater, refresh } = useNutrition();
+  // The day being viewed and logged; meals and water can be back-filled for missed days.
+  const [day, setDay] = useState(formatLocalDate());
+  const { dietaryPlan, previousCalorieTarget, meals, water, loading, error, addMeal, addMealsFromScan, updateMeal, deleteMeal, setWater: saveWater, refresh } = useNutrition(day);
   const targets = dietaryPlan ? planTargets(dietaryPlan) : undefined;
   const [editingEntries, setEditingEntries] = useState<FoodEntry[]>([]);
   const [editingPreview, setEditingPreview] = useState(false);
@@ -70,7 +73,8 @@ export default function ScanSection({ profile }: { profile: Profile }) {
   const preview = previewRequested && previewEligible && !error && meals.length === 0 && water === 0;
   const displayMeals = preview ? previewSnapshot.meals : meals;
   const displayWater = preview ? previewSnapshot.water : water;
-  const todayMeals = displayMeals.filter(meal => meal.date === formatLocalDate());
+  const todayMeals = displayMeals.filter(meal => meal.date === day);
+  const loggedDays = new Set(displayMeals.flatMap(meal => meal.date ? [meal.date] : []));
   const [sampleReview, setSampleReview] = useState(false);
   const [notice,setNotice]=useState('');
   const setWater = async (value:number) => {
@@ -154,7 +158,7 @@ export default function ScanSection({ profile }: { profile: Profile }) {
     try{
       const scope=scanSaveScope(); if(!scope)throw new Error('Sign in again before saving this meal.');
       await withScanSaveLock(scope,async()=>{
-        const pending=beginPendingScanSave(scope,meal,items,formatLocalDate(),new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}));
+        const pending=beginPendingScanSave(scope,meal,items,day,new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}));
         setPendingSave(pending);
         await addMealsFromScan({...pending.payload,meal:pending.payload.meal as MealName});
         clearPendingScanSave(scope,pending.key);setPendingSave(null);
@@ -180,7 +184,7 @@ export default function ScanSection({ profile }: { profile: Profile }) {
     const grams=unit==='grams'?amount:amount*food.servingSizeG;const now=new Date();
     const entry={name:food.name,meal,calories:food.calories,detail:`${food.name} · ${unit==='grams'?`${amount} g`:`${amount} serving(s) (${Math.round(grams)} g)`}`,time:now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}),source:'Manual' as const,protein:food.protein,carbs:food.carbs,fat:food.fat,fdcId:food.fdcId,estWeightG:grams,...(food.servingSizeG>0?{servingSizeG:food.servingSizeG}:{})};
     setActionError('');
-    if(preview || food.fdcId < 0){addPreviewEntries([{...entry,id:`preview-food-${Date.now()}`,date:formatLocalDate()}]);return;}
+    if(preview || food.fdcId < 0){addPreviewEntries([{...entry,id:`preview-food-${Date.now()}`,date:day}]);return;}
     try{await addMeal(entry);setHighlightedMeal(meal);setView('nutrition');setNotice(`Saved to ${meal}. Your meal diary has been updated.`);}catch(err){setActionError(err instanceof Error?err.message:'Could not save meal.');throw err;}
   };
   const openSampleReview=()=>{setPhotoSourceOpen(false);setSampleReview(true);setImageUrl('/scan-meal-reference.png');setScanStatus('ready');setScanError('');setAnalysis(previewScan);setView('review');};
@@ -192,7 +196,7 @@ export default function ScanSection({ profile }: { profile: Profile }) {
       view === 'history' ? <FoodHistory targets={targets} previousCalorieTarget={previousCalorieTarget} meals={meals} onBack={()=>setView('nutrition')}/> :
       view === 'supplements' ? <SupplementGuide profile={profile} onBack={()=>setView('nutrition')}/> :
       view === 'plan' ? dietaryPlan ? <DietaryPlan key="offline-plan" readOnly saved={dietaryPlan} profile={profile} meals={todayMeals} onBack={()=>setView('nutrition')}/> : <p>No saved dietary plan.</p> :
-      <NutritionDashboard readOnly targets={targets} onPlan={()=>setView('plan')} onSupplements={()=>setView('supplements')} meals={meals.filter(row=>row.date===formatLocalDate())} historyMeals={meals} water={water} onWater={async()=>{}} onScan={()=>{}} onAdd={()=>{}} onEdit={()=>{}} onHistory={openHistory}/>}
+      <NutritionDashboard readOnly targets={targets} onPlan={()=>setView('plan')} onSupplements={()=>setView('supplements')} meals={meals.filter(row=>row.date===day)} historyMeals={meals} water={water} onWater={async()=>{}} onScan={()=>{}} onAdd={()=>{}} onEdit={()=>{}} onHistory={openHistory}/>}
     </div>
     <BottomNav/>
   </section>;
@@ -227,7 +231,7 @@ export default function ScanSection({ profile }: { profile: Profile }) {
     {preview && (view!=='review'||sampleReview) && <p className="scan-preview-label">Sample preview · not your saved nutrition data <button type="button" onClick={()=>{setPreviewRequested(false);setSampleReview(false);setNotice('');setActionError('');setView('nutrition');}}>Start my log</button></p>}
     {!preview && previewEligible && !loading && !error && meals.length===0 && water===0 && view==='nutrition' && <button type="button" className="scan-preview-toggle" onClick={()=>{setPreviewSnapshot(createNutritionPreview());setPreviewRequested(true);}}>View sample nutrition</button>}
     {error&&<button type="button" className="scan-retry" onClick={()=>void refresh()}>Retry nutrition</button>}
-    {view==='nutrition'&&<NutritionDashboard targets={targets} onPlan={()=>setView('plan')} onSupplements={()=>setView('supplements')} meals={todayMeals} historyMeals={displayMeals} water={displayWater} onWater={setWater} onScan={scan} onAdd={add} onEdit={edit} onHistory={openHistory} highlightedMeal={highlightedMeal}/>}
+    {view==='nutrition'&&<NutritionDashboard dayPicker={<DayPicker day={day} onDay={setDay} loggedDays={loggedDays}/>} mealsHeading={day===formatLocalDate()?"Today's meals":`Meals on ${new Date(`${day}T12:00:00`).toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})}`} targets={targets} onPlan={()=>setView('plan')} onSupplements={()=>setView('supplements')} meals={todayMeals} historyMeals={displayMeals} water={displayWater} onWater={setWater} onScan={scan} onAdd={add} onEdit={edit} onHistory={openHistory} highlightedMeal={highlightedMeal}/>}
     {view==='supplements'&&<SupplementGuide profile={profile} onBack={()=>setView('nutrition')}/>}
     {view==='plan'&&<DietaryPlan saved={dietaryPlan} profile={profile} meals={todayMeals} onBack={()=>setView('nutrition')}/>}
     {view==='review'&&<ReviewEstimate imageUrl={imageUrl} preview={sampleReview} status={scanStatus} analysis={analysis} error={scanError} onBack={()=>{cancelAnalysis();setView('nutrition');}} onRetake={retake} onRetry={retryScan} onAddManual={add} onSave={saveScan}/>}

@@ -104,7 +104,9 @@ test('meal editor supports individual foods in a multi-item meal and retains the
 });
 test('scan logging sends the device-local logging time rather than leaving it empty', async () => {
   const scan = await readFile(new URL('../sections/Scan/ScanSection.tsx', import.meta.url), 'utf8');
-  assert.match(scan, /beginPendingScanSave\(scope,meal,items,formatLocalDate\(\),new Date\(\)\.toLocaleTimeString/);
+  // The scan saves on the day being viewed (today by default, or a back-filled day) at the device-local time.
+  assert.match(scan, /beginPendingScanSave\(scope,meal,items,day,new Date\(\)\.toLocaleTimeString/);
+  assert.match(scan, /const \[day, setDay\] = useState\(formatLocalDate\(\)\);/);
 });
 
 test('editor awaits persistence, preserves entry identity, and shows failed saves for retry', async () => {

@@ -1,4 +1,5 @@
 'use client';
+import type { ReactNode } from 'react';
 import { defaultMeal } from './defaultMeal';
 import AdditionalNutrition from '../Scan/AdditionalNutrition';
 import { nutrientTotal, nutrientLabel, knownNutrientTotal } from '../Scan/nutrientTotal';
@@ -20,7 +21,7 @@ export default function NutritionDashboard({
   onHistory,
   onEdit,
   onWater,
-  highlightedMeal, readOnly = false,
+  highlightedMeal, readOnly = false, dayPicker, mealsHeading = "Today's meals",
 }: {
   targets?: typeof nutritionTargets;
   onPlan: () => void;
@@ -35,6 +36,9 @@ export default function NutritionDashboard({
   onWater: (value: number) => Promise<void>;
   readOnly?: boolean;
   highlightedMeal?: MealName;
+  /** Rendered under the Nutrition / Manual entry row. */
+  dayPicker?: ReactNode;
+  mealsHeading?: string;
 }) {
   const calorieTarget = targets.calories;
   const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
@@ -57,6 +61,7 @@ export default function NutritionDashboard({
           <span aria-hidden="true">＋</span> Manual entry
         </button>}
       </header>
+      {dayPicker}
 
       <section className="scan-dashboard-summary" aria-label="Today's nutrition">
         <CalorieProgress calories={calories ?? knownCalories.total} target={calorieTarget} detailed partial={calories === null && knownCalories.total !== null}/>
@@ -78,7 +83,7 @@ export default function NutritionDashboard({
       </button>}
 
       <section className="scan-dashboard-meals" aria-labelledby="scan-today-heading">
-        <div className="diary-heading"><h2 id="scan-today-heading">Today&apos;s meals</h2></div>
+        <div className="diary-heading"><h2 id="scan-today-heading">{mealsHeading}</h2></div>
         <p className="meal-multiple-hint">{readOnly ? 'Open a meal to view saved foods. Connect to make changes.' : 'Open a meal to see and edit each food.'}</p>
         <MealDiary readOnly={readOnly} meals={meals} onAdd={onAdd} onEdit={onEdit} initialOpen={highlightedMeal}/>
       </section>

@@ -23,8 +23,8 @@ type Screen = 'quests' | 'leaderboard' | 'badges';
 const featuredBadgeIds = ['oath-1', 'self-made-3', 'streak-3', 'first-workout', 'personal-record', 'seven-suns', 'hydration-1', 'goal-1'];
 
 /** Badge art: an original crest whose shape shows the category and whose rim shows the rarity. */
-export function BadgeIcon({ badge }: { badge: ActivityBadge }) {
-  return <BadgeCrest id={badge.id} earned={badge.earned}/>;
+export function BadgeIcon({ badge, size }: { badge: ActivityBadge; size?: number }) {
+  return <BadgeCrest id={badge.id} earned={badge.earned} size={size}/>;
 }
 
 function BadgeMark({ badge }: { badge: ActivityBadge }) {

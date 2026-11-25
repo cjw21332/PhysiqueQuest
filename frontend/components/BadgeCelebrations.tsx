@@ -7,6 +7,7 @@ import { DATA_CHANGE_EVENT } from '../lib/dataChanges.mjs';
 import type { ActivityBadge } from '../hooks/useActivity';
 import { buildBadgeCollection } from '../sections/Quests Section/badgeProgress';
 import { BadgeIcon } from '../sections/Quests Section/QuestSection';
+import { BADGE_CATEGORIES, TIER_LABEL, badgeMeta } from '../sections/Quests Section/badgeCatalog';
 import { Icon } from '../sections/Home/icons';
 import OutcomeDialog from './OutcomeDialog';
 import './badgeCelebrations.css';
@@ -165,16 +166,24 @@ export default function BadgeCelebrations() {
     finally { setBusy(false); }
   };
   if (!badge) return null;
-  return <div className="badge-celebration-backdrop"><section ref={dialogRef} className="badge-celebration" role="dialog" aria-modal="true" aria-labelledby="badge-celebration-title" aria-describedby="badge-celebration-description">
+  const meta = badgeMeta(badge.id);
+  const category = BADGE_CATEGORIES.find(item => item.id === meta.category);
+  return <div className="badge-celebration-backdrop" style={{ '--bc-hue': category?.hue ?? '#22c55e' } as React.CSSProperties}><section ref={dialogRef} className={`badge-celebration tier-${meta.tier}`} role="dialog" aria-modal="true" aria-labelledby="badge-celebration-title" aria-describedby="badge-celebration-description">
     <button className="badge-celebration-close" type="button" aria-label="Close achievement" onClick={dismiss}><Icon name="close" size={20}/></button>
-    <div className="badge-celebration-kicker"><Icon name="star" size={15}/> ACHIEVEMENT UNLOCKED</div>
-    <div className="badge-celebration-art" ref={badgeRef}><BadgeIcon badge={badge}/></div>
-    <p className="badge-celebration-overline">YOU EARNED A NEW BADGE</p><h2 id="badge-celebration-title">{badge.title}</h2>
+    <div className="badge-celebration-ribbon"><Icon name="star" size={14}/> Achievement unlocked</div>
+    <div className="badge-celebration-stage">
+      <span className="badge-celebration-rays" aria-hidden="true"/>
+      <span className="badge-celebration-halo" aria-hidden="true"/>
+      {[0, 1, 2, 3, 4, 5].map(index => <i key={index} className={`badge-celebration-spark s${index}`} aria-hidden="true"/>)}
+      <div className="badge-celebration-art" ref={badgeRef}><BadgeIcon badge={badge} size={184}/></div>
+    </div>
+    <div className="badge-celebration-tags"><span>{category?.name ?? 'Achievement'}</span><span className={`bc-tier bc-tier-${meta.tier}`}>{TIER_LABEL[meta.tier]}</span></div>
+    <h2 id="badge-celebration-title">{badge.title}</h2>
     <p id="badge-celebration-description">{badge.description || 'Your hard work is paying off.'}</p>
-    <div className="badge-celebration-brand"><img src="/physiquequest-icon.png" alt="" width={28} height={28}/><span>PHYSIQUEQUEST</span></div>
     {!replay && queue.length > 1 && <p className="badge-celebration-queue">{queue.length - 1} more {queue.length === 2 ? 'badge' : 'badges'} to celebrate</p>}
     {error && <p className="badge-celebration-error" role="alert">{error}</p>}
-    <div className="badge-celebration-actions"><button type="button" disabled={busy} onClick={() => void exportCard('share')}><Icon name="share" size={18}/> Share achievement</button><button type="button" disabled={busy} onClick={() => void exportCard('save')}><Icon name="download" size={18}/> Save image</button></div>
-    <button className="badge-celebration-done" type="button" onClick={dismiss}>{!replay && queue.length > 1 ? 'Next badge' : 'Continue'}</button>
+    <button type="button" className="badge-celebration-share" disabled={busy} onClick={() => void exportCard('share')}><Icon name="share" size={19}/> {busy ? 'Preparing…' : 'Share this crest'}</button>
+    <div className="badge-celebration-actions"><button type="button" disabled={busy} onClick={() => void exportCard('save')}><Icon name="download" size={17}/> Save image</button><button type="button" onClick={dismiss}>{!replay && queue.length > 1 ? 'Next badge' : 'Continue'}</button></div>
+    <div className="badge-celebration-brand"><img src="/physiquequest-icon.png" alt="" width={22} height={22}/><span>PHYSIQUEQUEST</span></div>
   </section>{outcome && <OutcomeDialog kind={outcome.kind} title={outcome.title} message={outcome.message} actionLabel="Got it" onClose={() => setOutcome(null)}/>}</div>;
 }

@@ -12,6 +12,13 @@ import { researchedRecipeById } from '../foodscan/services/researched-recipes.js
 import { verifiedWebNutrition } from '../foodscan/services/web-nutrition.js';
 import { readEvidenceProof } from '../foodscan/services/evidence-proof.js';
 
+/** Meals and water may be back-filled up to 30 days; a day ahead allows for time zones, nothing further. */
+export function assertLoggableDate(date?: string) {
+  if (!date) return;
+  const day = Date.parse(`${date}T00:00:00Z`), now = Date.now();
+  if (!Number.isFinite(day) || day > now + 86400000 || day < now - 31 * 86400000) throw new BadRequestException('Meals and water can be logged for today or up to 30 days back.');
+}
+
 @Injectable()
 export class NutritionService implements OnModuleInit {
   constructor(@InjectModel(Nutrition.name) private readonly model: Model<Nutrition>, private readonly usda?: UsdaService) {}
@@ -46,7 +53,7 @@ export class NutritionService implements OnModuleInit {
     ));
   }
 
-  async addMeal(userId: string, dto: MealDto): Promise<NutritionDocument> {
+  async addMeal(userId: string, dto: MealDto): Promise<NutritionDocument> { assertLoggableDate(dto.date);
     const meal = { ...dto, id: dto.id || randomUUID(), date: dto.date || new Date().toISOString().slice(0, 10) };
     return this.withActiveWrite(userId, async session => this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
@@ -97,7 +104,7 @@ export class NutritionService implements OnModuleInit {
     ));
   }
 
-  async setWater(userId: string, dto: WaterDto): Promise<NutritionDocument> {
+  async setWater(userId: string, dto: WaterDto): Promise<NutritionDocument> { assertLoggableDate(dto.date);
     return this.withActiveWrite(userId, async session => this.model.findOneAndUpdate(
       { userId: new Types.ObjectId(userId) },
       [{ $set: {
@@ -115,6 +122,7 @@ export class NutritionService implements OnModuleInit {
    */
   async addMealsFromScan(userId: string, dto: MealFromScanDto): Promise<NutritionDocument | { save_id: string; meal_ids: string[] }> {
     if (dto.items.length === 0) throw new BadRequestException('Select at least one food to save');
+    assertLoggableDate(dto.date);
 
     const key = dto.idempotency_key;
     const hash = key ? createHash('sha256').update(JSON.stringify({ meal: dto.meal, date: dto.date ?? null, time: dto.time ?? null, items: dto.items })).digest('hex') : '';
