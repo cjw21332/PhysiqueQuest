@@ -4,13 +4,13 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '../sections/Home/icons';
 import './whatsNew.css';
 
-export const WHATS_NEW_VERSION = '1.5.6';
+export const WHATS_NEW_VERSION = '1.6.0';
 export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
-  { icon: 'check-circle', title: 'Clear sync status', text: 'Connecting retries quickly and a green “Connected” notice confirms when everything is synced.' },
-  { icon: 'edit', title: 'New workout log', text: 'A redesigned manual log with a progress ring, set-by-set tiles and Next exercise buttons.' },
-  { icon: 'trophy', title: 'Better leaderboard', text: 'See your rank, how close you are to the next player, and a podium for the top three.' },
-  { icon: 'scan', title: 'Scan works offline', text: 'Saved meals stay visible offline or while syncing, with a clear note on what unlocks when you reconnect.' },
-  { icon: 'arrow-left', title: 'Back button stays in the app', text: 'Your phone’s Back button closes popups and goes back a screen. On Home, press it twice to exit.' },
+  { icon: 'clipboard', title: 'Programs in Coach', text: 'Browse popular training splits and athlete-inspired programs, or build your own with sets, reps, weight and rest.' },
+  { icon: 'coach-wand', title: 'Personal suggestions', text: 'Every exercise suggests sets, reps, a starting weight and rest, based on your profile and your logged sets.' },
+  { icon: 'dumbbell', title: 'Fits your equipment', text: 'Splits and saved programs swap exercises to match the equipment in your training preferences.' },
+  { icon: 'lock', title: 'Stay signed in', text: 'Reopening the app keeps you signed in until you log out. No more “Sign in to sync” reminders.' },
+  { icon: 'calendar', title: 'Redesigned Coach', text: 'Today, Programs and Library tabs, with a clearer weekly view and session card.' },
 ];
 // Shown once per version: the device remembers the version it showed, so reopening the app does not
 // repeat it. The per-launch flag stays honoured (tests and older builds set it).

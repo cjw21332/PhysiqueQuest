@@ -31,7 +31,9 @@
 
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-week { margin: 0 0 16px; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-week-head { margin: 0 0 9px; color: var(--muted); font-size: 12px; }
-.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-week-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: clamp(4px, 1.4vw, 6px); }
+/* Seven days must fit narrow phones; the global 48px button minimum would overflow (same exception as .week-days-grid). */
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-week-grid > .cq-day { min-width: 0 !important; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-day.day-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 62px; min-width: 0; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); color: var(--muted); }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-day .day-label { font-size: 11px; font-weight: 500; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-day b { color: var(--ink); font-size: 16px; font-weight: 650; }

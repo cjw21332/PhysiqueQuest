@@ -138,3 +138,26 @@ test('a custom program keeps optional reps and weight blank, saves rests, and st
   await expect(page.getByLabel('Weight (kg), set 1')).toHaveValue('60');
   await shot(page, info, '07-session');
 });
+
+test.describe('on a touch phone', () => {
+  // Touch screens apply a global 48px minimum to buttons; the week strip and builder must still fit.
+  test.use({ viewport: { width: 360, height: 780 }, hasTouch: true, isMobile: true });
+  test('Today, Programs and the builder never scroll sideways', async ({ page }, info) => {
+    await fixture(page);
+    await page.goto('/coach');
+    await expect(page.locator('.cq-day')).toHaveCount(7);
+    const last = await page.locator('.cq-day').last().boundingBox();
+    expect(last.x + last.width).toBeLessThanOrEqual(360);
+    expect(await noOverflow(page)).toBe(true);
+    await shot(page, info, '08-touch-today');
+    await page.goto('/coach/programs');
+    await expect(page.getByRole('heading', { name: 'Training splits' })).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    await page.getByRole('button', { name: /Create a program/ }).click();
+    await page.getByRole('button', { name: 'Add exercise' }).click();
+    await page.getByRole('dialog', { name: 'Add exercise' }).getByRole('searchbox', { name: 'Search exercises' }).fill('incline dumbbell');
+    await page.getByRole('dialog', { name: 'Add exercise' }).getByRole('button', { name: /Incline Dumbbell Press/ }).click();
+    expect(await noOverflow(page)).toBe(true);
+    await shot(page, info, '09-touch-builder');
+  });
+});
