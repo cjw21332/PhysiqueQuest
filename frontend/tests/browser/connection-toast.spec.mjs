@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 test.use({ viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true });
 
 async function signedIn(page, { ready = true } = {}) {
-  await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'toast-user', token: 'toast-token' })));
+  await page.addInitScript(() => { localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'toast-user', token: 'toast-token' })); sessionStorage.setItem('pq-whats-new-shown', '1'); });
   const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
   await page.route('**/ready', route => ready ? route.fulfill({ json: { status: 'ready' }, headers }) : route.fulfill({ status: 503, json: { status: 'waking' }, headers }));
   await page.route('**/api/**', route => {
@@ -89,4 +89,15 @@ test('back online toast replaces the offline toast and hides itself', async ({ p
   await expect(page.locator('.pq-toast-offline')).toHaveCount(0);
   await page.screenshot({ path: info.outputPath('online-375.png'), animations: 'disabled' });
   await expect(online).toHaveCount(0, { timeout: 8000 });
+});
+
+test('connecting toast turns into a Connected confirmation once the service answers', async ({ page }) => {
+  await signedIn(page, { ready: false });
+  await nativeConnecting(page);
+  await expect(page.locator('.pq-toast-connecting')).toBeVisible();
+  await page.unroute('**/ready');
+  await page.route('**/ready', route => route.fulfill({ json: { status: 'ready' }, headers: { 'access-control-allow-origin': '*' } }));
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect(page.locator('.pq-toast-online')).toContainText('Connected');
+  await expect(page.locator('.pq-toast-connecting')).toHaveCount(0);
 });

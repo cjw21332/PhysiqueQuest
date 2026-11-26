@@ -90,4 +90,12 @@ describe('private assistant quest computation', () => {
     await expect(service.getForAssistant(OWNER)).rejects.toThrow('Unavailable');
     expect(leaderboard.get).not.toHaveBeenCalled();
   });
+
+  it('keeps the streak alive until today ends, and breaks it after a missed day', async () => {
+    // Activity on Oct 28 and 29 (Singapore); nothing yet on Oct 30.
+    vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-30T06:00:00Z'));
+    expect((await fixture().service.getForAssistant(OWNER)).state.dayStreak).toBe(2);
+    vi.setSystemTime(new Date('2026-10-31T06:00:00Z'));
+    expect((await fixture().service.getForAssistant(OWNER)).state.dayStreak).toBe(0);
+  });
 });

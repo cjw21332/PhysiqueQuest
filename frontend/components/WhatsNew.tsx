@@ -4,13 +4,13 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '../sections/Home/icons';
 import './whatsNew.css';
 
-export const WHATS_NEW_VERSION = '1.5.4';
+export const WHATS_NEW_VERSION = '1.5.6';
 export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
-  { icon: 'target', title: 'Personal quests', text: 'Weekly quests built from your training days, goal, body weight and age, so no two users get the same set.' },
-  { icon: 'calendar', title: 'Weekly challenges', text: 'Three shared challenges each week. Targets grow by one over what you did last week.' },
-  { icon: 'trophy', title: 'Quests earn XP', text: 'Completed personal quests and weekly challenges now raise your level.' },
-  { icon: 'dumbbell', title: 'Easing back after a break', text: 'After a week or more off, Coach suggests lighter weight, fewer sets and reps, then builds you back up over the next sessions.' },
-  { icon: 'shield', title: 'Supplement guide', text: 'Scan → More: 16 supplements with doses, benefits, side effects and how to check real quality marks.' },
+  { icon: 'check-circle', title: 'Clear sync status', text: 'Connecting retries quickly and a green “Connected” notice confirms when everything is synced.' },
+  { icon: 'edit', title: 'New workout log', text: 'A redesigned manual log with a progress ring, set-by-set tiles and Next exercise buttons.' },
+  { icon: 'trophy', title: 'Better leaderboard', text: 'See your rank, how close you are to the next player, and a podium for the top three.' },
+  { icon: 'scan', title: 'Scan works offline', text: 'Saved meals stay visible offline or while syncing, with a clear note on what unlocks when you reconnect.' },
+  { icon: 'arrow-left', title: 'Back button stays in the app', text: 'Your phone’s Back button closes popups and goes back a screen. On Home, press it twice to exit.' },
 ];
 // sessionStorage lives for one app launch, so the popup returns on every open but not on every page change.
 const SHOWN_KEY = 'pq-whats-new-shown';

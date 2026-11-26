@@ -135,7 +135,7 @@ test('manual redesign supports numeric keypad, ordinary added sets and persisten
   await page.keyboard.type('8e.-');
   await reps.getByRole('button', { name: 'Done', exact: true }).click();
   await expect(page.getByLabel('Reps, set 1', { exact: true })).toHaveValue('8');
-  await page.getByRole('button', { name: '+ Add Set', exact: true }).click();
+  await page.getByRole('button', { name: 'Add set', exact: true }).click();
   await expect(page.getByLabel('Set type for set 2')).toHaveValue('normal');
   expect(state.workout.exercises.find(row => row.exerciseId === 'row').sets).toBe(2);
   await page.getByRole('button', { name: 'Save set 2', exact: true }).click();
@@ -244,7 +244,7 @@ async function fixture(page, { fail = false, conflict = false, failComplete = fa
   let workout = { _id: 'routine-1', exerciseIds: exercises.map(e => e.exerciseId), exercises, sets: [], revision: 0, startedAt: new Date(Date.now() - (stale ? 678091000 : 0)).toISOString(), status: 'active', pausedSeconds: 0 };
   let failNext = fail, conflictNext = conflict;
   const reads = { profile: 0, nutrition: 0 };
-  await page.context().addInitScript(() => { localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'routine-user', token: 'test-token' })); });
+  await page.context().addInitScript(() => { localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'routine-user', token: 'test-token' })); sessionStorage.setItem('pq-whats-new-shown', '1'); });
   await page.context().route('**/api/**', async route => {
     const request = route.request(), path = new URL(request.url()).pathname;
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });

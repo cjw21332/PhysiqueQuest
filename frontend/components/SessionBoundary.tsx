@@ -21,6 +21,9 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   const [retrying, setRetrying] = useState(false);
   const [onlinePopup, setOnlinePopup] = useState(false);
   const [retryFailed, setRetryFailed] = useState(false);
+  const [connectedPopup, setConnectedPopup] = useState(false);
+  // Set while any "not connected" notice applies, so recovery can confirm itself with a "Connected" toast.
+  const wasDisconnected = useRef(false);
   // Dismissed connecting/sign-in toasts stay hidden until that state ends and returns.
   const [hidden, setHidden] = useState<{ connecting?: boolean; sync?: boolean }>({});
   const dismissedOffline = useRef(false);
@@ -28,6 +31,13 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   const onlineCheckInFlight = useRef(false);
   useEffect(() => { if (!serviceReconnecting) setHidden(current => ({ ...current, connecting: false })); }, [serviceReconnecting]);
   useEffect(() => { if (!sessionExpired) setHidden(current => ({ ...current, sync: false })); }, [sessionExpired]);
+  useEffect(() => {
+    if (serviceReconnecting || sessionExpired || connectionLost) { wasDisconnected.current = true; setConnectedPopup(false); return; }
+    if (!wasDisconnected.current || !user || (typeof navigator !== 'undefined' && !navigator.onLine)) return;
+    wasDisconnected.current = false;
+    // The "back online" toast already confirms sync once the service answers.
+    if (!onlinePopup) setConnectedPopup(true);
+  }, [serviceReconnecting, sessionExpired, connectionLost, user, onlinePopup]);
   useEffect(() => {
     if (!user) {
       setConnectionLost(false); setSessionExpired(false); setServiceReconnecting(false); setOnlinePopup(false);
@@ -38,7 +48,8 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     setSessionExpired(Boolean(user.sessionExpired));
     try { dismissedOffline.current = sessionStorage.getItem('pq-offline-dismissed') === '1'; wasOffline.current = sessionStorage.getItem('pq-was-offline') === '1'; } catch { /* Storage may be unavailable. */ }
     const lost = (forceOffline = false) => {
-      if (!forceOffline && navigator.onLine) { setServiceReconnecting(true); return; }
+      // Online but the API failed: show "Connecting" and keep checking until the service answers.
+      if (!forceOffline && navigator.onLine) { setServiceReconnecting(true); scheduleCheck(); return; }
       setOnlinePopup(false); setServiceReconnecting(false); wasOffline.current = true;
       try { sessionStorage.setItem('pq-was-offline', '1'); } catch {}
       if (!dismissedOffline.current) setConnectionLost(true);
@@ -52,13 +63,19 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     const restored = () => { setServiceReconnecting(false); setConnectionLost(false); setRetryFailed(false); };
     const backendStatus = (event: Event) => {
       const status = (event as CustomEvent).detail;
-      if (status === 'offline') { if (navigator.onLine) { setServiceReconnecting(true); setConnectionLost(false); } else lost(true); }
+      if (status === 'offline') { if (navigator.onLine) { setServiceReconnecting(true); setConnectionLost(false); scheduleCheck(); } else lost(true); }
       else if (status === 'online') { restored(); window.dispatchEvent(new Event('physiquequest:connection-restored')); }
     };
     // A reconnect is often reported before the network can reach the server; retry so a
     // session that only looked expired while offline is confirmed without relaunching.
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     let retryAttempts = 0;
+    // Quick first retries (a waking server often answers within seconds), backing off to 15s, never giving up.
+    const scheduleCheck = () => {
+      clearTimeout(retryTimer);
+      const delay = Math.min(15_000, 1500 * 1.6 ** retryAttempts++);
+      retryTimer = setTimeout(() => online(true), delay);
+    };
     const online = (fromNative = false) => {
       if (!fromNative && !navigator.onLine) return;
       if (onlineCheckInFlight.current) return;
@@ -70,7 +87,7 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
         try {
           const base = getApiBaseUrl();
           const readyUrl = base.replace(/\/api\/?$/i, '/ready');
-          const response = await fetch(readyUrl, { credentials: 'omit', cache: 'no-store', headers: { 'Cache-Control': 'no-cache' }, signal: AbortSignal.timeout(10_000) });
+          const response = await fetch(readyUrl, { credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(8_000) });
           if (!response.ok || (await response.json())?.status !== 'ready') throw new Error('Service is still waking up.');
           const active = session.current();
           if (active && !active.offlineOnly) {
@@ -83,11 +100,12 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
           setServiceReconnecting(false);
           setConnectionLost(false);
           retryAttempts = 0;
+          clearTimeout(retryTimer);
           window.dispatchEvent(new Event('physiquequest:connection-restored'));
         } catch {
           // Internet is back even if a free hosted service is still waking up.
           setServiceReconnecting(true);
-          if (retryAttempts++ < 12) { clearTimeout(retryTimer); retryTimer = setTimeout(() => online(true), 5000); }
+          if (navigator.onLine) scheduleCheck();
         } finally {
           onlineCheckInFlight.current = false;
         }
@@ -96,7 +114,7 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     const offline = () => lost(true);
     const apiConnectionLost = () => lost();
     const browserOnline = () => online();
-    const onFocus = () => online();
+    const onFocus = () => { retryAttempts = 0; online(); };
     const internetStatus = (event: Event) => {
       const status = (event as CustomEvent).detail;
       if (status === 'offline') lost(true);
@@ -178,6 +196,7 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   const inSession = Boolean(pathname?.startsWith('/coach/session'));
   // One toast at a time, in the same priority the separate notices used.
   const connectionToast = () => {
+    if (connectedPopup) return <ConnectionToast key="connected" tone="online" title="Connected" message="Synced with PhysiqueQuest. Everything is up to date." autoHideMs={3000} dismissLabel="Dismiss connected message" onDismiss={() => setConnectedPopup(false)}/>;
     if (onlinePopup) return <ConnectionToast key="online" tone="online" title="You’re back online" autoHideMs={5500} dismissLabel="Dismiss online message" onDismiss={() => setOnlinePopup(false)}
       message={sessionExpired ? 'Your session expired. Log in again to sync; saved data stays on this device.' : serviceReconnecting ? 'PhysiqueQuest is reconnecting. Your saved data stays available.' : 'Saved workouts can sync and online features are available.'}/>;
     // Without internet a session cannot be confirmed, so it can look expired; telling the user

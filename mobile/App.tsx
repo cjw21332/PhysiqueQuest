@@ -10,7 +10,7 @@ import * as Network from 'expo-network';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, BackHandler, NativeModules, Platform, TurboModuleRegistry } from 'react-native';
+import { AppState, BackHandler, NativeModules, Platform, ToastAndroid, TurboModuleRegistry } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {
   ActivityIndicator,
@@ -197,18 +197,7 @@ function buildCameraScript(detail: {
 function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
   const insets = useSafeAreaInsets();
   const webRef = useRef<WebView<object>>(null);
-  // Android Back walks the web history; on a main tab (or with no history) it leaves the app as usual.
   const webHistory = useRef({ canGoBack: false, url: '' });
-  useEffect(() => {
-    if (Platform.OS !== 'android') return;
-    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      const { canGoBack, url } = webHistory.current;
-      if (!canGoBack || isMainTabUrl(url)) return false;
-      webRef.current?.goBack();
-      return true;
-    });
-    return () => subscription.remove();
-  }, []);
   const googleConfigured = useRef(false);
   const googleSignin = useRef<typeof GoogleSigninApi | null>(null);
   const pendingNotificationOpen = useRef(false);
@@ -287,6 +276,40 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
   }, []);
   const [foodCamera, setFoodCamera] = useState<FoodCameraRequest | null>(null);
   const [framing,setFraming]=useState<ReadinessCheck>({status:'unknown',reason:'pending'});
+  // Android Back never closes the app by accident: the page closes its top popup or goes back a
+  // screen, and only Home (or a failed load) asks for a second press within 2s to exit.
+  const errorRef = useRef(error);
+  errorRef.current = error;
+  const backAck = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastExitPress = useRef(0);
+  const exitOrWarn = useCallback(() => {
+    const now = Date.now();
+    if (now - lastExitPress.current < 2000) { BackHandler.exitApp(); return; }
+    lastExitPress.current = now;
+    ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
+  }, []);
+  const onBackResult = useCallback((exit: boolean) => {
+    if (backAck.current) clearTimeout(backAck.current);
+    backAck.current = null;
+    if (exit) exitOrWarn(); else lastExitPress.current = 0;
+  }, [exitOrWarn]);
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      const web = webRef.current;
+      if (!web || errorRef.current) { exitOrWarn(); return true; }
+      if (backAck.current) clearTimeout(backAck.current);
+      // A page that has not loaded the handler yet falls back to plain web history.
+      backAck.current = setTimeout(() => {
+        backAck.current = null;
+        const { canGoBack, url } = webHistory.current;
+        if (canGoBack && !isMainTabUrl(url)) web.goBack(); else exitOrWarn();
+      }, 700);
+      web.injectJavaScript("window.dispatchEvent(new CustomEvent('physiquequest:hardware-back'));true;");
+      return true;
+    });
+    return () => { subscription.remove(); if (backAck.current) clearTimeout(backAck.current); };
+  }, [exitOrWarn]);
   const cameraRequestId = useRef(0);
   const monitor = useRef<ReturnType<typeof createNativeMonitor> | null>(null);
   if (!monitor.current) {
@@ -565,6 +588,10 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
         }}
         onMessage={(e) => {
           if (!isTrustedWebViewUrl(e.nativeEvent.url, loadedAddress)) return;
+          if (e.nativeEvent.data.length < 100 && e.nativeEvent.data.includes('"hardware-back-result"')) {
+            try { onBackResult(JSON.parse(e.nativeEvent.data).exit === true); } catch { onBackResult(false); }
+            return;
+          }
           try {
             const parsedMessage=parseCameraHostMessage(e.nativeEvent.data);
             if(!parsedMessage)return;

@@ -73,6 +73,10 @@ export default function NutritionDashboard({
       {missingFoods.length > 0 && <p className="meal-multiple-hint" role="status">Some nutrition is missing for {missingFoods.map(item => item.name).join(', ')}. Totals show known values only; edit these foods to complete your daily summary.</p>}
 
       <AdditionalNutrition entries={meals}/>
+      {readOnly && <div className="scan-dashboard-scan is-locked" aria-disabled="true">
+        <span className="scan-dashboard-scan-icon"><Icon name="lock" size={20} /></span>
+        <span className="scan-dashboard-scan-copy"><strong>Meal scanning is paused</strong><small>Available again once you&apos;re connected</small></span>
+      </div>}
       {!readOnly && <button type="button" className="scan-dashboard-scan" onClick={onScan}>
         <span className="scan-dashboard-scan-icon"><Icon name="camera" size={22} /></span>
         <span className="scan-dashboard-scan-copy">

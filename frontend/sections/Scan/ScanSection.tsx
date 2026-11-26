@@ -26,12 +26,14 @@ import { useBackendConnection } from '../../hooks/useBackendConnection';
 import { useScreenRoute } from '../../hooks/useScreenRoute';
 import OutcomeDialog from '../../components/OutcomeDialog';
 import { beginPendingScanSave, clearPendingScanSave, readPendingScanSave, scanSaveScope, withScanSaveLock, type PendingScanSave } from '../../lib/scanSaveRecovery';
+import { ScanConnectionBanner, ScanEmptyState, ScanSkeleton, useDeviceOnline } from './ScanStates';
 import './scanExperience.css';
 
 type View = 'nutrition' | 'review' | 'add' | 'history' | 'edit' | 'plan' | 'supplements';
 type ScanStatus = 'loading' | 'ready' | 'error';
 export default function ScanSection({ profile }: { profile: Profile }) {
   const connected = useBackendConnection();
+  const deviceOnline = useDeviceOnline();
   const [view,setView]=useScreenRoute<View>('/scan', { nutrition: '', review: '/review', add: '/add-food', history: '/history', edit: '/edit-meal', plan: '/plan', supplements: '/supplements' }, 'nutrition');
   const contentRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{contentRef.current?.scrollTo(0,0);},[view]);
@@ -192,11 +194,12 @@ export default function ScanSection({ profile }: { profile: Profile }) {
   const retryScan=()=>{if(photo.current)void analyse(photo.current, scanDescription.current);};
   if (!connected) return <section className="scan-section scan-reference scan-view-nutrition">
     <div ref={contentRef} className="scan-content">
-    {loading ? <div className="profile-load-state" role="status" aria-label="Loading nutrition" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div> : error ? <p>Your saved nutrition is unavailable.</p> :
+    <ScanConnectionBanner online={deviceOnline}/>
+    {loading ? <ScanSkeleton label={deviceOnline ? 'Loading saved meals while PhysiqueQuest connects…' : 'Loading meals saved on this device…'}/> : error ? <ScanEmptyState online={deviceOnline} onRetry={()=>void refresh()}/> :
       view === 'history' ? <FoodHistory targets={targets} previousCalorieTarget={previousCalorieTarget} meals={meals} onBack={()=>setView('nutrition')}/> :
       view === 'supplements' ? <SupplementGuide profile={profile} onBack={()=>setView('nutrition')}/> :
       view === 'plan' ? dietaryPlan ? <DietaryPlan key="offline-plan" readOnly saved={dietaryPlan} profile={profile} meals={todayMeals} onBack={()=>setView('nutrition')}/> : <p>No saved dietary plan.</p> :
-      <NutritionDashboard readOnly targets={targets} onPlan={()=>setView('plan')} onSupplements={()=>setView('supplements')} meals={meals.filter(row=>row.date===day)} historyMeals={meals} water={water} onWater={async()=>{}} onScan={()=>{}} onAdd={()=>{}} onEdit={()=>{}} onHistory={openHistory}/>}
+      <NutritionDashboard readOnly dayPicker={<DayPicker day={day} onDay={setDay} loggedDays={new Set(meals.flatMap(meal => meal.date ? [meal.date] : []))}/>} targets={targets} onPlan={()=>setView('plan')} onSupplements={()=>setView('supplements')} meals={meals.filter(row=>row.date===day)} historyMeals={meals} water={water} onWater={async()=>{}} onScan={()=>{}} onAdd={()=>{}} onEdit={()=>{}} onHistory={openHistory}/>}
     </div>
     <BottomNav/>
   </section>;
@@ -224,7 +227,7 @@ export default function ScanSection({ profile }: { profile: Profile }) {
       </section>
     </div>}
     <div ref={contentRef} className="scan-content">
-    {loading && view === 'nutrition' ? <div className="profile-load-state" role="status" aria-label="Loading nutrition" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div> : <>
+    {loading && view === 'nutrition' ? <ScanSkeleton label="Syncing your nutrition…"/> : <>
     {error && <p className="error" role="alert">{error}</p>}
     {pendingSave && <section className="scan-warning" aria-label="Meal save recovery"><p><strong>Previous meal save needs checking</strong><br/>Its outcome is unknown. Check it before saving another scan.</p><button className="scan-retry" type="button" disabled={recovering} onClick={()=>void recoverSave()}>{recovering?'Checking…':'Check and recover'}</button></section>}
     {recoveryError && <p className="error" role="alert">{recoveryError}</p>}

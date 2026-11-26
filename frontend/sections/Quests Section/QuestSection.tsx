@@ -7,7 +7,7 @@ import type { Profile } from '../Home/types';
 import { useActivity, type ActivityBadge, type DailyMission, type QuestLogEntry } from '../../hooks/useActivity';
 import { useLeaderboard } from '../../hooks/useLeaderboard';
 import { useSettings } from '../../hooks/useSettings';
-import { api, type LeaderboardEntryRecord, type LeaderboardPeriod, type StrengthLeaderboardRecord } from '../../lib/api';
+import { api, type LeaderboardEntryRecord, type LeaderboardPeriod, type StrengthLeaderboardRecord, type StrengthStanding } from '../../lib/api';
 import { useScreenRoute } from '../../hooks/useScreenRoute';
 import { formatLocalDate } from '../../lib/localDate.mjs';
 import './leaderboard.css';
@@ -55,6 +55,58 @@ function movementClass(movement: LeaderboardEntryRecord['movement']) {
 
 function movementLabel(movement: LeaderboardEntryRecord['movement']) {
   return typeof movement === 'number' && movement !== 0 ? `${Math.abs(movement)} places ${movement > 0 ? 'up' : 'down'}` : 'No rank change';
+}
+
+type RankRow = { id: string; name: string; rank: number; value: string; sub?: string; movement?: LeaderboardEntryRecord['movement']; isYou?: boolean };
+
+// A stable hue per name keeps avatars distinguishable without photos.
+function Avatar({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }) {
+  let hue = 0;
+  for (const char of name) hue = (hue * 31 + char.charCodeAt(0)) % 360;
+  return <span className={`lb-avatar is-${size}`} aria-hidden="true" style={{ '--h': hue } as CSSProperties}>{getInitials(name) || '?'}</span>;
+}
+
+function MovementChip({ movement }: { movement: LeaderboardEntryRecord['movement'] }) {
+  const kind = movementClass(movement);
+  return <span className={`leaderboard-movement lb-move is-${kind}`} aria-label={movementLabel(movement)}>
+    {typeof movement === 'number' && movement !== 0 ? <><Icon name={movement > 0 ? 'arrow-up' : 'arrow-down'} size={12}/>{Math.abs(movement)}</> : <Icon name="minus" size={12}/>}
+  </span>;
+}
+
+function Podium({ label, rows }: { label: string; rows: RankRow[] }) {
+  const order = [rows[1], rows[0], rows[2]].filter((row): row is RankRow => Boolean(row));
+  return <section className="leaderboard-podium lb-podium" aria-label={label}>
+    {order.map(row => <div className={`podium-player podium-rank-${row.rank}${row.isYou ? ' is-you' : ''}`} key={row.id}>
+      {row.rank === 1 ? <span className="lb-crown"><Icon name="crown" size={20}/></span> : <span className="lb-crown-space"/>}
+      <span className="lb-podium-avatar"><Avatar name={row.name} size="lg"/><span className="lb-medal">{row.rank}</span></span>
+      <strong>{row.isYou ? 'You' : row.name}</strong>
+      <small>{row.value}</small>
+      <div className="podium-step" aria-hidden="true"/>
+    </div>)}
+  </section>;
+}
+
+function RankList({ label, rows, total }: { label: string; rows: RankRow[]; total: number }) {
+  if (!rows.length) return null;
+  return <section className="lb-list" aria-label={`${label} list`}>
+    <div className="lb-list-head"><h3>Standings</h3><span>{total} {total === 1 ? 'member' : 'members'}</span></div>
+    <div className="leaderboard-rankings" role="list" aria-label={label}>
+      {rows.map(row => <div className={`lb-row${row.isYou ? ' is-you' : ''}`} role="listitem" key={row.id}>
+        <span className="lb-rank">{row.rank}</span>
+        <Avatar name={row.name}/>
+        <span className="lb-person"><strong>{row.name}{row.isYou && <em>You</em>}</strong>{row.sub && <small>{row.sub}</small>}</span>
+        <span className="lb-value">{row.value}</span>
+        {row.movement !== undefined && <MovementChip movement={row.movement}/>}
+      </div>)}
+    </div>
+  </section>;
+}
+
+function RankSkeleton() {
+  return <div className="lb-skeleton" role="status" aria-label="Loading rankings…">
+    <div className="lb-skel-podium">{[70, 96, 56].map((h, i) => <span key={i}><i className="lb-skel round"/><i className="lb-skel" style={{ height: h }}/></span>)}</div>
+    {[0, 1, 2, 3].map(i => <i key={i} className="lb-skel row"/>)}
+  </div>;
 }
 
 export default function QuestSection({ profile, onLogoutRequest: _onLogoutRequest }: { profile: Profile; onLogoutRequest?: () => void }) {
@@ -113,65 +165,66 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
 
   if (screen === 'leaderboard') {
     const entries = leaderboard?.entries ?? [];
-    const podium = [entries[1], entries[0], entries[2]].filter((entry): entry is LeaderboardEntryRecord => Boolean(entry));
     const currentName = profile.name.trim() || 'You';
-    return <section className="quest-section leaderboard-screen" aria-label="Leaderboard">
+    const strengthValue = (entry: StrengthStanding) => measure === 'relative' ? `${entry.score.toFixed(2)}× BW` : `${entry.maxKg.toFixed(1)} kg`;
+    const questRows: RankRow[] = entries.map(entry => ({ id: entry.userId, name: entry.name, rank: entry.rank, value: `${formatPoints(entry.points)} pts`, movement: entry.movement, isYou: entry.isCurrentUser }));
+    const strengthRows: RankRow[] = (strength?.entries ?? []).map(entry => ({ id: entry.userId, name: entry.name, rank: entry.rank, value: strengthValue(entry), sub: `${entry.loadKg} kg × ${entry.reps} reps`, isYou: entry.isCurrentUser }));
+    const questSelf = leaderboard && settings.showLeaderboard ? leaderboard.self : null;
+    const behind = ranking === 'quests' ? leaderboard?.context : undefined;
+    const self = ranking === 'quests'
+      ? questSelf && { rank: questSelf.rank, value: `${formatPoints(questSelf.points)} pts`, sub: `${activity.dayStreak}-day streak`, movement: questSelf.movement }
+      : strength?.self && { rank: strength.self.rank, value: strengthValue(strength.self), sub: strength.hidden ? 'Hidden from others' : `${strength.self.loadKg} kg × ${strength.self.reps} reps`, movement: undefined };
+    const selfPoints = questSelf?.points ?? 0;
+    return <section className="quest-section leaderboard-screen lb2" aria-label="Leaderboard">
       <header className="leaderboard-header pq-page-heading">
         <button className="coach-back" type="button" onClick={() => setScreen('quests')} aria-label="Back to quests"><Icon name="arrow" size={20}/></button>
         <h2>Leaderboard</h2>
       </header>
       <div className="leaderboard-scroll">
-        <div className="leaderboard-mode" role="group" aria-label="Leaderboard category"><button type="button" aria-pressed={ranking === 'quests'} onClick={() => setRanking('quests')}><Icon name="trophy" size={19}/><span><strong>Quests</strong><small>Points earned</small></span></button><button type="button" aria-pressed={ranking === 'strength'} onClick={() => setRanking('strength')}><Icon name="dumbbell" size={19}/><span><strong>Strength</strong><small>Logged lifts</small></span></button></div>
-        <section className="leaderboard-overview" aria-label="Your standing"><div className="leaderboard-overview-icon"><Icon name={ranking === 'quests' ? 'trophy' : 'dumbbell'} size={22}/></div><div className="leaderboard-overview-main"><span>YOUR STANDING</span><strong>{ranking === 'quests' ? (leaderboard && settings.showLeaderboard ? `#${leaderboard.self.rank}` : '—') : (strength?.self ? `#${strength.self.rank}` : '—')}</strong><small>{ranking === 'quests' ? (leaderboard && settings.showLeaderboard ? `${formatPoints(leaderboard.self.points)} points` : 'Rank unavailable') : (strength?.self ? (measure === 'relative' ? `${strength.self.score.toFixed(2)}× bodyweight` : `${strength.self.maxKg.toFixed(1)} kg estimated max`) : 'Log a lift to get ranked')}</small></div><div className="leaderboard-overview-meta"><Icon name="chart-bars" size={18}/><small>{ranking === 'quests' ? periodLabels.find(item => item.key === period)?.label : 'Strength'}</small></div></section>
-        {ranking === 'quests' ? <>
-        <div className="leaderboard-periods" role="tablist" aria-label="Leaderboard period">
-          {periodLabels.map(option => <button key={option.key} type="button" role="tab" aria-selected={period === option.key} aria-pressed={period === option.key} className={period === option.key ? 'selected' : ''} onClick={() => setPeriod(option.key)}>{option.label}</button>)}
+        <div className="lb-tabs" role="group" aria-label="Leaderboard category">
+          <button type="button" aria-pressed={ranking === 'quests'} onClick={() => setRanking('quests')}><Icon name="trophy" size={17}/>Quests</button>
+          <button type="button" aria-pressed={ranking === 'strength'} onClick={() => setRanking('strength')}><Icon name="dumbbell" size={17}/>Strength</button>
         </div>
-        {leaderboardLoading ? <div className="profile-load-state" role="status"><h2>Loading rankings…</h2></div> : leaderboardError ? <div className="profile-load-state" role="alert"><h2>Could not load rankings</h2><p>{leaderboardError}</p><button type="button" onClick={() => void refreshLeaderboard()}>Try again</button></div> : entries.length === 0 ? <p className="leaderboard-context" role="status">No ranked activity in this period yet.</p> : <>
-          <div className="leaderboard-section-title"><div><span>THE TOP THREE</span><h3>Leading the way</h3></div><Icon name="medal" size={21}/></div><section className="leaderboard-podium" aria-label="Top three players">
-            {podium.map(entry => {
-              const rank = entry.rank;
-              return <div className={`podium-player podium-rank-${rank}`} key={entry.userId}>
-                {rank === 1 && <Icon name="crown" size={19}/>}
-                <div className="podium-avatar">{getInitials(entry.name)}</div>
-                <strong>{entry.name}</strong>
-                <small>{formatPoints(entry.points)} pts</small>
-                <div className="podium-step">{rank}</div>
-              </div>;
-            })}
-          </section>
-          <div className="leaderboard-list-heading"><div><h3>Standings</h3><p>{entries.length} visible {entries.length === 1 ? 'member' : 'members'}</p></div><Icon name="chart-bars" size={19}/></div>
-          <div className="leaderboard-rankings" role="list" aria-label="Leaderboard rankings">
-            {entries.slice(3).map(entry => <div className="leaderboard-row" role="listitem" key={entry.userId}>
-              <span className="leaderboard-rank">{entry.rank}</span>
-              <span className="leaderboard-avatar">{getInitials(entry.name)}</span>
-              <span className="leaderboard-person"><strong>{entry.name}</strong><small>{formatPoints(entry.points)} pts</small></span>
-              <span className={`leaderboard-movement ${movementClass(entry.movement)}`} aria-label={movementLabel(entry.movement)}>
-                {typeof entry.movement === 'number' && entry.movement !== 0 ? <><Icon name={entry.movement > 0 ? 'arrow-up' : 'arrow-down'} size={14}/> {Math.abs(entry.movement)}</> : <Icon name="minus" size={14}/>}
-              </span>
-            </div>)}
+
+        <section className={`lb-you${self ? '' : ' is-empty'}`} aria-label="Your standing">
+          <span className="lb-you-avatar">{profile.photo ? <img src={profile.photo} alt=""/> : getInitials(currentName)}</span>
+          <div className="lb-you-main">
+            <span className="lb-eyebrow">Your rank · {ranking === 'quests' ? periodLabels.find(item => item.key === period)?.label : 'Strength'}</span>
+            <strong>{self ? `#${self.rank}` : '—'}</strong>
+            <small>{self ? <>{self.value}<span aria-hidden="true"> · </span>{self.sub}</> : ranking === 'quests' ? (settings.showLeaderboard ? 'Rank unavailable' : 'Your ranking is hidden') : 'Log a lift to get ranked'}</small>
           </div>
-        </>}
-        {leaderboard && settings.showLeaderboard ? <>
-          <div className="leaderboard-self-row" aria-label={`Your rank, ${leaderboard.self.rank}, ${currentName}`}>
-            <span className="leaderboard-rank">{leaderboard.self.rank}</span>
-            <span className="leaderboard-self-avatar">{profile.photo ? <img src={profile.photo} alt="" className="leaderboard-profile-photo"/> : getInitials(currentName)}</span>
-            <span className="leaderboard-person"><strong>You · {currentName}</strong><small>{formatPoints(leaderboard.self.points)} pts · {activity.dayStreak}-day streak</small></span>
-            <span className={`leaderboard-movement ${movementClass(leaderboard.self.movement)}`} aria-label={movementLabel(leaderboard.self.movement)}>
-              {typeof leaderboard.self.movement === 'number' && leaderboard.self.movement !== 0 ? <><Icon name={leaderboard.self.movement > 0 ? 'arrow-up' : 'arrow-down'} size={14}/> {Math.abs(leaderboard.self.movement)}</> : <Icon name="minus" size={14}/>}
-            </span>
+          {self?.movement !== undefined && <MovementChip movement={self.movement}/>}
+          {behind && questSelf && <div className="lb-you-next">
+            <div className="lb-you-next-copy"><Icon name="target" size={14}/><span><b>{formatPoints(behind.pointsBehind)} pts</b> to pass {behind.previousName}</span></div>
+            <div className="lb-you-track" aria-hidden="true"><i style={{ width: `${Math.max(6, Math.min(100, selfPoints / Math.max(1, selfPoints + behind.pointsBehind) * 100))}%` }}/></div>
+          </div>}
+        </section>
+
+        {ranking === 'quests' ? <>
+          <div className="leaderboard-periods lb-periods" role="tablist" aria-label="Leaderboard period">
+            {periodLabels.map(option => <button key={option.key} type="button" role="tab" aria-selected={period === option.key} aria-pressed={period === option.key} className={period === option.key ? 'selected' : ''} onClick={() => setPeriod(option.key)}>{option.label}</button>)}
           </div>
-          {leaderboard.context && <p className="leaderboard-context">{formatPoints(leaderboard.context.pointsBehind)} pts behind {leaderboard.context.previousName}.</p>}
-        </> : !settings.showLeaderboard ? <p className="leaderboard-context" role="status">Your ranking is hidden. Turn on leaderboard visibility in privacy settings to show your profile.</p> : null}
-        <p className="leaderboard-privacy">Your ranking is hidden if you turn the leaderboard off in privacy settings.</p>
+          {leaderboardLoading ? <RankSkeleton/> : leaderboardError ? <div className="lb-state is-error" role="alert"><span className="lb-state-icon"><Icon name="warning" size={22}/></span><h3>Could not load rankings</h3><p>{leaderboardError}</p><button type="button" onClick={() => void refreshLeaderboard()}>Try again</button></div> : entries.length === 0 ? <div className="lb-state" role="status"><span className="lb-state-icon"><Icon name="trophy" size={22}/></span><h3>No rankings yet</h3><p>No ranked activity in this period yet. Complete a quest to claim the top spot.</p></div> : <>
+            <Podium label="Top three players" rows={questRows}/>
+            <RankList label="Leaderboard rankings" rows={questRows.slice(3)} total={entries.length}/>
+          </>}
+          {!settings.showLeaderboard && <p className="lb-note" role="status"><Icon name="lock" size={14}/>Your ranking is hidden. Turn on leaderboard visibility in privacy settings to show your profile.</p>}
+          <p className="leaderboard-privacy lb-note"><Icon name="shield" size={14}/>Your ranking is hidden if you turn the leaderboard off in privacy settings.</p>
         </> : <>
           <StrengthFilters exercises={strength?.exercises ?? []} selected={lift || strength?.exerciseId || ''} onSelect={setLift} loading={strengthLoading} error={Boolean(strengthError)}/>
-          <div className="leaderboard-mode leaderboard-measure" role="group" aria-label="Strength ranking method"><button type="button" aria-pressed={measure === 'heaviest'} onClick={() => setMeasure('heaviest')}><strong>Heaviest lift</strong><small>Estimated one-rep max</small></button><button type="button" aria-pressed={measure === 'relative'} onClick={() => setMeasure('relative')}><strong>Pound for pound</strong><small>One-rep max ÷ bodyweight</small></button></div>
-          {strengthLoading ? <p className="leaderboard-context" role="status">Loading strength rankings…</p> : strengthError ? <p className="leaderboard-context" role="alert">{strengthError}</p> : !strength?.entries.length ? <div className="leaderboard-strength-empty" role="status"><Icon name="trophy" size={24}/><h3>No rankings yet</h3><p>{measure === 'relative' ? 'A saved bodyweight and a logged lift are needed for this ranking.' : 'Complete a workout with a recorded weight to join the leaderboard.'}</p></div> : <><section className="leaderboard-podium" aria-label="Top three lifters">{[strength.entries[1], strength.entries[0], strength.entries[2]].filter(Boolean).map(entry => <div className={`podium-player podium-rank-${entry.rank}`} key={entry.userId}>{entry.rank === 1 && <Icon name="crown" size={19}/>}<div className="podium-avatar">{getInitials(entry.name)}</div><strong>{entry.name}</strong><small>{measure === 'relative' ? `${entry.score.toFixed(2)}× BW` : `${entry.maxKg.toFixed(1)} kg`}</small><div className="podium-step">{entry.rank}</div></div>)}</section><div className="leaderboard-rankings" role="list" aria-label="Strength rankings">{strength.entries.slice(3).map(entry => <div className="leaderboard-row" role="listitem" key={entry.userId}><span className="leaderboard-rank">{entry.rank}</span><span className="leaderboard-avatar">{getInitials(entry.name)}</span><span className="leaderboard-person"><strong>{entry.name}</strong><small>{entry.loadKg} kg × {entry.reps} reps</small></span><strong>{measure === 'relative' ? `${entry.score.toFixed(2)}× BW` : `${entry.maxKg.toFixed(1)} kg`}</strong></div>)}</div></>}
-          {strengthError && <button type="button" className="strength-retry" onClick={() => setStrengthRetry(value => value + 1)}>Try again</button>}
-          {!strengthLoading && !strengthError && !!strength?.participants?.length && <section className="leaderboard-unranked" aria-labelledby="strength-unranked-title"><div className="leaderboard-list-heading"><div><h3 id="strength-unranked-title">Community members</h3><p>Not yet ranked for this selection</p></div><Icon name="user" size={19}/></div><div className="leaderboard-rankings" role="list">{strength.participants.map(person => <div className="leaderboard-row" role="listitem" key={person.userId}><span className="leaderboard-rank">—</span><span className="leaderboard-avatar">{getInitials(person.name)}</span><span className="leaderboard-person"><strong>{person.isCurrentUser ? `You · ${person.name}` : person.name}</strong><small>{measure === 'relative' ? 'No eligible lift or bodyweight' : 'No eligible lift yet'}</small></span></div>)}</div></section>}
-          {!strengthLoading && !strengthError && strength?.self && <div className="leaderboard-self-row"><span className="leaderboard-rank">{strength.self.rank}</span><span className="leaderboard-self-avatar">{getInitials(currentName)}</span><span className="leaderboard-person"><strong>You · {currentName}</strong><small>{strength.hidden ? 'Hidden from others' : `${strength.self.loadKg} kg × ${strength.self.reps} reps`}</small></span><strong>{measure === 'relative' ? `${strength.self.score.toFixed(2)}× BW` : `${strength.self.maxKg.toFixed(1)} kg`}</strong></div>}
-          <p className="leaderboard-privacy">Self-reported completed sets, up to 30 reps. Single reps use the logged weight; other sets use an estimated one-rep max. Pound for pound divides that estimate by your current bodyweight. Estimates are less reliable at higher reps.</p>
+          <div className="lb-tabs lb-measure" role="group" aria-label="Strength ranking method">
+            <button type="button" aria-pressed={measure === 'heaviest'} onClick={() => setMeasure('heaviest')}><span><strong>Heaviest lift</strong><small>Est. one-rep max</small></span></button>
+            <button type="button" aria-pressed={measure === 'relative'} onClick={() => setMeasure('relative')}><span><strong>Pound for pound</strong><small>1RM ÷ bodyweight</small></span></button>
+          </div>
+          {strengthLoading ? <RankSkeleton/> : strengthError ? <div className="lb-state is-error" role="alert"><span className="lb-state-icon"><Icon name="warning" size={22}/></span><h3>Could not load strength rankings</h3><p>{strengthError}</p><button type="button" className="strength-retry" onClick={() => setStrengthRetry(value => value + 1)}>Try again</button></div> : !strength?.entries.length ? <div className="lb-state leaderboard-strength-empty" role="status"><span className="lb-state-icon"><Icon name="dumbbell" size={22}/></span><h3>No rankings yet</h3><p>{measure === 'relative' ? 'A saved bodyweight and a logged lift are needed for this ranking.' : 'Complete a workout with a recorded weight to join the leaderboard.'}</p></div> : <>
+            <Podium label="Top three lifters" rows={strengthRows}/>
+            <RankList label="Strength rankings" rows={strengthRows.slice(3)} total={strengthRows.length}/>
+          </>}
+          {!strengthLoading && !strengthError && !!strength?.participants?.length && <section className="lb-list lb-unranked" aria-labelledby="strength-unranked-title">
+            <div className="lb-list-head"><h3 id="strength-unranked-title">Community members</h3><span>Not yet ranked</span></div>
+            <div role="list">{strength.participants.map(person => <div className="lb-row is-muted" role="listitem" key={person.userId}><span className="lb-rank">—</span><Avatar name={person.name}/><span className="lb-person"><strong>{person.isCurrentUser ? `You · ${person.name}` : person.name}</strong><small>{measure === 'relative' ? 'No eligible lift or bodyweight' : 'No eligible lift yet'}</small></span></div>)}</div>
+          </section>}
+          <p className="leaderboard-privacy lb-note"><Icon name="lightbulb" size={14}/>Self-reported completed sets, up to 30 reps. Single reps use the logged weight; other sets use an estimated one-rep max. Pound for pound divides that estimate by your current bodyweight.</p>
         </>}
       </div>
       <BottomNav />

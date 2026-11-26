@@ -193,13 +193,17 @@ function buildActivityDates(mealDates: string[], waterEntries: any[], allWorkout
 }
 
 function computeStreak(activityDates: Set<string>, today: string): number {
+  const previousDay = (date: string) => {
+    const [year, month, day] = date.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day - 1)).toISOString().slice(0, 10);
+  };
   let dayStreak = 0;
-  let cursorDay = today;
+  // Today still counts as in progress, so a streak only breaks once a whole day passes with no activity.
+  let cursorDay = activityDates.has(today) ? today : previousDay(today);
   for (let days = 0; days < 365; days++) {
     if (!activityDates.has(cursorDay)) break;
     dayStreak++;
-    const [year, month, day] = cursorDay.split('-').map(Number);
-    cursorDay = new Date(Date.UTC(year, month - 1, day - 1)).toISOString().slice(0, 10);
+    cursorDay = previousDay(cursorDay);
   }
   return dayStreak;
 }

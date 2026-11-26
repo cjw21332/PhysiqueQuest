@@ -148,3 +148,99 @@
 .strength-picker-options button svg { flex:none; color:var(--green); }
 .strength-picker-options p { color:var(--muted); font-size:13px; }
 .strength-picker-dialog button:focus-visible, .strength-picker-field button:focus-visible { outline:2px solid var(--green); outline-offset:2px; }
+
+/* ── Leaderboard redesign ──────────────────────────────────────────── */
+.lb2 { --gold: #f5c451; --silver: #c7d2dc; --bronze: #d99a6c; --lb-coral: #ff7a6b; }
+.lb2 .leaderboard-scroll { display: grid; gap: 16px; align-content: start; }
+.lb2 button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+
+/* Category + measure segmented control */
+.lb2 .lb-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); }
+.lb2 .lb-tabs button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 10px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; transition: background .2s, color .2s; }
+.lb2 .lb-tabs button[aria-pressed="true"] { background: var(--green); color: #0c1a10; box-shadow: 0 6px 16px -10px var(--green); }
+.lb2 .lb-tabs button span { display: grid; gap: 1px; text-align: center; }
+.lb2 .lb-tabs button small { font-size: 11px; font-weight: 500; opacity: .8; }
+
+/* Your standing */
+.lb2 .lb-you { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px 14px; padding: 16px; border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line)); border-radius: 20px; background: radial-gradient(120% 160% at 100% 0%, color-mix(in srgb, var(--green) 18%, transparent), transparent 55%), var(--soft); }
+.lb2 .lb-you.is-empty { border-color: var(--line); background: var(--soft); }
+.lb2 .lb-you-avatar { display: grid; place-items: center; width: 54px; height: 54px; overflow: hidden; border: 2px solid var(--green); border-radius: 50%; background: color-mix(in srgb, var(--green) 18%, var(--surface)); color: var(--green); font-size: 18px; font-weight: 750; }
+.lb2 .lb-you-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.lb2 .lb-you-main { display: grid; gap: 2px; min-width: 0; }
+.lb2 .lb-eyebrow { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.lb2 .lb-you-main strong { color: var(--ink); font-size: 30px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.lb2 .lb-you-main small { color: var(--muted); font-size: 13px; }
+.lb2 .lb-you-next { grid-column: 1 / -1; display: grid; gap: 8px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.lb2 .lb-you-next-copy { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.lb2 .lb-you-next-copy svg { flex: none; color: var(--gold); }
+.lb2 .lb-you-next-copy b { color: var(--ink); }
+.lb2 .lb-you-track { height: 6px; overflow: hidden; border-radius: 99px; background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.lb2 .lb-you-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--green), var(--gold)); }
+
+/* Movement chips */
+.lb2 .lb-move { display: inline-flex; align-items: center; gap: 2px; min-width: 38px; justify-content: center; padding: 4px 8px; border-radius: 99px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lb2 .lb-move.is-up { background: color-mix(in srgb, var(--green) 16%, transparent); color: var(--green); }
+.lb2 .lb-move.is-down { background: color-mix(in srgb, var(--lb-coral) 16%, transparent); color: var(--lb-coral); }
+.lb2 .lb-move.is-same { background: color-mix(in srgb, var(--muted) 14%, transparent); color: var(--muted); }
+
+/* Period pills */
+.lb2 .lb-periods { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.lb2 .lb-periods button { min-height: 40px; border: 1px solid var(--line); border-radius: 99px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; }
+.lb2 .lb-periods button.selected { border-color: color-mix(in srgb, var(--green) 60%, transparent); background: color-mix(in srgb, var(--green) 14%, transparent); color: var(--green); }
+
+/* Podium */
+.lb2 .lb-podium { min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 8px; padding: 8px 0 0; }
+.lb2 .podium-player { --medal: var(--silver); display: flex; flex-direction: column; align-items: center; min-width: 0; text-align: center; }
+.lb2 .podium-rank-1 { --medal: var(--gold); }
+.lb2 .podium-rank-3 { --medal: var(--bronze); }
+.lb2 .lb-crown { color: var(--gold); line-height: 0; margin-bottom: 4px; filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--gold) 50%, transparent)); }
+.lb2 .lb-crown-space { height: 24px; }
+.lb2 .lb-podium-avatar { position: relative; margin-bottom: 8px; padding: 3px; border-radius: 50%; background: conic-gradient(var(--medal), color-mix(in srgb, var(--medal) 40%, transparent), var(--medal)); }
+.lb2 .lb-podium-avatar .lb-avatar { border: 2px solid var(--surface); }
+.lb2 .podium-rank-1 .lb-podium-avatar .lb-avatar { width: 64px; height: 64px; font-size: 20px; }
+.lb2 .lb-medal { position: absolute; right: -2px; bottom: -4px; display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid var(--surface); border-radius: 50%; background: var(--medal); color: #1b1405; font-size: 11px; font-weight: 800; }
+.lb2 .podium-player strong { max-width: 100%; overflow: hidden; color: var(--ink); font-size: 13px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.lb2 .podium-player small { margin-top: 2px; color: var(--medal); font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lb2 .podium-player.is-you strong { color: var(--green); }
+.lb2 .podium-step { width: 100%; height: 52px; margin-top: 10px; border: 1px solid color-mix(in srgb, var(--medal) 35%, transparent); border-bottom: 0; border-radius: 14px 14px 0 0; background: linear-gradient(180deg, color-mix(in srgb, var(--medal) 28%, transparent), color-mix(in srgb, var(--medal) 4%, transparent)); }
+.lb2 .podium-rank-1 .podium-step { height: 78px; }
+.lb2 .podium-rank-3 .podium-step { height: 38px; }
+
+/* Avatars */
+.lb2 .lb-avatar { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--h) 38% 24%); color: hsl(var(--h) 75% 82%); font-size: 13px; font-weight: 700; }
+.lb2 .lb-avatar.is-lg { width: 50px; height: 50px; font-size: 16px; }
+
+/* Standings list */
+.lb2 .lb-list { display: grid; gap: 8px; }
+.lb2 .lb-list-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.lb2 .lb-list-head h3 { margin: 0; color: var(--ink); font-size: 16px; font-weight: 700; }
+.lb2 .lb-list-head span { color: var(--muted); font-size: 12.5px; }
+.lb2 .lb-list [role="list"] { display: grid; gap: 6px; }
+.lb2 .lb-row { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); }
+.lb2 .lb-row.is-you { border-color: color-mix(in srgb, var(--green) 55%, transparent); background: color-mix(in srgb, var(--green) 10%, var(--soft)); }
+.lb2 .lb-row.is-muted { opacity: .75; }
+.lb2 .lb-rank { flex: 0 0 26px; color: var(--muted); font-size: 14px; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
+.lb2 .lb-person { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.lb2 .lb-person strong { display: flex; align-items: center; gap: 6px; overflow: hidden; color: var(--ink); font-size: 14.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.lb2 .lb-person em { flex: none; padding: 1px 7px; border-radius: 99px; background: var(--green); color: #0c1a10; font-size: 10.5px; font-style: normal; font-weight: 750; }
+.lb2 .lb-person small { color: var(--muted); font-size: 12px; }
+.lb2 .lb-value { flex: none; color: var(--ink); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* States, notes and skeleton */
+.lb2 .lb-state { display: grid; justify-items: center; gap: 6px; padding: 28px 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--soft); text-align: center; }
+.lb2 .lb-state-icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 4px; border-radius: 16px; background: color-mix(in srgb, var(--gold) 16%, transparent); color: var(--gold); }
+.lb2 .lb-state.is-error .lb-state-icon { background: color-mix(in srgb, var(--lb-coral) 16%, transparent); color: var(--lb-coral); }
+.lb2 .lb-state h3 { margin: 0; color: var(--ink); font-size: 17px; }
+.lb2 .lb-state p { margin: 0; max-width: 32ch; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+.lb2 .lb-state button { min-height: 44px; margin-top: 8px; padding: 0 22px; border: 0; border-radius: 12px; background: var(--green); color: #0c1a10; font-weight: 700; }
+.lb2 .lb-note { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; text-align: left; }
+.lb2 .lb-note svg { flex: none; margin-top: 2px; }
+.lb2 .lb-skeleton { display: grid; gap: 8px; }
+.lb2 .lb-skel-podium { display: grid; grid-template-columns: repeat(3, 1fr); align-items: end; gap: 8px; margin-bottom: 8px; }
+.lb2 .lb-skel-podium > span { display: grid; justify-items: center; gap: 8px; }
+.lb2 .lb-skel { display: block; width: 100%; border-radius: 12px; background: linear-gradient(90deg, var(--soft), color-mix(in srgb, var(--green) 10%, var(--soft)), var(--soft)); background-size: 200% 100%; animation: lb-shimmer 1.4s ease-in-out infinite; }
+.lb2 .lb-skel.round { width: 48px; height: 48px; border-radius: 50%; }
+.lb2 .lb-skel.row { height: 60px; border-radius: 14px; }
+@keyframes lb-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (max-width: 360px) { .lb2 .lb-you-main strong { font-size: 26px; } .lb2 .lb-row { gap: 8px; padding: 8px 10px; } .lb2 .lb-avatar { width: 32px; height: 32px; } }
+@media (prefers-reduced-motion: reduce) { .lb2 .lb-skel { animation: none; } .lb2 .lb-tabs button { transition: none; } }

@@ -15,8 +15,9 @@ test('strength filters narrow exercises and keep the selected ranking clear', as
     else if (path.endsWith('/notifications')) json = {items:[]};
     await route.fulfill({json});
   });
+  await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1'));
   await page.goto('/quests/leaderboard');
-  await page.getByRole('button',{name:/Strength Logged lifts/}).click();
+  await page.getByRole('button',{name:'Strength',exact:true}).click();
   const panel=page.getByRole('region',{name:'Find an exercise'});
   await expect(panel.getByRole('button',{name:/Exercise Bench Press/})).toBeVisible();
   await panel.getByRole('button',{name:/Muscle group/}).click();
@@ -63,8 +64,9 @@ test('strength rankings can be retried after a load failure', async ({ page }) =
     else if(path.endsWith('/notifications')) json={items:[]};
     await route.fulfill({json});
   });
+  await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1'));
   await page.goto('/quests/leaderboard');
-  await page.getByRole('button',{name:/Strength Logged lifts/}).click();
+  await page.getByRole('button',{name:'Strength',exact:true}).click();
   await expect(page.getByRole('alert').filter({hasText:'Please try again'})).toBeVisible();
   await page.getByRole('button',{name:'Try again'}).click();
   await expect(page.getByText('No ranked exercises are available yet.')).toBeVisible();

@@ -189,3 +189,43 @@
 .scan-description-dialog button { cursor: pointer; }
 .scan-description-dialog :is(button, textarea):focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
 @media (max-height: 560px) { .scan-description-dialog { padding: 16px; } .scan-description-dialog label { margin-top: 12px; } .scan-description-dialog textarea { min-height: 84px; } .scan-description-actions { margin-top: 12px; } }
+
+/* Connection banner, skeleton and empty state for offline / still-syncing Scan. */
+.scan-conn-banner { --conn: #f5b544; display: flex; align-items: center; gap: 12px; margin: 0 0 16px; padding: 12px 12px 12px 14px; border: 1px solid color-mix(in srgb, var(--conn) 35%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--conn) 9%, var(--soft)); }
+.scan-conn-banner.is-offline { --conn: #ff8a7a; }
+.scan-conn-icon { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 11px; background: color-mix(in srgb, var(--conn) 18%, transparent); color: var(--conn); }
+.scan-conn-spinner { width: 16px; height: 16px; border: 2px solid color-mix(in srgb, var(--conn) 30%, transparent); border-top-color: var(--conn); border-radius: 50%; animation: scan-spin .8s linear infinite; }
+.scan-conn-copy { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.scan-conn-copy strong { color: var(--ink); font-size: 14px; font-weight: 650; line-height: 1.3; }
+.scan-conn-copy small { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+.scan-conn-retry { flex: none; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--green); font-size: 13px; font-weight: 650; cursor: pointer; }
+.scan-conn-retry.wide { min-height: 46px; padding: 0 24px; margin-top: 6px; }
+.scan-conn-retry:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+.scan-dashboard-scan.is-locked { background: var(--soft); border: 1px dashed var(--line); color: var(--ink); cursor: default; }
+.scan-dashboard-scan.is-locked .scan-dashboard-scan-icon { background: var(--surface); color: var(--muted); }
+.scan-dashboard-scan.is-locked .scan-dashboard-scan-copy small { color: var(--muted); }
+
+.scan-skeleton { display: grid; gap: 14px; padding-top: 4px; }
+.scan-skel { display: block; border-radius: 10px; background: linear-gradient(90deg, var(--soft) 0%, color-mix(in srgb, var(--green) 10%, var(--soft)) 50%, var(--soft) 100%); background-size: 200% 100%; animation: scan-shimmer 1.4s ease-in-out infinite; }
+.scan-skel-row { display: flex; justify-content: space-between; align-items: center; }
+.scan-skel-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.scan-skel.day { height: 52px; border-radius: 12px; }
+.scan-skel-card { display: flex; align-items: center; gap: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 18px; }
+.scan-skel.ring { flex: none; width: 112px; height: 112px; border-radius: 50%; }
+.scan-skel-bars { display: grid; flex: 1; gap: 14px; }
+.scan-skel-bars > span { display: grid; gap: 6px; }
+.scan-skel.w30 { width: 30%; } .scan-skel.w40 { width: 40%; }
+.scan-skel.h8 { height: 8px; } .scan-skel.h10 { height: 10px; } .scan-skel.h28 { height: 28px; } .scan-skel.h36 { height: 36px; }
+.scan-skel.h56 { height: 56px; } .scan-skel.h64 { height: 64px; }
+.scan-skel.pill { border-radius: 99px; } .scan-skel.card { border-radius: 14px; }
+.scan-skel-label { margin: 2px 0 0; color: var(--muted); font-size: 13px; text-align: center; }
+
+.scan-empty-state { display: grid; justify-items: center; gap: 8px; margin: 12px auto; padding: 32px 22px; max-width: 420px; border: 1px solid var(--line); border-radius: 20px; background: var(--soft); text-align: center; }
+.scan-empty-icon { display: grid; place-items: center; width: 60px; height: 60px; margin-bottom: 6px; border-radius: 18px; background: color-mix(in srgb, var(--green) 14%, transparent); color: var(--green); }
+.scan-empty-state h2 { margin: 0; color: var(--ink); font-size: 18px; font-weight: 700; }
+.scan-empty-state p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+@keyframes scan-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@keyframes scan-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .scan-skel { animation: none; } .scan-conn-spinner { animation-duration: 2.4s; } }
