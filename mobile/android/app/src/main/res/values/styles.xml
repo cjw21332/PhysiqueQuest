@@ -8,6 +8,7 @@
     <item name="android:windowBackground">@color/activityBackground</item>
   </style>
   <style name="Theme.App.SplashScreen" parent="AppTheme">
-    <item name="android:windowBackground">@drawable/splashscreen_logo</item>
+    <!-- Dark like the brand intro, so launch never flashes white before the intro plays. -->
+    <item name="android:windowBackground">@color/activityBackground</item>
   </style>
 </resources>
