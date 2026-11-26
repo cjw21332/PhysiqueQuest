@@ -33,7 +33,7 @@ test('search combines with muscle and equipment filters, including a true any-eq
   assert.equal(filterLibrary(libraryPreview, 'does not exist', 'All', 'Any equipment').length, 0);
 });
 
-test('the independent sample library stays reachable during loading, plan errors, and rest days', async () => {
+test('the plan renders its loading, error and rest-day states (Programs and Library are Coach tabs)', async () => {
   const require = createRequire(import.meta.url);
   const source = await readFile(new URL('../sections/Coach/CoachPlan.tsx', import.meta.url), 'utf8');
   const icons = await readFile(new URL('../sections/Home/icons.tsx', import.meta.url), 'utf8');
@@ -55,9 +55,8 @@ test('the independent sample library stays reachable during loading, plan errors
       if (name.endsWith('/programSuggest')) return { suggestFor: () => ({ sets: 3, reps: '10', unit: 'kg', perHand: false, restSets: 90, restNext: 120, basis: 'bodyweight' }), formatLoad: () => '', formatRest: () => '1:30' };
       return require(name);
     });
-    const html = renderToStaticMarkup(React.createElement(CoachPlan, { profile: {}, onStart: () => {}, onLibrary: () => {}, onPrograms: () => {} }));
-    assert.match(html, /<button[^>]*class="[^"]*library-link-card[^"]*"[^>]*>/);
-    assert.match(html, /Exercise library/);
+    const html = renderToStaticMarkup(React.createElement(CoachPlan, { profile: {}, onStart: () => {} }));
+    assert.doesNotMatch(html, /library-link-card|Browse programs/, 'no duplicate links to tabs');
     assert.match(html, state.loading ? /aria-busy="true"/ : state.plan ? /Rest day/ : /Backend unavailable/);
   }
 });

@@ -133,7 +133,6 @@ function ProgramDetail({ program, base, swaps, equipment, template, ctx, owned, 
       <div className="cq-detail-tags"><span className={`cq-tag ${program.source}`}>{template?.athlete ? `Inspired by ${template.athlete}` : sourceLabel[program.source]}</span>{template && <span className="cq-tag muted">{template.daysPerWeek} days / week</span>}</div>
       <h2>{program.name}</h2>
       {(template?.detail || program.notes) && <p>{template?.detail || program.notes}</p>}
-      <WeekDots days={program.days.map(item => item.weekday)} label={`${program.days.length} training days`}/>
     </section>
     {program.source !== 'athlete' && <details className="cq-adapt" open={swaps.length > 0 && swaps.length <= 3}>
       <summary><Icon name="dumbbell" size={14}/>{swaps.length ? `Adapted to your equipment · ${swaps.length} ${swaps.length === 1 ? 'swap' : 'swaps'}` : 'Fits your equipment'}<span>{equipment}</span></summary>

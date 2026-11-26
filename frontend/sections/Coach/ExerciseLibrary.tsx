@@ -44,7 +44,7 @@ function FilterPicker({ label, value, options, onChange }: { label: string; valu
   </div>;
 }
 
-export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStartPersonal }: { onBack: () => void; selectedEquipment?: string[]; onStartPersonal?: (item: PersonalExercise, mode: 'manual' | 'upload') => void }) {
+export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStartPersonal, embedded = false }: { onBack: () => void; selectedEquipment?: string[]; onStartPersonal?: (item: PersonalExercise, mode: 'manual' | 'upload') => void; embedded?: boolean }) {
   const [personal, setPersonal] = useState<PersonalExercise[]>([]);
   useEffect(() => { try { setPersonal(readPersonalExercises()); } catch { setPersonal([]); } }, []);
   const [searchTerm, setSearchTerm] = useState('');
@@ -206,11 +206,14 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
   if (preview) return <PoseTrackerSession key={preview._id} exercise={preview} onExit={() => setPreview(null)}/>;
 
   return <div className="coach-library" ref={libraryRef}>
-    <header className="coach-header library-header pq-page-heading">
-      <button type="button" className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button>
-      <h2 ref={headingRef} tabIndex={-1}>Exercise library</h2>
-    </header>
-    <div className="library-discover-intro"><span aria-hidden="true"><Icon name="library-dumbbells" size={22}/></span><div><strong>Find your next exercise</strong><p>Explore movements, watch demonstrations and choose how to track.</p></div></div>
+    {/* Inside the Coach tabs the Library tab already names the page, so its own back/title header and intro are dropped. */}
+    {embedded ? <h2 ref={headingRef} tabIndex={-1} className="visually-hidden">Exercise library</h2> : <>
+      <header className="coach-header library-header pq-page-heading">
+        <button type="button" className="coach-back" onClick={onBack} aria-label="Back to AI Coach"><Icon name="arrow" size={20}/></button>
+        <h2 ref={headingRef} tabIndex={-1}>Exercise library</h2>
+      </header>
+      <div className="library-discover-intro"><span aria-hidden="true"><Icon name="library-dumbbells" size={22}/></span><div><strong>Find your next exercise</strong><p>Explore movements, watch demonstrations and choose how to track.</p></div></div>
+    </>}
     {catalog && offline && <p className="library-offline-status" role="status">Offline: showing saved exercises.</p>}
     {storageUnavailable && <p role="status">Offline saving is unavailable.</p>}
     <label className="library-search">

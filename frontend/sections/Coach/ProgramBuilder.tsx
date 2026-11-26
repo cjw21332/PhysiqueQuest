@@ -46,7 +46,7 @@ export default function ProgramBuilder({ ctx, initial, isNew, onCancel, onSaved 
   };
 
   return <form className="cq-builder" onSubmit={event => { event.preventDefault(); void save(); }} aria-label={isNew ? 'Create program' : 'Edit program'}>
-    <header className="cq-subheader"><button type="button" className="coach-back" onClick={onCancel} disabled={busy} aria-label="Back without saving"><Icon name="arrow-left" size={22}/></button><span>{isNew ? 'New program' : 'Edit program'}</span><button type="submit" className="cq-header-save" disabled={busy}>{busy ? 'Saving…' : 'Save'}</button></header>
+    <header className="cq-subheader"><button type="button" className="coach-back" onClick={onCancel} disabled={busy} aria-label="Back without saving"><Icon name="arrow-left" size={22}/></button><span>{isNew ? 'New program' : 'Edit program'}</span></header>
 
     <section className="cq-builder-card">
       <label className="cq-input"><span>Program name</span><input value={draft.name} maxLength={60} onChange={event => setDraft({ ...draft, name: event.target.value })} placeholder="e.g. Summer Push / Pull / Legs" disabled={busy}/></label>

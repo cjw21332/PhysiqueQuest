@@ -66,7 +66,6 @@
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-suggested { color: var(--green); font-weight: 600; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-ex-rest { display: inline-flex; align-items: center; gap: 4px; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-badge { flex: none; padding: 4px 9px; border-radius: 999px; background: var(--green-light); color: var(--green); font-size: 11px; }
-.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-badge.manual { background: var(--bg-tertiary); color: var(--muted); }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-ex-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 10px 0 0; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-ex-stats > div { min-width: 0; padding: 8px 8px 7px; border-radius: 10px; background: var(--surface); }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-ex-stats dt { color: var(--gray-mid); font-size: 10.5px; text-transform: uppercase; letter-spacing: .4px; }
@@ -83,11 +82,6 @@
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-rest p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-rest-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub :is(.cq-rest-actions, .cq-actions-row) .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; height: auto; padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-tertiary); color: var(--ink); font-size: 13px; font-weight: 500; }
-.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-quick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0 8px; }
-.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-quick-card { display: grid; gap: 10px; min-height: 0; padding: 14px; border: 1px solid var(--line); border-radius: var(--cq-radius); background: var(--soft); color: var(--ink); text-align: left; }
-.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-quick-card strong { display: block; font-size: 14px; font-weight: 600; }
-.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-quick-card small { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.4; }
-.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-quick-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; background: var(--green-light); color: var(--green); }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .coach-plan-note { color: var(--muted); font-size: 12px; line-height: 1.55; }
 
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-create { display: flex; align-items: center; gap: 13px; width: 100%; margin: 0 0 24px; padding: 16px; border: 1px solid #22c55e4d; border-radius: 20px; background: linear-gradient(135deg, var(--green-light), #0f2a1c); color: var(--ink); text-align: left; }
@@ -129,7 +123,6 @@
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-subheader { position: sticky; top: 0; z-index: 4; display: flex; align-items: center; gap: 8px; min-height: 56px; margin: 0 -18px 10px; padding: 6px 12px; border-bottom: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 600; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-subheader > span { flex: 1; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-subheader .coach-back { display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; padding: 0; border: 0; border-radius: 12px; background: transparent; color: var(--ink); font-size: inherit; }
-.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-header-save { min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--green); color: var(--surface); font-size: 13px; font-weight: 650; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-detail-hero { margin: 8px 0 14px; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-detail-hero h2 { margin: 10px 0 6px; color: var(--ink); font-size: 24px; font-weight: 700; letter-spacing: -.6px; line-height: 1.2; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-detail-hero p { margin: 0 0 8px; color: var(--muted); font-size: 13px; line-height: 1.6; }
@@ -213,7 +206,7 @@
   .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-weight { grid-column: span 2; }
 }
 @media (max-width: 340px) {
-  .coach-dark-theme.coach-dark-theme .coach-section.cq-hub :is(.cq-quick, .cq-actions-row) { grid-template-columns: 1fr; }
+  .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-actions-row { grid-template-columns: 1fr; }
   .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-ex-stats { grid-template-columns: 1fr 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-skeleton { animation: none; } }

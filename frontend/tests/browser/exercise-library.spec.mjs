@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// The release "What's new" dialog would cover the page under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1')); });
+
 const exercise = { _id: 'api-press', slug: 'api-press', name: 'Backend seated press', targetMuscle: 'Shoulders', equipment: 'Dumbbells', trackingStatus: 'Manual', instructions: ['Keep feet planted.', 'Press overhead slowly.'], gifUrl: 'https://exercise.test/demo.gif', pose: 'missing', status: 'published', source: 'ExerciseDB V1' };
 const gif = Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
 

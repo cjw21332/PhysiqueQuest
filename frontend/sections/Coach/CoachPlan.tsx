@@ -12,18 +12,15 @@ import { useTrainingContext } from '../../hooks/useTrainingContext';
 
 const hasLoad = (prescription = '') => /(?:@|·)\s*\d+(?:\.\d+)?\s*(?:kg|lbs?)\b/i.test(prescription);
 
-export default function CoachPlan({ profile, onStart, onLibrary, onPrograms }: { profile: Profile; onStart: (exercises: CoachExercise[], title?: string) => void; onLibrary: () => void; onPrograms: () => void }) {
+// Programs and the exercise library are reached through the Coach tabs above this view.
+export default function CoachPlan({ profile, onStart }: { profile: Profile; onStart: (exercises: CoachExercise[], title?: string) => void }) {
   const { plan, loading, error, refresh } = useCoachPlan(profile as unknown as Record<string, unknown>);
   const ctx = useTrainingContext(profile);
   const [selectedDay, setSelectedDay] = useState(() => (new Date().getDay() + 6) % 7);
   const [editing, setEditing] = useState(false);
-  const quickLinks = <div className="cq-quick">
-    <button type="button" className="cq-quick-card" onClick={onPrograms}><span className="cq-quick-icon"><Icon name="clipboard" size={18}/></span><span><strong>Programs</strong><small>Splits, athletes &amp; your own</small></span></button>
-    <button type="button" className="cq-quick-card library-link-card" onClick={onLibrary}><span className="cq-quick-icon"><Icon name="book-open" size={18}/></span><span><strong>Exercise library</strong><small>Demos and form guides</small></span></button>
-  </div>;
 
-  if (loading) return <div className="cq-today"><div className="profile-load-state" role="status" aria-label="Loading plan" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div>{quickLinks}</div>;
-  if (error || !plan) return <div className="cq-today"><div className="profile-load-state" role="alert"><h2>Could not load your plan</h2><p>{error || 'Your profile is required to build a plan.'}</p><button type="button" onClick={() => void refresh()}>Try again</button></div>{quickLinks}</div>;
+  if (loading) return <div className="cq-today"><div className="profile-load-state" role="status" aria-label="Loading plan" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div></div>;
+  if (error || !plan) return <div className="cq-today"><div className="profile-load-state" role="alert"><h2>Could not load your plan</h2><p>{error || 'Your profile is required to build a plan.'}</p><button type="button" onClick={() => void refresh()}>Try again</button></div></div>;
 
   const currentDay = plan.days[selectedDay] ?? plan.days[0];
   const todayIndex = (new Date().getDay() + 6) % 7;
@@ -73,7 +70,8 @@ export default function CoachPlan({ profile, onStart, onLibrary, onPrograms }: {
                 <small>{exercise.prescription || plan.sets}{!hasLoad(exercise.prescription) && hint.weight !== undefined && <> · <span className="cq-suggested">{formatLoad(hint)}</span></>}</small>
                 <small className="cq-ex-rest"><Icon name="clock" size={12}/>Rest {formatRest(hint.restSets)} · {formatRest(hint.restNext)} before next</small>
               </div>
-              <span className={`cq-badge ${exercise.tracking === 'AI tracked' ? 'ai-tracked' : 'manual'}`}>{exercise.tracking}</span>
+              {/* Manual is the default, so only camera-tracked exercises get a badge. */}
+              {exercise.tracking === 'AI tracked' && <span className="cq-badge">AI tracked</span>}
             </li>)}</ol>
           </section>
           {rows.some(row => row.hint.weight !== undefined) && <p className="cq-fineprint">Suggested weights are starting points from your profile{ctx.records.length ? ' and logged sets' : ''}. Adjust to how each set feels.</p>}
@@ -85,10 +83,9 @@ export default function CoachPlan({ profile, onStart, onLibrary, onPrograms }: {
       </> : <section className="cq-rest">
         <span className="cq-rest-icon" aria-hidden="true"><Icon name="sun" size={22}/></span>
         <h3>{currentDay?.title ?? 'Rest day'}</h3>
-        <p>No workout scheduled for this day. Recovery is part of the plan — or pick a session from your programs.</p>
-        <div className="cq-rest-actions"><button type="button" className="secondary" onClick={onPrograms}>Browse programs</button><button type="button" className="secondary" onClick={() => setEditing(true)} disabled={!plan.programVersion}>Edit day</button></div>
+        <p>No workout scheduled for this day. Recovery is part of the plan; the Programs tab has sessions if you want to train.</p>
+        <div className="cq-rest-actions"><button type="button" className="secondary" onClick={() => setEditing(true)} disabled={!plan.programVersion}>Edit day</button></div>
       </section>}
-      {quickLinks}
     </>}
   </div>;
 }

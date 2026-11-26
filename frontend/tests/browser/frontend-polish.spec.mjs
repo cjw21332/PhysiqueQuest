@@ -26,7 +26,7 @@ test('Coach empty states and library search retain readable contrast and keyboar
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await page.screenshot({path:info.outputPath(`coach-empty-${width}.png`),animations:'disabled'});
   }
-  await page.getByRole('button',{name:/Exercise library Demos/}).click();
+  await page.getByRole('button',{name:'Exercise library'}).click();
   const input=page.getByRole('searchbox');await input.focus();
   await expect(input).toHaveCSS('outline-style','solid');
   await expect(input).toHaveCSS('outline-width','2px');
