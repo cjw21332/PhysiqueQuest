@@ -12,12 +12,14 @@ export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
   { icon: 'scan', title: 'Scan works offline', text: 'Saved meals stay visible offline or while syncing, with a clear note on what unlocks when you reconnect.' },
   { icon: 'arrow-left', title: 'Back button stays in the app', text: 'Your phone’s Back button closes popups and goes back a screen. On Home, press it twice to exit.' },
 ];
-// sessionStorage lives for one app launch, so the popup returns on every open but not on every page change.
+// Shown once per version: the device remembers the version it showed, so reopening the app does not
+// repeat it. The per-launch flag stays honoured (tests and older builds set it).
 const SHOWN_KEY = 'pq-whats-new-shown';
+const SEEN_VERSION_KEY = 'pq-whats-new-seen-version';
 // Decided once per page load, so React re-running the effect cannot report it closed while it is open.
 let showThisLaunch: boolean | null = null;
 
-/** Shows what changed in this version once per app launch. Render it only for signed-in users. */
+/** Shows what changed in this version once per device. Render it only for signed-in users. */
 export default function WhatsNew({ onClose }: { onClose: () => void }) {
   const pathname = usePathname();
   const dialog = useRef<HTMLDialogElement>(null);
@@ -26,10 +28,10 @@ export default function WhatsNew({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     if (showThisLaunch === null) {
       let shown = false;
-      try { shown = sessionStorage.getItem(SHOWN_KEY) === '1'; } catch {}
+      try { shown = sessionStorage.getItem(SHOWN_KEY) === '1' || localStorage.getItem(SEEN_VERSION_KEY) === WHATS_NEW_VERSION; } catch {}
       // Never interrupt a live workout.
       showThisLaunch = !shown && !pathname?.startsWith('/coach/session');
-      if (showThisLaunch) try { sessionStorage.setItem(SHOWN_KEY, '1'); } catch {}
+      if (showThisLaunch) try { sessionStorage.setItem(SHOWN_KEY, '1'); localStorage.setItem(SEEN_VERSION_KEY, WHATS_NEW_VERSION); } catch {}
     }
     if (showThisLaunch) setOpen(true); else onClose();
   // Decide once per mount; later navigation must not reopen it.

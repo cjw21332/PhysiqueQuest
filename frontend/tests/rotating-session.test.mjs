@@ -111,3 +111,27 @@ test('expired online credentials fall back to a local-only session without a ser
   assert.equal(session.current('/api')?.sessionExpired, true);
   assert.equal(session.current('/api')?.token, '');
 });
+
+test('in the app shell the device session refreshes without a cookie and keeps the same user', async () => {
+  let cookieCalls = 0;
+  const session = createSession({ fetcher: async () => { cookieCalls++; return { ok: false, status: 401 }; }, nativeRefresh: async () => ({ status: 'ok', session: { access_token: 'device-access', expires_in: 900, user: { id: 'owner', name: 'Owner', email: 'a@example.com' } } }) });
+  session.restoreOffline({ id: 'owner', expiresAt: Number.MAX_SAFE_INTEGER }, '/api');
+  assert.equal(session.current('/api')?.sessionExpired, false, 'a restored account is not "expired" before the server answers');
+  const user = await session.restore('/api');
+  assert.equal(user?.token, 'device-access');
+  assert.equal(session.current('/api')?.offlineOnly, undefined);
+  assert.equal(cookieCalls, 0);
+});
+
+test('device refresh: rejected marks expired, unreachable keeps the account, missing falls back to the cookie', async () => {
+  const rejected = createSession({ nativeRefresh: async () => ({ status: 'unauthorized' }) });
+  rejected.restoreOffline({ id: 'owner', expiresAt: Number.MAX_SAFE_INTEGER }, '/api');
+  assert.equal(await rejected.refresh('/api'), null);
+  assert.equal(rejected.current('/api')?.sessionExpired, true);
+  const asleep = createSession({ nativeRefresh: async () => ({ status: 'error' }) });
+  asleep.restoreOffline({ id: 'owner', expiresAt: Number.MAX_SAFE_INTEGER }, '/api');
+  await assert.rejects(asleep.refresh('/api'));
+  assert.equal(asleep.current('/api')?.sessionExpired, false);
+  const cookie = createSession({ fetcher: async () => reply('cookie-access'), nativeRefresh: async () => ({ status: 'none' }) });
+  assert.equal((await cookie.refresh('/api'))?.token, 'cookie-access');
+});

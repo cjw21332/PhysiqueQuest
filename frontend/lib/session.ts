@@ -1,4 +1,4 @@
-import { nativeOfflineAccount } from './nativeOfflineAccount';
+import { nativeDeviceRefresh, nativeOfflineAccount } from './nativeOfflineAccount';
 import { DEVICE_CACHE_STORAGE_KEY } from './deviceCache.mjs';
 export const AUTH_STORAGE_KEY = 'physiquequest-auth';
 export const PROFILE_STORAGE_KEY = 'physiquequest-profile';
@@ -21,4 +21,4 @@ export function appVersionHeaders(): Record<string, string> {
   try { if (typeof window !== 'undefined') version = localStorage.getItem('physiquequest-app-version') || version; } catch { /* Native metadata is optional. */ }
   return version && /^\d{1,5}\.\d{1,5}\.\d{1,5}$/.test(version) ? { 'X-App-Version': version } : {};
 }
-export const session = createSession({ storage: () => typeof window === 'undefined' ? undefined : window.localStorage, headers: appVersionHeaders });
+export const session = createSession({ storage: () => typeof window === 'undefined' ? undefined : window.localStorage, headers: appVersionHeaders, nativeRefresh: nativeDeviceRefresh });

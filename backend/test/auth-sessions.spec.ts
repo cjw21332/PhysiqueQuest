@@ -52,6 +52,19 @@ describe('rotating sessions', () => {
     expect(h.row.revokedAt).toBeNull();
     await expect(h.service.refresh(first.refresh_token)).resolves.toHaveProperty('access_token');
   });
+  it('slides the 30-day expiry on every refresh so an app in use stays signed in', async () => {
+    const h = harness(); const first = await h.service.issue(h.user as any);
+    h.row.expiresAt = new Date(Date.now() + 86400_000);
+    await h.service.refresh(first.refresh_token);
+    expect(h.row.expiresAt.getTime()).toBeGreaterThan(Date.now() + 29 * 86400_000);
+  });
+  it('device logout revokes only with the current token', async () => {
+    const h = harness(); const first = await h.service.issue(h.user as any);
+    await h.service.revokeToken(`${h.row._id}.${'f'.repeat(64)}`);
+    expect(h.row.revokedAt).toBeNull();
+    await h.service.revokeToken(first.refresh_token);
+    expect(h.row.revokedAt).toBeInstanceOf(Date);
+  });
   it('fails closed when refreshes race', async () => {
     const h = harness(); const first = await h.service.issue(h.user as any);
     const results = await Promise.allSettled([h.service.refresh(first.refresh_token), h.service.refresh(first.refresh_token)]);

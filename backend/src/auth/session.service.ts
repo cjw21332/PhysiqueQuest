@@ -64,7 +64,8 @@ export class SessionService {
     const next = `${id}.${randomBytes(32).toString('hex')}`;
     const rotated = await new AccountLifecycleFence(this.sessions.db).withActiveWrite(String(session.userId), async lifecycleSession => this.sessions.findOneAndUpdate(
       { _id: id, tokenHash: digest, revokedAt: null, expiresAt: { $gt: new Date() } },
-      { $set: { tokenHash: hash(next), lastUsedAt: new Date() }, $push: { usedHashes: digest } },
+      // Sliding expiry: an app that keeps opening stays signed in; 30 idle days still end the session.
+      { $set: { tokenHash: hash(next), lastUsedAt: new Date(), expiresAt: afterDays(new Date(), 30), purgeAt: afterDays(afterDays(new Date(), 30), retention('REFRESH_TOKEN_RECORD_BUFFER_DAYS')) }, $push: { usedHashes: digest } },
       { returnDocument: 'before' },
     ).session(lifecycleSession), generation);
     if (!rotated) {
@@ -80,6 +81,14 @@ export class SessionService {
 
   async revoke(id: string, userId: string, generation?: number) {
     await new AccountLifecycleFence(this.sessions.db).withActiveWrite(userId, async lifecycleSession => this.sessions.updateOne({ _id: id, userId: new Types.ObjectId(userId) }, { $set: { revokedAt: new Date() } }).session(lifecycleSession), generation);
+  }
+
+  /** Revokes the session a device still holds the current refresh token for (device logout). */
+  async revokeToken(token: string) {
+    if (!/^[a-f0-9]{64}\.[a-f0-9]{64}$/.test(token)) return;
+    const session = await this.sessions.findById(token.slice(0, 64));
+    if (!session || session.revokedAt || session.tokenHash !== hash(token)) return;
+    await this.revoke(session._id as unknown as string, String(session.userId));
   }
 
   async list(userId: string, version: number) {

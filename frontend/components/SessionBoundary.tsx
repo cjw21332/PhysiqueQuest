@@ -166,7 +166,8 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
         setReady(true);
       } catch {
         if (!active) return;
-        if (offline) setSessionExpired(true);
+        // Unreachable (often a sleeping server) is not "signed out": keep the saved account and keep retrying.
+        if (offline) setServiceReconnecting(true);
         else setError('Could not restore your session. Check your connection and retry.');
       }
     })();
@@ -202,7 +203,8 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     // Without internet a session cannot be confirmed, so it can look expired; telling the user
     // to sign in would be wrong. The device's own connection state decides which notice applies.
     const deviceOffline = typeof navigator !== 'undefined' && !navigator.onLine;
-    if (sessionExpired && nativeApp && !hidden.sync && !deviceOffline) return <ConnectionToast key="sync" tone="sync" title="Sign in to sync" message="Your saved content and on-device workouts are available." dismissLabel="Dismiss sign-in message" onDismiss={() => setHidden(current => ({ ...current, sync: true }))}/>;
+    // Only shown after the server really rejected the login; on-device workouts stay and sync after signing back in.
+    if (sessionExpired && nativeApp && !hidden.sync && !deviceOffline) return <ConnectionToast key="sync" tone="sync" title="Sign in to sync" message="Your saved content and on-device workouts are available." action={{ label: 'Sign in', onClick: () => { clearAuthSession(); window.location.assign('/login'); } }} dismissLabel="Dismiss sign-in message" onDismiss={() => setHidden(current => ({ ...current, sync: true }))}/>;
     if ((connectionLost || (deviceOffline && !dismissedOffline.current)) && (!sessionExpired || deviceOffline) && !inSession) return <ConnectionToast key="offline" tone="offline" title="You’re offline"
       message={nativeApp ? 'Saved data may be out of date.' : `${retryFailed ? 'Still unable to connect. ' : ''}Saved content and manual workouts still work; they sync when you reconnect. Food logging needs a connection.`}
       action={{ label: 'Try again', onClick: () => { void retryConnection(); }, busy: retrying }} dismissLabel="Continue offline" onDismiss={continueOffline}/>;

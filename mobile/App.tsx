@@ -1,4 +1,5 @@
 import { handleOfflineAccount } from './offlineAccount';
+import { forgetDeviceSession, linkDeviceSession, refreshDeviceSession } from './deviceSession';
 import BrandIntro from './BrandIntro';
 import Constants from 'expo-constants';
 import { googleSignInError } from './googleSignInError';
@@ -160,6 +161,7 @@ function buildInsetsScript(insets: { top: number; bottom: number; left: number; 
     document.head.appendChild(m);
     localStorage.setItem('physiquequest-runtime-api-url',${encodedApiUrl});
     localStorage.setItem('physiquequest-app-version',${JSON.stringify(Constants.expoConfig?.version ?? '')});
+    window.__pqDeviceSessions=1;
   }catch(e){}})();true;`;
 }
 
@@ -629,10 +631,21 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
               return;
             }
             if(e.nativeEvent.data.length>readinessMessageLimit){stopNativeCamera();return;}
+            if (apiUrl && message.type === 'refresh-device-session' && typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,120}$/.test(message.requestId)) {
+              const origin = new URL(loadedAddress).origin, requestId = message.requestId;
+              void refreshDeviceSession(origin, apiUrl).catch(() => ({ status: 'error' as const })).then(result => {
+                const detail = JSON.stringify({ requestId, ...result }).replace(/</g, '\\u003c');
+                webRef.current?.injectJavaScript(`if(location.origin===${JSON.stringify(origin)})window.dispatchEvent(new CustomEvent('physiquequest:device-session',{detail:${detail}}));true;`);
+              });
+              return;
+            }
             if (apiUrl && ['remember-offline-account','forget-offline-account','restore-offline-account'].includes(message.type ?? '') &&
                 typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,120}$/.test(message.requestId)) {
               const origin = new URL(loadedAddress).origin;
+              if (message.type === 'forget-offline-account') void forgetDeviceSession(apiUrl);
               void handleOfflineAccount(message.type!,origin,apiUrl,message.token).catch(()=>null).then(grant => {
+                // Signed in: keep this device's own login so reopening the app restores it without a cookie.
+                if (message.type === 'remember-offline-account' && message.token) void linkDeviceSession(origin, apiUrl, message.token, grant?.id).catch(() => false);
                 const detail = JSON.stringify({requestId:message.requestId,account:grant ? {id:grant.id,expiresAt:grant.expiresAt} : null});
                 webRef.current?.injectJavaScript(`if(location.origin===${JSON.stringify(origin)})window.dispatchEvent(new CustomEvent('physiquequest:offline-account',{detail:${detail}}));true;`);
               });

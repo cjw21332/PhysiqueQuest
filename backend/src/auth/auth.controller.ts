@@ -6,7 +6,7 @@ import { PasswordChangeRequestDto, PasswordResetConfirmDto, PasswordResetRequest
 import { AuthService } from './auth.service.js';
 import { RegisterDto, LoginDto, AuthResponseDto, RefreshDto } from './dto/auth.dto.js';
 import { SessionService } from './session.service.js';
-import { assertSessionRequest, readRefreshCookie, SESSION_COOKIE, sessionCookieOptions } from './session-cookie.js';
+import { assertDeviceRequest, assertSessionRequest, DEVICE_TOKEN, readRefreshCookie, SESSION_COOKIE, sessionCookieOptions } from './session-cookie.js';
 import { assertLegacyAuthEnabled } from './legacy-auth.js';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { SessionResponseDto } from './dto/auth.dto.js';
@@ -108,6 +108,40 @@ export class AuthController {
     }
   }
 
+  @Post('session/device')
+  @ApiOperation({ summary: 'Link the native app to the signed-in account', description: 'Native app shell only (X-PQ-Device: 1, no Origin). Issues a separate device session and returns its refresh token for the device secure store.' })
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async deviceSession(@Req() req: Request & { user: { userId: string; tokenVersion: number } }, @Res({ passthrough: true }) res: Response) {
+    assertDeviceRequest(req);
+    if (req.user.tokenVersion !== 2) throw new ForbiddenException('Sign in again to link this device.');
+    const { refresh_token, user } = await this.sessions.issue(await this.authService.validateUser(req.user.userId));
+    res.setHeader('Cache-Control', 'no-store');
+    return { device_token: refresh_token, user_id: user.id };
+  }
+
+  @Post('session/device/refresh')
+  @ApiOperation({ summary: 'Rotate a device refresh token', description: 'Native app shell only. Body: { token }. Returns a new access token and the rotated device token; reuse of a consumed token revokes the session.' })
+  @HttpCode(HttpStatus.OK)
+  async deviceRefresh(@Body() body: unknown, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    assertDeviceRequest(req);
+    const token = (body as { token?: unknown } | null)?.token;
+    if (typeof token !== 'string' || !DEVICE_TOKEN.test(token)) throw new UnauthorizedException('Session expired. Sign in again.');
+    const { refresh_token, ...result } = await this.sessions.refresh(token);
+    res.setHeader('Cache-Control', 'no-store');
+    return { ...result, device_token: refresh_token };
+  }
+
+  @Post('session/device/logout')
+  @ApiOperation({ summary: 'Revoke a device session', description: 'Native app shell only. Body: { token }. Always succeeds so a device can forget its credential offline.' })
+  @HttpCode(HttpStatus.OK)
+  async deviceLogout(@Body() body: unknown, @Req() req: Request) {
+    assertDeviceRequest(req);
+    const token = (body as { token?: unknown } | null)?.token;
+    if (typeof token === 'string' && DEVICE_TOKEN.test(token)) await this.sessions.revokeToken(token);
+    return { loggedOut: true };
+  }
+
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -115,6 +149,9 @@ export class AuthController {
     assertSessionRequest(req);
     if (req.user.sessionId) await this.sessions.revoke(req.user.sessionId, req.user.userId);
     else await this.authService.revokeAll(req.user.userId);
+    // In the app the access token belongs to the device session, so also end the cookie's own session.
+    const cookie = readRefreshCookie(req);
+    if (DEVICE_TOKEN.test(cookie)) await this.sessions.revokeToken(cookie);
     res.clearCookie(SESSION_COOKIE, sessionCookieOptions());
     return { loggedOut: true };
   }
