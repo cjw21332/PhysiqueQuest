@@ -3,7 +3,7 @@ import { expectDarkPalette, expectReferenceLayout, expectHomeBack } from './them
 
 async function fixtures(page) {
   await page.clock.setFixedTime(new Date('2026-10-19T08:00:00Z'));
-  await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'visual', token: 'visual-test' })));
+  await page.addInitScript(() => { localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'visual', token: 'visual-test' })); sessionStorage.setItem('pq-whats-new-shown', '1'); });
   const profile = { name: 'Toji', email: 'toji@example.test', goal: 'Build muscle', weight: '59.5', weightUnit: 'kg', targetWeight: '74', targetDate: '2027-03-31', duration: '45 min', equipment: ['Dumbbells'], days: ['Monday', 'Wednesday', 'Friday', 'Saturday'], createdAt: '2026-10-05', photo: '' };
   const weights = Array.from({ length: 8 }, (_, i) => ({ _id: `weight-${i}`, metric: 'weight', unit: 'kg', value: Number((66.4 + i * .3).toFixed(1)), measuredAt: new Date(Date.UTC(2026, 7, 24 + i * 8)).toISOString() }));
   let measurements = [...weights];
@@ -171,7 +171,7 @@ test('profile photo can be selected, saved, and removed', async ({ page }) => {
   await expect(dialog).not.toBeVisible();
   await expect(page.locator('.me-avatar img')).toBeVisible();
   await page.goto('/home');
-  const homePhoto = page.locator('.avatar-badge img.user-photo');
+  const homePhoto = page.locator('.hm-avatar img.user-photo');
   await expect(homePhoto).toBeVisible();
   await expect(homePhoto).toHaveCSS('object-fit', 'cover');
   expect(await homePhoto.evaluate(image => image.getBoundingClientRect().width === image.parentElement.clientWidth)).toBe(true);
@@ -258,22 +258,22 @@ test('dark dashboard, goals and progress match reference layouts and preserve me
   await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toBeVisible();
   await expect(page.getByText('1,840', { exact: true })).toBeVisible();
   await expect(page.locator('.home-section')).toHaveCSS('background-color', 'rgb(11, 15, 21)');
-  await expectReferenceLayout(page, ['.home-section', '.home-content', '.home-ref-dashboard', '.home-ref-header', '.home-ref-workout', '.home-bottom-nav']);
+  await expectReferenceLayout(page, ['.home-section', '.home-content', '.hm-dashboard', '.hm-topbar', '.hm-hero', '.home-bottom-nav']);
   await capture(page, info, '01-dashboard');
   await page.locator('.home-content').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await capture(page, info, '02-dashboard-scrolled');
   await page.getByRole('button', { name: /Goals & milestones/ }).click();
   await expect(page.getByRole('heading', { name: 'Goals', exact: true })).toBeVisible();
   await expectHomeBack(page);
-  await expectReferenceLayout(page, ['.pq-goals', '.pq-goals-header', '.pq-goals-hero', '.pq-goals-training']);
-  await expect(page.locator('.pq-goals-metrics')).toContainText('74');
+  await expectReferenceLayout(page, ['.hm-goals', '.hm-pagehead', '.hm-goal-hero', '.hm-week-card']);
+  await expect(page.locator('.hm-goal-path')).toContainText('74');
   await capture(page, info, '03-goals');
   await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
   await page.getByRole('button', { name: /Progress Review saved measurements/ }).click();
   await expect(page.getByText('68.5 kg', { exact: true }).first()).toBeVisible();
   await expectHomeBack(page);
-  await expect(page.locator('.pq-progress-measurement').getByRole('button', { name: 'Add', exact: true })).toBeVisible();
-  await expectReferenceLayout(page, ['.pq-progress', '.pq-progress-header', '.pq-progress-chips', '.pq-progress-measurement', '.pq-progress-history']);
+  await expect(page.locator('.hm-measure').getByRole('button', { name: 'Add', exact: true })).toBeVisible();
+  await expectReferenceLayout(page, ['.hm-progress', '.hm-pagehead', '.hm-segmented', '.hm-measure', '.hm-disclosure']);
   await capture(page, info, '04-progress');
   await page.locator('.home-content').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await capture(page, info, '05-progress-scrolled');
@@ -283,16 +283,16 @@ test('dark dashboard, goals and progress match reference layouts and preserve me
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.locator('.pq-progress-measurement').getByRole('button', { name: 'Add', exact: true }).click();
+  await page.locator('.hm-measure').getByRole('button', { name: 'Add', exact: true }).click();
   await page.getByLabel('Current weight (kg)').fill('69');
   await page.getByRole('button', { name: 'Save weight', exact: true }).click();
   await expect.poll(() => state.saved?.value).toBe(69);
   await page.getByRole('dialog', { name: /Measurement updated|Update details/ }).getByRole('button', { name: 'Done' }).click();
-  await expect(page.locator('.pq-progress-value strong')).toContainText('69');
-  await page.locator('.pq-progress-history summary').click();
+  await expect(page.locator('.hm-measure-value strong')).toContainText('69');
+  await page.locator('.hm-disclosure summary').click();
   await page.getByRole('button', { name: 'Delete 69 kg measurement', exact: true }).click();
   await page.getByRole('dialog', { name: 'Delete this measurement?' }).getByRole('button', { name: 'Delete measurement', exact: true }).click();
-  await expect(page.locator('.pq-progress-value strong')).toContainText('68.5');
+  await expect(page.locator('.hm-measure-value strong')).toContainText('68.5');
   await page.getByRole('dialog', { name: 'Measurement updated' }).getByRole('button', { name: 'Done' }).click();
   await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toBeVisible();
@@ -304,14 +304,14 @@ test('dark notifications preserve individual and mark-all read actions', async (
   await page.getByRole('button', { name: 'Notifications', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Notifications', exact: true })).toBeVisible();
   await expectHomeBack(page);
-  await expectReferenceLayout(page, ['.home-notifications', '.section-page-head', '.notification-safety-card', '.notification-item']);
+  await expectReferenceLayout(page, ['.hm-notifications', '.hm-pagehead', '.hm-safety', '.hm-note-row']);
   await expect(page.getByRole('region', { name: 'Pinned safety notice' })).toBeVisible();
   await capture(page, info, '06-notifications');
   await page.getByRole('button', { name: '2 missions left, Finish before midnight to keep your 12-day streak, unread, mark as read', exact: true }).click();
   await expect(page.getByRole('button', { name: '2 missions left, Finish before midnight to keep your 12-day streak', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Mark all read', exact: true }).click();
   await expect.poll(() => state.marks).toBe(1);
-  await expect(page.locator('.unread-dot')).toHaveCount(0);
+  await expect(page.locator('.hm-note-row.is-unread')).toHaveCount(0);
   await page.getByRole('button', { name: 'Back to Home', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toBeVisible();
 });

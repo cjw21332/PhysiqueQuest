@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1')); });
 
 test('records preserve units and sort and filter one best per exercise', async ({ page }) => {
   const records = [

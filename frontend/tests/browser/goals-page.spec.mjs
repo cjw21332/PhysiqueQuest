@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1')); });
 
 test('goals use saved data, update weight and fit mobile widths', async ({ page }) => {
   let profile = { name: 'Test', goal: 'Build muscle', weight: '70', weightUnit: 'kg', targetWeight: '75', targetDate: '2027-12-31', days: ['Monday', 'Wednesday', 'Friday'], equipment: [] };
@@ -31,7 +32,7 @@ test('goals use saved data, update weight and fit mobile widths', async ({ page 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
   }
   await page.getByRole('button', { name: 'Edit', exact: true }).click();
-  await expect(page).toHaveURL(/\/me\/goals$/);
+  await expect(page).toHaveURL(/\/me\/goals(\?from=goals)?$/);
 });
 
 test('shows empty and recoverable error states', async ({ page }) => {

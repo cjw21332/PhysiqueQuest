@@ -18,13 +18,13 @@ export default function HomeSection({ profile }: { profile: Profile }) {
   const feedback = (value: string) => { setMessage(value); window.setTimeout(() => setMessage(''), 2600); };
 
   return (
-    <section className="home-section screen-enter">
+    <section className="home-section hm screen-enter">
       <div className="home-content">
         {view === 'dashboard' && <HomeDashboard profile={profile} onNotify={() => open('notifications')} onAction={feedback}/>}
-        {view === 'notifications' && <div className="home-subview"><Notifications onBack={goHome}/></div>}
+        {view === 'notifications' && <div className="hm-subview"><Notifications onBack={goHome}/></div>}
       </div>
       <BottomNav />
-      {message && <div className="home-toast" role="status">{message}</div>}
+      {message && <div className="hm-toast" role="status">{message}</div>}
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1')); });
 
 test('program pickers filter exercises and fit narrow screens', async ({ page }) => {
   const exercises = [

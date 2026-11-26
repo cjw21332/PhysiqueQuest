@@ -16,5 +16,5 @@
 .whats-new-icon { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--green-light); color: var(--green-dark); }
 .whats-new li strong { display: block; font-size: 15px; line-height: 1.35; }
 .whats-new li small { display: block; margin-top: 2px; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
-.whats-new-done { width: 100%; min-height: 48px; border: 0; border-radius: 14px; background: var(--green); color: #102016; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+.whats-new-done { width: 100%; min-height: 48px; border: 0; border-radius: 14px; background: var(--green); color: #0b0f15; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
 .whats-new :is(button):focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }

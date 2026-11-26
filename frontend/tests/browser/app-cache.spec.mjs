@@ -8,6 +8,7 @@ const makePlan = title => ({ goal: 'Build muscle', duration: '45 min', weekLabel
 async function setup(page, savedWater = false) {
   await page.clock.setFixedTime(new Date('2026-10-19T08:00:00Z'));
   await page.addInitScript(() => {
+    sessionStorage.setItem('pq-whats-new-shown', '1');
     if (!sessionStorage.getItem('cache-test-auth-seeded')) {
       localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'cached-user', token: 'test-session' }));
       sessionStorage.setItem('cache-test-auth-seeded', 'true');
@@ -98,7 +99,7 @@ test('offline tabs open their own screens and personal exercises persist locally
   await expect(page.getByRole('heading', { name: 'Account & settings' })).toBeVisible();
   await page.goto('/home');
   await expect(page.getByRole('heading', { name: 'Hi, Toji' })).toBeVisible();
-  await expect(page.locator('.greeting-meta')).toContainText('October 19, 2026');
+  await expect(page.locator('.hm-topbar-copy small')).toContainText('Monday, Oct 19');
   await page.waitForTimeout(1500);
   fixture.offline();
   await page.evaluate(() => { Object.defineProperty(navigator, 'onLine', { configurable: true, value: false }); window.dispatchEvent(new Event('offline')); });
@@ -199,7 +200,7 @@ test('Progress keeps the same divided header as Goals while scrolling', async ({
   const styles = [];
   for (const [url, title] of [['/goals', 'Goals'], ['/progress', 'Progress']]) {
     await page.goto(url);
-    const header = page.locator('.section-page-head').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
+    const header = page.locator('.hm-pagehead').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
     await expect(header).toBeVisible();
     const before = await header.boundingBox();
     styles.push(await header.evaluate(node => ({ position: getComputedStyle(node).position, border: getComputedStyle(node).borderBottomWidth, color: getComputedStyle(node).borderBottomColor, height: getComputedStyle(node).height })));

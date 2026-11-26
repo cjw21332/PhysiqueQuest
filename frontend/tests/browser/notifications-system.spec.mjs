@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('notifications show account data, mark read, and persist reminder settings', async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1'));
   let state = { items: [{ id: 'one', icon: 'clipboard', title: 'Workout completed', subtitle: '', body: 'Saved', time: 'now', group: 'Today', unread: true }], reminder: null };
   await page.route('**/api/**', async route => {
     const request = route.request();

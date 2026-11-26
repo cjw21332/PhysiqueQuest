@@ -76,29 +76,43 @@ export default function Notifications({ onBack }: { onBack: () => void }) {
     }
     finally { setClearing(false); }
   };
-  return <div className="home-notifications">
-    <header className="section-page-head home-notifications-head">
-      <div className="section-back-title pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="arrow" size={20}/></button><h2>Notifications</h2></div>
+  return <div className="hm-page hm-notifications">
+    <header className="hm-pagehead pq-page-heading">
+      <button type="button" className="coach-back" onClick={onBack} aria-label="Back to Home"><Icon name="arrow" size={20}/></button>
+      <h2>Notifications</h2>
+      <span className={`hm-pill${unread ? ' hm-tone-green' : ''}`}>{unread ? `${unread} unread` : 'All caught up'}</span>
     </header>
-    <div className="notification-intro"><div><h3>Your updates</h3><p>Keep track of your activity and safety notices.</p></div><span className="notification-count">{unread ? `${unread} unread` : 'All caught up'}</span></div>
-    {(unread > 0 || remaining.length > 0) && <div className="notification-actions" aria-label="Notification actions">
-      {unread > 0 && <button type="button" className="mark-all-btn" disabled={clearing} onClick={() => void markAllRead()}><Icon name="check-circle" size={16}/> Mark all read</button>}
-      {remaining.length > 0 && <button type="button" className="notification-clear" disabled={clearing} onClick={() => { setClearFailed(false); setClearSelection({ ids: remaining.slice(0, 1000).map(item => item.id), hasMore: remaining.length > 1000, pinned: Boolean(safety) }); }}><Icon name="trash" size={16}/>Clear notifications</button>}
+    <p className="hm-lede">Your activity updates and safety notices, in one place.</p>
+    {(unread > 0 || remaining.length > 0) && <div className="hm-toolbar" aria-label="Notification actions">
+      {unread > 0 && <button type="button" className="hm-btn hm-btn-soft hm-btn-sm" disabled={clearing} onClick={() => void markAllRead()}><Icon name="check-circle" size={16}/> Mark all read</button>}
+      {remaining.length > 0 && <button type="button" className="hm-btn hm-btn-danger hm-btn-sm" disabled={clearing} onClick={() => { setClearFailed(false); setClearSelection({ ids: remaining.slice(0, 1000).map(item => item.id), hasMore: remaining.length > 1000, pinned: Boolean(safety) }); }}><Icon name="trash" size={16}/>Clear notifications</button>}
     </div>}
-    {clearMessage && <p role="status" className="notification-clear-feedback">{clearMessage}</p>}
+    {clearMessage && <p role="status" className="hm-state">{clearMessage}</p>}
     {clearSelection && <DeleteConfirmation title="Clear notifications?" description={`Remove ${clearSelection.ids.length} notification${clearSelection.ids.length === 1 ? '' : 's'}?${clearSelection.pinned ? ' Your pinned safety notice will stay.' : ''}`} confirmLabel="Clear notifications" busyLabel="Clearing…" busy={clearing} error={clearFailed ? 'Could not clear notifications. Please try again.' : undefined} onCancel={() => setClearSelection(null)} onConfirm={() => void clearRecent()}/>}
-    {error && !clearFailed && <div role="alert" className="scan-warning notification-error"><p>{error}</p><button type="button" onClick={() => void refresh()}>Try again</button></div>}
-    {clearFailed && !clearSelection && <p role="alert" className="notification-clear-feedback">Could not clear notifications. Please try again.</p>}
-    {loading && !items.length ? <p role="status" className="notifications-state">Loading notifications…</p> : !items.length && !error ? <div className="notification-empty"><span className="notification-empty-icon"><Icon name="bell" size={24}/></span><strong>You’re all caught up</strong><p>New notifications will appear here.</p></div> : <>
-      {safety && <section className="safety-alert notification-safety-card" aria-label="Pinned safety notice">
-        <span className="alert-icon"><Icon name="shield" size={18}/></span>
-        <div className="alert-content"><span className="alert-badge">Safety notice · pinned</span><b className="alert-title">{safety.title}</b><p className="alert-body">{safety.body}</p><span className="notification-safety-date">{safety.createdAt ? new Date(safety.createdAt).toLocaleDateString() : safety.time}</span>{safety.unread && <button type="button" className="alert-action" onClick={() => void markRead(safety.id)}>Mark as read</button>}</div>
+    {error && !clearFailed && <div role="alert" className="hm-state hm-state-error"><p>{error}</p><button type="button" onClick={() => void refresh()}>Try again</button></div>}
+    {clearFailed && !clearSelection && <p role="alert" className="hm-state hm-state-error">Could not clear notifications. Please try again.</p>}
+    {loading && !items.length ? <p role="status" className="hm-state">Loading notifications…</p> : !items.length && !error ? <div className="hm-empty"><span className="hm-empty-icon"><Icon name="bell" size={26}/></span><strong>You’re all caught up</strong><p>New notifications will appear here.</p></div> : <>
+      {safety && <section className="hm-safety" aria-label="Pinned safety notice">
+        <span className="hm-safety-icon"><Icon name="shield" size={20}/></span>
+        <div><span className="hm-eyebrow">Safety notice · pinned</span><b>{safety.title}</b><p>{safety.body}</p><span className="hm-meta">{safety.createdAt ? new Date(safety.createdAt).toLocaleDateString() : safety.time}</span>{safety.unread && <button type="button" className="hm-btn hm-btn-soft hm-btn-sm" onClick={() => void markRead(safety.id)}>Mark as read</button>}</div>
       </section>}
-      {remaining.length > 0 && <section className="notification-group" aria-label="Your notifications"><h3>Recent activity</h3>{remaining.map(item => <button type="button" className={`notification-item ${item.unread ? 'unread' : ''}`} key={item.id} onClick={() => { if (item.unread) void markRead(item.id); }} aria-label={`${item.title}, ${item.body}${item.unread ? ', unread, mark as read' : ''}`}><span className={`notification-icon ${item.icon}`}><Icon name={item.icon} size={18}/></span><span className="notification-copy"><span className="notification-row-title"><b>{item.title}</b>{item.unread && <span className="notification-unread-label">Unread</span>}</span><small>{item.body}</small><span className="notification-time">{item.createdAt ? new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : item.time}</span></span>{item.unread && <i className="unread-dot" aria-hidden="true"/>}</button>)}</section>}
+      {remaining.length > 0 && <section className="hm-block" aria-label="Your notifications"><div className="hm-block-head"><h3>Recent activity</h3></div><div className="hm-card hm-list">{remaining.map(item => <button type="button" className={`hm-note-row${item.unread ? ' is-unread' : ''}`} key={item.id} onClick={() => { if (item.unread) void markRead(item.id); }} aria-label={`${item.title}, ${item.body}${item.unread ? ', unread, mark as read' : ''}`}><span className={`hm-note-icon hm-kind-${item.icon}`}><Icon name={item.icon} size={18}/></span><span className="hm-note-copy"><span className="hm-note-title"><b>{item.title}</b>{item.unread && <span className="notification-unread-label hm-pill hm-tone-green">Unread</span>}</span><small>{item.body}</small><span className="hm-meta">{item.createdAt ? new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : item.time}</span></span></button>)}</div></section>}
     </>}
-    <section className="notification-settings" aria-labelledby="notification-settings-title"><div className="notification-settings-heading"><span className="notification-settings-icon"><Icon name="clock" size={19}/></span><div><h3 id="notification-settings-title">Daily check-in</h3><p>Choose when you’d like a reminder.</p></div><span className="notification-setting-status">{reminder?.enabled ? 'On' : 'Off'}</span></div>
-      <div className="notification-reminder"><label htmlFor="reminder-time">Reminder time</label><div className="notification-reminder-controls"><input id="reminder-time" type="time" value={reminderTime} onChange={event => setReminderTime(event.target.value)} disabled={reminderBusy}/><button type="button" className="notification-save" disabled={reminderBusy} onClick={() => void saveReminder(true)}>{reminderBusy ? 'Saving…' : reminder?.enabled ? 'Update reminder' : 'Save reminder'}</button>{reminder?.enabled && <button type="button" className="notification-turn-off" disabled={reminderBusy} onClick={() => void saveReminder(false)}>Turn off</button>}</div><small>Times use your device’s time zone{reminder?.enabled && reminder.timezone ? ` · ${reminder.timezone}` : ''}.</small>{reminderMessage && <p role="status" className="notification-feedback">{reminderMessage}</p>}</div>
-      <div className="notification-push"><span className="notification-push-icon"><Icon name="bell" size={18}/></span><div><strong>Phone notifications</strong><p>{native ? 'Enable alerts on this phone to receive reminders when the app is closed.' : 'Open the PhysiqueQuest phone app to enable alerts on your device.'}</p>{pushMessage && <p role="status" className="notification-feedback">{pushMessage}</p>}</div>{native && <button type="button" disabled={busy} onClick={enablePush}>{busy ? 'Enabling…' : 'Enable alerts'}</button>}</div>
+    <section className="hm-block" aria-labelledby="notification-settings-title">
+      <div className="hm-block-head"><h3 id="notification-settings-title">Daily check-in</h3><span className={`hm-pill${reminder?.enabled ? ' hm-tone-green' : ''}`}>{reminder?.enabled ? 'On' : 'Off'}</span></div>
+      <div className="hm-card hm-setting">
+        <div className="hm-setting-head"><span className="hm-tile-icon hm-tone-violet"><Icon name="clock" size={19}/></span><p>Choose when you’d like a reminder.</p></div>
+        <label htmlFor="reminder-time" className="hm-field-label">Reminder time</label>
+        <div className="hm-inline-form"><input id="reminder-time" className="hm-input" type="time" value={reminderTime} onChange={event => setReminderTime(event.target.value)} disabled={reminderBusy}/><button type="button" className="hm-btn hm-btn-primary" disabled={reminderBusy} onClick={() => void saveReminder(true)}>{reminderBusy ? 'Saving…' : reminder?.enabled ? 'Update reminder' : 'Save reminder'}</button></div>
+        <small className="hm-meta">Times use your device’s time zone{reminder?.enabled && reminder.timezone ? ` · ${reminder.timezone}` : ''}.</small>
+        {reminder?.enabled && <button type="button" className="hm-btn hm-btn-ghost hm-btn-sm" disabled={reminderBusy} onClick={() => void saveReminder(false)}>Turn off</button>}
+        {reminderMessage && <p role="status" className="hm-feedback">{reminderMessage}</p>}
+      </div>
+      <div className="hm-card hm-setting hm-push">
+        <div className="hm-setting-head"><span className="hm-tile-icon hm-tone-sky"><Icon name="bell" size={18}/></span><div><strong>Phone notifications</strong><p>{native ? 'Enable alerts on this phone to receive reminders when the app is closed.' : 'Open the PhysiqueQuest phone app to enable alerts on your device.'}</p></div></div>
+        {pushMessage && <p role="status" className="hm-feedback">{pushMessage}</p>}
+        {native && <button type="button" className="hm-btn hm-btn-soft" disabled={busy} onClick={enablePush}>{busy ? 'Enabling…' : 'Enable alerts'}</button>}
+      </div>
     </section>
   </div>;
 }

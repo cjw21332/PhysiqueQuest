@@ -16,7 +16,9 @@ export async function expectDarkPalette(page) {
         if (parseFloat(style[`border${side}Width`]) > 0 && !['none', 'hidden'].includes(style[`border${side}Style`])) properties.push(`border${side}Color`);
       }
       for (const prop of properties) {
-        const channels = style[prop].match(/[\d.]+/g)?.map(Number);
+        let channels = style[prop].match(/[\d.]+/g)?.map(Number);
+        // color-mix() computes to color(srgb r g b / a) with 0-1 channels; scale to 0-255 before comparing.
+        if (channels && style[prop].startsWith('color(srgb')) channels = [...channels.slice(0, 3).map(value => Math.round(value * 255)), ...channels.slice(3)];
         if (!channels || channels.length === 4 && channels[3] === 0) continue;
         if (!allowed.has(channels.slice(0, 3).join(','))) issues.push(`${el.tagName}.${el.classList.value}: ${prop}=${style[prop]}`);
       }
@@ -49,7 +51,7 @@ export async function expectHomeBack(page) {
   await back.scrollIntoViewIfNeeded();
   await expect(back).toBeVisible();
   const button = await back.boundingBox();
-  const heading = await page.locator('.section-back-title h2, .pq-goals-header h1, .pq-progress-header h1').first().boundingBox();
+  const heading = await page.locator('.section-back-title h2, .hm-pagehead h1, .hm-pagehead h2').first().boundingBox();
   expect(button.x + button.width).toBeLessThanOrEqual(heading.x);
   expect(button.width).toBeGreaterThanOrEqual(44);
 }
