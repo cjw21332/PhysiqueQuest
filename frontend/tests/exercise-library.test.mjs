@@ -51,10 +51,12 @@ test('the independent sample library stays reachable during loading, plan errors
       if (name.endsWith('/titleCase')) return { titleCase };
       if (name.endsWith('/PoseTrackerEntry')) return { default: () => null };
       if (name.endsWith('/ProgramDayEditor')) return { default: () => null };
+      if (name.endsWith('/useTrainingContext')) return { useTrainingContext: () => ({ bodyKg: 75, heightCm: 175, age: 30, female: false, goal: 'General fitness', activity: '', unit: 'kg', records: [] }) };
+      if (name.endsWith('/programSuggest')) return { suggestFor: () => ({ sets: 3, reps: '10', unit: 'kg', perHand: false, restSets: 90, restNext: 120, basis: 'bodyweight' }), formatLoad: () => '', formatRest: () => '1:30' };
       return require(name);
     });
-    const html = renderToStaticMarkup(React.createElement(CoachPlan, { profile: {}, onStart: () => {}, onLibrary: () => {} }));
-    assert.match(html, /<button[^>]*class="library-link-card"[^>]*>/);
+    const html = renderToStaticMarkup(React.createElement(CoachPlan, { profile: {}, onStart: () => {}, onLibrary: () => {}, onPrograms: () => {} }));
+    assert.match(html, /<button[^>]*class="[^"]*library-link-card[^"]*"[^>]*>/);
     assert.match(html, /Exercise library/);
     assert.match(html, state.loading ? /aria-busy="true"/ : state.plan ? /Rest day/ : /Backend unavailable/);
   }

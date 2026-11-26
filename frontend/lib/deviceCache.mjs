@@ -1,5 +1,5 @@
 export const DEVICE_CACHE_STORAGE_KEY = 'physiquequest-device-cache-v1';
-const RESOURCES = ['profile', 'settings', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:chest', 'progress:waist', 'progress:arms', 'progress:benchPress', 'workouts', 'workout-summary', 'exercise-library'];
+const RESOURCES = ['profile', 'settings', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:chest', 'progress:waist', 'progress:arms', 'progress:benchPress', 'workouts', 'workout-summary', 'exercise-library', 'saved-programs'];
 const MAX_BYTES = 512_000;
 
 // One bounded snapshot for the last account. Server responses remain authoritative.

@@ -24,6 +24,7 @@ export const deviceCache = createDeviceCache({
     if (key === 'nutrition') return Array.isArray(data.meals) && Array.isArray(data.water);
     if (key === 'notifications') return Array.isArray(data.items);
     if (key === 'workouts' || key.startsWith('progress:')) return Array.isArray(data);
+    if (key === 'saved-programs') return Array.isArray(data.items) && data.items.every((item: any) => item && typeof item.id === 'string' && Array.isArray(item.days));
     if (key === 'workout-summary') return Array.isArray(data.trainingDates) && Array.isArray(data.personalRecords);
     if (key === 'exercise-library') return (typeof data.query === 'string' && Array.isArray(data.result?.items)) || (data.queries && typeof data.queries === 'object' && data.details && typeof data.details === 'object');
     return data.state && typeof data.state === 'object' && Array.isArray(data.dailyMissions);
@@ -156,7 +157,14 @@ export interface CoachExercise {
   tracking: 'AI tracked' | 'Manual';
   prescription?: string;
   formTip?: string | null;
+  /** Rest in seconds, applied to the session when it starts from a saved program. */
+  restBetweenSets?: number;
+  restAfterExercise?: number;
 }
+
+export interface ProgramExercise { exerciseId: string; name: string; targetMuscle: string; equipment: string; sets: number; reps?: string; weight?: number; unit: 'kg' | 'lbs'; restSets: number; restNext: number; }
+export interface ProgramDay { id: string; title: string; weekday?: number; exercises: ProgramExercise[]; }
+export interface SavedProgram { id: string; name: string; notes?: string; source: 'custom' | 'split' | 'athlete'; templateId?: string; days: ProgramDay[]; updatedAt?: string; }
 
 export interface CoachDay {
   label: string;
@@ -427,6 +435,7 @@ class ApiClient {
         if (endpoint.startsWith('/notifications/')) { deviceCache.publish('notifications', result); changed.push('notifications'); }
         if (endpoint === '/profile/photo') changed.push('profile');
         if (endpoint === '/coach/plan/day') changed.push('coach');
+        if (endpoint.startsWith('/coach/programs/')) { deviceCache.publish('saved-programs', result); changed.push('saved-programs'); }
         const owner = session.current(requestBaseUrl);
         if (owner?.id) announceDataChange(`${requestBaseUrl}:${owner.id}`, changed);
       }
@@ -568,6 +577,9 @@ class ApiClient {
   async chat(messages: { role: 'user' | 'assistant'; text: string }[], includePersonalData = false, page?: string, signal?: AbortSignal) {
     return this.request<{ reply: string; sources?: { id: string; label: string }[]; privacy: { personalDataIncluded: boolean; historyStored: false; provider: 'openai' } }>('/chat', { method: 'POST', body: JSON.stringify({ messages, includePersonalData, page }), timeoutMs: 60000, signal });
   }
+  async getSavedPrograms(force = false) { return deviceCache.fetch('saved-programs', () => this.request<{ items: SavedProgram[] }>('/coach/programs'), force); }
+  async saveProgram(program: SavedProgram) { const { updatedAt: _updatedAt, ...body } = program; return this.request<{ items: SavedProgram[] }>(`/coach/programs/${encodeURIComponent(program.id)}`, { method: 'PUT', body: JSON.stringify(body) }); }
+  async deleteProgram(id: string) { return this.request<{ items: SavedProgram[] }>(`/coach/programs/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
   async getCoachPlan(force = false) { return deviceCache.fetch('coach', () => this.request<CoachPlanRecord>('/coach/plan', { timeoutMs: 30_000 }), force); }
   async checkEquipment(photo: string) {
     return this.request<{status: 'visible_damage' | 'inconclusive'}>('/coach/equipment-check', {

@@ -1,6 +1,6 @@
 export const DATA_CHANGE_KEY = 'physiquequest-data-change-v1';
 export const DATA_CHANGE_EVENT = 'physiquequest:data-change';
-const allowed = new Set(['profile', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:waist', 'progress:benchPress', 'workouts', 'workout-summary', 'exercise-library', 'settings']);
+const allowed = new Set(['profile', 'nutrition', 'activity', 'coach', 'notifications', 'progress:weight', 'progress:waist', 'progress:benchPress', 'workouts', 'workout-summary', 'exercise-library', 'settings', 'saved-programs']);
 
 export function parseDataChange(raw, scope) {
   try {

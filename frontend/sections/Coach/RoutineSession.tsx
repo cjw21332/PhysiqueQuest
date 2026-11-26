@@ -5,7 +5,7 @@ import { api, ApiRequestError, getApiBaseUrl, type WorkoutSessionRecord, type Wo
 import { getCurrentUser } from '../../lib/auth';
 import LiveSession from './LiveSession';
 import { Icon } from '../Home/icons';
-import { exerciseProgress, prescribedWork } from './workoutRoutine';
+import { exerciseProgress, prescribedWork, plannedLoadKg } from './workoutRoutine';
 import { titleCase } from '../../lib/titleCase';
 import WorkoutKeypad from './WorkoutKeypad';
 import WorkoutEditor from './WorkoutEditor';
@@ -83,7 +83,8 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
   const suggestion = exercise && !historyLoading && !historyError && !prescribedWork(exercise.prescription).durationSeconds
     ? suggestedWorkingSet(history, exercise.exerciseId, exercise.equipment, record.startedAt, usesEstimatedBar) : null;
   const hasExerciseDraft = exercise && Object.keys(draft.values).some(key => key.startsWith(`${exercise.exerciseId}:`));
-  const unit = (exercise && draft.units?.[exercise.exerciseId]) || record.sets?.find(set => set.exerciseId === exercise?.exerciseId && set.loadUnit)?.loadUnit || (hasExerciseDraft ? draft.unit : suggestion?.preferredUnit) || draft.unit || 'lbs';
+  const plannedUnit = exercise?.prescription?.match(/(?:@|·)\s*\d+(?:\.\d+)?\s*(kg|lbs?)\b/i)?.[1].toLowerCase() === 'kg' ? 'kg' as const : /(?:@|·)\s*\d+(?:\.\d+)?\s*lbs?\b/i.test(exercise?.prescription ?? '') ? 'lbs' as const : undefined;
+  const unit = (exercise && draft.units?.[exercise.exerciseId]) || record.sets?.find(set => set.exerciseId === exercise?.exerciseId && set.loadUnit)?.loadUnit || (hasExerciseDraft ? draft.unit : suggestion?.preferredUnit ?? plannedUnit) || draft.unit || 'lbs';
   const defaultBarKg = /smith/i.test(barDescription) ? 20 : /ez.?bar/i.test(barDescription) ? 10 : 20;
   const barInput = exercise ? (barWeights[exercise.exerciseId] ?? String(record.sets?.find(set => set.exerciseId === exercise.exerciseId && set.barWeightKg !== undefined)?.barWeightKg ?? defaultBarKg)) : String(defaultBarKg);
   const estimatedBarKg = Number(barInput);
@@ -96,7 +97,10 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
     }).filter(type => type === 'normal').length;
     const suggest = !saved && setType === 'normal' && suggestion
       ? suggestedWorkingSet(history, exercise.exerciseId, exercise.equipment, record.startedAt, usesEstimatedBar, workingIndex) : null;
-    const suggestedWeight = suggest?.weightKg === undefined ? '' : String(Number((suggest.weightKg * (unit === 'lbs' ? 2.2046226218 : 1)).toFixed(2)));
+    // Without history, fall back to the program's planned load (bar excluded where the field logs plates only).
+    const planned = !suggest && setType === 'normal' ? plannedLoadKg(exercise?.prescription) : undefined;
+    const suggestedKg = suggest?.weightKg ?? (planned === undefined ? undefined : Math.max(0, planned - (usesEstimatedBar ? estimatedBarKg || 0 : 0)));
+    const suggestedWeight = suggestedKg === undefined ? '' : String(Number((suggestedKg * (unit === 'lbs' ? 2.2046226218 : 1)).toFixed(unit === 'lbs' ? 0 : 1)));
     return {
       reps: input?.reps ?? String(saved?.status === 'completed' ? saved.reps : suggest?.reps ?? (prescribed.reps || '')),
       weight: input?.weight ?? (saved?.loadKg === undefined ? suggestedWeight : String(Number(displayedLoad(saved).toFixed(2)))),
@@ -268,7 +272,7 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
           {open && <section aria-label="Current exercise" className="routine-current ml-current">
             <div className="ml-toolbar"><span className="ml-toolbar-label">Weight unit</span><div className="ml-segmented" role="group" aria-label={`Weight unit for ${titleCase(row.name)}`}>{(['lbs', 'kg'] as const).map(value => <button type="button" key={value} aria-pressed={unit === value} disabled={paused || saving} onClick={() => setUnit(value)}>{value}</button>)}</div></div>
             {usesEstimatedBar && <label className="ml-bar">Bar estimate (kg) <input type="number" min="0" max="100" step="0.1" inputMode="decimal" value={barInput} disabled={paused || saving} onChange={event => setBarWeights(current => ({ ...current, [exercise.exerciseId]: event.target.value }))}/></label>}
-            {!prescribedWork(exercise.prescription).durationSeconds && <aside className="ml-tip"><span className="ml-tip-icon" aria-hidden="true"><Icon name="lightbulb" size={16}/></span><span><strong>Suggested starting point</strong><p>{historyLoading ? 'Loading your last workout…' : historyError ? 'History is unavailable. Enter your own values.' : suggestion ? suggestion.unknownBar ? 'Check the bar weight and enter your added plates.' : suggestion.note : 'No previous working set. Enter your own values.'}</p>{suggestion && <small>Suggestions are editable. Adjust to how you feel.</small>}</span></aside>}
+            {!prescribedWork(exercise.prescription).durationSeconds && <aside className="ml-tip"><span className="ml-tip-icon" aria-hidden="true"><Icon name="lightbulb" size={16}/></span><span><strong>Suggested starting point</strong><p>{historyLoading ? 'Loading your last workout…' : historyError ? 'History is unavailable. Enter your own values.' : suggestion ? suggestion.unknownBar ? 'Check the bar weight and enter your added plates.' : suggestion.note : plannedLoadKg(exercise.prescription) !== undefined ? 'Weight prefilled from your program. Adjust it after the first set.' : 'No previous working set. Enter your own values.'}</p>{suggestion && <small>Suggestions are editable. Adjust to how you feel.</small>}</span></aside>}
             <p className="ml-help">{usesEstimatedBar ? 'Enter added plates. Total includes the estimated bar.' : 'Tap a value to edit, then tick to log the set. Blank weight means no added load.'}</p>
             <div className="ml-sets">
             {Array.from({ length: exercise.sets }, (_, index) => {

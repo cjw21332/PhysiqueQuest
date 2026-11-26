@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { expectDarkPalette, expectReferenceLayout } from './theme-layout-helpers.mjs';
 
+// The release "What's new" dialog would cover the page under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1')); });
+
 const exercises = [
   { exerciseId: 'push-up', name: 'Push-up', equipment: 'Bodyweight', prescription: '3 × 12', tracking: 'AI tracked' },
   { exerciseId: 'bench-press', name: 'Dumbbell bench press', equipment: 'Dumbbells', prescription: '4 × 10 · 22 kg', tracking: 'AI tracked' },
@@ -73,7 +76,7 @@ test('dark Coach plan, library and exercise details retain filters, playback and
     await expect(page.locator(selector).first()).toHaveCSS('background-color', 'rgb(11, 15, 21)');
   }
   await expect(page.locator('.home-bottom-nav')).toHaveCSS('background-color', 'rgb(22, 29, 39)');
-  await expectReferenceLayout(page, ['.coach-scroll', '.coach-plan-header', '.day-button', '.exercise-item', '.start-button-container', '.home-bottom-nav']);
+  await expectReferenceLayout(page, ['.coach-scroll', '.coach-plan-header', '.day-button', '.exercise-item', '.cq-hero', '.home-bottom-nav']);
   await capture(page, info, '01-coach-plan');
   await page.locator('.coach-scroll').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await capture(page, info, '02-coach-plan-scrolled');
@@ -180,10 +183,10 @@ test('long equipment lists wrap inside every workout day on narrow screens', asy
   await page.goto('/coach');
   for (const day of ['Monday', 'Wednesday', 'Friday', 'Saturday']) {
     await page.getByRole('button', { name: `${day}, workout day` }).click();
-    const equipment = page.locator('.workout-meta .meta-item').filter({ hasText: label });
+    const equipment = page.locator('.cq-hero-equipment').filter({ hasText: label });
     await expect(equipment).toBeVisible();
     const layout = await equipment.evaluate(element => {
-      const rect = element.getBoundingClientRect(), parent = element.closest('.workout-meta').getBoundingClientRect();
+      const rect = element.getBoundingClientRect(), parent = element.closest('.cq-hero').getBoundingClientRect();
       return { left: rect.left, right: rect.right, parentLeft: parent.left, parentRight: parent.right, height: rect.height, lineHeight: parseFloat(getComputedStyle(element).lineHeight) };
     });
     expect(layout.left).toBeGreaterThanOrEqual(layout.parentLeft - 1);

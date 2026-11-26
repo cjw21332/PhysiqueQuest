@@ -2,6 +2,7 @@
 
 import './coach-reference.css';
 import './manual-session.css';
+import './coach-hub.css';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Profile } from '../Home/types';
@@ -19,12 +20,15 @@ import { api, type WorkoutSessionRecord, type CoachExercise } from '../../lib/ap
 import { useScreenRoute } from '../../hooks/useScreenRoute';
 import SessionChoice from './SessionChoice';
 import OutcomeDialog from '../../components/OutcomeDialog';
+import ProgramsHub from './ProgramsHub';
+import { Icon } from '../Home/icons';
 
-type View = 'plan' | 'library' | 'review' | 'session' | 'report';
+type View = 'plan' | 'programs' | 'library' | 'review' | 'session' | 'report';
+const TABS: { view: View; label: string; icon: string }[] = [{ view: 'plan', label: 'Today', icon: 'calendar' }, { view: 'programs', label: 'Programs', icon: 'clipboard' }, { view: 'library', label: 'Library', icon: 'book-open' }];
 
 export default function CoachSection({ profile }: { profile: Profile }) {
   const { push: navigate } = useRouter();
-  const [view, setView] = useScreenRoute<View>('/coach', { plan: '', library: '/library', review: '/review', session: '/session', report: '/report' }, 'plan');
+  const [view, setView] = useScreenRoute<View>('/coach', { plan: '', programs: '/programs', library: '/library', review: '/review', session: '/session', report: '/report' }, 'plan');
   const [sessionExercises, setSessionExercises] = useState<CoachExercise[]>([]);
   const [sessionTitle, setSessionTitle] = useState('Workout session');
   const [choiceOpen, setChoiceOpen] = useState(false);
@@ -65,7 +69,7 @@ export default function CoachSection({ profile }: { profile: Profile }) {
     } finally { if (request === recoveryRequest.current) setChecking(false); }
   }, []);
   useEffect(() => {
-    if (view !== 'plan' && view !== 'library' && view !== 'review') return;
+    if (view !== 'plan' && view !== 'programs' && view !== 'library' && view !== 'review') return;
     void refreshRecovery();
     const refresh = () => { if (document.visibilityState === 'visible') void refreshRecovery(); };
     window.addEventListener('focus', refresh);
@@ -88,16 +92,28 @@ export default function CoachSection({ profile }: { profile: Profile }) {
     try {
       if (!selected.length) throw new Error('Select a program with available exercises first.');
       startAttempt.current ??= { requestKey: createRequestKey(), startedAt: new Date().toISOString() };
-      const created = await api.startManualWorkout({kind:'create',data:{...startAttempt.current, exerciseIds:selected.map(row => row.exerciseId), exercises:routineSnapshot(selected),routineName:title,timezone:Intl.DateTimeFormat().resolvedOptions().timeZone}});
+      let created = await api.startManualWorkout({kind:'create',data:{...startAttempt.current, exerciseIds:selected.map(row => row.exerciseId), exercises:routineSnapshot(selected),routineName:title,timezone:Intl.DateTimeFormat().resolvedOptions().timeZone}});
+      // Program rest timers go through the routine update the session already uses; defaults apply if it fails.
+      if (selected.some(row => row.restBetweenSets !== undefined)) {
+        try { created = await api.updateWorkoutRoutine(created._id, created.revision ?? 0, routineSnapshot(selected).map((row, index) => ({ ...row, restBetweenSets: selected[index].restBetweenSets ?? 90, restAfterExercise: selected[index].restAfterExercise ?? 120 })), title); }
+        catch { /* Rests stay editable in the session. */ }
+      }
       setSessionMode('manual'); setWorkout(created); setChoiceOpen(false); setView('session');
     } catch (err) { setActionError(err instanceof Error ? err.message : 'Could not start workout.'); }
     finally { starting.current = false; setStartingSession(false); }
   };
   const chooseSession = () => { void startSession(); };
+  const openChoice = (selected: CoachExercise[], title?: string) => {
+    if (checking || checkFailed || recoverable) { setActionError(recoverable ? 'Resume your existing workout before starting another.' : 'Wait for workout recovery or retry the check before starting.'); return; }
+    startAttempt.current = null; setSessionExercises(selected); setSessionTitle(title || 'Workout session'); setChoiceOpen(true);
+  };
+  const hub = view === 'plan' || view === 'programs' || view === 'library';
 
   return (
-    <section className={`coach-section coach-view-${view} ${view === 'plan' ? 'coach-reference' : ''}`}>
+    <section className={`coach-section coach-view-${view} ${hub ? 'cq-hub' : ''}`}>
       <div className="coach-scroll">
+        {hub && view !== 'library' && <header className="cq-hub-header coach-plan-header"><div><p className="cq-eyebrow">{profile.name ? `Hi, ${profile.name.split(' ')[0]}` : 'Your training'}</p><h2 className="coach-title">AI Coach</h2></div></header>}
+        {hub && <nav className="cq-tabs" aria-label="Coach sections">{TABS.map(tab => <button type="button" key={tab.view} aria-current={view === tab.view ? 'page' : undefined} onClick={() => setView(tab.view)}><Icon name={tab.icon} size={16}/>{tab.label}</button>)}</nav>}
         {view === 'plan' && <>
           {recoverable && !checking && <section className="routine-recovery"><h2>Workout in progress</h2><p>Resume your saved sets. Resume paused; unsaved inputs are restored only on this device. Without a device checkpoint, elapsed time includes the gap while the app was closed.</p><button type="button" disabled={starting.current} onClick={async()=>{
             if(starting.current)return;starting.current=true;setActionError('');
@@ -108,8 +124,9 @@ export default function CoachSection({ profile }: { profile: Profile }) {
             }catch(err){setActionError(err instanceof Error?err.message:'Could not restore workout. Try again.');}finally{starting.current=false;}
           }}>Resume saved workout</button></section>}
           {checkFailed && <p role="alert">Could not check for an existing workout. <button type="button" onClick={()=>void refreshRecovery()}>Retry workout recovery</button></p>}
-          <CoachPlan profile={profile} onStart={(selected, title) => { if(checking || checkFailed || recoverable){setActionError(recoverable?'Resume your existing workout before starting another.':'Wait for workout recovery or retry the check before starting.');return;}startAttempt.current=null;setSessionExercises(selected); setSessionTitle(title || 'Workout session'); setChoiceOpen(true); }} onLibrary={() => setView('library')}/>
+          <CoachPlan profile={profile} onStart={openChoice} onLibrary={() => setView('library')} onPrograms={() => setView('programs')}/>
         </>}
+        {view === 'programs' && <ProgramsHub profile={profile} onStart={openChoice} onOpenPlan={() => setView('plan')}/>}
         {view === 'library' && <>
           <ExerciseLibrary selectedEquipment={profile.equipment ?? []} onBack={() => setView('plan')} onStartPersonal={(item, mode) => { if(checking || checkFailed || recoverable){setActionError(recoverable?'Resume your existing workout before starting another.':'Wait for workout recovery or retry the check before starting.');return;} startAttempt.current=null; const selected: CoachExercise[] = [{ exerciseId:item._id, name:item.name, group:item.targetMuscle, targetMuscle:item.targetMuscle, equipment:item.equipment, tracking:'Manual', prescription:'1 × 10' }]; setSessionExercises(selected); setSessionTitle(item.name); if (mode === 'upload') setView('review'); else void startSession(selected, item.name); }}/>
         </>}
@@ -117,7 +134,7 @@ export default function CoachSection({ profile }: { profile: Profile }) {
         {view === 'session' && workout?.status === 'active' && <RoutineSession title={sessionTitle} onCancel={() => { setWorkout(null); setRecoverable(null); setView('plan'); }} mode={sessionMode} workout={workout} thresholdSeconds={settings.threshold} contactName={profile.contactName??''} contactPhone={profile.contactPhone??''} onSaved={setWorkout} onComplete={saved=>{setWorkout(saved);setRecoverable(null);try { sessionStorage.setItem('physiquequest-last-workout-report', saved._id); } catch {} setView('report');}}/>}
         {view === 'report' && workout?.status === 'completed' && <WorkoutReport workout={workout} title={workout.routineName || sessionTitle} exercises={sessionExercises} onBack={() => setView('plan')} onHome={goHome} onShare={() => say('Sharing is not available yet.')}/>}
       </div>
-      {(view === 'plan' || view === 'library') && <BottomNav coachIcon="coach-wand" />}
+      {hub && <BottomNav coachIcon="coach-wand" />}
       {choiceOpen && <SessionChoice busy={startingSession} error={actionError} onClose={() => { setChoiceOpen(false); setActionError(''); }} onChoose={chooseSession} onReviewVideo={() => { setChoiceOpen(false); setView('review'); }} />}
       {actionError && !choiceOpen && <OutcomeDialog kind="error" title="Workout unavailable" message={actionError} onClose={() => setActionError('')} actionLabel="OK"/>}
       {toast && <OutcomeDialog kind="info" title="Sharing unavailable" message={toast} onClose={() => setToast('')}/>}

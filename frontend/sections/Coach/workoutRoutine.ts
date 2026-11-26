@@ -14,3 +14,9 @@ export function exerciseProgress(exercise: Pick<WorkoutExerciseSnapshot, 'exerci
   if (rows.length === exercise.sets) return 'skipped';
   return rows.length ? 'in progress' : 'upcoming';
 }
+/** Planned load from a prescription such as "3 × 8-12 @ 40 kg" or "4 × 10 · 22 kg", in kilograms. */
+export function plannedLoadKg(prescription?: string): number | undefined {
+  const match = prescription?.match(/(?:@|·)\s*(\d+(?:\.\d+)?)\s*(kg|lbs?)\b/i);
+  if (!match) return undefined;
+  return Number(match[1]) / (match[2].toLowerCase() === 'kg' ? 1 : 2.2046226218);
+}

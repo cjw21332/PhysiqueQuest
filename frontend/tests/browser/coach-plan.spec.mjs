@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// The release "What's new" dialog would cover the page under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem('pq-whats-new-shown', '1')); });
+
 const prescribed = [
   { exerciseId: 'catalog-pushup', name: 'Push-up', equipment: 'Bodyweight', prescription: '3 × 12', tracking: 'Manual' },
   { exerciseId: 'catalog-bench', name: 'Dumbbell bench press', equipment: 'Dumbbell', prescription: '4 × 10', tracking: 'Manual' },
@@ -138,8 +141,9 @@ test('reference Coach layout renders server prescriptions and starts the chosen 
   for (const size of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(size);
     await page.locator('.coach-scroll').evaluate(element => { element.scrollTop = 0; });
-    expect(await page.locator('.start-button-container').evaluate(element => getComputedStyle(element).position)).toBe('static');
-    await page.locator('.coach-scroll').evaluate(element => { element.scrollTop = element.scrollHeight; });
+    expect(await page.locator('.cq-hero').evaluate(element => getComputedStyle(element).position)).toBe('static');
+    // Start lives in the hero card; it must be reachable and clear of the bottom navigation.
+    await page.getByRole('button', { name: 'Start session', exact: true }).scrollIntoViewIfNeeded();
     await expect(page.getByRole('button', { name: 'Start session', exact: true })).toBeInViewport();
     const start = await page.getByRole('button', { name: 'Start session', exact: true }).boundingBox();
     const nav = await page.getByRole('navigation', { name: 'Main navigation' }).boundingBox();
