@@ -411,14 +411,21 @@
   .hm.hm.hm .hm-hero { padding: 16px; }
   .hm.hm.hm .hm-hero h2 { font-size: 22px; }
   .hm.hm.hm :is(.hm-hero-actions, .hm-inline-form) { grid-template-columns: 1fr; }
-  .hm.hm.hm .hm-player-stats { grid-template-columns: 1fr; }
   .hm.hm.hm .hm-nutrition-top { gap: 12px; }
+  .hm.hm.hm .hm-macro { padding: 10px 8px; }
+  .hm.hm.hm .hm-macro b { font-size: 15px; }
+  .hm.hm.hm .hm-tile { min-height: 124px; padding: 14px; }
+  .hm.hm.hm .hm-goal-path strong { font-size: 21px; }
+  .hm.hm.hm .hm-week-day > i { width: 30px; height: 30px; }
+}
+/* 360px is a common Android width, so only genuinely tiny screens stack these pairs. */
+@media (max-width: 340px) {
+  .hm.hm.hm .hm-player-stats { grid-template-columns: 1fr; }
   .hm.hm.hm .hm-macros { grid-template-columns: 1fr; }
   .hm.hm.hm .hm-tiles { grid-template-columns: 1fr; }
   .hm.hm.hm .hm-tile { min-height: 0; }
   .hm.hm.hm .hm-goal-path { grid-template-columns: 1fr; }
   .hm.hm.hm .hm-goal-arrow { justify-self: center; transform: rotate(90deg); }
-  .hm.hm.hm .hm-week-day > i { width: 30px; height: 30px; }
   .hm.hm.hm :is(.records-controls, .hm-dates) { grid-template-columns: 1fr; }
 }
 @media (min-width: 600px) {

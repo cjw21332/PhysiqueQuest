@@ -4,13 +4,13 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '../sections/Home/icons';
 import './whatsNew.css';
 
-export const WHATS_NEW_VERSION = '1.6.0';
+export const WHATS_NEW_VERSION = '1.6.1';
 export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
-  { icon: 'clipboard', title: 'Programs in Coach', text: 'Browse popular training splits and athlete-inspired programs, or build your own with sets, reps, weight and rest.' },
-  { icon: 'coach-wand', title: 'Personal suggestions', text: 'Every exercise suggests sets, reps, a starting weight and rest, based on your profile and your logged sets.' },
-  { icon: 'dumbbell', title: 'Fits your equipment', text: 'Splits and saved programs swap exercises to match the equipment in your training preferences.' },
-  { icon: 'lock', title: 'Stay signed in', text: 'Reopening the app keeps you signed in until you log out. No more “Sign in to sync” reminders.' },
-  { icon: 'calendar', title: 'Redesigned Coach', text: 'Today, Programs and Library tabs, with a clearer weekly view and session card.' },
+  { icon: 'home', title: 'Redesigned Home', text: 'Your level, streak and points up top, today’s session front and centre, and missions with progress rings.' },
+  { icon: 'meal', title: 'Clearer nutrition', text: 'A calorie ring shows what’s left today, with protein, carbs and fats side by side.' },
+  { icon: 'target', title: 'Goals at a glance', text: 'See current and target weight together, this week’s training days and your recent check-ins.' },
+  { icon: 'trend', title: 'Refreshed Progress', text: 'Tabs for overview, exercises, muscles and records, with a bigger trend chart and history.' },
+  { icon: 'bell', title: 'Tidier notifications', text: 'Pinned safety notices, clearer unread updates, and reminder settings in one place.' },
 ];
 // Shown once per version: the device remembers the version it showed, so reopening the app does not
 // repeat it. The per-launch flag stays honoured (tests and older builds set it).
