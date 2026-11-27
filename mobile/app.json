@@ -52,6 +52,10 @@
     },
     "ios": {
       "bundleIdentifier": "com.physiquequest.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
       "supportsTablet": true,
       "requireFullScreen": false
     },

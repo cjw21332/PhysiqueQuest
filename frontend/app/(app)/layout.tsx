@@ -65,6 +65,7 @@ export default function AppLayout({
     };
     const sync = () => { if (isAuthenticated() && document.visibilityState === 'visible') void api.syncManualWorkouts().catch(() => {}); };
     window.addEventListener('physiquequest:connection-restored', sync);
+    window.addEventListener('online', sync);
     window.addEventListener('focus', sync);
     sync();
     preload();
@@ -73,6 +74,7 @@ export default function AppLayout({
     window.addEventListener('storage', onStorage);
     return () => {
       window.removeEventListener('physiquequest:connection-restored', sync);
+      window.removeEventListener('online', sync);
       window.removeEventListener('focus', sync);
       window.removeEventListener('focus', preload);
       window.removeEventListener('physiquequest:session-ended', endSession);

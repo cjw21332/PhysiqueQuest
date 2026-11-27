@@ -184,6 +184,8 @@ export interface CoachPlanRecord {
   goal: string;
   weekLabel: string;
   ageNote?: string | null;
+  intensity?: 'starter' | 'building' | 'advanced';
+  intensityNote?: string | null;
   sessionCount: number;
   duration: string;
   libraryReady: boolean;
@@ -201,6 +203,7 @@ export interface AdminAnalyticsRecord {
   missionCompletion: number | null;
   weeklyRetention: number[] | null;
   emergencyEvents: { total: number; delivered: number; failed: number; pending: number };
+  appFeedback?: { count: number; averageRating: number | null; recent: { rating: number; category: string; message: string; platform: string | null; createdAt: string }[] };
 }
 
 /** Per-100 g macros, as reported alongside a scanned item. Informational only. */
@@ -585,6 +588,11 @@ class ApiClient {
     return this.request<{status: 'visible_damage' | 'inconclusive'}>('/coach/equipment-check', {
       method: 'POST', body: JSON.stringify({ photo, consent: true }), timeoutMs: 20000,
     });
+  }
+  async saveAppFeedback(input: { rating: number; category: 'bug' | 'idea' | 'praise' | 'other'; message: string }) {
+    const native = typeof window !== 'undefined' && window.ReactNativeWebView ? (/iphone|ipad|ipod/i.test(navigator.userAgent) ? 'ios' : 'android') : 'web';
+    const appVersion = appVersionHeaders()['X-App-Version'];
+    await this.request('/feedback/app', { method: 'POST', body: JSON.stringify({ ...input, platform: native, ...(appVersion && { appVersion }) }) });
   }
   async saveWorkoutFeedback(input: { source: 'manual' | 'pose'; exercise: string; sessionRef?: string; rpe: number; difficulty: string; enjoyment?: number; painLocations: string[]; notes?: string }) {
     await this.request('/feedback', { method: 'POST', body: JSON.stringify(input) });

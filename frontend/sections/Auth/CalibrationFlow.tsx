@@ -52,7 +52,7 @@ const goalOptions = [
 ];
 const equipmentOptions = ['Bodyweight only', 'Dumbbells', 'Resistance bands', 'Full gym'];
 const activityOptions = ['Sedentary', 'Light', 'Moderate', 'Active', 'Athlete'];
-const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'None of these'];
+const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'Heart condition', 'None of these'];
 
 export default function CalibrationFlow({ name, email, onComplete, submitError = '', pendingDraftKey }: {
   name: string;
@@ -348,6 +348,7 @@ export default function CalibrationFlow({ name, email, onComplete, submitError =
             {!skipped.includes('health') && <><div className="choice-group condition-list">
               <div className="group-title"><b>Existing conditions</b><small>Optional</small></div>
               {conditionOptions.map((condition) => <label key={condition}><input type="checkbox" checked={data.conditions.includes(condition)} onChange={() => toggleCondition(condition)} />{condition}</label>)}
+              {data.conditions.some(item => item === 'Heart condition' || item === 'Hypertension') && <div className="safety-note" role="note"><span><Icon name="shield" size={16} /></span><p>Get clearance from your doctor before starting. Your plan skips HIIT, sprints and max-effort work. Stop at once and seek help if you feel chest pain, severe breathlessness, dizziness or an irregular heartbeat.</p></div>}
             </div>
             <div className="choice-group notes-group">
               <div className="group-title"><b>Additional information</b><small>Optional</small></div>

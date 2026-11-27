@@ -12,6 +12,7 @@ import PersonalDataEdit from './PersonalDataEdit';
 import GoalsEdit from './GoalsEdit';
 import TrainingPreferenceEdit from './TrainingPreferenceEdit';
 import HealthProfileEdit from './HealthProfileEdit';
+import AppFeedbackForm from './AppFeedbackForm';
 import EmergencyContactEdit from './EmergencyContactEdit';
 import { useSettings } from '../../hooks/useSettings';
 import { normalizeTrainingDays } from '../../lib/trainingDays';
@@ -22,7 +23,7 @@ import { updateNutritionForProfile } from '../../lib/weightUpdate';
 import { useRouter } from 'next/navigation';
 import styles from './MeSection.module.css';
 
-type MeView = 'settings' | 'personal-exercises' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency';
+type MeView = 'settings' | 'personal-exercises' | 'edit-personal' | 'edit-goals' | 'edit-training' | 'edit-health' | 'edit-emergency' | 'app-feedback';
 
 function Switch({ label, checked, onChange, disabled = false, tone = 'green' }: { label: string; checked: boolean; onChange: () => void; disabled?: boolean; tone?: 'green' | 'red' }) {
   return <button className={`me-switch ${tone} ${checked ? 'on' : ''}`} type="button" role="switch" aria-label={label} aria-checked={checked} disabled={disabled} onClick={onChange}><i/></button>;
@@ -44,7 +45,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   const [photoOpen, setPhotoOpen] = useState(false);
   const [currentProfile, setCurrentProfile] = useState(profile);
   const accountEmail = currentProfile.email || getCurrentUser()?.email || '';
-  const [view, setView] = useScreenRoute<MeView>('/me', { settings: '', 'personal-exercises': '/personal-exercises', 'edit-personal': '/personal-data', 'edit-goals': '/goals', 'edit-training': '/training', 'edit-health': '/health', 'edit-emergency': '/emergency-contact' }, 'settings');
+  const [view, setView] = useScreenRoute<MeView>('/me', { settings: '', 'personal-exercises': '/personal-exercises', 'edit-personal': '/personal-data', 'edit-goals': '/goals', 'edit-training': '/training', 'edit-health': '/health', 'edit-emergency': '/emergency-contact', 'app-feedback': '/feedback' }, 'settings');
   const [notice, setNotice] = useState('');
   const [saveError, setSaveError] = useState('');
   const backFromJourneyEditor = () => { setSaveError(''); if (new URLSearchParams(window.location.search).get('from') === 'goals') router.push('/goals'); else setView('settings'); };
@@ -99,6 +100,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   if (view === 'edit-health') return <HealthProfileEdit key={String(connected)} profile={currentProfile} error={saveError} onBack={() => { setSaveError(''); setView('settings'); }} onSave={patch => saveProfile(patch, 'Health profile edit')} />;
   if (view === 'edit-emergency') return <EmergencyContactEdit key={String(connected)} profile={currentProfile} error={saveError} onBack={() => { setSaveError(''); setView('settings'); }} onSave={patch => saveProfile(patch, 'Emergency contact edit')} />;
 
+  if (view === 'app-feedback') return <AppFeedbackForm onBack={() => setView('settings')} onSent={() => { setView('settings'); setNotice('Thanks! Your feedback was sent to the team.'); }} />;
   if (view === 'personal-exercises') return <PersonalExercises onBack={() => setView('settings')} />;
 
   return <section className={`me-section me-reference ${styles.settings}`} aria-label="Account and settings">
@@ -139,6 +141,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
       <h3 className="me-group-title me-privacy-title">Privacy</h3>
       <div className="me-setting-row"><span><b>Show me on leaderboard</b><small>Friends can see your rank and points</small></span><Switch label="Show me on leaderboard" checked={settings.showLeaderboard} disabled={!connected} onChange={() => void toggle('showLeaderboard')}/></div></>}
 
+      <h3 className="me-group-title">Support</h3><div className="me-list"><SettingRow icon="star" title="Send feedback" detail="Rate the app, report a problem or suggest a feature" disabled={!connected} onClick={() => setView('app-feedback')}/></div>
       <h3 className="me-group-title">Security</h3><div className="me-list"><SettingRow icon="key" title="Change password" detail={accountEmail ? `Verified with a code sent to ${accountEmail}` : 'Verified with a code sent to your account email'} disabled={!connected} onClick={() => setPasswordOpen(true)}/></div>
       <button type="button" className="me-logout" onClick={() => onLogoutRequest?.()}><Icon name="logout" size={17}/>Log out</button>
     </div>

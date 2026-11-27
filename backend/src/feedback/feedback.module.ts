@@ -3,9 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FeedbackController } from './feedback.controller.js';
 import { FeedbackService } from './feedback.service.js';
 import { WorkoutFeedback, WorkoutFeedbackSchema } from './schemas/workout-feedback.schema.js';
+import { AppFeedback, AppFeedbackSchema } from './schemas/app-feedback.schema.js';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: WorkoutFeedback.name, schema: WorkoutFeedbackSchema }])],
+  imports: [MongooseModule.forFeature([{ name: WorkoutFeedback.name, schema: WorkoutFeedbackSchema }, { name: AppFeedback.name, schema: AppFeedbackSchema }])],
   controllers: [FeedbackController],
   providers: [FeedbackService],
   exports: [FeedbackService],

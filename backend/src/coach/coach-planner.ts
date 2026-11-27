@@ -1,3 +1,4 @@
+import { fitnessTier, type BodyIndexProfile } from '../profile/body-index.js';
 import { commonMovementScore, matchesFocus, movementFamily, primaryCategory, suitableStrengthMovement } from './movement-curation.js';
 
 const WEEKDAYS = [
@@ -87,6 +88,7 @@ const EXCLUSIONS: Record<string, string[]> = {
   'Shoulder impingement': ['overhead', 'shoulder press', 'upright row', 'lateral raise'],
   Hypertension: ['hiit', 'max effort', 'sprint'],
   Asthma: ['hiit', 'sprint', 'max effort'],
+  'Heart condition': ['hiit', 'sprint', 'max effort', 'jump', 'burpee'],
 };
 
 export interface LibraryExercise {
@@ -113,6 +115,7 @@ export interface CoachFeedback {
 const restrictionAliases: Record<string, string> = {
   knee: 'Knee injury', shoulder: 'Shoulder impingement', 'lower back': 'Lower back pain',
   'high blood pressure': 'Hypertension',
+  heart: 'Heart condition', 'heart problem': 'Heart condition', 'heart disease': 'Heart condition',
 };
 function exclusionsFor(label: string) {
   const key = normalized(label);
@@ -144,6 +147,15 @@ const AGE_LIMITS: Record<AgeBand, { excluded: string[]; maxSets: number; minReps
 };
 
 /** Applies the age caps to a prescription such as "4 × 6" or "3 × 45 s at easy effort". */
+const INTENSITY_NOTES: Record<'starter' | 'building' | 'advanced', string | null> = {
+  starter: 'Starter intensity from your activity level and body index: 2 sets per exercise, no jumping or max-effort work. Intensity rises as you log consistent weeks.',
+  building: null,
+  advanced: 'Advanced intensity from your activity level and body index: one extra working set per exercise.',
+};
+function tierPrescription(prescription: string, tier: 'starter' | 'building' | 'advanced') {
+  return prescription.replace(/^\d+/, sets => String(tier === 'starter' ? Math.min(Number(sets), 2) : tier === 'advanced' ? Math.min(Number(sets) + 1, 5) : Number(sets)));
+}
+
 export function limitPrescription(prescription: string, band: AgeBand) {
   const limits = AGE_LIMITS[band];
   return prescription.replace(/^(\d+) × (\d+)( s)?/, (_, sets: string, amount: string, timed?: string) =>
@@ -175,7 +187,7 @@ export function feedbackSignals(feedback: CoachFeedback[]) {
     .sort((a, b) => a.exercise.localeCompare(b.exercise));
 }
 
-export interface PlanProfile { goal: string; age?: string; injuries?: string[]; healthRisks?: string[]; days?: string[]; duration?: string; equipment?: string[]; conditions?: string[]; createdAt?: string | Date; }
+export interface PlanProfile extends BodyIndexProfile { goal: string; age?: string; injuries?: string[]; healthRisks?: string[]; days?: string[]; duration?: string; equipment?: string[]; conditions?: string[]; createdAt?: string | Date; }
 
 export class CoachPlanner {
   build(profile: PlanProfile, library: LibraryExercise[], feedback: CoachFeedback[] = []) {
@@ -193,6 +205,9 @@ export class CoachPlanner {
     const unknownRestriction = restrictions.some(label => !exclusionsFor(label));
     const excluded = [...(profile.conditions ?? []), ...restrictions].flatMap(label => exclusionsFor(label) ?? []);
     excluded.push(...AGE_LIMITS[band].excluded);
+    // Body index: starters skip jumps and do fewer sets; advanced users get one more set (age caps still apply).
+    const tier = fitnessTier(profile);
+    if (tier === 'starter') excluded.push(...HIGH_IMPACT_TERMS);
     const latest = latestFeedback(feedback);
     let workoutIndex = 0;
 
@@ -219,7 +234,9 @@ export class CoachPlanner {
       sessionCount,
       duration,
       libraryReady: available.length > 0,
-      sets: limitPrescription(SETS_BY_GOAL[profile.goal] ?? SETS_BY_GOAL['General fitness'], band),
+      sets: limitPrescription(tierPrescription(SETS_BY_GOAL[profile.goal] ?? SETS_BY_GOAL['General fitness'], tier), band),
+      intensity: tier,
+      intensityNote: INTENSITY_NOTES[tier],
       ageNote: AGE_LIMITS[band].note,
       days,
     };

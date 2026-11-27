@@ -10,6 +10,19 @@ import { nutritionTargets, type FoodEntry, type MealName } from './types';
 import MealDiary from './MealDiary';
 import WaterTracker from './WaterTracker';
 import { summarizeHistory } from './nutritionPresentation';
+import { weeklyFoodCarbon } from '../../lib/foodCarbon';
+import { formatLocalDate } from '../../lib/localDate.mjs';
+
+/** Estimated food CO2e for the last 7 logged days, with local eco-friendly swaps. */
+function FoodCarbon({ entries }: { entries: FoodEntry[] }) {
+  const week = weeklyFoodCarbon(entries, formatLocalDate());
+  if (!week.bySource.length) return null;
+  return <details className="food-carbon"><summary>Food carbon footprint · {week.totalKg.toFixed(1)} kg CO₂e this week</summary>
+    {week.bySource.map(row => <div className="food-value" key={row.group}><span>{row.group}</span><b>{row.kg.toFixed(1)} kg</b></div>)}
+    {week.swaps.map(swap => <p className="meal-multiple-hint" key={swap}>🌱 {swap}</p>)}
+    <p className="meal-multiple-hint">Estimates from food type and portion; foods without a weight count as 150 g.</p>
+  </details>;
+}
 
 export default function NutritionDashboard({
   targets = nutritionTargets, onPlan, onSupplements,
@@ -73,6 +86,7 @@ export default function NutritionDashboard({
       {missingFoods.length > 0 && <p className="meal-multiple-hint" role="status">Some nutrition is missing for {missingFoods.map(item => item.name).join(', ')}. Totals show known values only; edit these foods to complete your daily summary.</p>}
 
       <AdditionalNutrition entries={meals}/>
+      <FoodCarbon entries={historyMeals}/>
       {readOnly && <div className="scan-dashboard-scan is-locked" aria-disabled="true">
         <span className="scan-dashboard-scan-icon"><Icon name="lock" size={20} /></span>
         <span className="scan-dashboard-scan-copy"><strong>Meal scanning is paused</strong><small>Available again once you&apos;re connected</small></span>

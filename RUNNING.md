@@ -217,6 +217,23 @@ npm run start --workspace mobile -- --clear
 - Press `w` - Open in web browser
 - Scan QR code with Expo Go app on your phone
 
+## iOS build (iPhone)
+
+The mobile app is one Expo codebase for Android and iOS (`mobile/app.json` → `ios.bundleIdentifier` `com.physiquequest.app`). Windows cannot compile iOS, so iOS builds run on EAS cloud Macs.
+
+1. Get an Apple Developer Program membership (99 USD/year) at developer.apple.com.
+2. For Google sign-in on iPhone, create an **iOS OAuth client** for `com.physiquequest.app` in Google Cloud Console and add its id to `mobile/app.json` → `expo.extra.googleIosClientId`. Without it, the iOS app hides Google sign-in and email sign-in still works.
+3. From `mobile/`, sign in and build (EAS creates the signing certificate and provisioning profile when asked):
+   ```powershell
+   npx eas-cli login
+   npx eas-cli device:create
+   npx eas-cli build --platform ios --profile preview
+   ```
+   `device:create` registers your iPhone for internal (ad hoc) installs. Open the build link on the iPhone to install.
+4. For TestFlight / App Store: `npx eas-cli build --platform ios --profile production`, then `npx eas-cli submit --platform ios`.
+
+iOS notes: the emergency alarm uses the normal notification sound (the max-volume native alarm is Android-only), and Expo Go on iPhone runs the app without the native pose tracker.
+
 ## Accessing the Application
 
 ### Web Application

@@ -62,11 +62,13 @@ test('Today shows personalised loads and rest, and the Programs tab lists splits
   await page.getByRole('navigation', { name: 'Coach sections' }).getByRole('button', { name: 'Programs' }).click();
   await expect(page).toHaveURL(/\/coach\/programs$/);
   await expect(page.getByRole('heading', { name: 'Training splits' })).toBeVisible();
-  await expect(page.locator('.cq-split-card')).toHaveCount(11);
+  const splitCards = page.getByRole('region', { name: 'Training splits' }).locator('.cq-split-card');
+  await expect(splitCards).toHaveCount(11);
+  await expect(page.getByRole('region', { name: 'For injuries & conditions' }).locator('.cq-split-card')).toHaveCount(5);
   await expect(page.locator('.cq-athlete-card')).toHaveCount(8);
   await expect(page.getByText('Matched to your equipment:')).toContainText('Dumbbells');
   await page.getByRole('button', { name: '4 days', exact: true }).click();
-  await expect(page.locator('.cq-split-card')).toHaveCount(3);
+  await expect(splitCards).toHaveCount(3);
   for (const width of [320, 390]) { await page.setViewportSize({ width, height: 800 }); expect(await noOverflow(page)).toBe(true); }
   await page.getByRole('button', { name: 'All', exact: true }).click();
   await shot(page, info, '02-programs');

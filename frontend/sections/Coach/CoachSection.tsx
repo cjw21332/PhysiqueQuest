@@ -10,7 +10,7 @@ import CoachPlan from './CoachPlan';
 import ExerciseLibrary from './ExerciseLibrary';
 import CameraCheck from './CameraCheck';
 import RoutineSession, { readWorkoutDraft } from './RoutineSession';
-import { routineSnapshot } from './workoutRoutine';
+import { DEFAULT_REST_SECONDS, routineSnapshot } from './workoutRoutine';
 import WorkoutReport from './WorkoutReport';
 import BottomNav from '../Home/BottomNav';
 import { useRouter } from 'next/navigation';
@@ -95,7 +95,7 @@ export default function CoachSection({ profile }: { profile: Profile }) {
       let created = await api.startManualWorkout({kind:'create',data:{...startAttempt.current, exerciseIds:selected.map(row => row.exerciseId), exercises:routineSnapshot(selected),routineName:title,timezone:Intl.DateTimeFormat().resolvedOptions().timeZone}});
       // Program rest timers go through the routine update the session already uses; defaults apply if it fails.
       if (selected.some(row => row.restBetweenSets !== undefined)) {
-        try { created = await api.updateWorkoutRoutine(created._id, created.revision ?? 0, routineSnapshot(selected).map((row, index) => ({ ...row, restBetweenSets: selected[index].restBetweenSets ?? 90, restAfterExercise: selected[index].restAfterExercise ?? 120 })), title); }
+        try { created = await api.updateWorkoutRoutine(created._id, created.revision ?? 0, routineSnapshot(selected).map((row, index) => ({ ...row, restBetweenSets: selected[index].restBetweenSets ?? DEFAULT_REST_SECONDS, restAfterExercise: selected[index].restAfterExercise ?? DEFAULT_REST_SECONDS })), title); }
         catch { /* Rests stay editable in the session. */ }
       }
       setSessionMode('manual'); setWorkout(created); setChoiceOpen(false); setView('session');

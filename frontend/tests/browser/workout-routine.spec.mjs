@@ -176,8 +176,11 @@ test('manual logging converts pounds to kilograms and starts rest after saving',
   const before = await timer.textContent();
   await page.getByRole('button', { name: '+1 min' }).click();
   await expect(timer).not.toHaveText(before);
+  await expect(page.getByRole('dialog', { name: 'Rest time' }).getByText(/How did .* feel\?/)).toHaveCount(0);
   await page.getByRole('button', { name: 'End rest' }).click();
   await page.getByRole('button', { name: 'Save set 2', exact: true }).click();
+  // Finishing an exercise adds a quick review to the rest dialog.
+  await expect(page.getByRole('dialog', { name: 'Rest time' }).getByText('How did Push-Up feel?')).toBeVisible();
   await page.getByRole('button', { name: 'End rest' }).click();
   await page.getByRole('button', { name: 'lbs', exact: true }).click();
   await page.getByLabel('Weight (lbs), set 1').fill('22.0462');
@@ -200,7 +203,7 @@ test('manual session saves set type, exercise order and per-exercise rest', asyn
   await expect.poll(() => state.workout.exerciseIds).toEqual(['row', 'push', 'plank']);
   await page.getByRole('button', { name: 'Options for Dumbbell Row' }).click();
   await page.getByRole('button', { name: 'Increase between sets rest for Dumbbell Row' }).click();
-  await expect.poll(() => state.workout.exercises.find(item => item.exerciseId === 'row')?.restBetweenSets).toBe(105);
+  await expect.poll(() => state.workout.exercises.find(item => item.exerciseId === 'row')?.restBetweenSets).toBe(45);
   await page.getByRole('button', { name: 'Remove exercise', exact: true }).click();
   await page.getByRole('dialog', { name: 'Remove this exercise?' }).getByRole('button', { name: 'Remove exercise' }).click();
   await expect.poll(() => state.workout.exerciseIds).toEqual(['push', 'plank']);

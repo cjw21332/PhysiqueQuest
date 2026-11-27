@@ -5,7 +5,8 @@ import { api, ApiRequestError, getApiBaseUrl, type WorkoutSessionRecord, type Wo
 import { getCurrentUser } from '../../lib/auth';
 import LiveSession from './LiveSession';
 import { Icon } from '../Home/icons';
-import { exerciseProgress, prescribedWork, plannedLoadKg } from './workoutRoutine';
+import { DEFAULT_REST_SECONDS, exerciseProgress, prescribedWork, plannedLoadKg } from './workoutRoutine';
+import WorkoutFeedback from './WorkoutFeedback';
 import { titleCase } from '../../lib/titleCase';
 import WorkoutKeypad from './WorkoutKeypad';
 import WorkoutEditor from './WorkoutEditor';
@@ -58,11 +59,14 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
   const [restNow, setRestNow] = useState(Date.now());
   const restDialog = useRef<HTMLDialogElement>(null);
   useEffect(() => { if (!restUntil) return; const timer = window.setInterval(() => { const now = Date.now(); setRestNow(now); if (now >= restUntil) setRestUntil(0); }, 1000); return () => window.clearInterval(timer); }, [restUntil]);
+  // Exercise just finished: its quick review keeps the rest dialog open after the timer ends.
+  const [reviewing, setReviewing] = useState<string | null>(null);
   useEffect(() => {
     const dialog = restDialog.current;
-    if (restUntil && dialog && !dialog.open) dialog.showModal();
-    if (!restUntil && dialog?.open) dialog.close();
-  }, [restUntil]);
+    if ((restUntil || reviewing) && dialog && !dialog.open) dialog.showModal();
+    if (!restUntil && !reviewing && dialog?.open) dialog.close();
+  }, [restUntil, reviewing]);
+  const endRest = () => { setRestUntil(0); setReviewing(null); };
   const [cancelling, setCancelling] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
@@ -145,7 +149,7 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
   const changeRoutine = async (rows: typeof exercises, routineName?: string) => {
     const currentId = exercise?.exerciseId;
     return attempt(async () => {
-      const next = await api.updateWorkoutRoutine(workout._id, recordRef.current.revision ?? 0, rows.map(row => ({ exerciseId: row.exerciseId, name: row.name, equipment: row.equipment, prescription: row.prescription, sets: row.sets, restBetweenSets: row.restBetweenSets ?? 90, restAfterExercise: row.restAfterExercise ?? 120 })), routineName);
+      const next = await api.updateWorkoutRoutine(workout._id, recordRef.current.revision ?? 0, rows.map(row => ({ exerciseId: row.exerciseId, name: row.name, equipment: row.equipment, prescription: row.prescription, sets: row.sets, restBetweenSets: row.restBetweenSets ?? DEFAULT_REST_SECONDS, restAfterExercise: row.restAfterExercise ?? DEFAULT_REST_SECONDS })), routineName);
       updateRecord(next);
       const newIndex = (next.exercises ?? []).findIndex(row => row.exerciseId === currentId);
       changeDraft({ ...draftRef.current, values: Object.fromEntries(Object.entries(draftRef.current.values).filter(([key]) => next.exercises?.some(row => key.startsWith(`${row.exerciseId}:`)))), selected: newIndex < 0 ? Math.min(selected, Math.max(0, (next.exercises?.length ?? 1) - 1)) : newIndex });
@@ -179,7 +183,7 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
     const loadKg = addedKg === undefined ? undefined : addedKg + (usesEstimatedBar ? estimatedBarKg : 0);
     if ((!prescribed.durationSeconds && (input?.reps === '' || !Number.isInteger(reps) || reps < 1 || reps > 1000)) || (loadKg !== undefined && (!Number.isFinite(loadKg) || loadKg < 0 || loadKg > 1000))) throw new Error('Enter 1–1000 whole reps and a valid weight, or leave weight blank.');
     await writeSet({ setId, exerciseId: exercise.exerciseId, setIndex: index, reps, setType: draftRef.current.setTypes?.[setId] ?? existing?.setType ?? 'normal', ...(prescribed.durationSeconds ? { durationSeconds: prescribed.durationSeconds } : {}), ...(loadKg !== undefined ? { loadKg, loadValue: loadKg * (unit === 'lbs' ? 2.2046226218 : 1), loadUnit: unit, ...(usesEstimatedBar ? { barWeightKg: estimatedBarKg } : {}) } : {}), status: 'completed', source: 'manual' });
-    if (existing?.status !== 'completed') { const seconds = exerciseProgress(exercise, recordRef.current.sets ?? []) === 'completed' ? exercise.restAfterExercise ?? 120 : exercise.restBetweenSets ?? 90; const now = Date.now(); setRestNow(now); setRestUntil(seconds > 0 ? now + seconds * 1000 : 0); }
+    if (existing?.status !== 'completed') { const done = exerciseProgress(exercise, recordRef.current.sets ?? []) === 'completed'; const seconds = done ? exercise.restAfterExercise ?? DEFAULT_REST_SECONDS : exercise.restBetweenSets ?? DEFAULT_REST_SECONDS; const now = Date.now(); setRestNow(now); setRestUntil(seconds > 0 ? now + seconds * 1000 : 0); if (done) setReviewing(exercise.name); }
     const remainingValues = { ...draftRef.current.values }; delete remainingValues[setId];
     const setTypes = { ...draftRef.current.setTypes }; delete setTypes[setId];
     changeDraft({ ...draftRef.current, values: remainingValues, setTypes });
@@ -265,7 +269,7 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
           {menu === row.exerciseId && <div className="ml-panel ml-menu">
             <div className="ml-menu-actions"><button type="button" disabled={saving || paused} onClick={() => { setError(''); setEditor({ kind: 'rename', id: row.exerciseId }); }}><Icon name="edit" size={16}/>Rename exercise</button><button type="button" disabled={saving || paused || sets.some(set => set.exerciseId === row.exerciseId)} onClick={() => { setError(''); setEditor({ kind: 'replace', id: row.exerciseId }); }}><Icon name="retake" size={16}/>Replace exercise</button><button type="button" disabled={saving || paused || index !== selected} onClick={() => void skip()}><Icon name="arrow" size={16}/>Skip exercise</button></div>
             <strong className="ml-menu-title"><Icon name="clock" size={14}/> Rest for {titleCase(row.name)}</strong>
-            {([['Between sets', 'restBetweenSets', row.restBetweenSets ?? 90], ['Before next exercise', 'restAfterExercise', row.restAfterExercise ?? 120]] as const).map(([label,key,seconds]) => <div className="ml-rest" key={key}><span>{label}</span><div className="ml-stepper"><button type="button" aria-label={`Decrease ${label.toLowerCase()} rest for ${titleCase(row.name)}`} disabled={saving || paused || seconds <= 0} onClick={() => void changeRoutine(exercises.map(item => item.exerciseId === row.exerciseId ? { ...item, [key]: Math.max(0, seconds - 15) } : item))}><Icon name="minus" size={16}/></button><b>{Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2,'0')}</b><button type="button" aria-label={`Increase ${label.toLowerCase()} rest for ${titleCase(row.name)}`} disabled={saving || paused || seconds >= 600} onClick={() => void changeRoutine(exercises.map(item => item.exerciseId === row.exerciseId ? { ...item, [key]: Math.min(600, seconds + 15) } : item))}><Icon name="plus" size={16}/></button></div></div>)}
+            {([['Between sets', 'restBetweenSets', row.restBetweenSets ?? DEFAULT_REST_SECONDS], ['Before next exercise', 'restAfterExercise', row.restAfterExercise ?? DEFAULT_REST_SECONDS]] as const).map(([label,key,seconds]) => <div className="ml-rest" key={key}><span>{label}</span><div className="ml-stepper"><button type="button" aria-label={`Decrease ${label.toLowerCase()} rest for ${titleCase(row.name)}`} disabled={saving || paused || seconds <= 0} onClick={() => void changeRoutine(exercises.map(item => item.exerciseId === row.exerciseId ? { ...item, [key]: Math.max(0, seconds - 15) } : item))}><Icon name="minus" size={16}/></button><b>{Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2,'0')}</b><button type="button" aria-label={`Increase ${label.toLowerCase()} rest for ${titleCase(row.name)}`} disabled={saving || paused || seconds >= 600} onClick={() => void changeRoutine(exercises.map(item => item.exerciseId === row.exerciseId ? { ...item, [key]: Math.min(600, seconds + 15) } : item))}><Icon name="plus" size={16}/></button></div></div>)}
             <button type="button" className="ml-danger" disabled={saving || paused || exercises.length <= 1 || sets.some(set => set.exerciseId === row.exerciseId)} onClick={() => setRemoving(row.exerciseId)}><Icon name="trash" size={16}/>Remove exercise</button>
             <small>Exercises with saved sets cannot be removed or replaced.</small>
           </div>}
@@ -308,7 +312,7 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
     }}/>}
     {cancelling && <DeleteConfirmation title="Cancel workout?" description="This discards this workout and all its sets. It will not count toward your progress. Choose End session instead to keep your logged sets." confirmLabel="Discard workout" busy={saving} error={error} onCancel={() => setCancelling(false)} onConfirm={() => void attempt(async () => { await api.cancelWorkout(workout._id, recordRef.current.revision ?? 0); try { localStorage.removeItem(workoutDraftKey(workout._id)); } catch {} onCancel?.(); })}/>}
     {removing && <DeleteConfirmation title="Remove this exercise?" description={`${titleCase(exercises.find(row => row.exerciseId === removing)?.name ?? 'This exercise')} will be removed from this workout. Exercises with saved sets cannot be removed or replaced.`} confirmLabel="Remove exercise" busy={saving} error={error} onCancel={() => { setRemoving(null); setError(''); }} onConfirm={() => { void changeRoutine(exercises.filter(row => row.exerciseId !== removing)).then(ok => { if (ok) { setRemoving(null); setMenu(null); } }); }}/>}
-    <dialog ref={restDialog} className="routine-rest-dialog" aria-labelledby="routine-rest-title" onCancel={event => { event.preventDefault(); setRestUntil(0); }}><h2 id="routine-rest-title">Rest time</h2><p>Take a breath before your next set.</p><strong role="timer" aria-label="Rest time remaining">{Math.floor(Math.max(0, Math.ceil((restUntil - restNow) / 1000)) / 60)}:{String(Math.max(0, Math.ceil((restUntil - restNow) / 1000)) % 60).padStart(2, '0')}</strong><div className="routine-rest-actions"><button type="button" onClick={() => setRestUntil(until => until + 60000)}>+1 min</button><button type="button" onClick={() => setRestUntil(0)}>End rest</button></div></dialog>
+    <dialog ref={restDialog} className="routine-rest-dialog" aria-labelledby="routine-rest-title" onCancel={event => { event.preventDefault(); endRest(); }}><h2 id="routine-rest-title">Rest time</h2><p>{reviewing ? `${titleCase(reviewing)} done. Quick check before you move on — stop if you feel chest pain, dizziness or sharp joint pain.` : 'Take a breath before your next set.'}</p><strong role="timer" aria-label="Rest time remaining">{Math.floor(Math.max(0, Math.ceil((restUntil - restNow) / 1000)) / 60)}:{String(Math.max(0, Math.ceil((restUntil - restNow) / 1000)) % 60).padStart(2, '0')}</strong>{reviewing && <WorkoutFeedback key={reviewing} source="manual" exercise={reviewing} sessionRef={workout._id}/>}<div className="routine-rest-actions"><button type="button" onClick={() => setRestUntil(until => Math.max(until, Date.now()) + 60000)}>+1 min</button><button type="button" onClick={endRest}>{reviewing && !restUntil ? 'Continue' : 'End rest'}</button></div></dialog>
     {ending !== null && <dialog ref={endDialog} aria-labelledby="routine-end-title" className="routine-end-dialog" onCancel={event=>{event.preventDefault();if(!saving)setEnding(null);}}><h2 id="routine-end-title">End workout early?</h2><p>{total - completed} sets are not completed. Remaining sets will be saved as skipped. Unsaved inputs are not counted.</p>{error && <p role="alert">{error}</p>}<button type="button" disabled={saving} onClick={()=>{completionRequest.current=null;setEnding(null);}}>Keep training</button><button type="button" disabled={saving} onClick={()=>void finish(ending)}>{saving ? 'Saving…' : 'Save and end workout'}</button></dialog>}
   </div>;
 }

@@ -3,6 +3,7 @@ import { savedScanMealDates } from '../nutrition/saved-scan-meals.js';
 import { BadRequestException, Injectable, Optional } from '@nestjs/common';
 import { Profile } from '../profile/schemas/profile.schema.js';
 import { type DayData, type QuestProfile, questHistory, weekStart, weeklyChallenges } from './quests.js';
+import { fitnessTier } from '../profile/body-index.js';
 import { advanceChain, type ChainState } from './quest-chain.js';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -92,8 +93,8 @@ export class ActivityService {
     const dailyMissions = buildDailyMissions({ ...todayStats, records: Number(records.includes(today)) }, mealGoal);
     const activityDates = buildActivityDates(mealDates, nutrition.water, allWorkoutDates);
 
-    // Only training days are read (for the Oathkeeper badge); a missing profile just means no plan weeks.
-    const profile = this.profiles ? await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('userId days').lean().exec().catch(() => null) as QuestProfile | null : null;
+    // Training days feed the Oathkeeper badge; body fields set the quest tier. A missing profile means no plan weeks and the default tier.
+    const profile = this.profiles ? await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).select('userId days height heightInches heightUnit weight weightUnit activity').lean().exec().catch(() => null) as QuestProfile | null : null;
     const dayData: DayData = { workouts: allWorkoutDates, records: new Set(records), active: activityDates, water: waterByDate,
       mealsDone: date => (allMeals.get(date) ?? 0) >= mealMissionGoal(date, allMeals) };
     const thisWeek = weekStart(today);
@@ -134,7 +135,7 @@ export class ActivityService {
       dailyMissions,
       personalQuests: chain.view,
       personalQuestLog: chain.state.recent,
-      weeklyChallenges: weeklyChallenges(dayData, thisWeek, today),
+      weeklyChallenges: weeklyChallenges(dayData, thisWeek, today, fitnessTier(profile)),
       badges,
     };
   }

@@ -79,6 +79,7 @@ export default function CoachPlan({ profile, onStart }: { profile: Profile; onSt
           {!rows.length && <p className="coach-plan-note">No matching exercises are available for this day. Check your preferences or browse the library.</p>}
           {!!rows.length && currentDay.availabilityNote && <p className="coach-plan-note">{currentDay.availabilityNote}</p>}
           {plan.ageNote && <p className="coach-plan-note" role="note">{plan.ageNote}</p>}
+          {plan.intensityNote && <p className="coach-plan-note" role="note">{plan.intensityNote}</p>}
         </>}
       </> : <section className="cq-rest">
         <span className="cq-rest-icon" aria-hidden="true"><Icon name="sun" size={22}/></span>

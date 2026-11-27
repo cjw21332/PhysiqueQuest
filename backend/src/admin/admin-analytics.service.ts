@@ -28,11 +28,16 @@ export class AdminAnalyticsService {
       this.alerts.countDocuments({ ...eventFilter, status: 'pending' }),
       this.signInEvents.find({ occurredAt: { $gte: start, $lte: end } }).select('userId occurredAt').lean().exec(),
     ]);
+    // In-app feedback for the range: no user ids leave the server, only ratings and messages.
+    const feedbackRows = await Promise.resolve().then(() => this.users.db.collection('app_feedback').find(eventFilter, { projection: { _id: 0, rating: 1, category: 1, message: 1, platform: 1, createdAt: 1 } }).sort({ createdAt: -1 }).limit(500).toArray()).catch(() => []);
+    const appFeedback = { count: feedbackRows.length, averageRating: feedbackRows.length ? Math.round(feedbackRows.reduce((sum, row) => sum + Number(row.rating), 0) / feedbackRows.length * 10) / 10 : null,
+      recent: feedbackRows.slice(0, 10).map(row => ({ rating: row.rating, category: row.category, message: row.message, platform: row.platform ?? null, createdAt: row.createdAt })) };
     const { activeUsers, weeklyRetention } = this.summarizeSignIns(signIns as { userId: unknown; occurredAt: Date }[], start, days);
     return {
       rangeDays: days, generatedAt: end.toISOString(), usersTotal, activeUsers,
       completedSessions, formScore: null, missionCompletion: null, weeklyRetention,
       emergencyEvents: { total: totalAlerts, delivered: deliveredAlerts, failed: failedAlerts, pending: pendingAlerts },
+      appFeedback,
     };
   }
 

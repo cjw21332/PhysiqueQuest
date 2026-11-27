@@ -11,7 +11,7 @@ type Props = {
   error?: string;
 };
 
-const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'None of these'];
+const conditionOptions = ['Knee injury', 'Lower back pain', 'Shoulder impingement', 'Hypertension', 'Asthma', 'Heart condition', 'None of these'];
 
 export default function HealthProfileEdit({ profile, onBack, onSave, error }: Props) {
   const [data, setData] = useState({
@@ -59,7 +59,7 @@ export default function HealthProfileEdit({ profile, onBack, onSave, error }: Pr
           : { ...current, healthConsentAt: null, injuries: [], healthRisks: [] })}/> Allow health-based coaching</label>
       </fieldset>
       {data.healthConsentAt && (['injuries', 'healthRisks'] as const).map(field => <fieldset key={field}><legend>{field === 'injuries' ? 'Injuries' : 'Health risks'}</legend>
-        {Array.from(new Set([...(field === 'injuries' ? conditionOptions.slice(0, 3) : conditionOptions.slice(3, 5)), ...data[field]])).map(label => <label key={label} className="condition-checkbox">
+        {Array.from(new Set([...(field === 'injuries' ? conditionOptions.slice(0, 3) : conditionOptions.slice(3, 6)), ...data[field]])).map(label => <label key={label} className="condition-checkbox">
           <input type="checkbox" checked={data[field].includes(label)} onChange={() => setData(curr => ({ ...curr, [field]: curr[field].includes(label) ? curr[field].filter(item => item !== label) : [...curr[field], label] }))}/>{label}</label>)}
       </fieldset>)}
       <div className="choice-group condition-list">

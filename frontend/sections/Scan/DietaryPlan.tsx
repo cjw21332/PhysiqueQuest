@@ -12,7 +12,14 @@ const initial: Plan = { goal: 'Maintenance', calories: 2300, protein: 30, carbs:
 const goals = ['Clean Bulk', 'Weight Loss', 'Maintenance', 'Hypertrophy'];
 const presets = [{ name: 'High protein', values: [30, 45, 25] }, { name: 'Balanced', values: [25, 50, 25] }, { name: 'Low carb', values: [40, 20, 40] }];
 const meals = [{ name: 'Breakfast', key: 'Breakfast', time: '07:30 – 08:30', share: .22, note: 'Start the day with a balanced meal containing protein and carbohydrates.' }, { name: 'Lunch', key: 'Lunch', time: '12:30 – 13:30', share: .30, note: 'Build a meal around protein, carbohydrates and vegetables.' }, { name: 'Afternoon snack', key: 'Snack', time: '16:30', share: .16, note: 'A convenient snack can help you reach your daily targets.' }, { name: 'Dinner', key: 'Dinner', time: '19:30 – 20:30', share: .32, note: 'Finish the day with a balanced meal that fits your remaining targets.' }];
-const activities: Record<string, number> = { Sedentary: 1.2, Light: 1.375, Moderate: 1.55, Active: 1.725, Athlete: 1.9 };
+// Filipino staples; "lean" swaps lower-calorie options in for weight-loss plans.
+const LOCAL_FOODS: [string, { base: string; lean: string }][] = [
+  ['Protein', { base: 'itlog, chicken (tinola, inasal), bangus, galunggong, tokwa, monggo', lean: 'boiled itlog, skinless chicken tinola, paksiw or grilled isda, tokwa, monggo' }],
+  ['Carbs', { base: 'kanin (try half brown rice), kamote, saba, mais, pandesal', lean: '1 cup kanin or less, kamote, boiled saba, mais' }],
+  ['Vegetables', { base: 'malunggay, kangkong, pechay, sitaw, ampalaya, kalabasa', lean: 'half your plate: kangkong, pechay, sitaw, ampalaya, pinakbet without bagnet' }],
+  ['Fruit', { base: 'saging, papaya, mangga, bayabas, pakwan', lean: 'papaya, bayabas, pakwan; keep mangga to a few slices' }],
+];
+const activities: Record<string, number> ={ Sedentary: 1.2, Light: 1.375, Moderate: 1.55, Active: 1.725, Athlete: 1.9 };
 const offsets: Record<string, number> = { 'Clean Bulk': 300, 'Weight Loss': -450, Maintenance: 0, Hypertrophy: 500 };
 export const planTargets = (plan: Plan) => ({ calories: plan.calories, protein: Math.round(plan.calories * plan.protein / 400), carbs: Math.round(plan.calories * plan.carbs / 400), fats: Math.round(plan.calories * plan.fat / 900) });
 
@@ -55,8 +62,12 @@ export default function DietaryPlan({ saved, profile, meals: loggedMeals, onBack
     {tab === 'Active Plan' && scanned.length > 0 && <section className="diet-card"><h3>Today's scans and your plan</h3>
       <p>{scanned.length === 1 ? '1 scanned food entry is' : `${scanned.length} scanned food entries are`} included in today's diary. Your current plan targets {targets.protein} g of protein.</p>
       {loggedProtein !== null ? <p>{nutrientLabel(loggedProtein, 'g')} protein logged across all meals today.</p> : <p>Some entries are missing protein values. Review the portions before comparing your intake with your target.</p>}
-      {age >= 18 && saved && loggedProtein !== null && loggedProtein < targets.protein && <p>For your next meal, consider beans, tofu, eggs or another protein source you eat. If you regularly struggle to meet your target with food, ask a dietitian whether a protein supplement fits your diet.</p>}
+      {age >= 18 && saved && loggedProtein !== null && loggedProtein < targets.protein && <p>For your next meal, consider local protein like itlog, tokwa, monggo, bangus, galunggong or chicken tinola. If you regularly struggle to meet your target with food, ask a dietitian whether a protein supplement fits your diet.</p>}
       <a href="https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/" target="_blank" rel="noreferrer">NIH guide to exercise supplements</a>
+    </section>}
+    {tab === 'Active Plan' && <section className="diet-card" aria-labelledby="diet-local-heading"><h3 id="diet-local-heading">Local food ideas for {draft.goal.toLowerCase()}</h3>
+      {LOCAL_FOODS.map(([label, foods]) => <p key={label}><b>{label}:</b> {draft.goal === 'Weight Loss' ? foods.lean : foods.base}</p>)}
+      <p><b>Supplements:</b> food first. If you can&apos;t reach your protein target, a whey or soy protein powder can help; creatine monohydrate (3–5 g a day) has the strongest evidence for strength. Check Nutrition › Supplements for evidence ratings, and ask a doctor first if you have a health condition.</p>
     </section>}
     {tab === 'Active Plan' && <section className="diet-card">
       <span className="diet-badge">{hasUnsavedChanges ? 'Unsaved draft' : saved ? `In progress${days ? ` • Day ${days}` : ''}` : 'Draft plan'}</span><div className="diet-title-row"><h2>{draft.goal}</h2><button type="button" disabled={readOnly} onClick={() => setTab('Custom Goals')}>Change ›</button></div><p>{hasUnsavedChanges ? 'These draft targets are not active until you save them.' : `Your daily nutrition targets and meal allocation for ${draft.goal.toLowerCase()}.`}</p>

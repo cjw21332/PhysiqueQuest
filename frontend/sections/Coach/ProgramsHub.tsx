@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Icon } from '../Home/icons';
 import type { Profile } from '../Home/types';
 import { api, type CoachExercise, type SavedProgram } from '../../lib/api';
-import { ATHLETES, SPLITS, type ProgramTemplate } from '../../lib/programCatalog';
+import { ATHLETES, HEALTH_PROGRAMS, SPLITS, type ProgramTemplate } from '../../lib/programCatalog';
 import { formatLoad, formatRest, sessionMinutes, suggestFor, type TrainingContext } from '../../lib/programSuggest';
 import { useSavedPrograms } from '../../hooks/useSavedPrograms';
 import { useCoachPlan } from '../../hooks/useCoachPlan';
@@ -14,7 +14,7 @@ import { adaptProgram, dayToSession, newId, programExerciseCount, templateToProg
 
 // Detail screens keep ids, not computed programs, so equipment or profile changes re-render them live.
 type Screen = { kind: 'hub' } | { kind: 'detail'; templateId?: string; program?: SavedProgram } | { kind: 'build'; draft: SavedProgram; isNew: boolean; from?: Screen };
-const TEMPLATES = [...SPLITS, ...ATHLETES];
+const TEMPLATES = [...SPLITS, ...ATHLETES, ...HEALTH_PROGRAMS];
 export const equipmentLabel = (equipment: string[] = []) => equipment.length ? equipment.join(', ') : 'Full gym';
 const sourceLabel = { custom: 'Custom', split: 'Split', athlete: 'Athlete' } as const;
 const initials = (name = '') => name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
@@ -51,6 +51,9 @@ export default function ProgramsHub({ profile, onStart, onOpenPlan }: { profile:
 
   const filters = ['All', '6', '5', '4', '3', '2'];
   const splits = SPLITS.filter(item => filter === 'All' || item.daysPerWeek.split('-').includes(filter));
+  const healthLabels = new Set([...(profile.conditions ?? []), ...(profile.injuries ?? []), ...(profile.healthRisks ?? [])]);
+  const matchesHealth = (item: ProgramTemplate) => item.forConditions?.some(label => healthLabels.has(label)) ?? false;
+  const healthPrograms = [...HEALTH_PROGRAMS].sort((a, b) => Number(matchesHealth(b)) - Number(matchesHealth(a)));
   return <div className="cq-programs">
     <button type="button" className="cq-create" onClick={create}>
       <span className="cq-create-icon" aria-hidden="true"><Icon name="plus" size={22}/></span>
@@ -88,6 +91,16 @@ export default function ProgramsHub({ profile, onStart, onOpenPlan }: { profile:
         <span className="cq-row-copy"><strong>{split.name}</strong><small>{split.summary}</small><WeekDots days={split.days.map(day => day.weekday)} label={`Trains ${split.days.map(day => weekdayShort[day.weekday]).join(', ')}`}/></span>
         <Icon name="arrow" size={16}/>
       </button>)}</div>
+    </section>
+
+    <section className="cq-block" aria-labelledby="cq-health-heading">
+      <h3 id="cq-health-heading" className="cq-block-title">For injuries &amp; conditions</h3>
+      <div className="cq-list">{healthPrograms.map(item => <button type="button" key={item.id} className="cq-split-card" onClick={() => openTemplate(item)}>
+        <span className="cq-split-days" aria-hidden="true"><b>{item.daysPerWeek}</b><small>days</small></span>
+        <span className="cq-row-copy"><strong>{item.name}</strong><small>{item.tag} · {item.summary}</small>{matchesHealth(item) && <span className="cq-pill">Matches your health profile</span>}</span>
+        <Icon name="arrow" size={16}/>
+      </button>)}</div>
+      <p className="cq-fineprint">General exercise guidance, not treatment. Ask your doctor or physiotherapist before starting, and stop any exercise that causes pain.</p>
     </section>
 
     <section className="cq-block" aria-labelledby="cq-athlete-heading">

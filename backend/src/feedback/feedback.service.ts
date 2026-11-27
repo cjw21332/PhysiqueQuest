@@ -3,12 +3,22 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { transformFeedbackHealth } from '../privacy/health-encryption.js';
-import { CreateFeedbackDto } from './dto/feedback.dto.js';
+import { CreateAppFeedbackDto, CreateFeedbackDto } from './dto/feedback.dto.js';
+import { AppFeedback } from './schemas/app-feedback.schema.js';
 import { WorkoutFeedback } from './schemas/workout-feedback.schema.js';
 
 @Injectable()
 export class FeedbackService {
-  constructor(@InjectModel(WorkoutFeedback.name) private readonly model: Model<WorkoutFeedback>) {}
+  constructor(
+    @InjectModel(WorkoutFeedback.name) private readonly model: Model<WorkoutFeedback>,
+    @InjectModel(AppFeedback.name) private readonly appModel?: Model<AppFeedback>,
+  ) {}
+
+  async createApp(userId: string, dto: CreateAppFeedbackDto) {
+    const record = { userId: new Types.ObjectId(userId), rating: dto.rating, category: dto.category, message: dto.message, ...(dto.appVersion && { appVersion: dto.appVersion }), ...(dto.platform && { platform: dto.platform }) };
+    const saved = await new AccountLifecycleFence(this.appModel!.db).withActiveWrite(userId, async session => (await this.appModel!.create([record], { session }))[0]);
+    return { id: String(saved._id), saved: true as const };
+  }
 
   async create(userId: string, dto: CreateFeedbackDto) {
     const owner = new Types.ObjectId(userId);

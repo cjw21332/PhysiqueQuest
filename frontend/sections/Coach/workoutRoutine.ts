@@ -1,5 +1,8 @@
 import type { CoachExercise, WorkoutExerciseSnapshot, WorkoutSetResult } from '../../lib/api';
 
+/** Fallback rest (seconds) between sets and before the next exercise when a routine sets none. */
+export const DEFAULT_REST_SECONDS = 30;
+
 export function routineSnapshot(exercises: Pick<CoachExercise, 'exerciseId' | 'name' | 'equipment' | 'prescription'>[]): WorkoutExerciseSnapshot[] {
   return exercises.map(({ exerciseId, name, equipment, prescription }) => ({ exerciseId, name, equipment, prescription, sets: Math.min(10, Math.max(1, Number(prescription?.match(/^(\d+)\s*[×x]/i)?.[1] ?? 1))) }));
 }

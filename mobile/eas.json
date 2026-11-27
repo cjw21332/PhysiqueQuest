@@ -13,6 +13,10 @@
       "env": { "EXPO_PUBLIC_PQ_LOCAL_DEV": "0" },
       "android": { "gradleCommand": ":app:assembleStandalone", "buildType": "apk" }
     },
+    "production": {
+      "env": { "EXPO_PUBLIC_PQ_LOCAL_DEV": "0" },
+      "autoIncrement": true
+    },
     "development": {
       "developmentClient": true,
       "distribution": "internal",
