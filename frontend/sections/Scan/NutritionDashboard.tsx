@@ -110,8 +110,8 @@ export default function NutritionDashboard({
 
       <section className="scan-dashboard-more" aria-labelledby="scan-more-heading">
         <h2 id="scan-more-heading">More</h2>
-        <button type="button" className="scan-dashboard-link" onClick={onPlan}><span className="scan-dashboard-link-icon"><Icon name="meal" size={19} /></span><span><strong>My dietary plan</strong><small>{readOnly ? 'View saved targets and meal schedule' : 'Manage targets and meal schedule'}</small></span><Icon name="arrow" size={16} /></button>
-        <button type="button" className="scan-dashboard-link" onClick={onSupplements}><span className="scan-dashboard-link-icon"><Icon name="shield" size={19} /></span><span><strong>Supplement guide</strong><small>Benefits, doses, side effects and safety marks</small></span><Icon name="arrow" size={16} /></button>
+        <button type="button" className="scan-dashboard-link" onClick={onPlan}><span className="scan-dashboard-link-icon plan"><Icon name="meal" size={19} /></span><span><strong>My dietary plan</strong><small>{readOnly ? 'View saved targets and meal schedule' : 'Manage targets and meal schedule'}</small></span><Icon name="arrow" size={16} /></button>
+        <button type="button" className="scan-dashboard-link" onClick={onSupplements}><span className="scan-dashboard-link-icon supplements"><Icon name="shield" size={19} /></span><span><strong>Supplement guide</strong><small>Benefits, doses, side effects and safety marks</small></span><Icon name="arrow" size={16} /></button>
         <button type="button" className="scan-dashboard-link" onClick={onHistory}>
           <span className="scan-dashboard-link-icon history"><Icon name="chart-bars" size={19} /></span>
           <span><strong>Food history</strong><small>{historyAverage ? `7-day average ${historyAverage.toLocaleString()} kcal` : 'Review your saved meals'}</small></span>
@@ -126,7 +126,7 @@ function MacroBar({ label, current, known, target }: { label: string; current: n
   const shown = current ?? known;
   const progress = shown === null || target <= 0 ? 0 : Math.min(100, Math.max(0, (shown / target) * 100));
   return (
-    <div className="scan-dashboard-macro">
+    <div className="scan-dashboard-macro" data-macro={label.toLowerCase()}>
       <div><span>{label}</span><small>{current === null ? shown === null ? 'Unavailable' : `${Math.round(shown)} g` : `${Math.round(current)} / ${target} g`}</small></div>
       <div className="scan-dashboard-track" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={target} {...(current === null ? { 'aria-valuetext': shown === null ? 'Unavailable' : `${Math.round(shown)} grams known; total incomplete` } : { 'aria-valuenow': Math.min(target, Math.round(current)) })}>
         <span style={{ width: `${progress}%` }} />

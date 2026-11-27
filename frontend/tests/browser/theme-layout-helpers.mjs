@@ -3,10 +3,12 @@ import { expect } from '@playwright/test';
 export async function expectDarkPalette(page) {
   await page.addStyleTag({ content: '*, *::before, *::after { animation: none !important; transition: none !important; }' });
   const unexpected = await page.evaluate(() => {
-    const allowed = new Set(['11,15,21', '22,29,39', '33,43,59', '39,52,68', '34,197,94', '74,222,128', '248,113,113', '248,250,252', '148,163,184', '100,116,139', '20,59,38', '72,9,9', '0,0,0']);
+    const allowed = new Set(['11,15,21', '22,29,39', '33,43,59', '39,52,68', '34,197,94', '74,222,128', '248,113,113', '248,250,252', '148,163,184', '100,116,139', '20,59,38', '72,9,9', '0,0,0',
+      // v1.6.3 accents: teal, amber, violet and sky, each with its dark tint.
+      '45,212,191', '11,48,45', '251,191,36', '59,41,20', '167,139,250', '42,33,72', '56,189,248', '12,42,58']);
     const issues = [];
     for (const el of document.querySelectorAll('body *')) {
-      if (!el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) || el.closest('nextjs-portal, .google-auth-mark')) continue;
+      if (!el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) || el.closest('nextjs-portal, .google-auth-mark, .badge-crest')) continue;
       const rect = el.getBoundingClientRect();
       if (!rect.width || !rect.height) continue;
       const style = getComputedStyle(el);

@@ -217,7 +217,7 @@ export default function ScanSection({ profile }: { profile: Profile }) {
           <span><strong>Take a photo</strong><small>Open your camera</small></span>
           <Icon name="arrow" size={17}/>
         </button>
-        <button type="button" className="scan-source-option" onClick={()=>uploadInput.current?.click()}>
+        <button type="button" className="scan-source-option" onClick={()=>uploadInput.current?.click()} data-source="upload">
           <span className="scan-source-icon"><Icon name="image" size={21}/></span>
           <span><strong>Upload a photo</strong><small>Choose from your photos or files</small></span>
           <Icon name="arrow" size={17}/>

@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+// Signed-in pages show What's New once per release; mark it seen so it never covers the controls under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { sessionStorage.setItem('pq-whats-new-shown', '1'); } catch {} }); });
 
 test('camera counting beta is hidden and old tracking links do not start workouts', async ({ page }) => {
   let created = 0;

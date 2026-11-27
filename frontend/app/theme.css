@@ -29,6 +29,16 @@
   --gray-light: #161d27;
   --gray-mid: #64748b;
   --gray-dark: #94a3b8;
+  /* Lively accents (v1.6.3): each pairs a bright tone for text, bars and icons with a dark tint for tiles.
+     Protein teal, carbs amber, fats violet, water sky; green stays the action and calorie colour. */
+  --teal: #2dd4bf;
+  --teal-tint: #0b302d;
+  --amber: var(--orange-mid);
+  --amber-tint: var(--orange-light);
+  --violet: #a78bfa;
+  --violet-tint: #2a2148;
+  --sky: #38bdf8;
+  --sky-tint: #0c2a3a;
 }
 
 html, body { background: var(--bg); }

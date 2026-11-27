@@ -4,7 +4,7 @@
     "slug": "physiquequest",
     "scheme": "physiquequest",
     "icon": "./assets/physiquequest-icon.png",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "platforms": [
       "android",
       "ios"
@@ -28,13 +28,17 @@
     "orientation": "default",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0b0f15",
+    "splash": {
+      "backgroundColor": "#0b0f15"
+    },
     "android": {
-      "versionCode": 18,
+      "versionCode": 19,
       "package": "com.physiquequest.app",
       "googleServicesFile": "./google-services.json",
+      "icon": "./assets/physiquequest-icon-round.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/physiquequest-icon.png",
-        "backgroundColor": "#0b0f15"
+        "foregroundImage": "./assets/physiquequest-adaptive-foreground.png",
+        "backgroundColor": "#ffffff"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
@@ -53,6 +57,10 @@
     "ios": {
       "bundleIdentifier": "com.physiquequest.app",
       "buildNumber": "1",
+      "icon": "./assets/physiquequest-icon-ios.png",
+      "splash": {
+        "backgroundColor": "#0b0f15"
+      },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },

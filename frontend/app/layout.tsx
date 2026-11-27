@@ -5,6 +5,7 @@ import './scrollbars.css';
 import SessionBoundary from '../components/SessionBoundary';
 import OfflineWorker from '../components/OfflineWorker';
 import HardwareBack from '../components/HardwareBack';
+import InputModality from '../components/InputModality';
 
 export const metadata: Metadata = {
   title: 'PhysiqueQuest — Training that fits you',
@@ -31,5 +32,5 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   // The Expo WebView injects native safe-area CSS variables on <html> before
   // hydration, so its initial style attribute intentionally differs from SSR.
-  return <html lang="en" data-theme="dark" suppressHydrationWarning><body><OfflineWorker/><HardwareBack/><SessionBoundary>{children}</SessionBoundary></body></html>;
+  return <html lang="en" data-theme="dark" suppressHydrationWarning><body><OfflineWorker/><HardwareBack/><InputModality/><SessionBoundary>{children}</SessionBoundary></body></html>;
 }

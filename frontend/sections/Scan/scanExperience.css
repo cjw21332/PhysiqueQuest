@@ -19,6 +19,10 @@
 .scan-reference .meal-diary-add { min-height: 44px; min-width: 64px; }
 .scan-reference .meal-diary-food { min-height: 56px; }
 .scan-reference .water-tracker { margin-block: 20px; }
+.scan-reference .food-carbon { margin-block: 18px; padding: 6px 16px 14px; border: 1px solid var(--line); border-radius: var(--scan-radius); }
+.scan-reference .food-carbon summary { display: flex; align-items: center; gap: 8px; min-height: 48px; color: var(--ink); font-weight: 600; line-height: 1.4; cursor: pointer; }
+.scan-reference .food-carbon .food-value { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); }
+.scan-reference .food-carbon p { margin: 10px 0 0; }
 .scan-reference .water-tracker-actions button { min-height: 44px; }
 .scan-reference .scan-dashboard-link { min-height: 68px; }
 
@@ -229,3 +233,128 @@
 @keyframes scan-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 @keyframes scan-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .scan-skel { animation: none; } .scan-conn-spinner { animation-duration: 2.4s; } }
+
+/* ===== Lively Scan (v1.6.3) =====
+   Accent mapping: calories and actions green, protein teal, carbs amber, fats violet, water sky.
+   Meals: breakfast amber, lunch teal, dinner violet, snack sky. The repeated .scan-section class
+   outranks the older .scan-dark-theme layers in globals.css without !important. */
+.scan-section.scan-section.scan-reference {
+  --accent: var(--green); --accent-tint: var(--green-light);
+  --scan-card: linear-gradient(165deg, color-mix(in srgb, var(--accent) 9%, var(--soft)) 0%, var(--soft) 55%);
+}
+.scan-section.scan-section.scan-reference :is([data-macro="protein"], [data-macro="protein_g"], [data-meal="lunch"], [data-group="protein"]) { --accent: var(--teal); --accent-tint: var(--teal-tint); }
+.scan-section.scan-section.scan-reference :is([data-macro="carbs"], [data-macro="carbs_g"], [data-macro="carbohydrates"], [data-meal="breakfast"], [data-group="carbs"]) { --accent: var(--amber); --accent-tint: var(--amber-tint); }
+.scan-section.scan-section.scan-reference :is([data-macro="fats"], [data-macro="fat_g"], [data-meal="dinner"], [data-group="fruit"]) { --accent: var(--violet); --accent-tint: var(--violet-tint); }
+.scan-section.scan-section.scan-reference :is([data-meal="snack"], .water-tracker) { --accent: var(--sky); --accent-tint: var(--sky-tint); }
+.scan-section.scan-section.scan-reference :is([data-macro="kcal"], [data-group="vegetables"]) { --accent: var(--green); --accent-tint: var(--green-light); }
+
+/* Today summary: a soft green-lit card with colour-coded macros. */
+.scan-section.scan-section.scan-reference .scan-dashboard-summary { padding: 18px 16px; border: 1px solid var(--line); border-radius: 22px; background: var(--scan-card); }
+.scan-section.scan-section.scan-reference .scan-dashboard-macro > div:first-child span { display: inline-flex; align-items: center; gap: 7px; }
+.scan-section.scan-section.scan-reference .scan-dashboard-macro > div:first-child span::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.scan-section.scan-section.scan-reference .scan-dashboard-track { height: 6px; background: color-mix(in srgb, var(--accent) 16%, transparent); }
+.scan-section.scan-section.scan-reference .scan-dashboard-track span { background: var(--accent); }
+
+/* Scan call to action: green to mint, with a night icon tile. */
+.scan-section.scan-section.scan-reference .scan-dashboard-scan:not(.is-locked) { border: 0; background: linear-gradient(120deg, var(--green) 0%, #4ade80 100%); color: var(--surface); }
+.scan-section.scan-section.scan-reference .scan-dashboard-scan:not(.is-locked) .scan-dashboard-scan-icon { background: var(--surface); color: #4ade80; }
+.scan-section.scan-section.scan-reference .scan-dashboard-scan:not(.is-locked) .scan-dashboard-scan-copy small { color: color-mix(in srgb, var(--surface) 78%, transparent); }
+.scan-section.scan-section.scan-reference .scan-dashboard-scan:active:not(.is-locked) { transform: scale(.985); }
+
+/* Meal diary: each meal carries its own colour on the icon tile, add button and open state. */
+.scan-section.scan-section.scan-reference .meal-diary-card { border-color: var(--line); border-radius: 18px; background: var(--soft); transition: border-color .2s ease; }
+.scan-section.scan-section.scan-reference .meal-diary-card:has(.meal-diary-toggle[aria-expanded="true"]) { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.scan-section.scan-section.scan-reference .meal-diary-icon { background: var(--accent-tint); color: var(--accent); border-radius: 14px; }
+.scan-section.scan-section.scan-reference .meal-diary-add { border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 14px; background: var(--accent-tint); color: var(--accent); font-weight: 650; }
+.scan-section.scan-section.scan-reference .meal-diary-add svg { color: var(--accent); }
+.scan-section.scan-section.scan-reference .meal-diary-chevron { color: var(--accent); }
+.scan-section.scan-section.scan-reference .meal-diary-copy small { color: var(--muted); }
+
+/* Water: sky blue throughout. */
+.scan-section.scan-section.scan-reference .water-tracker { border: 1px solid color-mix(in srgb, var(--sky) 30%, transparent); border-radius: 22px; background: linear-gradient(165deg, color-mix(in srgb, var(--sky) 10%, var(--soft)) 0%, var(--soft) 55%); }
+.scan-section.scan-section.scan-reference .water-tracker-icon { background: var(--sky-tint); color: var(--sky); }
+.scan-section.scan-section.scan-reference .water-tracker-head strong { color: var(--ink); }
+.scan-section.scan-section.scan-reference .water-tracker-progress { height: 8px; border-radius: 99px; background: color-mix(in srgb, var(--sky) 14%, transparent); }
+.scan-section.scan-section.scan-reference .water-tracker-progress span { border-radius: inherit; background: var(--sky); }
+.scan-section.scan-section.scan-reference .water-tracker-actions button:last-child { border: 0; background: var(--sky); color: var(--surface); }
+.scan-section.scan-section.scan-reference .water-tracker-actions button:last-child:disabled { background: var(--line); color: var(--muted); }
+.scan-section.scan-section.scan-reference .water-tracker-actions button:first-child { border: 1px solid var(--line); background: var(--surface); color: var(--sky); }
+
+/* Food carbon footprint: a green leaf card. */
+.scan-section.scan-section.scan-reference .food-carbon { border-color: color-mix(in srgb, var(--green) 30%, transparent); border-radius: 22px; background: var(--scan-card); }
+.scan-section.scan-section.scan-reference .food-carbon summary { list-style: none; }
+.scan-section.scan-section.scan-reference .food-carbon summary::-webkit-details-marker { display: none; }
+.scan-section.scan-section.scan-reference .food-carbon summary::before { content: "\1F331"; display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 12px; background: var(--green-light); font-size: 17px; }
+.scan-section.scan-section.scan-reference .food-carbon summary::after { content: "\203A"; margin-left: auto; color: var(--green); font-size: 22px; transition: transform .2s ease; }
+.scan-section.scan-section.scan-reference .food-carbon[open] summary::after { transform: rotate(90deg); }
+.scan-section.scan-section.scan-reference .food-carbon .food-value b { color: var(--green); font-variant-numeric: tabular-nums; }
+
+/* More: one colour per destination. */
+.scan-section.scan-section.scan-reference .scan-dashboard-link-icon { border-radius: 12px; }
+.scan-section.scan-section.scan-reference .scan-dashboard-link-icon.plan { background: var(--amber-tint); color: var(--amber); }
+.scan-section.scan-section.scan-reference .scan-dashboard-link-icon.supplements { background: var(--violet-tint); color: var(--violet); }
+.scan-section.scan-section.scan-reference .scan-dashboard-link-icon.history { background: var(--sky-tint); color: var(--sky); }
+
+/* Add food and editors: tinted chips, a single-border search field. */
+.scan-section.scan-section.scan-reference .food-search { border-radius: 16px; background: var(--soft); }
+.scan-section.scan-section.scan-reference .food-search:focus-within { border-color: var(--green); }
+.scan-section.scan-section.scan-reference .recent-foods button { border: 1px solid color-mix(in srgb, var(--teal) 30%, transparent); background: var(--teal-tint); color: var(--ink); }
+.scan-section.scan-section.scan-reference .food-result-list { overflow: hidden; border-radius: 16px; background: var(--soft); }
+.scan-section.scan-section.scan-reference .food-result-list > button strong { color: var(--green); }
+
+/* Review: colour dots on each nutrition row. */
+.scan-section.scan-section.scan-reference .estimated-macros > div > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
+.scan-section.scan-section.scan-reference .estimated-macros > div > span:first-child::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+.scan-section.scan-section.scan-reference .estimated-macros b { color: var(--accent); }
+
+/* Photo source sheet: camera green, upload sky. */
+.scan-section.scan-section.scan-reference .scan-source-dialog { border-radius: 26px 26px 22px 22px; }
+.scan-section.scan-section.scan-reference .scan-source-option { border-radius: 18px; transition: border-color .2s ease; }
+.scan-section.scan-section.scan-reference .scan-source-option:active { border-color: var(--green); }
+.scan-section.scan-section.scan-reference .scan-source-option[data-source="upload"] .scan-source-icon { background: var(--sky-tint); color: var(--sky); }
+
+/* Dietary plan: colour-coded split, macro tiles and local food list. */
+.scan-section.scan-section.scan-reference .diet-card { border: 1px solid var(--line); border-radius: 22px; background: var(--scan-card); }
+.scan-section.scan-section.scan-reference .diet-track { gap: 4px; }
+.scan-section.scan-section.scan-reference .diet-track i { height: 10px; border-radius: 99px; }
+.scan-section.scan-section.scan-reference .diet-track i:nth-child(1) { background: var(--teal); }
+.scan-section.scan-section.scan-reference .diet-track i:nth-child(2) { background: var(--amber); }
+.scan-section.scan-section.scan-reference .diet-track i:nth-child(3) { background: var(--violet); }
+.scan-section.scan-section.scan-reference .diet-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.scan-section.scan-section.scan-reference .diet-legend span::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+.scan-section.scan-section.scan-reference .diet-legend span:nth-child(2)::before { background: var(--amber); }
+.scan-section.scan-section.scan-reference .diet-legend span:nth-child(3)::before { background: var(--violet); }
+.scan-section.scan-section.scan-reference .diet-macro-grid > div { border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 16px; background: var(--accent-tint); }
+.scan-section.scan-section.scan-reference .diet-macro-grid strong { color: var(--accent); font-size: 21px; font-variant-numeric: tabular-nums; }
+.scan-section.scan-section.scan-reference .diet-badge { background: var(--green-light); color: var(--green); }
+.scan-section.scan-section.scan-reference .diet-local h3 { margin: 0; color: var(--ink); font-size: 17px; }
+.scan-section.scan-section.scan-reference .diet-local-goal { margin: 4px 0 14px; color: var(--muted); }
+.scan-section.scan-section.scan-reference .diet-local-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.scan-section.scan-section.scan-reference .diet-local-list li { display: grid; gap: 4px; padding: 12px 14px; border-left: 3px solid var(--accent); border-radius: 12px; background: var(--surface); }
+.scan-section.scan-section.scan-reference .diet-local-list b { color: var(--accent); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.scan-section.scan-section.scan-reference .diet-local-list span { color: var(--ink); font-size: 14px; line-height: 1.5; }
+.scan-section.scan-section.scan-reference .diet-local-supplements { margin: 12px 0 0; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--violet) 30%, transparent); border-radius: 12px; background: var(--violet-tint); color: var(--muted); }
+.scan-section.scan-section.scan-reference .diet-local-supplements b { display: block; margin-bottom: 4px; color: var(--violet); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.scan-section.scan-section.scan-reference .diet-schedule-meal:nth-child(4n+1) .diet-schedule-number { background: var(--amber-tint); color: var(--amber); }
+.scan-section.scan-section.scan-reference .diet-schedule-meal:nth-child(4n+2) .diet-schedule-number { background: var(--teal-tint); color: var(--teal); }
+.scan-section.scan-section.scan-reference .diet-schedule-meal:nth-child(4n+3) .diet-schedule-number { background: var(--violet-tint); color: var(--violet); }
+.scan-section.scan-section.scan-reference .diet-schedule-meal:nth-child(4n+4) .diet-schedule-number { background: var(--sky-tint); color: var(--sky); }
+
+/* Supplements: evidence levels read at a glance. */
+.scan-section.scan-section.scan-reference .supp-evidence.moderate { background: var(--sky-tint); color: var(--sky); }
+.scan-section.scan-section.scan-reference .supp-evidence.limited { background: var(--amber-tint); color: var(--amber); }
+.scan-section.scan-section.scan-reference .supp-tags .fit { background: var(--teal-tint); color: var(--teal); }
+.scan-section.scan-section.scan-reference .supp-card { border-radius: 18px; }
+
+/* Food history: green days, mint for today, amber above target (the documented warm accent). */
+.scan-section.scan-section.scan-reference .history-summary { border-radius: 22px; background: var(--scan-card); }
+.scan-section.scan-section.scan-reference .history-summary-icon { background: var(--sky-tint); color: var(--sky); }
+.scan-section.scan-section.scan-reference .history-chart-column i.over { background: var(--amber); }
+.scan-section.scan-section.scan-reference .history-chart-column i.latest { background: #4ade80; }
+.scan-section.scan-section.scan-reference .history-record-group { border-radius: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-section.scan-section.scan-reference :is(.meal-diary-card, .scan-source-option) { transition: none; }
+  .scan-section.scan-section.scan-reference .food-carbon summary::after { transition: none; }
+  .scan-section.scan-section.scan-reference .scan-dashboard-scan:active { transform: none; }
+}

@@ -10,6 +10,8 @@ export class AppFeedback {
   @Prop({ required: true, maxlength: 1000 }) message: string;
   @Prop({ maxlength: 40 }) appVersion?: string;
   @Prop({ maxlength: 20 }) platform?: string;
+  /** When the team email was accepted by the provider; unset means it was not sent. */
+  @Prop() notifiedAt?: Date;
 }
 
 export const AppFeedbackSchema = SchemaFactory.createForClass(AppFeedback);

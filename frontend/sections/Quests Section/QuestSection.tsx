@@ -19,7 +19,7 @@ import { BADGE_CATEGORIES, TIER_LABEL, TIER_ORDER, badgeMeta } from './badgeCata
 import './badge-collection.css';
 import type { LeaderboardRecord, WorkoutSessionRecord, WorkoutSummary } from '../../lib/api';
 
-type Screen = 'quests' | 'leaderboard' | 'badges';
+type Screen = 'quests' | 'leaderboard' | 'badges' | 'personal';
 const featuredBadgeIds = ['oath-1', 'self-made-3', 'streak-3', 'first-workout', 'personal-record', 'seven-suns', 'hydration-1', 'goal-1'];
 
 /** Badge art: an original crest whose shape shows the category and whose rim shows the rarity. */
@@ -113,7 +113,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
   const { activity, dailyMissions, personalQuests, personalQuestLog, weeklyChallenges, badges: savedBadges, loading, error, refresh } = useActivity();
   const [badgeData, setBadgeData] = useState<{ ranking: LeaderboardRecord | null; workouts: WorkoutSessionRecord[] | null; summary: WorkoutSummary | null; nutrition: { water: {date: string; glasses: number}[]; meals: {id?: string; date?: string; scanSavedAt?: string; scanGroupId?: string}[]; scanSaveReceipts?: {key: string; mealIds: string[]}[] } | null }>({ ranking: null, workouts: null, summary: null, nutrition: null });
   const { settings } = useSettings();
-  const [screen, setScreen] = useScreenRoute<Screen>('/quests', { quests: '', leaderboard: '/leaderboard', badges: '/badges' }, 'quests');
+  const [screen, setScreen] = useScreenRoute<Screen>('/quests', { quests: '', leaderboard: '/leaderboard', badges: '/badges', personal: '/personal' }, 'quests');
   const [period, setPeriod] = useState<LeaderboardPeriod>('week');
   const [ranking, setRanking] = useState<'quests' | 'strength'>('quests');
   const [lift, setLift] = useState('');
@@ -162,6 +162,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
   if (error) return <section className="quest-section"><div className="profile-load-state" role="alert"><h2>Could not load quests</h2><p>{error}</p><button type="button" onClick={() => void refresh()}>Try again</button></div><BottomNav /></section>;
 
   if (screen === 'badges') return <BadgeVault badges={badges} onBack={() => setScreen('quests')}/>;
+  if (screen === 'personal') return <PersonalQuestsPage quests={personalQuests} log={personalQuestLog} completed={activity?.personalQuestsCompleted ?? personalQuestLog.length} onBack={() => setScreen('quests')}/>;
 
   if (screen === 'leaderboard') {
     const entries = leaderboard?.entries ?? [];
@@ -245,7 +246,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
         <p>Your streak tracks consecutive days with saved activity.</p>
       </section>
       <QuestList id="missions" title="Daily missions" note="Same for everyone · resets daily" items={dailyMissions} empty="No daily missions are available."/>
-      <PersonalJournal quests={personalQuests} log={personalQuestLog}/>
+      <PersonalJournal quests={personalQuests} log={personalQuestLog} onViewAll={() => setScreen('personal')}/>
       <QuestList id="weekly" title="Weekly challenges" note="Targets grow with last week · resets Monday" items={weeklyChallenges} empty="No weekly challenges are available."/>
       <section className="quest-v2-badges" aria-labelledby="quest-v2-badges-title">
         <div className="quest-v2-section-heading quest-badge-heading"><h3 id="quest-v2-badges-title">Badges</h3><div><span>{badges.filter(badge => badge.earned).length} of {badges.length} earned</span><button type="button" onClick={() => setScreen('badges')}>View all <Icon name="chevron-right" size={16}/></button></div></div>
@@ -329,21 +330,55 @@ function BadgeVault({ badges, onBack }: { badges: ActivityBadge[]; onBack: () =>
   </section>;
 }
 
-/** Personal quests look and read differently from the shared lists: a violet journal with rings and a "why it's yours" line. */
-function PersonalJournal({ quests, log }: { quests: DailyMission[] | undefined; log: QuestLogEntry[] }) {
+// Each personal quest slot keeps its label for good: a finished quest is replaced in the same slot, so Quest 2 stays Quest 2.
+const QUEST_NUMBER: Record<string, number> = { record: 1, routine: 2, volume: 3 };
+const questLabel = (slot: string | undefined, index = 0) => `Quest ${slot && QUEST_NUMBER[slot] ? QUEST_NUMBER[slot] : index + 1}`;
+const personalIcon = (key: string) => ({ record: 'trophy', routine: 'dumbbell', volume: 'chart-bars' } as Record<string, string>)[key] ?? 'target';
+
+function PersonalQuestCard({ quest, index }: { quest: DailyMission; index: number }) {
+  const share = Math.min(1, quest.progress / Math.max(1, quest.target));
+  return <li className={quest.complete ? 'done' : ''} aria-label={`${questLabel(quest.key, index)}: ${quest.title}, ${quest.progress} of ${quest.target}`}>
+    <span className="pq-ring" aria-hidden="true"><svg className="pq-ring-svg" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" className="pq-ring-track"/><circle cx="22" cy="22" r="18" className="pq-ring-fill" strokeDasharray={`${(share * 113.1).toFixed(1)} 113.1`}/></svg><Icon name={quest.complete ? 'check' : personalIcon(quest.key)} size={17}/></span>
+    <div><span className="pq-level">{questLabel(quest.key, index)}{(quest.level ?? 1) > 1 ? <i> · Level {quest.level}</i> : null}</span><strong>{quest.title}</strong>{quest.reason && <small>{quest.reason}</small>}<em>{quest.target > 1 ? `${quest.progress.toLocaleString('en-US')} / ${quest.target.toLocaleString('en-US')}` : quest.progress ? 'Done' : 'Not yet'}</em></div>
+    <span className="pq-xp">+{quest.points}<small>XP</small></span>
+  </li>;
+}
+
+/** View all: the three current personal quests and every finished one (latest 100 kept), newest first. */
+function PersonalQuestsPage({ quests, log, completed, onBack }: { quests: DailyMission[] | undefined; log: QuestLogEntry[]; completed: number; onBack: () => void }) {
   const list = quests ?? [];
-  const icon = (key: string) => ({ record: 'trophy', routine: 'dumbbell', volume: 'chart-bars' } as Record<string, string>)[key] ?? 'target';
+  const earned = log.reduce((sum, entry) => sum + entry.points, 0);
+  return <section className="quest-section badge-collection pq-all" aria-label="All personal quests">
+    <header className="leaderboard-header pq-page-heading"><button className="coach-back" type="button" onClick={onBack} aria-label="Back to quests"><Icon name="arrow" size={20}/></button><h2>Personal quests</h2></header>
+    <div className="leaderboard-scroll badge-collection-scroll">
+      <section className="pq-all-summary" aria-label="Personal quest summary">
+        <div><strong>{completed}</strong><small>Finished</small></div><div><strong>{list.length}</strong><small>In progress</small></div><div><strong>+{earned.toLocaleString('en-US')}</strong><small>XP earned</small></div>
+      </section>
+      <section className="pq-journal" aria-labelledby="pq-all-current"><header><span className="pq-journal-sigil" aria-hidden="true"><Icon name="target" size={20}/></span><div><h3 id="pq-all-current">In progress</h3><p>Finish one and the next, a little harder, takes its place</p></div></header>
+        {list.length ? <ul>{list.map((quest, index) => <PersonalQuestCard key={quest.key} quest={quest} index={index}/>)}</ul> : <p className="pq-journal-empty">{quests ? 'Complete your profile to unlock personal quests.' : 'Personal quests appear after your account syncs. Connect to the internet and sign in.'}</p>}
+      </section>
+      <section className="pq-journal" aria-labelledby="pq-all-finished"><header><span className="pq-journal-sigil" aria-hidden="true"><Icon name="check" size={20}/></span><div><h3 id="pq-all-finished">Finished</h3><p>{log.length ? `Newest first${completed > log.length ? ` · latest ${log.length} of ${completed}` : ''}` : 'Your finished quests will be listed here'}</p></div></header>
+        {log.length ? <ul className="pq-all-history">{log.map(entry => <li key={entry.completedAt + entry.title}>
+          <span className="pq-ring" aria-hidden="true"><Icon name="check" size={16}/></span>
+          <div><span className="pq-level">{entry.slot ? questLabel(entry.slot) : 'Personal quest'}{(entry.level ?? 1) > 1 ? <i> · Level {entry.level}</i> : null}</span><strong>{entry.title}</strong><small>Finished {new Date(entry.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</small></div>
+          <span className="pq-xp">+{entry.points}<small>XP</small></span>
+        </li>)}</ul> : <p className="pq-journal-empty">No finished quests yet. Beat one of your current quests to start your record.</p>}
+      </section>
+    </div>
+    <BottomNav/>
+  </section>;
+}
+
+/** Personal quests look and read differently from the shared lists: a violet journal with rings and a "why it's yours" line. */
+function PersonalJournal({ quests, log, onViewAll }: { quests: DailyMission[] | undefined; log: QuestLogEntry[]; onViewAll: () => void }) {
+  const list = quests ?? [];
   return <section className="pq-journal" aria-labelledby="pq-journal-title">
     <header>
       <span className="pq-journal-sigil" aria-hidden="true"><Icon name="user" size={20}/></span>
       <div><h3 id="pq-journal-title">Personal quests</h3><p>Built from your own training · each win unlocks the next</p></div>
-      {log.length > 0 && <strong aria-label={`${log.length} recently completed`}>{log.length}<small> won</small></strong>}
+      <button type="button" className="pq-view-all" onClick={onViewAll}>View all <Icon name="chevron-right" size={14}/></button>
     </header>
-    {list.length ? <ul>{list.map(quest => { const share = Math.min(1, quest.progress / Math.max(1, quest.target)); return <li key={quest.key} className={quest.complete ? 'done' : ''} aria-label={`${quest.title}, ${quest.progress} of ${quest.target}`}>
-      <span className="pq-ring" aria-hidden="true"><svg className="pq-ring-svg" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" className="pq-ring-track"/><circle cx="22" cy="22" r="18" className="pq-ring-fill" strokeDasharray={`${(share * 113.1).toFixed(1)} 113.1`}/></svg><Icon name={quest.complete ? 'check' : icon(quest.key)} size={17}/></span>
-      <div><span className="pq-level">Quest {quest.level ?? 1}</span><strong>{quest.title}</strong>{quest.reason && <small>{quest.reason}</small>}<em>{quest.target > 1 ? `${quest.progress.toLocaleString('en-US')} / ${quest.target.toLocaleString('en-US')}` : quest.progress ? 'Done' : 'Not yet'}</em></div>
-      <span className="pq-xp">+{quest.points}<small>XP</small></span>
-    </li>; })}</ul> : <p className="pq-journal-empty">{quests ? 'Complete your profile to unlock personal quests.' : 'Personal quests appear after your account syncs. Connect to the internet and sign in.'}</p>}
+    {list.length ? <ul>{list.map((quest, index) => <PersonalQuestCard key={quest.key} quest={quest} index={index}/>)}</ul> : <p className="pq-journal-empty">{quests ? 'Complete your profile to unlock personal quests.' : 'Personal quests appear after your account syncs. Connect to the internet and sign in.'}</p>}
     {log.length > 0 && <div className="pq-log" aria-label="Recently completed personal quests"><h4>Recently completed</h4><ul>{log.slice(0, 3).map(entry => <li key={entry.completedAt + entry.title}><Icon name="check" size={13}/><span>{entry.title}</span><b>+{entry.points}</b></li>)}</ul></div>}
     <footer><Icon name="medal" size={14}/><span>Beat a quest and the next one unlocks, a little harder. Complete 3 to forge your <b>Self-Made</b> crest.</span></footer>
   </section>;

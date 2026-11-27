@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+// Signed-in pages show What's New once per release; mark it seen so it never covers the controls under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { sessionStorage.setItem('pq-whats-new-shown', '1'); } catch {} }); });
 async function fixture(page) {
   let profile = { name:'Student',email:'student@example.test',goal:'Strength',equipment:['Bodyweight only'],days:['Monday'],duration:'30 min',contactName:'Maria',contactPhone:'09123456789' };
   let values={threshold:30}, writes=0;
@@ -28,8 +30,9 @@ test('Coach empty states and library search retain readable contrast and keyboar
   }
   await page.getByRole('button',{name:'Exercise library'}).click();
   const input=page.getByRole('searchbox');await input.focus();
-  await expect(input).toHaveCSS('outline-style','solid');
-  await expect(input).toHaveCSS('outline-width','2px');
+  // One highlight only: the search bar's border turns green and the input draws no ring of its own.
+  await expect(input).toHaveCSS('outline-style','none');
+  await expect(input.locator('xpath=ancestor::*[contains(@class,"library-search")][1]')).toHaveCSS('border-top-color','rgb(34, 197, 94)');
   expect(await input.evaluate(el=>getComputedStyle(el,'::placeholder').color)).toBe('rgb(148, 163, 184)');
 });
 test('saved safety threshold announces selection and omitted targets read cleanly',async({page})=>{

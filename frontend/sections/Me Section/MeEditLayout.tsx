@@ -13,7 +13,8 @@ export default function MeEditLayout({
   onSave,
   isDirty,
   isSaving,
-  error
+  error,
+  saveLabel = 'Save changes'
 }: {
   title: string;
   description?: ReactNode;
@@ -24,6 +25,7 @@ export default function MeEditLayout({
   isDirty: boolean;
   isSaving?: boolean;
   error?: string;
+  saveLabel?: string;
 }) {
   const connected = useBackendConnection();
   return (
@@ -45,7 +47,7 @@ export default function MeEditLayout({
       {connected && <footer className="wizard-footer edit-footer">
         <button type="button" className="secondary discard-btn" onClick={onDiscard} disabled={isSaving || !isDirty}>Discard</button>
         <button type="button" className="primary save-btn" disabled={!isDirty || isSaving} onClick={onSave}>
-          {isSaving ? 'Saving...' : 'Save changes'}
+          {isSaving ? 'Saving...' : saveLabel}
         </button>
       </footer>}
     </section>

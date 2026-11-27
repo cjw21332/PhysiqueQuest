@@ -54,3 +54,18 @@ describe('personal quest chain', () => {
     expect(advanceChain({ version: 1, completed: 0, xp: 0, quests: [quest, generateQuest('routine', 1, [], quest.createdAt), generateQuest('volume', 1, [], quest.createdAt)], recent: [] }, [warmup], '2026-11-22T12:00:00.000Z').view[0].progress).toBe(0);
   });
 });
+
+describe('personal quest history', () => {
+  it('keeps each finished quest with its slot and level, beyond the old five-entry cap', async () => {
+    const { advanceChain, MAX_QUEST_HISTORY } = await import('../src/activity/quest-chain.js');
+    const old = Array.from({ length: 7 }, (_, index) => ({ title: `Old ${index}`, points: 100, completedAt: '2026-11-01T00:00:00.000Z' }));
+    const starter = { version: 1, completed: 7, xp: 700, recent: old, quests: [
+      { slot: 'record' as const, level: 2, createdAt: '2026-11-01T00:00:00.000Z', title: 'Log a weighted set', reason: '', target: 1, points: 100, spec: { kind: 'starter' as const } },
+    ] };
+    const sessions = [{ endedAt: '2026-11-02T00:00:00.000Z', sets: [{ exerciseId: 'bench', reps: 5, loadKg: 60, status: 'completed' }] }];
+    const { state } = advanceChain(starter, sessions, '2026-11-03T00:00:00.000Z');
+    expect(state.recent).toHaveLength(8);
+    expect(state.recent[0]).toMatchObject({ title: 'Log a weighted set', slot: 'record', level: 2 });
+    expect(MAX_QUEST_HISTORY).toBe(100);
+  });
+});

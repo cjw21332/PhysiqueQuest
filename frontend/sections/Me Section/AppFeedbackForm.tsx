@@ -24,10 +24,10 @@ export default function AppFeedbackForm({ onBack, onSent }: { onBack: () => void
     finally { setSaving(false); }
   };
   return <MeEditLayout title="Send feedback" description="Tell the PhysiqueQuest team what works and what doesn't. Don't include health details you want kept private." onBack={onBack}
-    onDiscard={() => { setRating(0); setMessage(''); setError(''); }} onSave={() => void send()} isDirty={rating > 0 || message.trim().length > 0} isSaving={saving} error={error}>
+    onDiscard={() => { setRating(0); setMessage(''); setError(''); }} onSave={() => void send()} isDirty={rating > 0 || message.trim().length > 0} isSaving={saving} error={error} saveLabel="Send feedback">
     <div className="choice-group" role="radiogroup" aria-label="Rating">
       <div className="group-title"><b>Rating</b></div>
-      <div className="option-row">{[1, 2, 3, 4, 5].map(value => <button type="button" key={value} role="radio" aria-checked={rating === value} aria-label={`${value} star${value === 1 ? '' : 's'}`} className={rating >= value ? 'selected' : ''} onClick={() => setRating(value)}>★</button>)}</div>
+      <div className="feedback-stars">{[1, 2, 3, 4, 5].map(value => <button type="button" key={value} role="radio" aria-checked={rating === value} aria-label={`${value} star${value === 1 ? '' : 's'}`} className={rating >= value ? 'selected' : ''} onClick={() => setRating(value)}>★</button>)}</div>
     </div>
     <label className="field"><span>Type</span><div className="input-wrap"><select value={category} onChange={event => setCategory(event.target.value as Category)}>{categories.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div></label>
     <div className="choice-group notes-group">

@@ -136,3 +136,29 @@ describe('EmailDeliveryProvider', () => {
     });
   });
 });
+
+describe('EmailDeliveryProvider feedback alerts', () => {
+  const feedback = { rating: 4, category: 'bug', message: 'Scan <button> froze', platform: 'android', appVersion: '1.6.3', userName: 'Sam', userEmail: 'sam@example.test', sentAt: new Date('2026-11-28T00:00:00Z') };
+  it('sends feedback through the EmailJS feedback template to the lead programmer by default', async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response(null, { status: 200 }));
+    vi.stubGlobal('fetch', fetch);
+    expect(await createProvider({ ...emailJsSettings, FEEDBACK_TEMPLATE_ID: 'feedback-template' }).sendFeedback(feedback)).toBe(true);
+    const body = JSON.parse(String(fetch.mock.calls[0][1]?.body));
+    expect(body).toMatchObject({ service_id: 'service-id', template_id: 'feedback-template', template_params: { email: 'waletcharlesjames3@gmail.com', category: 'bug', message: 'Scan <button> froze', from_user: 'Sam <sam@example.test>', device: 'android v1.6.3' } });
+    expect(body.template_params.rating).toBe('★★★★☆ (4/5)');
+  });
+  it('honours FEEDBACK_NOTIFY_EMAIL and never reuses the verification-code template', async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response(null, { status: 200 }));
+    vi.stubGlobal('fetch', fetch);
+    expect(await createProvider(emailJsSettings).sendFeedback(feedback)).toBe(false);
+    expect(fetch).not.toHaveBeenCalled();
+    await createProvider({ ...emailJsSettings, FEEDBACK_TEMPLATE_ID: 'feedback-template', FEEDBACK_NOTIFY_EMAIL: 'team@example.test' }).sendFeedback(feedback);
+    expect(JSON.parse(String(fetch.mock.calls[0][1]?.body)).template_params.email).toBe('team@example.test');
+  });
+  it('reports a rejected or unreachable provider as not sent', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('bad template', { status: 400 })));
+    expect(await createProvider({ ...emailJsSettings, FEEDBACK_TEMPLATE_ID: 'feedback-template' }).sendFeedback(feedback)).toBe(false);
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('offline'); }));
+    expect(await createProvider({ ...emailJsSettings, FEEDBACK_TEMPLATE_ID: 'feedback-template' }).sendFeedback(feedback)).toBe(false);
+  });
+});

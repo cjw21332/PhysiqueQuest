@@ -2,6 +2,8 @@ import { test, expect, chromium } from '@playwright/test';
 import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+// Signed-in pages show What's New once per release; mark it seen so it never covers the controls under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { sessionStorage.setItem('pq-whats-new-shown', '1'); } catch {} }); });
 
 // Run against a separately started production build and populated Coach server.
 test('offline reopen uses the public shell and saved exercise catalog', async () => {

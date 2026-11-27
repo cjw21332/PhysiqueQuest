@@ -3,6 +3,8 @@ import { test } from '@playwright/test';
 // iPhone emulation: touch, mobile viewport and Safari UA so coarse-pointer CSS applies.
 test.use({ isMobile: true, hasTouch: true, deviceScaleFactor: 3, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1' });
 import { writeFileSync, mkdirSync } from 'node:fs';
+// Signed-in pages show What's New once per release; mark it seen so it never covers the controls under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { sessionStorage.setItem('pq-whats-new-shown', '1'); } catch {} }); });
 
 // Crawls every route at phone size with mocked API data and records UI defects:
 // low contrast, tiny text, small touch targets, unnamed controls, horizontal overflow.

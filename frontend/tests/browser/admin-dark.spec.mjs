@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { expectDarkPalette } from './theme-layout-helpers.mjs';
+// Signed-in pages show What's New once per release; mark it seen so it never covers the controls under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { sessionStorage.setItem('pq-whats-new-shown', '1'); } catch {} }); });
 
 test('admin dark references retain local controls and responsive layout', async ({ page }, info) => {
   await page.addInitScript(() => localStorage.setItem('physiquequest-auth', JSON.stringify({ id: 'visual', token: 'visual-test' })));

@@ -9838,6 +9838,12 @@ html { -webkit-tap-highlight-color: transparent; }
   outline-offset: -3px;
 }
 :root[data-theme] .password-input-wrap:focus-within input { border-color: var(--green); }
+/* Controls inside a composite field never draw their own focus border: the wrapper's green border is the only one. */
+:root[data-theme] :is(.input-wrap, .focus-within, .library-search, .food-search, .admin-search) :is(input, select, textarea):focus { border-color: var(--line); }
+/* A select that fills its field is a full dropdown, not a unit suffix: no divider, no width cap. */
+.input-wrap > select:only-child { flex: 1; max-width: none; border-left: 0; padding-left: 0; color: var(--ink); font-size: 15px; font-weight: 500; }
+/* Taps never leave a focus ring; keyboard navigation (InputModality sets data-keyboard) still shows it. */
+:root:not([data-keyboard]) :focus-visible { outline: none !important; }
 
 /* Session reminders float above the page without resizing its content. */
 .verification-alert { position: fixed; top: calc(var(--sat) + 12px); left: 50%; transform: translateX(-50%); z-index: 105; width: min(408px, calc(100% - 32px)); display: flex; align-items: flex-start; gap: 12px; padding: 12px 12px 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); color: var(--ink); box-shadow: 0 8px 24px rgb(0 0 0 / 25%); }
@@ -10520,7 +10526,7 @@ body:has(.admin-reference-form) .signed-in-layout :is(.home-content, .scan-conte
 :root[data-theme="dark"] .registration-screen .input-wrap,
 :root[data-theme="dark"] .calibration-wizard .input-wrap { min-height: 50px; }
 :root[data-theme="dark"] .registration-screen .input-wrap:focus-within,
-:root[data-theme="dark"] .calibration-wizard .input-wrap:focus-within { border-color: var(--green); box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 18%, transparent); }
+:root[data-theme="dark"] .calibration-wizard .input-wrap:focus-within { border-color: var(--green); box-shadow: none; }
 :root[data-theme="dark"] .registration-screen .consent { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); }
 :root[data-theme="dark"] .registration-screen .eye { min-width: 44px; min-height: 44px; }
 :root[data-theme="dark"] .calibration-wizard > .progress { margin: 24px 20px 22px; gap: 7px; }
@@ -10634,4 +10640,88 @@ dialog[open]::backdrop { animation: pq-fade-in .22s ease-out; }
 :where(.signed-in-layout) :where(button, a, [role="button"]):not(:disabled):active { scale: .97; }
 @media (prefers-reduced-motion: reduce) {
   .signed-in-layout *, .signed-in-layout *::before, .signed-in-layout *::after, dialog[open], dialog[open]::backdrop { animation: none !important; transition: none !important; scale: none !important; }
+}
+
+/* Send feedback rating: amber stars when chosen, steel outlines otherwise. */
+.feedback-stars { display: flex; gap: 6px; }
+.feedback-stars button { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); color: var(--gray-mid); font-size: 24px; line-height: 1; cursor: pointer; transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
+.feedback-stars button.selected { border-color: color-mix(in srgb, var(--amber) 45%, transparent); background: var(--amber-tint); color: var(--amber); }
+@media (prefers-reduced-motion: reduce) { .feedback-stars button { transition: none; } }
+
+/* ===== Lively Phiq (v1.6.3) =====
+   Green to mint for Phiq itself and your messages; suggestion rows use sky, amber and violet;
+   data access turns teal when on. Lives here because components/coach-chat.css is not imported; repeated classes outrank the .signed-in-layout chat rules above. */
+.coach-chat-launcher.coach-chat-launcher.coach-chat-launcher { border: 3px solid var(--surface); background: linear-gradient(135deg, var(--green) 0%, #4ade80 100%); box-shadow: 0 0 0 1px color-mix(in srgb, var(--green) 45%, transparent), 0 6px 18px rgb(0 0 0 / 40%); transition: transform .15s ease; }
+.coach-chat-launcher.coach-chat-launcher.coach-chat-launcher:active { transform: scale(.94); }
+.coach-chat-launcher.coach-chat-launcher.coach-chat-launcher > span { width: 12px; height: 12px; background: var(--sky); }
+.coach-chat-dialog.coach-chat-dialog { border-color: color-mix(in srgb, var(--green) 25%, transparent); border-radius: 26px 26px 0 0; background: var(--surface); }
+.coach-chat-dialog.coach-chat-dialog::backdrop { background: rgb(0 0 0 / 70%); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-header { padding: 16px; background: linear-gradient(160deg, color-mix(in srgb, var(--green) 16%, var(--soft)) 0%, var(--soft) 70%); border-bottom-color: var(--line); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-avatar { background: linear-gradient(135deg, var(--green) 0%, #4ade80 100%); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-header .coach-chat-avatar { width: 44px; height: 44px; flex-basis: 44px; box-shadow: 0 0 0 3px var(--green-light); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-eyebrow { color: #4ade80; font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-header h2 { font-size: 18px; font-weight: 700; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-header p { display: flex; align-items: baseline; gap: 6px; line-height: 1.4; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-header p::before { flex: none; transform: translateY(-1px); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-header p::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-header button { border-radius: 12px; color: var(--ink); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-header .coach-chat-clear { display: inline-flex; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); text-decoration: none; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-messages { padding: 18px 16px 12px; background: radial-gradient(120% 60% at 100% 0%, color-mix(in srgb, var(--violet) 7%, transparent) 0%, transparent 60%), var(--surface); }
+
+/* Welcome and suggestions */
+.coach-chat-dialog.coach-chat-dialog .coach-chat-welcome-heading { padding: 18px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(165deg, color-mix(in srgb, var(--green) 10%, var(--soft)) 0%, var(--soft) 60%); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-welcome-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; margin-bottom: 10px; border-radius: 14px; background: linear-gradient(135deg, var(--green) 0%, #4ade80 100%); color: var(--surface); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-welcome-heading > span:not(.coach-chat-welcome-icon) { display: block; color: #4ade80; font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-welcome-heading h3 { margin: 6px 0 4px; color: var(--ink); font-size: 20px; line-height: 1.25; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-welcome-heading p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompt-label { margin: 18px 2px 0; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts { display: grid; gap: 8px; margin: 10px 0 0; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts button { --accent: var(--sky); --accent-tint: var(--sky-tint); display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 14px 8px 8px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); color: var(--ink); font-size: 14px; font-weight: 550; text-align: left; transition: border-color .15s ease; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts button:nth-child(2) { --accent: var(--amber); --accent-tint: var(--amber-tint); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts button:nth-child(3) { --accent: var(--violet); --accent-tint: var(--violet-tint); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts button > svg:first-child { box-sizing: content-box; flex: none; padding: 9px; border-radius: 12px; background: var(--accent-tint); color: var(--accent); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts button > span { flex: 1; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts button > svg:last-child { color: var(--accent); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts button:active:not(:disabled) { border-color: var(--accent); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-prompts button:disabled { opacity: .55; }
+
+/* Messages */
+.coach-chat-dialog.coach-chat-dialog .coach-chat-message p { padding: 12px 14px; border: 1px solid var(--line); border-radius: 18px 18px 18px 6px; background: var(--soft); color: var(--ink); font-size: 14px; line-height: 1.55; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-message.user p { border: 0; border-radius: 18px 18px 6px 18px; background: linear-gradient(135deg, var(--green) 0%, #4ade80 100%); color: var(--surface); font-weight: 500; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-message + .coach-chat-message { margin-top: 14px; }
+
+/* Waiting, errors and notices */
+.coach-chat-dialog.coach-chat-dialog .coach-chat-pending { margin-top: 14px; padding: 10px 10px 10px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--soft); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-pending .coach-chat-privacy { display: inline-flex; align-items: center; gap: 10px; margin: 0; color: var(--ink); font-size: 13px; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-pending .coach-chat-privacy::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #4ade80; animation: phiq-pulse 1s ease-in-out infinite; }
+.coach-chat-dialog.coach-chat-dialog :is(.coach-chat-pending, .coach-chat-retry) button { min-height: 40px; border-radius: 999px; background: var(--surface); font-weight: 600; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-retry { padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--red-dark) 40%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--red-light) 60%, transparent); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-retry .coach-chat-error { margin: 0 0 10px; color: var(--red-dark); font-size: 13px; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-retry button:not(:disabled) { border-color: var(--red-dark); color: var(--ink); }
+
+/* Data access and composer */
+.coach-chat-dialog.coach-chat-dialog .coach-chat-dock { border-top: 1px solid var(--line); background: var(--soft); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-access { margin: 10px 12px 0; padding: 4px 12px 8px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); transition: border-color .2s ease, background-color .2s ease; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-access.is-enabled { border-color: color-mix(in srgb, var(--teal) 45%, transparent); background: var(--teal-tint); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-access .coach-chat-consent svg { color: var(--muted); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-access.is-enabled .coach-chat-consent svg { color: var(--teal); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-access-state { padding: 3px 10px; border-radius: 999px; background: var(--line); color: var(--muted); font-size: 11px; font-weight: 700; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-access.is-enabled .coach-chat-access-state { background: var(--teal); color: var(--surface); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-consent input { accent-color: var(--teal); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-access-details summary { color: var(--sky); font-size: 12px; font-weight: 600; cursor: pointer; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-composer { border-top: 0; padding-top: 10px; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-composer input { min-height: 48px; border-color: var(--line); background: var(--surface); color: var(--ink); font-size: 15px; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-composer input:focus { border-color: var(--green); }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-composer button { width: 48px; height: 48px; flex-basis: 48px; }
+.coach-chat-dialog.coach-chat-dialog .coach-chat-composer button:not(:disabled) { background: linear-gradient(135deg, var(--green) 0%, #4ade80 100%); color: var(--surface); }
+
+/* Phone widths: Clear chat becomes a 44px icon button; its text stays as the accessible name. */
+@media (max-width: 480px) {
+  .coach-chat-dialog.coach-chat-dialog .coach-chat-header .coach-chat-clear { justify-content: center; width: 44px; min-width: 44px; min-height: 44px; padding: 0; border-radius: 50%; }
+  .coach-chat-dialog.coach-chat-dialog .coach-chat-header .coach-chat-clear span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+@keyframes phiq-pulse { 0%, 100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .coach-chat-dialog.coach-chat-dialog .coach-chat-pending .coach-chat-privacy::before { animation: none; }
+  .coach-chat-launcher.coach-chat-launcher.coach-chat-launcher, .coach-chat-dialog.coach-chat-dialog :is(.coach-chat-prompts button, .coach-chat-access) { transition: none; }
 }

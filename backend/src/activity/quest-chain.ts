@@ -13,7 +13,11 @@ type Spec =
   | { kind: 'volume'; best: number }
   | { kind: 'starter' };
 export type ChainQuest = { slot: Slot; level: number; createdAt: string; title: string; reason: string; target: number; points: number; spec: Spec };
-export type ChainState = { version: number; completed: number; xp: number; quests: ChainQuest[]; recent: { title: string; points: number; completedAt: string }[] };
+/** A finished quest. slot and level are absent on entries saved before v1.6.3. */
+export type ChainLogEntry = { title: string; points: number; completedAt: string; slot?: Slot; level?: number };
+export type ChainState = { version: number; completed: number; xp: number; quests: ChainQuest[]; recent: ChainLogEntry[] };
+/** Finished quests kept for the View all page; older ones still count in `completed` and `xp`. */
+export const MAX_QUEST_HISTORY = 100;
 export type ChainView = { key: string; title: string; reason: string; target: number; progress: number; points: number; complete: boolean; level: number };
 
 const SLOTS: Slot[] = ['record', 'routine', 'volume'];
@@ -109,7 +113,7 @@ export function advanceChain(stored: ChainState | undefined, sessions: LogSessio
     if (!quest) { quest = generateQuest(slot, 1, ordered, now); state.quests.push(quest); changed = true; }
     if (progressOf(quest, ordered) >= quest.target) {
       state.completed++; state.xp += quest.points;
-      state.recent = [{ title: quest.title, points: quest.points, completedAt: now }, ...state.recent].slice(0, 5);
+      state.recent = [{ title: quest.title, points: quest.points, completedAt: now, slot, level: quest.level }, ...state.recent].slice(0, MAX_QUEST_HISTORY);
       const next = generateQuest(slot, quest.level + 1, ordered, now, quest.spec);
       state.quests = state.quests.map(item => item.slot === slot ? next : item);
       quest = next; changed = true;

@@ -3,7 +3,7 @@ import { api } from '../lib/api';
 import { useAppResource } from './useAppResource';
 
 export type DailyMission = { key: string; title: string; target: number; progress: number; points: number; complete: boolean; reason?: string; level?: number };
-export type QuestLogEntry = { title: string; points: number; completedAt: string };
+export type QuestLogEntry = { title: string; points: number; completedAt: string; slot?: string; level?: number };
 export type ActivityBadge = { id: string; title: string; icon: string; earned: boolean; available?: boolean; description?: string; progressText?: string; progress?: { current: number; target: number; unit: string } };
 export type ActivityState = { timezone: string; questProgress: { workout: number; meals: number; water: number }; level: number; currentExp: number; nextLevelExp: number; dayStreak: number; earnedPoints: number; activityDates?: string[]; accountCreatedAt?: string | null; questWeeks?: { plan: number; challenges: number }; personalQuestsCompleted?: number };
 export type ActivityResponse = { state: ActivityState; dailyMissions: DailyMission[]; personalQuests?: DailyMission[]; personalQuestLog?: QuestLogEntry[]; weeklyChallenges?: DailyMission[]; badges: ActivityBadge[] };

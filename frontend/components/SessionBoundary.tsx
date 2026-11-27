@@ -25,7 +25,18 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
   // Set while any "not connected" notice applies, so recovery can confirm itself with a "Connected" toast.
   const wasDisconnected = useRef(false);
   // Dismissed connecting/sign-in toasts stay hidden until that state ends and returns.
-  const [hidden, setHidden] = useState<{ connecting?: boolean; sync?: boolean }>({});
+  const [hidden, setHidden] = useState<{ connecting?: boolean; sync?: boolean; slow?: boolean }>({});
+  // Number of API requests running past SLOW_REQUEST_MS (lib/api.ts); a dismissal lasts until they finish.
+  const [slowNetwork, setSlowNetwork] = useState(false);
+  useEffect(() => {
+    const onSlow = (event: Event) => {
+      const pending = Number((event as CustomEvent).detail) > 0;
+      setSlowNetwork(pending);
+      if (!pending) setHidden(current => current.slow ? { ...current, slow: false } : current);
+    };
+    window.addEventListener('physiquequest:slow-network', onSlow);
+    return () => window.removeEventListener('physiquequest:slow-network', onSlow);
+  }, []);
   const dismissedOffline = useRef(false);
   const wasOffline = useRef(false);
   const onlineCheckInFlight = useRef(false);
@@ -208,6 +219,7 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     if ((connectionLost || (deviceOffline && !dismissedOffline.current)) && (!sessionExpired || deviceOffline) && !inSession) return <ConnectionToast key="offline" tone="offline" title="You’re offline"
       message={nativeApp ? 'Saved data may be out of date.' : `${retryFailed ? 'Still unable to connect. ' : ''}Saved content and manual workouts still work; they sync when you reconnect. Food logging needs a connection.`}
       action={{ label: 'Try again', onClick: () => { void retryConnection(); }, busy: retrying }} dismissLabel="Continue offline" onDismiss={continueOffline}/>;
+    if (slowNetwork && !hidden.slow && !deviceOffline) return <ConnectionToast key="slow" tone="connecting" title="Slow connection" message="Still working on it. Keep the app open; nothing you entered is lost." dismissLabel="Dismiss slow connection message" onDismiss={() => setHidden(current => ({ ...current, slow: true }))}/>;
     if (serviceReconnecting && nativeApp && !sessionExpired && !hidden.connecting) return <ConnectionToast key="connecting" tone="connecting" title="Connecting to PhysiqueQuest" message="You can keep using your saved content." dismissLabel="Dismiss connecting message" onDismiss={() => setHidden(current => ({ ...current, connecting: true }))}/>;
     return null;
   };

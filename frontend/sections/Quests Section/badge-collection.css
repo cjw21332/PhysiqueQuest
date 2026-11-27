@@ -5,23 +5,23 @@
 .badge-crest.is-earned { filter: drop-shadow(0 6px 14px rgb(0 0 0 / .45)); }
 .badge-crest.is-earned.badge-tier-legendary { animation: bc-legend 4s ease-in-out infinite; }
 .badge-crest.is-locked { opacity: .82; }
-@keyframes bc-legend { 50% { filter: drop-shadow(0 0 14px rgb(167 139 250 / .55)) drop-shadow(0 6px 14px rgb(0 0 0 / .45)); } }
+@keyframes bc-legend { 50% { filter: drop-shadow(0 0 14px color-mix(in srgb, var(--violet) 55%, transparent)) drop-shadow(0 6px 14px rgb(0 0 0 / .45)); } }
 
 /* ---------- Vault ---------- */
 .bc .bc-scroll { display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
 /* The scroll area is a fixed-height flex column: stop it squashing the hero and sections. */
 .bc .bc-scroll > * { flex-shrink: 0; }
 .bc-hero { position: relative; display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: 22px; overflow: hidden;
-  background: radial-gradient(120% 140% at 0% 0%, rgb(181 123 255 / .28), transparent 55%), radial-gradient(120% 140% at 100% 100%, rgb(34 211 238 / .18), transparent 55%), var(--soft);
-  border: 1px solid color-mix(in srgb, #b57bff 35%, var(--line)); }
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--violet) 28%, transparent), transparent 55%), radial-gradient(120% 140% at 100% 100%, color-mix(in srgb, var(--sky) 18%, transparent), transparent 55%), var(--soft);
+  border: 1px solid color-mix(in srgb, var(--violet) 35%, transparent); }
 .bc-hero-crest { flex: none; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 50%; background: radial-gradient(circle, rgb(255 255 255 / .08), transparent 70%); }
 .bc-hero-copy { min-width: 0; display: grid; gap: 6px; }
-.bc-hero-copy small { color: #c4a6ff; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.bc-hero-copy small { color: var(--violet); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .bc-hero-copy h3 { margin: 0; color: var(--ink); font-size: 20px; line-height: 1.2; }
 .bc-hero-copy p { margin: 0; color: var(--muted); font-size: 13px; }
 .bc-hero-copy p strong { color: var(--ink); font-size: 16px; }
 .bc-hero-bar { height: 8px; border-radius: 999px; background: rgb(255 255 255 / .08); overflow: hidden; }
-.bc-hero-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #b57bff, #22d3ee, #facc15); transition: width .6s cubic-bezier(.2, .7, .2, 1); }
+.bc-hero-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--violet), var(--sky), var(--amber)); transition: width .6s cubic-bezier(.2, .7, .2, 1); }
 
 .bc-rarity { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 @media (min-width: 420px) { .bc-rarity { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
@@ -30,7 +30,7 @@
 .bc-rarity-common i { background: linear-gradient(135deg, #f3c595, #6d3b17); }
 .bc-rarity-rare i { background: linear-gradient(135deg, #ffffff, #5f6b7d); }
 .bc-rarity-epic i { background: linear-gradient(135deg, #fff0b0, #8a5a05); }
-.bc-rarity-legendary i { background: conic-gradient(#e9d5ff, #67e8f9, #facc15, #e9d5ff); }
+.bc-rarity-legendary i { background: conic-gradient(var(--violet), var(--sky), var(--amber), var(--violet)); }
 
 .bc-filters { display: flex; gap: 8px; }
 .bc-filters button { flex: 1; min-height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--soft); color: var(--text-secondary); font: inherit; font-size: 13px; font-weight: 700; }
@@ -47,7 +47,7 @@
 .bc-category > header strong small { color: var(--muted); font-size: 12px; font-weight: 600; }
 .bc-category-bar { height: 4px; border-radius: 999px; background: rgb(255 255 255 / .07); overflow: hidden; }
 .bc-category-bar span { display: block; height: 100%; background: var(--bc-hue); border-radius: inherit; }
-.bc-category-personal { border-width: 1.5px; box-shadow: 0 0 0 1px rgb(181 123 255 / .12), 0 12px 30px rgb(181 123 255 / .08); }
+.bc-category-personal { border-width: 1.5px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--violet) 12%, transparent), 0 12px 30px color-mix(in srgb, var(--violet) 8%, transparent); }
 
 .bc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 @media (min-width: 560px) { .bc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
@@ -65,7 +65,7 @@
 .bc-tier-common { color: #e2a36b; }
 .bc-tier-rare { color: #c9d4e3; }
 .bc-tier-epic { color: #f5c542; }
-.bc-tier-legendary { background: linear-gradient(90deg, #d8b4fe, #67e8f9, #facc15); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.bc-tier-legendary { background: linear-gradient(90deg, var(--violet), var(--sky), var(--amber)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .bc-mini-bar { width: 70%; height: 3px; border-radius: 999px; background: rgb(255 255 255 / .08); overflow: hidden; }
 .bc-mini-bar i { display: block; height: 100%; background: var(--bc-hue); border-radius: inherit; }
 
@@ -89,34 +89,34 @@
 
 /* ---------- Personal quest journal ---------- */
 .pq-journal { display: grid; gap: 12px; margin: 4px 0 18px; padding: 16px; border-radius: 22px; color: var(--ink);
-  background: radial-gradient(120% 90% at 100% 0%, rgb(181 123 255 / .28), transparent 60%), linear-gradient(160deg, #1d1530, #121a29 70%);
-  border: 1px solid rgb(181 123 255 / .38); box-shadow: 0 14px 34px rgb(124 58 237 / .14); }
+  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--violet) 28%, transparent), transparent 60%), linear-gradient(160deg, #1d1530, #121a29 70%);
+  border: 1px solid color-mix(in srgb, var(--violet) 38%, transparent); box-shadow: 0 14px 34px color-mix(in srgb, var(--violet) 14%, transparent); }
 .pq-journal > header { display: flex; align-items: center; gap: 12px; }
-.pq-journal-sigil { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg, #b57bff, #7c3aed); color: #fff; box-shadow: 0 6px 16px rgb(124 58 237 / .4); }
+.pq-journal-sigil { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg, var(--violet), var(--violet)); color: #fff; box-shadow: 0 6px 16px color-mix(in srgb, var(--violet) 40%, transparent); }
 .pq-journal > header div { min-width: 0; flex: 1; }
 .pq-journal h3 { margin: 0; font-size: 17px; }
-.pq-journal header p { margin: 2px 0 0; color: #c4b5fd; font-size: 12px; }
-.pq-journal > header strong { color: #e9d5ff; font-size: 20px; }
-.pq-journal > header strong small { color: #a78bfa; font-size: 12px; }
+.pq-journal header p { margin: 2px 0 0; color: var(--violet); font-size: 12px; }
+.pq-journal > header strong { color: var(--violet); font-size: 20px; }
+.pq-journal > header strong small { color: var(--violet); font-size: 12px; }
 .pq-journal ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.pq-journal li { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: rgb(255 255 255 / .04); border: 1px solid rgb(181 123 255 / .16); }
+.pq-journal li { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: rgb(255 255 255 / .04); border: 1px solid color-mix(in srgb, var(--violet) 16%, transparent); }
 .pq-journal li.done { background: rgb(34 197 94 / .08); border-color: rgb(34 197 94 / .35); }
-.pq-ring { position: relative; flex: none; display: grid; place-items: center; width: 46px; height: 46px; color: #e9d5ff; }
+.pq-ring { position: relative; flex: none; display: grid; place-items: center; width: 46px; height: 46px; color: var(--violet); }
 .pq-ring .pq-ring-svg { position: absolute; inset: 0; rotate: -90deg; }
 .pq-ring .pq-ring-svg circle { fill: none; stroke-width: 4; }
-.pq-ring-track { stroke: rgb(181 123 255 / .18); }
-.pq-ring-fill { stroke: #b57bff; stroke-linecap: round; transition: stroke-dasharray .6s cubic-bezier(.2, .7, .2, 1); }
+.pq-ring-track { stroke: color-mix(in srgb, var(--violet) 18%, transparent); }
+.pq-ring-fill { stroke: var(--violet); stroke-linecap: round; transition: stroke-dasharray .6s cubic-bezier(.2, .7, .2, 1); }
 .pq-journal li.done .pq-ring-fill { stroke: var(--green); }
 .pq-journal li.done .pq-ring { color: var(--green); }
 .pq-journal li > div { min-width: 0; flex: 1; display: grid; gap: 2px; }
 .pq-journal li strong { font-size: 14px; line-height: 1.3; }
-.pq-journal li small { color: #c4b5fd; font-size: 12px; line-height: 1.35; }
+.pq-journal li small { color: var(--violet); font-size: 12px; line-height: 1.35; }
 .pq-journal li em { color: var(--muted); font-size: 12px; font-style: normal; font-weight: 700; }
-.pq-xp { flex: none; display: grid; justify-items: center; min-width: 48px; padding: 6px 8px; border-radius: 12px; background: rgb(181 123 255 / .16); color: #e9d5ff; font-weight: 800; font-size: 14px; }
-.pq-xp small { color: #a78bfa; font-size: 9px; letter-spacing: .08em; }
-.pq-journal-empty { margin: 0; color: #c4b5fd; font-size: 13px; }
-.pq-journal footer { display: flex; align-items: center; gap: 6px; color: #a78bfa; font-size: 12px; }
-.pq-journal footer b { color: #e9d5ff; }
+.pq-xp { flex: none; display: grid; justify-items: center; min-width: 48px; padding: 6px 8px; border-radius: 12px; background: color-mix(in srgb, var(--violet) 16%, transparent); color: var(--violet); font-weight: 800; font-size: 14px; }
+.pq-xp small { color: var(--violet); font-size: 9px; letter-spacing: .08em; }
+.pq-journal-empty { margin: 0; color: var(--violet); font-size: 13px; }
+.pq-journal footer { display: flex; align-items: center; gap: 6px; color: var(--violet); font-size: 12px; }
+.pq-journal footer b { color: var(--violet); }
 .quest-v2-mission-reason { display: block; margin-top: 1px; color: var(--muted); font-size: 11.5px; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -130,14 +130,24 @@
 .signed-in-layout .quest-v2-badge.quest-v2-badge > span .badge-lock { right: -2px; bottom: 0; }
 .pq-journal footer span { min-width: 0; }
 /* In a pill the gradient-text trick has no background to clip; use a tinted pill with solid text. */
-.bc-detail-tags span.bc-tier-legendary { color: #f3e8ff; -webkit-background-clip: border-box; background-clip: border-box; background: linear-gradient(90deg, rgb(216 180 254 / .28), rgb(103 232 249 / .28), rgb(250 204 21 / .28)); }
+.bc-detail-tags span.bc-tier-legendary { color: var(--violet); -webkit-background-clip: border-box; background-clip: border-box; background: linear-gradient(90deg, color-mix(in srgb, var(--violet) 28%, transparent), color-mix(in srgb, var(--sky) 28%, transparent), color-mix(in srgb, var(--amber) 28%, transparent)); }
 
 /* Quest chain: level chip per quest and the recently completed log. */
-.pq-level { justify-self: start; padding: 2px 8px; border-radius: 999px; background: rgb(181 123 255 / .2); color: #e9d5ff; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
-.pq-log { padding: 10px 12px; border-radius: 14px; background: rgb(255 255 255 / .03); border: 1px dashed rgb(181 123 255 / .28); }
-.pq-log h4 { margin: 0 0 6px; color: #c4b5fd; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.pq-level { justify-self: start; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--violet) 20%, transparent); color: var(--violet); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.pq-log { padding: 10px 12px; border-radius: 14px; background: rgb(255 255 255 / .03); border: 1px dashed color-mix(in srgb, var(--violet) 28%, transparent); }
+.pq-log h4 { margin: 0 0 6px; color: var(--violet); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .pq-log ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .pq-log li { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 12.5px; }
 .pq-log li svg { flex: none; color: var(--green); }
 .pq-log li span { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pq-log li b { color: #e9d5ff; font-size: 12px; }
+.pq-log li b { color: var(--violet); font-size: 12px; }
+
+/* Personal quests: View all link and the all-quests page (v1.6.3). */
+.pq-view-all { display: inline-flex; flex: none; align-items: center; gap: 2px; min-height: 44px; padding: 0 4px 0 10px; border: 0; background: transparent; color: var(--violet); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
+.pq-level i { color: var(--muted); font-style: normal; font-weight: 600; }
+.pq-all .badge-collection-scroll { display: grid; gap: 16px; align-content: start; }
+.pq-all-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pq-all-summary > div { display: grid; gap: 2px; padding: 14px 10px; border: 1px solid color-mix(in srgb, var(--violet) 30%, transparent); border-radius: 16px; background: var(--violet-tint); text-align: center; }
+.pq-all-summary strong { color: var(--ink); font-size: 20px; font-variant-numeric: tabular-nums; }
+.pq-all-summary small { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.pq-all-history .pq-ring { color: var(--violet); }

@@ -1,5 +1,7 @@
 import { createRequire } from 'node:module';
 import { test, expect } from '@playwright/test';
+// Signed-in pages show What's New once per release; mark it seen so it never covers the controls under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { sessionStorage.setItem('pq-whats-new-shown', '1'); } catch {} }); });
 
 const backendRequire = createRequire(new URL('../../../backend/package.json', import.meta.url));
 backendRequire('reflect-metadata');

@@ -1,6 +1,8 @@
 // Migration regression. Synthetic provider events do not validate live PoseTracker.
 import {test,expect} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
+// Signed-in pages show What's New once per release; mark it seen so it never covers the controls under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { sessionStorage.setItem('pq-whats-new-shown', '1'); } catch {} }); });
 const squat={_id:'6YUfHPL',name:'quads (bodyweight squat)',targetMuscles:['quadriceps'],equipments:['bodyweight'],instructions:['Bend knees and hips.'],pose:'missing'};
 const config={exerciseId:squat._id,name:squat.name,normalizedName:'quads bodyweight squat',bodyParts:['upper legs'],targetMuscles:['quadriceps'],equipment:['bodyweight'],category:'repetition',trackingMode:'builtin',providerExerciseId:'squat',cameraOrientation:'front',capabilities:['repetitions','provider-feedback'],referenceStatus:'not-required',validationStatus:'documentation-mapped',limitations:['Not validated with real people.'],configurationVersion:1};
 const generatedAngleConfig={source:'gif-derived',verified:false,liveValidated:false,primaryJoints:['left_knee'],sideMode:'unilateral',startAngles:{left_knee:150},peakAngles:{left_knee:90},directions:{left_knee:'decreasing'},referenceRanges:{left_knee:60},stabilityConstraints:[],viewHint:'side',cycleCount:1,validFraction:1,thresholdsUsed:{},generatorVersion:'test',generatedAt:'test'};

@@ -8,3 +8,34 @@
 .settings :global(.me-setting-row > span) { min-width: 0; }
 .settings :global(.me-logout) { min-height: 48px; margin-top: 24px; margin-bottom: 8px; }
 .settings :global(button:focus-visible) { outline: 2px solid var(--green); outline-offset: 3px; }
+
+/* ===== Lively Me (v1.6.3) =====
+   Grouped cards; each row's icon tile takes an accent by meaning (see DESIGN.md Accents):
+   profile sky, goals amber, training teal, health green, own exercises violet, feedback amber,
+   security violet, safety coral. The tripled module class outranks .account-dark-theme rules. */
+.settings.settings.settings :global(.me-profile-summary) { padding: 16px; border: 1px solid color-mix(in srgb, var(--green) 25%, transparent); border-radius: 22px; background: linear-gradient(160deg, color-mix(in srgb, var(--green) 14%, var(--soft)) 0%, var(--soft) 65%); }
+.settings.settings.settings :global(.me-avatar) { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px #4ade80; }
+.settings.settings.settings :global(.me-profile-name b) { color: var(--ink); font-size: 17px; font-weight: 700; }
+.settings.settings.settings :global(.me-profile-name small) { color: #4ade80; font-weight: 600; }
+.settings.settings.settings :global(.me-photo-link) { color: var(--sky); font-weight: 600; }
+.settings.settings.settings :global(.me-edit) { min-height: 40px; padding: 0 16px; border: 1px solid color-mix(in srgb, var(--green) 40%, transparent); border-radius: 999px; background: var(--green-light); color: var(--green); font-weight: 650; }
+.settings.settings.settings :global(.me-group-title) { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.settings.settings.settings :global(.me-group-title.safety) { color: var(--red-dark); }
+.settings.settings.settings :global(.me-list) { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--soft); }
+.settings.settings.settings :global(.me-list .me-row) { --accent: var(--sky); --accent-tint: var(--sky-tint); width: 100%; padding: 10px 14px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; }
+.settings.settings.settings :global(.me-list .me-row:last-child) { border-bottom: 0; }
+.settings.settings.settings :global(.me-list .me-row:active:not(:disabled)) { background: var(--bg-tertiary); }
+.settings.settings.settings :global(.me-row .me-row-icon) { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-tint); color: var(--accent); }
+.settings.settings.settings :global(.me-row > svg) { color: var(--accent); }
+.settings.settings.settings :global(.me-row[data-icon="target"]), .settings.settings.settings :global(.me-row[data-icon="star"]) { --accent: var(--amber); --accent-tint: var(--amber-tint); }
+.settings.settings.settings :global(.me-row[data-icon="library-dumbbells"]) { --accent: var(--teal); --accent-tint: var(--teal-tint); }
+.settings.settings.settings :global(.me-row[data-icon="health"]) { --accent: var(--green); --accent-tint: var(--green-light); }
+.settings.settings.settings :global(.me-row[data-icon="exercise-books"]), .settings.settings.settings :global(.me-row[data-icon="key"]) { --accent: var(--violet); --accent-tint: var(--violet-tint); }
+.settings.settings.settings :global(.me-row.danger) { --accent: var(--red-dark); --accent-tint: var(--red-light); }
+.settings.settings.settings :global(.me-row-copy b) { color: var(--ink); font-size: 15px; font-weight: 600; }
+.settings.settings.settings :global(.me-setting-row) { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.settings.settings.settings :global(.me-setting-block) { margin-top: 20px; padding: 14px; border: 1px solid var(--line); border-radius: 18px; background: var(--soft); }
+.settings.settings.settings :global(.me-threshold button) { min-width: 64px; border-color: var(--line); background: var(--surface); color: var(--ink); font-weight: 600; }
+.settings.settings.settings :global(.me-threshold button.selected) { border-color: var(--green); background: var(--green); color: var(--surface); }
+.settings.settings.settings :global(.me-logout) { border: 1px solid color-mix(in srgb, var(--red-dark) 45%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--red-light) 45%, transparent); color: var(--red-dark); font-weight: 650; }
+.settings.settings.settings :global(.me-logout:active) { background: var(--red-light); }

@@ -310,6 +310,14 @@ type RequestOptions = RequestInit & { timeoutMs?: number };
  * answered with a rejection. The distinction matters to the caller: a timeout
  * is worth retrying unchanged, whereas a 503 or a quota error usually is not.
  */
+/** Requests still running after this long count as slow; the app shell shows a slow-connection notice. */
+export const SLOW_REQUEST_MS = 6000;
+let slowRequests = 0;
+function reportSlow(delta: 1 | -1) {
+  slowRequests = Math.max(0, slowRequests + delta);
+  window.dispatchEvent(new CustomEvent('physiquequest:slow-network', { detail: slowRequests }));
+}
+
 export class ApiTimeoutError extends Error {
   constructor(public readonly timeoutMs: number) {
     super('This is taking longer than expected. Please try again.');
@@ -388,6 +396,9 @@ class ApiClient {
       };
     }
 
+    // Chat and capped calls (photo scans) show their own progress; everything else reports when it is slow.
+    let slow = false;
+    const slowTimer = ownApi && !cap && endpoint !== '/chat' && typeof window !== 'undefined' ? setTimeout(() => { slow = true; reportSlow(1); }, SLOW_REQUEST_MS) : null;
     try {
       if (config.signal?.aborted) throw config.signal.reason ?? new Error('Request cancelled');
       let response = await fetch(url, config);
@@ -463,6 +474,8 @@ class ApiClient {
       throw new Error('We couldn’t connect. Check your internet connection and try again.');
     } finally {
       if (timer) clearTimeout(timer);
+      if (slowTimer) clearTimeout(slowTimer);
+      if (slow) reportSlow(-1);
       externalSignal?.removeEventListener('abort', forwardAbort);
     }
   }

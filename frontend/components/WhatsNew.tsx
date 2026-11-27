@@ -4,13 +4,13 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '../sections/Home/icons';
 import './whatsNew.css';
 
-export const WHATS_NEW_VERSION = '1.6.1';
+export const WHATS_NEW_VERSION = '1.6.3';
 export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
-  { icon: 'home', title: 'Redesigned Home', text: 'Your level, streak and points up top, today’s session front and centre, and missions with progress rings.' },
-  { icon: 'meal', title: 'Clearer nutrition', text: 'A calorie ring shows what’s left today, with protein, carbs and fats side by side.' },
-  { icon: 'target', title: 'Goals at a glance', text: 'See current and target weight together, this week’s training days and your recent check-ins.' },
-  { icon: 'trend', title: 'Refreshed Progress', text: 'Tabs for overview, exercises, muscles and records, with a bigger trend chart and history.' },
-  { icon: 'bell', title: 'Tidier notifications', text: 'Pinned safety notices, clearer unread updates, and reminder settings in one place.' },
+  { icon: 'shield', title: 'Safer training', text: 'Add a heart condition to your health profile, rest defaults to 30 seconds, and a quick check-in follows every exercise.' },
+  { icon: 'pulse', title: 'Plans fit your body', text: 'Weekly quests and Coach intensity now follow your activity level and body index.' },
+  { icon: 'health', title: 'Programs for injuries', text: 'Knee, lower-back, shoulder, heart-healthy and asthma-friendly programs in Coach › Programs.' },
+  { icon: 'meal', title: 'A livelier Scan', text: 'Colour-coded macros, meals and water, Filipino food ideas in your Dietary Plan, and a weekly food carbon estimate.' },
+  { icon: 'star', title: 'Send feedback', text: 'Rate the app or report a problem from Me › Send feedback; it goes straight to the PhysiqueQuest team.' },
 ];
 // Shown once per version: the device remembers the version it showed, so reopening the app does not
 // repeat it. The per-launch flag stays honoured (tests and older builds set it).

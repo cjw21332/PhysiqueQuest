@@ -1,0 +1,28 @@
+<!--
+  EmailJS template for in-app feedback alerts (Me > Send feedback).
+  Setup (EmailJS dashboard, same service as the OTP email, e.g. service_pdqqhio):
+    1. Email Templates > Create New Template.
+    2. Settings: To Email = {{email}}   Subject = {{subject}}   From Name = PhysiqueQuest
+    3. Content > Edit Content > Code Editor: paste everything below this comment, then Save.
+    4. Copy the new template ID (template_xxxxxxx).
+    5. Render > physiquequest-api > Environment: add FEEDBACK_TEMPLATE_ID=<that id> and save (it redeploys).
+       Optional: FEEDBACK_NOTIFY_EMAIL to send alerts somewhere other than waletcharlesjames3@gmail.com.
+  Variables sent by the backend: email, subject, category, rating, message, from_user, device, sent_at.
+  Double braces escape HTML, so user text cannot inject markup.
+-->
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#0f172a">
+  <div style="background:#16a34a;color:#ffffff;padding:16px 20px;border-radius:12px 12px 0 0">
+    <strong style="font-size:18px">New PhysiqueQuest feedback</strong>
+  </div>
+  <div style="border:1px solid #e2e8f0;border-top:0;padding:20px;border-radius:0 0 12px 12px">
+    <table style="border-collapse:collapse;font-size:14px;line-height:1.6">
+      <tr><td style="padding:2px 12px 2px 0;color:#64748b">Type</td><td><strong>{{category}}</strong></td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#64748b">Rating</td><td>{{rating}}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#64748b">From</td><td>{{from_user}}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#64748b">Device</td><td>{{device}}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#64748b">Sent</td><td>{{sent_at}}</td></tr>
+    </table>
+    <p style="margin:16px 0 0;padding:14px;background:#f1f5f9;border-radius:8px;white-space:pre-wrap;font-size:15px;line-height:1.55">{{message}}</p>
+    <p style="margin:16px 0 0;color:#64748b;font-size:12px">Also stored in the app_feedback collection and shown in Admin &gt; Engagement.</p>
+  </div>
+</div>

@@ -13,6 +13,11 @@ export type EmailDeliveryFailureCode =
   | 'EMAIL_PROVIDER_UNAVAILABLE'
   | 'EMAIL_PROVIDER_UNREACHABLE';
 
+/** One in-app feedback entry, emailed to the team as soon as it is saved. */
+export type FeedbackEmail = { rating: number; category: string; message: string; platform?: string; appVersion?: string; userName?: string; userEmail?: string; sentAt: Date };
+export const DEFAULT_FEEDBACK_NOTIFY_EMAIL = 'waletcharlesjames3@gmail.com';
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]!));
+
 export type EmailDeliveryResult =
   | { ok: true }
   | { ok: false; code: EmailDeliveryFailureCode; status?: number; reason: string };
@@ -64,6 +69,60 @@ export class EmailDeliveryProvider {
     const provider = configuredMailProvider();
     if (provider) return provider.send({ template: 'verification-code', to: email, token: code });
     return (await this.sendPasswordReset(email, code)).ok;
+  }
+
+  /** Recipient for feedback alerts: FEEDBACK_NOTIFY_EMAIL, else the lead programmer's address. */
+  feedbackRecipient() {
+    return this.config.get<string>('FEEDBACK_NOTIFY_EMAIL')?.trim() || DEFAULT_FEEDBACK_NOTIFY_EMAIL;
+  }
+
+  /**
+   * Emails one feedback entry to the team. Uses the configured mail provider (Resend, Brevo, Mailpit) when set,
+   * otherwise EmailJS with FEEDBACK_TEMPLATE_ID (see docs/emails/feedback-template.html). Never throws.
+   */
+  async sendFeedback(feedback: FeedbackEmail): Promise<boolean> {
+    const to = this.feedbackRecipient();
+    const stars = `${'★'.repeat(feedback.rating)}${'☆'.repeat(5 - feedback.rating)}`;
+    const from = feedback.userName || feedback.userEmail ? `${feedback.userName ?? 'A user'}${feedback.userEmail ? ` <${feedback.userEmail}>` : ''}` : 'A signed-in user';
+    const device = [feedback.platform, feedback.appVersion && `v${feedback.appVersion}`].filter(Boolean).join(' ') || 'unknown device';
+    const subject = `PhysiqueQuest feedback: ${feedback.category} · ${feedback.rating}/5`;
+    const provider = configuredMailProvider();
+    if (provider) {
+      const text = `${subject}
+
+From: ${from}
+Device: ${device}
+Rating: ${stars}
+Sent: ${feedback.sentAt.toISOString()}
+
+${feedback.message}`;
+      const html = `<h2>New PhysiqueQuest feedback</h2><p><b>Type:</b> ${escapeHtml(feedback.category)}<br><b>Rating:</b> ${stars} (${feedback.rating}/5)<br><b>From:</b> ${escapeHtml(from)}<br><b>Device:</b> ${escapeHtml(device)}<br><b>Sent:</b> ${feedback.sentAt.toISOString()}</p><p style="white-space:pre-wrap">${escapeHtml(feedback.message)}</p>`;
+      return provider.send({ template: 'feedback', to, subject, text, html }).catch(() => false);
+    }
+    const serviceId = this.serviceId(), publicKey = this.publicKey();
+    const templateId = this.config.get<string>('FEEDBACK_TEMPLATE_ID');
+    if (!serviceId || !publicKey || !templateId) {
+      this.logger.warn('Feedback email skipped: set FEEDBACK_TEMPLATE_ID (EmailJS) or MAIL_PROVIDER.');
+      return false;
+    }
+    const privateKey = this.config.get<string>('EMAILJS_PRIVATE_KEY');
+    try {
+      const response = await outboundFetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: serviceId, template_id: templateId, user_id: publicKey,
+          ...(privateKey ? { accessToken: privateKey } : {}),
+          template_params: { email: to, subject, category: feedback.category, rating: `${stars} (${feedback.rating}/5)`, message: feedback.message, from_user: from, device, sent_at: feedback.sentAt.toISOString() },
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (!response.ok) { this.failure(response.status, await response.text().catch(() => '')); return false; }
+      return true;
+    } catch {
+      this.logger.error('Feedback email request failed (EMAIL_PROVIDER_UNREACHABLE)');
+      return false;
+    }
   }
 
   async sendPasswordReset(email: string, token: string, name = 'there'): Promise<EmailDeliveryResult> {

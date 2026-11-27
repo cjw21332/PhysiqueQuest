@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+// Signed-in pages show What's New once per release; mark it seen so it never covers the controls under test.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => { try { sessionStorage.setItem('pq-whats-new-shown', '1'); } catch {} }); });
 
 test('reviews a scan, replaces a food, adds another and saves only included items', async ({ page }, testInfo) => {
   let scans = 0, saved;

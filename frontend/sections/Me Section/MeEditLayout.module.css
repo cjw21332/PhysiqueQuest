@@ -19,6 +19,18 @@
 .layout :global(.condition-checkbox) { min-height: 48px; }
 .layout :global(.edit-footer) { box-sizing: border-box; width: 100%; max-width: none; margin: 0; padding-inline: var(--editor-gutter); }
 .layout :global(:is(button, input, textarea):focus-visible) { outline: 2px solid var(--green); outline-offset: 3px; }
+
+/* Lively Me editors (v1.6.3): soft cards for groups, tile-style checkboxes, gradient save, clear status lines. */
+.layout.layout.layout :global(.edit-description) { padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--sky) 30%, transparent); border-radius: 14px; background: var(--sky-tint); color: var(--ink); font-size: 13px; }
+.layout.layout.layout :global(.edit-scroll > p[role="status"]) { margin: 0 0 16px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent); border-radius: 14px; background: var(--amber-tint); color: var(--amber); font-size: 13px; font-weight: 600; }
+.layout.layout.layout :global(fieldset.step-content > fieldset), .layout.layout.layout :global(.choice-group.condition-list) { padding: 14px; border: 1px solid var(--line); border-radius: 18px; background: var(--soft); }
+.layout.layout.layout :global(.condition-checkbox) { display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.layout.layout.layout :global(.condition-checkbox:has(input:checked)) { border-color: color-mix(in srgb, var(--green) 50%, transparent); background: var(--green-light); }
+.layout.layout.layout :global(.condition-checkbox input) { accent-color: var(--green); }
+.layout.layout.layout :global(.safety-note) { border-color: color-mix(in srgb, var(--amber) 35%, transparent); background: var(--amber-tint); }
+.layout.layout.layout :global(.safety-note svg) { color: var(--amber); }
+.layout.layout.layout :global(.step-content .error) { padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--red-dark) 45%, transparent); border-radius: 14px; background: var(--red-light); color: var(--red-text, var(--red-dark)); }
+.layout.layout.layout :global(.edit-footer .save-btn:not(:disabled)) { border: 0; background: linear-gradient(120deg, var(--green) 0%, #4ade80 100%); color: var(--surface); }
 @media (max-width: 350px) {
   .layout.layout.layout { --editor-gutter: 14px; }
   .layout :global(.weight-value-control button) { font-size: 12px; }

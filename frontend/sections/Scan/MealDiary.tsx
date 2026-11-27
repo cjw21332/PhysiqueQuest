@@ -14,7 +14,7 @@ export default function MealDiary({ meals, onAdd, onEdit, initialOpen, readOnly 
     const expanded = open.includes(meal);
     const calories = nutrientTotal(entries, item => item.calories);
     const summary = entries.length ? `${titleCase(entries[0].name)}${entries.length > 1 ? ` and ${entries.length - 1} more` : ''}` : 'No foods logged yet';
-    return <article className="meal-diary-card" key={meal}>
+    return <article className="meal-diary-card" data-meal={meal.toLowerCase()} key={meal}>
       <div className="meal-diary-header"><button type="button" className="meal-diary-toggle" aria-expanded={expanded} aria-controls={`meal-diary-${meal}`} onClick={() => setOpen(current => expanded ? current.filter(value => value !== meal) : [...current, meal])}>
         <span className="meal-diary-icon"><Icon name={mealIcons[meal]} size={20}/></span><span className="meal-diary-copy"><strong>{meal}</strong><span>{summary}</span><small>{entries.length ? `${nutrientLabel(calories, 'kcal')} · ${entries.length} ${entries.length === 1 ? 'food' : 'foods'}` : 'Tap to view foods'}</small></span><span className={`meal-diary-chevron ${expanded ? 'open' : ''}`} aria-hidden="true"><Icon name="chevron-down" size={18}/></span>
       </button>{!readOnly && <button type="button" className="meal-diary-add" onClick={() => onAdd(meal)} aria-label={`Add food to ${meal}`}><Icon name="plus" size={18}/> Add</button>}</div>

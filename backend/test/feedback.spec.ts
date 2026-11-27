@@ -96,3 +96,20 @@ describe('FeedbackService.create', () => {
     expect(upserts[0].update.$unset).toEqual({ enjoyment: '', notes: '' });
   });
 });
+
+describe('app feedback team alerts', () => {
+  it('emails saved feedback with the account name and records notifiedAt only when sent', async () => {
+    const updates: unknown[] = [];
+    const users = { findOne: vi.fn(async () => ({ name: 'Sam', email: 'sam@example.test' })) };
+    const appModel = { db: { collection: () => users }, updateOne: (filter: unknown, update: unknown) => { updates.push([filter, update]); return { exec: async () => undefined }; } };
+    const email = { sendFeedback: vi.fn(async () => true) };
+    const service = new FeedbackService({} as never, appModel as never, email as never);
+    const record = { userId: new Types.ObjectId(), rating: 5, category: 'praise', message: 'Great app', platform: 'android' };
+    expect(await service.notifyTeam(String(new Types.ObjectId()), record)).toBe(true);
+    expect(email.sendFeedback).toHaveBeenCalledWith(expect.objectContaining({ rating: 5, category: 'praise', message: 'Great app', userName: 'Sam', userEmail: 'sam@example.test' }));
+    expect(updates).toHaveLength(1);
+    email.sendFeedback.mockResolvedValueOnce(false);
+    expect(await service.notifyTeam(String(new Types.ObjectId()), record)).toBe(false);
+    expect(updates).toHaveLength(1);
+  });
+});

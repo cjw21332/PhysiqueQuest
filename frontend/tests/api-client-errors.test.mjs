@@ -22,3 +22,12 @@ test('preserves server errors with status codes and caller aborts', () => {
   assert.equal(normalizeTransportError(serverError), serverError);
   assert.equal(normalizeTransportError(abortError), abortError);
 });
+
+test('framework 401/403 defaults become clear session and permission messages; specific text is kept', async () => {
+  const { friendlyRequestMessage } = await import('../lib/apiErrors.mjs');
+  assert.equal(friendlyRequestMessage(401, 'Unauthorized'), 'Your session expired. Sign in again.');
+  assert.equal(friendlyRequestMessage(403, 'Forbidden resource'), 'You don’t have permission to do that.');
+  assert.equal(friendlyRequestMessage(403, ''), 'You don’t have permission to do that.');
+  assert.equal(friendlyRequestMessage(401, 'Invalid email or password'), 'Invalid email or password');
+  assert.equal(friendlyRequestMessage(403, 'Verify your email to continue'), 'Verify your email to continue');
+});
