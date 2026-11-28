@@ -12,7 +12,9 @@ test('an explicit logout blocks automatic session restore until the next sign-in
   assert.match(auth, /finally \{\s*clearAuthSession\(\);\s*markSignedOut\(true\);/);
   // Every explicit sign-in (email, register, Google) goes through announceSuccessfulAuth, which clears it.
   assert.match(auth, /function announceSuccessfulAuth\(\)[^}]*markSignedOut\(false\)/);
-  assert.equal(auth.match(/session\.set\(response, getApiBaseUrl\(\)\);\s*announceSuccessfulAuth\(\);/g)?.length, 4);
+  const signIns = auth.match(/session\.set\(response, getApiBaseUrl\(\)\);/g)?.length ?? 0;
+  assert.ok(signIns >= 4, 'email, register and both Google paths set a session');
+  assert.equal(auth.match(/session\.set\(response, getApiBaseUrl\(\)\);\s*announceSuccessfulAuth\(\);/g)?.length, signIns, 'every sign-in clears the marker');
   // The startup restore checks the marker before any offline or server restore.
   const gate = boundary.indexOf('if (signedOutByUser())');
   assert.ok(gate > 0, 'SessionBoundary checks the signed-out marker');
