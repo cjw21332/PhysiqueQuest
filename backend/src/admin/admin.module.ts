@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AdminDashboardController } from './admin-dashboard.controller.js';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RolesGuard } from '../auth/roles.guard.js';
 import { User, UserSchema } from '../auth/schemas/user.schema.js';
@@ -9,9 +10,11 @@ import { AdminAnalyticsController } from './admin-analytics.controller.js';
 import { AdminAnalyticsService } from './admin-analytics.service.js';
 import { AdminAlertsController } from './admin-alerts.controller.js';
 import { AdminAlertsService } from './admin-alerts.service.js';
+import { ActivityModule } from '../activity/activity.module.js';
+import { CoachModule } from '../coach/coach.module.js';
 @Module({
-  imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: SignInEvent.name, schema: SignInEventSchema }, { name: WorkoutSession.name, schema: WorkoutSessionSchema }, { name: AlertEvent.name, schema: AlertEventSchema }])],
-  controllers: [AdminAnalyticsController, AdminAlertsController],
+  imports: [ActivityModule, CoachModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: SignInEvent.name, schema: SignInEventSchema }, { name: WorkoutSession.name, schema: WorkoutSessionSchema }, { name: AlertEvent.name, schema: AlertEventSchema }])],
+  controllers: [AdminAnalyticsController, AdminAlertsController, AdminDashboardController],
   providers: [AdminAnalyticsService, AdminAlertsService, RolesGuard],
 })
 export class AdminModule {}

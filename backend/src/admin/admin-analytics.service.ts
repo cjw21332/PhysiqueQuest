@@ -19,8 +19,9 @@ export class AdminAnalyticsService {
     const end = new Date();
     const start = new Date(end.getTime() - days * 24 * 60 * 60 * 1000);
     const eventFilter = { createdAt: { $gte: start, $lte: end } };
-    const [usersTotal, completedSessions, totalAlerts, deliveredAlerts, failedAlerts, pendingAlerts, signIns] = await Promise.all([
-      this.users.countDocuments({ isActive: true }),
+    const [usersTotal, newUsers, completedSessions, totalAlerts, deliveredAlerts, failedAlerts, pendingAlerts, signIns] = await Promise.all([
+      this.users.countDocuments({ isActive: true, role: { $ne: 'admin' } }),
+      this.users.countDocuments({ isActive: true, role: { $ne: 'admin' }, createdAt: { $gte: start, $lte: end } }),
       this.workouts.countDocuments({ status: 'completed', endedAt: { $gte: start, $lte: end } }),
       this.alerts.countDocuments(eventFilter),
       this.alerts.countDocuments({ ...eventFilter, status: 'delivered' }),
@@ -28,17 +29,40 @@ export class AdminAnalyticsService {
       this.alerts.countDocuments({ ...eventFilter, status: 'pending' }),
       this.signInEvents.find({ occurredAt: { $gte: start, $lte: end } }).select('userId occurredAt').lean().exec(),
     ]);
-    // In-app feedback for the range: no user ids leave the server, only ratings and messages.
-    const feedbackRows = await Promise.resolve().then(() => this.users.db.collection('app_feedback').find(eventFilter, { projection: { _id: 0, rating: 1, category: 1, message: 1, platform: 1, createdAt: 1 } }).sort({ createdAt: -1 }).limit(500).toArray()).catch(() => []);
-    const appFeedback = { count: feedbackRows.length, averageRating: feedbackRows.length ? Math.round(feedbackRows.reduce((sum, row) => sum + Number(row.rating), 0) / feedbackRows.length * 10) / 10 : null,
-      recent: feedbackRows.slice(0, 10).map(row => ({ rating: row.rating, category: row.category, message: row.message, platform: row.platform ?? null, createdAt: row.createdAt })) };
+    // Some isolated service consumers provide only a count model. In that case
+    // feedback is unavailable, rather than silently reporting a zero count.
+    const appFeedback = this.users.db ? await (async () => {
+      const collection = this.users.db.collection('app_feedback');
+      const [summary, feedbackRows] = await Promise.all([
+        collection.aggregate([{ $match: eventFilter }, { $group: { _id: null, count: { $sum: 1 }, averageRating: { $avg: '$rating' }, pending: { $sum: { $cond: [{ $ne: [{ $ifNull: ['$adminStatus', 'new'] }, 'resolved'] }, 1, 0] } } } }]).toArray(),
+        collection.find(eventFilter, { projection: { _id: 0, rating: 1, category: 1, message: 1, platform: 1, createdAt: 1 } }).sort({ createdAt: -1 }).limit(10).toArray(),
+      ]);
+      return { count: Number(summary[0]?.count ?? 0), pending: Number(summary[0]?.pending ?? 0), averageRating: summary[0] ? Math.round(Number(summary[0].averageRating) * 10) / 10 : null,
+        recent: feedbackRows.map(row => ({ rating: row.rating, category: row.category, message: row.message, platform: row.platform ?? null, createdAt: row.createdAt })) };
+    })() : undefined;
     const { activeUsers, weeklyRetention } = this.summarizeSignIns(signIns as { userId: unknown; occurredAt: Date }[], start, days);
+    const trend = this.users.db ? await this.dailyTrend(start, end, signIns as { userId: unknown; occurredAt: Date }[]) : undefined;
     return {
-      rangeDays: days, generatedAt: end.toISOString(), usersTotal, activeUsers,
+      rangeDays: days, generatedAt: end.toISOString(), usersTotal, newUsers, activeUsers,
       completedSessions, formScore: null, missionCompletion: null, weeklyRetention,
       emergencyEvents: { total: totalAlerts, delivered: deliveredAlerts, failed: failedAlerts, pending: pendingAlerts },
-      appFeedback,
+      appFeedback, trend,
     };
+  }
+
+  /** Per-UTC-day new accounts, distinct sign-ins and completed workouts for the overview chart. */
+  private async dailyTrend(start: Date, end: Date, signIns: { userId: unknown; occurredAt: Date }[]) {
+    const [created, finished] = await Promise.all([
+      this.users.find({ isActive: true, role: { $ne: 'admin' }, createdAt: { $gte: start, $lte: end } }).select('createdAt').lean().exec(),
+      this.workouts.find({ status: 'completed', endedAt: { $gte: start, $lte: end } }).select('endedAt').lean().exec(),
+    ]);
+    const key = (value: Date | string | number) => new Date(value).toISOString().slice(0, 10);
+    const days = new Map<string, { date: string; newUsers: number; activeUsers: number; workouts: number; ids: Set<string> }>();
+    for (let time = Date.parse(`${key(start)}T00:00:00.000Z`); time <= end.getTime(); time += 86_400_000) days.set(key(time), { date: key(time), newUsers: 0, activeUsers: 0, workouts: 0, ids: new Set() });
+    for (const row of created as { createdAt?: Date }[]) if (row.createdAt) { const day = days.get(key(row.createdAt)); if (day) day.newUsers += 1; }
+    for (const row of finished as { endedAt?: Date }[]) if (row.endedAt) { const day = days.get(key(row.endedAt)); if (day) day.workouts += 1; }
+    for (const row of signIns) days.get(key(row.occurredAt))?.ids.add(String(row.userId));
+    return [...days.values()].map(({ ids, ...day }) => ({ ...day, activeUsers: ids.size }));
   }
 
   /**

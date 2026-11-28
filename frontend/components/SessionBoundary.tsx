@@ -10,6 +10,12 @@ import { clearAuthSession, session, signedOutByUser } from '../lib/session';
 import { DATA_CHANGE_EVENT, DATA_CHANGE_KEY, parseDataChange } from '../lib/dataChanges.mjs';
 
 export default function SessionBoundary({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  if (pathname === '/admin' || pathname?.startsWith('/admin/')) return <>{children}</>;
+  return <AppSessionBoundary>{children}</AppSessionBoundary>;
+}
+
+function AppSessionBoundary({ children }: { children: React.ReactNode }) {
   const user = useSyncExternalStore(session.subscribe, session.current, () => null);
   const pathname = usePathname();
   const [dismissedUser, setDismissedUser] = useState<string | null>(null);

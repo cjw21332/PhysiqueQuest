@@ -38,6 +38,15 @@ export class LoginDto {
   password: string;
 }
 
+export class AdminLoginDto {
+  @Transform(({ value }) => typeof value === 'string' ? value.trim().toLowerCase() : value)
+  @IsString() @Matches(/^admin$/)
+  username: string;
+
+  @IsString() @MinLength(1) @MaxLength(128)
+  password: string;
+}
+
 export class AuthResponseDto {
   access_token: string;
   user: {

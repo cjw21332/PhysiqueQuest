@@ -51,4 +51,16 @@ describe('admin analytics', () => {
     expect(result.weeklyRetention?.length).toBeGreaterThan(0);
     expect(result.weeklyRetention?.[result.weeklyRetention.length - 1]).toBe(50);
   });
+
+  it('builds a per-day trend of new users, active users and completed workouts', async () => {
+    const now = new Date();
+    const query = (rows: unknown[]) => vi.fn(() => ({ select: () => ({ lean: () => ({ exec: async () => rows }) }) }));
+    const users = { countDocuments: vi.fn(async () => 1), db: { collection: () => ({ aggregate: () => ({ toArray: async () => [] }), find: () => ({ sort: () => ({ limit: () => ({ toArray: async () => [] }) }) }) }) }, find: query([{ createdAt: now }]) };
+    const workouts = { countDocuments: vi.fn(async () => 2), find: query([{ endedAt: now }, { endedAt: now }]) };
+    const alerts = { countDocuments: vi.fn(async () => 0) };
+    const result = await new AdminAnalyticsService(users as any, workouts as any, alerts as any, signInModel([{ userId: 'a', occurredAt: now }, { userId: 'a', occurredAt: now }])).get(7);
+    const today = result.trend?.find(day => day.date === now.toISOString().slice(0, 10));
+    expect(result.trend?.length).toBeGreaterThanOrEqual(7);
+    expect(today).toEqual({ date: now.toISOString().slice(0, 10), newUsers: 1, activeUsers: 1, workouts: 2 });
+  });
 });

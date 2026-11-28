@@ -43,7 +43,9 @@
     ".next-proxy-verification/types/**/*.ts",
     ".next-proxy-verification/dev/types/**/*.ts",
     ".next-library-test/types/**/*.ts",
-    ".next-library-test/dev/types/**/*.ts"
+    ".next-library-test/dev/types/**/*.ts",
+    ".next-admin-dev/types/**/*.ts",
+    ".next-admin-dev/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

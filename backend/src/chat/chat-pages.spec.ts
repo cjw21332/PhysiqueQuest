@@ -21,7 +21,8 @@ describe('reviewed page knowledge coverage', () => {
       if (array) for (const match of array[1].matchAll(/'([^']+)'/g)) paths.push('/' + section + '/' + match[1]);
       else for (const match of content.matchAll(/\.view !== '([^']+)'/g)) paths.push('/' + section + '/' + match[1]);
     }
-    for (const path of paths) expect(resolveChatPage(path), 'Missing ' + path).toBeDefined();
+    // The admin console has no chat assistant; only its reference manager has reviewed help.
+    for (const path of paths.filter(path => !path.startsWith('/admin') || path === '/admin/pose-tracker/references')) expect(resolveChatPage(path), 'Missing ' + path).toBeDefined();
     expect(new Set(CHAT_PAGES.map(page => page.path)).size).toBe(CHAT_PAGES.length);
   });
   it('has direct contextual help for every known page, with no personal data', () => {

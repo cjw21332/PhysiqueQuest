@@ -46,6 +46,19 @@ export function coachProgramContext(profile: Profile, values: Record<string, unk
 export class CoachService {
   private readonly generating = new Map<string, Promise<Program>>();
   constructor(@InjectModel(Profile.name) private readonly profiles: Model<Profile>, @InjectModel(Settings.name) private readonly settings: Model<Settings>, private readonly exercises: ExerciseDbService, @InjectModel(CoachProgram.name) private readonly programs: Model<CoachProgram>, private readonly feedback?: FeedbackService) {}
+  /** Read the currently matching saved plan without generating a new one. */
+  async getSavedPlanForAdmin(userId: string) {
+    const profile = await this.profileModel(userId);
+    const settings = await this.settings.findOne({ userId: new Types.ObjectId(userId) }).lean().exec();
+    const values = (settings as { values?: Record<string, unknown> } | null)?.values ?? {};
+    const { contextHash } = coachProgramContext(profile, values);
+    const saved = await this.programs.findOne({ userId: new Types.ObjectId(userId), contextHash }).lean().exec();
+    if (!saved || !Array.isArray(saved.plan?.days)) return null;
+    return saved.plan.days.map((day: { label?: string; name?: string; title?: string; isWorkoutDay?: boolean; exercises?: { name?: string }[] }) => ({
+      label: day.label ?? day.name ?? day.title ?? '', isWorkoutDay: Boolean(day.isWorkoutDay),
+      exercises: Array.isArray(day.exercises) ? day.exercises.map(exercise => exercise.name).filter(Boolean) : [],
+    }));
+  }
   /** `withFeedback: false` returns the stored plan without feedback adjustments, so edits never bake them in. */
   async getPlan(userId: string, withFeedback = true) {
     const fence = new AccountLifecycleFence(this.programs.db);

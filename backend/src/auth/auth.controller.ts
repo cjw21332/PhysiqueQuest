@@ -4,7 +4,7 @@ import { JwtAuthGuard } from './jwt-auth.guard.js';
 import { PasswordRecoveryService } from './password-recovery.service.js';
 import { PasswordChangeRequestDto, PasswordResetConfirmDto, PasswordResetRequestDto, PasswordResetVerifyDto } from './dto/password-recovery.dto.js';
 import { AuthService } from './auth.service.js';
-import { RegisterDto, LoginDto, AuthResponseDto, RefreshDto } from './dto/auth.dto.js';
+import { RegisterDto, LoginDto, AdminLoginDto, AuthResponseDto, RefreshDto } from './dto/auth.dto.js';
 import { SessionService } from './session.service.js';
 import { assertDeviceRequest, assertSessionRequest, DEVICE_TOKEN, readRefreshCookie, SESSION_COOKIE, sessionCookieOptions } from './session-cookie.js';
 import { assertLegacyAuthEnabled } from './legacy-auth.js';
@@ -15,6 +15,12 @@ import { ConfirmVerificationDto, ResendVerificationDto } from './dto/email-verif
 import { GoogleAuthService } from './google-auth.service.js';
 import { GoogleCheckDto, GoogleLoginDto, GoogleRegisterDto } from './dto/google-auth.dto.js';
 import { validateProfileMeasurements } from '../profile/profile.service.js';
+
+export function localAdminLoginAllowed(origin: string | undefined, peer: string | undefined, environment: string | undefined) {
+  let localOrigin = false;
+  try { const parsed = new URL(origin ?? ''); localOrigin = ['http:', 'https:'].includes(parsed.protocol) && ['localhost', '127.0.0.1', '[::1]'].includes(parsed.hostname); } catch { /* Reject missing or invalid origins. */ }
+  return environment === 'development' && localOrigin && ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(peer ?? '');
+}
 
 @Controller('auth')
 export class AuthController {
@@ -33,9 +39,28 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async sessionLogin(@Body() dto: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     assertSessionRequest(req);
+    if (dto.email === 'admin@localhost.invalid') {
+      if (!localAdminLoginAllowed(req.get('origin'), req.socket.remoteAddress, process.env.NODE_ENV)) throw new ForbiddenException('Local development account is only available on this computer.');
+    }
     const result = await this.authService.login(dto);
     req.user = { userId: result.user.id };
     return this.deliver(await this.sessions.issue(await this.authService.validateUser(result.user.id)), res);
+  }
+
+  @Post('session/admin-login')
+  @HttpCode(HttpStatus.OK)
+  async sessionAdminLogin(@Body() dto: AdminLoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    assertSessionRequest(req);
+    if (dto.username !== 'admin') throw new UnauthorizedException('Invalid username or password');
+    const configured = process.env.ADMIN_LOGIN_EMAIL?.trim().toLowerCase();
+    const local = !configured && localAdminLoginAllowed(req.get('origin'), req.socket.remoteAddress, process.env.NODE_ENV);
+    const email = configured || (local ? 'admin@localhost.invalid' : '');
+    if (!email || (email === 'admin@localhost.invalid' && !localAdminLoginAllowed(req.get('origin'), req.socket.remoteAddress, process.env.NODE_ENV))) throw new UnauthorizedException('Invalid username or password');
+    const result = await this.authService.login({ email, password: dto.password });
+    const user = await this.authService.validateUser(result.user.id);
+    if (user.role !== 'admin' || user.emailVerified !== true) throw new UnauthorizedException('Invalid username or password');
+    req.user = { userId: result.user.id };
+    return this.deliver(await this.sessions.issue(user), res);
   }
 
   @Post('session/register')
@@ -195,6 +220,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto, @Req() req?: Request): Promise<AuthResponseDto> {
     assertLegacyAuthEnabled();
+    if (loginDto.email === 'admin@localhost.invalid') throw new ForbiddenException('Use the local administrator sign-in.');
     const result = await this.authService.login(loginDto);
     if (req) req.user = { userId: result.user.id };
     return result;
@@ -252,7 +278,14 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  me(@Req() req: Request & { user: { userId: string; email: string; role: string; emailVerified: boolean; legacyEmailAccess: boolean } }) {
-    return { id: req.user.userId, email: req.user.email, role: req.user.role, emailVerified: req.user.emailVerified, legacyEmailAccess: req.user.legacyEmailAccess };
+  me(@Req() req: Request & { user: { userId: string; email: string; role: string; emailVerified: boolean; legacyEmailAccess: boolean; mustChangePassword: boolean } }) {
+    return { id: req.user.userId, email: req.user.email, role: req.user.role, emailVerified: req.user.emailVerified, legacyEmailAccess: req.user.legacyEmailAccess, mustChangePassword: req.user.mustChangePassword };
+  }
+
+  @Post('admin-initial-password')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  changeInitialAdminPassword(@Req() req: Request & { user: { userId: string } }, @Body() body: { currentPassword?: unknown; newPassword?: unknown }) {
+    return this.authService.changeInitialAdminPassword(req.user.userId, body?.currentPassword, body?.newPassword);
   }
 }

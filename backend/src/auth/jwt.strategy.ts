@@ -38,6 +38,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       assertLegacyAuthEnabled();
       this.logger.log({ event: 'legacy_token_used' });
     }
-    return { userId: payload.sub, lifecycleGeneration: user.$locals?.lifecycleGeneration, email: user.email, ...emailStatus(user), role: user.role ?? 'user', sessionId: payload.tokenVersion === 2 ? payload.sid : undefined, tokenVersion: payload.tokenVersion === 2 ? 2 : 1 };
+    return { userId: payload.sub, lifecycleGeneration: user.$locals?.lifecycleGeneration, email: user.email, ...emailStatus(user), role: user.role ?? 'user', mustChangePassword: Boolean(user.mustChangePassword), sessionId: payload.tokenVersion === 2 ? payload.sid : undefined, tokenVersion: payload.tokenVersion === 2 ? 2 : 1 };
   }
 }

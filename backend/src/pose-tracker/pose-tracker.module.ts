@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Header, Injectable, Module, NotFoundException, Param, Put, Post, Req, ServiceUnavailableException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Header, Injectable, Module, NotFoundException, Optional, Param, Put, Post, Req, ServiceUnavailableException, UseGuards } from '@nestjs/common';
 import { InjectModel, MongooseModule } from '@nestjs/mongoose';
 import { Schema, Model } from 'mongoose';
 import { z } from 'zod';
@@ -10,6 +10,7 @@ import { CatalogSyncService } from '../exercises/catalog-sync.service.js';
 import { auditCoverage, canTrack, resolveTrackingConfig, validateOverride, type CatalogExercise, type ConfigOverride } from './exercise-registry.js';
 import { AuthRateLimit, AuthRateLimitSchema } from '../auth/auth-rate-limit.schema.js';
 import { PoseTrackerRateLimitGuard } from './pose-tracker-rate-limit.guard.js';
+import { PrivacyService } from '../privacy/privacy.service.js';
 
 // Zod schema for generated-angle config
 const generatedAngleConfigSchema = z.object({
@@ -122,9 +123,13 @@ export class PoseTrackerController {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
 export class PoseTrackerAdminController {
-  constructor(private readonly service: PoseTrackerService) {}
+  constructor(private readonly service: PoseTrackerService, @Optional() private readonly privacy?: PrivacyService) {}
   @Get('coverage') audit() { return this.service.audit(); }
-  @Put('exercises/:id') save(@Param('id') id: string, @Body() body: unknown, @Req() req: any) { return this.service.save(id,body,String(req.user.id ?? req.user.sub)); }
+  @Put('exercises/:id') async save(@Param('id') id: string, @Body() body: unknown, @Req() req: {user:{userId:string}}) {
+    const result = await this.service.save(id, body, req.user.userId);
+    if (this.privacy) await this.privacy.audit({ actorId: req.user.userId, targetId: id, action: 'admin_pose_reference_updated', status: 200 });
+    return result;
+  }
   @Post('exercises/:id/test')
   @UseGuards(PoseTrackerRateLimitGuard)
   @Header('Cache-Control','private, no-store')

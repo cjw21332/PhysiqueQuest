@@ -1,0 +1,7 @@
+{
+  "name": "physiquequest-admin-local",
+  "private": true,
+  "scripts": {
+    "dev": "node ../frontend/scripts/admin-dev-server.mjs"
+  }
+}

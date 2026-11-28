@@ -42,7 +42,7 @@ export class LeaderboardService {
     @InjectModel(WorkoutSession.name) private readonly workouts: Model<WorkoutSession>,
   ) {}
 
-  async get(userId: string, period: LeaderboardPeriod) {
+  async get(userId: string, period: LeaderboardPeriod, capture = true) {
     if (!PERIODS.includes(period)) throw new BadRequestException('Period must be week, month, or all');
     const now = new Date();
     const start = this.periodStart(period, now);
@@ -82,7 +82,7 @@ export class LeaderboardService {
       .filter(entry => entry.rank < self.rank)
       .sort((a, b) => b.rank - a.rank)[0];
 
-    void this.captureSnapshot(period, boundaryKey, ranked, generations)
+    if (capture) void this.captureSnapshot(period, boundaryKey, ranked, generations)
       .catch(() => this.logger.warn('Failed to capture leaderboard history snapshot'));
 
     return {

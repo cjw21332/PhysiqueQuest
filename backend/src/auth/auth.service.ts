@@ -1,5 +1,5 @@
 import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
-import { Injectable, Logger, UnauthorizedException, ConflictException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, ConflictException, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, type HydratedDocument } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -10,6 +10,7 @@ import { RegisterDto, LoginDto, AuthResponseDto } from './dto/auth.dto.js';
 import { emailStatus } from './email-verification.js';
 import { Profile } from '../profile/schemas/profile.schema.js';
 import { validateProfileMeasurements } from '../profile/profile.service.js';
+import { IsStrongPasswordConstraint } from './validators/password.validator.js';
 
 @Injectable()
 export class AuthService {
@@ -144,6 +145,16 @@ export class AuthService {
     }
     user.$locals.lifecycleGeneration = generation;
     return user;
+  }
+
+  async changeInitialAdminPassword(userId: string, currentPassword: unknown, newPassword: unknown) {
+    if (typeof currentPassword !== 'string' || currentPassword.length > 128 || typeof newPassword !== 'string' || !new IsStrongPasswordConstraint().validate(newPassword) || currentPassword === newPassword) throw new BadRequestException('Choose a different password with 8-15 characters, an uppercase letter, a lowercase letter and a number.');
+    const user = await this.userModel.findById(userId).select('+passwordHash');
+    if (!user || user.role !== 'admin' || !user.mustChangePassword || !await bcrypt.compare(currentPassword, user.passwordHash)) throw new UnauthorizedException('Unable to change password.');
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    const result = await new AccountLifecycleFence(this.userModel.db).withActiveWrite(userId, async session => this.userModel.updateOne({ _id: user._id, mustChangePassword: true, passwordHash: user.passwordHash }, { $set: { passwordHash, mustChangePassword: false }, $inc: { sessionVersion: 1 } }).session(session));
+    if (!result.modifiedCount) throw new ConflictException('The password has already changed. Sign in again.');
+    return { updated: true };
   }
 
   async revokeAll(userId: string): Promise<void> {

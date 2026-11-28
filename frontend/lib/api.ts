@@ -40,6 +40,9 @@ export function getCoachApiBaseUrl() {
 }
 
 export function getApiBaseUrl() {
+  if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_PQ_ADMIN_GATEWAY === '1' && window.location.pathname.startsWith('/admin')) {
+    return `${window.location.origin}/api`;
+  }
   let runtimeApiUrl: string | undefined;
     let pageLocation: { protocol: string; hostname: string; port?: string } | undefined;
   if (typeof window !== 'undefined') {
@@ -200,13 +203,15 @@ export interface AdminAnalyticsRecord {
   rangeDays: 7 | 30 | 90;
   generatedAt: string;
   usersTotal: number;
+  newUsers?: number;
   activeUsers: number | null;
   completedSessions: number;
   formScore: number | null;
   missionCompletion: number | null;
   weeklyRetention: number[] | null;
   emergencyEvents: { total: number; delivered: number; failed: number; pending: number };
-  appFeedback?: { count: number; averageRating: number | null; recent: { rating: number; category: string; message: string; platform: string | null; createdAt: string }[] };
+  trend?: { date: string; newUsers: number; activeUsers: number; workouts: number }[];
+  appFeedback?: { count: number; pending?: number; averageRating: number | null; recent: { rating: number; category: string; message: string; platform: string | null; createdAt: string }[] };
 }
 
 /** Per-100 g macros, as reported alongside a scanned item. Informational only. */
@@ -523,6 +528,10 @@ class ApiClient {
     });
   }
 
+  async adminLogin(data: { username: string; password: string }) {
+    return this.request<{user: {id: string; name: string; email: string}; access_token: string; expires_in: number}>('/auth/session/admin-login', {method:'POST',body:JSON.stringify(data)});
+  }
+
   async checkGoogleAccount(idToken: string, intent: 'login' | 'register') {
     return this.request<{ email: string; name: string; registered: boolean; needsProfile?: boolean }>('/auth/google/check', {
       method: 'POST',
@@ -643,7 +652,8 @@ class ApiClient {
   async markAllNotifications() { return this.request<any>('/notifications/read-all', { method: 'POST' }); }
   async clearNotifications(ids: string[]) { return this.request<any>('/notifications/clear', { method: 'POST', body: JSON.stringify({ ids }) }); }
 
-  async getAuthMe() { return this.request<{ id: string; email: string; role: 'user' | 'admin' }>('/auth/me'); }
+  async getAuthMe() { return this.request<{ id: string; email: string; role: 'user' | 'admin'; mustChangePassword?: boolean }>('/auth/me'); }
+  async changeInitialAdminPassword(currentPassword: string, newPassword: string) { return this.request<{updated: boolean}>('/auth/admin-initial-password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) }); }
   async requestPasswordReset(email: string) {
     return this.request<PasswordRecoveryRequest>('/auth/password-reset/request', {
       method: 'POST',
@@ -808,6 +818,15 @@ class ApiClient {
   async createAdminExercise(data: any) { return this.request<any>('/admin/exercises', { method: 'POST', body: JSON.stringify(data) }); }
   async updateAdminExercise(id: string, data: Record<string, unknown>) { return this.request<any>(`/admin/exercises/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(data) }); }
   async deleteAdminExercise(id: string) { return this.request<any>(`/admin/exercises/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
+  async getAdminUsers(search = '', page = 1) { return this.request<{ items: { _id: string; name: string; email: string; isActive: boolean; createdAt?: string; lastSignIn?: string | null }[]; total: number; page: number; pageSize: number }>(`/admin/dashboard/users?${new URLSearchParams({search, page: String(page)})}`); }
+  async getAdminUser(id: string) { return this.request<{user: {name: string; email: string}; profile: {name?: string; age?: string; height?: string; heightInches?: string; heightUnit?: string; weight?: string; weightUnit?: string; goal?: string} | null; split: {label: string; isWorkoutDay: boolean; exercises: string[]}[] | null; badges: {id: string; title: string}[] | null; badgeCoverageIncomplete: boolean} | null>(`/admin/dashboard/users/${encodeURIComponent(id)}`); }
+  async getAdminFeedback(page = 1, filters: {status?: string; category?: string; platform?: string; search?: string; rating?: string; version?: string; from?: string; to?: string} = {}) { return this.request<{items: { _id: string; rating: number; category: string; message: string; platform?: string; appVersion?: string; createdAt?: string; adminStatus?: 'new'|'in_progress'|'resolved'; adminNote?: string }[]; total: number; page: number; pageSize: number}>(`/admin/dashboard/feedback?${new URLSearchParams({page: String(page), ...filters})}`); }
+  async updateAdminFeedback(id: string, status: string, note: string) { return this.request<{saved: boolean}>(`/admin/dashboard/feedback/${encodeURIComponent(id)}`, {method:'PATCH', body:JSON.stringify({status,note})}); }
+  async getAdminExerciseFeedback(filters: {source?:string;search?:string;days?:string} = {}) { return this.request<{ _id: {exercise: string; source: string}; responses: number; averageRpe: number; averageEnjoyment: number | null; tooEasy: number; justRight: number; tooHard: number }[]>(`/admin/dashboard/exercise-feedback?${new URLSearchParams(filters)}`); }
+  async getAdminPoseEvidence() { return this.request<{exercise: string; sets: number; verified: number; agreement: number | null; zeroRepSets: number; zeroRepFalsePositives: number; lastReviewed: string}[]>('/admin/dashboard/pose-evidence'); }
+  async addAdminPoseEvidence(input: {exercise: string; verified: number; predicted: number; conditions: string}) { return this.request<{saved: boolean}>('/admin/dashboard/pose-evidence', {method: 'POST', body: JSON.stringify(input)}); }
+  async getAdminFoods() { return this.request<{top: {_id: string; count: number}[]; meals: number; savedScanEntries: number; scans: {status: string; count: number}[]}>('/admin/dashboard/foods'); }
+  async getAdminAudit() { return this.request<{items: {_id: string; action: string; actorId?: string; targetId?: string; status?: number; occurredAt: string}[]}>('/admin/dashboard/audit'); }
   async getAdminAnalytics(days: 7 | 30 | 90) { return this.request<AdminAnalyticsRecord>(`/admin/analytics?days=${days}`); }
   async sendSafetyAlert(idempotencyKey: string) {
     return this.request<AlertRecord>('/safety/alerts', {

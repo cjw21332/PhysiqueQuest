@@ -66,6 +66,12 @@ export async function login(email: string, password: string): Promise<User> {
   }
 }
 
+export async function loginAsAdmin(username: string, password: string): Promise<void> {
+  const response = await api.adminLogin({username, password});
+  session.set(response, getApiBaseUrl());
+  announceSuccessfulAuth();
+}
+
 export async function loginWithGoogle(idToken: string): Promise<User> {
   const response = await api.googleLogin(idToken);
   session.set(response, getApiBaseUrl());

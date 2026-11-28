@@ -36,12 +36,12 @@ export class PrivacyService implements OnModuleInit, OnModuleDestroy {
   }
   onModuleDestroy() { if (this.timer) clearInterval(this.timer); }
 
-  async audit(event: { actorId?: string; action: string; requestId?: string; status?: number; ip?: string; counts?: Record<string, number> }) {
+  async audit(event: { actorId?: string; targetId?: string; action: string; requestId?: string; status?: number; ip?: string; counts?: Record<string, number> }) {
     const now = new Date();
     const pseudonym = (value: string) => createHmac('sha256', process.env.JWT_SECRET!).update(value).digest('hex');
     await this.db.collection('audit_logs').insertOne({
       // Operational security audit is never a late user-owned record.
-      actorId: event.actorId ? `actor:${pseudonym(event.actorId)}` : undefined, action: event.action.slice(0, 160), requestId: event.requestId,
+      actorId: event.actorId ? `actor:${pseudonym(event.actorId)}` : undefined, targetId: event.targetId ? `subject:${pseudonym(event.targetId)}` : undefined, action: event.action.slice(0, 160), requestId: event.requestId,
       status: event.status, ipHash: event.ip ? pseudonym(event.ip) : undefined, counts: event.counts,
       occurredAt: now, hotUntil: afterDays(now, retention('AUDIT_LOG_HOT_DAYS')), cold: false, purgeAt: auditExpiry(now),
     });

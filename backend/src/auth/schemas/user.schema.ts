@@ -35,6 +35,8 @@ export class User {
   @Prop({ enum: ['user', 'admin'], default: 'user', required: true })
   role: 'user' | 'admin';
 
+  @Prop({ default: false }) mustChangePassword?: boolean;
+
   @Prop({ default: false }) emailVerified: boolean;
   @Prop({ type: Date, default: null }) emailVerifiedAt: Date | null;
   @Prop({ default: 1 }) authPolicyVersion: number;

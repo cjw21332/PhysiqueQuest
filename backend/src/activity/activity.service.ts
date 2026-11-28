@@ -73,10 +73,15 @@ export class ActivityService {
     return this.summary(userId, undefined, false);
   }
 
-  private async summary(userId: string, requestedTimezone: string | undefined, includeLeaderboard: boolean) {
+  /** Administrator view: compute the same badges without changing the user's quest chain. */
+  async getForAdmin(userId: string) {
+    return this.summary(userId, undefined, true, false);
+  }
+
+  private async summary(userId: string, requestedTimezone: string | undefined, includeLeaderboard: boolean, persistChain = includeLeaderboard) {
     const record = await this.model.findOne({ userId: new Types.ObjectId(userId) }).exec();
     const timezone = resolveTimezone(requestedTimezone ?? record?.state?.timezone);
-    const [nutrition, workouts, records, ranking, user, liftSummary] = await Promise.all([this.nutrition.read(userId, 'userId meals.id meals.date meals.scanSavedAt meals.scanGroupId meals.protein meals.carbs meals.fat scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? this.leaderboard.get(userId, 'all').catch(() => null) : Promise.resolve(null), this.users.findById(userId).select('createdAt').lean().exec(), typeof this.workouts.summary === 'function' ? this.workouts.summary(userId, timezone).catch(() => null) : Promise.resolve(null)]);
+    const [nutrition, workouts, records, ranking, user, liftSummary] = await Promise.all([this.nutrition.read(userId, 'userId meals.id meals.date meals.scanSavedAt meals.scanGroupId meals.protein meals.carbs meals.fat scanSaveReceipts.key scanSaveReceipts.mealIds water.date water.glasses'), this.workouts.creditHistory(userId, timezone), this.workouts.personalRecordDays(userId, timezone), includeLeaderboard ? (persistChain ? this.leaderboard.get(userId, 'all') : this.leaderboard.get(userId, 'all', false)).catch(() => null) : Promise.resolve(null), this.users.findById(userId).select('createdAt').lean().exec(), typeof this.workouts.summary === 'function' ? this.workouts.summary(userId, timezone).catch(() => null) : Promise.resolve(null)]);
     const today = zoneDate(new Date(), timezone);
 
     const mealDates = nutrition.meals.map(meal => meal.date).filter((date): date is string => typeof date === 'string');
@@ -103,7 +108,7 @@ export class ActivityService {
     const log = typeof this.workouts.trainingLog === 'function' ? await this.workouts.trainingLog(userId).catch(() => []) : [];
     const storedChain = record?.state?.questChain as ChainState | undefined;
     const chain = advanceChain(storedChain, log, new Date().toISOString());
-    if (chain.changed && includeLeaderboard) await this.saveChain(userId, storedChain?.version, chain.state, !record).catch(() => undefined);
+    if (chain.changed && persistChain) await this.saveChain(userId, storedChain?.version, chain.state, !record).catch(() => undefined);
 
     const quests = questHistory(profile, dayData, today);
     const dayStreak = computeStreak(activityDates, today);
