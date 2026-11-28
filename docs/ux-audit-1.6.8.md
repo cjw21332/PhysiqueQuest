@@ -21,7 +21,7 @@ Mechanical checklist built from greps on the 1.6.7 tree. "Fixed" means changed a
 ## Forms and validation
 
 - [x] **Auth login and register:** each field has its own message, `aria-invalid` and `aria-describedby`; the first invalid field gets focus; typing clears only its own message; native bubbles are replaced by these messages (`noValidate`). Covered by `tests/browser/auth-validation.spec.mjs` (3 pass, palette check included) and the register regression spec (pass).
-- [ ] **Forgot password:** six inputs, no `aria-invalid`; errors show in shared banners. Email, OTP, new password and confirm need field-level messages.
+- [x] **Forgot password:** email, code and new-password steps link their message to the failing field (`aria-invalid`, `aria-describedby`), check the email format, and show the registration password checker. Covered by the forgot-password test in `auth-validation.spec.mjs` (4 pass).
 - [x] **Password length decided: 8–15 characters everywhere.** That is the policy in the client checker and in `backend/src/auth/validators/password.validator.ts`, so the forgot-password `maxLength={15}` already matches. No change.
 - [ ] Me edit forms, `AppFeedbackForm`, `ProgramBuilder`, `AddFood` and `EditMeal` still need `aria-invalid` plus a linked message.
 

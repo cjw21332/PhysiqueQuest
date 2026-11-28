@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent, type KeyboardEvent } from 'react';
 import { api } from '../../lib/api';
 import { Icon } from '../Home/icons';
+import PasswordStrengthChecker, { validatePassword } from '../../components/PasswordStrengthChecker';
 
 type Step = 'reset' | 'verify' | 'password' | 'success';
 type Props = { onClose: () => void; onSuccess: () => void; mode?: 'reset' | 'change' | 'register' | 'verify-email'; accountEmail?: string; initialRequestId?: string; onRegister?: (requestId: string, code: string) => Promise<void> };
 const OTP_LENGTH = 6;
 const RESEND_DELAY = 60;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset', accountEmail, initialRequestId = '', onRegister }: Props) {
   const [step, setStep] = useState<Step>(mode === 'register' ? 'verify' : 'reset');
@@ -21,6 +23,8 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [resendSeconds, setResendSeconds] = useState(mode === 'register' ? RESEND_DELAY : 0);
   const [error, setError] = useState('');
+  // Which password field the current error belongs to, so only that field is marked invalid.
+  const [passwordErrorField, setPasswordErrorField] = useState<'password' | 'confirm'>('password');
   const [busy, setBusy] = useState(false);
   const codeInputs = useRef<Array<HTMLInputElement | null>>([]);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -48,6 +52,10 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
   const requestCode = async (event: FormEvent) => {
     event.preventDefault();
     if (inFlight.current) return;
+    if (mode === 'reset' && !EMAIL_PATTERN.test(email.trim())) {
+      setError('Enter a valid email address, like you@email.com.');
+      return;
+    }
     inFlight.current = true;
     setBusy(true);
     setError('');
@@ -182,7 +190,13 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     event.preventDefault();
     if (inFlight.current) return;
     setError('');
+    if (!validatePassword(password)) {
+      setPasswordErrorField('password');
+      setError('Your new password does not meet all the requirements.');
+      return;
+    }
     if (password !== confirmPassword) {
+      setPasswordErrorField('confirm');
       setError('Passwords do not match.');
       return;
     }
@@ -195,6 +209,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
       else await api.confirmPasswordReset(passwordData);
       setStep('success');
     } catch (err) {
+      setPasswordErrorField('password');
       setError(err instanceof Error ? err.message : 'Could not update the password.');
     } finally {
       inFlight.current = false;
@@ -206,7 +221,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
 
   return <dialog ref={dialogRef} className="forgot-password-overlay" aria-modal="true" aria-label={step === 'verify' ? 'Verification code' : step === 'password' ? 'Set new password' : step === 'success' ? 'Password updated' : mode === 'verify-email' ? 'Verify your email' : mode === 'change' ? 'Change your password' : 'Reset your password'} onCancel={event => { event.preventDefault(); onClose(); }}>
     {step === 'verify' && mode !== 'register' && mode !== 'verify-email' && <div className="forgot-password-modal forgot-password-modal-background" aria-hidden="true" inert>
-      <div className="modal-header"><h3>{mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><span className="close-btn">×</span></div>
+      <div className="modal-header"><h3>{mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><span className="close-btn"><Icon name="close" size={20}/></span></div>
       <div className="modal-body">
         <p className="modal-description">{mode === 'change' ? 'Enter the verification code sent to your account email to change your password.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
         <label className="forgot-field"><span>Email address</span><input type="email" value={email} readOnly /></label>
@@ -216,13 +231,13 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     <div className={`forgot-password-modal${step === 'verify' ? ' forgot-password-modal-otp' : ''}`}>
     {step === 'reset' && <>
       <div className="modal-header"><h3>{mode === 'verify-email' ? 'Verify your email' : mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={20}/></button></div>
-      <form onSubmit={event => void requestCode(event)}>
+      <form onSubmit={event => void requestCode(event)} noValidate>
         <div className="modal-body">
           <p className="modal-description">{mode === 'verify-email' ? 'Confirm your email address to finish verifying your account.' : mode === 'change' ? 'We’ll send a verification code to the email address on your signed-in account.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
           {mode === 'change' || mode === 'verify-email'
             ? <label className="forgot-field"><span>Account email</span><input type="email" value={email} readOnly /></label>
-            : <label className="forgot-field"><span>Email address</span><input type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} placeholder="you@email.com" /></label>}
-          {error && <p className="error-hint" role="alert">{error}</p>}
+            : <label className="forgot-field"><span>Email address</span><input type="email" autoComplete="email" required value={email} onChange={event => { setEmail(event.target.value); setError(''); }} placeholder="you@email.com" aria-invalid={error ? true : undefined} aria-describedby={error ? 'forgot-error' : undefined} /></label>}
+          {error && <p id="forgot-error" className="error-hint" role="alert">{error}</p>}
         </div>
         <div className="modal-footer"><button type="submit" className="btn-primary" disabled={busy}>{busy ? 'Sending…' : mode === 'change' || mode === 'verify-email' ? 'Send Verification Code' : 'Send OTP Verification'}</button></div>
       </form>
@@ -235,7 +250,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
           <p className="modal-description">We have sent a verification code to <strong>{email}</strong></p>
           <div className="forgot-field">
             <span className="otp-label">6-digit code</span>
-            <div className="otp-digit-inputs" role="group" aria-label="6-digit verification code" onPaste={pasteCode}>
+            <div className="otp-digit-inputs" role="group" aria-label="6-digit verification code" aria-describedby={error ? 'forgot-error' : undefined} onPaste={pasteCode}>
               {Array.from({ length: OTP_LENGTH }, (_, index) => <input
                 key={index}
                 ref={element => { codeInputs.current[index] = element; }}
@@ -248,10 +263,11 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
                 value={code[index] && code[index] !== ' ' ? code[index] : ''}
                 onChange={event => updateCodeAt(index, event.target.value)}
                 onKeyDown={event => handleCodeKeyDown(index, event)}
+                aria-invalid={error ? true : undefined}
               />)}
             </div>
           </div>
-          {error && <p className="error-hint" role="alert">{error}</p>}
+          {error && <p id="forgot-error" className="error-hint" role="alert">{error}</p>}
         </div>
         <div className="modal-footer">
           <button type="submit" className="btn-primary" disabled={busy}>{busy ? 'Verifying…' : 'Confirm'}</button>
@@ -264,12 +280,13 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
 
     {step === 'password' && <>
       <div className="modal-header"><h3>{mode === 'change' ? 'Set new password' : 'Create new password'}</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={20}/></button></div>
-      <form onSubmit={event => void confirm(event)}>
+      <form onSubmit={event => void confirm(event)} noValidate>
         <div className="modal-body">
           <p className="modal-description">Your identity is verified. Please provide a strong new password.</p>
-          <label className="forgot-field"><span>New Password</span><div className="password-input-wrap"><input type={showPassword ? 'text' : 'password'} autoComplete="new-password" required minLength={8} maxLength={15} value={password} onChange={event => setPassword(event.target.value)} /><button type="button" className="eye-toggle" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? 'Hide new password' : 'Show new password'} aria-pressed={showPassword}><EyeIcon visible={showPassword} /></button></div></label>
-          <label className="forgot-field"><span>Confirm New Password</span><div className="password-input-wrap"><input type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password" required minLength={8} maxLength={15} value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} /><button type="button" className="eye-toggle" onClick={() => setShowConfirmPassword(value => !value)} aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} aria-pressed={showConfirmPassword}><EyeIcon visible={showConfirmPassword} /></button></div></label>
-          {error && <p className="error-hint" role="alert">{error}</p>}
+          <label className="forgot-field"><span>New Password</span><div className="password-input-wrap"><input type={showPassword ? 'text' : 'password'} autoComplete="new-password" required minLength={8} maxLength={15} value={password} onChange={event => { setPassword(event.target.value); setError(''); }} aria-invalid={error && passwordErrorField === 'password' ? true : undefined} aria-describedby={error && passwordErrorField === 'password' ? 'forgot-error' : undefined} /><button type="button" className="eye-toggle" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? 'Hide new password' : 'Show new password'} aria-pressed={showPassword}><EyeIcon visible={showPassword} /></button></div></label>
+          <PasswordStrengthChecker password={password} />
+          <label className="forgot-field"><span>Confirm New Password</span><div className="password-input-wrap"><input type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password" required minLength={8} maxLength={15} value={confirmPassword} onChange={event => { setConfirmPassword(event.target.value); setError(''); }} aria-invalid={error && passwordErrorField === 'confirm' ? true : undefined} aria-describedby={error && passwordErrorField === 'confirm' ? 'forgot-error' : undefined} /><button type="button" className="eye-toggle" onClick={() => setShowConfirmPassword(value => !value)} aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} aria-pressed={showConfirmPassword}><EyeIcon visible={showConfirmPassword} /></button></div></label>
+          {error && <p id="forgot-error" className="error-hint" role="alert">{error}</p>}
         </div>
         <div className="modal-footer"><button type="submit" className="btn-primary" disabled={busy}>{busy ? 'Updating…' : 'Update New Password'}</button></div>
       </form>
