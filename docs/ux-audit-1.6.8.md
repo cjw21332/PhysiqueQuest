@@ -20,8 +20,10 @@ Mechanical checklist built from greps on the 1.6.7 tree. "Fixed" means changed a
 
 ## Forms and validation
 
-- [ ] Field-level errors: `aria-invalid` appears once across 14 form files (`aria-describedby` 12). Auth (login, register, forgot password), Me edit forms, `AppFeedbackForm`, `ProgramBuilder`, `AddFood` and `EditMeal` need `aria-invalid` plus a linked message.
-- [x] Auth form: busy state and `role="alert"` already present (11 matches).
+- [x] **Auth login and register:** each field has its own message, `aria-invalid` and `aria-describedby`; the first invalid field gets focus; typing clears only its own message; native bubbles are replaced by these messages (`noValidate`). Covered by `tests/browser/auth-validation.spec.mjs` (3 pass, palette check included) and the register regression spec (pass).
+- [ ] **Forgot password:** six inputs, no `aria-invalid`; errors show in shared banners. Email, OTP, new password and confirm need field-level messages.
+- [ ] **Product question:** the forgot-password new-password field caps input at 15 characters (`maxLength={15}`), but registration has no cap. A user who registers with a longer password can't reset to it. Decide the rule before changing it.
+- [ ] Me edit forms, `AppFeedbackForm`, `ProgramBuilder`, `AddFood` and `EditMeal` still need `aria-invalid` plus a linked message.
 
 ## Search and empty results
 

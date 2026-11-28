@@ -22,8 +22,18 @@ type Props = {
   emailInputRef?: Ref<HTMLInputElement>;
 };
 
+type FieldKey = 'name' | 'email' | 'password' | 'confirm';
+type FieldErrors = Partial<Record<FieldKey, string>>;
+const FIELD_ORDER: FieldKey[] = ['name', 'email', 'password', 'confirm'];
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 function EyeIcon({ visible }: { visible: boolean }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true">{visible ? <><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 002.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0112 5c5.5 0 9 7 9 7a15.6 15.6 0 01-3.1 3.8M6.2 6.2C4.1 7.5 3 12 3 12s3.5 7 9 7a9 9 0 003-.5"/></> : <><path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z"/><circle cx="12" cy="12" r="3"/></>}</svg>;
+}
+
+/** Message under one field; the input points at it with aria-describedby. */
+function FieldError({ id, message }: { id: string; message?: string }) {
+  return message ? <small id={id} className="auth-field-error">{message}</small> : null;
 }
 
 export default function AuthForm({ mode, onModeChange, name, email, onNameChange, onEmailChange, onContinue, error, onErrorChange, consent, onConsentChange, onForgotPassword, onGoogleAuth, busy = false, emailInputRef }: Props) {
@@ -31,11 +41,15 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const submitting = useRef(false);
   const [pending, setPending] = useState(false);
   const [googlePending, setGooglePending] = useState(false);
   const working = busy || pending || googlePending;
   const register = mode === 'register';
+
+  const clearField = (key: FieldKey) => setFieldErrors(current => current[key] ? { ...current, [key]: undefined } : current);
+  const fieldAttrs = (key: FieldKey) => fieldErrors[key] ? { 'aria-invalid': true, 'aria-describedby': `auth-${key}-error` } : {};
 
   const handleGoogleAuth = async () => {
     if (!onGoogleAuth || working) return;
@@ -50,53 +64,67 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
     }
   };
 
-  const passwordField = (label: string, value: string, onChange: (value: string) => void, visible: boolean, toggle: () => void, confirm = false) => (
-    <>
-      <label className="field">
-        <span>{label}</span>
-        <div className="input-wrap">
-          <input
-            type={visible ? 'text' : 'password'}
-            placeholder={confirm ? 'Re-enter password' : 'At least 8 characters'}
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            autoComplete={confirm ? 'new-password' : register ? 'new-password' : 'current-password'}
-            required
-            disabled={working}
-          />
-          <button
-            type="button"
-            className="eye"
-            onClick={toggle}
-            aria-label={visible ? `Hide ${confirm ? 'confirm password' : 'password'}` : `Show ${confirm ? 'confirm password' : 'password'}`}
-            aria-pressed={visible}
-          >
-            <EyeIcon visible={visible}/>
-          </button>
-        </div>
-      </label>
-      {register && !confirm && <PasswordStrengthChecker password={value} />}
-    </>
-  );
+  const passwordField = (key: 'password' | 'confirm', label: string, value: string, onChange: (value: string) => void, visible: boolean, toggle: () => void) => {
+    const confirm = key === 'confirm';
+    return (
+      <>
+        <label className="field">
+          <span>{label}</span>
+          <div className="input-wrap">
+            <input
+              id={`auth-${key}`}
+              type={visible ? 'text' : 'password'}
+              placeholder={confirm ? 'Re-enter password' : 'At least 8 characters'}
+              value={value}
+              onChange={e => { onChange(e.target.value); clearField(key); }}
+              autoComplete={register ? 'new-password' : 'current-password'}
+              required
+              disabled={working}
+              {...fieldAttrs(key)}
+            />
+            <button
+              type="button"
+              className="eye"
+              onClick={toggle}
+              aria-label={visible ? `Hide ${confirm ? 'confirm password' : 'password'}` : `Show ${confirm ? 'confirm password' : 'password'}`}
+              aria-pressed={visible}
+            >
+              <EyeIcon visible={visible}/>
+            </button>
+          </div>
+        </label>
+        <FieldError id={`auth-${key}-error`} message={fieldErrors[key]}/>
+        {register && !confirm && <PasswordStrengthChecker password={value} />}
+      </>
+    );
+  };
+
+  /** Checks every field, marks the ones that fail, and moves focus to the first one. */
+  const validate = (): FieldErrors => {
+    const errors: FieldErrors = {};
+    if (register && !name.trim()) errors.name = 'Enter your full name.';
+    if (!EMAIL_PATTERN.test(email.trim())) errors.email = 'Enter a valid email address, like you@email.com.';
+    if (register) {
+      if (!validatePassword(password)) errors.password = 'Your password does not meet all the requirements above.';
+      if (confirmPassword !== password) errors.confirm = 'Your passwords do not match.';
+    } else if (!password) {
+      errors.password = 'Enter your password.';
+    }
+    return errors;
+  };
 
   const handleContinue = async (event: FormEvent) => {
     event.preventDefault();
     if (busy || submitting.current) return;
-    if (register) {
-      if (!validatePassword(password)) {
-        onErrorChange('Please meet all password requirements.');
-        return;
-      }
-      if (password !== confirmPassword) {
-        onErrorChange('Your passwords do not match.');
-        return;
-      }
-    } else {
-      if (!password) {
-        onErrorChange('Please enter your password.');
-        return;
-      }
+    const errors = validate();
+    const first = FIELD_ORDER.find(key => errors[key]);
+    if (first) {
+      setFieldErrors(errors);
+      onErrorChange('');
+      requestAnimationFrame(() => document.getElementById(`auth-${first}`)?.focus());
+      return;
     }
+    setFieldErrors({});
     submitting.current = true;
     setPending(true);
     onErrorChange('');
@@ -111,7 +139,7 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
   };
 
   return (
-    <form className={`auth-screen screen-enter ${register ? 'registration-screen' : ''}`} onSubmit={event => void handleContinue(event)} aria-busy={working}>
+    <form className={`auth-screen screen-enter ${register ? 'registration-screen' : ''}`} onSubmit={event => void handleContinue(event)} aria-busy={working} noValidate>
       <div className="auth-body">
         <div className="auth-heading">
           {register && <span className="registration-eyebrow">YOUR JOURNEY STARTS HERE</span>}
@@ -119,10 +147,10 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
           <p>{register ? 'A few details now. A plan built around you next.' : 'Log in to continue your fitness journey.'}</p>
         </div>
         <div className="segmented">
-          <button type="button" disabled={working} aria-pressed={register} className={register ? 'selected' : ''} onClick={() => { onModeChange('register'); onErrorChange(''); }}>
+          <button type="button" disabled={working} aria-pressed={register} className={register ? 'selected' : ''} onClick={() => { onModeChange('register'); onErrorChange(''); setFieldErrors({}); }}>
             Register
           </button>
-          <button type="button" disabled={working} aria-pressed={!register} className={!register ? 'selected' : ''} onClick={() => { onModeChange('login'); onErrorChange(''); }}>
+          <button type="button" disabled={working} aria-pressed={!register} className={!register ? 'selected' : ''} onClick={() => { onModeChange('login'); onErrorChange(''); setFieldErrors({}); }}>
             Log in
           </button>
         </div>
@@ -130,21 +158,23 @@ export default function AuthForm({ mode, onModeChange, name, email, onNameChange
           <label className="field">
             <span>Full name</span>
             <div className="input-wrap">
-              <input autoComplete="name" required disabled={working} placeholder="Juan Dela Cruz" value={name} onChange={e => onNameChange(e.target.value)}/>
+              <input id="auth-name" autoComplete="name" required disabled={working} placeholder="Juan Dela Cruz" value={name} onChange={e => { onNameChange(e.target.value); clearField('name'); }} {...fieldAttrs('name')}/>
             </div>
           </label>
         )}
+        {register && <FieldError id="auth-name-error" message={fieldErrors.name}/>}
         <label className="field">
           <span>Email address</span>
           <div className="input-wrap">
-            <input ref={emailInputRef} type="email" inputMode="email" autoCapitalize="none" spellCheck={false} autoComplete="email" required disabled={working} placeholder="you@email.com" value={email} onChange={e => onEmailChange(e.target.value)}/>
+            <input id="auth-email" ref={emailInputRef} type="email" inputMode="email" autoCapitalize="none" spellCheck={false} autoComplete="email" required disabled={working} placeholder="you@email.com" value={email} onChange={e => { onEmailChange(e.target.value); clearField('email'); }} {...fieldAttrs('email')}/>
           </div>
         </label>
-        {passwordField('Password', password, setPassword, showPassword, () => setShowPassword(v => !v))}
+        <FieldError id="auth-email-error" message={fieldErrors.email}/>
+        {passwordField('password', 'Password', password, setPassword, showPassword, () => setShowPassword(v => !v))}
         {!register && <button type="button" className="forgot-password-link" disabled={working} onClick={onForgotPassword}>Forgot Password?</button>}
         {register && (
           <>
-            {passwordField('Confirm password', confirmPassword, setConfirmPassword, showConfirmPassword, () => setShowConfirmPassword(v => !v), true)}
+            {passwordField('confirm', 'Confirm password', confirmPassword, setConfirmPassword, showConfirmPassword, () => setShowConfirmPassword(v => !v))}
             <PolicyConsent checked={consent} onChange={onConsentChange} disabled={working}/>
           </>
         )}
