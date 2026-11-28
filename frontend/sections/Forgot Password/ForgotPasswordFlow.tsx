@@ -215,7 +215,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     </div>}
     <div className={`forgot-password-modal${step === 'verify' ? ' forgot-password-modal-otp' : ''}`}>
     {step === 'reset' && <>
-      <div className="modal-header"><h3>{mode === 'verify-email' ? 'Verify your email' : mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>{mode === 'verify-email' ? 'Verify your email' : mode === 'change' ? 'Change your password' : 'Reset your password'}</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={20}/></button></div>
       <form onSubmit={event => void requestCode(event)}>
         <div className="modal-body">
           <p className="modal-description">{mode === 'verify-email' ? 'Confirm your email address to finish verifying your account.' : mode === 'change' ? 'We’ll send a verification code to the email address on your signed-in account.' : 'Enter the email address you signed up with and we’ll send you a verification code to reset your password.'}</p>
@@ -229,7 +229,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     </>}
 
     {step === 'verify' && <>
-      <div className="modal-header"><h3>Verification code</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>Verification code</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={20}/></button></div>
       <form onSubmit={event => void verifyCode(event)}>
         <div className="modal-body">
           <p className="modal-description">We have sent a verification code to <strong>{email}</strong></p>
@@ -263,7 +263,7 @@ export default function ForgotPasswordFlow({ onClose, onSuccess, mode = 'reset',
     </>}
 
     {step === 'password' && <>
-      <div className="modal-header"><h3>{mode === 'change' ? 'Set new password' : 'Create new password'}</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close">×</button></div>
+      <div className="modal-header"><h3>{mode === 'change' ? 'Set new password' : 'Create new password'}</h3><button type="button" className="close-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={20}/></button></div>
       <form onSubmit={event => void confirm(event)}>
         <div className="modal-body">
           <p className="modal-description">Your identity is verified. Please provide a strong new password.</p>

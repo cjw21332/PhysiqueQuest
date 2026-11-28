@@ -124,7 +124,7 @@ export default function LaunchPage() {
           </div>
           <div className="launch-actions"><Link className="primary" href="/register">Get started</Link><Link className="secondary" href="/login">I already have an account</Link></div>
         </section>
-        {notice && <div className="toast" role="status">{notice}<button type="button" onClick={() => setNotice('')} aria-label="Dismiss">×</button></div>}
+        {notice && <div className="toast" role="status">{notice}<button type="button" onClick={() => setNotice('')} aria-label="Dismiss"><Icon name="close" size={20}/></button></div>}
       </div>
     </main>
   );

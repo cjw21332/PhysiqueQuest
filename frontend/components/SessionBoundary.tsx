@@ -101,12 +101,11 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
           const response = await fetch(readyUrl, { credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(8_000) });
           if (!response.ok || (await response.json())?.status !== 'ready') throw new Error('Service is still waking up.');
           const active = session.current();
-          if (active && !active.offlineOnly) {
-            const restored = await session.refresh(base);
-            setSessionExpired(!restored);
-          } else if (active?.offlineOnly) {
-            const restored = await session.refresh(base);
-            setSessionExpired(!restored);
+          // Only a server rejection marks the session expired (the session layer sets sessionExpired on 401).
+          // A null result can also mean a newer session change superseded this request, which is not expiry.
+          if (active) {
+            await session.refresh(base);
+            setSessionExpired(Boolean(session.current()?.sessionExpired));
           }
           setServiceReconnecting(false);
           setConnectionLost(false);
@@ -172,7 +171,8 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
       try {
         const restored = await session.restore(base);
         if (!active) return;
-        if (!restored && offline) setSessionExpired(true);
+        // Expired only when the server rejected the saved sign-in, not when the restore was superseded.
+        if (!restored && offline && session.current()?.sessionExpired) setSessionExpired(true);
         if (!restored && !offline) void nativeOfflineAccount('forget-offline-account');
         setReady(true);
       } catch {

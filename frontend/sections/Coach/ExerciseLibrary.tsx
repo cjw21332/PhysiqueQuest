@@ -37,7 +37,7 @@ function FilterPicker({ label, value, options, onChange }: { label: string; valu
     <span>{label}</span>
     <button ref={button} type="button" className="library-picker-trigger" aria-label={`${label}: ${options.find(option => option.value === value)?.label || value}`} aria-haspopup="dialog" onClick={() => dialog.current?.showModal()}>{options.find(option => option.value === value)?.label || value}<span aria-hidden="true">⌄</span></button>
     <dialog ref={dialog} className="library-picker-dialog" aria-label={label} onClose={() => button.current?.focus()} onClick={event => { if (event.target === event.currentTarget) dialog.current?.close(); }}>
-      <div className="library-picker-panel"><header><h3>{label}</h3><button type="button" aria-label={`Close ${label}`} onClick={() => dialog.current?.close()}>×</button></header>
+      <div className="library-picker-panel"><header><h3>{label}</h3><button type="button" aria-label={`Close ${label}`} onClick={() => dialog.current?.close()}><Icon name="close" size={20}/></button></header>
         <div className="library-picker-options">{options.map(option => <button key={option.value} type="button" className={value === option.value ? 'selected' : ''} aria-pressed={value === option.value} onClick={() => { onChange(option.value); dialog.current?.close(); }}>{option.label}{value === option.value && <span aria-hidden="true">✓</span>}</button>)}</div>
       </div>
     </dialog>

@@ -56,7 +56,7 @@ export default function DietaryPlan({ saved, profile, meals: loggedMeals, onBack
     finally { setBusy(false); }
   };
   return <div className="diet-plan">
-    <header className="diet-header pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Nutrition"><Icon name="arrow" size={20}/></button><h1>My Dietary Plan</h1></header>
+    <header className="diet-header pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Nutrition"><Icon name="arrow" size={20}/></button><h2>My Dietary Plan</h2></header>
     <div className="diet-tabs" role="group" aria-label="Dietary plan sections">{(['Active Plan', 'Custom Goals', 'Meal Schedule'] as const).map(item => <button type="button" className={tab === item ? 'active' : ''} aria-pressed={tab === item} key={item} disabled={readOnly && item === 'Custom Goals'} onClick={() => setTab(item)}>{item}</button>)}</div>
     {message && <p role="status" className="diet-message">{message}</p>}
     {tab === 'Active Plan' && scanned.length > 0 && <section className="diet-card"><h3>Today's scans and your plan</h3>

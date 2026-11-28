@@ -10741,6 +10741,9 @@ dialog[open]::backdrop { animation: pq-fade-in .22s ease-out; }
 /* Confirmation dialog, non-destructive tone (v1.6.5): replacing the weekly plan. */
 .delete-confirmation.is-primary .delete-confirm-icon { background: #143b26; color: #22c55e; }
 .delete-confirmation.is-primary .delete-confirm-action { background: #22c55e; color: #0b0f15; }
+/* Danger fill must win inside screens that style their own buttons (the workout cancel dialog lost it). */
+.delete-confirmation.delete-confirmation .delete-confirm-action { background: #f87176; color: #111827; }
+.delete-confirmation.delete-confirmation.is-primary .delete-confirm-action { background: #22c55e; color: #0b0f15; }
 .delete-confirmation .cq-weekday-pick { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: -6px 0 20px; }
 .delete-confirmation .cq-weekday-pick button { min-width: 0; min-height: 44px; padding: 0; border: 1px solid #273444; border-radius: 12px; background: #212b3b; color: #f8fafc; font-size: 12px; font-weight: 600; }
 .delete-confirmation .cq-weekday-pick button[aria-checked="true"] { border-color: #22c55e; background: #143b26; color: #4ade80; }

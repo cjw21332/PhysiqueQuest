@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { api, type ExerciseRecord } from '../../lib/api';
+import { Icon } from '../Home/icons';
 
 export default function WorkoutEditor({ title, initialName, replacing, busy, error, excludedIds, onSave, onReplace, onClose }: {
   title: string; initialName: string; replacing: boolean; busy: boolean; error: string; excludedIds: string[];
@@ -23,7 +24,7 @@ export default function WorkoutEditor({ title, initialName, replacing, busy, err
     return () => { active = false; clearTimeout(timer); };
   }, [query, replacing, retry]);
   return <dialog ref={dialog} className="workout-editor" aria-labelledby="workout-editor-title" onCancel={event => { event.preventDefault(); if (!busy) onClose(); }}>
-    <header><h2 id="workout-editor-title">{title}</h2><button type="button" disabled={busy} onClick={onClose} aria-label="Close editor">×</button></header>
+    <header><h2 id="workout-editor-title">{title}</h2><button type="button" disabled={busy} onClick={onClose} aria-label="Close editor"><Icon name="close" size={20}/></button></header>
     {!replacing ? <form onSubmit={event => { event.preventDefault(); if (name.trim()) onSave(name.trim()); }}><label>Name<input autoFocus maxLength={120} required value={name} onChange={event => setName(event.target.value)} /></label><button type="submit" disabled={busy || !name.trim()}>{busy ? 'Saving…' : 'Save name'}</button></form> : <><label>Find an exercise<input autoFocus type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search exercises" /></label><p className="routine-help">Replacement starts with fresh sets. Logged exercises stay in your workout.</p>{loading ? <p role="status">Loading exercises…</p> : <div className="workout-search-results">{availableItems.map(item => <button type="button" key={item._id} disabled={busy} onClick={() => onReplace(item)}><strong>{item.name}</strong><small>{item.equipment || item.equipments?.join(', ')}</small></button>)}{!availableItems.length && !searchError && <p>No available exercises found. Try another name.</p>}</div>}{searchError && <p role="alert">{searchError} <button type="button" onClick={() => setRetry(value => value + 1)}>Retry</button></p>}</>}
     {error && <p role="alert">{error}</p>}
   </dialog>;

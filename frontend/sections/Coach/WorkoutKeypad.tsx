@@ -43,7 +43,7 @@ export default function WorkoutKeypad({ field, value, unit, onApply, onClose }: 
     if (event.key === 'Enter' && event.target === panel.current) { event.preventDefault(); apply(); return; }
     if (/^\d$/.test(event.key) || event.key === '.' || event.key === ',' || event.key === 'Backspace') { event.preventDefault(); enter(event.key === ',' ? '.' : event.key); }
   }}>
-    <header><h2 id="keypad-title">{field === 'weight' ? 'Weight' : 'Reps'}</h2><button type="button" onClick={onClose} aria-label="Close keypad">×</button></header>
+    <header><h2 id="keypad-title">{field === 'weight' ? 'Weight' : 'Reps'}</h2><button type="button" onClick={onClose} aria-label="Close keypad"><Icon name="close" size={20}/></button></header>
     <output aria-live="polite">{text || '—'} <small>{field === 'weight' ? selectedUnit : 'reps'}</small></output>
     {field === 'weight' && <div className="keypad-units" role="group" aria-label="Weight unit">{(['lbs', 'kg'] as const).map(next => <button key={next} type="button" aria-pressed={selectedUnit === next} onClick={() => {
       if (next === selectedUnit) return;

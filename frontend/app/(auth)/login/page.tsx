@@ -8,6 +8,7 @@ import { login, loginWithGoogle } from '../../../lib/auth';
 import { ApiRequestError, api } from '../../../lib/api';
 import { requestGoogleIdentity } from '../../../lib/googleAuth';
 import { useRouter } from 'next/navigation';
+import { Icon } from '../../../sections/Home/icons';
 
 export default function LoginPage() {
   const { push: navigate } = useRouter();
@@ -89,9 +90,7 @@ export default function LoginPage() {
           {notice && (
             <div className="toast" role="status">
               {notice}
-              <button type="button" onClick={() => setNotice('')} aria-label="Dismiss">
-                ×
-              </button>
+              <button type="button" onClick={() => setNotice('')} aria-label="Dismiss"><Icon name="close" size={20}/></button>
             </div>
           )}
         </div>

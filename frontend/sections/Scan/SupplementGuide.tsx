@@ -18,12 +18,12 @@ export default function SupplementGuide({ profile, onBack }: { profile: Profile;
   const shown = filter === 'For you' ? (forYou.length ? forYou : audience.ordered) : filter === 'All' ? audience.ordered : audience.ordered.filter(item => item.category === filter);
 
   if (selected) return <div className="diet-plan supp-guide" ref={top}>
-    <header className="diet-header pq-page-heading"><button type="button" className="coach-back" onClick={() => setSelected(null)} aria-label="Back to supplement guide"><Icon name="arrow" size={20}/></button><h1>{selected.name}</h1></header>
+    <header className="diet-header pq-page-heading"><button type="button" className="coach-back" onClick={() => setSelected(null)} aria-label="Back to supplement guide"><Icon name="arrow" size={20}/></button><h2>{selected.name}</h2></header>
     <SupplementDetail item={selected} minor={audience.minor} fits={audience.fits(selected)}/>
   </div>;
 
   return <div className="diet-plan supp-guide" ref={top}>
-    <header className="diet-header pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Nutrition"><Icon name="arrow" size={20}/></button><h1>Supplement guide</h1></header>
+    <header className="diet-header pq-page-heading"><button type="button" className="coach-back" onClick={onBack} aria-label="Back to Nutrition"><Icon name="arrow" size={20}/></button><h2>Supplement guide</h2></header>
 
     <section className="supp-hero" aria-labelledby="supp-hero-title">
       <span className="supp-hero-icon" aria-hidden="true"><Icon name="shield" size={22}/></span>
