@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../../../lib/api';
-import { Card, Icon, PageHeader, Pagination, SearchBox, State, errorText, formatDate, initials, useAdminData } from '../ui';
+import { Avatar, Card, Icon, PageHeader, Pagination, SearchBox, State, errorText, formatDate, useAdminData } from '../ui';
 
 type Profile = NonNullable<Awaited<ReturnType<typeof api.getAdminUser>>>;
 
@@ -12,6 +12,15 @@ export default function Users() {
   const [openId, setOpenId] = useState<string | null>(null);
   useEffect(() => { const timer = window.setTimeout(() => { setQuery(search.trim()); setPage(1); }, 300); return () => window.clearTimeout(timer); }, [search]);
   const { data, error, loading, reload } = useAdminData(() => api.getAdminUsers(query, page), [query, page]);
+  const [photos, setPhotos] = useState<Record<string, string>>({});
+  // Photos load after the rows so the list never waits on large images.
+  useEffect(() => {
+    const ids = data?.items.map(user => user._id) ?? [];
+    if (!ids.length) return;
+    let active = true;
+    api.getAdminPhotos(ids).then(result => { if (active) setPhotos(current => ({ ...current, ...result.photos })); }).catch(() => undefined);
+    return () => { active = false; };
+  }, [data]);
 
   return <main className="adm-page">
     <PageHeader eyebrow="Monitor" title="Users" subtitle="Every PhysiqueQuest member. Open a row for their profile, split and badges." />
@@ -21,7 +30,7 @@ export default function Users() {
           <div className="adm-table-wrap"><table className="adm-table">
             <thead><tr><th scope="col">Member</th><th scope="col">Status</th><th scope="col">Joined</th><th scope="col">Last sign-in</th><th scope="col"><span className="adm-sr">Profile</span></th></tr></thead>
             <tbody>{data.items.map(user => <tr key={user._id} className="is-clickable" onClick={() => setOpenId(user._id)}>
-              <td><span className="adm-person"><span className="adm-avatar">{initials(user.name)}</span><span><strong>{user.name}</strong><small>{user.email}</small></span></span></td>
+              <td><span className="adm-person"><Avatar name={user.name} photo={photos[user._id]} /><span><strong>{user.name}</strong><small>{user.email}</small></span></span></td>
               <td><span className={`adm-pill ${user.isActive ? 'is-good' : 'is-muted'}`}>{user.isActive ? 'Active' : 'Inactive'}</span></td>
               <td>{formatDate(user.createdAt)}</td>
               <td>{user.lastSignIn ? formatDate(user.lastSignIn) : <span className="adm-dim">Not recorded</span>}</td>
@@ -59,7 +68,7 @@ function ProfileDrawer({ id, onClose }: { id: string; onClose: () => void }) {
       </div>
       <State loading={!profile && !error} error={error}>
         {profile && <>
-          <div className="adm-profile-id"><span className="adm-avatar adm-avatar-lg">{initials(p?.name || profile.user.name)}</span><div><h2 id="adm-drawer-title">{p?.name || profile.user.name}</h2><p className="adm-sub">{profile.user.email}</p></div></div>
+          <div className="adm-profile-id"><Avatar large name={p?.name || profile.user.name} photo={profile.photo} /><div><h2 id="adm-drawer-title">{p?.name || profile.user.name}</h2><p className="adm-sub">{profile.user.email}</p></div></div>
           <dl className="adm-facts">{facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || <span className="adm-dim">Not set</span>}</dd></div>)}</dl>
           <h3>Current split</h3>
           {profile.split?.length ? <ol className="adm-split">{profile.split.map((day, index) => <li key={`${day.label}-${index}`} className={day.isWorkoutDay ? 'is-work' : 'is-rest'}>

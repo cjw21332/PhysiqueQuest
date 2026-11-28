@@ -8,6 +8,8 @@ import { ActivityService } from '../activity/activity.service.js';
 import { CoachService } from '../coach/coach.service.js';
 import { PrivacyService } from '../privacy/privacy.service.js';
 
+const profilePhoto = (value: unknown) => typeof value === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(value) ? value : null;
+
 @Controller('admin/dashboard')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
@@ -39,13 +41,25 @@ export class AdminDashboardController {
     const userId = new Types.ObjectId(id);
     const user = await this.db.collection('users').findOne({ _id: userId, deletedAt: null, role: { $in: ['user', null] } }, { projection: { name: 1, email: 1, createdAt: 1, isActive: 1 } });
     if (!user) return null;
-    const profile = await this.db.collection('profiles').findOne({ userId }, { projection: { _id: 0, name: 1, age: 1, height: 1, heightInches: 1, heightUnit: 1, weight: 1, weightUnit: 1, goal: 1 } });
+    const profile = await this.db.collection('profiles').findOne({ userId }, { projection: { _id: 0, name: 1, age: 1, height: 1, heightInches: 1, heightUnit: 1, weight: 1, weightUnit: 1, goal: 1, photo: 1 } });
     const [split, summary] = await Promise.all([
       this.coach?.getSavedPlanForAdmin(id).catch(() => null) ?? null,
       this.activity?.getForAdmin(id).catch(() => null) ?? null,
     ]);
     if (req && this.privacy) await this.privacy.audit({ actorId: req.user.userId, action: 'admin_user_profile_viewed', targetId: id });
-    return { user, profile, split, badges: summary ? summary.badges.filter(badge => badge.earned).map(badge => ({ id: badge.id, title: badge.title })) : null, badgeCoverageIncomplete: summary ? summary.badges.some(badge => 'available' in badge && badge.available === false) : true };
+    const photo = profilePhoto(profile?.photo);
+    if (profile) delete profile.photo;
+    return { user, profile, photo, split, badges: summary ? summary.badges.filter(badge => badge.earned).map(badge => ({ id: badge.id, title: badge.title })) : null, badgeCoverageIncomplete: summary ? summary.badges.some(badge => 'available' in badge && badge.available === false) : true };
+  }
+
+  /** Profile photos for directory rows; members only, valid JPEG data URLs only. */
+  @Get('photos')
+  async photos(@Query('ids') ids = '') {
+    const wanted = [...new Set(String(ids).split(','))].filter(id => id.length === 24 && Types.ObjectId.isValid(id)).slice(0, 50).map(id => new Types.ObjectId(id));
+    if (!wanted.length) return { photos: {} };
+    const members = await this.db.collection('users').find({ _id: { $in: wanted }, deletedAt: null, role: { $in: ['user', null] } }, { projection: { _id: 1 } }).toArray();
+    const rows = await this.db.collection('profiles').find({ userId: { $in: members.map(member => member._id) }, photo: { $type: 'string', $ne: '' } }, { projection: { userId: 1, photo: 1 } }).toArray();
+    return { photos: Object.fromEntries(rows.flatMap(row => { const photo = profilePhoto(row.photo); return photo ? [[String(row.userId), photo]] : []; })) };
   }
 
   @Get('feedback')

@@ -6,7 +6,7 @@ const allowedQueries: Record<string, string[]> = {
   '/api/leaderboard/strength': ['exerciseId', 'metric'], '/api/leaderboard/photos': ['ids'],
   '/api/admin/analytics': ['days'], '/api/admin/alerts': ['days', 'status'], '/api/admin/exercises': ['limit'],
   '/api/admin/dashboard/users': ['search', 'page'], '/api/admin/dashboard/feedback': ['page', 'status', 'category', 'platform', 'search', 'rating', 'version', 'from', 'to'],
-  '/api/admin/dashboard/exercise-feedback': ['source', 'search', 'days'],
+  '/api/admin/dashboard/exercise-feedback': ['source', 'search', 'days'], '/api/admin/dashboard/photos': ['ids'],
   '/api/exercises': ['search', 'muscle', 'equipment', 'bodyPart', 'target', 'secondary', 'sort', 'page', 'limit'], '/api/nutrition/foods/search': ['q'],
 };
 export function queryValidationMiddleware(req: Request, res: Response, next: NextFunction) {

@@ -110,5 +110,14 @@ export function BarList({ rows, unit, tone = 'accent' }: { rows: { label: string
 }
 
 export const formatDate = (value?: string | null, withTime = false) => value ? new Date(value).toLocaleString(undefined, withTime ? { dateStyle: 'medium', timeStyle: 'short' } : { dateStyle: 'medium' }) : '—';
+/** Member avatar: their profile photo when they have one, otherwise initials. */
+export function Avatar({ name, photo, large = false }: { name: string; photo?: string | null; large?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  const className = `adm-avatar${large ? ' adm-avatar-lg' : ''}`;
+  // eslint-disable-next-line @next/next/no-img-element -- data URLs from the API, not optimisable assets
+  if (photo && !failed) return <img className={`${className} adm-avatar-photo`} src={photo} alt={`${name}'s profile photo`} onError={() => setFailed(true)} />;
+  return <span className={className} aria-hidden="true">{initials(name)}</span>;
+}
+
 export const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase()).join('') || '?';
 export const humanize = (value: string) => value.replaceAll('_', ' ').replaceAll('-', ' ');

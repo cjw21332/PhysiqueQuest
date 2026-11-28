@@ -10,6 +10,17 @@ describe('admin dashboard access and data', () => {
     expect(Reflect.getMetadata(ROLES_KEY, AdminDashboardController)).toEqual(['admin']);
     expect(Reflect.getMetadata(GUARDS_METADATA, AdminDashboardController)).toEqual([JwtAuthGuard, RolesGuard]);
   });
+  it('returns only valid member JPEG photos and keeps them out of the profile object', async () => {
+    const good = 'data:image/jpeg;base64,QUJD', member = '507f1f77bcf86cd799439011', other = '507f1f77bcf86cd799439012';
+    const find = vi.fn((filter: { role?: unknown }) => ({ toArray: async () => filter.role ? [{ _id: { toString: () => member } }] : [{ userId: member, photo: good }, { userId: other, photo: 'data:image/svg+xml;base64,PHN2Zz4=' }] }));
+    const controller = new AdminDashboardController({ collection: () => ({ find }) } as never);
+    expect(await controller.photos(`${member},${other},bad`)).toEqual({ photos: { [member]: good } });
+    expect(await controller.photos('')).toEqual({ photos: {} });
+    const findOne = vi.fn().mockResolvedValueOnce({ name: 'Member' }).mockResolvedValueOnce({ goal: 'Strength', photo: good });
+    const detail = await new AdminDashboardController({ collection: () => ({ findOne }) } as never).user(member);
+    expect(detail?.photo).toBe(good);
+    expect(detail?.profile).not.toHaveProperty('photo');
+  });
   it('rejects malformed user IDs before querying', async () => {
     const collection = vi.fn();
     const controller = new AdminDashboardController({ collection } as never);
