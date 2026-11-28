@@ -358,3 +358,41 @@
   .scan-section.scan-section.scan-reference .food-carbon summary::after { transition: none; }
   .scan-section.scan-section.scan-reference .scan-dashboard-scan:active { transform: none; }
 }
+
+/* Food carbon card (v1.6.7): its own Day / Week / Month / Year / All time filter, total, change, chart and sources. */
+.scan-section.scan-section.scan-reference .carbon-card { display: grid; gap: 14px; padding: 16px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-head { display: flex; align-items: center; gap: 12px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-leaf { display: grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--green-light); font-size: 18px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-head h3 { margin: 0; color: var(--ink); font-size: 16px; font-weight: 650; line-height: 1.3; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-head p { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-periods { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-periods button { min-width: 0; min-height: 40px; padding: 0 4px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font: inherit; font-size: 12.5px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-periods button[aria-selected="true"] { background: var(--green-light); color: var(--green); }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-periods button:focus-visible { outline: 2px solid var(--green); outline-offset: 1px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-total { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 10px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-total p { display: flex; align-items: baseline; gap: 6px; margin: 0; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-total strong { color: var(--ink); font-size: 34px; font-weight: 750; letter-spacing: -.8px; line-height: 1; font-variant-numeric: tabular-nums; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-total span { color: var(--muted); font-size: 13px; font-weight: 500; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-change { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 650; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-change.is-down { background: var(--green-light); color: var(--green); }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-change.is-up { background: color-mix(in srgb, #f87171 16%, transparent); color: #f87171; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-meta { margin: -6px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-chart { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 6px; align-items: end; height: 120px; padding-top: 4px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-chart.is-dense { gap: 2px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-col { display: grid; grid-template-rows: 1fr auto; gap: 6px; height: 100%; min-width: 0; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-col-track { position: relative; display: block; border-radius: 6px; background: color-mix(in srgb, var(--green) 8%, transparent); }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-col-track i { position: absolute; inset: auto 0 0; display: block; border-radius: 6px; background: color-mix(in srgb, var(--green) 60%, transparent); }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-col.is-current .carbon-col-track i { background: var(--green); }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-col small { overflow: hidden; color: var(--muted); font-size: 10.5px; text-align: center; white-space: nowrap; text-overflow: clip; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-col.is-current small { color: var(--green); font-weight: 650; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-sources { display: grid; gap: 10px; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--line); list-style: none; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-sources li { display: grid; grid-template-columns: minmax(84px, 38%) 1fr auto; align-items: center; gap: 10px; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-source-name { overflow: hidden; color: var(--ink); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-share { display: block; height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--green) 10%, transparent); }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-share i { display: block; height: 100%; border-radius: 999px; background: var(--green); }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-sources b { color: var(--green); font-size: 13px; font-variant-numeric: tabular-nums; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-swap { margin: 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--green) 25%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--green) 7%, transparent); color: var(--ink); font-size: 12.5px; line-height: 1.5; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-empty { margin: 0; padding: 14px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); font-size: 13px; line-height: 1.5; text-align: center; }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-note { margin: 0; color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+@media (max-width: 360px) { .scan-section.scan-section.scan-reference .carbon-card .carbon-periods button { font-size: 11.5px; } .scan-section.scan-section.scan-reference .carbon-card .carbon-total strong { font-size: 30px; } }
+.scan-section.scan-section.scan-reference .carbon-card .carbon-chart.is-dense .carbon-col small { overflow: visible; margin-inline: -8px; }

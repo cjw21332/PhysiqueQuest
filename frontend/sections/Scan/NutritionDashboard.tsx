@@ -1,5 +1,5 @@
 'use client';
-import type { ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { defaultMeal } from './defaultMeal';
 import AdditionalNutrition from '../Scan/AdditionalNutrition';
 import { nutrientTotal, nutrientLabel, knownNutrientTotal } from '../Scan/nutrientTotal';
@@ -11,18 +11,65 @@ import { nutritionTargets, type FoodEntry, type MealName } from './types';
 import MealDiary from './MealDiary';
 import WaterTracker from './WaterTracker';
 import { summarizeHistory } from './nutritionPresentation';
-import { weeklyFoodCarbon } from '../../lib/foodCarbon';
+import { carbonForPeriod, CAR_KG_PER_KM, type CarbonPeriod } from '../../lib/foodCarbon';
 import { formatLocalDate } from '../../lib/localDate.mjs';
 
-/** Estimated food CO2e for the last 7 logged days, with local eco-friendly swaps. */
-function FoodCarbon({ entries }: { entries: FoodEntry[] }) {
-  const week = weeklyFoodCarbon(entries, formatLocalDate());
-  if (!week.bySource.length) return null;
-  return <details className="food-carbon"><summary>Food carbon footprint · {week.totalKg.toFixed(1)} kg CO₂e this week</summary>
-    {week.bySource.map(row => <div className="food-value" key={row.group}><span>{row.group}</span><b>{row.kg.toFixed(1)} kg</b></div>)}
-    {week.swaps.map(swap => <p className="meal-multiple-hint" key={swap}>🌱 {swap}</p>)}
-    <p className="meal-multiple-hint">Estimates from food type and portion; foods without a weight count as 150 g.</p>
-  </details>;
+const CARBON_PERIODS: { key: CarbonPeriod; label: string; previous: string }[] = [
+  { key: 'day', label: 'Day', previous: 'the day before' },
+  { key: 'week', label: 'Week', previous: 'last week' },
+  { key: 'month', label: 'Month', previous: 'last month' },
+  { key: 'year', label: 'Year', previous: 'last year' },
+  { key: 'all', label: 'All time', previous: '' },
+];
+const kgText = (kg: number) => kg >= 100 ? Math.round(kg).toLocaleString('en-US') : kg.toFixed(1);
+const dateText = (day: string, options: Intl.DateTimeFormatOptions) => new Date(`${day}T12:00:00`).toLocaleDateString('en-US', options);
+function carbonRangeLabel(period: CarbonPeriod, from: string, to: string, firstLogged: string | null) {
+  if (period === 'all') return firstLogged ? `Every log since ${dateText(firstLogged, { month: 'short', day: 'numeric', year: 'numeric' })}` : 'Every food you log in Scan';
+  if (period === 'day') return dateText(from, { weekday: 'long', month: 'short', day: 'numeric' });
+  if (period === 'week') return `${dateText(from, { month: 'short', day: 'numeric' })} – ${dateText(to, { month: 'short', day: 'numeric' })}`;
+  if (period === 'month') return dateText(from, { month: 'long', year: 'numeric' });
+  if (period === 'year') return from.slice(0, 4);
+  return from === to ? 'All your logged meals' : `Since ${dateText(from, { month: 'short', year: 'numeric' })}`;
+}
+
+/** Estimated food CO2e by day (default), week, month, year or all time, with its sources and local swaps. */
+function FoodCarbon({ entries, anchor }: { entries: FoodEntry[]; anchor: string }) {
+  const [period, setPeriod] = useState<CarbonPeriod>('day');
+  const data = useMemo(() => carbonForPeriod(entries, period, anchor), [entries, period, anchor]);
+  const option = CARBON_PERIODS.find(item => item.key === period)!;
+  const peak = Math.max(0, ...data.buckets.map(bucket => bucket.kg));
+  const top = data.buckets.find(bucket => bucket.kg === peak && peak > 0);
+  const change = data.previousKg ? Math.round((data.totalKg - data.previousKg) / data.previousKg * 100) : null;
+  const dense = data.buckets.length > 12;
+  const unit = period === 'day' ? 'meal' : period === 'week' || period === 'month' ? 'day' : data.buckets[0]?.key.length === 4 ? 'year' : 'month';
+  const current = period === 'year' || (period === 'all' && unit === 'month') ? anchor.slice(0, 7) : period === 'all' ? anchor.slice(0, 4) : anchor;
+  return <section className="food-carbon carbon-card" aria-labelledby="carbon-title">
+    <header className="carbon-head">
+      <span className="carbon-leaf" aria-hidden="true">🌱</span>
+      <div><h3 id="carbon-title">Food carbon footprint</h3><p>{carbonRangeLabel(period, data.from, data.to, data.firstLogged)}</p></div>
+    </header>
+    <div className="carbon-periods" role="tablist" aria-label="Footprint period">{CARBON_PERIODS.map(item => <button key={item.key} type="button" role="tab" aria-selected={period === item.key} onClick={() => setPeriod(item.key)}>{item.label}</button>)}</div>
+    <div className="carbon-total" role="tabpanel" aria-label={`${option.label} footprint`}>
+      <p><strong>{kgText(data.totalKg)}</strong><span>kg CO₂e</span></p>
+      {change !== null && change !== 0 && <span className={`carbon-change ${change > 0 ? 'is-up' : 'is-down'}`}>{change > 0 ? '▲' : '▼'} {Math.abs(change)}% vs {option.previous}</span>}
+    </div>
+    {data.foods ? <>
+      <p className="carbon-meta">{data.foods} {data.foods === 1 ? 'food' : 'foods'}{period !== 'day' && <> · {data.daysLogged} {data.daysLogged === 1 ? 'day' : 'days'} logged · {kgText(data.perDayKg)} kg a day</>} · like driving {Math.round(data.drivingKm).toLocaleString('en-US')} km{data.undated > 0 && <> · {data.undated} waiting to sync, counted but not charted</>}</p>
+      <div className={`carbon-chart${dense ? ' is-dense' : ''}`} role="img" aria-label={`Footprint per ${unit}${top ? `; highest: ${top.label}, ${kgText(top.kg)} kg` : ''}`}>
+        {data.buckets.map((bucket, index) => <div key={bucket.key} className={`carbon-col${bucket.key === current ? ' is-current' : ''}`}>
+          <span className="carbon-col-track"><i style={{ height: `${peak ? Math.max(bucket.kg ? 6 : 0, bucket.kg / peak * 100) : 0}%` }}/></span>
+          <small aria-hidden="true">{!dense || index % 7 === 0 ? bucket.label : ''}</small>
+        </div>)}
+      </div>
+      <ul className="carbon-sources" aria-label="Biggest sources">{data.bySource.slice(0, 5).map(row => <li key={row.group}>
+        <span className="carbon-source-name">{row.group}</span>
+        <span className="carbon-share" aria-hidden="true"><i style={{ width: `${Math.max(3, row.share * 100)}%` }}/></span>
+        <b>{kgText(row.kg)} kg</b>
+      </li>)}</ul>
+      {data.swaps.map(swap => <p className="carbon-swap" key={swap}>{swap}</p>)}
+    </> : <p className="carbon-empty">{period === 'day' ? 'No meals logged on this day yet.' : 'No meals logged in this period yet.'} Log meals to see their footprint.</p>}
+    <p className="carbon-note">Estimates from food type and portion (Poore &amp; Nemecek 2018); foods without a weight count as 150 g. The driving comparison uses {CAR_KG_PER_KM} kg CO₂e per km for an average petrol car.</p>
+  </section>;
 }
 
 export default function NutritionDashboard({
@@ -35,7 +82,7 @@ export default function NutritionDashboard({
   onHistory,
   onEdit,
   onWater,
-  highlightedMeal, readOnly = false, dayPicker, mealsHeading = "Today's meals",
+  highlightedMeal, readOnly = false, dayPicker, mealsHeading = "Today's meals", day = formatLocalDate(),
 }: {
   targets?: typeof nutritionTargets;
   onPlan: () => void;
@@ -53,6 +100,8 @@ export default function NutritionDashboard({
   /** Rendered under the Nutrition / Manual entry row. */
   dayPicker?: ReactNode;
   mealsHeading?: string;
+  /** Day chosen in the day picker (YYYY-MM-DD); the carbon card's periods are around it. */
+  day?: string;
 }) {
   const calorieTarget = targets.calories;
   const macroTargets = { Protein: targets.protein, Carbs: targets.carbs, Fats: targets.fats };
@@ -86,7 +135,7 @@ export default function NutritionDashboard({
       {missingFoods.length > 0 && <p className="meal-multiple-hint" role="status">Some nutrition is missing for {missingFoods.map(item => item.name).join(', ')}. Totals show known values only; edit these foods to complete your daily summary.</p>}
 
       <AdditionalNutrition entries={meals}/>
-      <FoodCarbon entries={historyMeals}/>
+      <FoodCarbon entries={historyMeals} anchor={day}/>
       {readOnly && <div className="scan-dashboard-scan is-locked" aria-disabled="true">
         <span className="scan-dashboard-scan-icon"><Icon name="lock" size={20} /></span>
         <span className="scan-dashboard-scan-copy"><strong>Meal scanning is paused</strong><small>Available again once you&apos;re connected</small></span>
