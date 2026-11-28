@@ -42,6 +42,12 @@ Working set:
 17 lbs x 15 ✅
 17 lbs x 13 ✅
 
+6. Preacher Curl
+Working set:
+EZ bar+ 10 kg x 10 ✅
+EZ bar + 15 kg x 8 ✅
+EZ bar + 15 kg x 8 ✅
+
 PULL DAY - 11/12/26
 1. Wide Grip Lat Pulldown
 Warmup set:
@@ -97,7 +103,8 @@ test('a phone workout note becomes a PPLUL draft program with working-set weight
   assert.match(program.notes ?? '', /No exercises were listed for: Lower/);
 
   const push = program.days[0].exercises;
-  assert.deepEqual(push.map(item => item.name), ['Smith Machine Bench Press', 'Dumbbell Shoulder Press', 'Incline Chest Machine Press', 'Cable Lateral Raises']);
+  assert.deepEqual(push.map(item => item.name), ['Smith Machine Bench Press', 'Dumbbell Shoulder Press', 'Incline Chest Machine Press', 'Cable Lateral Raises', 'Preacher Curl']);
+  assert.deepEqual({ weight: push[4].weight, loadBase: push[4].loadBase, reps: push[4].reps }, { weight: 15, loadBase: 'EZ bar', reps: '8-10' }, '"EZ bar + 15 kg" keeps its EZ bar');
   // "Smith machine bar + 25 kg": 25 kg of plates on the bar, not 25 kg in total.
   assert.deepEqual({ sets: push[0].sets, reps: push[0].reps, weight: push[0].weight, loadBase: push[0].loadBase, unit: push[0].unit, equipment: push[0].equipment }, { sets: 3, reps: '8-10', weight: 25, loadBase: 'Bar', unit: 'kg', equipment: 'Smith machine' });
   assert.equal(push[1].loadBase, undefined, 'dumbbells have no bar');
