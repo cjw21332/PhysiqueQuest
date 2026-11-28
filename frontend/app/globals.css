@@ -10756,3 +10756,9 @@ dialog[open]::backdrop { animation: pq-fade-in .22s ease-out; }
 
 /* Inline retry inside a status line (UX audit 1.6.8): a text action, not a full button. */
 .training-progress .training-retry.training-retry { display: inline; min-height: 0; margin-left: 4px; padding: 0; border: 0; background: none; color: var(--green, #22c55e); font: inherit; font-weight: 650; text-decoration: underline; cursor: pointer; }
+
+/* Field error spacing (UX audit 1.6.8): the message sits under its own field with room before the next label. */
+.auth-screen .auth-field-error { margin: -11px 0 14px; }
+/* Invalid reset fields get the same coral border as login and register (outranks the dark reset field rule). */
+:root[data-theme='dark'] .forgot-password-modal :is(input, .otp-digit)[aria-invalid="true"] { border-color: #f87171; }
+.forgot-password-modal .password-requirements { margin-bottom: 14px; }

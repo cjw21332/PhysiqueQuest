@@ -23,6 +23,7 @@ test('log in shows one linked message per invalid field and focuses the first', 
   await expect(page.locator('#auth-password-error')).toHaveText('Enter your password.');
   await expect(email).toBeFocused();
   await expectDarkPalette(page);
+  await page.screenshot({ path: 'test-results/auth-login-errors.png', fullPage: true });
 });
 
 test('typing in a field clears only its own message', async ({ page }) => {
@@ -68,6 +69,7 @@ test('forgot password links each step message to its field and ends in success',
   await expect(dialog.locator('#forgot-error')).toHaveText('Your new password does not meet all the requirements.');
   await expect(fresh).toHaveAttribute('aria-invalid', 'true');
   await expect(again).not.toHaveAttribute('aria-invalid', 'true');
+  await page.screenshot({ path: 'test-results/auth-reset-password-errors.png' });
 
   await fresh.fill('Testing123');
   await again.fill('Testing124');
