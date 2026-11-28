@@ -110,7 +110,7 @@ export default function HomeDashboard({ profile, onNotify }: {
 
     <section className="hm-block" aria-labelledby="hm-missions-title">
       <div className="hm-block-head">
-        <h2 id="hm-missions-title">Daily missions <span className="hm-count">{activityLoading ? '…' : `${completed}/${dailyMissions.length}`}</span></h2>
+        <h2 id="hm-missions-title">Daily missions {(activityLoading || dailyMissions.length > 0) && <span className="hm-count">{activityLoading ? '…' : `${completed}/${dailyMissions.length}`}</span>}</h2>
         <button type="button" className="hm-link" onClick={() => navigate('/quests')}>View all <Icon name="chevron-right" size={14}/></button>
       </div>
       {activityError ? <p role="alert" className="hm-state">{activityError} <button type="button" onClick={() => void refreshActivity()}>Try again</button></p> : activityLoading ? <p role="status" className="hm-state">Loading your missions…</p> : dailyMissions.length ? <ul className="hm-missions">{dailyMissions.map(mission => <MissionRow key={mission.key} kind={mission.key} title={mission.title} current={mission.progress} total={mission.target} points={mission.points} complete={mission.complete} />)}</ul> : <p className="hm-state">No missions available right now.</p>}

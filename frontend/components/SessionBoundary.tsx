@@ -5,7 +5,8 @@ import ForgotPasswordFlow from '../sections/Forgot Password/ForgotPasswordFlow';
 import { deviceCache, getApiBaseUrl } from '../lib/api';
 import { nativeOfflineAccount } from '../lib/nativeOfflineAccount';
 import ConnectionToast from './ConnectionToast';
-import { clearAuthSession, session } from '../lib/session';
+import { Icon } from '../sections/Home/icons';
+import { clearAuthSession, session, signedOutByUser } from '../lib/session';
 import { DATA_CHANGE_EVENT, DATA_CHANGE_KEY, parseDataChange } from '../lib/dataChanges.mjs';
 
 export default function SessionBoundary({ children }: { children: React.ReactNode }) {
@@ -162,6 +163,9 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
     // offline grant restores cached data; otherwise show login immediately.
     if (nativeApp) setReady(true);
     void (async () => {
+      // After an explicit logout nothing restores automatically: drop any credential the shell still
+      // holds and show the signed-out screens until the user signs in again.
+      if (signedOutByUser()) { void nativeOfflineAccount('forget-offline-account'); setReady(true); return; }
       // Open an existing, device-bound offline session before waiting for a
       // potentially sleeping server. A server rejection still ends it.
       const grant = await nativeOfflineAccount('restore-offline-account');
@@ -183,7 +187,7 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
       }
     })();
     const onStorage = (event: StorageEvent) => {
-      if (event.key === 'physiquequest-logout' || event.key === 'physiquequest-runtime-api-url') { clearAuthSession(false); window.location.assign('/'); }
+      if (event.key === 'physiquequest-logout' || event.key === 'physiquequest-runtime-api-url') { clearAuthSession(false); window.location.assign('/launch'); }
       if (event.key === DATA_CHANGE_KEY && event.newValue) {
         const base = getApiBaseUrl(), owner = session.current(base);
         const resources = parseDataChange(event.newValue, owner?.id ? `${base}:${owner.id}` : null);
@@ -202,7 +206,12 @@ export default function SessionBoundary({ children }: { children: React.ReactNod
       if (grant && session.current(getApiBaseUrl())?.id === grant.id) navigator.serviceWorker?.ready.then(reg => reg.active?.postMessage({type:'PREPARE_OFFLINE_APP'})).catch(()=>{});
     });
   }, [user]);
-  if (!ready) return error ? <div role="alert">{error}<button type="button" onClick={() => { setError(''); setAttempt(value => value + 1); }}>Retry</button></div> : null;
+  if (!ready) return error ? <main className="pq-session-error" role="alert">
+    <span className="pq-session-error-icon" aria-hidden="true"><Icon name="warning" size={26}/></span>
+    <h1>Can’t reach PhysiqueQuest</h1>
+    <p>{error}</p>
+    <button type="button" className="primary" onClick={() => { setError(''); setAttempt(value => value + 1); }}>Try again</button>
+  </main> : null;
   const continueOffline = () => { dismissedOffline.current = true; try { sessionStorage.setItem('pq-offline-dismissed', '1'); } catch {} setConnectionLost(false); };
   const nativeApp = typeof window !== 'undefined' && Boolean(window.ReactNativeWebView);
   const inSession = Boolean(pathname?.startsWith('/coach/session'));

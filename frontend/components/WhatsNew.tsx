@@ -4,12 +4,12 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '../sections/Home/icons';
 import './whatsNew.css';
 
-export const WHATS_NEW_VERSION = '1.6.8';
+export const WHATS_NEW_VERSION = '1.6.9';
 export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
   { icon: 'calendar', title: 'Use a program as your weekly plan', text: 'Open any program in Coach › Programs and tap Use as my weekly plan. Your Today tab follows it, day by day.' },
   { icon: 'check-circle', title: 'Clearer forms and messages', text: 'Sign-in, registration and password reset now point to the exact field to fix, and searches say when nothing matches.' },
   { icon: 'chart-bars', title: 'Food carbon, any period', text: 'Scan › Food carbon footprint now has Day, Week, Month, Year and All time, with a chart, your biggest sources and how it compares.' },
-  { icon: 'dumbbell', title: 'Bar + plates', text: 'Weights written as "Bar + 25 kg" stay that way: 25 kg of plates on the bar. Use the Bar + switch when editing a program.' },
+  { icon: 'lightbulb', title: 'Easier to read', text: 'Small labels are larger, faint text is brighter, Log out always keeps you signed out, and screens no longer flash blank.' },
 ];
 // Shown once per version: the device remembers the version it showed, so reopening the app does not
 // repeat it. The per-launch flag stays honoured (tests and older builds set it).

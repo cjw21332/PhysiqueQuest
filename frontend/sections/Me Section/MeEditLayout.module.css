@@ -30,6 +30,8 @@
 .layout.layout.layout :global(.safety-note) { border-color: color-mix(in srgb, var(--amber) 35%, transparent); background: var(--amber-tint); }
 .layout.layout.layout :global(.safety-note svg) { color: var(--amber); }
 .layout.layout.layout :global(.step-content .error) { padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--red-dark) 45%, transparent); border-radius: 14px; background: var(--red-light); color: var(--red-text, var(--red-dark)); }
+/* Discard and Save sit side by side, so they share one type style and corner. */
+.layout.layout.layout :global(.edit-footer :is(.primary, .secondary)) { border-radius: 14px; font-size: 15px; font-weight: 600; }
 .layout.layout.layout :global(.edit-footer .save-btn:not(:disabled)) { border: 0; background: linear-gradient(120deg, var(--green) 0%, #4ade80 100%); color: var(--surface); }
 @media (max-width: 350px) {
   .layout.layout.layout { --editor-gutter: 14px; }

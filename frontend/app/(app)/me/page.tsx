@@ -15,7 +15,8 @@ export default function MePage() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    // Straight to the start screen: "/" is an empty redirect page that shows as a blank flash.
+    navigate('/launch');
   };
 
   if (loading || error || !profile) return <ProfileLoadState loading={loading} error={error} onRetry={retry} />;

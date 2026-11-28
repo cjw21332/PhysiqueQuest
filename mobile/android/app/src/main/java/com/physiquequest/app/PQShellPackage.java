@@ -24,6 +24,8 @@ public class PQShellPackage implements ReactPackage {
     return Collections.singletonList(new ReactContextBaseJavaModule(context) {
       @Override public String getName() { return "PQShell"; }
       @Override public Map<String,Object> getConstants() { return Collections.singletonMap("standalone", BuildConfig.PQ_STANDALONE); }
+      // The brand intro has mounted: release the launch splash that MainActivity is holding.
+      @ReactMethod public void introShown() { MainActivity.Companion.releaseSplash(getCurrentActivity()); }
       @ReactMethod public void exportBadge(String encoded, String name, String action, Promise promise) {
         Uri uri = null;
         try {

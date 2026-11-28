@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { NativeModules, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Path } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -81,6 +81,8 @@ export default function BrandIntro({ onAnimationComplete }: { onAnimationComplet
   const exit = useSharedValue(0);
   const all = [clock, fly, ringDraw, logoIn, curl, curlRight, logoOut, exit];
 
+  // Mounted: let the native launch splash go now, so the logo hands straight over with no blank gap.
+  useEffect(() => { NativeModules.PQShell?.introShown?.(); }, []);
   useEffect(() => {
     if (reduced) { done(); return; }
     clock.value = withTiming(WORD_MS, { duration: WORD_MS, easing: Easing.linear });

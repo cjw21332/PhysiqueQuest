@@ -61,7 +61,7 @@
 .bc-lock { position: absolute; right: -2px; bottom: 2px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #1b2330; border: 1px solid #3b4657; color: #9aa6b8; }
 .bc-tile strong { width: 100%; font-size: 11.5px; line-height: 1.25; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .bc-tile.locked strong { color: var(--text-secondary); }
-.bc-tier { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.bc-tier { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .bc-tier-common { color: #e2a36b; }
 .bc-tier-rare { color: #c9d4e3; }
 .bc-tier-epic { color: #f5c542; }
@@ -113,7 +113,7 @@
 .pq-journal li small { color: var(--violet); font-size: 12px; line-height: 1.35; }
 .pq-journal li em { color: var(--muted); font-size: 12px; font-style: normal; font-weight: 700; }
 .pq-xp { flex: none; display: grid; justify-items: center; min-width: 48px; padding: 6px 8px; border-radius: 12px; background: color-mix(in srgb, var(--violet) 16%, transparent); color: var(--violet); font-weight: 800; font-size: 14px; }
-.pq-xp small { color: var(--violet); font-size: 9px; letter-spacing: .08em; }
+.pq-xp small { color: var(--violet); font-size: 11px; letter-spacing: .08em; }
 .pq-journal-empty { margin: 0; color: var(--violet); font-size: 13px; }
 .pq-journal footer { display: flex; align-items: center; gap: 6px; color: var(--violet); font-size: 12px; }
 .pq-journal footer b { color: var(--violet); }
@@ -133,7 +133,7 @@
 .bc-detail-tags span.bc-tier-legendary { color: var(--violet); -webkit-background-clip: border-box; background-clip: border-box; background: linear-gradient(90deg, color-mix(in srgb, var(--violet) 28%, transparent), color-mix(in srgb, var(--sky) 28%, transparent), color-mix(in srgb, var(--amber) 28%, transparent)); }
 
 /* Quest chain: level chip per quest and the recently completed log. */
-.pq-level { justify-self: start; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--violet) 20%, transparent); color: var(--violet); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.pq-level { justify-self: start; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--violet) 20%, transparent); color: var(--violet); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .pq-log { padding: 10px 12px; border-radius: 14px; background: rgb(255 255 255 / .03); border: 1px dashed color-mix(in srgb, var(--violet) 28%, transparent); }
 .pq-log h4 { margin: 0 0 6px; color: var(--violet); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .pq-log ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }

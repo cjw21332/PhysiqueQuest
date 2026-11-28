@@ -12,12 +12,12 @@ const SIGNED_OUT = ['/launch', '/login', '/register'];
 const ROUTES = [
   '/verify-email', '/privacy', '/terms', '/camera-consent', '/exercises',
   '/home', '/home/notifications', '/goals', '/progress',
-  '/coach', '/coach/library', '/coach/review', '/coach/session', '/coach/report',
-  '/scan', '/scan/plan', '/scan/history', '/scan/add-food',
-  '/quests', '/quests/badges', '/quests/leaderboard',
-  '/me', '/me/personal-data', '/me/goals', '/me/training', '/me/health', '/me/emergency-contact', '/me/personal-exercises',
+  '/coach', '/coach/programs', '/coach/library', '/coach/review', '/coach/session', '/coach/report',
+  '/scan', '/scan/plan', '/scan/supplements', '/scan/history', '/scan/add-food',
+  '/quests', '/quests/badges', '/quests/leaderboard', '/quests/personal',
+  '/me', '/me/personal-data', '/me/goals', '/me/training', '/me/health', '/me/emergency-contact', '/me/personal-exercises', '/me/feedback',
 ];
-const OUT = process.env.PQ_AUDIT_OUT || 'test-results/ui-audit';
+const OUT = process.env.PQ_AUDIT_OUT || (process.env.PQ_AUDIT_EMPTY ? 'test-results/ui-audit-empty' : 'test-results/ui-audit');
 
 async function fixtures(page, signedIn = true) {
   await page.clock.setFixedTime(new Date('2026-10-19T08:00:00Z'));
@@ -33,6 +33,8 @@ async function fixtures(page, signedIn = true) {
     const headers = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' };
     if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
     let json = {};
+    // Signed-out pass: refuse the session so /launch and /register render instead of redirecting home.
+    if (!signedIn && path.includes('/auth/session')) return route.fulfill({ status: 401, json: { message: 'Unauthorized' }, headers });
     if (path.includes('/auth/session')) json = { access_token: 'audit-token', expires_in: 3600, user: { id: 'audit', name: 'Toji', email: 'toji@example.test', emailVerified: true } };
     else if (path.endsWith('/profile')) json = profile;
     else if (path.endsWith('/workouts')) json = [];
@@ -55,6 +57,16 @@ async function fixtures(page, signedIn = true) {
     ] };
     else if (path.includes('/leaderboard')) json = { entries: Array.from({ length: 8 }, (_, i) => ({ rank: i + 1, name: ['Ana', 'Ben', 'Toji', 'Dee', 'Eli', 'Fay', 'Gus', 'Hal'][i], points: 2400 - i * 120, isMe: i === 2 })), me: { rank: 3, points: 2160 } };
     else if (path.includes('/exercises') || path.includes('/library')) json = { items: exercises.map(e => ({ ...e, target: 'Chest', bodyPart: 'Chest', gifUrl: '' })), total: 6, page: 1, pages: 1 };
+    // PQ_AUDIT_EMPTY=1: a new account with nothing logged, so every empty state renders.
+    if (process.env.PQ_AUDIT_EMPTY) {
+      if (path.includes('/activity')) json = { ...json, state: { ...json.state, dayStreak: 0, earnedPoints: 0, activityDates: [] }, dailyMissions: [], badges: [] };
+      else if (path.endsWith('/nutrition')) json = { meals: [], water: [] };
+      else if (path.endsWith('/coach/plan')) json = { ...json, days: json.days.map(day => ({ ...day, exercises: [] })) };
+      else if (path.includes('/progress')) json = [];
+      else if (path.includes('/notifications')) json = { items: [] };
+      else if (path.includes('/leaderboard')) json = { entries: [], me: null };
+      else if (path.includes('/exercises') || path.includes('/library')) json = { items: [], total: 0, page: 1, pages: 0 };
+    }
     return route.fulfill({ json, headers });
   });
 }
@@ -106,12 +118,29 @@ async function audit(page) {
     }
     if (document.documentElement.scrollWidth > innerWidth) issues.overflow.unshift(`page scrollWidth=${document.documentElement.scrollWidth}`);
     for (const k of Object.keys(issues)) issues[k] = [...new Set(issues[k])];
-    return { title: document.title, h1: document.querySelector('h1,h2')?.innerText, issues };
+    // Rendered style census, compared across routes for visual consistency.
+    const palette = new Set(['11,15,21', '22,29,39', '33,43,59', '39,52,68', '34,197,94', '74,222,128', '248,113,113', '248,250,252', '148,163,184', '100,116,139', '20,59,38', '72,9,9', '0,0,0', '45,212,191', '11,48,45', '251,191,36', '59,41,20', '167,139,250', '42,33,72', '56,189,248', '12,42,58', '255,255,255']);
+    const census = { headings: [], pageHeading: [], buttons: [], fonts: [], offPalette: [] };
+    for (const el of document.querySelectorAll('body *')) {
+      if (!visible(el) || el.closest('nextjs-portal, .google-auth-mark, .badge-crest, [inert]')) continue;
+      const s = getComputedStyle(el);
+      if (/^H[1-3]$/.test(el.tagName)) census.headings.push(`${el.tagName} ${s.fontSize}/${s.fontWeight}`);
+      if (el.matches('.pq-page-heading > h1, .pq-page-heading > h2')) census.pageHeading.push(`${s.fontSize}/${s.fontWeight} h=${Math.round(el.closest('.pq-page-heading').getBoundingClientRect().height)}`);
+      if (el.matches('button.primary, button.secondary')) { const r = el.getBoundingClientRect(); census.buttons.push(`${el.classList.contains('primary') ? 'primary' : 'secondary'} h=${Math.round(r.height)} r=${s.borderRadius} ${s.fontSize}/${s.fontWeight}`); }
+      census.fonts.push(s.fontFamily.split(',')[0].replace(/"/g, ''));
+      for (const prop of ['color', 'backgroundColor']) {
+        const c = s[prop].match(/[\d.]+/g)?.map(Number);
+        if (!c || (c.length === 4 && c[3] === 0) || (prop === 'color' && ![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()))) continue;
+        if (!palette.has(c.slice(0, 3).join(','))) census.offPalette.push(`${label(el)} ${prop}=${s[prop]}`);
+      }
+    }
+    for (const k of Object.keys(census)) census[k] = [...new Set(census[k])];
+    return { title: document.title, h1: document.querySelector('h1,h2')?.innerText, issues, census };
   });
 }
 
-// iPhone SE (1st gen), SE/mini, 14/15, Pro Max.
-for (const [width, height] of [[320, 568], [375, 667], [390, 844], [430, 932]]) {
+// iPhone SE (1st gen), common Android (360), SE/mini, 14/15, Pro Max, tablet portrait.
+for (const [width, height] of [[320, 568], [360, 800], [375, 667], [390, 844], [430, 932], [768, 1024]]) {
   test(`ui audit at ${width}px`, async ({ page, context }) => {
     test.setTimeout(900_000);
     await page.setViewportSize({ width, height });

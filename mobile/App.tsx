@@ -129,11 +129,11 @@ export function nativeFramingText(check:ReadinessCheck) {
 
 /** Main tabs and the start page: Back there exits the app instead of returning to sign-in screens. */
 export function isMainTabUrl(url: string) {
-  try { return /^\/(home|coach|scan|quests|me)?(\.html)?\/?$/.test(new URL(url).pathname); } catch { return true; }
+  try { return /^\/(home|coach|scan|quests|me|launch)?(\.html)?\/?$/.test(new URL(url).pathname); } catch { return true; }
 }
 
 function getInitialAddress() {
-  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net/?pq-shell=1.5.1';
+  if (Platform.OS === 'android' && NativeModules.PQShell?.standalone === true) return 'https://appassets.androidplatform.net/launch?pq-shell=1.5.1'; // "/" is a blank redirect page
   const extra = Constants.expoConfig?.extra as { EXPO_PUBLIC_WEB_APP_URL?: string } | undefined;
   return resolveFrontendUrl(selectConfiguredUrl(process.env.EXPO_PUBLIC_PQ_LOCAL_DEV === '1', process.env.EXPO_PUBLIC_WEB_APP_URL, extra?.EXPO_PUBLIC_WEB_APP_URL), Constants.expoConfig?.hostUri);
 }
@@ -313,6 +313,8 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
     return () => { subscription.remove(); if (backAck.current) clearTimeout(backAck.current); };
   }, [exitOrWarn]);
   const cameraRequestId = useRef(0);
+  // Bumped on every logout ("forget"); a sign-in link that started before it must not run after it.
+  const forgetCount = useRef(0);
   const monitor = useRef<ReturnType<typeof createNativeMonitor> | null>(null);
   if (!monitor.current) {
     monitor.current = createNativeMonitor({
@@ -642,10 +644,12 @@ function AppContent({ onAuthenticated }: { onAuthenticated: () => void }) {
             if (apiUrl && ['remember-offline-account','forget-offline-account','restore-offline-account'].includes(message.type ?? '') &&
                 typeof message.requestId === 'string' && /^[a-zA-Z0-9-]{8,120}$/.test(message.requestId)) {
               const origin = new URL(loadedAddress).origin;
-              if (message.type === 'forget-offline-account') void forgetDeviceSession(apiUrl);
+              if (message.type === 'forget-offline-account') { forgetCount.current++; void forgetDeviceSession(apiUrl); }
+              const forgetsAtStart = forgetCount.current;
               void handleOfflineAccount(message.type!,origin,apiUrl,message.token).catch(()=>null).then(grant => {
                 // Signed in: keep this device's own login so reopening the app restores it without a cookie.
-                if (message.type === 'remember-offline-account' && message.token) void linkDeviceSession(origin, apiUrl, message.token, grant?.id).catch(() => false);
+                // Skip when the account check failed or a logout arrived meanwhile, so logout always wins.
+                if (message.type === 'remember-offline-account' && message.token && grant && forgetCount.current === forgetsAtStart) void linkDeviceSession(origin, apiUrl, message.token, grant.id).catch(() => false);
                 const detail = JSON.stringify({requestId:message.requestId,account:grant ? {id:grant.id,expiresAt:grant.expiresAt} : null});
                 webRef.current?.injectJavaScript(`if(location.origin===${JSON.stringify(origin)})window.dispatchEvent(new CustomEvent('physiquequest:offline-account',{detail:${detail}}));true;`);
               });

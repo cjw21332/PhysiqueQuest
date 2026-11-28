@@ -10305,7 +10305,7 @@ body:has(.admin-reference-form) .signed-in-layout :is(.home-content, .scan-conte
 .signed-in-layout .pq-page-heading { display: flex; align-items: center; gap: 8px !important; min-height: 48px; }
 .signed-in-layout .pq-page-heading > .coach-back { position: static; display: grid; place-items: center; flex: 0 0 44px; width: 44px; min-width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); }
 .signed-in-layout .pq-page-heading > .coach-back svg { width: 22px; height: 22px; transform: rotate(180deg); stroke-width: 2.3; }
-.signed-in-layout .pq-page-heading > :is(h1, h2) { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 17px !important; font-weight: 650; line-height: 1.25; text-align: left; }
+.signed-in-layout .pq-page-heading > :is(h1, h2) { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 17px !important; font-weight: 650 !important; line-height: 1.25; text-align: left; }
 .signed-in-layout .pq-page-heading.diet-header { justify-content: flex-start; padding-left: 0; }
 .pq-progress-eyebrow { display:block; color:var(--green); font-size: 12px; font-weight:750; letter-spacing:.12em; line-height:1.4; }
 .pq-progress-nav { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; padding:4px; border:1px solid var(--line); border-radius:15px; background:var(--soft); }
@@ -10551,6 +10551,13 @@ body:has(.admin-reference-form) .signed-in-layout :is(.home-content, .scan-conte
   :root[data-theme="dark"] .me-reference-edit .day-grid { gap: 3px; }
 }
 
+
+/* Session restore failed (SessionBoundary): full-screen, centred, app font and primary button. */
+.pq-session-error { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 100dvh; padding: 24px max(24px, var(--sab, 0px)); background: #0b0f15; color: #f8fafc; font-family: Inter, system-ui, sans-serif; text-align: center; }
+.pq-session-error-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px; background: #3b2914; color: #fbbf24; }
+.pq-session-error h1 { margin: 4px 0 0; font-size: 20px; font-weight: 700; }
+.pq-session-error p { max-width: 320px; margin: 0; color: #94a3b8; font-size: 15px; line-height: 1.5; }
+.pq-session-error .primary { width: min(320px, 100%); margin-top: 8px; color: #0b0f15; font: 600 15px/1 Inter, system-ui, sans-serif; }
 
 /* Connection status toast (SessionBoundary): one at a time, top of screen, dismiss by close button or swipe. */
 .pq-toast { position: fixed; z-index: 200; top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px); left: 50%; display: flex; align-items: flex-start; gap: 12px; width: min(420px, calc(100% - 24px)); padding: 12px 6px 12px 14px; border: 1px solid var(--line); border-left: 4px solid var(--toast-accent, var(--green)); border-radius: 16px; background: var(--soft); color: var(--ink); box-shadow: 0 12px 32px #000a; touch-action: none; user-select: none; transition: transform .18s ease, opacity .18s ease; animation: pq-toast-in .22s ease-out; }

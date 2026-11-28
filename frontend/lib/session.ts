@@ -2,6 +2,15 @@ import { nativeDeviceRefresh, nativeOfflineAccount } from './nativeOfflineAccoun
 import { DEVICE_CACHE_STORAGE_KEY } from './deviceCache.mjs';
 export const AUTH_STORAGE_KEY = 'physiquequest-auth';
 export const PROFILE_STORAGE_KEY = 'physiquequest-profile';
+// Set by an explicit logout. Automatic session restore stays off until the user signs in again, so a
+// logout that could not reach the server (or a leftover refresh cookie) can never sign them back in.
+export const SIGNED_OUT_KEY = 'physiquequest-signed-out';
+export function markSignedOut(signedOut: boolean): void {
+  try { if (signedOut) localStorage.setItem(SIGNED_OUT_KEY, '1'); else localStorage.removeItem(SIGNED_OUT_KEY); } catch { /* Storage may be unavailable. */ }
+}
+export function signedOutByUser(): boolean {
+  try { return typeof window !== 'undefined' && localStorage.getItem(SIGNED_OUT_KEY) === '1'; } catch { return false; }
+}
 
 export function clearAuthSession(broadcast = true): void {
   session.clear();

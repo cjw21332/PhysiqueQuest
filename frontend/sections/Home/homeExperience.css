@@ -66,7 +66,7 @@
 .hm.hm.hm .hm-icon-btn { position: relative; display: inline-grid; flex: none; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--hm-line); border-radius: 14px; background: var(--hm-card); color: var(--hm-ink); }
 .hm.hm.hm .hm-icon-btn-danger { width: 40px; height: 40px; border-color: transparent; background: transparent; color: #f87171; }
 .hm.hm.hm .hm-icon-btn .icon-alert-dot { display: none; }
-.hm.hm.hm .hm-badge { position: absolute; top: -5px; right: -5px; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border: 2px solid var(--surface); border-radius: 999px; background: var(--hm-red); color: #f8fafc; font-size: 11px; font-weight: 700; }
+.hm.hm.hm .hm-badge { position: absolute; top: -5px; right: -5px; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border: 2px solid var(--surface); border-radius: 999px; background: var(--hm-red); color: #0b0f15; font-size: 11px; font-weight: 700; }
 
 /* Sub-page header: follows the app-wide .pq-page-heading standard (44px back, 8px gap, 17px title) and stays pinned with a divider. */
 .hm.hm.hm .hm-pagehead { position: sticky; top: 0; z-index: 6; display: flex; align-items: center; gap: 8px; min-height: 64px; margin: -14px -18px 0; padding: 10px 18px; border-bottom: 1px solid var(--hm-line); background: var(--surface); }
@@ -86,7 +86,7 @@
 .hm.hm.hm .hm-ring-fill { stroke: var(--tone); stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
 .hm.hm.hm .hm-ring-label { position: relative; display: grid; justify-items: center; color: var(--tone); line-height: 1; text-align: center; }
 .hm.hm.hm .hm-ring-label b { color: var(--hm-ink); font-size: 18px; font-weight: 750; font-variant-numeric: tabular-nums; }
-.hm.hm.hm .hm-ring-label small { margin-top: 3px; color: var(--hm-muted); font-size: 9px; font-weight: 650; letter-spacing: .06em; }
+.hm.hm.hm .hm-ring-label small { margin-top: 3px; color: var(--hm-muted); font-size: 11px; font-weight: 650; letter-spacing: .06em; }
 .hm.hm.hm .hm-bar { --tone: var(--hm-green); height: 6px; overflow: hidden; border-radius: 999px; background: #f8fafc12; }
 .hm.hm.hm .hm-bar.hm-tone-sky { --tone: var(--hm-sky); }
 .hm.hm.hm .hm-bar.hm-tone-amber { --tone: var(--hm-amber); }
@@ -142,7 +142,7 @@
 .hm.hm.hm .hm-nutrition-top .circle-progress { fill: none; stroke: var(--hm-green); stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
 .hm.hm.hm .hm-nutrition-top .circle-content { position: relative; display: grid; justify-items: center; gap: 3px; line-height: 1; }
 .hm.hm.hm .hm-nutrition-top .calorie-amount { color: var(--hm-ink); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
-.hm.hm.hm .hm-nutrition-top .calorie-goal { color: var(--hm-muted); font-size: 10px; font-weight: 600; }
+.hm.hm.hm .hm-nutrition-top .calorie-goal { color: var(--hm-muted); font-size: 12px; font-weight: 600; }
 .hm.hm.hm .hm-nutrition-summary { display: grid; gap: 4px; min-width: 0; }
 .hm.hm.hm .hm-nutrition-summary strong { font-size: 28px; font-weight: 800; letter-spacing: -.6px; font-variant-numeric: tabular-nums; }
 .hm.hm.hm .hm-nutrition-summary strong small { color: var(--hm-muted); font-size: 14px; font-weight: 500; }

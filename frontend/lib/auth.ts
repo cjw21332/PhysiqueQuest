@@ -1,5 +1,5 @@
 import { api, ApiRequestError, getApiBaseUrl } from './api';
-import { clearAuthSession, session } from './session';
+import { clearAuthSession, markSignedOut, session } from './session';
 
 // Authentication utilities
 export interface User {
@@ -15,6 +15,7 @@ export { AUTH_STORAGE_KEY, PROFILE_STORAGE_KEY, clearAuthSession } from './sessi
 
 function announceSuccessfulAuth(): void {
   if (typeof window === 'undefined') return;
+  markSignedOut(false);
   const bridge = (window as Window & { ReactNativeWebView?: { postMessage: (message: string) => void } }).ReactNativeWebView;
   bridge?.postMessage(JSON.stringify({ type: 'auth-success' }));
 }
@@ -108,6 +109,7 @@ export async function logout() {
     // The local session must still end when the server cannot be reached.
   } finally {
     clearAuthSession();
+    markSignedOut(true);
   }
 }
 

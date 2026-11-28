@@ -91,6 +91,22 @@ test('back online toast replaces the offline toast and hides itself', async ({ p
   await expect(online).toHaveCount(0, { timeout: 8000 });
 });
 
+test('a request slower than 6 s shows the Slow connection toast, which clears when it finishes', async ({ page }, info) => {
+  test.setTimeout(60_000);
+  await signedIn(page);
+  // Delay every data request except the session by 9 s; fallback hands it to the mock above.
+  await page.route('**/api/**', async route => {
+    if (!new URL(route.request().url()).pathname.includes('/auth/session') && route.request().method() !== 'OPTIONS') await new Promise(resolve => setTimeout(resolve, 9000));
+    return route.fallback();
+  });
+  await page.goto('/progress');
+  const toast = page.locator('.pq-toast-connecting');
+  await expect(toast).toContainText('Slow connection', { timeout: 12_000 });
+  await expect(toast).toContainText('nothing you entered is lost');
+  await page.screenshot({ path: info.outputPath('slow-375.png'), animations: 'disabled' });
+  await expect(toast).toHaveCount(0, { timeout: 20_000 });
+});
+
 test('connecting toast turns into a Connected confirmation once the service answers', async ({ page }) => {
   await signedIn(page, { ready: false });
   await nativeConnecting(page);

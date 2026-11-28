@@ -15,7 +15,7 @@ export default function QuestsPage() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    navigate('/launch');
   };
 
   if (loading || error || !profile) return <ProfileLoadState loading={loading} error={error} onRetry={retry} />;

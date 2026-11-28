@@ -3,6 +3,10 @@ package com.physiquequest.app
 import android.os.Build
 import android.os.Bundle
 import android.graphics.Color
+import android.os.SystemClock
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.WindowInsetsController
 
 import com.facebook.react.ReactActivity
@@ -24,6 +28,32 @@ class MainActivity : ReactActivity() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) window.isNavigationBarContrastEnforced = false
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       window.insetsController?.setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS)
+    }
+    holdSplashUntilFirstReactView()
+  }
+
+  // Android's launch splash (the logo) ends at the activity's first frame, but React needs ~2-3 s to load
+  // its bundle, which showed as a blank dark screen. Skip drawing until the brand intro reports it has
+  // mounted (PQShell.introShown) so the logo hands straight over to it. Capped at 6 s so it can never stick.
+  private fun holdSplashUntilFirstReactView() {
+    introShown = false
+    val content = findViewById<ViewGroup>(android.R.id.content)
+    val started = SystemClock.uptimeMillis()
+    content.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+      override fun onPreDraw(): Boolean {
+        val ready = introShown || SystemClock.uptimeMillis() - started > 6000
+        if (ready) content.viewTreeObserver.removeOnPreDrawListener(this)
+        return ready
+      }
+    })
+    content.postDelayed({ content.invalidate() }, 6100)
+  }
+
+  companion object {
+    @Volatile private var introShown = false
+    fun releaseSplash(activity: android.app.Activity?) {
+      introShown = true
+      activity?.runOnUiThread { activity.findViewById<View>(android.R.id.content)?.invalidate() }
     }
   }
 

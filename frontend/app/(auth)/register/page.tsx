@@ -31,7 +31,8 @@ export default function RegisterPage() {
   const [pendingProfile, setPendingProfile] = useState<Record<string, unknown> | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const registeredAccount = useRef<{ scope: string | null; sessionKey: number | undefined } | null>(null);
-  const [checkingAccount, setCheckingAccount] = useState(true);
+  // Only a saved sign-in needs the "Checking your saved profile" step; signed out, show the form at once.
+  const [checkingAccount, setCheckingAccount] = useState(() => Boolean(getCurrentUser()?.token));
   const [recoveryFailed, setRecoveryFailed] = useState(false);
   const recover = async () => {
     setCheckingAccount(true); setRecoveryFailed(false);
