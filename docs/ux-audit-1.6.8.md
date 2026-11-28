@@ -13,7 +13,7 @@ Mechanical checklist built from greps on the 1.6.7 tree. "Fixed" means changed a
 ## Session, network and permission states (global)
 
 - [x] **False "Sign in to sync" after a server restart.** `SessionBoundary` treated every null session refresh as expired. A null can also mean a newer session change superseded the request. Now it reads the session's own `sessionExpired` flag, which only a server 401 sets. (`components/SessionBoundary.tsx`)
-- [x] Covered by `rotating-session.test.mjs` (13 pass).
+- [ ] **Not directly tested.** `rotating-session.test.mjs` (13 pass) covers the session layer that sets `sessionExpired` on a 401, not `SessionBoundary` itself. The fix is type-checked and reviewed only.
 - [x] Slow connection: already matches. `SLOW_REQUEST_MS = 6000` in `api.ts` (chat and photo scans excluded), and the toast says "Keep the app open; nothing you entered is lost."
 - [x] Permission denied and session expired wording: already shared in `lib/apiErrors.mjs` (`friendlyRequestMessage`): 401 "Your session expired. Sign in again.", 403 "You don’t have permission to do that." Specific server messages are kept.
 - [x] Camera denied: handled once in `hooks/useCameraStream.ts` (`NotAllowedError`/`SecurityError` → "Camera access is blocked. Allow the camera in your browser or phone settings, then tap Enable camera again."). `CameraCheck` reviews an uploaded video and never opens the camera.
@@ -63,21 +63,24 @@ Mechanical checklist built from greps on the 1.6.7 tree. "Fixed" means changed a
 
 - `OfflineLeaderboard` back span: the header sits in an `inert`, `aria-hidden` preview. The real "Back to quests" button is present.
 
-## Next pass (module order from the advisor)
+## Not yet audited
 
-1. Auth: field-level validation, session expiry, forgot-password states.
-2. Home, Coach, Scan, Quests, Me: data-hook error and empty states, no-results, 403 and camera-denied messages.
-3. Responsive check at 360 px and tablet width.
+- Responsive layout per screen at 360 px and at tablet width (only the specs' own viewports ran).
+- Empty-state wording on every list, beyond the library and program picker no-results messages.
+- Visual consistency, typography scale, and spacing and layout beyond the heading levels, close icons and auth error spacing fixed here.
+- No internet on the phone (airplane mode) and slow network on the phone.
+- Login, register and forgot password on the phone (needs signing out).
+- A direct test for the `SessionBoundary` expiry fix.
 
 ## Phone pass (1.6.8, 2026-11-28)
 
 - Exercise library search with no match: "No exercises match “query”. Check the spelling or clear the search and filters." and **Clear search and filters** restores all 1,500 exercises.
 - Cancel-workout dialog: red **Discard workout** fill.
-- Server cold start: the app showed "Connecting to PhysiqueQuest", not "Sign in to sync" (the session-expiry fix).
+- Server cold start: the app showed "Connecting to PhysiqueQuest". This goes through the unchanged offline branch, so it does not prove the session-expiry fix.
 - Login, register and forgot password were checked in the browser with the session mocked (`auth-validation.spec.mjs`, 4 pass), not on the phone: that needs signing out.
 
 ## Browser specs run
 
 - `auth-validation.spec.mjs`: 4 pass (new).
 - `calibration-redesign.spec.mjs`: 1 pass (register flow regression).
-- `exercise-library.spec.mjs`: 7 pass, 9 fail. The API-failure test fails without this pass's change too (checked by stashing it); the others fail on selectors unrelated to it ("Equipment type" matching 3 elements, admin catalog timeouts).
+- `exercise-library.spec.mjs`: 7 pass, 9 fail. The same 9 tests (3, 6, 8, 10, 11, 13, 14, 15, 16) fail on the 1.6.7 frontend (3db7ad4), so none is a regression from this pass.
