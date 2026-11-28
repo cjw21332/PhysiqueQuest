@@ -262,3 +262,7 @@
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-actions-row.single { grid-template-columns: 1fr; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-overview-actions > .cq-fineprint { margin: -2px 0 2px; text-align: center; }
 .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-link { display: inline; min-height: 0; margin-left: 4px; padding: 0; border: 0; background: none; color: var(--green); font: inherit; font-weight: 650; text-decoration: underline; }
+
+/* Bar toggle beside weight (v1.6.6): on means the weight is plates added to a bar. */
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-bar-toggle { flex: none; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-bar-toggle button { white-space: nowrap; }

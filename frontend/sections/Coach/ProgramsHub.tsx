@@ -286,7 +286,7 @@ function ProgramDayView({ program, base, template, owned, planVersion, day, ctx,
           <dl className="cq-ex-stats">
             <div><dt>Sets</dt><dd>{row.sets}</dd></div>
             <div><dt>Reps</dt><dd>{reps}{!row.reps && <em>suggested</em>}</dd></div>
-            <div><dt>Weight</dt><dd>{formatLoad({ weight, unit: row.weight !== undefined ? row.unit : hint.unit, perHand: hint.perHand })}{row.weight === undefined && weight !== undefined && <em>suggested</em>}</dd></div>
+            <div><dt>Weight</dt><dd>{formatLoad({ weight, unit: row.weight !== undefined ? row.unit : hint.unit, perHand: hint.perHand, base: row.weight !== undefined ? row.loadBase : undefined })}{row.weight === undefined && weight !== undefined && <em>suggested</em>}</dd></div>
             <div><dt>Rest</dt><dd>{formatRest(row.restSets)}<em>{formatRest(row.restNext)} after</em></dd></div>
           </dl>
         </div>

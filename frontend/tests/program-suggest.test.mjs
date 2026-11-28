@@ -44,6 +44,7 @@ test('logged bests, strength goals, older lifters and pound users adjust the pla
   const pushUp = suggestFor({ name: 'Push-Up', equipment: 'Bodyweight', kind: 'compound' }, trainingContext({ goal: 'Build muscle' }));
   assert.equal(pushUp.reps, '8-20', 'unloaded work uses wider rep ranges taken near failure');
   assert.equal(prescriptionText(4, '8-12'), '4 × 8-12');
+  assert.equal(prescriptionText(3, '8-10', 25, 'kg', 'Bar'), '3 × 8-10 @ Bar + 25 kg', 'plates on a bar read as added weight');
   assert.ok(sessionMinutes([{ sets: 3, restSets: 120, restNext: 150 }, { sets: 3, restSets: 75, restNext: 120 }]) >= 10);
 });
 

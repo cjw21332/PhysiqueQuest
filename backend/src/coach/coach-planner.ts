@@ -321,7 +321,8 @@ export function applyFeedback<T extends { days: { exercises: PlannedExercise[] }
       if (sets !== null) prescription = exercise.prescription!.replace(/^\d+/, String(Math.max(2, sets - 1)));
       tip = `Felt hard last time (effort ${entry.rpe}/10): one fewer set this week. Keep the same weight, lower it slowly and rest a little longer between sets.`;
     } else if (effort === 'easy') {
-      if (amount !== null) prescription = exercise.prescription!.replace(/× \d+/, `× ${amount + (timed ? 10 : 2)}`);
+      // "3 × 8-10" becomes "3 × 10-12": both ends of a rep range move together.
+      if (amount !== null) prescription = exercise.prescription!.replace(/× (\d+)(?:-(\d+))?/, (_match, low: string, high?: string) => `× ${Number(low) + (timed ? 10 : 2)}${high ? `-${Number(high) + (timed ? 10 : 2)}` : ''}`);
       tip = `Felt easy last time (effort ${entry.rpe}/10): ${timed ? 'hold 10 s longer' : 'two more reps per set'}. When every set reaches the top, add 2.5 kg (or the next dumbbell) next session.`;
     } else if ((entry.enjoyment ?? 3) <= 2) {
       tip = 'You rated this low: try a slightly different grip, stance or tempo, and ask Phiq for a variation if it still feels wrong.';

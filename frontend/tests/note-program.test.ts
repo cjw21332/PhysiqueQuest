@@ -98,7 +98,9 @@ test('a phone workout note becomes a PPLUL draft program with working-set weight
 
   const push = program.days[0].exercises;
   assert.deepEqual(push.map(item => item.name), ['Smith Machine Bench Press', 'Dumbbell Shoulder Press', 'Incline Chest Machine Press', 'Cable Lateral Raises']);
-  assert.deepEqual({ sets: push[0].sets, reps: push[0].reps, weight: push[0].weight, unit: push[0].unit, equipment: push[0].equipment }, { sets: 3, reps: '8-10', weight: 25, unit: 'kg', equipment: 'Smith machine' });
+  // "Smith machine bar + 25 kg": 25 kg of plates on the bar, not 25 kg in total.
+  assert.deepEqual({ sets: push[0].sets, reps: push[0].reps, weight: push[0].weight, loadBase: push[0].loadBase, unit: push[0].unit, equipment: push[0].equipment }, { sets: 3, reps: '8-10', weight: 25, loadBase: 'Bar', unit: 'kg', equipment: 'Smith machine' });
+  assert.equal(push[1].loadBase, undefined, 'dumbbells have no bar');
   assert.deepEqual({ sets: push[3].sets, weight: push[3].weight, unit: push[3].unit }, { sets: 2, weight: 17, unit: 'lbs' });
 
   const pulldown = program.days[1].exercises[0];
@@ -109,7 +111,7 @@ test('a phone workout note becomes a PPLUL draft program with working-set weight
   assert.equal(legs[1].weight, undefined);
 
   const upper = program.days[3].exercises;
-  assert.deepEqual(upper.map(item => [item.name, item.targetMuscle, item.weight]), [['Smith Machine Bench Press', 'Chest', 30], ['Chest-Supported T-Bar Row', 'Back', 32.5]]);
+  assert.deepEqual(upper.map(item => [item.name, item.targetMuscle, item.weight, item.loadBase]), [['Smith Machine Bench Press', 'Chest', 30, 'Bar'], ['Chest-Supported T-Bar Row', 'Back', 32.5, undefined]]);
   assert.ok(program.days.every(day => day.exercises.every(item => item.restSets === 30 && item.exerciseId.length <= 80)));
 });
 

@@ -5,7 +5,7 @@ import { api, ApiRequestError, getApiBaseUrl, type WorkoutSessionRecord, type Wo
 import { getCurrentUser } from '../../lib/auth';
 import LiveSession from './LiveSession';
 import { Icon } from '../Home/icons';
-import { DEFAULT_REST_SECONDS, exerciseProgress, prescribedWork, plannedLoadKg } from './workoutRoutine';
+import { DEFAULT_REST_SECONDS, exerciseProgress, prescribedWork, plannedLoadKg, plannedLoadUnit, plannedOnBar } from './workoutRoutine';
 import WorkoutFeedback from './WorkoutFeedback';
 import { titleCase } from '../../lib/titleCase';
 import WorkoutKeypad from './WorkoutKeypad';
@@ -87,7 +87,7 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
   const suggestion = exercise && !historyLoading && !historyError && !prescribedWork(exercise.prescription).durationSeconds
     ? suggestedWorkingSet(history, exercise.exerciseId, exercise.equipment, record.startedAt, usesEstimatedBar) : null;
   const hasExerciseDraft = exercise && Object.keys(draft.values).some(key => key.startsWith(`${exercise.exerciseId}:`));
-  const plannedUnit = exercise?.prescription?.match(/(?:@|·)\s*\d+(?:\.\d+)?\s*(kg|lbs?)\b/i)?.[1].toLowerCase() === 'kg' ? 'kg' as const : /(?:@|·)\s*\d+(?:\.\d+)?\s*lbs?\b/i.test(exercise?.prescription ?? '') ? 'lbs' as const : undefined;
+  const plannedUnit = plannedLoadUnit(exercise?.prescription);
   const unit = (exercise && draft.units?.[exercise.exerciseId]) || record.sets?.find(set => set.exerciseId === exercise?.exerciseId && set.loadUnit)?.loadUnit || (hasExerciseDraft ? draft.unit : suggestion?.preferredUnit ?? plannedUnit) || draft.unit || 'lbs';
   const defaultBarKg = /smith/i.test(barDescription) ? 20 : /ez.?bar/i.test(barDescription) ? 10 : 20;
   const barInput = exercise ? (barWeights[exercise.exerciseId] ?? String(record.sets?.find(set => set.exerciseId === exercise.exerciseId && set.barWeightKg !== undefined)?.barWeightKg ?? defaultBarKg)) : String(defaultBarKg);
@@ -103,7 +103,8 @@ export default function RoutineSession({ workout, thresholdSeconds, contactName,
       ? suggestedWorkingSet(history, exercise.exerciseId, exercise.equipment, record.startedAt, usesEstimatedBar, workingIndex) : null;
     // Without history, fall back to the program's planned load (bar excluded where the field logs plates only).
     const planned = !suggest && setType === 'normal' ? plannedLoadKg(exercise?.prescription) : undefined;
-    const suggestedKg = suggest?.weightKg ?? (planned === undefined ? undefined : Math.max(0, planned - (usesEstimatedBar ? estimatedBarKg || 0 : 0)));
+    // "Bar + 25 kg" is already the added plates; only a plain total has the bar taken off.
+    const suggestedKg = suggest?.weightKg ?? (planned === undefined ? undefined : Math.max(0, planned - (usesEstimatedBar && !plannedOnBar(exercise?.prescription) ? estimatedBarKg || 0 : 0)));
     const suggestedWeight = suggestedKg === undefined ? '' : String(Number((suggestedKg * (unit === 'lbs' ? 2.2046226218 : 1)).toFixed(unit === 'lbs' ? 0 : 1)));
     return {
       reps: input?.reps ?? String(saved?.status === 'completed' ? saved.reps : suggest?.reps ?? (prescribed.reps || '')),

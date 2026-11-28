@@ -91,6 +91,12 @@ describe('saved per-user Coach programs', () => {
     await expect(service.replaceWeek(user, { programVersion: first.programVersion, days: [{ dayIndex: 0, title: 'A', exercises: [] }, { dayIndex: 0, title: 'B', exercises: [] }] })).rejects.toThrow();
     await expect(service.replaceWeek(user, { programVersion: first.programVersion, days: [] })).rejects.toThrow();
   });
+  it('moves both ends of a rep range and keeps a bar-plus load when a set felt easy', async () => {
+    const { applyFeedback } = await import('../src/coach/coach-planner.js');
+    const plan = { days: [{ exercises: [{ name: 'Smith Machine Bench Press', prescription: '3 × 8-10 @ Bar + 25 kg' }] }] };
+    const [row] = applyFeedback(plan, [{ exercise: 'Smith Machine Bench Press', rpe: 4, difficulty: 'too_easy', pain: false }]).days[0].exercises;
+    expect(row.prescription).toBe('3 × 10-12 @ Bar + 25 kg');
+  });
   it('never stores feedback adjustments when a day is edited', async () => {
     const test = setup(), service = test.service();
     const first = await service.getPlan(user);

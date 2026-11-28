@@ -164,7 +164,8 @@ export interface CoachExercise {
   restAfterExercise?: number;
 }
 
-export interface ProgramExercise { exerciseId: string; name: string; targetMuscle: string; equipment: string; sets: number; reps?: string; weight?: number; unit: 'kg' | 'lbs'; restSets: number; restNext: number; }
+/** `loadBase` ("Bar", "EZ bar") means `weight` is plates added to that bar, shown as "Bar + 25 kg". */
+export interface ProgramExercise { exerciseId: string; name: string; targetMuscle: string; equipment: string; sets: number; reps?: string; weight?: number; loadBase?: string; unit: 'kg' | 'lbs'; restSets: number; restNext: number; }
 export interface ProgramDay { id: string; title: string; weekday?: number; exercises: ProgramExercise[]; }
 export interface SavedProgram { id: string; name: string; notes?: string; source: 'custom' | 'split' | 'athlete'; templateId?: string; days: ProgramDay[]; updatedAt?: string; }
 

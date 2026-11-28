@@ -62,7 +62,7 @@ export function blankExercise(item: { exerciseId: string; name: string; targetMu
 
 /** Session rows for a program day; blank reps/weight stay blank so the user fills them in during the workout. */
 export function dayToSession(day: ProgramDay): CoachExercise[] {
-  return day.exercises.map(row => ({ exerciseId: row.exerciseId, name: row.name, group: row.targetMuscle, targetMuscle: row.targetMuscle, equipment: row.equipment, tracking: 'Manual', prescription: prescriptionText(row.sets, row.reps, row.weight, row.unit), restBetweenSets: row.restSets, restAfterExercise: row.restNext }));
+  return day.exercises.map(row => ({ exerciseId: row.exerciseId, name: row.name, group: row.targetMuscle, targetMuscle: row.targetMuscle, equipment: row.equipment, tracking: 'Manual', prescription: prescriptionText(row.sets, row.reps, row.weight, row.unit, row.loadBase), restBetweenSets: row.restSets, restAfterExercise: row.restNext }));
 }
 
 export const weekdayShort = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

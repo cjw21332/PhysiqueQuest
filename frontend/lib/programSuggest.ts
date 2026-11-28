@@ -123,10 +123,10 @@ export function suggestFor(exercise: { exerciseId?: string; name: string; equipm
 }
 
 export function formatRest(seconds: number) { return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`; }
-export function formatLoad(s: Pick<Suggestion, 'weight' | 'unit' | 'perHand'>) { return s.weight === undefined ? 'Bodyweight' : `${s.weight} ${s.unit}${s.perHand ? ' each' : ''}`; }
-/** Session prescription such as "3 × 8-12 @ 40 kg"; blank reps stay blank so the user decides. */
-export function prescriptionText(sets: number, reps?: string, weight?: number, unit: Unit = 'kg') {
-  return `${sets} × ${reps?.trim() || '—'}${weight !== undefined ? ` @ ${weight} ${unit}` : ''}`.slice(0, 80);
+export function formatLoad(s: Pick<Suggestion, 'weight' | 'unit' | 'perHand'> & { base?: string }) { return s.weight === undefined ? 'Bodyweight' : `${s.base ? `${s.base} + ` : ''}${s.weight} ${s.unit}${s.perHand ? ' each' : ''}`; }
+/** Session prescription such as "3 × 8-12 @ 40 kg" or "3 × 8-10 @ Bar + 25 kg"; blank reps stay blank so the user decides. */
+export function prescriptionText(sets: number, reps?: string, weight?: number, unit: Unit = 'kg', base?: string) {
+  return `${sets} × ${reps?.trim() || '—'}${weight !== undefined ? ` @ ${base ? `${base} + ` : ''}${weight} ${unit}` : ''}`.slice(0, 80);
 }
 /** Rough session length: ~40 s per working set plus prescribed rests. */
 export function sessionMinutes(rows: { sets: number; restSets: number; restNext: number }[]) {

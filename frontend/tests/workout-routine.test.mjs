@@ -15,6 +15,16 @@ test('routine snapshots retain prescribed sets and timed sets do not fabricate r
   assert.deepEqual(prescribedWork('4 × 10'), { reps: 10 });
   assert.equal(routineSnapshot([{ exerciseId: 'a', name: 'A', equipment: '', prescription: '99 × 8' }])[0].sets, 10);
 });
+test('a bar-plus load is the added plates, so the bar is never subtracted again', async () => {
+  const { plannedLoadKg, plannedOnBar, plannedLoadUnit } = await load();
+  assert.equal(plannedLoadKg('3 × 8-10 @ Bar + 25 kg'), 25);
+  assert.equal(plannedOnBar('3 × 8-10 @ Bar + 25 kg'), true);
+  assert.equal(plannedOnBar('3 × 8-10 @ EZ bar + 10 kg'), true);
+  assert.equal(plannedLoadKg('5 × 5 @ 70 kg'), 70);
+  assert.equal(plannedOnBar('5 × 5 @ 70 kg'), false);
+  assert.equal(plannedLoadUnit('3 × 15 @ Bar + 17 lbs'), 'lbs');
+  assert.equal(plannedLoadUnit('3 × 15'), undefined);
+});
 test('progress distinguishes skipped from done and revisiting uses the same set slot', async () => {
   const { exerciseProgress } = await load();
   const exercise = { exerciseId: 'squat', sets: 2 };

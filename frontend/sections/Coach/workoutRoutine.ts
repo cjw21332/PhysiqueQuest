@@ -17,9 +17,17 @@ export function exerciseProgress(exercise: Pick<WorkoutExerciseSnapshot, 'exerci
   if (rows.length === exercise.sets) return 'skipped';
   return rows.length ? 'in progress' : 'upcoming';
 }
+// "@ 40 kg", "· 22 kg" or "@ Bar + 25 kg" (plates added to a bar).
+const PLANNED_LOAD = /(?:@|·)\s*(?:([A-Za-z][A-Za-z .-]{0,30}?)\s*\+\s*)?(\d+(?:\.\d+)?)\s*(kg|lbs?)\b/i;
 /** Planned load from a prescription such as "3 × 8-12 @ 40 kg" or "4 × 10 · 22 kg", in kilograms. */
 export function plannedLoadKg(prescription?: string): number | undefined {
-  const match = prescription?.match(/(?:@|·)\s*(\d+(?:\.\d+)?)\s*(kg|lbs?)\b/i);
+  const match = prescription?.match(PLANNED_LOAD);
   if (!match) return undefined;
-  return Number(match[1]) / (match[2].toLowerCase() === 'kg' ? 1 : 2.2046226218);
+  return Number(match[2]) / (match[3].toLowerCase() === 'kg' ? 1 : 2.2046226218);
+}
+/** True when the planned load is plates on a bar ("@ Bar + 25 kg"), so the bar is not subtracted again. */
+export const plannedOnBar = (prescription?: string) => Boolean(prescription?.match(PLANNED_LOAD)?.[1]);
+export function plannedLoadUnit(prescription?: string): 'kg' | 'lbs' | undefined {
+  const unit = prescription?.match(PLANNED_LOAD)?.[3]?.toLowerCase();
+  return unit === undefined ? undefined : unit === 'kg' ? 'kg' : 'lbs';
 }

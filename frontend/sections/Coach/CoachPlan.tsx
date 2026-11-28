@@ -10,7 +10,7 @@ import { formatLoad, formatRest, suggestFor } from '../../lib/programSuggest';
 import ProgramDayEditor from './ProgramDayEditor';
 import { useTrainingContext } from '../../hooks/useTrainingContext';
 
-const hasLoad = (prescription = '') => /(?:@|·)\s*\d+(?:\.\d+)?\s*(?:kg|lbs?)\b/i.test(prescription);
+const hasLoad = (prescription = '') => /(?:@|·)\s*(?:[A-Za-z][A-Za-z .-]{0,30}?\s*\+\s*)?\d+(?:\.\d+)?\s*(?:kg|lbs?)\b/i.test(prescription);
 
 // Programs and the exercise library are reached through the Coach tabs above this view.
 export default function CoachPlan({ profile, onStart }: { profile: Profile; onStart: (exercises: CoachExercise[], title?: string) => void }) {

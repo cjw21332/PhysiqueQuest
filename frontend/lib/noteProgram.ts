@@ -7,7 +7,7 @@ const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
  * ("3. Incline Chest Machine Press", "2. Leg Press: 4 sets x 10-12 reps"), warm-up vs working sets, and set
  * lines such as "20 kg x 8", "Bar + 20 kg × 10", "EZ bar + 10 kg x 12" or "12 reps". Only working sets count.
  */
-type Draft = { order: number; name: string; section?: string; declaredSets?: number; declaredReps?: string; working: { reps?: number; load?: number; unit?: 'kg' | 'lbs' }[] };
+type Draft = { order: number; name: string; section?: string; declaredSets?: number; declaredReps?: string; working: { reps?: number; load?: number; unit?: 'kg' | 'lbs'; base?: string }[] };
 const DAY = /^(push|pull|legs?|upper|lower|full(?:\s+body)?)(?:\s+day)?(?:\s+workout)?(?:\s*[-–:].*)?$/i;
 const SECTION = /^(chest|back|shoulders?|biceps|triceps|core|abs|arms)$/i;
 const DAY_TITLE: Record<string, string> = { push: 'Push', pull: 'Pull', legs: 'Legs', upper: 'Upper', lower: 'Lower' };
@@ -45,6 +45,8 @@ function toExercise(draft: Draft, dayKey: string, index: number): ProgramExercis
   const units = loads.map(set => set.unit ?? 'kg');
   const unit: 'kg' | 'lbs' = units.filter(value => value === 'lbs').length > units.length / 2 ? 'lbs' : 'kg';
   const sameUnit = loads.filter(set => (set.unit ?? 'kg') === unit);
+  // Heaviest working set; "Bar + 30 kg" keeps its bar label so the weight reads as added plates.
+  const heaviest = sameUnit.reduce<typeof sameUnit[number] | undefined>((best, set) => !best || set.load! > best.load! ? set : best, undefined);
   const reps = draft.working.map(set => set.reps).filter((value): value is number => typeof value === 'number' && value > 0);
   const repText = draft.declaredReps ?? (reps.length ? (Math.min(...reps) === Math.max(...reps) ? String(reps[0]) : `${Math.min(...reps)}-${Math.max(...reps)}`) : undefined);
   return {
@@ -54,7 +56,7 @@ function toExercise(draft: Draft, dayKey: string, index: number): ProgramExercis
     equipment: equipmentOf(draft.name, loads.length > 0),
     sets: Math.min(10, Math.max(1, draft.declaredSets ?? (draft.working.length || 3))),
     ...(repText ? { reps: repText.slice(0, 20) } : {}),
-    ...(sameUnit.length ? { weight: Math.max(...sameUnit.map(set => set.load!)) } : {}),
+    ...(heaviest ? { weight: heaviest.load!, ...(heaviest.base ? { loadBase: heaviest.base } : {}) } : {}),
     unit,
     restSets: 30,
     restNext: 30,
@@ -98,7 +100,9 @@ export function noteToProgram(text: string, id: string, dayId: (index: number) =
     const loads = [...line.matchAll(/(\d+(?:\.\d+)?)\s*(kg|lbs?)\b/gi)];
     const last = loads[loads.length - 1];
     const draft: Draft = current;
-    draft.working.push({ reps: Number(reps[1]), ...(last ? { load: Number(last[1]), unit: /^lb/i.test(last[2]) ? 'lbs' as const : 'kg' as const } : {}) });
+    const bar = /^(.*?)\s*\+\s*\d+(?:\.\d+)?\s*(?:kg|lbs?)\b/i.exec(line)?.[1] ?? '';
+    const base = /\bbar\b/i.test(bar) && !/t-?bar/i.test(bar) ? (/\bez\b/i.test(bar) ? 'EZ bar' : 'Bar') : undefined;
+    draft.working.push({ reps: Number(reps[1]), ...(last ? { load: Number(last[1]), unit: /^lb/i.test(last[2]) ? 'lbs' as const : 'kg' as const, ...(base ? { base } : {}) } : {}) });
   }
   flush();
 

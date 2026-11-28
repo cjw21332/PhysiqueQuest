@@ -10,6 +10,8 @@ const exercise = z.object({
   sets: z.number().int().min(1).max(10),
   reps: z.string().trim().max(20).optional(),
   weight: z.number().min(0).max(1000).optional(),
+  // Set when the weight is plates added to a bar ("Bar + 25 kg"); the bar itself is not included.
+  loadBase: z.string().trim().min(1).max(30).optional(),
   unit: z.enum(['kg', 'lbs']),
   restSets: z.number().int().min(0).max(600),
   restNext: z.number().int().min(0).max(600),
