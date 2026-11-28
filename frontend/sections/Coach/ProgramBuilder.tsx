@@ -156,5 +156,6 @@ function ExercisePicker({ taken, onClose, onPick }: { taken: Set<string>; onClos
     </button></li>)}</ul>
     {custom.length >= 2 && <button type="button" className="cq-add-custom" onClick={() => onPick({ exerciseId: newId('custom').slice(0, 80), name: custom.slice(0, 120), targetMuscle: '', equipment: '', source: 'Custom' })}><Icon name="plus" size={16}/>Add “{custom.slice(0, 40)}” as a custom exercise</button>}
     {!results.length && custom.length < 2 && <p className="cq-empty">Type at least two letters to search.</p>}
+    {!loading && !results.length && custom.length >= 2 && <p className="cq-empty" role="status">No exercises match “{custom.slice(0, 40)}”. Try another name or muscle, or add it as a custom exercise above.</p>}
   </dialog>;
 }

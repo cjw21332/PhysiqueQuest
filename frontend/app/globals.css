@@ -10753,3 +10753,6 @@ dialog[open]::backdrop { animation: pq-fade-in .22s ease-out; }
 .auth-screen .field:has([aria-invalid="true"]) .input-wrap,
 .auth-screen .field [aria-invalid="true"] { border-color: #f87171; }
 .auth-screen .field:has([aria-invalid="true"]) .input-wrap:focus-within { border-color: #f87171; }
+
+/* Inline retry inside a status line (UX audit 1.6.8): a text action, not a full button. */
+.training-progress .training-retry.training-retry { display: inline; min-height: 0; margin-left: 4px; padding: 0; border: 0; background: none; color: var(--green, #22c55e); font: inherit; font-weight: 650; text-decoration: underline; cursor: pointer; }

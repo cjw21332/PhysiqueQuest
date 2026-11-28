@@ -204,12 +204,12 @@ export default function AddFood({
         <section className="portion-entry">
           <h3>Portion</h3>
           <div className="quantity-row">
-            <label><small>Quantity</small><input type="number" min="0.1" step="any" inputMode="decimal" value={amount} onChange={event => setAmount(event.target.value)} aria-label="Quantity" /></label>
+            <label><small>Quantity</small><input type="number" min="0.1" step="any" inputMode="decimal" value={amount} onChange={event => setAmount(event.target.value)} aria-label="Quantity" aria-invalid={selected && !validAmount ? true : undefined} aria-describedby={selected && !validAmount ? 'add-food-amount-error' : undefined} /></label>
             <div className="scan-chips" aria-label="Portion unit">
               {(['grams', 'servings'] as const).map(value => <button type="button" key={value} className={unit === value ? 'active' : ''} aria-pressed={unit === value} onClick={() => { if (value === unit) return; if (Number.isFinite(grams) && servingSizeG) setAmount(String(Number((value === 'grams' ? grams : grams / servingSizeG).toFixed(6)))); else if (value === 'servings') setAmount('1'); else setAmount(''); setUnit(value); }}>{value}</button>)}
             </div>
           </div>
-          {unit === 'servings' && !selected?.detail?.serving_size_g && <label className="serving-weight-field">Grams per serving<input type="number" min="0.000001" max="100000" step="any" inputMode="decimal" value={customServing} onChange={event => setCustomServing(event.target.value)} placeholder="Enter serving weight" /></label>}
+          {unit === 'servings' && !selected?.detail?.serving_size_g && <label className="serving-weight-field">Grams per serving<input type="number" min="0.000001" max="100000" step="any" inputMode="decimal" value={customServing} onChange={event => setCustomServing(event.target.value)} aria-invalid={selected && !validAmount ? true : undefined} aria-describedby={selected && !validAmount ? 'add-food-amount-error' : undefined} placeholder="Enter serving weight" /></label>}
           <div className="calculated-head"><h3>Calculated nutrition</h3><small>{unit === 'grams' ? `${Number(amount) || 0} g` : `${round(grams) || 0} g`}</small></div>
           {detailLoading && <p className="food-detail-loading" role="status">Loading nutrition…</p>}
           {!detailLoading && selected && !selected.detail && error && <p className="food-detail-loading" role="alert">{error}</p>}
@@ -226,7 +226,7 @@ export default function AddFood({
 
       <footer className="scan-footer add-food-footer">
         {!selected && !loading && <p className="scan-save-hint">Select a food to continue.</p>}
-        {selected && !validAmount && <p className="scan-save-hint" role="alert">Enter a valid quantity and serving weight (up to 100,000 g).</p>}
+        {selected && !validAmount && <p id="add-food-amount-error" className="scan-save-hint" role="alert">Enter a valid quantity and serving weight (up to 100,000 g).</p>}
         {error && selected?.detail && <p className="error" role="alert">{error}</p>}
         {calculated && Object.values(calculated).some(value => value === null) && <p>Nutrition information is missing. Known values will be saved.</p>}
         <button type="button" className="primary" disabled={saving || !selected?.detail || detailLoading || !calculated || !validAmount} onClick={()=>void handleSave()}>{saving ? 'Saving…' : `Save to ${meal}`}</button>

@@ -41,7 +41,8 @@ export default function MeEditLayout({
         <fieldset className="step-content" disabled={isSaving || !connected}>
           {description && <p className="edit-description">{description}</p>}
           {children}
-          {error && <p className="error" role="alert">{error}</p>}
+          {/* Stable id so a form can point its failing field at this message with aria-describedby. */}
+          {error && <p id="me-edit-error" className="error" role="alert">{error}</p>}
         </fieldset>
       </div>
       {connected && <footer className="wizard-footer edit-footer">

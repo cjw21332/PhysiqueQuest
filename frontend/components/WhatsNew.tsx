@@ -4,10 +4,10 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '../sections/Home/icons';
 import './whatsNew.css';
 
-export const WHATS_NEW_VERSION = '1.6.7';
+export const WHATS_NEW_VERSION = '1.6.8';
 export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
   { icon: 'calendar', title: 'Use a program as your weekly plan', text: 'Open any program in Coach › Programs and tap Use as my weekly plan. Your Today tab follows it, day by day.' },
-  { icon: 'clipboard', title: 'Programs by weekday', text: 'Programs now list Monday to Sunday. Start, edit or delete a day right from the list, or open it for the full workout.' },
+  { icon: 'check-circle', title: 'Clearer forms and messages', text: 'Sign-in, registration and password reset now point to the exact field to fix, and searches say when nothing matches.' },
   { icon: 'chart-bars', title: 'Food carbon, any period', text: 'Scan › Food carbon footprint now has Day, Week, Month, Year and All time, with a chart, your biggest sources and how it compares.' },
   { icon: 'dumbbell', title: 'Bar + plates', text: 'Weights written as "Bar + 25 kg" stay that way: 25 kg of plates on the bar. Use the Bar + switch when editing a program.' },
 ];

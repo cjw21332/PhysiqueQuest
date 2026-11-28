@@ -244,7 +244,7 @@ export default function ExerciseLibrary({ onBack, selectedEquipment = [], onStar
           <span className="library-copy"><b>{titleCase(item.name)}</b><small>{metadata(item)}</small>{variations.length > 0 && <span className="library-variation-tag">Variation · {variations.join(' · ')}</span>}<span className="library-item-meta"><span className={`tracking-tag ${trackingLabel(item) === 'Manual tracking' ? 'manual' : ''}`}>{trackingLabel(item)}</span>{hasDemo && <span className="library-demo-label">Demo</span>}</span></span>
           <Icon name="arrow" size={16}/>
         </button>})}
-        {!catalog.items.length && <div className="empty-library"><p>No exercises match those filters.</p><button type="button" className="secondary" onClick={reset}>Reset filters</button></div>}
+        {!catalog.items.length && <div className="empty-library" role="status"><p>{searchTerm.trim() ? `No exercises match “${searchTerm.trim()}”. Check the spelling or clear the search and filters.` : 'No exercises match those filters.'}</p><button type="button" className="secondary" onClick={reset}>{searchTerm.trim() ? 'Clear search and filters' : 'Reset filters'}</button></div>}
       </div>
       {catalog.pages > 1 && <nav className="library-caption" aria-label="Exercise pages"><button type="button" className="secondary" disabled={page <= 1} onClick={() => setPage(value => value - 1)}>Previous page</button><span>Page {page} of {catalog.pages}</span><button type="button" className="secondary" disabled={page >= catalog.pages} onClick={() => setPage(value => value + 1)}>Next page</button></nav>}
       {catalog.coverageNote && <p className="library-preview-note">{catalog.coverageNote}</p>}

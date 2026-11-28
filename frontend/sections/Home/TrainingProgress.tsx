@@ -78,7 +78,7 @@ export default function TrainingProgress({ workouts, tab }: { workouts: WorkoutS
   const [dayIndex, setDayIndex] = useState<number | null>(null);
   const [picker, setPicker] = useState<Picker | null>(null);
   const [catalog, setCatalog] = useState<Record<string, ExerciseRecord>>({});
-  const { plan, error: planError, loading } = useCoachPlan();
+  const { plan, error: planError, loading, refresh: refreshPlan } = useCoachPlan();
   const days = useMemo(() => {
     const groups = (plan?.days ?? []).map(day => ({ index: day.index, name: day.name, title: day.title, exercises: day.isWorkoutDay ? day.exercises.map(exercise => ({ exerciseId: exercise.exerciseId, name: exercise.name, targetMuscle: exercise.targetMuscle ?? '', group: exercise.group ?? '' })) : [] }));
     for (const workout of workouts) {
@@ -137,7 +137,7 @@ export default function TrainingProgress({ workouts, tab }: { workouts: WorkoutS
   }
   return <section className="training-progress subsection" aria-label="Training progress">
     <div className="pq-progress-card-head"><div><span className="pq-progress-eyebrow">YOUR TRAINING</span><h3>{tab === 'exercise' ? 'Exercise Progress' : 'Muscle Progress'}</h3><p>Explore the work behind your progress.</p></div></div>
-    {planError && <p role="alert">Your current program could not be loaded. Showing available workout history.</p>}
+    {planError && <p role="alert">Your current program could not be loaded. Showing available workout history. <button type="button" className="training-retry" onClick={() => void refreshPlan()}>Try again</button></p>}
     {loading && !plan && !days.length ? <p>Loading your program…</p> : !days.length ? <p>No exercises are available in your program or workout history yet.</p> : <>
       {tab === 'exercise' ? <><span className="progress-picker-label">Workout Day</span><button type="button" className="progress-picker-trigger" onClick={() => setPicker('day')}><span>{day ? `${titleCase(day.name)} – ${titleCase(day.title)}` : 'Choose a Workout Day'}</span><span aria-hidden="true">⌄</span></button><span className="progress-picker-label">Exercise</span><button type="button" className="progress-picker-trigger" disabled={!day} onClick={() => setPicker('exercise')}><span>{chosen ? titleCase(chosen.name) : 'Choose an Exercise'}</span><span aria-hidden="true">⌄</span></button></> : <><span className="progress-picker-label">Muscle Group</span><button type="button" className="progress-picker-trigger" onClick={() => setPicker('muscle')}><span>{muscle || 'Choose a Muscle Group'}</span><span aria-hidden="true">⌄</span></button><span className="progress-picker-label">Exercise</span><button type="button" className="progress-picker-trigger" disabled={!matching.length} onClick={() => setPicker('muscleExercise')}><span>{chosen ? titleCase(chosen.name) : 'Choose an Exercise'}</span><span aria-hidden="true">⌄</span></button>{muscle && !matching.length && <small>No exercises for this muscle are assigned in your current program.</small>}</>}
       {chosen ? <ExerciseAnalytics key={chosen.id} workouts={workouts} id={chosen.id} name={chosen.name} /> : <p>Select an exercise to see its progress.</p>}
