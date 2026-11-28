@@ -35,7 +35,7 @@ export default function WorkoutFeedback({ source, exercise, sessionRef }: { sour
         : 'Could not save feedback. Check your connection and try again.' });
     }
   }
-  if (status.state === 'saved') return <p role="status" className="workout-feedback-status">Thanks — feedback saved for {name}. Your Coach plan will adapt.</p>;
+  if (status.state === 'saved') return <p role="status" className="workout-feedback-status">Thanks — feedback saved for {name}. Your next session will adjust sets or reps and show a tip.</p>;
   const saving = status.state === 'saving';
   return <details className="workout-feedback"><summary>How did {name} feel?</summary>
     <form onSubmit={submit} onChange={() => { if (status.state === 'error') setStatus({ state: 'ready' }); }}>
@@ -44,7 +44,7 @@ export default function WorkoutFeedback({ source, exercise, sessionRef }: { sour
       <label>Enjoyment (optional, 1 to 5)<input type="number" inputMode="numeric" name="enjoyment" min="1" max="5" step="1"/></label>
       <label>Pain locations (optional, separated by commas)<input name="pain" maxLength={(MAX_PAIN_LENGTH + 2) * MAX_PAIN_LOCATIONS} placeholder="e.g. left knee, lower back"/></label>
       <label>Private notes (optional)<textarea name="notes" maxLength={500}/></label>
-      <p className="workout-feedback-note">Reporting pain removes this exercise from upcoming Coach plans. Pain locations and notes are stored privately and never shared with chat. Sharp or lasting pain should be checked by a health professional.</p>
+      <p className="workout-feedback-note">Your feedback keeps this exercise in your plan and adjusts its sets or reps, with a tip for next time. Pain locations and notes are stored privately and never shared with chat. Sharp or lasting pain should be checked by a health professional.</p>
       <button disabled={saving}>{saving ? 'Saving…' : 'Save feedback'}</button>
       {status.state === 'error' && <p role="alert" className="workout-feedback-error">{status.message}</p>}
     </form></details>;

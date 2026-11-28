@@ -210,3 +210,24 @@
   .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-ex-stats { grid-template-columns: 1fr 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-skeleton { animation: none; } }
+
+/* Import from notes (v1.6.3): sky card, paste field and review action. */
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-card { border-color: color-mix(in srgb, var(--sky) 35%, transparent); background: linear-gradient(165deg, color-mix(in srgb, var(--sky) 10%, var(--soft)) 0%, var(--soft) 60%); }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-card .cq-create-icon { background: var(--sky-tint); color: var(--sky); }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import { display: grid; gap: 14px; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-head { display: flex; align-items: center; gap: 10px; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-head h2 { margin: 0; color: var(--ink); font-size: 18px; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-intro { margin: 0; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--sky) 30%, transparent); border-radius: 14px; background: var(--sky-tint); color: var(--ink); font-size: 13px; line-height: 1.5; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-field { display: grid; gap: 8px; color: var(--ink); font-size: 13px; font-weight: 600; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-field textarea { box-sizing: border-box; width: 100%; min-height: 240px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); color: var(--ink); font: inherit; font-size: 14px; font-weight: 400; line-height: 1.5; resize: vertical; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-field textarea:focus { border-color: var(--green); outline: none; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-next { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; border: 0; border-radius: 14px; background: linear-gradient(120deg, var(--green) 0%, #4ade80 100%); color: var(--surface); font: inherit; font-size: 15px; font-weight: 650; cursor: pointer; }
+.coach-dark-theme.coach-dark-theme .coach-section.cq-hub .cq-import-next:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
+
+/* Feedback tip under a planned exercise (v1.6.3): violet, informational, never a swap. */
+.cq-ex-feedback { display: flex; align-items: flex-start; gap: 6px; margin-top: 6px; padding: 8px 10px; border: 1px solid color-mix(in srgb, var(--violet) 30%, transparent); border-radius: 10px; background: var(--violet-tint); color: var(--ink); font-size: 12px; line-height: 1.45; }
+.cq-ex-feedback svg { flex: none; margin-top: 2px; color: var(--violet); }
+
+/* Builder day actions (v1.6.4): duplicate beside remove. */
+.cq-day-actions { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; }
+.cq-text-action { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--sky); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }

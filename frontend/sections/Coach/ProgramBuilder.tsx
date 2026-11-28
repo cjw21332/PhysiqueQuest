@@ -32,6 +32,13 @@ export default function ProgramBuilder({ ctx, initial, isNew, onCancel, onSaved 
   const move = (index: number, by: number) => setDay(current => { const list = [...current.exercises]; [list[index], list[index + by]] = [list[index + by], list[index]]; return { ...current, exercises: list }; });
   const addDay = () => { setDraft(current => ({ ...current, days: [...current.days, { id: newId('day'), title: `Day ${current.days.length + 1}`, exercises: [] }] })); setDayIndex(draft.days.length); };
   const usedWeekdays = new Set(draft.days.map(item => item.weekday).filter(value => value !== undefined));
+  // Copies the open day (exercises, sets, reps, weights, rest) onto the next free weekday after it.
+  const duplicateDay = () => {
+    const start = (day.weekday ?? -1) + 1;
+    const weekday = [0, 1, 2, 3, 4, 5, 6].map(offset => (start + offset) % 7).find(value => !usedWeekdays.has(value));
+    setDraft(current => ({ ...current, days: [...current.days, { ...day, id: newId('day'), title: `${day.title.trim() || 'Day'} copy`.slice(0, 60), weekday, exercises: day.exercises.map(row => ({ ...row })) }] }));
+    setDayIndex(draft.days.length);
+  };
 
   const save = async () => {
     const name = draft.name.trim();
@@ -67,7 +74,10 @@ export default function ProgramBuilder({ ctx, initial, isNew, onCancel, onSaved 
           {weekdayShort.map((name, index) => <option key={name} value={index} disabled={usedWeekdays.has(index) && day.weekday !== index}>{name}</option>)}
         </select></label>
       </div>
-      {draft.days.length > 1 && <button type="button" className="cq-text-danger" onClick={() => setRemovingDay(true)} disabled={busy}><Icon name="trash" size={15}/>Remove this day</button>}
+      <div className="cq-day-actions">
+        {draft.days.length < 7 && day.exercises.length > 0 && <button type="button" className="cq-text-action" onClick={duplicateDay} disabled={busy}><Icon name="plus" size={15}/>Duplicate day</button>}
+        {draft.days.length > 1 && <button type="button" className="cq-text-danger" onClick={() => setRemovingDay(true)} disabled={busy}><Icon name="trash" size={15}/>Remove this day</button>}
+      </div>
     </section>
 
     <ol className="cq-build-list">{day.exercises.map((row, index) => {

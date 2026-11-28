@@ -255,17 +255,17 @@ export class CoachPlanner {
   }
 
   private pickExercises(library: LibraryExercise[], keywords: string[], excluded: string[], count: number, goal: string, feedback: Map<string, CoachFeedback>, band: AgeBand = 'under35') {
-    const report = (exercise: LibraryExercise) => feedback.get(normalized(exercise.name)) ?? feedback.get(normalized(exercise.id));
+    // Feedback never changes which exercises are picked; applyFeedback adjusts their sets, reps and tips instead.
     const safe = library.filter(exercise => {
       const haystack = normalized(`${exercise.name} ${exercise.group} ${exercise.targetMuscle}`);
       const category = primaryCategory(exercise.targetMuscle, exercise.group);
       const eligible = category === 'Cardio' ? goal === 'Endurance' : suitableStrengthMovement(exercise.name);
-      return !report(exercise)?.pain && !excluded.some(term => haystack.includes(normalized(term))) && eligible && matchesFocus(category, exercise.name, keywords);
+      return !excluded.some(term => haystack.includes(normalized(term))) && eligible && matchesFocus(category, exercise.name, keywords);
     });
     const priority = (exercise: LibraryExercise) => ['bodyweight push', 'horizontal push', 'vertical push', 'squat', 'hinge', 'row', 'vertical pull'].includes(movementFamily(exercise.name)) ? 0 : primaryCategory(exercise.targetMuscle, exercise.group) === 'Core' ? 2 : 1;
     const scored = safe
       .map(exercise => ({ exercise, score: commonMovementScore(exercise.name) }))
-      .sort((a, b) => (report(b.exercise)?.enjoyment ?? 3) - (report(a.exercise)?.enjoyment ?? 3) || priority(a.exercise) - priority(b.exercise) || b.score - a.score || a.exercise.name.localeCompare(b.exercise.name))
+      .sort((a, b) => priority(a.exercise) - priority(b.exercise) || b.score - a.score || a.exercise.name.localeCompare(b.exercise.name))
       .map(entry => entry.exercise);
     // Prefer distinct movement families before adding a second variant.
     const coreFocus = keywords.includes('core') || keywords.includes('ab');
@@ -288,16 +288,44 @@ export class CoachPlanner {
       tracking: 'Manual',
       prescription: limitPrescription(prescription(exercise), band),
       formTip: exercise.instructions.find(step => step.trim()) ?? null,
+      feedbackTip: null as string | null,
     }));
     function prescription(exercise: LibraryExercise) {
-      const entry = report(exercise);
       const timed = primaryCategory(exercise.targetMuscle, exercise.group) === 'Cardio' || /plank|wall sit|hold/i.test(exercise.name);
-      if (feedbackEffort(entry) === 'hard') return timed ? '2 × 20 s at easy effort' : '2 × 8 at easy effort';
       const base = timed ? '3 × 45 s' : goal === 'Build muscle' ? (/bench|incline|floor press|squat|row|deadlift/i.test(exercise.name) ? '4 × 10' : /lateral raise/i.test(exercise.name) ? '3 × 15' : /overhead|shoulder press/i.test(exercise.name) ? '3 × 10' : '3 × 12') : SETS_BY_GOAL[goal] ?? SETS_BY_GOAL['General fitness'];
-      if (feedbackEffort(entry) === 'easy') {
-        return base.replace(/× (\d+)/, (_, amount) => '× ' + (Number(amount) + (timed ? 5 : 1)));
-      }
       return base;
     }
   }
+}
+
+type PlannedExercise = { name: string; exerciseId?: string; prescription?: string; feedbackTip?: string | null };
+/**
+ * Workout feedback never swaps or reorders exercises. It nudges the prescription of the exercise it was given for
+ * (one set fewer when it was too hard, two reps more when it was too easy, at most 2 lighter sets after pain) and adds
+ * a tip. Applied when the plan is read, so the latest feedback always shows without regenerating the plan.
+ */
+export function applyFeedback<T extends { days: { exercises: PlannedExercise[] }[] }>(plan: T, feedback: CoachFeedback[]): T {
+  const latest = latestFeedback(feedback);
+  if (!latest.size) return plan;
+  return { ...plan, days: plan.days.map(day => ({ ...day, exercises: day.exercises.map(exercise => {
+    const entry = latest.get(normalized(exercise.name)) ?? (exercise.exerciseId ? latest.get(normalized(exercise.exerciseId)) : undefined);
+    if (!entry) return exercise;
+    const match = /^(\d+) × (\d+)( s)?/.exec(exercise.prescription ?? '');
+    const sets = match ? Number(match[1]) : null, amount = match ? Number(match[2]) : null, timed = Boolean(match?.[3]);
+    const effort = feedbackEffort(entry);
+    let prescription = exercise.prescription, tip: string | null = null;
+    if (entry.pain) {
+      if (sets !== null) prescription = exercise.prescription!.replace(/^\d+/, String(Math.min(sets, 2)));
+      tip = 'You reported pain last time: use a lighter weight and a pain-free range of motion, warm up well, and stop this exercise if the pain returns. Sharp or lasting pain should be checked by a health professional.';
+    } else if (effort === 'hard') {
+      if (sets !== null) prescription = exercise.prescription!.replace(/^\d+/, String(Math.max(2, sets - 1)));
+      tip = `Felt hard last time (effort ${entry.rpe}/10): one fewer set this week. Keep the same weight, lower it slowly and rest a little longer between sets.`;
+    } else if (effort === 'easy') {
+      if (amount !== null) prescription = exercise.prescription!.replace(/× \d+/, `× ${amount + (timed ? 10 : 2)}`);
+      tip = `Felt easy last time (effort ${entry.rpe}/10): ${timed ? 'hold 10 s longer' : 'two more reps per set'}. When every set reaches the top, add 2.5 kg (or the next dumbbell) next session.`;
+    } else if ((entry.enjoyment ?? 3) <= 2) {
+      tip = 'You rated this low: try a slightly different grip, stance or tempo, and ask Phiq for a variation if it still feels wrong.';
+    }
+    return { ...exercise, prescription, feedbackTip: tip };
+  }) })) };
 }

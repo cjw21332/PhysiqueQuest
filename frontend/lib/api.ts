@@ -156,6 +156,8 @@ export interface CoachExercise {
   equipment: string;
   tracking: 'AI tracked' | 'Manual';
   prescription?: string;
+  /** Adjustment and tip from this exercise's latest workout feedback; the exercise itself never changes. */
+  feedbackTip?: string | null;
   formTip?: string | null;
   /** Rest in seconds, applied to the session when it starts from a saved program. */
   restBetweenSets?: number;

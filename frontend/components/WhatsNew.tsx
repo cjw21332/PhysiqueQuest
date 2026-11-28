@@ -4,13 +4,12 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '../sections/Home/icons';
 import './whatsNew.css';
 
-export const WHATS_NEW_VERSION = '1.6.3';
+export const WHATS_NEW_VERSION = '1.6.4';
 export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
-  { icon: 'shield', title: 'Safer training', text: 'Add a heart condition to your health profile, rest defaults to 30 seconds, and a quick check-in follows every exercise.' },
-  { icon: 'pulse', title: 'Plans fit your body', text: 'Weekly quests and Coach intensity now follow your activity level and body index.' },
-  { icon: 'health', title: 'Programs for injuries', text: 'Knee, lower-back, shoulder, heart-healthy and asthma-friendly programs in Coach › Programs.' },
-  { icon: 'meal', title: 'A livelier Scan', text: 'Colour-coded macros, meals and water, Filipino food ideas in your Dietary Plan, and a weekly food carbon estimate.' },
-  { icon: 'star', title: 'Send feedback', text: 'Rate the app or report a problem from Me › Send feedback; it goes straight to the PhysiqueQuest team.' },
+  { icon: 'clipboard', title: 'Import from notes', text: 'Coach › Programs › Import from notes turns a pasted workout note into a program you can review, edit and save.' },
+  { icon: 'coach-wand', title: 'Smarter feedback', text: 'Workout feedback no longer swaps your exercises. It adjusts sets or reps and gives you a tip for next time.' },
+  { icon: 'target', title: 'Quest 1, 2 and 3', text: 'Personal quests keep their slot label, and View all shows every current and finished quest.' },
+  { icon: 'star', title: 'Feedback goes straight to the team', text: 'Send feedback from Me and it reaches the PhysiqueQuest team by email right away.' },
 ];
 // Shown once per version: the device remembers the version it showed, so reopening the app does not
 // repeat it. The per-launch flag stays honoured (tests and older builds set it).

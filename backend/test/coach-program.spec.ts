@@ -32,19 +32,26 @@ function setup() {
 }
 
 describe('saved per-user Coach programs', () => {
-  it('refreshes cached prescriptions and removes painful exercises using only the owner feedback', async () => {
+  it('keeps the same exercises and only adjusts sets, reps and tips from the owner feedback', async () => {
     const test = setup(), service = test.service();
     const exercise = 'Dumbbell bench press';
     const original = await service.getPlan(user);
+    expect(original.days[0].exercises[0].prescription).toBe('4 × 10');
     test.feedback.list.mockResolvedValue([{ exercise, difficulty: 'too_easy', rpe: 4 }]);
     const easy = await service.getPlan(user);
-    expect(easy.programVersion).not.toBe(original.programVersion);
-    expect(easy.days[0].exercises[0].prescription).toBe('4 × 11');
+    expect(easy.programVersion).toBe(original.programVersion);
+    expect(easy.days[0].exercises.map((item: any) => item.name)).toEqual(original.days[0].exercises.map((item: any) => item.name));
+    expect(easy.days[0].exercises[0].prescription).toBe('4 × 12');
+    expect(easy.days[0].exercises[0].feedbackTip).toMatch(/two more reps/);
     test.feedback.list.mockResolvedValue([{ exercise, difficulty: 'just_right', rpe: 9 }]);
-    expect((await service.getPlan(user)).days[0].exercises[0].prescription).toContain('easy effort');
+    const hard = (await service.getPlan(user)).days[0].exercises[0];
+    expect(hard.prescription).toBe('3 × 10');
+    expect(hard.feedbackTip).toMatch(/one fewer set/);
     test.feedback.list.mockResolvedValue([{ exercise, difficulty: 'too_hard', rpe: 9, painLocations: ['shoulder'], notes: 'private note' }]);
     const painful = await service.getPlan(user);
-    expect(painful.days.flatMap(day => day.exercises)).toHaveLength(0);
+    expect(painful.days[0].exercises[0].name).toBe(original.days[0].exercises[0].name);
+    expect(painful.days[0].exercises[0].prescription).toBe('2 × 10');
+    expect(painful.days[0].exercises[0].feedbackTip).toMatch(/pain-free range/);
     expect(JSON.stringify(painful)).not.toMatch(/shoulder|private note/i);
     expect(test.feedback.list).toHaveBeenCalledWith(user, 20);
   });
@@ -167,10 +174,10 @@ describe('coach planner adaptation signals', () => {
     expect(new CoachPlanner().build({ ...base, age: '60' }, library).sets).toBe(new CoachPlanner().build({ ...base, age: '30' }, library).sets);
   });
 
-  it('does not regenerate a program for feedback that changes nothing', async () => {
+  it('never regenerates the program because of workout feedback', async () => {
     const { coachProgramContext } = await import('../src/coach/coach.service.js');
-    const hash = (rpe: number) => coachProgramContext(profile as any, {}, [{ exercise: 'Row', rpe, difficulty: 'just_right', pain: false }]).contextHash;
-    expect(hash(6)).toBe(hash(7));
-    expect(hash(6)).not.toBe(hash(9));
+    const hash = (rpe: number, pain = false) => coachProgramContext(profile as any, {}, [{ exercise: 'Row', rpe, difficulty: 'just_right', pain }]).contextHash;
+    const none = coachProgramContext(profile as any, {}, []).contextHash;
+    expect([hash(6), hash(9), hash(9, true)]).toEqual([none, none, none]);
   });
 });

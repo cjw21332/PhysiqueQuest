@@ -10,10 +10,11 @@ import { useCoachPlan } from '../../hooks/useCoachPlan';
 import { useTrainingContext } from '../../hooks/useTrainingContext';
 import DeleteConfirmation from '../../components/DeleteConfirmation';
 import ProgramBuilder from './ProgramBuilder';
+import { noteToProgram } from '../../lib/noteProgram';
 import { adaptProgram, dayToSession, newId, programExerciseCount, templateToProgram, weekdayShort } from './programModel';
 
 // Detail screens keep ids, not computed programs, so equipment or profile changes re-render them live.
-type Screen = { kind: 'hub' } | { kind: 'detail'; templateId?: string; program?: SavedProgram } | { kind: 'build'; draft: SavedProgram; isNew: boolean; from?: Screen };
+type Screen = { kind: 'hub' } | { kind: 'import' } | { kind: 'detail'; templateId?: string; program?: SavedProgram } | { kind: 'build'; draft: SavedProgram; isNew: boolean; from?: Screen };
 const TEMPLATES = [...SPLITS, ...ATHLETES, ...HEALTH_PROGRAMS];
 export const equipmentLabel = (equipment: string[] = []) => equipment.length ? equipment.join(', ') : 'Full gym';
 const sourceLabel = { custom: 'Custom', split: 'Split', athlete: 'Athlete' } as const;
@@ -34,6 +35,7 @@ export default function ProgramsHub({ profile, onStart, onOpenPlan }: { profile:
   const openTemplate = (template: ProgramTemplate) => { setNotice(''); setScreen({ kind: 'detail', templateId: template.id }); };
   const create = () => setScreen({ kind: 'build', isNew: true, draft: { id: newId('prog'), name: '', source: 'custom', days: [{ id: newId('day'), title: 'Day 1', exercises: [] }] } });
 
+  if (screen.kind === 'import') return <NoteImport trainingDays={profile.days ?? []} onCancel={() => setScreen({ kind: 'hub' })} onReady={draft => setScreen({ kind: 'build', isNew: true, draft, from: { kind: 'import' } })}/>;
   if (screen.kind === 'build') return <ProgramBuilder ctx={ctx} initial={screen.draft} isNew={screen.isNew} onCancel={() => setScreen(screen.from ?? { kind: 'hub' })} onSaved={saved => { setNotice(`${saved.name} saved to My programs.`); setScreen({ kind: 'detail', program: saved }); }}/>;
   if (screen.kind === 'detail') {
     const template = TEMPLATES.find(item => item.id === screen.templateId);
@@ -58,6 +60,11 @@ export default function ProgramsHub({ profile, onStart, onOpenPlan }: { profile:
     <button type="button" className="cq-create" onClick={create}>
       <span className="cq-create-icon" aria-hidden="true"><Icon name="plus" size={22}/></span>
       <span><strong>Create a program</strong><small>Pick exercises, sets, reps, weight and rest for every day.</small></span>
+      <Icon name="arrow" size={16}/>
+    </button>
+    <button type="button" className="cq-create cq-import-card" onClick={() => { setNotice(''); setScreen({ kind: 'import' }); }}>
+      <span className="cq-create-icon" aria-hidden="true"><Icon name="clipboard" size={22}/></span>
+      <span><strong>Import from notes</strong><small>Paste a workout note; days, sets, reps and weights are filled in for you to review.</small></span>
       <Icon name="arrow" size={16}/>
     </button>
 
@@ -192,5 +199,23 @@ function ProgramDetail({ program, base, swaps, equipment, template, ctx, owned, 
       </div>
     </div>
     {deleting && <DeleteConfirmation title="Delete this program?" description={`${program.name} will be removed from My programs. Logged workouts are kept.`} confirmLabel="Delete program" busy={busy} error={error} onCancel={() => setDeleting(false)} onConfirm={() => void remove()}/>}
+  </div>;
+}
+
+/** Paste a workout note, then review the parsed program in the normal Program builder before saving. */
+function NoteImport({ trainingDays, onCancel, onReady }: { trainingDays: string[]; onCancel: () => void; onReady: (draft: SavedProgram) => void }) {
+  const [text, setText] = useState('');
+  const [error, setError] = useState('');
+  const next = () => {
+    const draft = noteToProgram(text, newId('prog'), () => newId('day'), trainingDays);
+    if (!draft) { setError('No exercises found. Number each exercise (for example "1. Bench Press") and list working sets like "20 kg x 8".'); return; }
+    onReady(draft);
+  };
+  return <div className="cq-programs cq-import">
+    <header className="cq-import-head"><button type="button" className="coach-back" onClick={onCancel} aria-label="Back to programs"><Icon name="arrow" size={20}/></button><h2>Import from notes</h2></header>
+    <p className="cq-import-intro">Paste your workout note. Day headings (Push day, Leg day, Upper day), numbered exercises and working sets such as <b>20 kg x 8</b> or <b>Bar + 25 kg x 10</b> become a program. Warm-up sets are skipped; each exercise uses your heaviest working weight. You can edit everything before saving.</p>
+    <label className="cq-import-field"><span>Workout note</span><textarea value={text} maxLength={20000} rows={12} onChange={event => { setText(event.target.value); setError(''); }} placeholder={'PUSH DAY\n1. Smith Machine Bench Press\nWorking set:\nBar + 25 kg x 8\nBar + 25 kg x 10'}/></label>
+    {error && <p className="cq-inline-error" role="alert">{error}</p>}
+    <button type="button" className="cq-import-next" disabled={!text.trim()} onClick={next}>Review program <Icon name="arrow" size={16}/></button>
   </div>;
 }

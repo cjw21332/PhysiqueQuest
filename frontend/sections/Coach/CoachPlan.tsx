@@ -69,6 +69,7 @@ export default function CoachPlan({ profile, onStart }: { profile: Profile; onSt
                 <strong>{titleCase(exercise.name)}</strong>
                 <small>{exercise.prescription || plan.sets}{!hasLoad(exercise.prescription) && hint.weight !== undefined && <> · <span className="cq-suggested">{formatLoad(hint)}</span></>}</small>
                 <small className="cq-ex-rest"><Icon name="clock" size={12}/>Rest {formatRest(hint.restSets)} · {formatRest(hint.restNext)} before next</small>
+                {exercise.feedbackTip && <small className="cq-ex-feedback" role="note"><Icon name="coach-wand" size={12}/>{exercise.feedbackTip}</small>}
               </div>
               {/* Manual is the default, so only camera-tracked exercises get a badge. */}
               {exercise.tracking === 'AI tracked' && <span className="cq-badge">AI tracked</span>}
