@@ -19,9 +19,9 @@ function Stepper({ label, value, min, max, step, format = String, onChange }: { 
   </div></div>;
 }
 
-export default function ProgramBuilder({ ctx, initial, isNew, onCancel, onSaved }: { ctx: TrainingContext; initial: SavedProgram; isNew: boolean; onCancel: () => void; onSaved: (program: SavedProgram) => void }) {
+export default function ProgramBuilder({ ctx, initial, isNew, initialDay = 0, onCancel, onSaved }: { ctx: TrainingContext; initial: SavedProgram; isNew: boolean; initialDay?: number; onCancel: () => void; onSaved: (program: SavedProgram) => void }) {
   const [draft, setDraft] = useState<SavedProgram>(initial);
-  const [dayIndex, setDayIndex] = useState(0);
+  const [dayIndex, setDayIndex] = useState(Math.min(Math.max(0, initialDay), initial.days.length - 1));
   const [picking, setPicking] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -53,7 +53,7 @@ export default function ProgramBuilder({ ctx, initial, isNew, onCancel, onSaved 
   };
 
   return <form className="cq-builder" onSubmit={event => { event.preventDefault(); void save(); }} aria-label={isNew ? 'Create program' : 'Edit program'}>
-    <header className="cq-subheader"><button type="button" className="coach-back" onClick={onCancel} disabled={busy} aria-label="Back without saving"><Icon name="arrow-left" size={22}/></button><span>{isNew ? 'New program' : 'Edit program'}</span></header>
+    <header className="cq-subheader pq-page-heading"><button type="button" className="coach-back" onClick={onCancel} disabled={busy} aria-label="Back without saving"><Icon name="arrow" size={20}/></button><h2>{isNew ? 'New program' : 'Edit program'}</h2></header>
 
     <section className="cq-builder-card">
       <label className="cq-input"><span>Program name</span><input value={draft.name} maxLength={60} onChange={event => setDraft({ ...draft, name: event.target.value })} placeholder="e.g. Summer Push / Pull / Legs" disabled={busy}/></label>

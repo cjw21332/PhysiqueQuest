@@ -45,6 +45,10 @@ export class CoachController {
   updateDay(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
     return this.service.updateDay(req.user.userId, body);
   }
+  @Put('plan/week')
+  replaceWeek(@Req() req: AuthenticatedRequest, @Body() body: unknown) {
+    return this.service.replaceWeek(req.user.userId, body);
+  }
 
   @Get('programs')
   listPrograms(@Req() req: AuthenticatedRequest) {

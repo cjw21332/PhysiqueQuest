@@ -65,12 +65,12 @@ export default function HomeDashboard({ profile, onNotify }: {
   const remaining = calories === null ? null : Math.round(targets.calories - calories);
 
   return <div className="hm-page hm-dashboard">
-    <header className="hm-topbar">
-      <div className="hm-topbar-copy">
-        <small suppressHydrationWarning>{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</small>
-        <h1>Hi, {profile.name.trim().split(' ')[0] || 'there'}</h1>
+    <header className="hm-topbar pq-tab-header">
+      <div className="hm-topbar-copy pq-tab-copy">
+        <small className="pq-tab-eyebrow" suppressHydrationWarning>{now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</small>
+        <h1 className="pq-tab-title">Hi, {profile.name.trim().split(' ')[0] || 'there'}</h1>
       </div>
-      <div className="hm-topbar-actions">
+      <div className="hm-topbar-actions pq-tab-actions">
         <button type="button" className="hm-icon-btn" aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'} onClick={onNotify}><Icon name="bell" size={20} />{unread > 0 && <span className="hm-badge" aria-hidden="true">{unread > 99 ? '99+' : unread}</span>}</button>
         <span className="hm-avatar" aria-hidden="true"><img className={profile.photo ? 'user-photo' : undefined} src={profile.photo || '/logo.jpg'} alt="" /></span>
       </div>

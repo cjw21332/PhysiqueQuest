@@ -2,6 +2,7 @@ import type { CoachExercise, ProgramDay, ProgramExercise, SavedProgram } from '.
 import { EXERCISES, adaptToEquipment, templateDays, type ProgramTemplate } from '../../lib/programCatalog';
 import { prescriptionText, suggestFor, type TrainingContext } from '../../lib/programSuggest';
 import { createRequestKey } from '../../lib/requestKey';
+import { programWeek } from '../../lib/programWeek';
 
 export const newId = (prefix: string) => `${prefix}_${createRequestKey(prefix).replace(/[^A-Za-z0-9]/g, '').slice(-16)}`;
 
@@ -65,4 +66,14 @@ export function dayToSession(day: ProgramDay): CoachExercise[] {
 }
 
 export const weekdayShort = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+export const weekdayLong = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+/** Plan rows for the weekly plan (the backend accepts only these fields); duplicate exercises are dropped. */
+export function planExercises(day: ProgramDay): CoachExercise[] {
+  const rows = dayToSession(day).map(row => ({ exerciseId: row.exerciseId.slice(0, 80), name: row.name.slice(0, 120), group: (row.group ?? '').slice(0, 120), targetMuscle: (row.targetMuscle ?? '').slice(0, 120), equipment: (row.equipment ?? '').slice(0, 120), tracking: row.tracking, prescription: row.prescription, restBetweenSets: row.restBetweenSets, restAfterExercise: row.restAfterExercise }));
+  return [...new Map(rows.map(row => [row.exerciseId, row])).values()].slice(0, 50);
+}
+
+export { programWeek };
+export const weekPayload = (program: SavedProgram) => programWeek(program).map(({ day, dayIndex }) => ({ dayIndex, title: day.title.trim().slice(0, 80) || 'Workout', exercises: planExercises(day) }));
 export const programExerciseCount = (program: SavedProgram) => program.days.reduce((sum, day) => sum + day.exercises.length, 0);

@@ -30,7 +30,7 @@ export default function CoachPlan({ profile, onStart }: { profile: Profile; onSt
     const [, sets, reps] = exercise.prescription?.match(/^(\d+)\s*[×x]\s*(\d+(?:-\d+)?(?:\s*s\b)?)/i) ?? [];
     const hint = suggestFor(exercise, ctx, {}, { sets: sets ? Number(sets) : undefined, reps });
     const prescription = hasLoad(exercise.prescription) || hint.weight === undefined ? exercise.prescription : `${exercise.prescription || plan.sets} @ ${hint.weight} ${hint.unit}`;
-    return { exercise, hint, session: { ...exercise, prescription, restBetweenSets: hint.restSets, restAfterExercise: hint.restNext } as CoachExercise };
+    return { exercise, hint, session: { ...exercise, prescription, restBetweenSets: exercise.restBetweenSets ?? hint.restSets, restAfterExercise: exercise.restAfterExercise ?? hint.restNext } as CoachExercise };
   });
   const totalSets = rows.reduce((sum, row) => sum + row.hint.sets, 0);
 
@@ -68,7 +68,7 @@ export default function CoachPlan({ profile, onStart }: { profile: Profile; onSt
               <div className="cq-ex-body">
                 <strong>{titleCase(exercise.name)}</strong>
                 <small>{exercise.prescription || plan.sets}{!hasLoad(exercise.prescription) && hint.weight !== undefined && <> · <span className="cq-suggested">{formatLoad(hint)}</span></>}</small>
-                <small className="cq-ex-rest"><Icon name="clock" size={12}/>Rest {formatRest(hint.restSets)} · {formatRest(hint.restNext)} before next</small>
+                <small className="cq-ex-rest"><Icon name="clock" size={12}/>Rest {formatRest(exercise.restBetweenSets ?? hint.restSets)} · {formatRest(exercise.restAfterExercise ?? hint.restNext)} before next</small>
                 {exercise.feedbackTip && <small className="cq-ex-feedback" role="note"><Icon name="coach-wand" size={12}/>{exercise.feedbackTip}</small>}
               </div>
               {/* Manual is the default, so only camera-tracked exercises get a badge. */}

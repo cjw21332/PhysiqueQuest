@@ -38,7 +38,7 @@ export default function ProgramDayEditor({ day, version, onCancel, onSaved }: { 
     if (!title.trim()) { setError('Enter a name for this day.'); return; }
     setBusy(true); setError('');
     try {
-      await api.updateCoachDay({ programVersion: version, dayIndex: day.index, title: title.trim(), exercises: exercises.map(({ exerciseId, name, group, targetMuscle, equipment, tracking, prescription }) => ({ exerciseId, name, group: group || '', targetMuscle: targetMuscle || '', equipment: equipment || '', tracking, ...(prescription ? { prescription } : {}) })) });
+      await api.updateCoachDay({ programVersion: version, dayIndex: day.index, title: title.trim(), exercises: exercises.map(({ exerciseId, name, group, targetMuscle, equipment, tracking, prescription, restBetweenSets, restAfterExercise }) => ({ exerciseId, name, group: group || '', targetMuscle: targetMuscle || '', equipment: equipment || '', tracking, ...(prescription ? { prescription } : {}), ...(restBetweenSets !== undefined ? { restBetweenSets } : {}), ...(restAfterExercise !== undefined ? { restAfterExercise } : {}) })) });
       await onSaved();
     } catch (err) { setError(err instanceof Error ? err.message : 'Could not save your day.'); } finally { setBusy(false); }
   };

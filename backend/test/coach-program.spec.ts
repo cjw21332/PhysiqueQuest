@@ -80,6 +80,27 @@ describe('saved per-user Coach programs', () => {
     await service.updateDay(user, { programVersion: first.programVersion, dayIndex: 0, title: 'Rest', exercises: [] });
     expect((await service.getPlan(user)).days[0]).toMatchObject({ title: 'Rest', exercises: [], isWorkoutDay: false });
   });
+  it('replaces the whole week from a program: listed days become sessions, the rest become rest days', async () => {
+    const test = setup(), service = test.service();
+    const first = await service.getPlan(user);
+    const row = (id: string) => ({ exerciseId: id, name: id, group: 'Legs', targetMuscle: 'Quads', equipment: 'Machine', tracking: 'Manual' as const, prescription: '3 × 8-10 @ 70 kg' });
+    const week = await service.replaceWeek(user, { programVersion: first.programVersion, days: [{ dayIndex: 0, title: 'Push', exercises: [row('bench')] }, { dayIndex: 4, title: 'Lower', exercises: [row('deadlift'), row('leg-press')] }] });
+    expect(week.days.map((day: any) => [day.title, day.isWorkoutDay])).toEqual([['Push', true], ['Recovery day', false], ['Recovery day', false], ['Recovery day', false], ['Lower', true], ['Recovery day', false], ['Rest day', false]]);
+    expect(week.sessionCount).toBe(2);
+    expect((await test.service().getPlan(user)).days[4].exercises.map((item: any) => item.exerciseId)).toEqual(['deadlift', 'leg-press']);
+    await expect(service.replaceWeek(user, { programVersion: first.programVersion, days: [{ dayIndex: 0, title: 'A', exercises: [] }, { dayIndex: 0, title: 'B', exercises: [] }] })).rejects.toThrow();
+    await expect(service.replaceWeek(user, { programVersion: first.programVersion, days: [] })).rejects.toThrow();
+  });
+  it('never stores feedback adjustments when a day is edited', async () => {
+    const test = setup(), service = test.service();
+    const first = await service.getPlan(user);
+    test.feedback.list.mockResolvedValue([{ exercise: 'Dumbbell bench press', difficulty: 'too_hard', rpe: 9 }]);
+    await service.updateDay(user, { programVersion: first.programVersion, dayIndex: 1, title: 'Arms', exercises: [] });
+    const stored = [...test.records.values()][0].plan.days[0].exercises[0];
+    expect(stored.prescription).toBe('4 × 10');
+    expect(stored.feedbackTip ?? null).toBeNull();
+    expect((await service.getPlan(user)).days[0].exercises[0].prescription).toBe('3 × 10');
+  });
   it('rejects malformed, duplicate and stale edits', async () => {
     const test = setup(), service = test.service();
     const first = await service.getPlan(user);

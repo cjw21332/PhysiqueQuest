@@ -22,6 +22,7 @@ import SessionChoice from './SessionChoice';
 import OutcomeDialog from '../../components/OutcomeDialog';
 import ProgramsHub from './ProgramsHub';
 import { Icon } from '../Home/icons';
+import TabHeader from '../../components/TabHeader';
 
 type View = 'plan' | 'programs' | 'library' | 'review' | 'session' | 'report';
 const TABS: { view: View; label: string; icon: string; name?: string }[] = [{ view: 'plan', label: 'Today', icon: 'calendar' }, { view: 'programs', label: 'Programs', icon: 'clipboard' }, { view: 'library', label: 'Library', icon: 'book-open', name: 'Exercise library' }];
@@ -112,7 +113,7 @@ export default function CoachSection({ profile }: { profile: Profile }) {
   return (
     <section className={`coach-section coach-view-${view} ${hub ? 'cq-hub' : ''}`}>
       <div className="coach-scroll">
-        {hub && <header className="cq-hub-header coach-plan-header"><div><p className="cq-eyebrow">{profile.name ? `Hi, ${profile.name.split(' ')[0]}` : 'Your training'}</p><h2 className="coach-title">AI Coach</h2></div></header>}
+        {hub && <TabHeader className="cq-hub-header coach-plan-header" eyebrow="Your training" title="AI Coach"/>}
         {hub && <nav className="cq-tabs" aria-label="Coach sections">{TABS.map(tab => <button type="button" key={tab.view} aria-label={tab.name} aria-current={view === tab.view ? 'page' : undefined} onClick={() => setView(tab.view)}><Icon name={tab.icon} size={16}/>{tab.label}</button>)}</nav>}
         {view === 'plan' && <>
           {recoverable && !checking && <section className="routine-recovery"><h2>Workout in progress</h2><p>Resume your saved sets. Resume paused; unsaved inputs are restored only on this device. Without a device checkpoint, elapsed time includes the gap while the app was closed.</p><button type="button" disabled={starting.current} onClick={async()=>{

@@ -331,7 +331,7 @@ test('Scan nutrition, estimate, and log use the dark reference palette', async (
   await expect(page.locator('.home-bottom-nav')).toHaveCSS('background-color', 'rgb(22, 29, 39)');
   await expect(page.locator('.circle-bg')).toHaveCSS('stroke', 'rgb(39, 52, 68)');
   await expect(page.locator('.scan-dashboard-scan')).toHaveCSS('color', 'rgb(11, 15, 21)');
-  await expect(page.locator('.scan-dashboard-header h1')).toHaveCSS('font-size', '16px');
+  await expect(page.locator('.scan-dashboard-header h1')).toHaveCSS('font-size', '24px');
   await expect(page.locator('.scan-reference')).toHaveCSS('font-family', /Inter/);
   await expect(page.locator('.calorie-amount')).toHaveText('1,420');
   await expect(page.locator('.calorie-amount')).toHaveCSS('color', 'rgb(248, 250, 252)');

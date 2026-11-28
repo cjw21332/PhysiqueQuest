@@ -434,3 +434,6 @@
 @media (prefers-reduced-motion: reduce) {
   .hm.hm.hm *, .hm.hm.hm *::before { transition: none !important; animation: none !important; }
 }
+
+/* v1.6.5: the dashboard header uses the shared tab header padding, so the page adds none on top. */
+.hm.hm.hm .hm-dashboard { padding-top: 0; }

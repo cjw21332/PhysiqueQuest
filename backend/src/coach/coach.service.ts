@@ -12,8 +12,15 @@ import { z } from 'zod';
 import { AccountLifecycleFence } from '../privacy/account-lifecycle-fence.js';
 import { orderPlanWithOpenAI } from './openai-plan.js';
 
-const exerciseSchema = z.object({ exerciseId: z.string().trim().min(1).max(80), name: z.string().trim().min(1).max(120), group: z.string().max(120), targetMuscle: z.string().max(120), equipment: z.string().max(120), tracking: z.enum(['Manual', 'AI tracked']), prescription: z.string().max(80).optional() }).strict();
-const dayUpdateSchema = z.object({ programVersion: z.string().regex(/^[a-f0-9]{64}$/), dayIndex: z.number().int().min(0).max(6), title: z.string().trim().min(1).max(80), exercises: z.array(exerciseSchema).max(50) }).strict().refine(value => new Set(value.exercises.map(item => item.exerciseId)).size === value.exercises.length, 'Exercises must be unique');
+const exerciseSchema = z.object({ exerciseId: z.string().trim().min(1).max(80), name: z.string().trim().min(1).max(120), group: z.string().max(120), targetMuscle: z.string().max(120), equipment: z.string().max(120), tracking: z.enum(['Manual', 'AI tracked']), prescription: z.string().max(80).optional(), restBetweenSets: z.number().int().min(0).max(600).optional(), restAfterExercise: z.number().int().min(0).max(600).optional() }).strict();
+const programVersion = z.string().regex(/^[a-f0-9]{64}$/);
+const dayFields = { dayIndex: z.number().int().min(0).max(6), title: z.string().trim().min(1).max(80), exercises: z.array(exerciseSchema).max(50) };
+const uniqueExercises = (day: { exercises: { exerciseId: string }[] }) => new Set(day.exercises.map(item => item.exerciseId)).size === day.exercises.length;
+const dayUpdateSchema = z.object({ programVersion, ...dayFields }).strict().refine(uniqueExercises, 'Exercises must be unique');
+// Replaces the whole week in one write: listed days become these sessions, every other day becomes a rest day.
+const weekUpdateSchema = z.object({ programVersion, days: z.array(z.object(dayFields).strict().refine(uniqueExercises, 'Exercises must be unique')).min(1).max(7) }).strict()
+  .refine(value => new Set(value.days.map(day => day.dayIndex)).size === value.days.length, 'Days must be unique');
+type DayUpdate = z.infer<typeof dayUpdateSchema>;
 
 type Program = ReturnType<CoachPlanner['build']> & { source: string; programVersion?: string };
 
@@ -39,7 +46,8 @@ export function coachProgramContext(profile: Profile, values: Record<string, unk
 export class CoachService {
   private readonly generating = new Map<string, Promise<Program>>();
   constructor(@InjectModel(Profile.name) private readonly profiles: Model<Profile>, @InjectModel(Settings.name) private readonly settings: Model<Settings>, private readonly exercises: ExerciseDbService, @InjectModel(CoachProgram.name) private readonly programs: Model<CoachProgram>, private readonly feedback?: FeedbackService) {}
-  async getPlan(userId: string) {
+  /** `withFeedback: false` returns the stored plan without feedback adjustments, so edits never bake them in. */
+  async getPlan(userId: string, withFeedback = true) {
     const fence = new AccountLifecycleFence(this.programs.db);
     if (!Types.ObjectId.isValid(userId)) throw new NotFoundException('Profile not found');
     const [profile, settings, lifecycleGeneration, reports] = await Promise.all([
@@ -57,7 +65,8 @@ export class CoachService {
     const saved = await this.programs.findOne(filter).lean().exec();
     // Refresh the week label locally; exercise selection never needs a daily API call.
     // Feedback adjusts sets, reps and tips on read; it never regenerates or reorders the stored plan.
-    if (saved) return applyFeedback({ ...saved.plan, weekLabel: schedule.weekLabel, ageNote: schedule.ageNote, programVersion: contextHash } as Program, feedback);
+    const adjust = (plan: Program) => withFeedback ? applyFeedback(plan, feedback) : plan;
+    if (saved) return adjust({ ...saved.plan, weekLabel: schedule.weekLabel, ageNote: schedule.ageNote, programVersion: contextHash } as Program);
     const key = `${userId}:${lifecycleGeneration}:${contextHash}`;
     const pending = this.generating.get(key);
     if (pending) return pending;
@@ -74,23 +83,35 @@ export class CoachService {
       // Persist the user's program, not provider media. Details/GIFs are refreshed on opening the library.
       const snapshot = { ...plan, days: plan.days.map(day => ({ ...day, exercises: day.exercises.map(({ gifUrl: _gifUrl, ...exercise }) => exercise) })) };
       const stored = await fence.withActiveWrite(userId, async session => this.programs.findOneAndUpdate(filter, { $setOnInsert: { ...filter, plan: snapshot } }, { upsert: true, new: true, runValidators: true, session }).lean().exec(), lifecycleGeneration);
-      return applyFeedback({ ...stored!.plan, weekLabel: schedule.weekLabel, ageNote: schedule.ageNote, programVersion: contextHash } as Program, feedback);
+      return adjust({ ...stored!.plan, weekLabel: schedule.weekLabel, ageNote: schedule.ageNote, programVersion: contextHash } as Program);
     })();
     this.generating.set(key, generation);
     try { return await generation; } finally { this.generating.delete(key); }
   }
   async updateDay(userId: string, body: unknown) {
-    const fence = new AccountLifecycleFence(this.programs.db), generation = await fence.generation(userId);
     const parsed = dayUpdateSchema.safeParse(body);
     if (!parsed.success) throw new BadRequestException('Invalid day or exercise details.');
-    const { programVersion, dayIndex, title, exercises } = parsed.data;
-    const current = await this.getPlan(userId);
+    return this.writeDays(userId, parsed.data.programVersion, [parsed.data], false);
+  }
+  async replaceWeek(userId: string, body: unknown) {
+    const parsed = weekUpdateSchema.safeParse(body);
+    if (!parsed.success) throw new BadRequestException('Invalid days or exercise details.');
+    return this.writeDays(userId, parsed.data.programVersion, parsed.data.days, true);
+  }
+  private async writeDays(userId: string, programVersion: string, updates: Omit<DayUpdate, 'programVersion'>[], restOthers: boolean) {
+    const fence = new AccountLifecycleFence(this.programs.db), generation = await fence.generation(userId);
+    const current = await this.getPlan(userId, false);
     if (current.programVersion !== programVersion) throw new ConflictException('Your plan changed. Refresh it before saving.');
-    const days = current.days.map(day => day.index === dayIndex ? { ...day, title, focus: title, isWorkoutDay: exercises.length > 0, exercises, formTip: null, availabilityNote: null, equipmentLabel: [...new Set(exercises.map(item => item.equipment).filter(Boolean))].join(' + ') } : day);
-    const plan = { ...current, days, sessionCount: days.filter(day => day.isWorkoutDay).length, libraryReady: current.libraryReady || exercises.length > 0 };
+    const byIndex = new Map(updates.map(update => [update.dayIndex, update]));
+    const days = current.days.map(day => {
+      const update = byIndex.get(day.index);
+      if (update) return { ...day, title: update.title, focus: update.title, isWorkoutDay: update.exercises.length > 0, exercises: update.exercises, formTip: null, availabilityNote: null, equipmentLabel: [...new Set(update.exercises.map(item => item.equipment).filter(Boolean))].join(' + ') };
+      return restOthers ? { ...day, title: day.index === 6 ? 'Rest day' : 'Recovery day', focus: null, isWorkoutDay: false, exercises: [], formTip: null, availabilityNote: null, equipmentLabel: '' } : day;
+    });
+    const plan = { ...current, days, sessionCount: days.filter(day => day.isWorkoutDay).length, libraryReady: current.libraryReady || updates.some(update => update.exercises.length > 0) };
     delete plan.programVersion;
     await fence.withActiveWrite(userId, async session => this.programs.findOneAndUpdate({ userId: new Types.ObjectId(userId), contextHash: programVersion }, { $set: { plan } }, { upsert: true, new: true, runValidators: true, session }).exec(), generation);
-    return { ...plan, programVersion };
+    return this.getPlan(userId);
   }
   private async profileModel(userId: string) {
     const profile = await this.profiles.findOne({ userId: new Types.ObjectId(userId) }).lean().exec();

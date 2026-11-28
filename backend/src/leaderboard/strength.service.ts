@@ -14,6 +14,23 @@ export function estimatedMax(load: number, reps: number): number {
 export class StrengthService {
   constructor(@InjectModel(WorkoutSession.name) private readonly workouts: Model<WorkoutSession>, @InjectModel(Profile.name) private readonly profiles: Model<Profile>, @InjectModel(User.name) private readonly users: Model<User>, @InjectModel(Settings.name) private readonly settings: Model<Settings>) {}
 
+  /**
+   * Profile photos for leaderboard rows: only active accounts that show themselves on the leaderboard
+   * (your own photo is always returned). Fetched apart from the rankings so those stay small.
+   */
+  async photos(userId: string, ids: string[]) {
+    const wanted = [...new Set(ids)].filter(id => Types.ObjectId.isValid(id)).slice(0, 50);
+    if (!wanted.length) return { photos: {} };
+    const [hidden, active] = await Promise.all([
+      this.settings.find({ 'values.showLeaderboard': false }).select('userId').lean().exec().then(rows => new Set(rows.map(row => String(row.userId)))),
+      this.users.find({ _id: { $in: wanted.map(id => new Types.ObjectId(id)) }, isActive: { $ne: false }, deletedAt: null }).select('_id').lean().exec(),
+    ]);
+    const visible = active.map(user => String(user._id)).filter(id => wanted.includes(id) && (id === userId || !hidden.has(id)));
+    if (!visible.length) return { photos: {} };
+    const rows = await this.profiles.collection.find({ userId: { $in: visible.map(id => new Types.ObjectId(id)) }, photo: { $type: 'string', $ne: '' } }, { projection: { userId: 1, photo: 1 } }).toArray();
+    return { photos: Object.fromEntries(rows.filter(row => visible.includes(String(row.userId)) && /^data:image\/jpeg;base64,/.test(String(row.photo))).map(row => [String(row.userId), String(row.photo)])) };
+  }
+
   async get(userId: string, exerciseId?: string, metric = 'heaviest') {
     if (!['heaviest', 'relative'].includes(metric)) throw new BadRequestException('Invalid ranking method');
     if (exerciseId && (exerciseId.length > 80 || !exerciseId.trim())) throw new BadRequestException('Invalid exercise');

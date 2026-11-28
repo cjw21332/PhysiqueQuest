@@ -23,6 +23,21 @@ describe('strength rankings', () => {
     expect(relative.entries.map(row => row.userId)).toEqual([b, a]);
     expect(relative.entries[1].score).toBeCloseTo(120 / (200 / 2.2046226218));
   });
+  it('returns leaderboard photos only for visible accounts, and always your own', async () => {
+    const a = 'aaaaaaaaaaaaaaaaaaaaaaaa', b = 'bbbbbbbbbbbbbbbbbbbbbbbb', c = 'cccccccccccccccccccccccc', d = 'dddddddddddddddddddddddd';
+    const query = (items: unknown[]) => ({ select: () => ({ lean: () => ({ exec: async () => items }) }) });
+    const jpeg = (id: string) => `data:image/jpeg;base64,${id}`;
+    const service = new StrengthService(
+      {} as never,
+      { collection: { find: () => ({ toArray: async () => [{ userId: a, photo: jpeg('a') }, { userId: b, photo: jpeg('b') }, { userId: c, photo: jpeg('c') }] }) } } as never,
+      { find: () => query([{ _id: a }, { _id: b }, { _id: c }]) } as never,
+      { find: () => query([{ userId: a }, { userId: c }]) } as never,
+    );
+    // a and c hide themselves from the leaderboard, d is not an active account, 'bad' is not an id.
+    expect((await service.photos(a, [a, b, c, d, 'bad'])).photos).toEqual({ [a]: jpeg('a'), [b]: jpeg('b') });
+    expect((await service.photos(b, [c])).photos).toEqual({});
+    expect((await service.photos(b, [])).photos).toEqual({});
+  });
   it('lists visible accounts without a qualifying set as unranked', async () => {
     const a = 'aaaaaaaaaaaaaaaaaaaaaaaa', b = 'bbbbbbbbbbbbbbbbbbbbbbbb';
     const query = (items: unknown[]) => ({ select: () => ({ lean: () => ({ exec: async () => items, cursor: () => ({ async *[Symbol.asyncIterator]() { yield* items; } }) }) }) });

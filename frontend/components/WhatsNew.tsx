@@ -4,12 +4,12 @@ import { usePathname } from 'next/navigation';
 import { Icon } from '../sections/Home/icons';
 import './whatsNew.css';
 
-export const WHATS_NEW_VERSION = '1.6.4';
+export const WHATS_NEW_VERSION = '1.6.5';
 export const WHATS_NEW: { icon: string; title: string; text: string }[] = [
-  { icon: 'clipboard', title: 'Import from notes', text: 'Coach › Programs › Import from notes turns a pasted workout note into a program you can review, edit and save.' },
-  { icon: 'coach-wand', title: 'Smarter feedback', text: 'Workout feedback no longer swaps your exercises. It adjusts sets or reps and gives you a tip for next time.' },
-  { icon: 'target', title: 'Quest 1, 2 and 3', text: 'Personal quests keep their slot label, and View all shows every current and finished quest.' },
-  { icon: 'star', title: 'Feedback goes straight to the team', text: 'Send feedback from Me and it reaches the PhysiqueQuest team by email right away.' },
+  { icon: 'calendar', title: 'Use a program as your weekly plan', text: 'Open any program in Coach › Programs and tap Use as my weekly plan. Your Today tab follows it, day by day.' },
+  { icon: 'clipboard', title: 'Programs by weekday', text: 'Programs now list Monday to Sunday. Start, edit or delete a day right from the list, or open it for the full workout.' },
+  { icon: 'play', title: 'One day at a time', text: 'Like one workout? Put it on any day of your plan without changing the rest of your week.' },
+  { icon: 'star', title: 'Cleaner headers', text: 'Every tab now has the same header style, with clear buttons for Manual entry and Leaderboard.' },
 ];
 // Shown once per version: the device remembers the version it showed, so reopening the app does not
 // repeat it. The per-launch flag stays honoured (tests and older builds set it).

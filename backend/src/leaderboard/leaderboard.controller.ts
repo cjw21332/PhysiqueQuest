@@ -16,6 +16,11 @@ export class LeaderboardController {
     return this.strength.get(req.user.userId, exerciseId, metric);
   }
 
+  @Get('photos')
+  photos(@Req() req: AuthenticatedRequest, @Query('ids') ids = '') {
+    return this.strength.photos(req.user.userId, String(ids).split(',').map(id => id.trim()).filter(Boolean));
+  }
+
   @Get()
   get(@Req() req: AuthenticatedRequest, @Query('period') period: LeaderboardPeriod = 'week') {
     return this.service.get(req.user.userId, period);

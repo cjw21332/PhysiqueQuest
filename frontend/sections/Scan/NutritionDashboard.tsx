@@ -5,6 +5,7 @@ import AdditionalNutrition from '../Scan/AdditionalNutrition';
 import { nutrientTotal, nutrientLabel, knownNutrientTotal } from '../Scan/nutrientTotal';
 
 import { Icon } from '../Home/icons';
+import TabHeader from '../../components/TabHeader';
 import CalorieProgress from '../Home/CalorieProgress';
 import { nutritionTargets, type FoodEntry, type MealName } from './types';
 import MealDiary from './MealDiary';
@@ -68,12 +69,11 @@ export default function NutritionDashboard({
 
   return (
     <div className="scan-dashboard">
-      <header className="scan-dashboard-header">
-        <h1>Nutrition</h1>
-        {!readOnly && <button type="button" className="scan-dashboard-manual" onClick={() => onAdd(defaultMeal())}>
-          <span aria-hidden="true">＋</span> Manual entry
+      <TabHeader as="h1" className="scan-dashboard-header" eyebrow="Track your meals" title="Nutrition">
+        {!readOnly && <button type="button" className="scan-dashboard-manual pq-header-action" onClick={() => onAdd(defaultMeal())}>
+          <Icon name="plus" size={16}/>Manual entry
         </button>}
-      </header>
+      </TabHeader>
       {dayPicker}
 
       <section className="scan-dashboard-summary" aria-label="Today's nutrition">

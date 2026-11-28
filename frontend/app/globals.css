@@ -10725,3 +10725,22 @@ dialog[open]::backdrop { animation: pq-fade-in .22s ease-out; }
   .coach-chat-dialog.coach-chat-dialog .coach-chat-pending .coach-chat-privacy::before { animation: none; }
   .coach-chat-launcher.coach-chat-launcher.coach-chat-launcher, .coach-chat-dialog.coach-chat-dialog :is(.coach-chat-prompts button, .coach-chat-access) { transition: none; }
 }
+
+/* Main tab headers (v1.6.5): Home, Coach, Scan, Quests and Me share one layout - eyebrow, 24px title, actions on
+   the right, no divider. The class is repeated to outrank older per-section header rules; side padding stays per page. */
+.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header { position: static; z-index: auto; display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 12px; width: auto; height: auto; min-height: 64px; margin: 0; padding-top: 16px; padding-bottom: 14px; border: 0; background: transparent; box-shadow: none; }
+.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header .pq-tab-copy { display: grid; gap: 2px; min-width: 0; }
+.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header .pq-tab-eyebrow { display: block; margin: 0; color: var(--muted, #94a3b8); font-size: 13px; font-weight: 500; letter-spacing: 0; line-height: 1.4; text-transform: none; }
+.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header .pq-tab-title { margin: 0; color: var(--ink, #f8fafc); font-size: 24px; font-weight: 750; letter-spacing: -.5px; line-height: 1.2; overflow-wrap: anywhere; }
+.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header.pq-tab-header .pq-tab-actions { display: flex; flex: none; align-items: center; gap: 10px; }
+.pq-header-action.pq-header-action.pq-header-action.pq-header-action.pq-header-action.pq-header-action { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; min-height: 44px; margin: 0; padding: 0 14px; border: 1px solid var(--line, #273444); border-radius: 999px; background: var(--soft, #161d27); color: var(--ink, #f8fafc); font: inherit; font-size: 13px; font-weight: 600; letter-spacing: 0; white-space: nowrap; text-decoration: none; cursor: pointer; }
+.pq-header-action.pq-header-action.pq-header-action.pq-header-action.pq-header-action.pq-header-action svg { flex: none; color: var(--green, #22c55e); }
+.pq-header-action.pq-header-action.pq-header-action.pq-header-action.pq-header-action.pq-header-action:active { transform: scale(.97); }
+.pq-header-action.pq-header-action.pq-header-action.pq-header-action.pq-header-action.pq-header-action:focus-visible { outline: 2px solid var(--green, #22c55e); outline-offset: 2px; }
+
+/* Confirmation dialog, non-destructive tone (v1.6.5): replacing the weekly plan. */
+.delete-confirmation.is-primary .delete-confirm-icon { background: #143b26; color: #22c55e; }
+.delete-confirmation.is-primary .delete-confirm-action { background: #22c55e; color: #0b0f15; }
+.delete-confirmation .cq-weekday-pick { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: -6px 0 20px; }
+.delete-confirmation .cq-weekday-pick button { min-width: 0; min-height: 44px; padding: 0; border: 1px solid #273444; border-radius: 12px; background: #212b3b; color: #f8fafc; font-size: 12px; font-weight: 600; }
+.delete-confirmation .cq-weekday-pick button[aria-checked="true"] { border-color: #22c55e; background: #143b26; color: #4ade80; }

@@ -244,3 +244,7 @@
 @keyframes lb-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 @media (max-width: 360px) { .lb2 .lb-you-main strong { font-size: 26px; } .lb2 .lb-row { gap: 8px; padding: 8px 10px; } .lb2 .lb-avatar { width: 32px; height: 32px; } }
 @media (prefers-reduced-motion: reduce) { .lb2 .lb-skel { animation: none; } .lb2 .lb-tabs button { transition: none; } }
+
+/* Member photos (v1.6.5): fill the round avatar; initials stay the fallback. */
+.lb2 .lb-avatar.has-photo { overflow: hidden; padding: 0; background: var(--soft); }
+.lb2 .lb-avatar.has-photo img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }

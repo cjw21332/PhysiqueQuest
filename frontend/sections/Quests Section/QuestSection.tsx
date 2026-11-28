@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
+import TabHeader from '../../components/TabHeader';
 import type { Profile } from '../Home/types';
 import { useActivity, type ActivityBadge, type DailyMission, type QuestLogEntry } from '../../hooks/useActivity';
 import { useLeaderboard } from '../../hooks/useLeaderboard';
+import { useLeaderboardPhotos } from '../../hooks/useLeaderboardPhotos';
 import { useSettings } from '../../hooks/useSettings';
 import { api, type LeaderboardEntryRecord, type LeaderboardPeriod, type StrengthLeaderboardRecord, type StrengthStanding } from '../../lib/api';
 import { useScreenRoute } from '../../hooks/useScreenRoute';
@@ -57,13 +59,13 @@ function movementLabel(movement: LeaderboardEntryRecord['movement']) {
   return typeof movement === 'number' && movement !== 0 ? `${Math.abs(movement)} places ${movement > 0 ? 'up' : 'down'}` : 'No rank change';
 }
 
-type RankRow = { id: string; name: string; rank: number; value: string; sub?: string; movement?: LeaderboardEntryRecord['movement']; isYou?: boolean };
+type RankRow = { id: string; name: string; rank: number; value: string; sub?: string; movement?: LeaderboardEntryRecord['movement']; isYou?: boolean; photo?: string };
 
-// A stable hue per name keeps avatars distinguishable without photos.
-function Avatar({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }) {
+// Profile photo when the member has one; otherwise initials on a stable hue per name.
+function Avatar({ name, photo, size = 'md' }: { name: string; photo?: string; size?: 'md' | 'lg' }) {
   let hue = 0;
   for (const char of name) hue = (hue * 31 + char.charCodeAt(0)) % 360;
-  return <span className={`lb-avatar is-${size}`} aria-hidden="true" style={{ '--h': hue } as CSSProperties}>{getInitials(name) || '?'}</span>;
+  return <span className={`lb-avatar is-${size}${photo ? ' has-photo' : ''}`} aria-hidden="true" style={{ '--h': hue } as CSSProperties}>{photo ? <img src={photo} alt="" decoding="async"/> : getInitials(name) || '?'}</span>;
 }
 
 function MovementChip({ movement }: { movement: LeaderboardEntryRecord['movement'] }) {
@@ -78,7 +80,7 @@ function Podium({ label, rows }: { label: string; rows: RankRow[] }) {
   return <section className="leaderboard-podium lb-podium" aria-label={label}>
     {order.map(row => <div className={`podium-player podium-rank-${row.rank}${row.isYou ? ' is-you' : ''}`} key={row.id}>
       {row.rank === 1 ? <span className="lb-crown"><Icon name="crown" size={20}/></span> : <span className="lb-crown-space"/>}
-      <span className="lb-podium-avatar"><Avatar name={row.name} size="lg"/><span className="lb-medal">{row.rank}</span></span>
+      <span className="lb-podium-avatar"><Avatar name={row.name} photo={row.photo} size="lg"/><span className="lb-medal">{row.rank}</span></span>
       <strong>{row.isYou ? 'You' : row.name}</strong>
       <small>{row.value}</small>
       <div className="podium-step" aria-hidden="true"/>
@@ -93,7 +95,7 @@ function RankList({ label, rows, total }: { label: string; rows: RankRow[]; tota
     <div className="leaderboard-rankings" role="list" aria-label={label}>
       {rows.map(row => <div className={`lb-row${row.isYou ? ' is-you' : ''}`} role="listitem" key={row.id}>
         <span className="lb-rank">{row.rank}</span>
-        <Avatar name={row.name}/>
+        <Avatar name={row.name} photo={row.photo}/>
         <span className="lb-person"><strong>{row.name}{row.isYou && <em>You</em>}</strong>{row.sub && <small>{row.sub}</small>}</span>
         <span className="lb-value">{row.value}</span>
         {row.movement !== undefined && <MovementChip movement={row.movement}/>}
@@ -142,6 +144,9 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
   useEffect(() => { void refresh(); }, [today, refresh]);
   useEffect(() => { if (screen !== 'leaderboard' || ranking !== 'strength') return; let active = true; setStrengthLoading(true); setStrengthError(''); api.getStrengthLeaderboard(lift, measure).then(data => { if (active) setStrength(data); }).catch(error => { if (active) setStrengthError(error instanceof Error ? error.message : 'Could not load strength rankings.'); }).finally(() => { if (active) setStrengthLoading(false); }); return () => { active = false; }; }, [screen, ranking, lift, measure, strengthRetry]);
   const { data: leaderboard, loading: leaderboardLoading, error: leaderboardError, refresh: refreshLeaderboard } = useLeaderboard(period);
+  // Only fetched while the leaderboard is open; your own photo comes from your profile.
+  const photoOf = useLeaderboardPhotos(screen === 'leaderboard' ? [...(ranking === 'quests' ? leaderboard?.entries ?? [] : [...(strength?.entries ?? []), ...(strength?.participants ?? [])])].filter(entry => !entry.isCurrentUser).map(entry => entry.userId) : []);
+  const rowPhoto = (id: string, isYou: boolean) => isYou ? profile.photo || undefined : photoOf(id);
   const level = activity.level;
   const currentExp = activity.currentExp;
   const nextLevelExp = activity.nextLevelExp;
@@ -158,7 +163,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
   const weekDates = Array.from({ length: 7 }, (_, index) => { const date = new Date(weekStart); date.setDate(date.getDate() + index); return date; });
   const weekLabel = `${weekDates[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} – ${weekDates[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
-  if (loading) return <section className="quest-section"><header className="quest-v2-header"><h2>Quests</h2></header><div className="profile-load-state" role="status" aria-label="Loading quests" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div><BottomNav /></section>;
+  if (loading) return <section className="quest-section"><TabHeader className="quest-v2-header" eyebrow="Challenges & rewards" title="Quests"/><div className="profile-load-state" role="status" aria-label="Loading quests" aria-busy="true"><div className="section-placeholder" aria-hidden="true" /></div><BottomNav /></section>;
   if (error) return <section className="quest-section"><div className="profile-load-state" role="alert"><h2>Could not load quests</h2><p>{error}</p><button type="button" onClick={() => void refresh()}>Try again</button></div><BottomNav /></section>;
 
   if (screen === 'badges') return <BadgeVault badges={badges} onBack={() => setScreen('quests')}/>;
@@ -168,8 +173,8 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
     const entries = leaderboard?.entries ?? [];
     const currentName = profile.name.trim() || 'You';
     const strengthValue = (entry: StrengthStanding) => measure === 'relative' ? `${entry.score.toFixed(2)}× BW` : `${entry.maxKg.toFixed(1)} kg`;
-    const questRows: RankRow[] = entries.map(entry => ({ id: entry.userId, name: entry.name, rank: entry.rank, value: `${formatPoints(entry.points)} pts`, movement: entry.movement, isYou: entry.isCurrentUser }));
-    const strengthRows: RankRow[] = (strength?.entries ?? []).map(entry => ({ id: entry.userId, name: entry.name, rank: entry.rank, value: strengthValue(entry), sub: `${entry.loadKg} kg × ${entry.reps} reps`, isYou: entry.isCurrentUser }));
+    const questRows: RankRow[] = entries.map(entry => ({ id: entry.userId, name: entry.name, rank: entry.rank, value: `${formatPoints(entry.points)} pts`, movement: entry.movement, isYou: entry.isCurrentUser, photo: rowPhoto(entry.userId, entry.isCurrentUser) }));
+    const strengthRows: RankRow[] = (strength?.entries ?? []).map(entry => ({ id: entry.userId, name: entry.name, rank: entry.rank, value: strengthValue(entry), sub: `${entry.loadKg} kg × ${entry.reps} reps`, isYou: entry.isCurrentUser, photo: rowPhoto(entry.userId, entry.isCurrentUser) }));
     const questSelf = leaderboard && settings.showLeaderboard ? leaderboard.self : null;
     const behind = ranking === 'quests' ? leaderboard?.context : undefined;
     const self = ranking === 'quests'
@@ -223,7 +228,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
           </>}
           {!strengthLoading && !strengthError && !!strength?.participants?.length && <section className="lb-list lb-unranked" aria-labelledby="strength-unranked-title">
             <div className="lb-list-head"><h3 id="strength-unranked-title">Community members</h3><span>Not yet ranked</span></div>
-            <div role="list">{strength.participants.map(person => <div className="lb-row is-muted" role="listitem" key={person.userId}><span className="lb-rank">—</span><Avatar name={person.name}/><span className="lb-person"><strong>{person.isCurrentUser ? `You · ${person.name}` : person.name}</strong><small>{measure === 'relative' ? 'No eligible lift or bodyweight' : 'No eligible lift yet'}</small></span></div>)}</div>
+            <div role="list">{strength.participants.map(person => <div className="lb-row is-muted" role="listitem" key={person.userId}><span className="lb-rank">—</span><Avatar name={person.name} photo={rowPhoto(person.userId, person.isCurrentUser)}/><span className="lb-person"><strong>{person.isCurrentUser ? `You · ${person.name}` : person.name}</strong><small>{measure === 'relative' ? 'No eligible lift or bodyweight' : 'No eligible lift yet'}</small></span></div>)}</div>
           </section>}
           <p className="leaderboard-privacy lb-note"><Icon name="lightbulb" size={14}/>Self-reported completed sets, up to 30 reps. Single reps use the logged weight; other sets use an estimated one-rep max. Pound for pound divides that estimate by your current bodyweight.</p>
         </>}
@@ -233,7 +238,7 @@ export default function QuestSection({ profile, onLogoutRequest: _onLogoutReques
   }
 
   return <section className="quest-section quests-reference" aria-label="Quests">
-    <header className="quest-v2-header"><h2>Quests</h2><button className="quest-v2-leaderboard-link" type="button" onClick={() => setScreen('leaderboard')}><Icon name="trophy" size={14}/>Leaderboard</button></header>
+    <TabHeader className="quest-v2-header" eyebrow="Challenges & rewards" title="Quests"><button className="quest-v2-leaderboard-link pq-header-action" type="button" onClick={() => setScreen('leaderboard')}><Icon name="trophy" size={16}/>Leaderboard</button></TabHeader>
     <div className="quest-v2-scroll">
       <section className="quest-v2-level-card" aria-label={`Level ${level}, ${activity.dayStreak} day streak`}>
         <div className="quest-v2-level-top"><div><h3>Level {level}</h3><p>{currentExp} / {nextLevelExp} exp to level {level + 1}</p></div><div className="quest-v2-streak"><strong><Icon name="fire" size={17}/>{activity.dayStreak}</strong><small>day streak</small></div></div>

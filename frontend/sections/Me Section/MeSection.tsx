@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Icon } from '../Home/icons';
 import BottomNav from '../Home/BottomNav';
+import TabHeader from '../../components/TabHeader';
 import { api, deviceCache } from '../../lib/api';
 import { useBackendConnection } from '../../hooks/useBackendConnection';
 import { getCurrentUser, PROFILE_STORAGE_KEY } from '../../lib/auth';
@@ -104,7 +105,7 @@ export default function MeSection({ profile, onLogoutRequest }: { profile: Profi
   if (view === 'personal-exercises') return <PersonalExercises onBack={() => setView('settings')} />;
 
   return <section className={`me-section me-reference ${styles.settings}`} aria-label="Account and settings">
-    <header className="me-header"><h2>Account &amp; settings</h2></header>
+    <TabHeader className="me-header" eyebrow="Profile & preferences" title="Account & settings"/>
     <div className="me-scroll">
       <div className="me-profile-summary">
         <span className="me-avatar me-reference-avatar" aria-hidden="true">{currentProfile.photo ? <img src={currentProfile.photo} alt=""/> : <Icon name="user" size={28}/>}</span>

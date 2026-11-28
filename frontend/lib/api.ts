@@ -590,6 +590,7 @@ class ApiClient {
   }
   async updateActivity(state: Record<string, unknown>) { return this.request<any>('/activity/state', { method: 'PUT', body: JSON.stringify({ state }) }); }
   async getLeaderboard(period: LeaderboardPeriod = 'week') { return this.request<LeaderboardRecord>(`/leaderboard?period=${encodeURIComponent(period)}`); }
+  async getLeaderboardPhotos(ids: string[]) { return this.request<{ photos: Record<string, string> }>(`/leaderboard/photos?ids=${ids.map(encodeURIComponent).join(',')}`); }
   async getStrengthLeaderboard(exerciseId: string, metric: 'heaviest' | 'relative') { const params = new URLSearchParams({ metric }); if (exerciseId) params.set('exerciseId', exerciseId); return this.request<StrengthLeaderboardRecord>(`/leaderboard/strength?${params}`); }
   async saveProfilePhoto(photo: string | null) { const profile = await this.request<any>('/profile/photo', photo ? { method: 'PUT', body: JSON.stringify({ photo }) } : { method: 'DELETE' }); deviceCache.publish('profile', profile); return profile; }
   async chat(messages: { role: 'user' | 'assistant'; text: string }[], includePersonalData = false, page?: string, signal?: AbortSignal) {
@@ -621,6 +622,12 @@ class ApiClient {
     return this.request<{ summary: string; suggestion: string }>(`/workouts/${encodeURIComponent(id)}/ai-summary`, { method: 'POST', timeoutMs: 25000 }); }
   async updateCoachDay(data: { programVersion: string; dayIndex: number; title: string; exercises: CoachExercise[] }) {
     const plan = await this.request<CoachPlanRecord>('/coach/plan/day', { method: 'PUT', body: JSON.stringify(data) });
+    deviceCache.publish('coach', plan);
+    return plan;
+  }
+  /** Replaces the whole weekly plan: listed days become these sessions, every other day a rest day. */
+  async replaceCoachWeek(data: { programVersion: string; days: { dayIndex: number; title: string; exercises: CoachExercise[] }[] }) {
+    const plan = await this.request<CoachPlanRecord>('/coach/plan/week', { method: 'PUT', body: JSON.stringify(data) });
     deviceCache.publish('coach', plan);
     return plan;
   }
