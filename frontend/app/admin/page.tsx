@@ -81,11 +81,11 @@ function TrendChart({ trend }: { trend: NonNullable<AdminAnalyticsRecord['trend'
   const point = hover === null ? null : trend[hover];
   const totals = series.map(([key, label]) => `${trend.reduce((sum, day) => sum + day[key], 0)} ${label.toLowerCase()}`).join(', ');
   return <div className="adm-chart">
-    <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Daily trend from ${trend[0].date} to ${trend[trend.length - 1].date}: ${totals}.`} onMouseLeave={() => setHover(null)}>
+    <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Daily trend from ${trend[0].date} to ${trend[trend.length - 1].date}: ${totals}.`} onPointerLeave={event => { if (event.pointerType === 'mouse') setHover(null); }}>
       {[0, 0.5, 1].map(step => <g key={step}><line x1={pad} x2={width - pad} y1={y(max * step)} y2={y(max * step)} className="adm-chart-grid" /><text x={pad - 8} y={y(max * step) + 4} className="adm-chart-axis" textAnchor="end">{Math.round(max * step)}</text></g>)}
       {series.map(([key, , tone]) => <polyline key={key} className={`adm-chart-line tone-${tone}`} points={trend.map((day, index) => `${x(index)},${y(day[key])}`).join(' ')} />)}
       {hover !== null && <line x1={x(hover)} x2={x(hover)} y1={pad} y2={height - pad} className="adm-chart-cursor" />}
-      {trend.map((day, index) => <rect key={day.date} x={x(index) - slot / 2} y={pad} width={slot} height={height - pad * 2} fill="transparent" onMouseEnter={() => setHover(index)} />)}
+      {trend.map((day, index) => <rect key={day.date} x={x(index) - slot / 2} y={pad} width={slot} height={height - pad * 2} fill="transparent" onPointerEnter={() => setHover(index)} onPointerDown={() => setHover(index)} />)}
       {[...new Set([0, Math.floor((trend.length - 1) / 2), trend.length - 1])].map(index => <text key={index} x={x(index)} y={height - 6} className="adm-chart-axis" textAnchor="middle">{trend[index].date.slice(5)}</text>)}
     </svg>
     {point && hover !== null && <div className="adm-chart-tip" style={{ left: `${(x(hover) / width) * 100}%` }}><strong>{point.date}</strong>{series.map(([key, label, tone]) => <span key={key}><i className={`tone-${tone}`} />{label}: {point[key]}</span>)}</div>}

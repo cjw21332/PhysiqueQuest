@@ -35,12 +35,12 @@ export default function ExerciseFeedback() {
           <tbody>{rows.map(row => {
             const total = Math.max(1, row.tooEasy + row.justRight + row.tooHard);
             return <tr key={`${row._id.exercise}:${row._id.source}`}>
-              <td><strong>{row._id.exercise}</strong></td>
-              <td><span className={`adm-pill ${row._id.source === 'pose' ? 'is-info' : 'is-muted'}`}>{row._id.source === 'pose' ? 'PoseTracker' : 'Manual'}</span></td>
-              <td className="adm-num">{row.responses}</td>
-              <td className="adm-num">{row.averageRpe?.toFixed(1) ?? '—'}</td>
-              <td className="adm-num">{row.averageEnjoyment ? `${row.averageEnjoyment.toFixed(1)}/5` : '—'}</td>
-              <td><span className="adm-stack" role="img" aria-label={`${row.tooEasy} too easy, ${row.justRight} just right, ${row.tooHard} too hard`}>
+              <td className="adm-cell-main"><strong>{row._id.exercise}</strong></td>
+              <td data-label="Source"><span className={`adm-pill ${row._id.source === 'pose' ? 'is-info' : 'is-muted'}`}>{row._id.source === 'pose' ? 'PoseTracker' : 'Manual'}</span></td>
+              <td className="adm-num" data-label="Responses">{row.responses}</td>
+              <td className="adm-num" data-label="Avg RPE">{row.averageRpe?.toFixed(1) ?? '—'}</td>
+              <td className="adm-num" data-label="Enjoyment">{row.averageEnjoyment ? `${row.averageEnjoyment.toFixed(1)}/5` : '—'}</td>
+              <td data-label="Difficulty"><span className="adm-stack" role="img" aria-label={`${row.tooEasy} too easy, ${row.justRight} just right, ${row.tooHard} too hard`}>
                 <span className="tone-cyan" style={{ width: `${(row.tooEasy / total) * 100}%` }} /><span className="tone-accent" style={{ width: `${(row.justRight / total) * 100}%` }} /><span className="tone-red" style={{ width: `${(row.tooHard / total) * 100}%` }} />
               </span><small className="adm-dim">{row.tooEasy} / {row.justRight} / {row.tooHard}</small></td>
             </tr>;

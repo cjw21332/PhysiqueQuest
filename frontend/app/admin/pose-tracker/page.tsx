@@ -38,12 +38,12 @@ export default function PoseTracker() {
           <div className="adm-table-wrap"><table className="adm-table">
             <thead><tr><th scope="col">Exercise</th><th scope="col" className="adm-num">Sets</th><th scope="col" className="adm-num">Verified reps</th><th scope="col">Agreement</th><th scope="col" className="adm-num">Zero-rep false counts</th><th scope="col">Last reviewed</th></tr></thead>
             <tbody>{rows.map(row => <tr key={row.exercise}>
-              <td><strong>{row.exercise}</strong></td>
-              <td className="adm-num">{row.sets}</td>
-              <td className="adm-num">{row.verified}</td>
-              <td>{row.agreement === null ? <span className="adm-dim">Needs reps &gt; 0</span> : <span className="adm-meter"><span className="adm-meter-track"><span className={`tone-${tone(row.agreement)}`} style={{ width: `${row.agreement}%` }} /></span><strong>{row.agreement.toFixed(1)}%</strong></span>}</td>
-              <td className="adm-num">{row.zeroRepFalsePositives} / {row.zeroRepSets}</td>
-              <td>{formatDate(row.lastReviewed)}</td>
+              <td className="adm-cell-main"><strong>{row.exercise}</strong></td>
+              <td className="adm-num" data-label="Sets">{row.sets}</td>
+              <td className="adm-num" data-label="Verified reps">{row.verified}</td>
+              <td data-label="Agreement">{row.agreement === null ? <span className="adm-dim">Needs reps &gt; 0</span> : <span className="adm-meter"><span className="adm-meter-track"><span className={`tone-${tone(row.agreement)}`} style={{ width: `${row.agreement}%` }} /></span><strong>{row.agreement.toFixed(1)}%</strong></span>}</td>
+              <td className="adm-num" data-label="Zero-rep false counts">{row.zeroRepFalsePositives} / {row.zeroRepSets}</td>
+              <td data-label="Last reviewed">{formatDate(row.lastReviewed)}</td>
             </tr>)}</tbody>
           </table></div>
         </State>
@@ -60,11 +60,11 @@ export default function PoseTracker() {
         <div className="adm-table-wrap"><table className="adm-table">
           <thead><tr><th scope="col">Exercise</th><th scope="col">Mode</th><th scope="col">Camera</th><th scope="col">Equipment</th><th scope="col">Status</th></tr></thead>
           <tbody>{matches.slice(0, 100).map(row => <tr key={row.exerciseId}>
-            <td><strong>{row.name}</strong></td>
-            <td>{humanize(row.trackingMode)}</td>
-            <td>{row.cameraOrientation}</td>
-            <td className="adm-dim">{row.equipment.join(', ') || '—'}</td>
-            <td><span className={`adm-pill vs-${row.validationStatus}`}>{humanize(row.validationStatus)}</span></td>
+            <td className="adm-cell-main"><strong>{row.name}</strong></td>
+            <td data-label="Mode">{humanize(row.trackingMode)}</td>
+            <td data-label="Camera">{row.cameraOrientation}</td>
+            <td className="adm-dim" data-label="Equipment">{row.equipment.join(', ') || '—'}</td>
+            <td data-label="Status"><span className={`adm-pill vs-${row.validationStatus}`}>{humanize(row.validationStatus)}</span></td>
           </tr>)}</tbody>
         </table></div>
         {matches.length > 100 && <p className="adm-footnote">Showing 100 of {matches.length} matches. Search to narrow the list.</p>}

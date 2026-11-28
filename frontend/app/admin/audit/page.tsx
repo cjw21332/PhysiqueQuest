@@ -43,11 +43,11 @@ export default function Audit() {
         <div className="adm-table-wrap"><table className="adm-table">
           <thead><tr><th scope="col">Time</th><th scope="col">Action</th><th scope="col">Administrator</th><th scope="col">Target</th><th scope="col">Result</th></tr></thead>
           <tbody>{audit.data?.items.map(row => <tr key={row._id}>
-            <td>{formatDate(row.occurredAt, true)}</td>
-            <td><strong className="adm-capitalize">{humanize(row.action.replace(/^admin_/, ''))}</strong></td>
-            <td className="adm-mono">{short(row.actorId)}</td>
-            <td className="adm-mono">{short(row.targetId)}</td>
-            <td>{row.status ? <span className={`adm-pill ${row.status < 400 ? 'is-good' : 'is-bad'}`}>{row.status}</span> : <span className="adm-dim">—</span>}</td>
+            <td data-label="Time">{formatDate(row.occurredAt, true)}</td>
+            <td className="adm-cell-main"><strong className="adm-capitalize">{humanize(row.action.replace(/^admin_/, ''))}</strong></td>
+            <td className="adm-mono" data-label="Administrator">{short(row.actorId)}</td>
+            <td className="adm-mono" data-label="Target">{short(row.targetId)}</td>
+            <td data-label="Result">{row.status ? <span className={`adm-pill ${row.status < 400 ? 'is-good' : 'is-bad'}`}>{row.status}</span> : <span className="adm-dim">—</span>}</td>
           </tr>)}</tbody>
         </table></div>
       </State>

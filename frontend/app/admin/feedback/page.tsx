@@ -51,7 +51,7 @@ export default function Feedback() {
         <State loading={loading && !data} error={error} onRetry={reload} empty={data && !data.items.length ? 'No feedback matches these filters.' : false}>
           {data && <>
             <ul>{data.items.map(row => <li key={row._id}>
-              <button type="button" className={selected?._id === row._id ? 'is-selected' : ''} onClick={() => setSelected(row)} aria-pressed={selected?._id === row._id}>
+              <button type="button" className={selected?._id === row._id ? 'is-selected' : ''} onClick={() => { setSelected(row); if (window.matchMedia('(max-width: 1100px)').matches) window.setTimeout(() => document.getElementById('adm-feedback-detail')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0); }} aria-pressed={selected?._id === row._id}>
                 <span className="adm-inbox-top"><span className={`adm-chip cat-${row.category}`}>{row.category}</span><span className={`adm-pill st-${row.adminStatus ?? 'new'}`}>{humanize(row.adminStatus ?? 'new')}</span><span className="adm-inbox-date">{formatDate(row.createdAt)}</span></span>
                 <span className="adm-inbox-msg">{row.message}</span>
                 <span className="adm-inbox-meta">{row.rating}/5 · {row.platform || 'unknown platform'} · v{row.appVersion || '?'}</span>
@@ -61,7 +61,7 @@ export default function Feedback() {
           </>}
         </State>
       </section>
-      <section className="adm-card adm-inbox-detail" aria-live="polite">
+      <section className={`adm-card adm-inbox-detail${selected ? "" : " is-empty"}`} id="adm-feedback-detail" aria-live="polite">
         {selected ? <Detail key={selected._id} row={selected} onSaved={() => { setSelected(null); reload(); }} /> : <div className="adm-state adm-state-tall"><Icon name="inbox" size={28} />Select a report to read and triage it.</div>}
       </section>
     </div>

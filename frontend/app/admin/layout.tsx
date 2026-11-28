@@ -30,6 +30,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [forgot, setForgot] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Close the phone/tablet menu after navigating and on Escape.
+  useEffect(() => setMenuOpen(false), [pathname]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
 
   async function check() {
     try {
@@ -114,9 +123,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   </main>;
 
   const active = (url: string) => url === '/admin' || url === '/admin/pose-tracker' ? pathname === url : pathname.startsWith(url);
-  return <div className="adm-root adm-shell">
+  const title = nav.flatMap(section => section.links).find(([, url]) => active(url))?.[0] ?? 'Admin';
+  return <div className={`adm-root adm-shell${menuOpen ? ' is-menu-open' : ''}`}>
     <a className="adm-skip" href="#adm-main">Skip to content</a>
-    <aside className="adm-sidebar">
+    <header className="adm-topbar">
+      <button type="button" className="adm-btn adm-btn-ghost adm-btn-icon" onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-expanded={menuOpen} aria-controls="adm-sidebar"><Icon name="menu" /></button>
+      <Link href="/admin" className="adm-logo" aria-label="PhysiqueQuest admin overview"><img src="/physiquequest-icon.png" alt="" width={30} height={30} /></Link>
+      <span className="adm-topbar-title">{title}</span>
+      <button type="button" className="adm-btn adm-btn-ghost adm-btn-icon" onClick={() => void signOut()} aria-label="Sign out"><Icon name="logout" /></button>
+    </header>
+    <button type="button" className="adm-scrim" aria-label="Close menu" tabIndex={menuOpen ? 0 : -1} onClick={() => setMenuOpen(false)} />
+    <aside className="adm-sidebar" id="adm-sidebar">
+      <button type="button" className="adm-btn adm-btn-ghost adm-btn-icon adm-sidebar-close" onClick={() => setMenuOpen(false)} aria-label="Close menu"><Icon name="close" /></button>
       <Link href="/admin" className="adm-logo"><img src="/physiquequest-icon.png" alt="" width={34} height={34} /><span>PhysiqueQuest<small>Admin console</small></span></Link>
       <nav aria-label="Admin sections">
         {nav.map(section => <div key={section.group} className="adm-nav-group">

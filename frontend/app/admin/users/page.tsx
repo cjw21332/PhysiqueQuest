@@ -30,11 +30,11 @@ export default function Users() {
           <div className="adm-table-wrap"><table className="adm-table">
             <thead><tr><th scope="col">Member</th><th scope="col">Status</th><th scope="col">Joined</th><th scope="col">Last sign-in</th><th scope="col"><span className="adm-sr">Profile</span></th></tr></thead>
             <tbody>{data.items.map(user => <tr key={user._id} className="is-clickable" onClick={() => setOpenId(user._id)}>
-              <td><span className="adm-person"><Avatar name={user.name} photo={photos[user._id]} /><span><strong>{user.name}</strong><small>{user.email}</small></span></span></td>
-              <td><span className={`adm-pill ${user.isActive ? 'is-good' : 'is-muted'}`}>{user.isActive ? 'Active' : 'Inactive'}</span></td>
-              <td>{formatDate(user.createdAt)}</td>
-              <td>{user.lastSignIn ? formatDate(user.lastSignIn) : <span className="adm-dim">Not recorded</span>}</td>
-              <td className="adm-cell-end"><button type="button" className="adm-btn adm-btn-ghost" onClick={event => { event.stopPropagation(); setOpenId(user._id); }}>View profile<Icon name="right" size={14} /></button></td>
+              <td className="adm-cell-main"><span className="adm-person"><Avatar name={user.name} photo={photos[user._id]} /><span><strong>{user.name}</strong><small>{user.email}</small></span></span></td>
+              <td data-label="Status"><span className={`adm-pill ${user.isActive ? 'is-good' : 'is-muted'}`}>{user.isActive ? 'Active' : 'Inactive'}</span></td>
+              <td data-label="Joined">{formatDate(user.createdAt)}</td>
+              <td data-label="Last sign-in">{user.lastSignIn ? formatDate(user.lastSignIn) : <span className="adm-dim">Not recorded</span>}</td>
+              <td className="adm-cell-end adm-cell-action"><button type="button" className="adm-btn adm-btn-ghost" onClick={event => { event.stopPropagation(); setOpenId(user._id); }}>View profile<Icon name="right" size={14} /></button></td>
             </tr>)}</tbody>
           </table></div>
           <Pagination page={data.page} pageSize={data.pageSize} total={data.total} onPage={setPage} />
